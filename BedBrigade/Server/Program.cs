@@ -7,11 +7,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+//Swagger
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    //Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
     app.UseWebAssemblyDebugging();
 }
 else

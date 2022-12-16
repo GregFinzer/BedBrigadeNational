@@ -18,5 +18,8 @@ On the command line run as administrator in the directory you want to clone it t
 git clone https://github.com/GregFinzer/BedBrigadeNational
 ```
 
-
+### 3. Run the Application
+* Open the Solution in Visual Studio 2022
+* Press the play button
+* Execute Swagger Locally:  http://localhost:5100/swagger/index.html
     
