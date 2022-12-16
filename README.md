@@ -2,6 +2,8 @@
 
 This is the code for the Bed Brigade National Website.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true)](https://ci.appveyor.com/project/GregFinzer/bedbrigadenational)
+
 Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
 * [Architecture](Documentation/Architecture.md)
