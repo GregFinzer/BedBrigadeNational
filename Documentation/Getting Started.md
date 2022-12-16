@@ -8,6 +8,7 @@
 * <a href="https://community.chocolatey.org/packages/drawio" target="_blank">Draw.io</a> for the diagrams
 * <a href="https://community.chocolatey.org/packages/visualstudio2022community">Visual Studio 2022</a> for development 
 * To run the project the <a href="https://community.chocolatey.org/packages/visualstudio2022-workload-netweb">ASP.NET Workload</a> is required. 
+* .NET 7 SDK:  https://dotnet.microsoft.com/
 * To run the NUnit tests, <a href="https://www.jetbrains.com/resharper/">Resharper</a> or <a href="https://marketplace.visualstudio.com/items?itemName=NUnitDevelopers.NUnit3TestAdapter">NUnit Test Adapter</a> is required
 
 ### 2.  Clone the repository
