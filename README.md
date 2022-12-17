@@ -2,6 +2,10 @@
 
 This is the code for the Bed Brigade National Website.
 
+<a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
+  <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">
+</a>
+
 Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
 * [Architecture](Documentation/Architecture.md)
