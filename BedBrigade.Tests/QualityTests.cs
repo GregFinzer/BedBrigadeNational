@@ -28,6 +28,10 @@ namespace BedBrigade.Tests
                 ReportViolations(result);
                 Assert.Fail("Failed Quality Check for BedBrigade.Client");
             }
+            else
+            {
+                Console.WriteLine("Passed Quality Check for BedBrigade.Client");
+            }
         }
 
         [Test]
@@ -41,6 +45,10 @@ namespace BedBrigade.Tests
                 ReportViolations(result);
                 Assert.Fail("Failed Quality Check for BedBrigade.Server");
             }
+            else
+            {
+                Console.WriteLine("Passed Quality Check for BedBrigade.Server");
+            }
         }
 
         [Test]
@@ -53,6 +61,10 @@ namespace BedBrigade.Tests
             {
                 ReportViolations(result);
                 Assert.Fail("Failed Quality Check for BedBrigade.Shared");
+            }
+            else
+            {
+                Console.WriteLine("Passed Quality Check for BedBrigade.Shared");
             }
         }
 
