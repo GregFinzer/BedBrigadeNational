@@ -13,7 +13,11 @@
 * Mobile first responsive design    
 * Minimum Viable Product Deliverables
 
-## Project Execution
+## Agile Execution
 * Story cards will be as small as possible
 * Story cards will be a vertical slice
+
+## Development Process
+* Create Feature Branches with the title of the story in camel case like feature/editHomePage
 * Seed default data for story cards
+* Create Unit Tests for business logic
