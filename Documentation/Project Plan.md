@@ -1,15 +1,19 @@
 # Project Plan
 
+One thing you will notice about the following project plan is the lack of due dates.  This is all volunteer work and so it is between our normal day job and family responsibilities.
+
+ :heavy_check_mark: Means Done
+ 
 * Project Setup (Sprint 0)
-    * Information Architecture Diagram
+    * Information Architecture Diagram :heavy_check_mark:
+    * Define Roles :heavy_check_mark:
+    * Git Repository :heavy_check_mark:
+    * Visual Studio Solution :heavy_check_mark:
+    * AppVeyor Build Pipeline :heavy_check_mark:
+    * Static Code Quality Analysis :heavy_check_mark:
+    * Project Plan :heavy_check_mark:
+    * Implementation Plan :heavy_check_mark:
     * Application Infrastructure Diagram
-    * Define Roles
-    * Git Repository
-    * Visual Studio Solution
-    * AppVeyor Build Pipeline
-    * Static Code Quality Analysis
-    * Project Plan
-    * Implementation Plan
     * Application Architecture Diagram
     * Entity Relationship Diagram
     * Admin Blazor Module
@@ -20,6 +24,7 @@
     
 * Home Page
     * Home Page Header
+    * Image Rotator
     * Home Page Middle
     * Home Page Footer
     
