@@ -349,3 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Documentation/Design/.$Information Architecture Diagram.drawio.bkp
+/Documentation/Design/.$Application Infrastructure Diagram.drawio.bkp
