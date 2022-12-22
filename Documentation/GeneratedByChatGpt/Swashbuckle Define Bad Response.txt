@@ -1,0 +1,41 @@
+To define a 400 (Bad Request) response code with a model using Swashbuckle in an ASP.NET Core application, you can follow these steps:
+
+Create a model class for the response payload of the 400 response. For example:
+Copy code
+public class BadRequestModel
+{
+    public string Error { get; set; }
+}
+In your Web API controller action, return a BadRequestObjectResult with the model as the value. For example:
+Copy code
+[HttpPost]
+public IActionResult Create(CreateUserModel model)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(new BadRequestModel
+        {
+            Error = "Invalid request payload."
+        });
+    }
+
+    // ...
+}
+In the Swagger specification for the action, use the [ProducesResponseType] attribute to specify the 400 response code and the model class as the response type. For example:
+Copy code
+[HttpPost]
+[ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BadRequestModel))]
+public IActionResult Create(CreateUserModel model)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(new BadRequestModel
+        {
+            Error = "Invalid request payload."
+        });
+    }
+
+    // ...
+}
+Run your ASP.NET Core application and navigate to the Swagger UI (usually at http://localhost:<port>/swagger). The 400 response code with the model class as the response type will be reflected in the Swagger specification for the action.
+I hope this helps! Let me know if you have any questions.

@@ -1,0 +1,18 @@
+To configure Serilog to archive log files on a daily basis and keep the last 7 days of log files, you will need to use a rolling file sink. A rolling file sink allows you to specify a rolling interval (e.g., daily, hourly, etc.) and a retention policy (e.g., keep the last 7 days of log files).
+
+Here is an example of how you can configure Serilog to use a rolling file sink to archive log files daily and keep the last 7 days of log files:
+
+Copy code
+using Serilog;
+using Serilog.Sinks.RollingFile;
+
+// Create a new logger that writes to a rolling file sink
+var log = new LoggerConfiguration()
+    .WriteTo.RollingFile("logs/log-{Date}.txt", retainedFileCountLimit: 7, rollOnFileSizeLimit: true)
+    .CreateLogger();
+
+// Log an event to the rolling file sink
+log.Information("Hello, rolling file sink!");
+In the example above, the rolling file sink will create a new log file each day with the name "log-YYYY-MM-DD.txt" (e.g., "log-2022-12-20.txt"). The sink will keep the last 7 log files and delete any older files. The rollOnFileSizeLimit parameter specifies that the sink should roll the log file when it reaches a certain size, rather than at a fixed time interval.
+
+You can also specify other options for the rolling file sink, such as the maximum log file size or the log file encoding. For more information, see the documentation for the RollingFile sink in the Serilog documentation.

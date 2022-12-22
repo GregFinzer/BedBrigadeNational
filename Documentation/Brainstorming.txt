@@ -1,0 +1,28 @@
+Page Names should be derived by Title.  Add a number at the end if the page name already exists.  Increment the number.
+
+Automatically Create Image Folders Base On the Page Name
+
+Each location can have images for shared pages such as Request Bed, Volunteer, Contact Us.
+
+Add an optional location note beside the bed for request bed.
+
+Add an optional location note header, footer, for Request Bed, Volunteer, Contact Us
+
+Image headers can be a single image or three images with rotator.
+
+Three Image Rotator
+	Title
+	Allow multiple image upload and show image names below
+	Preview below.
+	
+Story Wizard for Dean
+	Page Title
+	Upload Main Image for Thumbnail
+	Content of the Story
+	Upload other images with note.  
+	
+Come up with folder structure
+
+Come up with UI Components
+
+	

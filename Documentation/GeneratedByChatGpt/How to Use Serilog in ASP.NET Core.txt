@@ -1,0 +1,49 @@
+To use Serilog in ASP.NET Core to log request and response, you can follow these steps:
+
+Install the Serilog.AspNetCore NuGet package in your ASP.NET Core project.
+In the ConfigureServices method of your Startup class, add the following lines to configure Serilog:
+Copy code
+services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+In the Configure method of your Startup class, add the following lines to add a middleware that logs requests and responses using Serilog:
+Copy code
+app.UseSerilogRequestLogging();
+This will log the request and response data using the Serilog logger. You can customize the logged data by providing a delegate to the UseSerilogRequestLogging method. For example:
+
+Copy code
+app.UseSerilogRequestLogging(
+    options =>
+    {
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            diagnosticContext.Set("UserName", httpContext.User.Identity.Name);
+        };
+    });
+This will enrich the diagnostic context with the user name for each request.
+
+You can also customize the format of the logged data by providing a template to the UseSerilogRequestLogging method. For example:
+
+Copy code
+app.UseSerilogRequestLogging(
+    options =>
+    {
+        options.GetLevel = (httpContext, elapsed, ex) =>
+        {
+            if (ex != null)
+            {
+                return LogEventLevel.Error;
+            }
+
+            if (elapsed.TotalSeconds > 1)
+            {
+                return LogEventLevel.Warning;
+            }
+
+            return LogEventLevel.Information;
+        };
+
+        options.MessageTemplate =
+            "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    });
+This will log the request method, path, status code, and elapsed time for each request, using different log levels based on the elapsed time and the presence of an exception.
+
+Note that you need to configure Serilog to output the logged data to the desired destination, such as a file or a database. You can do this by using the WriteTo method in the Serilog configuration.

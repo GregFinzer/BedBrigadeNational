@@ -1,0 +1,28 @@
+In C# create an entity framework model for user with the max length attributes with properties consisting of UserId, Email, PasswordHash, FirstName, LastName, and Role
+
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace MyProject
+{
+    public class User
+    {
+        [Key]
+        public int UserId { get; set; }
+
+        [MaxLength(255)]
+        public string Email { get; set; }
+
+        [MaxLength(255)]
+        public string PasswordHash { get; set; }
+
+        [MaxLength(255)]
+        public string FirstName { get; set; }
+
+        [MaxLength(255)]
+        public string LastName { get; set; }
+
+        [MaxLength(255)]
+        public string Role { get; set; }
+    }
+}

@@ -1,0 +1,26 @@
+To define descriptions for fields in a model class using Swashbuckle in an ASP.NET Core application, you can follow these steps:
+
+Install the Swashbuckle.AspNetCore.Annotations NuGet package in your project.
+
+In your model class, use the [Description] attribute from the Swashbuckle.AspNetCore.Annotations namespace to specify the description for each field. For example:
+
+Copy code
+public class CreateUserModel
+{
+    [Required]
+    [StringLength(100)]
+    [Description("The name of the user.")]
+    public string Name { get; set; }
+
+    [Required]
+    [StringLength(200)]
+    [Description("The email address of the user.")]
+    public string Email { get; set; }
+}
+Run your ASP.NET Core application and navigate to the Swagger UI (usually at http://localhost:<port>/swagger). The descriptions for the fields in the model class will be reflected in the Swagger specification.
+I hope this helps! Let me know if you have any questions.
+
+
+
+
+Regenerate response
