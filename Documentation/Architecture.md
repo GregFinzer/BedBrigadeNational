@@ -17,3 +17,5 @@ BedBrigadeNational\Documentation\Design
 ## Application Architecture Diagram
 ![Application Architecture Diagram](Design/Application%20Architecture%20Diagram.png)
 
+## Entity Relationship Diagram
+![Entity Relationship Diagram](Design/EntityRelationshipDiagram.png)
