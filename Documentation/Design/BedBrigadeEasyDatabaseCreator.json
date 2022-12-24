@@ -2,7 +2,7 @@
   "Tables": [
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_BedRequests_LocationId",
@@ -10,28 +10,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_BedRequests_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_BedRequests_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -337,7 +315,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -350,22 +328,20 @@
         {
           "Selected": false,
           "TableNameString": "BedRequests",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
           "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -374,7 +350,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -387,23 +363,38 @@
         {
           "Selected": false,
           "TableNameString": "BedRequests",
-          "ColumnName": "UpdateUserId",
+          "ColumnName": "UpdateUser",
           "DatabaseType": 16,
           "DatabaseTypeString": "String",
           "Unique": false,
           "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
-          "Length": 2147483647,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
-          "IsLongText": true,
-          "IsIndexed": true
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "BedRequests",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -432,6 +423,181 @@
     {
       "Selected": false,
       "DependencyOrder": 0,
+      "Indexes": [],
+      "Ignore": false,
+      "MappingFromDatabase": true,
+      "Schema": "",
+      "TableName": "Configurations",
+      "Fields": [
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "ConfigurationId",
+          "DatabaseType": 11,
+          "DatabaseTypeString": "Int32",
+          "Unique": true,
+          "AllowDbNull": false,
+          "IsPrimaryKey": true,
+          "KeyType": 1,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "IsCompositeKey": false,
+          "IsMaintenanceField": false,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "ConfigurationKey",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": false,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 50,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": false,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "ConfigurationValue",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 255,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": false,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "CreateDate",
+          "DatabaseType": 6,
+          "DatabaseTypeString": "DateTime",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "UpdateDate",
+          "DatabaseType": 6,
+          "DatabaseTypeString": "DateTime",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Configurations",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        }
+      ],
+      "PrimaryKey": {
+        "Selected": false,
+        "TableNameString": "Configurations",
+        "ColumnName": "ConfigurationId",
+        "DatabaseType": 11,
+        "DatabaseTypeString": "Int32",
+        "Unique": true,
+        "AllowDbNull": false,
+        "IsPrimaryKey": true,
+        "KeyType": 1,
+        "IsReadOnly": false,
+        "ForeignKeyUpdateActionString": "",
+        "ForeignKeyDeleteActionString": "",
+        "IsCompositeKey": false,
+        "IsMaintenanceField": false,
+        "IsLongText": false,
+        "IsIndexed": false
+      },
+      "Singular": "Configuration",
+      "Plural": "Configurations",
+      "HasCompositeKeys": false,
+      "CompositeKeys": []
+    },
+    {
+      "Selected": false,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_ContactUs_LocationId",
@@ -439,28 +605,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_ContactUs_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_ContactUs_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -607,7 +751,7 @@
           "DatabaseType": 16,
           "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -638,22 +782,20 @@
         {
           "Selected": false,
           "TableNameString": "ContactUs",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -675,22 +817,38 @@
         {
           "Selected": false,
           "TableNameString": "ContactUs",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "ContactUs",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -718,7 +876,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Content_LocationId",
@@ -726,28 +884,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Content_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Content_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -944,7 +1080,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -957,22 +1093,20 @@
         {
           "Selected": false,
           "TableNameString": "Content",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -981,7 +1115,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -994,22 +1128,38 @@
         {
           "Selected": false,
           "TableNameString": "Content",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Content",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -1037,7 +1187,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Donations_LocationId",
@@ -1045,28 +1195,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Donations_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Donations_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -1158,7 +1286,7 @@
           "DatabaseType": 16,
           "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -1242,22 +1370,20 @@
         {
           "Selected": false,
           "TableNameString": "Donations",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -1279,22 +1405,20 @@
         {
           "Selected": false,
           "TableNameString": "Donations",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -1341,30 +1465,7 @@
     {
       "Selected": false,
       "DependencyOrder": 0,
-      "Indexes": [
-        {
-          "IndexName": "IX_Locations_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Locations_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        }
-      ],
+      "Indexes": [],
       "Ignore": false,
       "MappingFromDatabase": true,
       "Schema": "",
@@ -1568,22 +1669,20 @@
         {
           "Selected": false,
           "TableNameString": "Locations",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
           "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -1605,22 +1704,38 @@
         {
           "Selected": false,
           "TableNameString": "Locations",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
           "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Locations",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -1648,7 +1763,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Media_LocationId",
@@ -1656,28 +1771,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Media_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Media_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -1806,7 +1899,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -1819,22 +1912,20 @@
         {
           "Selected": false,
           "TableNameString": "Media",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -1843,7 +1934,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -1856,22 +1947,38 @@
         {
           "Selected": false,
           "TableNameString": "Media",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Media",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -1899,7 +2006,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Schedules_LocationId",
@@ -1907,28 +2014,6 @@
           "IndexColumns": [
             {
               "ColumnName": "LocationId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Schedules_CreateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "CreateUserId",
-              "IsAscending": true
-            }
-          ],
-          "IsColumnIndex": true
-        },
-        {
-          "IndexName": "IX_Schedules_UpdateUserId",
-          "IsUnique": false,
-          "IndexColumns": [
-            {
-              "ColumnName": "UpdateUserId",
               "IsAscending": true
             }
           ],
@@ -2020,7 +2105,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -2033,22 +2118,20 @@
         {
           "Selected": false,
           "TableNameString": "Schedules",
-          "ColumnName": "CreateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
         },
         {
           "Selected": false,
@@ -2057,7 +2140,7 @@
           "DatabaseType": 6,
           "DatabaseTypeString": "DateTime",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
@@ -2070,22 +2153,38 @@
         {
           "Selected": false,
           "TableNameString": "Schedules",
-          "ColumnName": "UpdateUserId",
-          "DatabaseType": 11,
-          "DatabaseTypeString": "Int32",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
           "Unique": false,
-          "AllowDbNull": false,
+          "AllowDbNull": true,
           "IsPrimaryKey": false,
           "IsReadOnly": false,
-          "ForeignKeyTableString": "Users",
-          "ForeignKeyUpdateAction": 0,
-          "ForeignKeyUpdateActionString": "NoAction",
-          "ForeignKeyDeleteAction": 0,
-          "ForeignKeyDeleteActionString": "NoAction",
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
-          "IsIndexed": true
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Schedules",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
         }
       ],
       "PrimaryKey": {
@@ -2113,7 +2212,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Users_LocationId",
@@ -2289,7 +2388,7 @@
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
           "ForeignKeyDeleteActionString": "",
-          "Length": 255,
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
@@ -2324,7 +2423,25 @@
           "IsReadOnly": false,
           "ForeignKeyUpdateActionString": "",
           "ForeignKeyDeleteActionString": "",
-          "Length": 255,
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Users",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
           "IsCompositeKey": false,
           "IsMaintenanceField": true,
           "IsLongText": false,
@@ -2356,7 +2473,7 @@
     },
     {
       "Selected": false,
-      "DependencyOrder": 0,
+      "DependencyOrder": 1,
       "Indexes": [
         {
           "IndexName": "IX_Volunteers_LocationId",
@@ -2621,6 +2738,94 @@
           "ForeignKeyDeleteActionString": "",
           "IsCompositeKey": false,
           "IsMaintenanceField": false,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Volunteers",
+          "ColumnName": "CreateDate",
+          "DatabaseType": 6,
+          "DatabaseTypeString": "DateTime",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Volunteers",
+          "ColumnName": "CreateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Volunteers",
+          "ColumnName": "UpdateDate",
+          "DatabaseType": 6,
+          "DatabaseTypeString": "DateTime",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Volunteers",
+          "ColumnName": "UpdateUser",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
+          "IsLongText": false,
+          "IsIndexed": false
+        },
+        {
+          "Selected": false,
+          "TableNameString": "Volunteers",
+          "ColumnName": "MachineName",
+          "DatabaseType": 16,
+          "DatabaseTypeString": "String",
+          "Unique": false,
+          "AllowDbNull": true,
+          "IsPrimaryKey": false,
+          "IsReadOnly": false,
+          "ForeignKeyUpdateActionString": "",
+          "ForeignKeyDeleteActionString": "",
+          "Length": 100,
+          "IsCompositeKey": false,
+          "IsMaintenanceField": true,
           "IsLongText": false,
           "IsIndexed": false
         }

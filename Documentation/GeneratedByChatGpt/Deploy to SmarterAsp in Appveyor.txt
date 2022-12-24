@@ -1,0 +1,56 @@
+To deploy a Blazor application to a SmarterASP.NET site using AppVeyor, you will need to follow these steps:
+
+Sign up for an AppVeyor account and create a new project.
+
+In the project settings, under the "Build" tab, specify the project type as a .NET Core project and set the solution file path to the path of your Blazor solution file.
+
+Under the "Deployment" tab, choose "FTP" as the deployment provider. Enter the FTP hostname, username, and password for your SmarterASP.NET site.
+
+Add a build script to your project's AppVeyor configuration file (appveyor.yml). This script should include instructions to build and publish your Blazor application. Here is an example build script that builds and publishes a Blazor application to a SmarterASP.NET site using FTP:
+
+Copy code
+build_script:
+- dotnet build
+- dotnet publish -c Release -o publish
+- ncftpput -R -v -u FTP_USERNAME -p FTP_PASSWORD FTP_HOSTNAME / publish/*
+Replace "FTP_USERNAME", "FTP_PASSWORD", and "FTP_HOSTNAME" with the appropriate values for your site.
+
+Push your code to your version control repository (e.g., Git). AppVeyor will automatically detect the push and trigger a build and deployment according to the instructions in your configuration file.
+
+Monitor the build and deployment process in the AppVeyor dashboard to see the status and any potential errors.
+
+============================
+
+To set up a deployment in AppVeyor for just the "develop" branch, you can use the following configuration in your project's appveyor.yml file:
+
+Copy code
+deploy:
+  - provider: [DEPLOYMENT_PROVIDER]
+    on:
+      branch: develop
+Replace "[DEPLOYMENT_PROVIDER]" with the name of the deployment provider you are using (e.g., Azure, AWS, FTP, etc.).
+
+This configuration will tell AppVeyor to deploy your application whenever a commit is pushed to the "develop" branch. If you want to deploy on other branches as well, you can specify multiple branch names in the "branch" field (e.g., "branch: develop, master").
+
+You can also specify other conditions for triggering a deployment, such as the presence of certain tags or a successful build. For more information, see the AppVeyor documentation on deployment configuration.
+
+======================================
+
+To set up a deployment in AppVeyor for a Blazor application to a SmarterASP.NET site for just the "develop" branch, you can use the following configuration in your project's appveyor.yml file:
+
+Copy code
+deploy:
+  - provider: FTP
+    on:
+      branch: develop
+    FTP_HOST: [FTP_HOSTNAME]
+    FTP_USERNAME: [FTP_USERNAME]
+    FTP_PASSWORD: [FTP_PASSWORD]
+    artifact: publish/*
+Replace "[FTP_HOSTNAME]", "[FTP_USERNAME]", and "[FTP_PASSWORD]" with the appropriate values for your SmarterASP.NET site. The "publish/*" artifact specifies the files and directories that should be deployed to the site.
+
+This configuration will tell AppVeyor to deploy your application to the SmarterASP.NET site using FTP whenever a commit is pushed to the "develop" branch. If you want to deploy on other branches as well, you can specify multiple branch names in the "branch" field (e.g., "branch: develop, master").
+
+You can also specify other conditions for triggering a deployment, such as the presence of certain tags or a successful build. For more information, see the AppVeyor documentation on deployment configuration.
+
+I hope this helps! Let me know if you have any questions or need further assistance.
