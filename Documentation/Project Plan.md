@@ -13,10 +13,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Static Code Quality Analysis :heavy_check_mark:
     * Project Plan :heavy_check_mark:
     * Implementation Plan :heavy_check_mark:
-    * Application Infrastructure Diagram
-    * Application Architecture Diagram
-    * Entity Relationship Diagram
-    * Admin Blazor Module
+    * Application Infrastructure Diagram :heavy_check_mark:
+    * Application Architecture Diagram :heavy_check_mark:
+    * Entity Relationship Diagram :heavy_check_mark:
+    * Admin Blazor Module :heavy_check_mark:
     * Entity Framework
     * Entity Framework Models
     * Serilog Console, File and Database Logging
