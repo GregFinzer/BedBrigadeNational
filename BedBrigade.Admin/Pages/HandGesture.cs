@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace GrantImaharaRobotControls
+namespace BedBrigade.Admin.Pages
 {
     public static class HandGesture
     {
