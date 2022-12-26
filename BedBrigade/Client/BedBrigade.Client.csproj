@@ -12,7 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BedBrigade.Admin\BedBrigade.Admin.csproj" />
     <ProjectReference Include="..\Shared\BedBrigade.Shared.csproj" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="BedBrigade.Admin.dll" />
+  </ItemGroup>
 </Project>

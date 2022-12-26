@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Client", "BedBri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Shared", "BedBrigade\Shared\BedBrigade.Shared.csproj", "{EE5EB24F-42E3-41F3-AF33-4B33405DCB2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.Tests", "BedBrigade.Tests\BedBrigade.Tests.csproj", "{9E23181C-6E45-40B2-AE96-26D4F289CE79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Tests", "BedBrigade.Tests\BedBrigade.Tests.csproj", "{9E23181C-6E45-40B2-AE96-26D4F289CE79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.Admin", "BedBrigade.Admin\BedBrigade.Admin.csproj", "{C70F1976-365F-4DC3-B547-4F106AF0A83C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9E23181C-6E45-40B2-AE96-26D4F289CE79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E23181C-6E45-40B2-AE96-26D4F289CE79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E23181C-6E45-40B2-AE96-26D4F289CE79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C70F1976-365F-4DC3-B547-4F106AF0A83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C70F1976-365F-4DC3-B547-4F106AF0A83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C70F1976-365F-4DC3-B547-4F106AF0A83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C70F1976-365F-4DC3-B547-4F106AF0A83C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
