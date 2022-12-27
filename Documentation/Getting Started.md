@@ -21,5 +21,5 @@ git clone https://github.com/GregFinzer/BedBrigadeNational
 ### 3. Run the Application
 * Open the Solution in Visual Studio 2022
 * Press the play button
-* Execute Swagger Locally:  http://localhost:5100/swagger/index.html
+* Execute Swagger Locally:  http://localhost:5125/swagger/index.html
     

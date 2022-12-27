@@ -15,11 +15,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //Swagger
+    app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.UseWebAssemblyDebugging();
 }
 else
 {
