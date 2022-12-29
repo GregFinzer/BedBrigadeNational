@@ -17,9 +17,12 @@ One thing you will notice about the following project plan is the lack of due da
     * Application Architecture Diagram :heavy_check_mark:
     * Entity Relationship Diagram :heavy_check_mark:
     * Admin Blazor Module :heavy_check_mark:
-    * Entity Framework
+    * Entity Framework :heavy_check_mark:
+    * Estimates :heavy_check_mark:
     * Entity Framework Models
     * Serilog Console, File and Database Logging
+    * Code Quality Check Razor Pages
+    * Code Quality Check Async Methods
     * Setup Deployment
     
 * Home Page
