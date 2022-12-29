@@ -1,6 +1,12 @@
 # The Bed Brigade National Website
 
-This is the code for the Bed Brigade National Website.
+In 2023 we are developing a national website for The Bed Brigade.  Bed Brigade of Grove City, Ohio is a 501 3c registered charity.  Bed Brigade builds and delivers Twin XL beds to people in need.  80% of the beds delivered serve children that do not have a bed.  Several chapters of Bed Brigade opened up throughout Ohio in 2022.  There is a need  for a national website for all Bed Brigade Chapters to use. 
+
+This is the current website that runs in Orchard Core:
+https://www.bedbrigadecolumbus.org/
+
+The national web site will be built in Blazor Web Assembly for the front end and a .NET Core API for the back end.  .NET Core 7 will be used.
+
 
 <a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
   <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">
