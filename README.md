@@ -1,7 +1,8 @@
 # The Bed Brigade National Website
 
 In 2023 we are developing a national website for The Bed Brigade.  Bed Brigade of Grove City, Ohio is a 501 3c registered charity.  Bed Brigade builds and delivers Twin XL beds to people in need.  80% of the beds delivered serve children that do not have a bed.  Several chapters of Bed Brigade opened up throughout Ohio in 2022.  There is a need  for a national website for all Bed Brigade Chapters to use. 
-
+See the this page for more information about Bed Brigade: https://www.bedbrigadecolumbus.org/about-us
+ 
 This is the current website that runs in Orchard Core:
 https://www.bedbrigadecolumbus.org/
 
