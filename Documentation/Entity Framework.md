@@ -17,4 +17,10 @@ dotnet tool install --global dotnet-ef
     ```dos
     dotnet ef database update
      ```
+     
+## Removing the last migration
+```dos
+dotnet ef migrations remove
+```
+
 

@@ -19,7 +19,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Admin Blazor Module :heavy_check_mark:
     * Entity Framework :heavy_check_mark:
     * Estimates :heavy_check_mark:
-    * Entity Framework Models
+    * Entity Framework Models :heavy_check_mark:
     * Serilog Console, File and Database Logging
     * Code Quality Check Razor Pages
     * Code Quality Check Async Methods
