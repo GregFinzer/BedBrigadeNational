@@ -16,7 +16,7 @@ namespace BedBrigade.Tests
             _qualityLogic = new QualityLogic(TestHelper.KellermanUserName, TestHelper.KellermanLicenseKey);
             _solutionPath = TestHelper.GetSolutionPath();
         }
-        
+
         [Test]
         public void QualityCheckBedBrigadeAdmin()
         {
@@ -54,6 +54,8 @@ namespace BedBrigade.Tests
         [Test]
         public void QualityCheckBedBrigadeServer()
         {
+            _qualityLogic.Config.DirectoriesToExclude.Add("Migrations");
+            
             string projectPath = Path.Combine(_solutionPath, "BedBrigade", "Server");
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 

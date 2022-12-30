@@ -17,7 +17,8 @@ namespace BedBrigade.Shared
 		public String Email { get; set; }
 
 		[Required]
-		public Decimal Amount { get; set; }
+        [Column(TypeName = "decimal(18,4)")]
+        public Decimal Amount { get; set; }
 
 		[MaxLength(255)]
 		public String? TransactionId { get; set; }

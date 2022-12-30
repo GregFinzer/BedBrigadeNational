@@ -33,9 +33,11 @@ namespace BedBrigade.Shared
 		[MaxLength(10)]
 		public String PostalCode { get; set; }
 
-		public Decimal? Latitude { get; set; }
+        [Column(TypeName = "decimal(18,10)")]
+        public Decimal? Latitude { get; set; }
 
-		public Decimal? Longitude { get; set; }
+        [Column(TypeName = "decimal(18,10)")]
+        public Decimal? Longitude { get; set; }
 
 
 		public ICollection<BedRequest> BedRequests { get; set; }
