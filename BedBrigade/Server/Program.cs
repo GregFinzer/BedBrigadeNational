@@ -1,8 +1,25 @@
 using BedBrigade.Server.Data;
+using BedBrigade.Shared;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//Read logging configuration from appsettings.json
+//Log.Logger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .CreateLogger();
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File(@"..\logs\Log_.txt", shared: true, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+    .CreateLogger();
+
+Log.Logger.Information("Starting Up");
 
 // Add services to the container.
 
@@ -44,6 +61,13 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+
+//Configure logging
+//var seriLogger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .Enrich.FromLogContext()
+//    .CreateLogger();
+//builder.Logging.AddSerilog(seriLogger);
 
 //Create database if it does not exist
 using var scope = app.Services.CreateScope();
