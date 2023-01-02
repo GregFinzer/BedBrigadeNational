@@ -20,9 +20,9 @@ One thing you will notice about the following project plan is the lack of due da
     * Entity Framework :heavy_check_mark:
     * Estimates :heavy_check_mark:
     * Entity Framework Models :heavy_check_mark:
-    * Serilog Console, File and Database Logging
+    * Serilog Console, File Logging :heavy_check_mark:
+    * Code Quality Check Async Methods :heavy_check_mark:
     * Code Quality Check Razor Pages
-    * Code Quality Check Async Methods
     * Setup Deployment
     
 * Home Page
