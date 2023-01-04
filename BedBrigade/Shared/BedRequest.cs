@@ -48,7 +48,7 @@ namespace BedBrigade.Shared
 		public String AgesGender { get; set; }
 
 		[MaxLength(4000)]
-		public String? SpecialInstructions { get; set; }
+		public String SpecialInstructions { get; set; }
 
 		[Required]
 		[MaxLength(30)]
@@ -59,7 +59,7 @@ namespace BedBrigade.Shared
 		public DateTime? DeliveryDate { get; set; }
 
 		[MaxLength(255)]
-		public String? Notes { get; set; }
+		public String Notes { get; set; }
 
 
 

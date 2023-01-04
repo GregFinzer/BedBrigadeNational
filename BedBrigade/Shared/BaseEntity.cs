@@ -12,15 +12,15 @@ namespace BedBrigade.Shared
         public DateTime? CreateDate { get; set; }
 
         [MaxLength(100)]
-        public String? CreateUser { get; set; }
+        public String CreateUser { get; set; }
 
         public DateTime? UpdateDate { get; set; }
 
         [MaxLength(100)]
-        public String? UpdateUser { get; set; }
+        public String UpdateUser { get; set; }
 
         [MaxLength(100)]
-        public String? MachineName { get; set; }
+        public String MachineName { get; set; }
 
         public void SetCreateUser(String userName)
         {

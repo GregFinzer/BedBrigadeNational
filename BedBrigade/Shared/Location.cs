@@ -18,16 +18,16 @@ namespace BedBrigade.Shared
 		public String Route { get; set; }
 
 		[MaxLength(30)]
-		public String? Address1 { get; set; }
+		public String Address1 { get; set; }
 
 		[MaxLength(30)]
-		public String? Address2 { get; set; }
+		public String Address2 { get; set; }
 
 		[MaxLength(20)]
-		public String? City { get; set; }
+		public String City { get; set; }
 
 		[MaxLength(30)]
-		public String? State { get; set; }
+		public String State { get; set; }
 
 		[Required]
 		[MaxLength(10)]

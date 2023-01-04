@@ -29,7 +29,7 @@ namespace BedBrigade.Shared
 		public String PasswordHash { get; set; }
 
 		[MaxLength(14)]
-		public String? Phone { get; set; }
+		public String Phone { get; set; }
 
 		public String Role { get; set; }
         

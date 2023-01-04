@@ -12,16 +12,16 @@ namespace BedBrigade.Shared
 		public Location Location { get; set; }
 
 		[MaxLength(255)]
-		public String? Path { get; set; }
+		public String Path { get; set; }
 
 		[MaxLength(30)]
-		public String? Name { get; set; }
+		public String Name { get; set; }
 
 		[MaxLength(30)]
-		public String? MediaType { get; set; }
+		public String MediaType { get; set; }
 
 		[MaxLength(255)]
-		public String? AltText { get; set; }
+		public String AltText { get; set; }
 
 
 	}

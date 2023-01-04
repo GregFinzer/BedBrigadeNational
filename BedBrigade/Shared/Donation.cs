@@ -21,13 +21,13 @@ namespace BedBrigade.Shared
         public Decimal Amount { get; set; }
 
 		[MaxLength(255)]
-		public String? TransactionId { get; set; }
+		public String TransactionId { get; set; }
 
 		[MaxLength(20)]
-		public String? FirstName { get; set; }
+		public String FirstName { get; set; }
 
 		[MaxLength(25)]
-		public String? LastName { get; set; }
+		public String LastName { get; set; }
 
 		[Required]
 		public Boolean TaxFormSent { get; set; }

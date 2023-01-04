@@ -23,15 +23,15 @@ namespace BedBrigade.Shared
 		[MaxLength(30)]
 		public String Name { get; set; }
 
-		public String? ContentHtml { get; set; }
+		public String ContentHtml { get; set; }
 
-		public Int32? MainMediaId { get; set; }
+		public Int32 MainMediaId { get; set; }
 
-		public Int32? LeftMediaId { get; set; }
+		public Int32 LeftMediaId { get; set; }
 
-		public Int32? MiddleMediaId { get; set; }
+		public Int32 MiddleMediaId { get; set; }
 
-		public Int32? RightMediaId { get; set; }
+		public Int32 RightMediaId { get; set; }
 
 
 	}

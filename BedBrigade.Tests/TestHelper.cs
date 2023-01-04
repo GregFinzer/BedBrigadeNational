@@ -1,6 +1,4 @@
-﻿
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace BedBrigade.Tests
 {
@@ -35,8 +33,10 @@ namespace BedBrigade.Tests
         public static string GetSolutionPath()
         {
             string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+            int count = 0;
+            const int maxDepth = 1000;
 
-            while (true)
+            while (count < maxDepth)
             {
                 string[] files = Directory.GetFiles(currentPath, "*.sln");
 
@@ -49,12 +49,13 @@ namespace BedBrigade.Tests
 
                 //We are at the root we did not find anything
                 if (parentPath == null || parentPath == currentPath)
-                    throw new Exception("Could not find solution path");
+                    throw new Exception("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
 
                 currentPath = parentPath;
+                count++;
             }
 
-            return currentPath;
+            throw new Exception("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
         }
 
         /// <summary>
