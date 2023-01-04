@@ -38,10 +38,10 @@ namespace BedBrigade.Shared
 		public String Phone { get; set; }
 
 		[MaxLength(80)]
-		public String? OrganizationOrGroup { get; set; }
+		public String OrganizationOrGroup { get; set; }
 
 		[MaxLength(4000)]
-		public String? Message { get; set; }
+		public String Message { get; set; }
 
 		[Required]
 		public Boolean IHaveAMinivan { get; set; }
