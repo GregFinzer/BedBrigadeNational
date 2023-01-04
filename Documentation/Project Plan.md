@@ -22,7 +22,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Entity Framework Models :heavy_check_mark:
     * Serilog Console, File Logging :heavy_check_mark:
     * Code Quality Check Async Methods :heavy_check_mark:
-    * Code Quality Check Razor Pages
+    * Code Quality Check Razor Pages :heavy_check_mark:
+    * Create Theme Using Syncfusion Theme Studio for Blazor
     * Setup Deployment
     
 * Home Page
