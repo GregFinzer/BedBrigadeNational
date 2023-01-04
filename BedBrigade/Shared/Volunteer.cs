@@ -9,11 +9,11 @@ namespace BedBrigade.Shared
 		[Key]
 		public Int32 VolunteerId { get; set; }
 
-		public Location Location { get; set; }
+		public Location Location { get; set; } = new Location();
 
-		[Required]
-		[MaxLength(30)]
-		public String VolunteeringFor { get; set; }
+        [Required] 
+        [MaxLength(30)] 
+        public String VolunteeringFor { get; set; } = string.Empty;
 
 		[Required]
 		public DateTime VolunteeringForDate { get; set; }
@@ -23,27 +23,27 @@ namespace BedBrigade.Shared
 
 		[Required]
 		[MaxLength(20)]
-		public String FirstName { get; set; }
+		public String FirstName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(25)]
-		public String LastName { get; set; }
+		public String LastName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(255)]
-		public String Email { get; set; }
+		public String Email { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(14)]
-		public String Phone { get; set; }
+		public String Phone { get; set; } = string.Empty;
 
-		[MaxLength(80)]
-		public String OrganizationOrGroup { get; set; }
+        [MaxLength(80)]
+		public String? OrganizationOrGroup { get; set; } = string.Empty;
 
-		[MaxLength(4000)]
-		public String Message { get; set; }
+        [MaxLength(4000)]
+		public String? Message { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		public Boolean IHaveAMinivan { get; set; }
 
 		[Required]

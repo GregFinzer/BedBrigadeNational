@@ -9,31 +9,31 @@ namespace BedBrigade.Shared
 		[Key]
 		public Int32 ContactUsId { get; set; }
 
-		public Location Location { get; set; }
+		public Location Location { get; set; } = new Location();
 
 		[Required]
 		[MaxLength(20)]
-		public String FirstName { get; set; }
+		public String FirstName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(25)]
-		public String LastName { get; set; }
+		public String LastName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(255)]
-		public String Email { get; set; }
+		public String Email { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(14)]
-		public String Phone { get; set; }
+		public String Phone { get; set; } = string.Empty;
 
 		[Required]
 		[MaxLength(4000)]
-		public String Message { get; set; }
+		public String? Message { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(30)]
-		public String Status { get; set; }
+		public String Status { get; set; } = string.Empty;
 
 
 	}

@@ -7,10 +7,10 @@ namespace BedBrigade.Shared
 	public class Configuration : BaseEntity
     {
         [Key, MaxLength(50), Required]
-		public String ConfigurationKey { get; set; }
+		public String ConfigurationKey { get; set; } = string.Empty;
 
-        [MaxLength(255)]
-		public String ConfigurationValue { get; set; }
+        [MaxLength(255)] 
+        public String? ConfigurationValue { get; set; } = string.Empty;
 
 
 	}

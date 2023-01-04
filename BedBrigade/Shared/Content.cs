@@ -9,23 +9,23 @@ namespace BedBrigade.Shared
 		[Key]
 		public Int32 ContentId { get; set; }
 
-		public Location Location { get; set; }
+		public Location Location { get; set; } = new Location();
+
+        [Required]
+		[MaxLength(30)]
+		public String ContentType { get; set; } = string.Empty;
 
 		[Required]
 		[MaxLength(30)]
-		public String ContentType { get; set; }
+		public String Title { get; set; } = string.Empty;
 
 		[Required]
 		[MaxLength(30)]
-		public String Title { get; set; }
+		public String Name { get; set; } = string.Empty;
 
-		[Required]
-		[MaxLength(30)]
-		public String Name { get; set; }
+		public String? ContentHtml { get; set; } = string.Empty;
 
-		public String ContentHtml { get; set; }
-
-		public Int32 MainMediaId { get; set; }
+        public Int32 MainMediaId { get; set; }
 
 		public Int32 LeftMediaId { get; set; }
 

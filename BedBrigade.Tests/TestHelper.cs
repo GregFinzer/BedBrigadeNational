@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace BedBrigade.Tests
 {
@@ -10,7 +11,7 @@ namespace BedBrigade.Tests
         {
             get
             {
-                string account = Environment.GetEnvironmentVariable("APPVEYOR_ACCOUNT_NAME");
+                string? account = Environment.GetEnvironmentVariable("APPVEYOR_ACCOUNT_NAME");
 
                 return !string.IsNullOrEmpty(account);
             }
@@ -20,7 +21,7 @@ namespace BedBrigade.Tests
         {
             get
             {
-                string licenseKey = Environment.GetEnvironmentVariable("GOLD");
+                string? licenseKey = Environment.GetEnvironmentVariable("GOLD");
                 if (string.IsNullOrEmpty(licenseKey))
                 {
                     throw new Exception("GOLD environment variable not set");
@@ -45,7 +46,7 @@ namespace BedBrigade.Tests
                     return currentPath;
                 }
 
-                string parentPath = Path.GetDirectoryName(currentPath);
+                string? parentPath = Path.GetDirectoryName(currentPath);
 
                 //We are at the root we did not find anything
                 if (parentPath == null || parentPath == currentPath)

@@ -6,33 +6,33 @@ namespace BedBrigade.Shared
 	[Table("Users")]
 	public class User : BaseEntity
     {
-		[Key, MaxLength(50), Required]
-		public String UserName { get; set; }
+        [Key, MaxLength(50), Required] 
+        public String UserName { get; set; } = string.Empty;
 
-		[Required]
-		public Location Location { get; set; }
+        [Required] 
+        public Location Location { get; set; } = new Location();
 
-		[Required]
-		[MaxLength(20)]
-		public String FirstName { get; set; }
+        [Required] 
+        [MaxLength(20)] 
+        public String FirstName { get; set; } = string.Empty;
 
 		[Required]
 		[MaxLength(25)]
-		public String LastName { get; set; }
+		public String LastName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(255)]
-		public String Email { get; set; }
+		public String Email { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[MaxLength(255)]
-		public String PasswordHash { get; set; }
+		public String PasswordHash { get; set; } = string.Empty;
 
 		[MaxLength(14)]
-		public String Phone { get; set; }
+		public String? Phone { get; set; } = string.Empty;
 
-		public String Role { get; set; }
-        
+        public String? Role { get; set; } = string.Empty;
 
-	}
+
+    }
 }

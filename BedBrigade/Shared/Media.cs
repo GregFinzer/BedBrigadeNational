@@ -9,19 +9,19 @@ namespace BedBrigade.Shared
 		[Key]
 		public Int32 MediaId { get; set; }
 
-		public Location Location { get; set; }
+		public Location Location { get; set; } = new Location();
 
-		[MaxLength(255)]
-		public String Path { get; set; }
+        [MaxLength(255)] 
+        public String? Path { get; set; } = string.Empty;
+
+		[MaxLength(30)] 
+        public String? Name { get; set; } = string.Empty;
 
 		[MaxLength(30)]
-		public String Name { get; set; }
-
-		[MaxLength(30)]
-		public String MediaType { get; set; }
+        public String? MediaType { get; set; } = string.Empty;
 
 		[MaxLength(255)]
-		public String AltText { get; set; }
+		public String? AltText { get; set; } = string.Empty;
 
 
 	}

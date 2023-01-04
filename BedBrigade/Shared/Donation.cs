@@ -10,26 +10,26 @@ namespace BedBrigade.Shared
 		[Key]
 		public Int32 DonationId { get; set; }
 
-		public Location Location { get; set; }
+		public Location Location { get; set; } = new Location();
 
-		[Required]
+        [Required]
 		[MaxLength(255)]
-		public String Email { get; set; }
+		public String Email { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
         [Column(TypeName = "decimal(18,4)")]
         public Decimal Amount { get; set; }
 
 		[MaxLength(255)]
-		public String TransactionId { get; set; }
+		public String? TransactionId { get; set; } = string.Empty;
 
 		[MaxLength(20)]
-		public String FirstName { get; set; }
+		public String? FirstName { get; set; } = string.Empty;
 
-		[MaxLength(25)]
-		public String LastName { get; set; }
+        [MaxLength(25)]
+		public String? LastName { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		public Boolean TaxFormSent { get; set; }
 
 
