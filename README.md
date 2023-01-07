@@ -8,6 +8,10 @@ https://www.bedbrigadecolumbus.org/
 
 The national web site will be built in Blazor Web Assembly for the front end and a .NET Core API for the back end.  .NET Core 7 will be used.
 
+Overall Direction
+* The bed brigade national website will follow the Goodwill model where users will search a bed brigade near me
+* Each location of bed brigade will manage their home page, bed requests, volunteers, stories, and assembly instructions
+
 
 <a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
   <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">
