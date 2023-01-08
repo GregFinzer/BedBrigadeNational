@@ -1,5 +1,7 @@
 # The Bed Brigade National Website
 
+We are looking :mag_right: for volunteer developers to help with this effort.  Please email  <a href="mailto:gfinzer@hotmail.com">Greg Finzer</a> if interested.
+
 In 2023 we are developing a national website for The Bed Brigade.  Bed Brigade of Grove City, Ohio is a 501 3c registered charity.  Bed Brigade builds and delivers Twin XL beds to people in need.  80% of the beds delivered serve children that do not have a bed.  Several chapters of Bed Brigade opened up throughout Ohio in 2022.  There is a need  for a national website for all Bed Brigade Chapters to use. 
 See the this page for more information about Bed Brigade: https://www.bedbrigadecolumbus.org/about-us
  
@@ -14,9 +16,10 @@ The national web site will be built in Blazor Web Assembly for the front end and
 * The styling of the header and footer will be minimal so that each Bed Brigade location can have their own colors.
 
 **Business Pain**
-* Currently the only Bed Brigade location that has a website is Grove City.  All other locations are using either Facebook or an email address and phone number.  This is not optimal as everything is a manual process for handling volunteers, Bed Requests, scheduling, donations and contacts.  
+* Currently the only Bed Brigade location that has a website is Grove City.  All other locations are using either Facebook or an email address and phone number.  This is not optimal as everything is a manual process for handling volunteers, Bed Requests, scheduling, donations and contacts. 
+* The current Orchard Core CMS is too complicated to use.
 * The current volunteer page is sub optimal as it allows people to volunteer on days where there is no cut, build, or delivery happening.
-* There is no scheduling system which results in a out of delivery schedule.
+* There is no scheduling system which results in a out order of delivery schedule.
 * No tax forms are sent for donations.
 * There is currently no bulk email for: emailing all volunteers, emailing just delivery vehicle volunteers, emailing volunteer reminders, emailing bed request contacts, emailing delivery teams, performing followup, and performing announcements.
 
