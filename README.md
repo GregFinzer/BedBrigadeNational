@@ -8,10 +8,17 @@ https://www.bedbrigadecolumbus.org/
 
 The national web site will be built in Blazor Web Assembly for the front end and a .NET Core API for the back end.  .NET Core 7 will be used.
 
-Overall Direction
-* The bed brigade national website will follow the Goodwill model where users will search a bed brigade near me
-* Each location of bed brigade will manage their home page, bed requests, volunteers, stories, and assembly instructions
+**Overall Direction**
+* The Bed Brigade national website will follow the Goodwill model where users will search a bed brigade near me by entering in a zip code
+* Each location of Bed Brigade will manage their home page, bed requests, volunteers, stories, and assembly instructions
+* The styling of the header and footer will be minimal so that each Bed Brigade location can have their own colors.
 
+**Business Pain**
+* Currently the only Bed Brigade location that has a website is Grove City.  All other locations are using either Facebook or an email address and phone number.  This is not optimal as everything is a manual process for handling volunteers, Bed Requests, scheduling, donations and contacts.  
+* The current volunteer page is sub optimal as it allows people to volunteer on days where there is no cut, build, or delivery happening.
+* There is no scheduling system which results in a out of delivery schedule.
+* No tax forms are sent for donations.
+* There is currently no bulk email for: emailing all volunteers, emailing just delivery vehicle volunteers, emailing volunteer reminders, emailing bed request contacts, emailing delivery teams, performing followup, and performing announcements.
 
 <a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
   <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">

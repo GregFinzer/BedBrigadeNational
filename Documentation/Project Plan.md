@@ -120,6 +120,9 @@ One thing you will notice about the following project plan is the lack of due da
     * Edit Story
     * Delete Story
 
+* Added Scope
+    * Email Bed Brigade Location Prayer Requests to all volunteers and national officers.
+    
 * Search
     * Search Indexing
     * Search Bar
