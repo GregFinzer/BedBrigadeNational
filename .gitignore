@@ -353,3 +353,4 @@ MigrationBackup/
 /Documentation/Design/*.bkp
 /Documentation/Design/.$Application Architecture Diagram.drawio.dtmp
 /BedBrigade/Server/appsettings.json
+/BedBrigade/Server/appsettings.Production.json
