@@ -93,28 +93,29 @@ namespace BedBrigade.Server
 
         public static async Task SetupDatabase(WebApplication app)
         {
-            if (app.Environment.IsDevelopment())
-            {
-                Log.Logger.Information("Setup Database");
 
-                //Create database if it does not exist
-                using var scope = app.Services.CreateScope();
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<DataContext>();
-                    await context.Database.MigrateAsync();
-                    await Seed.SeedData(context);
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Error(ex, "An error occurred during migration");
-                }
-            }
-            else
+            Log.Logger.Information("Setup Database");
+
+            //Create database if it does not exist
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            try
             {
-                Log.Logger.Information("Skip Setup Database");
+                var context = services.GetRequiredService<DataContext>();
+                if (app.Environment.IsDevelopment())
+                {
+                    Log.Logger.Information("Performing Migration");
+                    await context.Database.MigrateAsync();
+                }
+
+                Log.Logger.Information("Seeding Data");
+                await Seed.SeedData(context);
             }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "An error occurred during migration");
+            }
+
         }
 
     }
