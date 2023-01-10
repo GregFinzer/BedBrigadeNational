@@ -53,6 +53,8 @@ namespace BedBrigade.Server
             }
             else
             {
+                app.UseSwagger();
+                app.UseSwaggerUI();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -60,34 +62,58 @@ namespace BedBrigade.Server
 
             app.UseHttpsRedirection();
 
-            app.UseBlazorFrameworkFiles();
-            app.UseStaticFiles();
+            //Explicitly only use blazor when the path doesn't start with api
+            app.MapWhen(ctx => !ctx.Request.Path.StartsWithSegments("/api"), blazor =>
+            {
+                blazor.UseBlazorFrameworkFiles();
+                blazor.UseStaticFiles();
 
-            app.UseRouting();
+                blazor.UseRouting();
+                blazor.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapFallbackToFile("index.html");
+                });
+            });
 
+            //Explicitly map api endpoints only when path starts with api
+            app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"), api =>
+            {
+                //if you are not using a blazor app, you can move these files out of this closure
+                api.UseStaticFiles();
+                api.UseRouting();
+                api.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+            });
 
-            app.MapRazorPages();
-            app.MapControllers();
-            app.MapFallbackToFile("index.html");
             return app;
         }
 
+
         public static async Task SetupDatabase(WebApplication app)
         {
-            Log.Logger.Information("Setup Database");
+            if (app.Environment.IsDevelopment())
+            {
+                Log.Logger.Information("Setup Database");
 
-            //Create database if it does not exist
-            using var scope = app.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            try
-            {
-                var context = services.GetRequiredService<DataContext>();
-                await context.Database.MigrateAsync();
-                await Seed.SeedData(context);
+                //Create database if it does not exist
+                using var scope = app.Services.CreateScope();
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<DataContext>();
+                    await context.Database.MigrateAsync();
+                    await Seed.SeedData(context);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error(ex, "An error occurred during migration");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Log.Logger.Error(ex, "An error occurred during migration");
+                Log.Logger.Information("Skip Setup Database");
             }
         }
 
