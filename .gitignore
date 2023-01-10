@@ -352,3 +352,4 @@ MigrationBackup/
 /Documentation/Design/.$Application Infrastructure Diagram.drawio.bkp
 /Documentation/Design/*.bkp
 /Documentation/Design/.$Application Architecture Diagram.drawio.dtmp
+/BedBrigade/Server/appsettings.json
