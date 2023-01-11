@@ -5,7 +5,49 @@
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars ms-1"></i></button>
 
             <div class="collapse navbar-collapse" id="navbarResponsive">
-                <menu alias="alias:main-menu" cache-id="main-menu" cache-fixed-duration="00:05:00" cache-tag="alias:main-menu" />
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/request-bed">Request A Bed</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/volunteer">Volunteer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donations">Donate</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stories">Stories</a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);">About</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/about-us">About Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/assembly-instructions">Assembly Instructions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/contact-us">Contact Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/history-of-bed-brigade">History of Bed Brigade</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/partners">Partners</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/news">News</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/locations">Locations</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -13,48 +55,3 @@
         <menu alias="alias:mobile-menu" cache-id="mobile-menu" cache-fixed-duration="00:05:00" cache-tag="alias:main-menu" />
     </div>
 </header>
-
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BedBrigade</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="admin">
-                <span class="oi oi-lock-locked" aria-hidden="true"></span> Admin
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
