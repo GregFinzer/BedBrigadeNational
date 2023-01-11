@@ -1,4 +1,20 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<header class="fixed-top bg-white shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-dark" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="/"><img src="/media/logo.png" class="img-fluid" /></a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars ms-1"></i></button>
+
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <menu alias="alias:main-menu" cache-id="main-menu" cache-fixed-duration="00:05:00" cache-tag="alias:main-menu" />
+            </div>
+        </div>
+    </nav>
+    <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">
+        <menu alias="alias:mobile-menu" cache-id="mobile-menu" cache-fixed-duration="00:05:00" cache-tag="alias:main-menu" />
+    </div>
+</header>
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">BedBrigade</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
