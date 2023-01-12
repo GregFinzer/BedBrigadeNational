@@ -11,7 +11,7 @@ body p {
 
 @font-face {
     font-family: 'Function';
-    src: url('../../fonts/Function-Regular.woff2') format('woff2'), url('../../fonts/Function-Regular.woff') format('woff');
+    src: url('../font_css/Function-Regular.woff2') format('woff2'), url('../font_css/Function-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -19,7 +19,7 @@ body p {
 
 @font-face {
     font-family: 'Function';
-    src: url('../../fonts/Function-Bold.woff2') format('woff2'), url('../../fonts/Function-Bold.woff') format('woff');
+    src: url('../font_css/Function-Bold.woff2') format('woff2'), url('../font_css/Function-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -27,7 +27,7 @@ body p {
 
 @font-face {
     font-family: 'Stencil';
-    src: url('../../fonts/Stencil.woff2') format('woff2'), url('../../fonts/Stencil.woff') format('woff');
+    src: url('../font_css/Stencil.woff2') format('woff2'), url('../font_css/Stencil.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -35,7 +35,7 @@ body p {
 
 @font-face {
     font-family: 'Stencil Std';
-    src: url('../../fonts/StencilStd.woff2') format('woff2'), url('../../fonts/StencilStd.woff') format('woff');
+    src: url('../font_css/StencilStd.woff2') format('woff2'), url('../font_css/StencilStd.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
