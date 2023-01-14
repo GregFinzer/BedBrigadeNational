@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Server.Data
 {
@@ -9,6 +10,74 @@ namespace BedBrigade.Server.Data
         public static async Task SeedData(DataContext context)
         {
             await SeedConfigurations(context);
+            await SeedLocations(context);
+            await SeedContents(context);
+            await SeedMedia(context);
+        }
+
+        private static async Task SeedMedia(DataContext context)
+        {
+
+            if (!context.Media.Any(m => m.Name == "Logo"))
+            {
+                var location = await context.Locations.FirstAsync(l => l.Name == "National");
+                context.Media.Add(new Media
+                {
+                    Location = location!,
+                    Name = "Logo",
+                    MediaType = "png",
+                    Path = "images/national",
+                    AltText = "Bed Brigade National Logo",
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    CreateUser = _seedUserName,
+                    UpdateUser = _seedUserName,
+                    MachineName = Environment.MachineName,
+                });
+
+            }
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedContents(DataContext context)
+        {
+            if (!context.Content.Any(c => c.ContentType == "Header"))
+            {
+                var location = await context.Locations.FirstAsync(l => l.Name == "National");
+                context.Content.Add(new Content
+                {
+                    Location = location!,
+                    ContentType = "Header",
+                    Name = "Header",
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    CreateUser = _seedUserName,
+                    UpdateUser = _seedUserName,
+                    MachineName = Environment.MachineName,
+                });
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedLocations(DataContext context)
+        {
+            if (!context.Locations.Any(l => l.Name == "National"))
+            {
+                context.Locations.Add(new Location
+                {
+                    Name = "National",
+                    Route = "/",
+                    PostalCode = string.Empty,
+                    CreateDate= DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    CreateUser = _seedUserName,
+                    UpdateUser = _seedUserName,
+                    MachineName = Environment.MachineName,
+                });
+            }
+
+            await context.SaveChangesAsync();
         }
 
         private static async Task SeedConfigurations(DataContext context)
