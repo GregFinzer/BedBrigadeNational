@@ -6,6 +6,7 @@ namespace BedBrigade.Server.Data
     public class Seed
     {
         private const string _seedUserName = "Seed";
+        private const string _national = "National";
 
         public static async Task SeedData(DataContext context)
         {
@@ -20,7 +21,7 @@ namespace BedBrigade.Server.Data
 
             if (!context.Media.Any(m => m.Name == "Logo"))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == "National");
+                var location = await context.Locations.FirstAsync(l => l.Name == _national);
                 context.Media.Add(new Media
                 {
                     Location = location!,
@@ -43,7 +44,7 @@ namespace BedBrigade.Server.Data
         {
             if (!context.Content.Any(c => c.ContentType == "Header"))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == "National");
+                var location = await context.Locations.FirstAsync(l => l.Name == _national);
                 context.Content.Add(new Content
                 {
                     Location = location!,
@@ -62,7 +63,7 @@ namespace BedBrigade.Server.Data
 
         private static async Task SeedLocations(DataContext context)
         {
-            if (!context.Locations.Any(l => l.Name == "National"))
+            if (!context.Locations.Any(l => l.Name == _national))
             {
                 context.Locations.Add(new Location
                 {
