@@ -1,0 +1,12 @@
+﻿@inject HttpClient Http;
+
+@((MarkupString)headerContent)
+
+@code {
+    private string headerContent = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        headerContent = await Http.GetStringAsync("api/Content/type/Header/name/Header");
+    }
+}
