@@ -28,11 +28,7 @@ namespace BedBrigade.Shared
 		[MaxLength(255)]
 		public String PasswordHash { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(255)]
-        public String PasswordSalt { get; set; } = string.Empty;
-
-        [MaxLength(14)]
+		[MaxLength(14)]
 		public String? Phone { get; set; } = string.Empty;
 
         public String? Role { get; set; } = string.Empty;
