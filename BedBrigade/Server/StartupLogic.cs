@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Server.Data;
-using BedBrigade.Server.Services.AuthService;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -31,8 +30,7 @@ namespace BedBrigade.Server
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped<IAuthService, AuthService>();
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 

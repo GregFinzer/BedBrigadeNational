@@ -244,7 +244,7 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("LeftMediaId")
+                    b.Property<int?>("LeftMediaId")
                         .HasColumnType("int");
 
                     b.Property<int>("LocationId")
@@ -254,10 +254,10 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("MainMediaId")
+                    b.Property<int?>("MainMediaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MiddleMediaId")
+                    b.Property<int?>("MiddleMediaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -265,7 +265,7 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int>("RightMediaId")
+                    b.Property<int?>("RightMediaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -494,6 +494,7 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
@@ -558,16 +559,12 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("PasswordSalt")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Phone")
                         .HasMaxLength(14)
                         .HasColumnType("nvarchar(14)");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateDate")

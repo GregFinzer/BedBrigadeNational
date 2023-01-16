@@ -1,22 +1,11 @@
 ﻿using BedBrigade.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
-using System.Text;
 
 namespace BedBrigade.Server.Data
 {
     public class Seed
     {
         private const string _seedUserName = "Seed";
-
-        // Table User
-        private const string _seedUserAdmin = "Administrator";
-        private const string _seedUserFirstName = "Admin";
-        private const string _seedUserLastName = "User";
-        private const string _seedUserEmail = "admin.user@bedbrigade.org";
-        private const string _seedUserPhone = "99999999999";
-        private const string _seedUserRole = "NationalAdmin";
-        private const string _seedUserPassword = "Password";
         private const string _national = "National";
 
         public static async Task SeedData(DataContext context)
@@ -25,46 +14,11 @@ namespace BedBrigade.Server.Data
             await SeedLocations(context);
             await SeedContents(context);
             await SeedMedia(context);
-            await SeedUser(context);
-            
         }
 
         private static string GetHtml(string fileName)
         {
             return File.ReadAllText($"./Data/SeedHtml/{fileName}");
-        }
-
-        private static async Task SeedUser(DataContext context)
-        {
-            if(!context.Users.Any(u => u.UserName == _seedUserAdmin))
-            {
-                SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                context.Users.Add(new User
-                {
-                    UserName = _seedUserAdmin,
-                    Location = context.Locations.Single(l => l.Name == _national),
-                    FirstName = _seedUserFirstName,
-                    LastName = _seedUserLastName,
-                    Email = _seedUserEmail,
-                    Phone = _seedUserPhone,
-                    Role = _seedUserRole,
-                    PasswordHash = Encoding.UTF8.GetString(passwordHash),
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName,
-
-                });
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch(DbException ex)
-                {
-                    Console.WriteLine($"SaveChanges Error {ex.Message}");
-                }
-            }
         }
 
         private static async Task SeedMedia(DataContext context)
