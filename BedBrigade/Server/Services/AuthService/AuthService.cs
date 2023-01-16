@@ -30,21 +30,24 @@ namespace BedBrigade.Server.Services.AuthService
 
         public async Task<ServiceResponse<string>> Login(string email, string password)
         {
-            var response = new ServiceResponse<string>();
-            var user = await _context.Users
+            var response = new ServiceResponse<string>()
+            {
+                Message = "User Name or Password was incorrect. Please try your login again.",
+                Success = true
+            };
+        var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
             if (user == null)
             {
                 response.Success = false;
-                response.Message = "User not found.";
             }
             else if (!VerifyPasswordHash(password, user.PasswordHash, user.UserName))
             {
                 response.Success = false;
-                response.Message = "Wrong password.";
             }
             else
             {
+                response.Message = string.Empty;
                 response.Data = CreateToken(user);
             }
 
