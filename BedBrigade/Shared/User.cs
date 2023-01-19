@@ -26,11 +26,11 @@ namespace BedBrigade.Shared
 
         [Required]
 		[MaxLength(255)]
-		public String PasswordHash { get; set; } = string.Empty;
+		public byte[] PasswordHash { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public String PasswordSalt { get; set; } = string.Empty;
+        public byte[] PasswordSalt { get; set; }
 
         [MaxLength(14)]
 		public String? Phone { get; set; } = string.Empty;
