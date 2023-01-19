@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Administration/Admin/Dashboard" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Dashboard
+            </NavLink>
+        </div>
+        <hr class="w-100" />
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Administration/edit/header">
+                <span class="oi oi-plus" aria-hidden="true"></span> Edit Header
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Administration/edit/home">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Edit Home Page
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Administration/edit/footer">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Edit Footer
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/BedRequests">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Bed Requests
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/Configration">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Configuration
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/Donations">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Donations
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/Locations">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Locations
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/Users">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Users
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="manage/Volunteers">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Volunteers
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
