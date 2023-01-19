@@ -36,12 +36,12 @@ namespace BedBrigade.Server.Services.AuthService
                 Success = true
             };
         var user = await _context.Users
-                .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+                .FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
             if (user == null)
             {
                 response.Success = false;
             }
-            else if (!VerifyPasswordHash(password, user.PasswordHash, user.UserName))
+            else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
             }
@@ -68,7 +68,7 @@ namespace BedBrigade.Server.Services.AuthService
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            user.PasswordHash = Encoding.UTF8.GetString(passwordHash);
+            user.PasswordHash = passwordHash;
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -95,14 +95,13 @@ namespace BedBrigade.Server.Services.AuthService
             }
         }
 
-        private bool VerifyPasswordHash(string password, string passwordHash, string passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            byte[] hash = Encoding.ASCII.GetBytes(passwordHash);
-            byte[] salt = Encoding.ASCII.GetBytes(passwordSalt);
-            using (var hmac = new HMACSHA512(salt))
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(hash);
+                var result = computedHash.SequenceEqual(passwordHash);
+                return result;
             }
         }
 
@@ -144,7 +143,7 @@ namespace BedBrigade.Server.Services.AuthService
 
             CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
-            user.PasswordHash = Encoding.ASCII.GetString(passwordHash);
+            user.PasswordHash = passwordHash;
 
             await _context.SaveChangesAsync();
 
