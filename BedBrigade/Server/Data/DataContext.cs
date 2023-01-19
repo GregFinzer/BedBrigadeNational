@@ -1,5 +1,4 @@
-﻿using BedBrigade.Server.Services.AuthService;
-using BedBrigade.Shared;
+﻿using BedBrigade.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
