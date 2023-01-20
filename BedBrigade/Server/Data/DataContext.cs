@@ -86,15 +86,21 @@ namespace BedBrigade.Server.Data
                             referenceEntity.CreateUser = userId;
                             referenceEntity.UpdateDate = DateTime.UtcNow;
                             referenceEntity.UpdateUser = userId;
+                            referenceEntity.MachineName = Environment.MachineName;
                             break;
+
                         case EntityState.Deleted:
                             referenceEntity.UpdateDate = DateTime.UtcNow;
                             referenceEntity.UpdateUser = userId;
+                            referenceEntity.MachineName = Environment.MachineName; 
                             break;
+
                         case EntityState.Modified:
                             referenceEntity.UpdateDate = DateTime.UtcNow;
                             referenceEntity.UpdateUser = userId;
+                            referenceEntity.MachineName = Environment.MachineName; 
                             break;
+
                         default:
                             break;
                     }
