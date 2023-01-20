@@ -8,6 +8,10 @@ namespace BedBrigade.Server.Data
     public class Seed
     {
         private const string _seedUserName = "Seed";
+        private const string _seedLocationNational = "National";
+        private const string _seedLocationOhio = "OhioColumbus";
+        private const string _seedLocationArizona = "ArizonaPrescott";
+
 
         // Table User
         private const string _seedUserAdmin = "Administrator";
@@ -15,13 +19,29 @@ namespace BedBrigade.Server.Data
         private const string _seedUserLastName = "User";
         private const string _seedUserEmail = "admin.user@bedbrigade.org";
         private const string _seedUserPhone = "99999999999";
-        private const string _seedUserRole = "NationalAdmin";
+        private const string _seedUserRole = "National Admin";
         private const string _seedUserPassword = "Password";
-        private const string _national = "National";
+
+
+        private static readonly List<User> users = new()
+        {
+            new User { FirstName = "Location", LastName = "Contributor", Role = "Location Contributor"},
+            new User {FirstName = "Location", LastName = "Author", Role = "Location Author" },
+            new User {FirstName = "Location", LastName = "Editor", Role = "Location Editor" },
+            new User {FirstName = "Location", LastName = "Scheduler", Role = "Location Scheduler" },
+            new User {FirstName = "Location", LastName = "Treasurer", Role = "Location Treasurer"},
+            new User {FirstName = "Location", LastName = "Communications", Role = "Location Communications"},
+            new User {FirstName = "Location", LastName = "Admin", Role = "Location Admin"},
+            new User {FirstName = "National", LastName = "Editor", Role = "National Editor"},
+            new User {FirstName = "National", LastName = "Admin", Role = "National Admin"}
+
+        };
+        static readonly List<User> Users = users;
 
         public static async Task SeedData(DataContext context)
         {
             await SeedConfigurations(context);
+            // Must populate before users as it is a dependancy
             await SeedLocations(context);
             await SeedContents(context);
             await SeedMedia(context);
@@ -36,34 +56,43 @@ namespace BedBrigade.Server.Data
 
         private static async Task SeedUser(DataContext context)
         {
-            if(!context.Users.Any(u => u.UserName == _seedUserAdmin))
+            foreach(var user in Users )
             {
-                SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                context.Users.Add(new User
+                if (!context.Users.Any(u => u.UserName == $"{ user.FirstName}{user.LastName}"))
                 {
-                    UserName = _seedUserAdmin,
-                    Location = context.Locations.Single(l => l.Name == _national),
-                    FirstName = _seedUserFirstName,
-                    LastName = _seedUserLastName,
-                    Email = _seedUserEmail,
-                    Phone = _seedUserPhone,
-                    Role = _seedUserRole,
-                    PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt,
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName,
+                    SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
+                    var location = _seedLocationOhio;
+                    var roleLocation = user.Role.Split(' ')[0];
+                    if(roleLocation == "National")
+                    {
+                        location = _seedLocationNational;
+                    }
+                    context.Users.Add(new User
+                    {
+                        UserName = $"{user.FirstName}{user.LastName}",
+                        Location = context.Locations.Single(l => l.Name == location ),
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        Phone = user.Phone,
+                        Role = user.Role,
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                        CreateUser = _seedUserName,
+                        UpdateUser = _seedUserName,
+                        MachineName = Environment.MachineName,
 
-                });
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch(DbException ex)
-                {
-                    Console.WriteLine($"SaveChanges Error {ex.Message}");
+                    });
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                    }
+                    catch (DbException ex)
+                    {
+                        Console.WriteLine($"SaveChanges Error {ex.Message}");
+                    }
                 }
             }
         }
@@ -73,7 +102,7 @@ namespace BedBrigade.Server.Data
 
             if (!context.Media.Any(m => m.Name == "Logo"))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == _national);
+                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
                 context.Media.Add(new Media
                 {
                     Location = location!,
@@ -97,7 +126,7 @@ namespace BedBrigade.Server.Data
             var header = "Header";
             if (!context.Content.Any(c => c.ContentType == header))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == _national);
+                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
                 var seedHtml = GetHtml("header.html");
                 context.Content.Add(new Content
                 {
@@ -118,21 +147,29 @@ namespace BedBrigade.Server.Data
 
         private static async Task SeedLocations(DataContext context)
         {
-            if (!context.Locations.Any(l => l.Name == _national))
+            var locations = new List<Location>
             {
-                context.Locations.Add(new Location
-                {
-                    Name = _national,
+                new() {
+                    Name = _seedLocationNational,
                     Route = "/",
-                    PostalCode = string.Empty,
-                    CreateDate= DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName,
-                });
-            }
+                    PostalCode = string.Empty
+                },
+                new() {
+                    Name = _seedLocationOhio,
+                    Route = "/ohio",
+                    PostalCode = string.Empty
+                },
+                new() {
+                    Name = _seedLocationArizona,
+                    Route = "/arizona",
+                    PostalCode = string.Empty
+                }
+            };
+            var rec = context.Locations.ToList();
+            if(rec.Count > 0)
+            context.Locations.RemoveRange(locations);
 
+            await context.Locations.AddRangeAsync(locations);
             await context.SaveChangesAsync();
         }
 
@@ -146,32 +183,15 @@ namespace BedBrigade.Server.Data
                 {
                     ConfigurationKey = "FromEmailAddress",
                     ConfigurationValue = "webmaster@bedbrigade.org",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName
                 },
                 new()
                 {
                     ConfigurationKey = "HostName",
                     ConfigurationValue = "mail.bedbrigade.org",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName
                 },
                 new()
-                {
-                    ConfigurationKey = "Port",
-                    ConfigurationValue = "8889",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName
-                }
+                {ConfigurationKey = "Port",
+                ConfigurationValue = "8889"}
             };
 
             await context.Configurations.AddRangeAsync(configurations);
