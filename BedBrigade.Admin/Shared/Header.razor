@@ -1,0 +1,13 @@
+﻿@inject HttpClient Http;
+@using Microsoft.AspNetCore.Components
+
+@((MarkupString)headerContent)
+
+@code {
+    private string headerContent = string.Empty;
+    protected string Login = "login";
+    protected override async Task OnInitializedAsync()
+    {
+        headerContent = await Http.GetStringAsync("api/Content/type/Header/name/Header");
+    }
+}

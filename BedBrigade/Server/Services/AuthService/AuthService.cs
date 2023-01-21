@@ -24,27 +24,30 @@ namespace BedBrigade.Server.Services.AuthService
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public string GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         public string GetUserEmail() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
 
         public async Task<ServiceResponse<string>> Login(string email, string password)
         {
-            var response = new ServiceResponse<string>();
-            var user = await _context.Users
-                .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
+            var response = new ServiceResponse<string>()
+            {
+                Message = "User Name or Password was incorrect. Please try your login again.",
+                Success = true
+            };
+        var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
             if (user == null)
             {
                 response.Success = false;
-                response.Message = "User not found.";
             }
-            else if (!VerifyPasswordHash(password, user.PasswordHash, user.UserName))
+            else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
-                response.Message = "Wrong password.";
             }
             else
             {
+                response.Message = string.Empty;
                 response.Data = CreateToken(user);
             }
 
@@ -65,7 +68,7 @@ namespace BedBrigade.Server.Services.AuthService
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            user.PasswordHash = Encoding.UTF8.GetString(passwordHash);
+            user.PasswordHash = passwordHash;
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -92,14 +95,13 @@ namespace BedBrigade.Server.Services.AuthService
             }
         }
 
-        private bool VerifyPasswordHash(string password, string passwordHash, string passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            byte[] hash = Encoding.ASCII.GetBytes(passwordHash);
-            byte[] salt = Encoding.ASCII.GetBytes(passwordSalt);
-            using (var hmac = new HMACSHA512(salt))
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(hash);
+                var result = computedHash.SequenceEqual(passwordHash);
+                return result;
             }
         }
 
@@ -112,7 +114,7 @@ namespace BedBrigade.Server.Services.AuthService
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
+            var key = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -141,7 +143,7 @@ namespace BedBrigade.Server.Services.AuthService
 
             CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
-            user.PasswordHash = Encoding.ASCII.GetString(passwordHash);
+            user.PasswordHash = passwordHash;
 
             await _context.SaveChangesAsync();
 

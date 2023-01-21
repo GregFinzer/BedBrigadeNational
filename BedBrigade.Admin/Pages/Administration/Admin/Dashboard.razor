@@ -1,0 +1,62 @@
+﻿@page "/administration/admin/dashboard"
+@*@attribute [Authorize(Roles = "National")]*@
+@layout BedBrigade.Admin.Shared.MainLayout
+<h3 class="w-100 text-center">Administrative Dashboard</h3>
+
+
+
+@if (DonationSource == null || VolunteerSource == null)
+{
+    <div class="w-100 text-center">
+        <span class="spinner-grow m-5"></span>
+
+        <span>Loading ....</span>
+    </div>
+}
+else
+{
+    
+    <div class="control-section" id="target">
+        <div class="text-center">
+            <h2>Bed Brigade</h2>
+        </div>
+        @*<div style="padding:5px;text-align: right;">
+    <SfButton CssClass="e-btn e-info" Content="New Panel"  @onclick="AddClick"></SfButton>
+    </div>*@
+        <SfDashboardLayout CellSpacing="@(new double[] { 10, 10 })" Columns="3">
+            <DashboardLayoutPanels>
+                <DashboardLayoutPanel ZIndex="500" SizeX="1" SizeY="1" Column="0" Row="0">
+                    <HeaderTemplate><div class="">@TotalVolunteers.ToString() Volunteers</div></HeaderTemplate>
+                    <ContentTemplate>
+                        <div>
+                            Volunteers
+                        </div>
+                    </ContentTemplate>
+                </DashboardLayoutPanel>
+                <DashboardLayoutPanel ZIndex="500" SizeX="1" SizeY="1" Column="1" Row="0">
+                    <HeaderTemplate><div class="">@TotalBedRequests.ToString() Bed Requests </div></HeaderTemplate>
+                    <ContentTemplate>
+                        <div>
+                            Bed Requests 
+                        </div>
+                    </ContentTemplate>
+                </DashboardLayoutPanel>
+                <DashboardLayoutPanel ZIndex="500" SizeX=1 SizeY="1" Column="2" Row="0">
+                    <HeaderTemplate><div class="">@TotalScheduledDeliveries.ToString() Deliveries</div></HeaderTemplate>
+                    <ContentTemplate>
+                        <div>
+                            Deliveries
+                        </div>
+                    </ContentTemplate>
+                </DashboardLayoutPanel>
+                @*<DashboardLayoutPanel ZIndex="500" SizeX=3 SizeY=2 Column="0" Row="1">
+            <HeaderTemplate><div>Upcoming Care Team Schedule</div></HeaderTemplate>
+            <ContentTemplate>
+            <div><SfSchedule TValue="AppointmentData" @bind-CurrentView=@CurrentView ></SfSchedule></div>
+            </ContentTemplate>
+            </DashboardLayoutPanel>*@
+            </DashboardLayoutPanels>
+        </SfDashboardLayout>
+    </div>
+
+}
