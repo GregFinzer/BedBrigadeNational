@@ -4,8 +4,6 @@ namespace BedBrigade.Admin.Pages.Administration.Admin
 {
     public partial class Dashboard : ComponentBase
     {
-        [Inject] protected IServiceProvider _serviceProvider { get; set; }
-
         public int TotalVolunteers { get; private set; }
         public int TotalBedRequests { get; private set; }
         public int TotalScheduledDeliveries { get; private set; }
