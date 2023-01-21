@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using Microsoft.JSInterop;
 
 namespace BedBrigade.Pages.Home
 {
@@ -15,6 +16,7 @@ namespace BedBrigade.Pages.Home
         [Inject] private IAuthService AuthService { get; set; }
         [Inject] private ILocalStorageService _local { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] private IJSRuntime _js { get; set;  }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
@@ -68,7 +70,6 @@ namespace BedBrigade.Pages.Home
 
                 await _local.SetItemAsync("authToken", result.Data);
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
                 NavigationManager.NavigateTo("/Administration/Admin/Dashboard");
             }
             else
