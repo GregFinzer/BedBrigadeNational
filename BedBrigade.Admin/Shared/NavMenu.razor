@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Components
-
+[AuthorizeView()]
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
@@ -7,50 +7,55 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Dashboard
             </NavLink>
         </div>
-        <hr class="w-100" />
+        <div class="px-3">
+            <span class="headSection" >Edit</span>
+        </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Administration/edit/header">
-                <span class="oi oi-plus" aria-hidden="true"></span> Edit Header
+                <span class="oi oi-plus" aria-hidden="true"></span>Header
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Administration/edit/home">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Edit Home Page
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Home Page
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Administration/edit/footer">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Edit Footer
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Footer
+            </NavLink>
+        </div>
+        <div class="px-3">
+            <span class="headSection" >Manage</span>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="Administration/manage/BedRequests">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Bed Requests
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/BedRequests">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Bed Requests
+            <NavLink class="nav-link" href="Administration/manage/Configuration">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Configuration
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/Configration">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Configuration
+            <NavLink class="nav-link" href="Administration/manage/Donations">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Donations
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/Donations">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Donations
+            <NavLink class="nav-link" href="Administration/manage/Locations">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Locations
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/Locations">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Locations
+            <NavLink class="nav-link" href="Administration/manage/Users">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Users
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/Users">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Users
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="manage/Volunteers">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Volunteers
+            <NavLink class="nav-link" href="Administration/manage/Volunteers">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Volunteers
             </NavLink>
         </div>
     </nav>
