@@ -21,17 +21,17 @@ namespace BedBrigade.Server.Data
         private const string _seedUserPhone = "99999999999";
         private const string _seedUserRole = "National Admin";
         private const string _seedUserPassword = "Password";
-
+        private const string _seedUserLocation = "Location";
 
         private static readonly List<User> users = new()
         {
-            new User { FirstName = "Location", LastName = "Contributor", Role = "Location Contributor"},
-            new User {FirstName = "Location", LastName = "Author", Role = "Location Author" },
-            new User {FirstName = "Location", LastName = "Editor", Role = "Location Editor" },
-            new User {FirstName = "Location", LastName = "Scheduler", Role = "Location Scheduler" },
-            new User {FirstName = "Location", LastName = "Treasurer", Role = "Location Treasurer"},
-            new User {FirstName = "Location", LastName = "Communications", Role = "Location Communications"},
-            new User {FirstName = "Location", LastName = "Admin", Role = "Location Admin"},
+            new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "_seeUserLocation Contributor"},
+            new User {FirstName = _seedUserLocation, LastName = "Author", Role = "_seeUserLocation Author" },
+            new User {FirstName = _seedUserLocation, LastName = "Editor", Role = "Location Editor" },
+            new User {FirstName = _seedUserLocation, LastName = "Scheduler", Role = "Location Scheduler" },
+            new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
+            new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
+            new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
             new User {FirstName = "National", LastName = "Editor", Role = "National Editor"},
             new User {FirstName = "National", LastName = "Admin", Role = "National Admin"}
 
@@ -63,7 +63,7 @@ namespace BedBrigade.Server.Data
                     SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
                     var location = _seedLocationOhio;
                     var roleLocation = user.Role.Split(' ')[0];
-                    if(roleLocation == "National")
+                    if(roleLocation == _seedLocationNational)
                     {
                         location = _seedLocationNational;
                     }
