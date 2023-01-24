@@ -23,18 +23,17 @@ One thing you will notice about the following project plan is the lack of due da
     * Serilog Console, File Logging :heavy_check_mark:
     * Code Quality Check Async Methods :heavy_check_mark:
     * Code Quality Check Razor Pages :heavy_check_mark:
-    * Create Theme Using Syncfusion Theme Studio for Blazor
-    * Setup Deployment
+    * Setup Deployment :heavy_check_mark:
     
 * Home Page
-    * Home Page Header
+    * Home Page Header :heavy_check_mark:
     * Image Rotator
     * Home Page Middle
     * Home Page Footer
     
 * Basic Administration
     * Login
-    * Logout
+    * Logout :heavy_check_mark:
     * Administration Dashboard
     * Edit Configuration
     * Edit Home Page
@@ -135,4 +134,5 @@ One thing you will notice about the following project plan is the lack of due da
     * Page History
     * Restore Version
     
-    
+* Scope Added
+    * Email Prayer Requests

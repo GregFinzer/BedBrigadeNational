@@ -26,7 +26,15 @@ git clone https://github.com/GregFinzer/BedBrigadeNational
     ```dos
     dotnet tool install --global dotnet-ef
     ```
-### 4. Run the Application
+
+### 4. Set Gold License Key
+In order to run the NUnit Tests and check for Quality Locally, please set a Windows Environment variable of Gold to what is in this document:  Bed Brigade National Website Information.docx
+* Login to the SmarterAsp.NET FTP Site using credentials given.
+* Download the Secrets Folder.
+* Open the file Bed Brigade National Website Information.docx to see the Gold Suite License Key.
+
+
+### 5. Run the Application
 * Press the play button
 * Execute Swagger Locally:  http://localhost:5125/swagger/index.html
     

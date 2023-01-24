@@ -35,6 +35,7 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 * <a href="https://github.com/GregFinzer/BedBrigadeNational/raw/main/Documentation/Design/Estimates.xlsx" target="_blank">Estimates</a>
 * [Implementation Plan](Documentation/Implementation%20Plan.md)
 * [Project Plan](Documentation/Project%20Plan.md)
+* [References](Documentation/References.md)
 * [Roles](Documentation/Roles.md)
 * <a href="https://bedbrigade.slack.com" target="_blank">Slack Workspace</a> used for project communication
 * <a href="https://trello.com/b/SfXILMoU/bed-brigade" target="_blank">Trello Board</a> used for Kanban
