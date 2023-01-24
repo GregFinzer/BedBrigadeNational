@@ -1,7 +1,5 @@
 ﻿using BedBrigade.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
-using System.Text;
 
 namespace BedBrigade.Server.Data
 {
@@ -41,12 +39,9 @@ namespace BedBrigade.Server.Data
         public static async Task SeedData(DataContext context)
         {
             await SeedConfigurations(context);
-            // Must populate before users as it is a dependancy
             await SeedLocations(context);
             await SeedContents(context);
             await SeedMedia(context);
-            await SeedUser(context);
-            
         }
 
         private static string GetHtml(string fileName)
@@ -56,37 +51,33 @@ namespace BedBrigade.Server.Data
 
         private static async Task SeedUser(DataContext context)
         {
-            foreach(var user in Users )
+            if(!context.Users.Any(u => u.UserName == _seedUserAdmin))
             {
-                if (!context.Users.Any(u => u.UserName == $"{ user.FirstName}{user.LastName}"))
+                SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
+                context.Users.Add(new User
                 {
-                    SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                    var location = _seedLocationOhio;
-                    var roleLocation = user.Role.Split(' ')[0];
-                    if(roleLocation == _seedLocationNational)
-                    {
-                        location = _seedLocationNational;
-                    }
-                    context.Users.Add(new User
-                    {
-                        UserName = $"{user.FirstName}{user.LastName}",
-                        Location = context.Locations.Single(l => l.Name == location ),
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
-                        Phone = "(999) 999-9999",
-                        Role = user.Role,
-                        PasswordHash = passwordHash,
-                        PasswordSalt = passwordSalt,
-                    });
-                    try
-                    {
-                        await context.SaveChangesAsync();
-                    }
-                    catch (DbException ex)
-                    {
-                        Console.WriteLine($"SaveChanges Error {ex.Message}");
-                    }
+                    UserName = _seedUserAdmin,
+                    Location = context.Locations.Single(l => l.Name == _national),
+                    FirstName = _seedUserFirstName,
+                    LastName = _seedUserLastName,
+                    Email = _seedUserEmail,
+                    Phone = _seedUserPhone,
+                    Role = _seedUserRole,
+                    PasswordHash = Encoding.UTF8.GetString(passwordHash),
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    CreateUser = _seedUserName,
+                    UpdateUser = _seedUserName,
+                    MachineName = Environment.MachineName,
+
+                });
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch(DbException ex)
+                {
+                    Console.WriteLine($"SaveChanges Error {ex.Message}");
                 }
             }
         }
