@@ -4,15 +4,21 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>06d4b681-cf55-4920-9c81-77ebf1a04645</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\scripts\googleMapHandler.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-    <PackageReference Include="Syncfusion.Blazor" Version="20.4.0.43" />
+    <PackageReference Include="Syncfusion.Blazor" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Licensing" Version="20.4.0.44" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,5 +28,11 @@
 
   <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="BedBrigade.Admin.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Shared\Header.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 </Project>

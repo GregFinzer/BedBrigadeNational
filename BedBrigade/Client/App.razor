@@ -1,27 +1,37 @@
 ﻿@using System.Reflection
+@using System
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.WebAssembly.Services
 @using Microsoft.Extensions.Logging
+@using BedBrigade.Admin
 @inject LazyAssemblyLoader AssemblyLoader
 @inject ILogger<App> Logger
 
-<Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="@lazyLoadedAssemblies"
-        OnNavigateAsync="@OnNavigateAsync">
-    <Navigating>
-@*        <div style="padding:20px;background-color:blue;color:white">
-            <p>Loading the requested page&hellip;</p>
-        </div>
-*@    </Navigating>
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-    </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p>Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+<CascadingAuthenticationState>
+
+    <Router AppAssembly="@typeof(App).Assembly"
+            AdditionalAssemblies="@lazyLoadedAssemblies"
+            OnNavigateAsync="@OnNavigateAsync">
+        <Navigating>
+            <div>
+                <p>Loading Administration</p>
+            </div>
+        </Navigating>
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                        <h3>Whoops! You're not allowed to see this page.</h3>
+                        <h5>Please <a href="home/login">login</a></h5>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
 
 @code {
     private List<Assembly> lazyLoadedAssemblies = new();
@@ -30,12 +40,13 @@
     {
         try
         {
-            if (args.Path == "admin")
+            if (args.Path.ToLower().Contains("administration"))
             {
                 var assemblies = await AssemblyLoader.LoadAssembliesAsync(
                     new[] { "BedBrigade.Admin.dll" });
                 lazyLoadedAssemblies.AddRange(assemblies);
             }
+        
         }
         catch (Exception ex)
         {

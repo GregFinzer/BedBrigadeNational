@@ -1,24 +1,22 @@
 ﻿using BedBrigade.Client.Services.AuthService;
 using BedBrigade.Shared;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Notifications;
 using Blazored.LocalStorage;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 
-namespace BedBrigade.Pages.Admin
+namespace BedBrigade.Pages.Home
 {
     public partial class LoginBase : ComponentBase
     {
         [Inject] private NavigationManager NavigationManager { get; set; }
-        //[Inject] private IUserService _svcUser { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
-        [Inject] private ILocalStorageService _local  { get; set; }
+        [Inject] private ILocalStorageService _local { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] private IJSRuntime _js { get; set;  }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
@@ -28,10 +26,6 @@ namespace BedBrigade.Pages.Admin
         protected string Error = "";
         protected StringValues returnUrl;
 
-        protected SfToast? ToastObj;
-        protected string? ToastContent;
-        protected int ToastTimeout;
-        protected string ToastTitle = string.Empty;
         protected string? errorMessage;
         protected InputText? inputTextFocus;
 
@@ -42,7 +36,7 @@ namespace BedBrigade.Pages.Admin
         protected override void OnInitialized()
         {
             loginModel.Email = User;
-            loginModel.Password= Password;
+            loginModel.Password = Password;
             Console.WriteLine("In Login Razor Initialize");
             passwordType = "password";
 
@@ -76,20 +70,12 @@ namespace BedBrigade.Pages.Admin
 
                 await _local.SetItemAsync("authToken", result.Data);
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
-                NavigationManager.NavigateTo(returnUrl);
+                NavigationManager.NavigateTo("/Administration/Admin/Dashboard");
             }
             else
             {
                 try
                 {
-                    
-                    ToastTitle = "Login Error";
-                    ToastContent = "The credentials entered are not valid.<br/> Please try again.";
-                    ToastTimeout = 5000;
-
-                    await ToastObj.ShowAsync();
-
                     errorMessage = result.Message;
                     DisplayError = "block;";
                     loginModel.Email = string.Empty;
@@ -103,59 +89,7 @@ namespace BedBrigade.Pages.Admin
                 {
                     Console.WriteLine(ex.ToString());
                 }
-;
             }
         }
-
-
-        //protected async Task HandleLogin()
-        //{
-        //    var result = await _svcUser.AuthenicateAsync(loginModel);
-        //    if (result.Successful)
-        //    {
-        //        await _local.SetItemAsync<string>("authToken", result.Token);
-        //        var loggedin = await _svcUser.LoginAsync(result.Token);
-        //        if (loggedin)
-        //        {
-        //            Identity = new(await _local.GetItemAsync<string>("authToken"));
-        //            if (result.TwoFactor)
-        //            {
-        //                if (Identity.TwoFactorExpires.Date > DateTime.Now.Date)
-        //                {
-        //                    NavigationManager.NavigateTo("/dash", true);
-        //                }
-        //                else
-        //                {
-        //                    NavigationManager.NavigateTo("/TwoFactor", true);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                NavigationManager.NavigateTo("/dash", true);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("Unable to login after authenication");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            ToastObj.Title = "Login Error";
-        //            ToastObj.Content = "The credentials entered are not valid.<br/> Please try again.";
-        //            ToastObj.Timeout = 5000;
-
-        //            await ToastObj.Show();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine(ex.ToString());
-        //        }
-
-        //        // DisplayError = "normal;";
-        //    }
-        //}
     }
 }

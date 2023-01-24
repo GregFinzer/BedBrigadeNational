@@ -4,6 +4,7 @@ using BedBrigade.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BedBrigade.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230117145339_Change_User_Salt")]
+    partial class ChangeUserSalt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,7 +247,7 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("LeftMediaId")
+                    b.Property<int>("LeftMediaId")
                         .HasColumnType("int");
 
                     b.Property<int>("LocationId")
@@ -254,10 +257,10 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("MainMediaId")
+                    b.Property<int>("MainMediaId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MiddleMediaId")
+                    b.Property<int>("MiddleMediaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -265,7 +268,7 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int?>("RightMediaId")
+                    b.Property<int>("RightMediaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -494,7 +497,6 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
@@ -569,7 +571,6 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(14)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateDate")

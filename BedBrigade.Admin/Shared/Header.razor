@@ -1,0 +1,25 @@
+﻿@inject HttpClient Http;
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop;
+
+@((MarkupString)headerContent)
+
+@code {
+    // Admin
+    private string headerContent = string.Empty;
+    protected string Login = "login";
+    [Parameter] public string InnerHtml { get; set; } = "Login";
+    [Parameter] public string Attr { get; set; } = "/home/login";
+    [Inject] private IJSRuntime _js { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        headerContent = await Http.GetStringAsync("api/Content/type/Header/name/Header");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+            await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", "loginElement", InnerHtml);
+            await _js.InvokeVoidAsync("SetGetValue.SetAttribute", "loginElement", "href", Attr);
+    }
+
+}

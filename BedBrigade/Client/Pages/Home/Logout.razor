@@ -1,0 +1,11 @@
+﻿@page "/home/logout"
+
+@code {
+    [Inject] private IJSRuntime _js { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
