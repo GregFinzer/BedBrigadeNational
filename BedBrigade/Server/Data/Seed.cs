@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Shared;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace BedBrigade.Server.Data
 {
@@ -57,13 +58,13 @@ namespace BedBrigade.Server.Data
                 context.Users.Add(new User
                 {
                     UserName = _seedUserAdmin,
-                    Location = context.Locations.Single(l => l.Name == _national),
+                    Location = context.Locations.Single(l => l.Name == _seedLocationNational),
                     FirstName = _seedUserFirstName,
                     LastName = _seedUserLastName,
                     Email = _seedUserEmail,
                     Phone = _seedUserPhone,
                     Role = _seedUserRole,
-                    PasswordHash = Encoding.UTF8.GetString(passwordHash),
+                    PasswordHash = passwordHash,
                     CreateDate = DateTime.Now,
                     UpdateDate = DateTime.Now,
                     CreateUser = _seedUserName,
