@@ -4,12 +4,12 @@ using System.Net.Http.Json;
 
 namespace BedBrigade.Client.Services.AuthService
 {
-    public class AuthService : Gateway<User>, IAuthService
+    public class AuthService : IAuthService
     {
         private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authStateProvider;
 
-        public AuthService(HttpClient http, AuthenticationStateProvider authStateProvider) : base(http)
+        public AuthService(HttpClient http, AuthenticationStateProvider authStateProvider)
         {
             _http = http;
             _authStateProvider = authStateProvider;

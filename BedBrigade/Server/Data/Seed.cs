@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Text;
 
 namespace BedBrigade.Server.Data
 {
@@ -45,7 +46,7 @@ namespace BedBrigade.Server.Data
             await SeedContents(context);
             await SeedMedia(context);
             await SeedUser(context);
-
+            
         }
 
         private static string GetHtml(string fileName)
@@ -55,21 +56,21 @@ namespace BedBrigade.Server.Data
 
         private static async Task SeedUser(DataContext context)
         {
-            foreach (var user in Users)
+            foreach(var user in Users )
             {
-                if (!context.Users.Any(u => u.UserName == $"{user.FirstName}{user.LastName}"))
+                if (!context.Users.Any(u => u.UserName == $"{ user.FirstName}{user.LastName}"))
                 {
                     SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
                     var location = _seedLocationOhio;
                     var roleLocation = user.Role.Split(' ')[0];
-                    if (roleLocation == "National")
+                    if(roleLocation == "National")
                     {
                         location = _seedLocationNational;
                     }
                     context.Users.Add(new User
                     {
                         UserName = $"{user.FirstName}{user.LastName}",
-                        Location = context.Locations.Single(l => l.Name == location),
+                        Location = context.Locations.Single(l => l.Name == location ),
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
@@ -159,8 +160,8 @@ namespace BedBrigade.Server.Data
                 }
             };
             var rec = context.Locations.ToList();
-            if (rec.Count > 0)
-                context.Locations.RemoveRange(locations);
+            if(rec.Count > 0)
+            context.Locations.RemoveRange(locations);
 
             await context.Locations.AddRangeAsync(locations);
             await context.SaveChangesAsync();
