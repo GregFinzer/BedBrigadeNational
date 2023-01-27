@@ -1,15 +1,11 @@
-﻿@layout BedBrigade.Admin.Shared.MainLayout
-@page "/administration/manage/users"
-@using Syncfusion.Blazor.Grids
+﻿@using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.DropDowns
 @using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
 
-@if (BBUsers == null)
+@if (Users == null)
 {
-    <span class="spinner-grow m-5"></span>
-
-    <span>Loading ....</span>
+    <span class="spinner-grow m-5"></span><span>Loading ....</span>
 }
 else
 {
@@ -18,20 +14,20 @@ else
         <div class="col-md-12 control-sec">
             <div class="content-wrapper">
                 <div class="row align-content-center">
-                    <SfGrid @ref="Grid" TValue="User" DataSource=@BBUsers ContextMenuItems=@ContextMenu
-                        EnablePersistence="true"
-                        ShowColumnChooser="true"
-                        Toolbar=@ToolBar
-                        AllowPaging="true"
-                        AllowSorting="true"
-                        AllowExcelExport="true"
-                        ShowColumnMenu="true"
-                        AllowFiltering="false"
-                        AllowReordering="true"
-                        AllowResizing="true"
-                        AllowSelection="true"
-                        AllowPdfExport="true"
-                        AllowTextWrap="true">
+                    <SfGrid @ref="Grid" TValue="User" DataSource=@Users ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="false"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true">
                         <GridTextWrapSettings WrapMode="WrapMode.Header" />
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
                         <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="User" />
@@ -53,7 +49,7 @@ else
                                             <SfTextBox ID="username" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="User Name" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <SfTextBox ID="password" @bind-Value=@UserPassword Enabled=@UserPass Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="password" @bind-Value=@UserPassword Enabled=@UserPass  Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="form-row">
@@ -99,9 +95,9 @@ else
                         <GridColumns>
                             <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="true" />
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center"  Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="true">
+                            <GridColumn HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="true" >
                             </GridColumn>
                         </GridColumns>
                     </SfGrid>
@@ -111,7 +107,7 @@ else
         </div>
     </fieldset>
 }
-<SfToast ID="SaveToast" CssClass="membertoast" @ref=@ToastObj Title=@ToastTitle Timeout=@ToastTimeout Width=@ToastWidth>
+<SfToast ID="SaveToast" CssClass="membertoast" @ref=@ToastObj Title=@ToastTitle Timeout=@ToastTimeout Width=@ToastWidth >
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
 
