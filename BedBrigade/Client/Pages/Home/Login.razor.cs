@@ -1,5 +1,4 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Shared;
+﻿using BedBrigade.Shared;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -16,7 +15,7 @@ namespace BedBrigade.Pages.Home
         [Inject] private IAuthService AuthService { get; set; }
         [Inject] private ILocalStorageService _local { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        [Inject] private IJSRuntime _js { get; set;  }
+        [Inject] private IJSRuntime _js { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
