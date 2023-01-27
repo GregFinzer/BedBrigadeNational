@@ -1,23 +1,21 @@
-﻿using BedBrigade.Server.Data;
+﻿using BedBrigade.Admin.Services;
 using BedBrigade.Shared;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.Common;
 
 namespace BedBrigade.Server.Controllers
 {
-    [Route("api/[controller")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(DataContext context, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
-            _context = context;
+            _userService = userService;
             _logger = logger;
         }
-
 
         /// <summary>
         /// 
@@ -25,61 +23,53 @@ namespace BedBrigade.Server.Controllers
         /// <returns></returns>
         [HttpGet("{UserName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get(string UserName)
+        public async Task<ActionResult<ServiceResponse<User>>> Get(string UserName)
         {
-            var result = await _context.Users.FindAsync(UserName);
-            if (result != null)
+            if (string.IsNullOrEmpty(UserName))
             {
-                return Ok(new ServiceResponse<User>("Found Record", true, result));
+                return BadRequest(new ServiceResponse<User>("UserName is empty or null."));
             }
-
-            return NotFound(new ServiceResponse<User>("Not Found"));
+            var response = await _userService.GetUserAsync(UserName);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return NotFound(response);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpGet()]
+        [HttpGet("GetAll")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<User>>>> GetAll()
         {
-            int.TryParse(User.Claims.FirstOrDefault(c => c.Type == "Location").Value ?? "0", out int locationId);
-            var result = _context.Users.Where(u => u.Location.LocationId == locationId).ToList();
-            if (result != null)
+            var response = await _userService.GetAllAsync();
+            if (response.Success)
             {
-                return Ok(new ServiceResponse<List<User>>($"Found {result.Count} records.", true, result));
+                return Ok(response);
             }
-            return NotFound(new ServiceResponse<List<User>>("None found."));
+            return NotFound(response);
         }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(string UserName)
+        public async Task<ActionResult<ServiceResponse<bool>>> Delete(string UserName)
         {
-            var user = await _context.Users.FindAsync(UserName);
-            if (user == null)
+            var response = await _userService.DeleteUserAsync(UserName);
+            if (response.Success)
             {
-                return NotFound(new ServiceResponse<User>($"User record with key {UserName} not found"));
+                return Ok(response);
             }
-            try
-            {
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
-                return Ok(new ServiceResponse<User>($"Removed record with key {UserName}.", true));
-            }
-            catch (DbException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ServiceResponse<User>($"DB error on delete of user record with key {UserName} - {ex.Message} ({ex.ErrorCode})"));
-            }
+            return BadRequest(response);
         }
 
         [HttpPut]
@@ -88,13 +78,12 @@ namespace BedBrigade.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(User user)
         {
-            var result = _context.Users.Update(user);
-            if (result != null)
+            var response = await _userService.UpdateAsync(user);
+            if (response.Success)
             {
-                return Ok(new ServiceResponse<User>($"Updated record with user key {user.UserName}", true));
+                return Ok(response);
             }
-            return BadRequest(new ServiceResponse<User>($"User record with key {user.UserName} was not updated."));
-
+            return BadRequest(response);
         }
 
         [HttpPost]
@@ -103,16 +92,13 @@ namespace BedBrigade.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] User user)
         {
-            try
+            var response = await _userService.CreateAsync(user);
+            if (response.Success)
             {
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
-                return Ok(new ServiceResponse<User>($"Added user record with key {user.UserName}.", true));
+                return Ok(response);
             }
-            catch (DbException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ServiceResponse<User>($"DB error on delete of user record with key {user.UserName} - {ex.Message} ({ex.ErrorCode})"));
-            }
+            return BadRequest(response);
+
         }
 
 
