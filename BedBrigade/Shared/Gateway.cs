@@ -33,8 +33,8 @@ namespace BedBrigade.Shared
 
         public async Task<ServiceResponse<T>> UpdateAsync(T objToUpdate)
         {
-            var result = await _http.PutAsJsonAsync<ServiceResponse<T>>($"api/{nameof(T)}", objToUpdate);
-            return await result.Content.ReadFromJsonAsync(ServiceResponse<T>);
+            var result = await _http.PutAsJsonAsync($"api/{nameof(User)}", objToUpdate);
+            return await result.Content.ReadFromJsonAsync<ServiceResponse<T>>();
         }
 
 
