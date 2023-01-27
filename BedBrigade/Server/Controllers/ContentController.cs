@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BedBrigade.Server.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class ContentController : ControllerBase
     {
         private readonly DataContext _context;
