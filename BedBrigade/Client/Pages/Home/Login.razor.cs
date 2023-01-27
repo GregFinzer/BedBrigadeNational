@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services.AuthService;
+﻿using BedBrigade.Client.Services;
 using BedBrigade.Shared;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
