@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Gateway.cs" />
     <Compile Remove="Header.razor.cs" />
+    <Compile Remove="IGateway.cs" />
   </ItemGroup>
 
   <ItemGroup>

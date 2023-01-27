@@ -1,4 +1,5 @@
-﻿using BedBrigade.Server.Data;
+﻿using BedBrigade.Server.Services;
+using BedBrigade.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -25,14 +26,22 @@ namespace BedBrigade.Server
         public static void AddServicesToTheContainer(WebApplicationBuilder builder)
         {
             Log.Logger.Information("Add services to the container");
-            
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+            //services cors
+            builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
+            {
+                builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+            }));
 
             //Configure Swagger
             builder.Services.AddSwaggerGen();
@@ -53,8 +62,9 @@ namespace BedBrigade.Server
             }
             else
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                // Swagger should only be in developement
+                //app.UseSwagger();
+                //app.UseSwaggerUI();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -86,7 +96,7 @@ namespace BedBrigade.Server
                     endpoints.MapControllers();
                 });
             });
-
+            app.UseCors("corsapp");
             return app;
         }
 

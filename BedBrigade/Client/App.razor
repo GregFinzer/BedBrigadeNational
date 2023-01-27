@@ -8,16 +8,16 @@
 @inject ILogger<App> Logger
 
 <CascadingAuthenticationState>
-
     <Router AppAssembly="@typeof(App).Assembly"
+            PreferExactMatches="@true"
             AdditionalAssemblies="@lazyLoadedAssemblies"
             OnNavigateAsync="@OnNavigateAsync">
-        <Navigating>
+@*        <Navigating>
             <div>
                 <p>Loading Administration</p>
             </div>
         </Navigating>
-        <Found Context="routeData">
+*@        <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
                         <h3>Whoops! You're not allowed to see this page.</h3>
@@ -35,22 +35,22 @@
 
 @code {
     private List<Assembly> lazyLoadedAssemblies = new();
+    private const string AdminFullName = "BedBrigade.Admin.dll";
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
-        try
+        Logger.LogInformation("OnNavigate: {0}", args.Path);
+        if(args.Path.ToLower().Contains("administration"))
         {
-            if (args.Path.ToLower().Contains("administration"))
+            try
             {
-                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
-                    new[] { "BedBrigade.Admin.dll" });
-                lazyLoadedAssemblies.AddRange(assemblies);
+                    var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { AdminFullName });
+                    lazyLoadedAssemblies.AddRange(assemblies);        
             }
-        
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError("Error: {Message}", ex.Message);
+            catch (Exception ex)
+            {
+                Logger.LogError("Error: {Message}", ex.Message);
+            }
         }
     }
 }
