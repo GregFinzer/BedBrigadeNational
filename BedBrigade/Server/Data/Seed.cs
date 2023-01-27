@@ -31,8 +31,8 @@ namespace BedBrigade.Server.Data
             new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
             new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
             new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
-            new User {FirstName = "National", LastName = "Editor", Role = "National Editor"},
-            new User {FirstName = "National", LastName = "Admin", Role = "National Admin"}
+            new User {FirstName =  _seedLocationNational, LastName = "Editor", Role = "National Editor"},
+            new User {FirstName =  _seedLocationNational, LastName = "Admin", Role = "National Admin"}
 
         };
         static readonly List<User> Users = users;
@@ -61,7 +61,7 @@ namespace BedBrigade.Server.Data
                     SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
                     var location = _seedLocationOhio;
                     var roleLocation = user.Role.Split(' ')[0];
-                    if (roleLocation == "National")
+                    if (roleLocation == _seedLocationNational)
                     {
                         location = _seedLocationNational;
                     }
