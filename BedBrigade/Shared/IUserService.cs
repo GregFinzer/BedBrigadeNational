@@ -1,7 +1,7 @@
 ﻿using BedBrigade.Shared;
 using static BedBrigade.Shared.Common;
 
-namespace BedBrigade.Admin.Services
+namespace BedBrigade.Shared
 {
     public interface IUserService 
     {

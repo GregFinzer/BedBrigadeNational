@@ -25,7 +25,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(dispose: true);
 
 Log.Logger.Information("Starting Up");
-
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddAuthorizationCore();

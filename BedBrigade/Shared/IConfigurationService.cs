@@ -1,7 +1,6 @@
-﻿using BedBrigade.Shared;
-
-namespace BedBrigade.Admin.Services
-{
+﻿
+namespace BedBrigade.Shared
+{ 
     public interface IConfigurationService 
     {
         Task<ServiceResponse<string>> CreateConfigAsync(Configuration objToCreate);
