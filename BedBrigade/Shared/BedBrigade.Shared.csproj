@@ -7,13 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\**" />
+    <EmbeddedResource Remove="Components\**" />
+    <None Remove="Components\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Gateway.cs" />
     <Compile Remove="Header.razor.cs" />
     <Compile Remove="IGateway.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Components\Header.razor" />
     <None Remove="Header.razor" />
     <None Remove="Header.razor.css" />
   </ItemGroup>
@@ -25,9 +30,5 @@
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\" />
   </ItemGroup>
 </Project>

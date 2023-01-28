@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="BedBrigade.Admin.dll" />
+    <!--<BlazorWebAssemblyLazyLoad Include="ServiceProxies.dll" />-->
   </ItemGroup>
 
   <ItemGroup>

@@ -12,12 +12,7 @@
             PreferExactMatches="@true"
             AdditionalAssemblies="@lazyLoadedAssemblies"
             OnNavigateAsync="@OnNavigateAsync">
-@*        <Navigating>
-            <div>
-                <p>Loading Administration</p>
-            </div>
-        </Navigating>
-*@        <Found Context="routeData">
+        <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
                         <h3>Whoops! You're not allowed to see this page.</h3>
@@ -26,10 +21,14 @@
             </AuthorizeRouteView>
         </Found>
         <NotFound>
+            <PageTitle>Not found</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
                 <p>Sorry, there's nothing at this address.</p>
             </LayoutView>
         </NotFound>
+        <Navigating>
+            ... Loading Administration ...
+        </Navigating>
     </Router>
 </CascadingAuthenticationState>
 
@@ -39,13 +38,14 @@
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
-        Logger.LogInformation("OnNavigate: {0}", args.Path);
+        Logger.LogInformation("OnNavigate: {0}", args.Path.ToLower());
         if(args.Path.ToLower().Contains("administration"))
         {
             try
             {
-                    var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { AdminFullName });
-                    lazyLoadedAssemblies.AddRange(assemblies);        
+                var assembliesToLoad = new List<string> { AdminFullName };
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(assembliesToLoad);
+                lazyLoadedAssemblies.AddRange(assemblies);        
             }
             catch (Exception ex)
             {
