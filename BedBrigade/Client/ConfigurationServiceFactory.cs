@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using BedBrigade.Admin.Services;
+using BedBrigade.Shared;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Client
 {
-    public class ConfigurationServiceFactory
+    public class ConfigurationServiceFactory : IConfigurationServiceFactory
     {
         private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authState;
@@ -12,5 +14,7 @@ namespace BedBrigade.Client
             _http = http;
             _authState = authState;
         }
+
+        public IConfigurationService Create() => new ConfigurationService(_http, _authState);
     }
 }
