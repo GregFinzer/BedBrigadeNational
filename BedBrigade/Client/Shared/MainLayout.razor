@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using BedBrigade.Shared
+@inherits LayoutComponentBase
 
 <div class="">
     <Header />
@@ -6,7 +7,25 @@
     <main>
 
         <article class="content px-4">
-            @Body
-        </article>
+            <ErrorBoundary @ref=@errorBoundary >
+              <ChildContent>
+                    @Body
+              </ChildContent>
+            <ErrorContent>
+                <h2 class="w-100 text-center my-4">An Error has occured</h2>
+            </ErrorContent>
+            </ErrorBoundary>
+</article>
     </main>
 </div>
+
+@code {
+    private ErrorBoundary errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+        base.OnParametersSet();
+    }
+
+}
