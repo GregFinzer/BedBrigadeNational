@@ -1,9 +1,8 @@
 ﻿using BedBrigade.Shared;
 
-namespace BedBrigade.Client
+namespace BedBrigade.Client;
+
+public interface IUserServiceFactory
 {
-    public interface IUserServiceFactory
-    {
-        IUserService Create();
-    }
+    IUserService Create();
 }
