@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Components\**" />
-    <EmbeddedResource Remove="Components\**" />
-    <None Remove="Components\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Gateway.cs" />
     <Compile Remove="Header.razor.cs" />
     <Compile Remove="IGateway.cs" />
