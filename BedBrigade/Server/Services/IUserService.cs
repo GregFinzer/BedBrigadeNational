@@ -1,4 +1,5 @@
-﻿using BedBrigade.Shared;
+﻿
+using BedBrigade.Shared;
 
 namespace BedBrigade.Server.Services
 {
@@ -6,7 +7,7 @@ namespace BedBrigade.Server.Services
     {
         Task<ServiceResponse<User>> CreateAsync(User user);
         Task<ServiceResponse<bool>> DeleteAsync(string UserName);
-        Task<ServiceResponse<User>> Get(string UserName);
+        Task<ServiceResponse<User>> GetAsync(string UserName);
         Task<ServiceResponse<List<User>>> GetAllAsync();
         Task<ServiceResponse<User>> UpdateAsync(User user);
     }
