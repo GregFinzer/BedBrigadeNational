@@ -93,7 +93,7 @@ else
                         </GridEditSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="Created" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="UserName" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
@@ -101,8 +101,7 @@ else
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
                             <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="true">
-                            </GridColumn>
+                            <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" ) HeaderTextAlign="TextAlign.Center" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 
