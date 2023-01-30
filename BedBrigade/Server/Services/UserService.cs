@@ -33,8 +33,7 @@ namespace BedBrigade.Server.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
-            int.TryParse(_httpContextAccessor.HttpContext.User.FindFirstValue("LocationId") ?? "0", out int locationId);
-            var result = _context.Users.Where(u => u.Location.LocationId == locationId).ToList();
+            var result = _context.Users.ToList();
             if (result != null)
             {
                 return new ServiceResponse<List<User>>($"Found {result.Count} records.", true, result);
