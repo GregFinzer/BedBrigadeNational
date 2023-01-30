@@ -1,6 +1,8 @@
 ﻿
 using BedBrigade.Shared;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
 namespace BedBrigade.Admin.Services
@@ -9,6 +11,7 @@ namespace BedBrigade.Admin.Services
     {
         private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authState;
+
         public UserService(HttpClient http, AuthenticationStateProvider authState)
         {
             _http = http;

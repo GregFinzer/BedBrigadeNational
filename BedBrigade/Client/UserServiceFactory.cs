@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using BedBrigade.Shared;
 using BedBrigade.Admin.Services;
+using Blazored.LocalStorage;
 
 namespace BedBrigade.Client
 {
@@ -8,7 +9,9 @@ namespace BedBrigade.Client
     {
         private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authState;
-        public UserServiceFactory(HttpClient http, AuthenticationStateProvider authState)
+
+        public UserServiceFactory(HttpClient http
+            ,AuthenticationStateProvider authState)
         {
             _http = http;
             _authState = authState;

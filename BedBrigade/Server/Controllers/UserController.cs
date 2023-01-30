@@ -8,10 +8,10 @@ namespace BedBrigade.Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly Services.IUserService _userService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(Services.IUserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -32,7 +32,7 @@ namespace BedBrigade.Server.Controllers
             {
                 return BadRequest(new ServiceResponse<User>("UserName is empty or null."));
             }
-            var response = await _userService.GetUserAsync(UserName);
+            var response = await _userService.GetAsync(UserName);
             if (response.Success)
             {
                 return Ok(response);
@@ -64,7 +64,7 @@ namespace BedBrigade.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServiceResponse<bool>>> Delete(string UserName)
         {
-            var response = await _userService.DeleteUserAsync(UserName);
+            var response = await _userService.DeleteAsync(UserName);
             if (response.Success)
             {
                 return Ok(response);

@@ -28,11 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BedBrigade.Admin\BedBrigade.Admin.csproj" />
     <ProjectReference Include="..\Shared\BedBrigade.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="BedBrigade.Admin.dll" />
-    <!--<BlazorWebAssemblyLazyLoad Include="ServiceProxies.dll" />-->
   </ItemGroup>
 
   <ItemGroup>

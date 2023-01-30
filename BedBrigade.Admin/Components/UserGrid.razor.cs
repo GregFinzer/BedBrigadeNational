@@ -1,16 +1,15 @@
-﻿using Blazored.LocalStorage;
+﻿using BedBrigade.Shared;
+using BedBrigade.Admin.Services;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
+using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
-using Action = Syncfusion.Blazor.Grids.Action;
-using BedBrigade.Admin.Services;
-using BedBrigade.Shared;
-using System.Reflection;
-using static BedBrigade.Shared.Common;
-using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using Syncfusion.Blazor.DropDowns;
+using static BedBrigade.Shared.Common;
+using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Admin.Components
 {
@@ -66,7 +65,7 @@ namespace BedBrigade.Admin.Components
                 ToolBar = new List<string> { "Search" };
             }
             var getUsers = await _svcUser.GetAllAsync();
-            if(getUsers.Success)
+            if (getUsers.Success)
             {
                 Users = getUsers.Data;
             }
@@ -105,7 +104,7 @@ namespace BedBrigade.Admin.Components
         }
         public async Task OnActionBegin(ActionEventArgs<User> args)
         {
-            
+
             var requestType = args.RequestType;
             switch (requestType)
             {

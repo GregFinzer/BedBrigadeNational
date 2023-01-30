@@ -21,7 +21,7 @@ namespace BedBrigade.Server.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ServiceResponse<User>> Get(string UserName)
+        public async Task<ServiceResponse<User>> GetAsync(string UserName)
         {
             var result = await _context.Users.FindAsync(UserName);
             if (result != null)
