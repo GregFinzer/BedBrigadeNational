@@ -4,32 +4,36 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Services
 @using Microsoft.Extensions.Logging
 @using BedBrigade.Admin
+@using BedBrigade.Client.Components
+
 @inject LazyAssemblyLoader AssemblyLoader
 @inject ILogger<App> Logger
 
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly"
-            PreferExactMatches="@true"
-            AdditionalAssemblies="@lazyLoadedAssemblies"
-            OnNavigateAsync="@OnNavigateAsync">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                        <h3>Whoops! You're not allowed to see this page.</h3>
-                        <h5>Please <a href="home/login">login</a></h5>
-                </NotAuthorized>
-            </AuthorizeRouteView>
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p>Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-        <Navigating>
-            ... Loading Administration ...
-        </Navigating>
-    </Router>
+    <Error>
+        <Router AppAssembly="@typeof(App).Assembly"
+                PreferExactMatches="@true"
+                AdditionalAssemblies="@lazyLoadedAssemblies"
+                OnNavigateAsync="@OnNavigateAsync">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                            <h3>Whoops! You're not allowed to see this page.</h3>
+                            <h5>Please <a href="home/login">login</a></h5>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p>Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+            <Navigating>
+                ... Loading Administration ...
+            </Navigating>
+        </Router>
+    </Error>
 </CascadingAuthenticationState>
 
 @code {
