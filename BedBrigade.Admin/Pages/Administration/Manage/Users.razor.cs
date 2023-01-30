@@ -59,7 +59,7 @@ public partial class Users : ComponentBase
         _logger.LogInformation("Starting User Grid");
         var authState = await _authState.GetAuthenticationStateAsync();
         Identity = authState.User;
-        if (Identity.IsInRole("Admin"))
+        if (Identity.IsInRole("NationalAdmin"))
         {
             ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
             ContextMenu = new List<string> { "Edit", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
