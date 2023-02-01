@@ -1,5 +1,5 @@
 ﻿@page "/administration/admin/dashboard"
-@attribute [Authorize(Roles = "NationalAdmin")]
+@attribute [Authorize(Roles = "National Admin")]
 @layout BedBrigade.Admin.Shared.MainLayout
 <h3 class="w-100 text-center">Administrative Dashboard</h3>
 
@@ -14,8 +14,7 @@
     </div>
 }
 else
-{
-    
+{    
     <div class="control-section" id="target">
         <div class="text-center">
             <h2>Bed Brigade</h2>

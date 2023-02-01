@@ -22,6 +22,19 @@ namespace BedBrigade.Server.Data
         private const string _seedUserPassword = "Password";
         private const string _seedUserLocation = "Location";
 
+        private static List<Location> locations = new()
+        {
+            new Location {Name="Bed Brigade Columbus", Route="/", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Vinyard Church Circleville", Route="/Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Hardbarger Impact", Route="/lancaster", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Upper Arlington Lutheran Church", Route="/Arlington", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
+            new Location {Name="Bed Brigade Greensburg United Methodist Church", Route="/canton", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
+
+        };
+
         private static readonly List<User> users = new()
         {
             new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "_seeUserLocation Contributor"},
@@ -159,8 +172,10 @@ namespace BedBrigade.Server.Data
             };
             var rec = context.Locations.ToList();
             if (rec.Count > 0)
+            {
                 context.Locations.RemoveRange(locations);
-
+                context.SaveChangesAsync();
+            }
             await context.Locations.AddRangeAsync(locations);
             await context.SaveChangesAsync();
         }
