@@ -11,18 +11,18 @@ namespace BedBrigade.Server.Data
         private const string _seedLocationOhio = "OhioColumbus";
         private const string _seedLocationArizona = "ArizonaPrescott";
 
-        private static List<Location> locations = new()
-        {
-            new Location {Name = "Bed Brigade Columbus", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Living Hope Church", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Rock City Polaris", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Peace Lutheran", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Vinyard Church Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Hardbarger Impact", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Upper Arlington Lutheran Church", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
-            new Location {Name = "Bed Brigade Greensburg United Methodist Church", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
+        //private static List<Location> locations = new()
+        //{
+        //    new Location {Name = "Bed Brigade Columbus", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Living Hope Church", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Rock City Polaris", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Peace Lutheran", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Vinyard Church Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Hardbarger Impact", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Upper Arlington Lutheran Church", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
+        //    new Location {Name = "Bed Brigade Greensburg United Methodist Church", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
 
-        };
+        //};
 
 
         // Table User
