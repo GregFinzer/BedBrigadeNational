@@ -1,5 +1,5 @@
-﻿using BedBrigade.Shared;
-using BedBrigade.Admin.Services;
+﻿using BedBrigade.Client;
+using BedBrigade.Shared;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -13,19 +13,19 @@ using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Admin.Components
 {
-    public partial class UserGrid : ComponentBase
+
+    public partial class UsersGrid : ComponentBase
     {
-        [Inject] private IUserService _svcUser { get; set; }
-        [Inject] private ILocalStorageService _svcLocal { get; set; }
+        [Inject] private IUserServiceFactory UserServiceFactory { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
-        [Inject] private ILogger _logger { get; set; }
+        [Inject] private ILogger<User> _logger { get; set; }
 
         private ClaimsPrincipal Identity { get; set; }
         protected SfGrid<User>? Grid { get; set; }
         protected SfDropDownList<string, Role>? RoleDD { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
-        protected List<User>? Users { get; set; }
+        protected List<User>? BBUsers { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
         protected string? _state { get; set; }
@@ -39,23 +39,26 @@ namespace BedBrigade.Admin.Components
         protected int ToastTimeout { get; private set; } = 3000;
         protected string ToastWidth { get; private set; } = "300";
         protected List<Role> Roles = new List<Role>()
-        {
-            new Role { Id = "National Admin", Name = "National Admin" },
-            new Role { Id = "National Editor", Name = "National Editor" },
-            new Role { Id = "Location Admin", Name = "Location Admin" },
-            new Role { Id = "Location Contributor", Name = "Location Contributor" },
-            new Role { Id = "Location Author", Name = "Location Author" },
-            new Role { Id = "Location Editor", Name = "Location Editor" },
-            new Role { Id = "Location Scheduler", Name = "Location Scheduler" },
-            new Role { Id = "Location Communications", Name = "Location Communications" },
-        };
+    {
+        new Role { Id = "National Admin", Name = "National Admin" },
+        new Role { Id = "National Editor", Name = "National Editor" },
+        new Role { Id = "Location Admin", Name = "Location Admin" },
+        new Role { Id = "Location Contributor", Name = "Location Contributor" },
+        new Role { Id = "Location Author", Name = "Location Author" },
+        new Role { Id = "Location Editor", Name = "Location Editor" },
+        new Role { Id = "Location Scheduler", Name = "Location Scheduler" },
+        new Role { Id = "Location Communications", Name = "Location Communications" },
+    };
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "550px" };
+        private IUserService _svcUser;
 
         protected override async Task OnInitializedAsync()
         {
+            _svcUser = UserServiceFactory.Create();
+            _logger.LogInformation("Starting User Grid");
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("Admin"))
+            if (Identity.IsInRole("NationalAdmin"))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -67,7 +70,7 @@ namespace BedBrigade.Admin.Components
             var getUsers = await _svcUser.GetAllAsync();
             if (getUsers.Success)
             {
-                Users = getUsers.Data;
+                BBUsers = getUsers.Data;
             }
             //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
 
@@ -113,19 +116,20 @@ namespace BedBrigade.Admin.Components
                     break;
 
                 case Action.Add:
-                    NewMethod();
+                    Add();
                     break;
 
                 case Action.Save:
-                    await Save(args); break;
+                    await Save(args);
+                    break;
                 case Action.BeginEdit:
-                    Save();
+                    BeginEdit();
                     break;
             }
 
         }
 
-        private void Save()
+        private void BeginEdit()
         {
             HeaderTitle = "Update User";
             ButtonTitle = "Update User";
@@ -183,13 +187,13 @@ namespace BedBrigade.Admin.Components
             var userResult = await _svcUser.GetAllAsync();
             if (userResult.Success)
             {
-                Users = userResult.Data;
+                BBUsers = userResult.Data;
             }
             Grid.CallStateHasChanged();
             Grid.Refresh();
         }
 
-        private void NewMethod()
+        private void Add()
         {
             HeaderTitle = "Add User";
             ButtonTitle = "Add User";
@@ -214,7 +218,7 @@ namespace BedBrigade.Admin.Components
             var result = await _svcUser.GetAllAsync();
             if (result.Success)
             {
-                Users = result.Data;
+                BBUsers = result.Data;
             }
             Grid.CallStateHasChanged();
             Grid.Refresh();

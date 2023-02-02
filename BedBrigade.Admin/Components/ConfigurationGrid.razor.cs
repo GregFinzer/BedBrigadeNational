@@ -29,18 +29,18 @@ namespace BedBrigade.Admin.Components
         protected SfGrid<Configuration>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
-        protected string?_state { get; set; }
-        protected string?HeaderTitle { get; set; }
-        protected string?ButtonTitle { get; private set; }
-        protected string?addNeedDisplay { get; private set; }
-        protected string?editNeedDisplay { get; private set; }
+        protected string? _state { get; set; }
+        protected string? HeaderTitle { get; set; }
+        protected string? ButtonTitle { get; private set; }
+        protected string? addNeedDisplay { get; private set; }
+        protected string? editNeedDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
-        protected string?ToastTitle { get; set; }
-        protected string?ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } 
+        protected string? ToastTitle { get; set; }
+        protected string? ToastContent { get; set; }
+        protected int ToastTimeout { get; set; }
 
-        protected string?RecordText { get; set; } = "Loading Configuration ...";
-        protected string?Hide { get; private set; } = "true";
+        protected string? RecordText { get; set; } = "Loading Configuration ...";
+        protected string? Hide { get; private set; } = "true";
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -54,7 +54,7 @@ namespace BedBrigade.Admin.Components
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
             if (Identity.IsInRole("Admin"))
-            { 
+            {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
@@ -65,7 +65,7 @@ namespace BedBrigade.Admin.Components
             }
 
             var result = await _svcConfiguration.GetAllAsync();
-            if(result.Success)
+            if (result.Success)
             {
                 ConfigRecs = result.Data.ToList();
             }
@@ -93,7 +93,7 @@ namespace BedBrigade.Admin.Components
         protected async Task OnLoad()
         {
             var result = await _svcUser.GetPersistAsync(PersistGrid.Configuration);
-            if(result.Success)
+            if (result.Success)
             {
                 await Grid.SetPersistData(_state);
             }

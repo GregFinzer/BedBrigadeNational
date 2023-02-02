@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace BedBrigade.Admin.Pages.Administration.Admin
+namespace BedBrigade.Admin.Pages.Administration
 {
     public partial class Dashboard : ComponentBase
     {

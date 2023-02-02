@@ -69,7 +69,7 @@ namespace BedBrigade.Pages.Home
 
                 await _local.SetItemAsync("authToken", result.Data);
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/Administration/Admin/Dashboard");
+                NavigationManager.NavigateTo("/Administration/Dashboard");
             }
             else
             {
