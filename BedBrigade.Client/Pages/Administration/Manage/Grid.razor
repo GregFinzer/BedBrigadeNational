@@ -5,7 +5,7 @@
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Inputs
 
-<h3>Grid - Employee: @EmployeeData.Count()</h3>
+<h3>Grid - Employee</h3>
 
 @if (EmployeeData == null)
 {
@@ -74,7 +74,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(10000);
         EmployeeData = Enumerable.Range(1, 15).Select(x => new Employee()
         {
             EmployeeId = 1000 + x,
