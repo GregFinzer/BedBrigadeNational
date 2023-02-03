@@ -21,7 +21,7 @@ namespace BedBrigade.Tests
         [Test]
         public void QualityCheckBedBrigadeClient()
         {
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade", "Client");
+            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Client");
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
             if (result.QualityViolations.Any())
@@ -39,8 +39,9 @@ namespace BedBrigade.Tests
         public void QualityCheckBedBrigadeServer()
         {
             _qualityLogic.Config.DirectoriesToExclude.Add("Migrations");
-            
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade", "Server");
+            _qualityLogic.Config.DirectoriesToExclude.Add("Seeding");
+
+            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Server");
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
             if (result.QualityViolations.Any())
@@ -57,7 +58,7 @@ namespace BedBrigade.Tests
         [Test]
         public void QualityCheckBedBrigadeShared()
         {
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade", "Shared");
+            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Shared");
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
             if (result.QualityViolations.Any())

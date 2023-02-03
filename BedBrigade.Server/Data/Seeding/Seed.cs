@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
-namespace BedBrigade.Server.Data
+namespace BedBrigade.Server.Data.Seeding
 {
     public class Seed
     {
