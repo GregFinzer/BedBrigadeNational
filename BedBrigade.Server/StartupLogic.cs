@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Server.Data;
+using BedBrigade.Server.Data.Seeding;
 using BedBrigade.Server.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

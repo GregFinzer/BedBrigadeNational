@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace BedBrigade.Server.Data
+namespace BedBrigade.Server.Data.Seeding
 {
     public static class SeedRoutines
     {
