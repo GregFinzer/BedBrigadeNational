@@ -1,4 +1,5 @@
-﻿using BedBrigade.Shared;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.DropDowns;
