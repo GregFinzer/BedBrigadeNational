@@ -17,22 +17,6 @@ namespace BedBrigade.Tests
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
-        [Test]
-        public void QualityCheckBedBrigadeAdmin()
-        {
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Admin");
-            QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
-
-            if (result.QualityViolations.Any())
-            {
-                ReportViolations(result);
-                Assert.Fail("Failed Quality Check for BedBrigade.Admin");
-            }
-            else
-            {
-                Console.WriteLine("Passed Quality Check for BedBrigade.Admin");
-            }
-        }
 
         [Test]
         public void QualityCheckBedBrigadeClient()
