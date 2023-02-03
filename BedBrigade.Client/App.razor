@@ -1,0 +1,24 @@
+﻿@using BedBrigade.Client.Components
+
+<CascadingAuthenticationState>
+    <Error>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+                    <NotAuthorized>
+                            <h3>Whoops! You're not allowed to see this page.</h3>
+                            <h5>Please <a href="home/login">login</a></h5>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </Error>
+</CascadingAuthenticationState>

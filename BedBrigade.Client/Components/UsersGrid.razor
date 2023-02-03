@@ -1,0 +1,126 @@
+﻿@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Notifications
+@using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
+@using BedBrigade.Shared
+
+
+@if (BBUsers == null)
+{
+    <span class="spinner-grow m-5"></span>
+
+    <span>Loading ....</span>
+}
+else
+{
+    <fieldset class="m-4">
+        <legend>Users</legend>
+        <div class="col-md-12 control-sec">
+            <div class="content-wrapper">
+                <div class="row align-content-center">
+                    <SfGrid @ref="Grid" TValue="User" DataSource=@BBUsers ContextMenuItems=@ContextMenu
+                        EnablePersistence="true"
+                        ShowColumnChooser="true"
+                        Toolbar=@ToolBar
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowExcelExport="true"
+                        ShowColumnMenu="true"
+                        AllowFiltering="false"
+                        AllowReordering="true"
+                        AllowResizing="true"
+                        AllowSelection="true"
+                        AllowPdfExport="true"
+                        AllowTextWrap="true">
+                        <GridTextWrapSettings WrapMode="WrapMode.Header" />
+                        <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
+                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="User" />
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    <span>@HeaderTitle</span>
+                                }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as User)) IsPrimary="true">@ButtonTitle</SfButton>
+                                <SfButton OnClick=@Cancel>Cancel</SfButton>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    var user = (context as User);
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox ID="username" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="User Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox ID="password" @bind-Value=@UserPassword Enabled=@UserPass Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox ID="firstname" @bind-Value=@user.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox ID="lastname" @bind-Value=@user.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="Phone Number" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox ID="email" @bind-Value=@user.Email Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    //<div class="form-row">
+                                    //    <div class="form-group col-md-4">
+                                    //        <SfCheckBox @bind-Checked=@user.IsText Disabled=true Label="Text Notification" LabelPosition="LabelPosition.After" />
+                                    //    </div>
+                                    //    <div class="form-group col-md-4">
+                                    //        <SfCheckBox @bind-Checked=@user.IsEmail Disabled=true Label="Email Notification" LabelPosition="LabelPosition.After" />
+                                    //    </div>
+                                    //    <div class="form-group col-md-4">
+                                    //        <SfCheckBox @bind-Checked=@user.TwoFactorEnabled Label="Two Factor" LabelPosition="LabelPosition.After" />
+                                    //    </div>
+                                    //</div>
+                                    <p>Roles</p>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                        </div>
+                                    </div>
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="UserName" Direction="SortDirection.Ascending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" ) HeaderTextAlign="TextAlign.Center" AutoFit="true" />
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+}
+<SfToast ID="SaveToast" CssClass="membertoast" @ref=@ToastObj Title=@ToastTitle Timeout=@ToastTimeout Width=@ToastWidth>
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+

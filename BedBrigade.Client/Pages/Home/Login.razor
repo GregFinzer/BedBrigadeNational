@@ -1,0 +1,69 @@
+﻿@page "/home/login"
+@page "/home/login/{user}"
+@page "/home/login/{user}/{password}"
+
+
+@using BedBrigade.Client.Components
+@using BedBrigade.Shared;
+
+@inherits LoginBase
+
+<div class="text-center w-100 m-2 text-black-50">
+    <h2>Bed Brigade Web</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Please enter your login details</h5>
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="email">User Name</label>
+                <InputText Id="email" @ref=@inputTextFocus class="form-control" @bind-Value="loginModel.Email"  />
+                <ValidationMessage For="@(() => loginModel.Email)" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <InputText Id="password" type=@passwordType class="form-control" @bind-Value="loginModel.Password" />
+                <ValidationMessage For="@(() => loginModel.Password)" />
+            </div>
+            <div class="form-group">
+                <input type="checkbox" checked=@showPassword @oninput=@HandlePassword />
+                <label for="showPassword">Show Password</label>
+            </div>
+            <h6 class="warning login-error text-center" style="display: @DisplayError">@errorMessage</h6>
+            <div class="w-100 text-center">
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<style>
+    .e-card-image {
+    }
+
+    .card {
+        border-radius: 25px;
+        border: 1px solid rgb(0,0,255,.8);
+        width: 40%;
+        margin-left: 30%;
+        margin-bottom: 25px;
+        margin-top: 50px;
+    }
+
+    .e-card .e-card-content {
+    }
+
+    .e-card.e-card-horizontal img {
+        margin: 0px;
+        width: 50%
+    }
+
+    .login-error {
+        color: red;
+        margin: 10px;
+    }
+</style>
