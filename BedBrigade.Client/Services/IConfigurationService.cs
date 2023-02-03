@@ -1,7 +1,8 @@
-﻿
-namespace BedBrigade.Shared;
+﻿using BedBrigade.Shared;
 
-public interface IConfigurationService 
+namespace BedBrigade.Client.Services;
+
+public interface IConfigurationService
 {
     Task<ServiceResponse<string>> CreateConfigAsync(Configuration objToCreate);
     Task<ServiceResponse<bool>> DeleteConfigAsync(string configKey);
