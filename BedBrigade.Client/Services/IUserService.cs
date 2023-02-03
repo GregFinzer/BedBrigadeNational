@@ -1,8 +1,9 @@
-﻿using static BedBrigade.Shared.Common;
+﻿using BedBrigade.Shared;
+using static BedBrigade.Shared.Common;
 
-namespace BedBrigade.Shared;
+namespace BedBrigade.Client.Services;
 
-public interface IUserService 
+public interface IUserService
 {
     Task<ServiceResponse<string>> GetPersistAsync(PersistGrid user);
     Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
