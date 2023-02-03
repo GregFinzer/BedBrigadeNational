@@ -7,7 +7,7 @@
 @using Syncfusion.Blazor.Inputs
 @using BedBrigade.Shared
 
-<h3>Grid - Employee</h3>
+<h3>Grid - User</h3>
 
 @if (BBUsers == null)
 {
@@ -17,7 +17,7 @@ else
 {
 
     <SfGrid @ref=@EmpGrid DataSource="@BBUsers" Toolbar="@ToolBar" ContextMenuItems="@ContextMenu">
-        <GridEditSettings AllowEditing="true" AllowAdding="true" AllowDeleting="true" Mode="Syncfusion.Blazor.Grids.EditMode.Dialog">
+        <GridEditSettings AllowEditing="true" AllowAdding="true" AllowDeleting="true" Mode="EditMode.Dialog">
             <HeaderTemplate>
                 @{
                     <span>User</span>
@@ -33,11 +33,11 @@ else
 
                     <div>
                         <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <SfTextBox @bind-Value=@rec.UserName Placeholder="Name" />
+                            <div class="form-group col-md-6 m-4">
+                                <SfTextBox @bind-Value=@rec.UserName Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
                             </div>
-                            <div class="form-group col-md-6">
-                                <SfTextBox @bind-Value=@rec.Email Placeholder="Email" />
+                            <div class="form-group col-md-6 m-4">
+                                <SfTextBox @bind-Value=@rec.Email Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
                             </div>
                         </div>
                     </div>

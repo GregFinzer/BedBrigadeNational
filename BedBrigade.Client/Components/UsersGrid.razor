@@ -19,7 +19,8 @@ else
         <div class="col-md-12 control-sec">
             <div class="content-wrapper">
                 <div class="row align-content-center">
-                    <SfGrid @ref="Grid" TValue="User" DataSource=@BBUsers ContextMenuItems=@ContextMenu
+                    <SfGrid @ref="Grid" TValue="User" DataSource=@BBUsers 
+                        ContextMenuItems=@ContextMenu
                         EnablePersistence="true"
                         ShowColumnChooser="true"
                         Toolbar=@ToolBar
@@ -92,12 +93,12 @@ else
                                 }
                             </Template>
                         </GridEditSettings>
-                        <GridSortSettings>
+@*                        <GridSortSettings>
                             <GridSortColumns>
                                 <GridSortColumn Field="UserName" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridColumns>
+*@                        <GridColumns>
                             <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="true" />
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
                             <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />

@@ -50,8 +50,8 @@ namespace BedBrigade.Server.Data
 
         private static readonly List<User> users = new()
         {
-            new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "_seeUserLocation Contributor"},
-            new User {FirstName = _seedUserLocation, LastName = "Author", Role = "_seeUserLocation Author" },
+            new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "UserLocation Contributor"},
+            new User {FirstName = _seedUserLocation, LastName = "Author", Role = "UserLocation Author" },
             new User {FirstName = _seedUserLocation, LastName = "Editor", Role = "Location Editor" },
             new User {FirstName = _seedUserLocation, LastName = "Scheduler", Role = "Location Scheduler" },
             new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
