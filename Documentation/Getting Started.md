@@ -37,8 +37,16 @@ In order to run the NUnit Tests and check for Quality Locally, please set a Wind
 * Download the Secrets Folder.
 * Open the file Bed Brigade National Website Information.docx to see the Gold Suite License Key.
 
+### 6. Seed the data
+* Open the solution in Visual Studio 
+* On the menu, select View -> Other Windows -> Package Manager Console
+* Enter:  cd bedbrigade.server
+* Enter:  dotnet ef database update
 
-### 6. Run the Application
+### 7. Run the Application
+* Right click the solution
+* Set startup projects
+    * Order the server first and then the client
+    * Set both to start
 * Press the play button
-* Execute Swagger Locally:  http://localhost:5125/swagger/index.html
-    
+
