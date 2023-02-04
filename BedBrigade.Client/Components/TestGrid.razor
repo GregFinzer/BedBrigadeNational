@@ -1,0 +1,139 @@
+﻿@layout BedBrigade.Client.Shared.AdminLayout
+@page "/administration/manage/grid"
+@using System.ComponentModel.DataAnnotations
+@using BedBrigade.Client.Services;
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using BedBrigade.Shared
+
+<h3>Grid - User</h3>
+
+@if (BBUsers == null)
+{
+    <span class="spinner-grow m-5"></span><span>Loading ....</span>
+}
+else
+{
+
+    <SfGrid @ref=@EmpGrid DataSource="@BBUsers" Toolbar="@ToolBar" ContextMenuItems="@ContextMenu">
+        <GridEditSettings AllowEditing="true" AllowAdding="true" AllowDeleting="true" Mode="EditMode.Dialog">
+            <HeaderTemplate>
+                @{
+                    <span>User</span>
+                }
+            </HeaderTemplate>
+            <FooterTemplate>
+                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as User)) IsPrimary="true">Update</SfButton>
+                <SfButton OnClick="Cancel">Cancel</SfButton>
+            </FooterTemplate>
+            <Template>
+                @{
+                    var rec = (context as User);
+
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6 m-4">
+                                <SfTextBox @bind-Value=@rec.UserName Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
+                            </div>
+                            <div class="form-group col-md-6 m-4">
+                                <SfTextBox @bind-Value=@rec.Email Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                            </div>
+                        </div>
+                    </div>
+                 }
+            </Template>
+        </GridEditSettings>
+        <GridTemplates>
+            <EmptyRecordTemplate>
+                <span>@RecordText</span>
+            </EmptyRecordTemplate>
+        </GridTemplates>
+        <GridColumns>
+            <GridColumn Field="@nameof(User.UserName)" HeaderText="User Name" TextAlign="TextAlign.Left"></GridColumn>
+            <GridColumn Field="@nameof(User.Email)" HeaderText="Email" TextAlign="TextAlign.Left"></GridColumn>
+            <GridColumn Field="@nameof(User.Phone)" HeaderText="Phone" TextAlign="TextAlign.Left"></GridColumn>
+            <GridColumn Field="@nameof(User.Role)" HeaderText="Role" TextAlign="TextAlign.Left"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+@code {
+
+    [Inject] private IUserService _svcUser { get; set; }
+
+    public SfGrid<User> EmpGrid { get; set; }
+
+    public class Employee
+    {
+        public int EmployeeId { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Designation { get; set; }
+        public DateTime DOJ { get; set; }
+        public double Salary { get; set; }
+    }
+
+    public List<Employee> EmployeeData { get; set; }
+    public string RecordText { get; set; } //= "Loading records ...";
+    public List<User> BBUsers = new ();
+    public List<string> ToolBar;
+    public List<string> ContextMenu;
+    protected override async Task OnInitializedAsync()
+    {
+        //_logger.LogInformation("Starting User Grid");
+        //var authState = await _authState.GetAuthenticationStateAsync();
+        //Identity = authState.User;
+        //if (Identity.IsInRole("National Admin"))
+        //{
+            ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+            ContextMenu = new List<string> { "Edit", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+        //}
+        //else
+        //{
+        //    ToolBar = new List<string> { "Search" };
+        //}
+        var getUsers = await _svcUser.GetAllAsync();
+        if (getUsers.Success)
+        {
+            BBUsers = getUsers.Data;
+        }
+        //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
+
+
+        //EmployeeData = Enumerable.Range(1, 15).Select(x => new Employee()
+        //{
+        //    EmployeeId = 1000 + x,
+        //    Name = (new String[] { "Alfki", "Anantr", "Anton", "Blomp", "Bolid" })[new Random().Next(5)],
+        //    Designation = (new String[] { "CMBKIO", "ERIPO", "EWOPHL", "WWIOPP", "MLOPSS" })[new Random().Next(5)],
+        //    DOJ = DateTime.Now.AddDays(-x),
+        //    Salary = 2000 * x,
+        //}).ToList();
+
+        //if (EmployeeData.Count == 0) RecordText = "No records found";
+
+    }
+
+    protected async Task OnDataBound()
+    {
+        if(EmployeeData.Count > 0)
+        {
+            RecordText = "Loading records...";
+        }
+        else
+        {
+            RecordText = "No records to display";
+        }
+    }
+
+    protected async Task Save(User user)
+    {
+        EmpGrid.EndEdit();
+    }
+
+    protected async Task Cancel()
+    {
+        EmpGrid.CloseEdit();
+    }
+
+}
