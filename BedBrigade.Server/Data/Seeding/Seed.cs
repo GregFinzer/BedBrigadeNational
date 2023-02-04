@@ -75,7 +75,7 @@ namespace BedBrigade.Server.Data.Seeding
 
         private static string GetHtml(string fileName)
         {
-            return File.ReadAllText($"./Data/SeedHtml/{fileName}");
+            return File.ReadAllText($"./Data/Seeding/SeedHtml/{fileName}");
         }
 
         private static async Task SeedUser(DataContext context)

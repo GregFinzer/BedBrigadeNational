@@ -15,9 +15,9 @@ namespace BedBrigade.Server.Migrations
             name: "PasswordHash",
             table: "Users");
 
-            migrationBuilder.DropColumn(
-                name: "PasswordSalt",
-                table: "Users");
+            //migrationBuilder.DropColumn(
+            //    name: "PasswordSalt",
+            //    table: "Users");
 
             migrationBuilder.AddColumn<string>(
             name: "PasswordHash",
@@ -36,6 +36,8 @@ namespace BedBrigade.Server.Migrations
             defaultValue: null);
 
         }
+
+
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
