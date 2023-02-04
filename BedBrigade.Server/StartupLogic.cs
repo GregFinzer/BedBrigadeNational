@@ -3,6 +3,7 @@ using BedBrigade.Server.Data.Seeding;
 using BedBrigade.Server.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Text.Json.Serialization;
 
 namespace BedBrigade.Server
 {
@@ -40,7 +41,8 @@ namespace BedBrigade.Server
             builder.Services.AddScoped<IDonationService, DonationService>();
             builder.Services.AddScoped<IBedRequestService, BedRequestService>();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             builder.Services.AddRazorPages();
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
