@@ -15,6 +15,7 @@ namespace BedBrigade.Client.Components
     public partial class UsersGrid : ComponentBase
     {
         [Inject] private IUserService _svcUser { get; set; }
+        [Inject] private ILocationService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
 
@@ -36,6 +37,8 @@ namespace BedBrigade.Client.Components
         protected string? ToastContent { get; private set; } = string.Empty;
         protected int ToastTimeout { get; private set; } = 3000;
         protected string ToastWidth { get; private set; } = "300";
+        public List<Location>? Locations { get; private set; }
+
         protected List<Role> Roles = new List<Role>()
     {
         new Role { Id = "National Admin", Name = "National Admin" },
@@ -68,6 +71,12 @@ namespace BedBrigade.Client.Components
             {
                 BBUsers = getUsers.Data;
             }
+            var getLocations = await _svcLocation.GetAllAsync();
+            if(getLocations.Success)
+            {
+                Locations = getLocations.Data;
+            }
+
             //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
 
         }
@@ -230,7 +239,7 @@ namespace BedBrigade.Client.Components
         }
         protected async Task DataBound()
         {
-            await Grid.AutoFitColumns();
+            //await Grid.AutoFitColumns();
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

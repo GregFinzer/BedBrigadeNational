@@ -2,6 +2,7 @@
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Buttons
 @using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
 @using BedBrigade.Shared
 
@@ -15,7 +16,7 @@
 else
 {
     <fieldset class="m-4">
-        <legend>Users</legend>
+        <legend>Bed Brigade Users</legend>
         <div class="col-md-12 control-sec">
             <div class="content-wrapper">
                 <div class="row align-content-center">
@@ -93,17 +94,17 @@ else
                                 }
                             </Template>
                         </GridEditSettings>
-@*                        <GridSortSettings>
+                        <GridSortSettings>
                             <GridSortColumns>
                                 <GridSortColumn Field="UserName" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-*@                        <GridColumns>
-                            <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AllowEditing="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" ) HeaderTextAlign="TextAlign.Center" AutoFit="true" />
+                        <GridColumns>
+                            <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
 
