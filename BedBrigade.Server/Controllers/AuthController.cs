@@ -18,6 +18,9 @@ namespace BedBrigade.Server.Controllers
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServiceResponse<bool>>> Register(UserRegister request)
         {
             var response = await _authService.Register(new User
@@ -35,6 +38,9 @@ namespace BedBrigade.Server.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServiceResponse<string>>> Login(UserLogin request)
         {
             var response = await _authService.Login(request.Email, request.Password);
@@ -47,6 +53,9 @@ namespace BedBrigade.Server.Controllers
         }
 
         [HttpPost("change-password"), Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServiceResponse<bool>>> ChangePassword([FromBody] string newPassword)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

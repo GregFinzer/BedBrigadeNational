@@ -99,7 +99,5 @@ namespace BedBrigade.Server.Controllers
             return BadRequest(response);
 
         }
-
-
     }
 }
