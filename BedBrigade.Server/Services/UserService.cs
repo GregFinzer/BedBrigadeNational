@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Server.Controllers;
 using BedBrigade.Server.Data;
 using BedBrigade.Shared;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Security.Claims;
 
@@ -33,7 +34,7 @@ namespace BedBrigade.Server.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
-            var result = _context.Users.ToList();
+            var result = _context.Users.Include(l => l.Location).ToList();
             if (result != null)
             {
                 return new ServiceResponse<List<User>>($"Found {result.Count} records.", true, result);
