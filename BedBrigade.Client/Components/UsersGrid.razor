@@ -96,15 +96,16 @@ else
                         </GridEditSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="UserName" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="FkLocation" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
-                            <GridColumn Field=@nameof(User.UserName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(User.FkLocation) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="Location" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
 
