@@ -12,7 +12,8 @@ namespace BedBrigade.Shared
 
         [Required]
         public Location Location { get; set; } = new Location();
-
+        [ForeignKey("Location")]
+        public int FkLocation { get; set; }
         [Required]
         [MaxLength(20)]
         public String FirstName { get; set; } = string.Empty;
