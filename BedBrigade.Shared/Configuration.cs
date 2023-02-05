@@ -9,7 +9,7 @@ namespace BedBrigade.Shared
         [Key, MaxLength(50), Required]
 		public String ConfigurationKey { get; set; } = string.Empty;
 
-        [MaxLength(255)] 
+        [MaxLength(255), Required] 
         public String? ConfigurationValue { get; set; } = string.Empty;
 
 
