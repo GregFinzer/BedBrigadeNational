@@ -39,7 +39,8 @@ namespace BedBrigade.Server.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
-            var location = int.TryParse(User.Claims.FirstOrDefault(c => c.Type == "ChurchId").Value);
+            //Compilation Error, Commented line below out Mike
+            //var location = int.TryParse(User.Claims.FirstOrDefault(c => c.Type == "ChurchId").Value);
             var result = _context.Users.Include(l => l.Location).ToList();
             if (result != null)
             {
