@@ -1,17 +1,20 @@
 ﻿using BedBrigade.Server.Controllers;
 using BedBrigade.Server.Data;
 using BedBrigade.Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Security.Claims;
 
 namespace BedBrigade.Server.Services
 {
-    public class UserService : IUserService
+   public class UserService : IUserService
     {
         private readonly DataContext _context;
         private readonly ILogger<UserController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEnumerable<Claim> _Claims;
 
         public UserService(DataContext context
             , ILogger<UserController> logger
@@ -20,6 +23,8 @@ namespace BedBrigade.Server.Services
             _context = context;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _Claims = _httpContextAccessor.HttpContext.User.Claims;
+
         }
 
         public async Task<ServiceResponse<User>> GetAsync(string UserName)
@@ -34,6 +39,7 @@ namespace BedBrigade.Server.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
+            var location = int.TryParse(User.Claims.FirstOrDefault(c => c.Type == "ChurchId").Value);
             var result = _context.Users.Include(l => l.Location).ToList();
             if (result != null)
             {

@@ -1,10 +1,12 @@
 ﻿using BedBrigade.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BedBrigade.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly Services.IUserService _userService;
@@ -49,6 +51,7 @@ namespace BedBrigade.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServiceResponse<List<User>>>> GetAll()
         {
+            
             var response = await _userService.GetAllAsync();
             if (response.Success)
             {
