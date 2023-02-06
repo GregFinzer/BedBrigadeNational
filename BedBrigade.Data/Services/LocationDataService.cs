@@ -22,7 +22,7 @@ public class LocationDataService : ILocationDataService
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<User>($"DB error on create of location record {content.Name} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<Location>($"DB error on create of location record {location.Name} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 
