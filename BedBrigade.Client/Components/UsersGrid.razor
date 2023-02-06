@@ -4,10 +4,12 @@
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Buttons
 @using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using WrapMode = Syncfusion.Blazor.Grids.WrapMode
 @using BedBrigade.Data.Models
 
 
-@if (BBUsers == null)
+@if (BBUsers == null || Locations == null)
 {
     <span class="spinner-grow m-5"></span>
 
