@@ -15,7 +15,7 @@ namespace BedBrigade.Data.Models
         public String? Path { get; set; } = string.Empty;
 
 		[MaxLength(30)] 
-        public String? Name { get; set; } = string.Empty;
+        public String? FileName { get; set; } = string.Empty;
 
 		[MaxLength(30)]
         public String? MediaType { get; set; } = string.Empty;
