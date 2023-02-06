@@ -13,7 +13,7 @@ public class ContentDataService : IContentDataService
         _context = context;
     }
 
-    public Task<ServiceResponse<Content>> CreateAsync(Content content)
+    public async Task<ServiceResponse<Content>> CreateAsync(Content content)
     {
         try
         {
@@ -23,7 +23,7 @@ public class ContentDataService : IContentDataService
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<User>($"DB error on create of content record {content.Name} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<Content>($"DB error on create of content record {content.Name} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 

@@ -12,13 +12,13 @@ public class LocationDataService : ILocationDataService
         _context= context;
     }
 
-    public Task<ServiceResponse<Location>> CreateAsync(Location location)
+    public async Task<ServiceResponse<Location>> CreateAsync(Location location)
     {
         try
         {
-            await _context.Content.AddAsync(location);
+            await _context.Locations.AddAsync(location);
             await _context.SaveChangesAsync();
-            return new ServiceResponse<Content>($"Added location record with key {location.Name}.", true);
+            return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true);
         }
         catch (DbException ex)
         {
