@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;

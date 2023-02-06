@@ -1,21 +1,22 @@
 ﻿
 using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services
 {
-    public class UserDataService : IUserDataService
+    public class UserDataService : BaseDataService, IUserDataService
     {
         private readonly DataContext _context;
 
-        public UserDataService(DataContext context)
+        public UserDataService(DataContext context, AuthenticationStateProvider authProvider) : base(authProvider)
         {
             _context = context;
         }
 
         public async Task<ServiceResponse<User>> GetAsync(string UserName)
-        {
+        {            
             var result = await _context.Users.FindAsync(UserName);
             if (result != null)
             {
@@ -26,9 +27,17 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
-            //Compilation Error, Commented line below out Mike
-            //var location = int.TryParse(User.Claims.FirstOrDefault(c => c.Type == "ChurchId").Value);
-            var result = _context.Users.Include(l => l.Location).ToList();
+            List<User> result;
+            if (!_identity.IsInRole("National Admin"))
+            {
+                int.TryParse(_identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+                result = _context.Users.Where(u => u.FkLocation == locationId).ToList();
+            }
+            else
+            {
+                result = _context.Users.ToList();
+            }
+
             if (result != null)
             {
                 return new ServiceResponse<List<User>>($"Found {result.Count} records.", true, result);

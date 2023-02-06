@@ -1,13 +1,14 @@
 ﻿using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
 
-public class LocationDataService : ILocationDataService
+public class LocationDataService : BaseDataService, ILocationDataService
 {
     private readonly DataContext _context;
 
-    public LocationDataService(DataContext context)
+    public LocationDataService(DataContext context, AuthenticationStateProvider authProvider) : base(authProvider)
     {
         _context= context;
     }
@@ -22,7 +23,7 @@ public class LocationDataService : ILocationDataService
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<User>($"DB error on create of location record {content.Name} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<Location>($"DB error on create of location record {location.Name} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 
