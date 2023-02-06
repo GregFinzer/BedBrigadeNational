@@ -33,4 +33,10 @@
       <Folder Include="Shared\" />
     </ItemGroup>
 
+  
+  
+    <ItemGroup>
+      <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
+    </ItemGroup>
+
 </Project>
