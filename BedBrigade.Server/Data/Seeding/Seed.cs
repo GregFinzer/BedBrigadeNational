@@ -118,15 +118,15 @@ namespace BedBrigade.Server.Data.Seeding
         private static async Task SeedMedia(DataContext context)
         {
 
-            if (!context.Media.Any(m => m.Name == "Logo"))
+            if (!context.Media.Any(m => m.FileName == "Logo"))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
                 context.Media.Add(new Media
                 {
                     Location = location!,
-                    Name = "logo",
+                    FileName = "logo",
                     MediaType = "png",
-                    Path = "images/national",
+                    Path = "media/national",
                     AltText = "Bed Brigade National Logo",
                     CreateDate = DateTime.Now,
                     UpdateDate = DateTime.Now,
