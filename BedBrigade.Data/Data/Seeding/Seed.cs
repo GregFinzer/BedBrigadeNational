@@ -187,7 +187,7 @@ namespace BedBrigade.Data.Seeding
             if (rec.Count > 0)
             {
                 context.Locations.RemoveRange(locations);
-                context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             await context.Locations.AddRangeAsync(locations);
             await context.SaveChangesAsync();
