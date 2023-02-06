@@ -14,8 +14,8 @@ namespace BedBrigade.Client.Pages.Administration
         public double TotalDonationsThisMonth { get; private set; }
         public double TotalDonationsThisYear { get; private set; }
 
-        public int DonationSource = 10;
-        public int VolunteerSource = 15;
+        public int? DonationSource = 10;
+        public int? VolunteerSource = 15;
 
         private class DataModel
         {
