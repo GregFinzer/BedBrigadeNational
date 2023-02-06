@@ -1,39 +1,38 @@
-﻿using BedBrigade.Shared;
+﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Json;
-using Configuration = BedBrigade.Shared.Configuration;
 
 namespace BedBrigade.Client.Services
 {
     public class ConfigurationService : IConfigurationService
     {
-        private readonly HttpClient _http;
+        private readonly IConfigurationDataService _data;
         private readonly AuthenticationStateProvider _authState;
-        public ConfigurationService(HttpClient http, AuthenticationStateProvider authState) 
+        public ConfigurationService(AuthenticationStateProvider authState, IConfigurationDataService dataService)
         {
-            _http = http;
+            _data = dataService;
             _authState = authState;
         }
 
         public async Task<ServiceResponse<bool>> DeleteConfigAsync(string configKey)
         {
-            return await _http.DeleteFromJsonAsync<ServiceResponse<bool>>($"api/configuration/{configKey}");
+            return await _data.DeleteAsync(configKey);  
         }
-        public async Task<ServiceResponse<string>> CreateConfigAsync(Configuration objToCreate)
+
+        public async Task<ServiceResponse<Configuration>> CreateConfigAsync(Configuration configuration)
         {
-            var result = await _http.PostAsJsonAsync($"api/configuration", objToCreate);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+            return await _data.CreateAsync(configuration);
         }
 
         public async Task<ServiceResponse<Configuration>> UpdateAsync(Configuration configuration)
         {
-            var result = await _http.PutAsJsonAsync($"api/configuration", configuration); 
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<Configuration>>();
+            return await _data.UpdateAsync(configuration);
         }
 
         public async Task<ServiceResponse<List<Configuration>>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<ServiceResponse<List<Configuration>>>($"api/Configuration/getconfiguration");
+            return await _data.GetAllAsync();
         }
     }
 }

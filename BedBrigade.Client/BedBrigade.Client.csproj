@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BedBrigade.Shared\BedBrigade.Shared.csproj" />
+    <ProjectReference Include="..\BedBrigade.Data\BedBrigade.Data.csproj" />
   </ItemGroup>
 
 

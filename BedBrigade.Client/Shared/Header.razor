@@ -1,6 +1,6 @@
-﻿@inject HttpClient Http;
-@using Microsoft.AspNetCore.Components
+﻿@using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop;
+@using BedBrigade.Client.Services;
 
 @((MarkupString)headerContent)
 
@@ -11,9 +11,14 @@
     [Parameter] public string InnerHtml { get; set; } = "Login";
     [Parameter] public string Attr { get; set; } = "/home/login";
     [Inject] private IJSRuntime _js { get; set; }
+    [Inject] private IContentService _svcContent { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        headerContent = await Http.GetStringAsync("api/Content/type/Header/name/Header");
+        var result = await _svcContent.GetAsync("Header");
+        if(result.Success)
+        {
+            headerContent = result.Data.ContentHtml;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -1,23 +1,23 @@
-﻿using BedBrigade.Shared;
+﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Client.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authStateProvider;
+        private readonly IAuthDataService _data;
 
-        public AuthService(HttpClient http, AuthenticationStateProvider authStateProvider)
+        public AuthService(AuthenticationStateProvider authStateProvider, IAuthDataService dataService)
         {
-            _http = http;
             _authStateProvider = authStateProvider;
+            _data = dataService;
         }
 
         public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
         {
-            var result = await _http.PostAsJsonAsync("api/auth/change-password", request.Password);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            return await _data.ChangePassword(request.UserId, request.Password);
         }
 
         public async Task<bool> IsUserAuthenticated()
@@ -27,14 +27,12 @@ namespace BedBrigade.Client.Services
 
         public async Task<ServiceResponse<string>> Login(UserLogin request)
         {
-            var result = await _http.PostAsJsonAsync("api/auth/login", request);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<string>>();
+            return await _data.Login(request.Email, request.Password);
         }
 
-        public async Task<ServiceResponse<bool>> Register(UserRegister request)
+        public async Task<ServiceResponse<bool>> RegisterAsync(UserRegister request)
         {
-            var result = await _http.PostAsJsonAsync("api/auth/register", request);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+                return await _data.Register(request.user, request.Password);
         }
     }
 }

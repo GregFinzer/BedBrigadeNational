@@ -1,4 +1,5 @@
-﻿using BedBrigade.Shared;
+﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Shared;
 
 namespace BedBrigade.Client.Services
 {

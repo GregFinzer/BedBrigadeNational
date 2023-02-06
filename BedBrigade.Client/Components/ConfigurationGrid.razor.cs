@@ -1,13 +1,12 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Shared;
+using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Shared.Common;
+using static BedBrigade.Data.Shared.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
-using Configuration = BedBrigade.Shared.Configuration;
 
 namespace BedBrigade.Client.Components
 {
@@ -91,7 +90,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(PersistGrid.Configuration);
+            var result = await _svcUser.GetPersistAsync(PersistGrid.User);
             if (result.Success)
             {
                 await Grid.SetPersistData(_state);
@@ -216,7 +215,7 @@ namespace BedBrigade.Client.Components
                 var createResult = await _svcConfiguration.CreateConfigAsync(Configuration);
                 if (createResult.Success)
                 {
-                    Configuration.ConfigurationKey = createResult.Data;
+                    Configuration config = createResult.Data;
                 }
                 ToastObj.Title = "Create Configuration";
                 if (string.IsNullOrEmpty(Configuration.ConfigurationKey))
