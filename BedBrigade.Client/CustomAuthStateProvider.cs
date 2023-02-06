@@ -22,15 +22,12 @@ namespace BedBrigade.Client
             string authToken = await _localStorageService.GetItemAsStringAsync("authToken");
 
             var identity = new ClaimsIdentity();
-            _http.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
             {
                 try
                 {
                     identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
-                    _http.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", authToken.Replace("\"", ""));
                 }
                 catch
                 {

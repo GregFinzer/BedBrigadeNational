@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
     <ProjectReference Include="..\BedBrigade.Data\BedBrigade.Data.csproj" />
   </ItemGroup>
 
