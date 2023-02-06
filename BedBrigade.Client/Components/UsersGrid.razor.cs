@@ -1,12 +1,12 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Shared;
+using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Shared.Common;
+using static BedBrigade.Data.Shared.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -15,6 +15,7 @@ namespace BedBrigade.Client.Components
     public partial class UsersGrid : ComponentBase
     {
         [Inject] private IUserService _svcUser { get; set; }
+        [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private ILocationService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
@@ -172,7 +173,8 @@ namespace BedBrigade.Client.Components
             else
             {
                 // new 
-                var registerResult = await _svcUser.RegisterUserAsync(user);
+                var newUser = new UserRegister { user = user, Password = string.Empty };
+                var registerResult = await _svcAuth.RegisterAsync(newUser);
                 ToastTitle = "Create User";
                 if (registerResult.Success)
                 {

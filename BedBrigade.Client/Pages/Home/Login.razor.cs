@@ -1,4 +1,4 @@
-﻿using BedBrigade.Shared;
+﻿using BedBrigade.Data.Models;
 using BedBrigade.Client.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;

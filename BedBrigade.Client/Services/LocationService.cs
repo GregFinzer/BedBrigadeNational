@@ -1,21 +1,20 @@
 ﻿
-using BedBrigade.Shared;
-using Blazored.LocalStorage;
+using BedBrigade.Data.Models;
+using BedBrigade.Data.Services;
+using BedBrigade.Data.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
 
 namespace BedBrigade.Client.Services
 {
     public class LocationService : ILocationService
     {
-        private readonly HttpClient _http;
         private readonly AuthenticationStateProvider _authState;
+        private readonly ILocationDataService _data;
 
-        public LocationService(HttpClient http, AuthenticationStateProvider authState)
+        public LocationService(AuthenticationStateProvider authState, ILocationDataService dataService)
         {
-            _http = http;
             _authState = authState;
+            _data = dataService;
         }
 
         /// <summary>
@@ -36,30 +35,28 @@ namespace BedBrigade.Client.Services
 
         public async Task<ServiceResponse<bool>> DeleteAsync(int locationId)
         {
-            return await _http.DeleteFromJsonAsync<ServiceResponse<bool>>($"api/Location/{locationId}");
+            return await _data.DeleteAsync(locationId);
         }
 
         public async Task<ServiceResponse<Location>> GetAsync(int locationId)
         {
-            return await _http.GetFromJsonAsync<ServiceResponse<Location>>($"api/location/{locationId}");
+            return await _data.GetAsync(locationId);
 
         }
 
         public async Task<ServiceResponse<List<Location>>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<ServiceResponse<List<Location>>>($"api/location/GetAll");
+            return await _data.GetAllAsync();
         }
 
         public async Task<ServiceResponse<Location>> UpdateAsync(Location location)
         {
-            var result = await _http.PutAsJsonAsync($"api/location", location);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<Location>>();
+            return await _data.UpdateAsync(location);
         }
 
         public async Task<ServiceResponse<Location>> CreateAsync(Location location)
         {
-            var result = await _http.PostAsJsonAsync($"api/location", location);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<Location>>();
+            return await _data.CreateAsync(location);
         }
     }
 }

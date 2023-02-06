@@ -1,20 +1,20 @@
 ﻿
-using BedBrigade.Shared;
-using Blazored.LocalStorage;
+using BedBrigade.Data.Models;
+using BedBrigade.Data.Services;
+using BedBrigade.Data.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
+using System.Security.Cryptography;
 
 namespace BedBrigade.Client.Services
 {
     public class UserService : IUserService
     {
-        private readonly HttpClient _http;
+        private readonly IUserDataService _data;
         private readonly AuthenticationStateProvider _authState;
 
-        public UserService(HttpClient http, AuthenticationStateProvider authState)
+        public UserService(AuthenticationStateProvider authState, IUserDataService dataService)
         {
-            _http = http;
+            _data = dataService;
             _authState = authState;
         }
 
@@ -36,36 +36,54 @@ namespace BedBrigade.Client.Services
 
         public async Task<ServiceResponse<bool>> DeleteUserAsync(string userName)
         {
-            return await _http.DeleteFromJsonAsync<ServiceResponse<bool>>($"api/User/{userName}");
-        }
-
-        public async Task<ServiceResponse<bool>> RegisterUserAsync(User user)
-        {
-            var result = await _http.PostAsJsonAsync($"api/user/register", user);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
+            return await _data.DeleteAsync(userName);
         }
 
         public async Task<ServiceResponse<User>> GetUserAsync(string userName)
         {
-            return await _http.GetFromJsonAsync<ServiceResponse<User>>($"api/user/getuser/{userName}");
-
+            return await _data.GetAsync(userName);
         }
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<ServiceResponse<List<User>>>($"api/user/getall");
+            return await _data.GetAllAsync();
         }
 
         public async Task<ServiceResponse<User>> UpdateAsync(User user)
         {
-            var result = await _http.PutAsJsonAsync($"api/user", user);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<User>>();
+            return await _data.UpdateAsync(user);
         }
 
         public async Task<ServiceResponse<User>> CreateAsync(User user)
         {
-            var result = await _http.PostAsJsonAsync($"api/user", user);
-            return await result.Content.ReadFromJsonAsync<ServiceResponse<User>>();
+            return await _data.CreateAsync(user);
         }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash =
+                    hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> UserExists(string email)
+        {
+            return await _data.UserExistsAsync(email);
+        }
+
+
     }
 }

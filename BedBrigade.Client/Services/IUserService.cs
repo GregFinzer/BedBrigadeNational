@@ -1,16 +1,17 @@
-﻿using BedBrigade.Shared;
-using static BedBrigade.Shared.Common;
+﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Shared;
 
-namespace BedBrigade.Client.Services;
-
-public interface IUserService
+namespace BedBrigade.Client.Services
 {
-    Task<ServiceResponse<string>> GetPersistAsync(PersistGrid user);
-    Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
-    Task<ServiceResponse<bool>> DeleteUserAsync(string userName);
-    Task<ServiceResponse<bool>> RegisterUserAsync(User user);
-    Task<ServiceResponse<User>> GetUserAsync(string userName);
-    Task<ServiceResponse<List<User>>> GetAllAsync();
-    Task<ServiceResponse<User>> UpdateAsync(User user);
-    Task<ServiceResponse<User>> CreateAsync(User user);
+    public interface IUserService
+    {
+        Task<ServiceResponse<User>> CreateAsync(User user);
+        Task<ServiceResponse<bool>> DeleteUserAsync(string userName);
+        Task<ServiceResponse<List<User>>> GetAllAsync();
+        Task<ServiceResponse<string>> GetPersistAsync(Common.PersistGrid User);
+        Task<ServiceResponse<User>> GetUserAsync(string userName);
+        Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
+        Task<ServiceResponse<User>> UpdateAsync(User user);
+        Task<ServiceResponse<bool>> UserExists(string email);
+    }
 }
