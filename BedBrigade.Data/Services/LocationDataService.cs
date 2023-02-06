@@ -14,7 +14,16 @@ public class LocationDataService : ILocationDataService
 
     public Task<ServiceResponse<Location>> CreateAsync(Location location)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _context.Content.AddAsync(location);
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<Content>($"Added location record with key {location.Name}.", true);
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<User>($"DB error on create of location record {content.Name} - {ex.Message} ({ex.ErrorCode})");
+        }
     }
 
     public async Task<ServiceResponse<bool>> DeleteAsync(int locationId)

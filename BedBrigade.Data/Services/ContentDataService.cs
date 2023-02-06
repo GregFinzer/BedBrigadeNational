@@ -15,7 +15,16 @@ public class ContentDataService : IContentDataService
 
     public Task<ServiceResponse<Content>> CreateAsync(Content content)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _context.Content.AddAsync(content);
+            await _context.SaveChangesAsync();
+            return new ServiceResponse<Content>($"Added content with key {content.Name}.", true);
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<User>($"DB error on create of content record {content.Name} - {ex.Message} ({ex.ErrorCode})");
+        }
     }
 
     public async Task<ServiceResponse<bool>> DeleteAsync(int contentId)
