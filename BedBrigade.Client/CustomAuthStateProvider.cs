@@ -9,12 +9,10 @@ namespace BedBrigade.Client
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService _localStorageService;
-        private readonly HttpClient _http;
 
-        public CustomAuthStateProvider(ILocalStorageService localStorageService, HttpClient http)
+        public CustomAuthStateProvider(ILocalStorageService localStorageService)
         {
             _localStorageService = localStorageService;
-            _http = http;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -22,15 +20,12 @@ namespace BedBrigade.Client
             string authToken = await _localStorageService.GetItemAsStringAsync("authToken");
 
             var identity = new ClaimsIdentity();
-            _http.DefaultRequestHeaders.Authorization = null;
 
             if (!string.IsNullOrEmpty(authToken))
             {
                 try
                 {
                     identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
-                    _http.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", authToken.Replace("\"", ""));
                 }
                 catch
                 {
