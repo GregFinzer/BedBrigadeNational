@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Seeding;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ namespace BedBrigade.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateIndexes(modelBuilder);
+            Seed.SeedRoles(modelBuilder);
         }
 
         /// <summary>
