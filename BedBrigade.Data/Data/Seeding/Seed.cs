@@ -70,6 +70,59 @@ namespace BedBrigade.Data.Seeding
             await SeedContents(context);
             await SeedMedia(context);
             await SeedUser(context);
+        }
+
+        public static void SeedRoles(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 1,
+                Name = "National Admin",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 2,
+                Name = "National Editor",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 3,
+                Name = "Location Admin",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 4,
+                Name = "Location Communications",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 5,
+                Name = "Location Treasurer",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 6,
+                Name = "Location Scheduler",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 7,
+                Name = "Location Editor",
+            });
+
+            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
+            {
+                RoleId = 8,
+                Name = "Location Contributor",
+            });
+
+
 
         }
 

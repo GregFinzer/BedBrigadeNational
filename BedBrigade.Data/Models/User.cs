@@ -48,5 +48,6 @@ namespace BedBrigade.Data.Models
             }
         }
 
+        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

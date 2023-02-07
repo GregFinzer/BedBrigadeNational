@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Data.Models;
+using BedBrigade.Data.Seeding;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,10 +24,12 @@ namespace BedBrigade.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Volunteer> Volunteers { get; set; }
+        public DbSet<RoleDb> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateIndexes(modelBuilder);
+            Seed.SeedRoles(modelBuilder);
         }
 
         /// <summary>

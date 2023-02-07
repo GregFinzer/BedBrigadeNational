@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Shared\**" />
+    <EmbeddedResource Remove="Shared\**" />
+    <None Remove="Shared\**" />
+  </ItemGroup>
+
   
   
     <ItemGroup>
@@ -26,12 +32,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 
   </ItemGroup>
-
-  
-  
-    <ItemGroup>
-      <Folder Include="Shared\" />
-    </ItemGroup>
 
   
   
