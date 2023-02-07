@@ -70,7 +70,55 @@ namespace BedBrigade.Data.Seeding
             await SeedContents(context);
             await SeedMedia(context);
             await SeedUser(context);
+            await SeedRoles(context);
 
+        }
+
+        private static async Task SeedRoles(DataContext context)
+        {
+            if (!context.Roles.Any())
+            {
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "National Admin",
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "National Editor"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Admin"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Communications"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Treasurer"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Scheduler"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Editor"
+                });
+                context.Roles.Add(new RoleDb()
+                {
+                    Name = "Location Contributor"
+                });
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (DbException ex)
+                {
+                    Console.WriteLine($"SaveChanges Error {ex.Message}");
+                }
+            }
         }
 
         private static string GetHtml(string fileName)

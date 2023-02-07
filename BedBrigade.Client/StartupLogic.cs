@@ -36,9 +36,10 @@ namespace BedBrigade.Client
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddAuthorizationCore();
-            builder.Services.AddDbContextFactory<DataContext>(options =>
+            builder.Services.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                    x => x.MigrationsAssembly("BedBrigade.Data"));
             });
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();

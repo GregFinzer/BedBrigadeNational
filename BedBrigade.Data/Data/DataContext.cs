@@ -23,6 +23,7 @@ namespace BedBrigade.Data
         public DbSet<Schedule> Schedules { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Volunteer> Volunteers { get; set; }
+        public DbSet<RoleDb> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
