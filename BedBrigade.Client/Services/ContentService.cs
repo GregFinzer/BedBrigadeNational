@@ -1,7 +1,7 @@
 ﻿
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
-using BedBrigade.Data.Shared;
+using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Client.Services
@@ -17,21 +17,6 @@ namespace BedBrigade.Client.Services
             _data = dataService;
         }
 
-        /// <summary>
-        /// Save a Grids value to persist the contents environment
-        /// </summary>
-        /// <param name="Content"> The DB column to be saved in the Content table</param>
-        /// <returns></returns>
-        public async Task<ServiceResponse<string>> GetPersistAsync(Common.PersistGrid Content)
-        {
-            /// ToDo: Add GetPersist codes
-            return new ServiceResponse<string>("Persistance", true, "");
-        }
-        public async Task<ServiceResponse<bool>> SavePersistAsync(Persist persist)
-        {
-            /// ToDo: Add SavePersist codes
-            return new ServiceResponse<bool>("Saved Persistance data", true);
-        }
 
         public async Task<ServiceResponse<bool>> DeleteAsync(int contentId)
         {

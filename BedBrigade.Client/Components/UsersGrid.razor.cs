@@ -1,12 +1,12 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
+using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Data.Shared.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -90,7 +90,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = _state });
+                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.User, UserState = _state });
                 return;
 
             }
