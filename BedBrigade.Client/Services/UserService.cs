@@ -1,7 +1,6 @@
 ﻿
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
-using BedBrigade.Data.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Cryptography;
 
@@ -23,7 +22,7 @@ namespace BedBrigade.Client.Services
         /// </summary>
         /// <param name="User"> The DB column to be saved in the User table</param>
         /// <returns></returns>
-        public async Task<ServiceResponse<string>> GetPersistAsync(Common.PersistGrid User)
+        public async Task<ServiceResponse<string>> GetPersistAsync(Common.Common.PersistGrid User)
         {
             /// ToDo: Add GetPersist codes
             return new ServiceResponse<string>("Persistance", true, "");

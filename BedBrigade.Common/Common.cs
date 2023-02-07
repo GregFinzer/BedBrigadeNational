@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BedBrigade.Data.Shared
+﻿namespace BedBrigade.Common
 {
     public static class Common
     {
@@ -14,7 +8,8 @@ namespace BedBrigade.Data.Shared
             User = 2,
             Location = 3,
             Volunteer = 4,
-            Donations = 5
+            Donations = 5,
+            Content = 6
 
         }
     }

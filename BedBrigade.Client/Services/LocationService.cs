@@ -1,7 +1,6 @@
 ﻿
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
-using BedBrigade.Data.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Client.Services
@@ -15,22 +14,6 @@ namespace BedBrigade.Client.Services
         {
             _authState = authState;
             _data = dataService;
-        }
-
-        /// <summary>
-        /// Save a Grids value to persist the locations environment
-        /// </summary>
-        /// <param name="Location"> The DB column to be saved in the Location table</param>
-        /// <returns></returns>
-        public async Task<ServiceResponse<string>> GetPersistAsync(Common.PersistGrid Location)
-        {
-            /// ToDo: Add GetPersist codes
-            return new ServiceResponse<string>("Persistance", true, "");
-        }
-        public async Task<ServiceResponse<bool>> SavePersistAsync(Persist persist)
-        {
-            /// ToDo: Add SavePersist codes
-            return new ServiceResponse<bool>("Saved Persistance data", true);
         }
 
         public async Task<ServiceResponse<bool>> DeleteAsync(int locationId)

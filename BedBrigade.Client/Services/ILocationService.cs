@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Data.Models;
-using BedBrigade.Data.Shared;
 
 namespace BedBrigade.Client.Services
 {
@@ -9,8 +8,6 @@ namespace BedBrigade.Client.Services
         Task<ServiceResponse<bool>> DeleteAsync(int locationId);
         Task<ServiceResponse<List<Location>>> GetAllAsync();
         Task<ServiceResponse<Location>> GetAsync(int locationId);
-        Task<ServiceResponse<string>> GetPersistAsync(Common.PersistGrid Location);
-        Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
         Task<ServiceResponse<Location>> UpdateAsync(Location location);
     }
 }

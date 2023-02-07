@@ -1,11 +1,11 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
+using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Data.Shared.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -90,7 +90,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(PersistGrid.User);
+            var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
             if (result.Success)
             {
                 await Grid.SetPersistData(_state);
@@ -100,7 +100,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Configuration, UserState = _state });
+            await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Configuration, UserState = _state });
         }
 
 
@@ -110,7 +110,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Configuration, UserState = _state });
+                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Configuration, UserState = _state });
                 return;
             }
 
