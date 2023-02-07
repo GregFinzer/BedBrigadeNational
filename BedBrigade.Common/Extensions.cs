@@ -1,7 +1,8 @@
-﻿using System.Diagnostics;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
-using System.Web;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BedBrigade.Common
 {
@@ -46,7 +47,7 @@ namespace BedBrigade.Common
 
         public static bool HasRole(this ClaimsPrincipal identity, string roles)
         {
-
+            
             var roleArray = roles.Split(',');
             foreach (var role in roleArray)
             {

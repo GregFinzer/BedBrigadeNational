@@ -57,6 +57,7 @@ namespace BedBrigade.Client.Components
         {
             _logger.LogInformation("Starting User Grid");
             var authState = await _authState.GetAuthenticationStateAsync();
+            
             Identity = authState.User;
             if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin"))
             {
