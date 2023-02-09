@@ -42,14 +42,14 @@ namespace BedBrigade.Client.Components
 
         protected List<Role> Roles = new List<Role>()
     {
-        new Role { Id = "National Admin", Name = "National Admin" },
-        new Role { Id = "National Editor", Name = "National Editor" },
-        new Role { Id = "Location Admin", Name = "Location Admin" },
-        new Role { Id = "Location Contributor", Name = "Location Contributor" },
-        new Role { Id = "Location Author", Name = "Location Author" },
-        new Role { Id = "Location Editor", Name = "Location Editor" },
-        new Role { Id = "Location Scheduler", Name = "Location Scheduler" },
-        new Role { Id = "Location Communications", Name = "Location Communications" },
+        new Role { Name = "National Admin" },
+        new Role { Name = "National Editor" },
+        new Role { Name = "Location Admin" },
+        new Role { Name = "Location Contributor" },
+        new Role { Name = "Location Author" },
+        new Role { Name = "Location Editor" },
+        new Role { Name = "Location Scheduler" },
+        new Role { Name = "Location Communications" },
     };
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "550px" };
 

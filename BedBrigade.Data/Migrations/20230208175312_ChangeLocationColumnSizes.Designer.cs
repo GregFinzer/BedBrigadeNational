@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230208175312_ChangeLocationColumnSizes")]
+    partial class ChangeLocationColumnSizes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -469,7 +472,7 @@ namespace BedBrigade.Server.Migrations
                     b.ToTable("Media");
                 });
 
-            modelBuilder.Entity("BedBrigade.Data.Models.Role", b =>
+            modelBuilder.Entity("BedBrigade.Data.Models.RoleDb", b =>
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -479,12 +482,54 @@ namespace BedBrigade.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            Name = "National Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            Name = "National Editor"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            Name = "Location Admin"
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            Name = "Location Communications"
+                        },
+                        new
+                        {
+                            RoleId = 5,
+                            Name = "Location Treasurer"
+                        },
+                        new
+                        {
+                            RoleId = 6,
+                            Name = "Location Scheduler"
+                        },
+                        new
+                        {
+                            RoleId = 7,
+                            Name = "Location Editor"
+                        },
+                        new
+                        {
+                            RoleId = 8,
+                            Name = "Location Contributor"
+                        });
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.Schedule", b =>
@@ -605,11 +650,11 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Data.Models.UserRole", b =>
                 {
-                    b.Property<int>("RoleId")
+                    b.Property<int>("UserRoleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserRoleId"));
 
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
@@ -625,7 +670,7 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("RoleId1")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -638,11 +683,11 @@ namespace BedBrigade.Server.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("RoleId");
+                    b.HasKey("UserRoleId");
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("RoleId1");
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserName");
 
@@ -820,9 +865,9 @@ namespace BedBrigade.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BedBrigade.Data.Models.Role", "Role")
+                    b.HasOne("BedBrigade.Data.Models.RoleDb", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId1")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
