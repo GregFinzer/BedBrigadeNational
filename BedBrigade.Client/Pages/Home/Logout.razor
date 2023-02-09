@@ -5,10 +5,12 @@
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private ILocalStorageService _local { get; set; }
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await _local.RemoveItemAsync("authToken");
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
         NavigationManager.NavigateTo("/");
     }
 }

@@ -3,16 +3,29 @@ using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
-
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 namespace BedBrigade.Data.Services
 {
-    public class UserDataService : BaseDataService, IUserDataService
+    public class UserDataService : IUserDataService
     {
         private readonly DataContext _context;
+        private readonly AuthenticationStateProvider _auth;
 
-        public UserDataService(DataContext context, AuthenticationStateProvider authProvider) : base(authProvider)
+        protected ClaimsPrincipal _identity;
+
+        public UserDataService(DataContext context, AuthenticationStateProvider authProvider) 
         {
             _context = context;
+            _auth = authProvider;
+            GetUserClaims(authProvider);
+        }
+
+        private async Task GetUserClaims(AuthenticationStateProvider provider)
+        {
+            var state = await provider.GetAuthenticationStateAsync();
+            _identity = state.User;
         }
 
         public async Task<ServiceResponse<User>> GetAsync(string UserName)
@@ -27,10 +40,13 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllAsync()
         {
+            var authState = await _auth.GetAuthenticationStateAsync();
+
+            var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             List<User> result;
-            if (!_identity.IsInRole("National Admin"))
+            if (role.ToLower() != "national admin")
             {
-                int.TryParse(_identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
                 result = _context.Users.Where(u => u.FkLocation == locationId).ToList();
             }
             else

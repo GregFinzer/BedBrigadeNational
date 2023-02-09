@@ -14,14 +14,9 @@ namespace BedBrigade.Data.Services
         protected ClaimsPrincipal _identity { get; private set; }
         protected BaseDataService(AuthenticationStateProvider authProvider)
         {
-            GetUserClaims(authProvider);
+            //GetUserClaims(authProvider);
 
         }
 
-        private async Task GetUserClaims(AuthenticationStateProvider provider)
-        {
-            var state = await provider.GetAuthenticationStateAsync();
-            _identity = state.User;
-        }
     }
 }
