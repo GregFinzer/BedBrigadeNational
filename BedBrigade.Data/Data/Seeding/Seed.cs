@@ -164,7 +164,6 @@ namespace BedBrigade.Data.Seeding
             if (context.Roles.Any()) return;
             try
             {
-                if()
                 await context.Roles.AddRangeAsync(Roles);
                 await context.SaveChangesAsync();
             }
