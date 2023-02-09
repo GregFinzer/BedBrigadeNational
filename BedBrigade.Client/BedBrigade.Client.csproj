@@ -17,6 +17,10 @@
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
+    <None Include="wwwroot\Media\arizona\arizonastateseal.webp" />
+    <None Include="wwwroot\Media\arizona\DNCMag49.pdf" />
+    <None Include="wwwroot\Media\national\CODEFocus.pdf" />
+    <None Include="wwwroot\Media\ohio\CODE2023_1.pdf" />
     <None Include="wwwroot\scripts\cookie.js" />
     <None Include="wwwroot\scripts\scriptLoader.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
