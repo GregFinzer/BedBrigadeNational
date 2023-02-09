@@ -1,21 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Data.Models;
+
+[Table("UserRoles")]
+public class UserRole : BaseEntity
 {
-    [Table("UserRoles")]
-    public class UserRole : BaseEntity
-    {
-        [Key]
-        public int UserRoleId { get; set; }
+    [Key]
+    public int UserRoleId { get; set; }
 
-        //Parent
-        public Location Location { get; set; } = new Location();
+    //Parent
+    public Location Location { get; set; } = new Location();
 
-        //Parent
-        public User User { get; set; } = new User();
+    //Parent
+    public User User { get; set; } = new User();
 
-        //Parent
-        public Role Role { get; set; } = new Role();
-    }
+    //Parent
+    public Role Role { get; set; } = new Role();
 }
