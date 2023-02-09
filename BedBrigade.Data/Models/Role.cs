@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Data.Models;
+
+public class Role
 {
-    public class Role
-    {
-        [Key]
-        public int RoleId { get; set; }
-        [Required, MaxLength(128)]
-        public string? Name { get; set; }
-    }
+    [Key]
+    public int RoleId { get; set; }
+    [Required, MaxLength(128)]
+    public string? Name { get; set; }
 }

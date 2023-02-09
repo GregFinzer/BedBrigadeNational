@@ -95,6 +95,7 @@ namespace BedBrigade.Data.Seeding
         }
         private static async Task SeedLocations(DataContext context)
         {
+            if(context.Configurations.Any()) return;    
             try
             {
                 await context.Locations.AddRangeAsync(locations);
@@ -102,7 +103,7 @@ namespace BedBrigade.Data.Seeding
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Location seed error: {ex.Message}");
+                Console.WriteLine($"Configuration seed error: {ex.Message}");
             }
         }
         private static async Task SeedContents(DataContext context)
@@ -158,10 +159,12 @@ namespace BedBrigade.Data.Seeding
                 Console.WriteLine($"Error seed media: {ex.Message}");
             }
         }
-        public static async Task SeedRoles(DataContext context)
+        private static async Task SeedRoles(DataContext context)
         {
+            if (context.Roles.Any()) return;
             try
             {
+                if()
                 await context.Roles.AddRangeAsync(Roles);
                 await context.SaveChangesAsync();
             }
@@ -219,7 +222,6 @@ namespace BedBrigade.Data.Seeding
                 }
             }
         }
-
         private static async Task SeedUserRoles(DataContext context)
         {
             try
@@ -243,7 +245,6 @@ namespace BedBrigade.Data.Seeding
                 Console.WriteLine($"Error SeedUserRoles {ex.Message}");
             }
         }
-
 
         private static string GetHtml(string fileName)
         {
