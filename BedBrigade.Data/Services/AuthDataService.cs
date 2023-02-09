@@ -39,7 +39,6 @@ namespace BedBrigade.Data.Services
             else
             {
                 response = new ServiceResponse<string>("User logged in", true, CreateToken(user));
-                response.Data = CreateToken(user);
             }
 
             return response;
