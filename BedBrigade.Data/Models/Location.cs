@@ -10,23 +10,23 @@ namespace BedBrigade.Data.Models
 		public Int32 LocationId { get; set; }
 
 		[Required]
-		[MaxLength(30)]
+		[MaxLength(128)]
 		public String Name { get; set; } = string.Empty;
 
 		[Required]
-		[MaxLength(30)]
+		[MaxLength(256)]
 		public String Route { get; set; } = string.Empty;
 
-		[MaxLength(30)]
+		[MaxLength(128)]
 		public String? Address1 { get; set; } = string.Empty;
 
-        [MaxLength(30)]
+        [MaxLength(128)]
 		public String? Address2 { get; set; } = string.Empty;
 
-        [MaxLength(20)]
+        [MaxLength(128)]
 		public String? City { get; set; } = string.Empty;
 
-        [MaxLength(30)] 
+        [MaxLength(128)] 
         public String? State { get; set; } = string.Empty;
 
 		[Required]

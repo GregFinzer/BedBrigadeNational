@@ -7,7 +7,7 @@ namespace BedBrigade.Data.Models
     public class UserRole : BaseEntity
     {
         [Key]
-        public Int32 UserRoleId { get; set; }
+        public int UserRoleId { get; set; }
 
         //Parent
         public Location Location { get; set; } = new Location();
@@ -16,6 +16,6 @@ namespace BedBrigade.Data.Models
         public User User { get; set; } = new User();
 
         //Parent
-        public RoleDb Role { get; set; } = new RoleDb();
+        public Role Role { get; set; } = new Role();
     }
 }

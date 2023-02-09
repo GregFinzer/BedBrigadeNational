@@ -8,32 +8,26 @@ namespace BedBrigade.Data.Seeding
     {
         private const string _seedUserName = "Seed";
         private const string _seedLocationNational = "National";
-        private const string _seedLocationOhio = "OhioColumbus";
-        private const string _seedLocationArizona = "ArizonaPrescott";
+        private const string _seedLocationNationalName = "Bed Brigade Columbus";
 
-        //private static List<Location> locations = new()
-        //{
-        //    new Location {Name = "Bed Brigade Columbus", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Living Hope Church", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Rock City Polaris", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Peace Lutheran", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Vinyard Church Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Hardbarger Impact", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Upper Arlington Lutheran Church", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
-        //    new Location {Name = "Bed Brigade Greensburg United Methodist Church", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
-
-        //};
 
 
         // Table User
-        private const string _seedUserAdmin = "Administrator";
-        private const string _seedUserFirstName = "Admin";
-        private const string _seedUserLastName = "User";
-        private const string _seedUserEmail = "admin.user@bedbrigade.org";
-        private const string _seedUserPhone = "99999999999";
-        private const string _seedUserRole = "National Admin";
         private const string _seedUserPassword = "Password";
         private const string _seedUserLocation = "Location";
+
+        private static List<Role> Roles = new()
+        {
+            new Role {Name = "National Admin"},
+            new Role {Name = "National Editor" },
+            new Role {Name = "Location Admin"},
+            new Role {Name = "Location Editor"},
+            new Role {Name = "Location Scheduler"},
+            new Role {Name = "Location Contributor"},
+            new Role {Name = "Location Treasurer"},
+            new Role {Name = "Location Communications"},
+            new Role {Name = "Location Author"}
+        };
 
         private static List<Location> locations = new()
         {
@@ -50,8 +44,8 @@ namespace BedBrigade.Data.Seeding
 
         private static readonly List<User> users = new()
         {
-            new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "UserLocation Contributor"},
-            new User {FirstName = _seedUserLocation, LastName = "Author", Role = "UserLocation Author" },
+            new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "Location Contributor" },
+            new User {FirstName = _seedUserLocation, LastName = "Author", Role = "Location Author" },
             new User {FirstName = _seedUserLocation, LastName = "Editor", Role = "Location Editor" },
             new User {FirstName = _seedUserLocation, LastName = "Scheduler", Role = "Location Scheduler" },
             new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
@@ -69,182 +63,11 @@ namespace BedBrigade.Data.Seeding
             await SeedLocations(context);
             await SeedContents(context);
             await SeedMedia(context);
+            await SeedRoles(context);
             await SeedUser(context);
+            await SeedUserRoles(context);
         }
 
-        public static void SeedRoles(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 1,
-                Name = "National Admin",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 2,
-                Name = "National Editor",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 3,
-                Name = "Location Admin",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 4,
-                Name = "Location Communications",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 5,
-                Name = "Location Treasurer",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 6,
-                Name = "Location Scheduler",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 7,
-                Name = "Location Editor",
-            });
-
-            modelBuilder.Entity<RoleDb>().HasData(new RoleDb()
-            {
-                RoleId = 8,
-                Name = "Location Contributor",
-            });
-
-
-
-        }
-
-        private static string GetHtml(string fileName)
-        {
-            return File.ReadAllText($"./Data/Seeding/SeedHtml/{fileName}");
-        }
-
-        private static async Task SeedUser(DataContext context)
-        {
-            foreach (var user in Users)
-            {
-                if (!context.Users.Any(u => u.UserName == $"{user.FirstName}{user.LastName}"))
-                {
-                    SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                    var location = _seedLocationOhio;
-                    var roleLocation = user.Role.Split(' ')[0];
-                    if (roleLocation == _seedLocationNational)
-                    {
-                        location = _seedLocationNational;
-                    }
-                    context.Users.Add(new User
-                    {
-                        UserName = $"{user.FirstName}{user.LastName}",
-                        Location = context.Locations.Single(l => l.Name == location),
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
-                        Phone = "(999) 999-9999",
-                        Role = user.Role,
-                        PasswordHash = passwordHash,
-                        PasswordSalt = passwordSalt,
-                    });
-                    try
-                    {
-                        await context.SaveChangesAsync();
-                    }
-                    catch (DbException ex)
-                    {
-                        Console.WriteLine($"SaveChanges Error {ex.Message}");
-                    }
-                }
-            }
-        }
-
-        private static async Task SeedMedia(DataContext context)
-        {
-
-            if (!context.Media.Any(m => m.FileName == "Logo"))
-            {
-                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
-                context.Media.Add(new Media
-                {
-                    Location = location!,
-                    FileName = "logo",
-                    MediaType = "png",
-                    Path = "media/national",
-                    AltText = "Bed Brigade National Logo",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName,
-                });
-
-            }
-            await context.SaveChangesAsync();
-        }
-
-        private static async Task SeedContents(DataContext context)
-        {
-            var header = "Header";
-            if (!context.Content.Any(c => c.ContentType == header))
-            {
-                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
-                var seedHtml = GetHtml("header.html");
-                context.Content.Add(new Content
-                {
-                    Location = location!,
-                    ContentType = header,
-                    Name = header,
-                    ContentHtml = seedHtml,
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = _seedUserName,
-                    UpdateUser = _seedUserName,
-                    MachineName = Environment.MachineName,
-                }); ;
-            }
-
-            await context.SaveChangesAsync();
-        }
-
-        private static async Task SeedLocations(DataContext context)
-        {
-            var locations = new List<Location>
-            {
-                new() {
-                    Name = _seedLocationNational,
-                    Route = "/",
-                    PostalCode = string.Empty
-                },
-                new() {
-                    Name = _seedLocationOhio,
-                    Route = "/ohio",
-                    PostalCode = string.Empty
-                },
-                new() {
-                    Name = _seedLocationArizona,
-                    Route = "/arizona",
-                    PostalCode = string.Empty
-                }
-            };
-            var rec = context.Locations.ToList();
-            if (rec.Count > 0)
-            {
-                context.Locations.RemoveRange(locations);
-                await context.SaveChangesAsync();
-            }
-            await context.Locations.AddRangeAsync(locations);
-            await context.SaveChangesAsync();
-        }
 
         private static async Task SeedConfigurations(DataContext context)
         {
@@ -270,5 +93,167 @@ namespace BedBrigade.Data.Seeding
             await context.Configurations.AddRangeAsync(configurations);
             await context.SaveChangesAsync();
         }
+        private static async Task SeedLocations(DataContext context)
+        {
+            try
+            {
+                await context.Locations.AddRangeAsync(locations);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Location seed error: {ex.Message}");
+            }
+        }
+        private static async Task SeedContents(DataContext context)
+        {
+            var header = "Header";
+            if (!context.Content.Any(c => c.ContentType == header))
+            {
+                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNationalName);
+                var seedHtml = GetHtml("header.html");
+                context.Content.Add(new Content
+                {
+                    Location = location!,
+                    ContentType = header,
+                    Name = header,
+                    ContentHtml = seedHtml
+                }); ;
+            }
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in content {ex.Message}");
+            }
+        }
+        private static async Task SeedMedia(DataContext context)
+        {
+            try
+            {
+                if (!context.Media.Any(m => m.FileName == "Logo"))
+                {
+                    var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
+                    context.Media.Add(new Media
+                    {
+                        Location = location!,
+                        FileName = "logo",
+                        MediaType = "png",
+                        Path = "media/national",
+                        AltText = "Bed Brigade National Logo",
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                        CreateUser = _seedUserName,
+                        UpdateUser = _seedUserName,
+                        MachineName = Environment.MachineName,
+                    });
+
+                }
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error seed media: {ex.Message}");
+            }
+        }
+        public static async Task SeedRoles(DataContext context)
+        {
+            try
+            {
+                await context.Roles.AddRangeAsync(Roles);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroor adding roles {ex.Message}");
+            }
+        }
+        private static async Task SeedUser(DataContext context)
+        {
+            foreach (var user in Users)
+            {
+                if (!context.Users.Any(u => u.UserName == $"{user.FirstName}{user.LastName}"))
+                {
+                    try
+                    {
+                        SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
+
+                        var location = locations[new Random().Next(locations.Count)];
+
+                        // Create the user
+                        var newUser = new User
+                        {
+                            UserName = $"{user.FirstName}{user.LastName}",
+                            Location = location,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
+                            Phone = "(999) 999-9999",
+                            Role = user.Role,
+                            PasswordHash = passwordHash,
+                            PasswordSalt = passwordSalt,
+                        };
+                        context.Users.Add(newUser);
+                        await context.SaveChangesAsync();
+                        //}
+                        //catch (Exception ex) { Console.WriteLine(ex.Message); }
+                        //try
+                        //{ 
+                        // Now store the user and a role
+
+                        //var userrole = new UserRole
+                        //{
+                        //    Location = location,
+                        //    Role = context.Roles.FirstOrDefault(r => r.Name == user.Role),
+                        //    User = newUser
+                        //};
+                        //context.UserRoles.Add(userrole);
+                        //context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"SaveChanges Error {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        private static async Task SeedUserRoles(DataContext context)
+        {
+            try
+            {
+                var users = context.Users.ToList();
+                foreach (var user in users)
+                {
+                    var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
+                    UserRole newUserRole = new()
+                    {
+                        Location = user.Location,
+                        Role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role),
+                        User = user
+                    };
+                    await context.AddAsync(newUserRole);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error SeedUserRoles {ex.Message}");
+            }
+        }
+
+
+        private static string GetHtml(string fileName)
+        {
+            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
+            return html;
+        }
+
     }
-}
+
+
+
+    }
+
