@@ -15,6 +15,9 @@ namespace BedBrigade.Data.Seeding
         // Table User
         private const string _seedUserPassword = "Password";
         private const string _seedUserLocation = "Location";
+        private const string _seedUserLocation1 = "Location1";
+        private const string _seedUserLocation2 = "Location2";
+
 
         private static List<Role> Roles = new()
         {
@@ -52,8 +55,21 @@ namespace BedBrigade.Data.Seeding
             new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
             new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
             new User {FirstName =  _seedLocationNational, LastName = "Editor", Role = "National Editor"},
-            new User {FirstName =  _seedLocationNational, LastName = "Admin", Role = "National Admin"}
-
+            new User {FirstName =  _seedLocationNational, LastName = "Admin", Role = "National Admin"},
+            new User { FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
+            new User {FirstName = _seedUserLocation1, LastName = "Author", Role = "Location Author" },
+            new User {FirstName = _seedUserLocation1, LastName = "Editor", Role = "Location Editor" },
+            new User {FirstName = _seedUserLocation1, LastName = "Scheduler", Role = "Location Scheduler" },
+            new User {FirstName = _seedUserLocation1, LastName = "Treasurer", Role = "Location Treasurer"},
+            new User {FirstName = _seedUserLocation1, LastName = "Communications", Role = "Location Communications"},
+            new User {FirstName = _seedUserLocation1, LastName = "Admin", Role = "Location Admin"},
+            new User { FirstName = _seedUserLocation2, LastName = "Contributor", Role = "Location Contributor" },
+            new User {FirstName = _seedUserLocation2, LastName = "Author", Role = "Location Author" },
+            new User {FirstName = _seedUserLocation2, LastName = "Editor", Role = "Location Editor" },
+            new User {FirstName = _seedUserLocation2, LastName = "Scheduler", Role = "Location Scheduler" },
+            new User {FirstName = _seedUserLocation2, LastName = "Treasurer", Role = "Location Treasurer"},
+            new User {FirstName = _seedUserLocation2, LastName = "Communications", Role = "Location Communications"},
+            new User {FirstName = _seedUserLocation2, LastName = "Admin", Role = "Location Admin"},
         };
         static readonly List<User> Users = users;
 
