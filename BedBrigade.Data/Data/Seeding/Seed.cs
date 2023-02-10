@@ -111,7 +111,7 @@ namespace BedBrigade.Data.Seeding
         }
         private static async Task SeedLocations(DataContext context)
         {
-            if(context.Configurations.Any()) return;    
+            if(context.Locations.Any()) return;    
             try
             {
                 await context.Locations.AddRangeAsync(locations);
@@ -150,31 +150,43 @@ namespace BedBrigade.Data.Seeding
         {
             try
             {
-                if (!context.Media.Any(m => m.FileName == "Logo"))
+                if (!context.Media.Any(m => m.FileName == "Logo")) // table Media does not have site logo
                 {
-                    var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
+                    // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
+                    // add the first reciord in Media table with National Logo
                     context.Media.Add(new Media
                     {
-                        Location = location!,
+                        LocationId = 1,
                         FileName = "logo",
                         MediaType = "png",
-                        Path = "media/national",
+                        FilePath = "media/national",
+                        FileSize = 9827,
                         AltText = "Bed Brigade National Logo",
+                        FileStatus = "seed",
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
                         CreateUser = _seedUserName,
                         UpdateUser = _seedUserName,
-                        MachineName = Environment.MachineName,
+                        MachineName = Environment.MachineName
                     });
 
+                    await context.SaveChangesAsync();
+                } // add the first media row
+                if (!context.Media.Any(m => m.FileStatus == "test"))
+                {
+                    // add additional test files - should be removed in production version - VS 2/9/2023
+                    // media table content & physical files synchronization is part of Media Manager
+                    await context.Media.AddRangeAsync(TestMedia);
+                    await context.SaveChangesAsync();
                 }
-                await context.SaveChangesAsync();
+         
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error seed media: {ex.Message}");
             }
-        }
+        } // Seed Media
+
         private static async Task SeedRoles(DataContext context)
         {
             if (context.Roles.Any()) return;
@@ -266,6 +278,253 @@ namespace BedBrigade.Data.Seeding
             var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
             return html;
         }
+
+        // added by VS for testing time
+        private static readonly List<Media> TestMedia = new()
+        {
+        new Media     {
+            // MediaId= 2,
+            LocationId= 1,
+            FilePath= "media/national",
+            FileName= "usamap",
+            MediaType= "jpg",
+            AltText= "USA Map",
+            FileSize= 146502,
+            CreateDate= DateTime.Now,
+            CreateUser= "vskordin@gmail.com",
+            UpdateDate= DateTime.Now,
+            UpdateUser= "vskordin@gmail.com",
+            MachineName= "DELLXPS-8930",
+            FileStatus="test"
+        },
+        new Media  {
+            //MediaId= 3,
+            LocationId= 1,
+            FilePath= "media/national",
+            FileName= "CODEFocus",
+            MediaType= "pdf",
+            AltText= "Magazine (PDF Example)",
+            FileSize= 6267940,
+            CreateDate= DateTime.Now,
+            CreateUser= "vskordin@gmail.com",
+            UpdateDate= DateTime.Now,
+            UpdateUser= "vskordin@gmail.com",
+            MachineName= "DELLXPS-8930",
+            FileStatus="test"
+        },
+        new Media  {
+            //MediaId= 4,
+            LocationId= 2,
+            FilePath= "media/ohio",
+            FileName= "ohioflag",
+            MediaType= "png",
+            AltText= "Ohio State Flag",
+            FileSize= 33419,
+            CreateDate= DateTime.Now,
+            CreateUser= "vskordin@gmail.com",
+            UpdateDate= DateTime.Now,
+            UpdateUser= "vskordin@gmail.com",
+            MachineName= "DELLXPS-8930",
+            FileStatus="test"
+        },
+        new Media{
+                //MediaId= 5,
+                LocationId= 2,
+                FilePath= "media/ohio",
+                FileName= "ohiomap",
+                MediaType= "jpg",
+                AltText= "Ohio State Map",
+                FileSize= 468934,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+        new Media{
+                //MediaId= 6,
+                LocationId= 2,
+                FilePath= "media/ohio",
+                FileName= "CODE2023_1",
+                MediaType= "pdf",
+                AltText= "PDF File Example",
+                FileSize= 7773635,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+            new Media{
+                //MediaId= 7,
+                LocationId= 2,
+                FilePath= "media/ohio",
+                FileName= "OhioStateSeal",
+                MediaType= "jpg",
+                AltText= "Ohio State Seal",
+                FileSize= 70694,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+           new Media {
+                //MediaId= 8,
+                LocationId= 2,
+                FilePath= "media/ohio",
+                FileName= "FordExplorer2006",
+                MediaType= "jpg",
+                AltText= "Ford Explorer 2006",
+                FileSize= 51567,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 9,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "arizonamap",
+                MediaType= "jpg",
+                AltText= "Arizona State Map",
+                FileSize= 72696,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+           new Media {
+                //MediaId= 10,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "arizonaflag",
+                MediaType= "png",
+                AltText= "Arizona State Flag",
+                FileSize= 24150,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 11,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "DNCMag49",
+                MediaType= "pdf",
+                AltText= "PDF File Example",
+                FileSize= 19564686,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 12,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "arizonastateseal",
+                MediaType= "webp",
+                AltText= "Arizona State Seal",
+                FileSize= 44802,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 13,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "FordT_1925",
+                MediaType= "jpg",
+                AltText= "Ford Model T 1925",
+                FileSize= 39665,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 14,
+                LocationId= 2,
+                FilePath= "media/ohio",
+                FileName= "Mercury1950",
+                MediaType= "jpg",
+                AltText= "Mercury 1950",
+                FileSize= 35468,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 15,
+                LocationId= 3,
+                FilePath= "media/arizona",
+                FileName= "Lincoln2006",
+                MediaType= "jpg",
+                AltText= "Lincoln Concept 2006",
+                FileSize= 35890,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 16,
+                LocationId= 1,
+                FilePath= "media/national",
+                FileName= "usaseal",
+                MediaType= "jpg",
+                AltText= "Great Seal of USA",
+                FileSize= 103948,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            },
+          new Media  {
+                //MediaId= 17,
+                LocationId= 1,
+                FilePath= "media/national",
+                FileName= "Edsel1958",
+                MediaType= "jpg",
+                AltText= "Ford Edsel 1958",
+                FileSize= 53399,
+                CreateDate= DateTime.Now,
+                CreateUser= "vskordin@gmail.com",
+                UpdateDate= DateTime.Now,
+                UpdateUser= "vskordin@gmail.com",
+                MachineName= "DELLXPS-8930",
+                FileStatus="test"
+            }
+        };
+
+
 
     }
 
