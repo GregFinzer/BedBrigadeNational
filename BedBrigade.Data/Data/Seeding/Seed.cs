@@ -111,7 +111,7 @@ namespace BedBrigade.Data.Seeding
         }
         private static async Task SeedLocations(DataContext context)
         {
-            if(context.Configurations.Any()) return;    
+            if(context.Locations.Any()) return;    
             try
             {
                 await context.Locations.AddRangeAsync(locations);
