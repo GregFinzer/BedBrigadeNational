@@ -116,11 +116,11 @@ namespace BedBrigade.Client.Components
 
             if (args.Item.Text == "Pdf Export")
             {
-                PdfExport();
+                await PdfExport();
             }
             if (args.Item.Text == "Excel Export")
             {
-                ExcelExport();
+                await ExcelExport();
                 return;
             }
             if (args.Item.Text == "Csv Export")
@@ -217,7 +217,7 @@ namespace BedBrigade.Client.Components
                 {
                     Configuration config = createResult.Data;
                 }
-                ToastObj.Title = "Create Configuration";
+                ToastTitle = "Create Configuration";
                 if (string.IsNullOrEmpty(Configuration.ConfigurationKey))
                 {
                     ToastContent = "Care Need Created Successfully!";
@@ -226,7 +226,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to save Care Need!";
                 }
-                ToastObj.Show();
+                await ToastObj.Show();
             }
         }
 
@@ -251,7 +251,7 @@ namespace BedBrigade.Client.Components
         protected async Task DataBound()
         {
             if (ConfigRecs.ToList().Count == 0) RecordText = "No configurations found";
-            //await Grid.AutoFitColumns();
+            await Grid.AutoFitColumns();
         }
 
         protected async Task PdfExport()

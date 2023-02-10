@@ -197,8 +197,8 @@ namespace BedBrigade.Client.Components
             {
                 BBUsers = userResult.Data;
             }
-            Grid.CallStateHasChanged();
-            Grid.Refresh();
+            await Grid.CallStateHasChangedAsync();
+            await Grid.Refresh();
         }
 
         private void Add()
@@ -228,8 +228,8 @@ namespace BedBrigade.Client.Components
             {
                 BBUsers = result.Data;
             }
-            Grid.CallStateHasChanged();
-            Grid.Refresh();
+            await Grid.CallStateHasChangedAsync();
+            await Grid.Refresh();
         }
 
         protected async Task Save(User status)
@@ -242,7 +242,7 @@ namespace BedBrigade.Client.Components
         }
         protected async Task DataBound()
         {
-            //await Grid.AutoFitColumns();
+            await Grid.AutoFitColumns();
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

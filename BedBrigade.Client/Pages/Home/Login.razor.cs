@@ -48,7 +48,7 @@ namespace BedBrigade.Client.Pages.Home
 
         }
 
-        protected async Task HandlePassword()
+        protected void HandlePassword()
         {
             if (showPassword)
             {
