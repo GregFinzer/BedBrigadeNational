@@ -19,7 +19,7 @@ namespace BedBrigade.Data.Services
         {
             _context = context;
             _auth = authProvider;
-            GetUserClaims(authProvider);
+            Task.Run(() => GetUserClaims(authProvider));
         }
 
         private async Task GetUserClaims(AuthenticationStateProvider provider)
@@ -82,7 +82,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<User>> UpdateAsync(User user)
         {
-            var result = _context.Users.Update(user);
+            var result = await Task.Run(() => _context.Users.Update(user));
             if (result != null)
             {
                 return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);

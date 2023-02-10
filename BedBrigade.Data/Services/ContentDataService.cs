@@ -48,7 +48,7 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
-        var result = _context.Content.ToList();
+        var result = await _context.Content.ToListAsync();
         if (result != null)
         {
             return new ServiceResponse<List<Content>>($"Found {result.Count} records.", true, result);
@@ -79,7 +79,7 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<Content>> UpdateAsync(Content content)
     {
-        var result = _context.Content.Update(content);
+        var result = await Task.Run(() => _context.Content.Update(content));
         if (result != null)
         {
             return new ServiceResponse<Content>($"Updated content with key {content.ContentId}", true);

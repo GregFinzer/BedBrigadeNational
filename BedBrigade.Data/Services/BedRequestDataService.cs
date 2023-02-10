@@ -25,7 +25,7 @@ public class BedRequestDataService : IBedRequestDataService
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllAsync()
     {
-        var result = _context.BedRequests.ToList();
+        var result = await _context.BedRequests.ToListAsync();
         if (result != null)
         {
             return new ServiceResponse<List<BedRequest>>($"Found {result.Count} records.", true, result);
@@ -54,7 +54,7 @@ public class BedRequestDataService : IBedRequestDataService
 
     public async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest bedRequest)
     {
-        var result = _context.BedRequests.Update(bedRequest);
+        var result = await Task.Run(() => _context.BedRequests.Update(bedRequest));
         if (result != null)
         {
             return new ServiceResponse<BedRequest>($"Updated bedRequest with key {bedRequest.BedRequestId}", true);

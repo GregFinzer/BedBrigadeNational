@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
@@ -23,7 +24,7 @@ public class ConfigurationDataService : IConfigurationDataService
 
     public async Task<ServiceResponse<List<Configuration>>> GetAllAsync()
     {
-        var result = _context.Configurations.ToList();
+        var result = await _context.Configurations.ToListAsync();
         if (result != null)
         {
             return new ServiceResponse<List<Configuration>>($"Found {result.Count} records.", true, result);
@@ -52,7 +53,7 @@ public class ConfigurationDataService : IConfigurationDataService
 
     public async Task<ServiceResponse<Configuration>> UpdateAsync(Configuration configuration)
     {
-        var result = _context.Configurations.Update(configuration);
+        var result = await Task.Run(() => _context.Configurations.Update(configuration));
         if (result != null)
         {
             return new ServiceResponse<Configuration>($"Updated location with key {configuration}", true);
