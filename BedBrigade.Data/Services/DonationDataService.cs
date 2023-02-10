@@ -1,5 +1,6 @@
 ﻿
 using BedBrigade.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
@@ -26,7 +27,7 @@ public class DonationDataService : IDonationDataService
 
     public async Task<ServiceResponse<List<Donation>>> GetAllAsync()
     {
-        var result = _context.Donations.ToList();
+        var result = await _context.Donations.ToListAsync();
         if (result != null)
         {
             return new ServiceResponse<List<Donation>>($"Found {result.Count} records.", true, result);
@@ -55,7 +56,7 @@ public class DonationDataService : IDonationDataService
 
     public async Task<ServiceResponse<Donation>> UpdateAsync(Donation donation)
     {
-        var result = _context.Donations.Update(donation);
+        var result = await Task.Run(() =>_context.Donations.Update(donation));
         if (result != null)
         {
             return new ServiceResponse<Donation>($"Updated donation with key {donation.DonationId}", true);
