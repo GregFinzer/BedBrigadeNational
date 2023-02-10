@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\Administration\Admin\Email.razor" />
+    <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Pages\Administration\Admin\Email.razor" />
+    <None Include="Pages\Administration\AdminTasks\Email.razor" />
     <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
