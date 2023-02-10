@@ -103,7 +103,12 @@ namespace BedBrigade.Data.Seeding
                 },
                 new()
                 {ConfigurationKey = "Port",
-                ConfigurationValue = "8889"}
+                ConfigurationValue = "8889"},
+                new()
+                {
+                    ConfigurationKey = "TokenExpiration",
+                    ConfigurationValue = "24"
+                }
             };
 
             await context.Configurations.AddRangeAsync(configurations);
