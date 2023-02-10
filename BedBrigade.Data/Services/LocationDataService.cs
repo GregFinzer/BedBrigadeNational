@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
@@ -48,7 +49,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<List<Location>>> GetAllAsync()
     {
-        var result = _context.Locations.ToList();
+        var result = await _context.Locations.ToListAsync();
         if (result != null)
         {
             return new ServiceResponse<List<Location>>($"Found {result.Count} records.", true, result);
@@ -70,7 +71,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<Location>> UpdateAsync(Location location)
     {
-        var result = _context.Locations.Update(location);
+        var result = await Task.Run(() => _context.Locations.Update(location));
         if (result != null)
         {
             return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
