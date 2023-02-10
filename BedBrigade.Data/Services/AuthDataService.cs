@@ -38,7 +38,7 @@ namespace BedBrigade.Data.Services
             }
             else
             {
-                response = new ServiceResponse<string>("User logged in", true, CreateToken(user));
+                response = new ServiceResponse<string>("User logged in", true, await CreateToken(user));
             }
 
             return response;
@@ -92,7 +92,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        private string CreateToken(User user)
+        private async Task<string> CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
             {
@@ -106,10 +106,11 @@ namespace BedBrigade.Data.Services
                 .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
+            var tokenExpiresIn = await _context.Configurations.FirstOrDefaultAsync(c => c.ConfigurationKey == "TokenExpiration");
+            int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
             var token = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddDays(1),
+                    expires: DateTime.Now.AddHours(tokenHours),
                     signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
