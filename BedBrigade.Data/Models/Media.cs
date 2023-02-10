@@ -8,17 +8,22 @@ namespace BedBrigade.Data.Models
     {
 		[Key]
 		public Int32 MediaId { get; set; }
-
-		public Location Location { get; set; } = new Location();
+        public Int32 LocationId { get; set; }
+        //  public Location Location { get; set; } = new Location(); - creates false locations - commented temporary by VS 2/9/2023
 
         [MaxLength(255)] 
-        public String? Path { get; set; } = string.Empty;
+        public String? FilePath { get; set; } = string.Empty; // renamed from Path by VS 2/9/2023
 
 		[MaxLength(30)] 
         public String? FileName { get; set; } = string.Empty;
+        [MaxLength(0)]
+        public String? FileStatus { get; set; } = string.Empty; // added by VS 2/9/2023
 
 		[MaxLength(30)]
         public String? MediaType { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public long FileSize { get; set; } // added by VS 2/9/2023
 
 		[MaxLength(255)]
 		public String? AltText { get; set; } = string.Empty;
