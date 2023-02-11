@@ -2,7 +2,7 @@
 using BedBrigade.Data.Services;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
-using MessageService;
+using BedBrigade.MessageService;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;

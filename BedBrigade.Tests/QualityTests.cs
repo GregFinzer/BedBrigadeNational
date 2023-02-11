@@ -17,80 +17,82 @@ namespace BedBrigade.Tests
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
-
         [Test]
         public void QualityCheckBedBrigadeClient()
         {
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Client");
+            const string project = "BedBrigade.Client";
+            string projectPath = Path.Combine(_solutionPath, project);
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
             if (result.QualityViolations.Any())
             {
                 ReportViolations(result);
-                Assert.Fail("Failed Quality Check for BedBrigade.Client");
+                Assert.Fail($"Failed Quality Check for {project}");
             }
             else
             {
-                Console.WriteLine("Passed Quality Check for BedBrigade.Client");
+                Console.WriteLine($"Passed Quality Check for {project}");
+            }
+        }
+
+        [Test]
+        public void QualityCheckBedBrigadeCommon()
+        {
+            const string project = "BedBrigade.Common";
+            string projectPath = Path.Combine(_solutionPath, project);
+            QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
+
+            if (result.QualityViolations.Any())
+            {
+                ReportViolations(result);
+                Assert.Fail($"Failed Quality Check for {project}");
+            }
+            else
+            {
+                Console.WriteLine($"Passed Quality Check for {project}");
             }
         }
 
         [Test]
         public void QualityCheckBedBrigadeData()
         {
+            const string project = "BedBrigade.Data";
             _qualityLogic.Config.DirectoriesToExclude.Add("Migrations");
             _qualityLogic.Config.DirectoriesToExclude.Add("Seeding");
 
-            string projectPath = Path.Combine(_solutionPath, "BedBrigade.Data");
+            string projectPath = Path.Combine(_solutionPath, project);
             QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
             if (result.QualityViolations.Any())
             {
                 ReportViolations(result);
-                Assert.Fail("Failed Quality Check for BedBrigade.Data");
+                Assert.Fail($"Failed Quality Check for {project}");
             }
             else
             {
-                Console.WriteLine("Passed Quality Check for BedBrigade.Data");
+                Console.WriteLine($"Failed Quality Check for  {project}");
             }
         }
 
-        //[Test]
-        //public void QualityCheckBedBrigadeServer()
-        //{
-        //    _qualityLogic.Config.DirectoriesToExclude.Add("Migrations");
-        //    _qualityLogic.Config.DirectoriesToExclude.Add("Seeding");
 
-        //    string projectPath = Path.Combine(_solutionPath, "BedBrigade.Server");
-        //    QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
+        [Test]
+        public void QualityCheckBedBrigadeMessageService()
+        {
+            const string project = "BedBrigade.MessageService";
+            string projectPath = Path.Combine(_solutionPath, project);
+            QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
 
-        //    if (result.QualityViolations.Any())
-        //    {
-        //        ReportViolations(result);
-        //        Assert.Fail("Failed Quality Check for BedBrigade.Server");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Passed Quality Check for BedBrigade.Server");
-        //    }
-        //}
+            if (result.QualityViolations.Any())
+            {
+                ReportViolations(result);
+                Assert.Fail($"Failed Quality Check for {project}");
+            }
+            else
+            {
+                Console.WriteLine($"Passed Quality Check for {project}");
+            }
+        }
 
-        //[Test]
-        //public void QualityCheckBedBrigadeShared()
-        //{
-        //    string projectPath = Path.Combine(_solutionPath, "BedBrigade.Shared");
-        //    QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
-
-        //    if (result.QualityViolations.Any())
-        //    {
-        //        ReportViolations(result);
-        //        Assert.Fail("Failed Quality Check for BedBrigade.Shared");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Passed Quality Check for BedBrigade.Shared");
-        //    }
-        //}
 
         private void ReportViolations(QualityResult result)
         {

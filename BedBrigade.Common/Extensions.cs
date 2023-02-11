@@ -20,7 +20,7 @@ namespace BedBrigade.Common
                 var formatted = string.Empty;
                 if (!string.IsNullOrEmpty(phone))
                 {
-                    var trimmed = phone.Trim().Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "").Replace(".", "");
+                    var trimmed = phone.Trim().Trim(' ', '(', ')', '-', ',');
                     formatted = String.Format("{0:(###) ###-####}", Convert.ToInt64(trimmed));
                 }
                 return formatted;
