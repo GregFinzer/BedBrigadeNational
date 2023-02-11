@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MessageService
+﻿namespace BedBrigade.MessageService
 {
     public class EmailConfiguration
     {

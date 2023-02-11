@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using MimeKit;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace MessageService
+namespace BedBrigade.MessageService
 {
     public class Message
     {

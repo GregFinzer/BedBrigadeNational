@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace MessageService
+namespace BedBrigade.MessageService
 {
     public class EmailSender : IEmailSender
     {

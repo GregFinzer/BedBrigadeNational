@@ -70,6 +70,13 @@
                 </NavLink>
             </div>
         </AuthorizeView>
+        <AuthorizeView Roles="National Admin, Location Admin, Location Scheduler">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="administration/schedule/deliveries">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span>Deliveries
+                </NavLink>
+            </div>
+        </AuthorizeView>
         <AuthorizeView Roles="National Admin, Location Admin, Location Treasurer">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="administration/manage/donations">
