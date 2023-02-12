@@ -7,19 +7,19 @@ namespace BedBrigade.Data.Models
     public class EmailQueue
     {
         [Key]
-        public int EmailQueueId;
+        public Int32 EmailQueueId { get; set; }
         [Required, MaxLength(100)]
-        public string FromDisplayName { get; set; }
+        public string FromDisplayName { get; set; } = string.Empty;
         [Required, MaxLength(100)]
-        public string FromAddress { get; set; }
+        public string FromAddress { get; set; } = string.Empty;
         [Required, MaxLength(100)]
-        public string ToAddress { get; set; }
+        public string ToAddress { get; set; } = string.Empty;
         [Required, MaxLength(100)]
-        public string Subject { get; set; }
-        [Required, MaxLength(100)]
-        public string Body { get; set; }
-        [Required, MaxLength(100)]
-        public string HtmlBody { get; set; }
+        public string Subject { get; set; } = string.Empty;
+        [Required, MaxLength(4000)]
+        public string Body { get; set; } = string.Empty;
+        [Required, MaxLength(4000)]
+        public string HtmlBody { get; set; } = string.Empty;
         [Required]
         public DateTime QueueDate { get; set; }
         public DateTime LockDate { get; set; }
