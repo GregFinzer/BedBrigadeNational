@@ -9,10 +9,11 @@ namespace BedBrigade.Data
     {
         private HttpContextAccessor _httpContext;
 
-        public DataContext(DbContextOptions options) : base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             
         }
+
 
         public DbSet<BedRequest> BedRequests { get; set; }
         public DbSet<Configuration> Configurations { get; set; }
@@ -26,6 +27,7 @@ namespace BedBrigade.Data
         public DbSet<Volunteer> Volunteers { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<EmailQueue> EmailQueues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
