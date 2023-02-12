@@ -44,7 +44,6 @@ namespace BedBrigade.Client
             // Add Email Messageing Service config
             // Email Messaging Service
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-            //Mike this is crashing with object reference not set to an instance of an object.  Commenting out
             builder.Services.AddSingleton(emailConfig);
             builder.Services.AddScoped<IEmailSender, EmailSender>();
 
