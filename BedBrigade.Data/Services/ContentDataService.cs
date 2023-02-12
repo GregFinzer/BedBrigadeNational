@@ -6,20 +6,23 @@ namespace BedBrigade.Data.Services;
 
 public class ContentDataService : IContentDataService
 {
-    private readonly DataContext _context;
+    private readonly IDbContextFactory<DataContext> _contextFactory;
 
-    public ContentDataService(DataContext context)
+    public ContentDataService(IDbContextFactory<DataContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task<ServiceResponse<Content>> CreateAsync(Content content)
     {
         try
         {
-            await _context.Content.AddAsync(content);
-            await _context.SaveChangesAsync();
-            return new ServiceResponse<Content>($"Added content with key {content.Name}.", true);
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                await ctx.Content.AddAsync(content);
+                await ctx.SaveChangesAsync();
+                return new ServiceResponse<Content>($"Added content with key {content.Name}.", true);
+            }
         }
         catch (DbException ex)
         {
@@ -29,62 +32,82 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<bool>> DeleteAsync(int contentId)
     {
-        var content = await _context.Content.FindAsync(contentId);
-        if (content == null)
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            return new ServiceResponse<bool>($"User record with key {contentId} not found");
-        }
-        try
-        {
-            _context.Content.Remove(content);
-            await _context.SaveChangesAsync();
-            return new ServiceResponse<bool>($"Removed record with key {contentId}.", true);
-        }
-        catch (DbException ex)
-        {
-            return new ServiceResponse<bool>($"DB error on delete of user record with key {contentId} - {ex.Message} ({ex.ErrorCode})");
+            var content = await ctx.Content.FindAsync(contentId);
+            if (content == null)
+            {
+                return new ServiceResponse<bool>($"User record with key {contentId} not found");
+            }
+
+            try
+            {
+                ctx.Content.Remove(content);
+                await ctx.SaveChangesAsync();
+                return new ServiceResponse<bool>($"Removed record with key {contentId}.", true);
+            }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<bool>(
+                    $"DB error on delete of user record with key {contentId} - {ex.Message} ({ex.ErrorCode})");
+            }
         }
     }
 
     public async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
-        var result = await _context.Content.ToListAsync();
-        if (result != null)
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            return new ServiceResponse<List<Content>>($"Found {result.Count} records.", true, result);
-        }
-        return new ServiceResponse<List<Content>>("None found.");
+            var result = await ctx.Content.ToListAsync();
+            if (result != null)
+            {
+                return new ServiceResponse<List<Content>>($"Found {result.Count} records.", true, result);
+            }
 
+            return new ServiceResponse<List<Content>>("None found.");
+        }
     }
 
     public async Task<ServiceResponse<Content>> GetAsync(int contentId)
     {
-        var result = await _context.Content.FindAsync(contentId);
-        if (result != null)
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            return new ServiceResponse<Content>("Found Record", true, result);
+            var result = await ctx.Content.FindAsync(contentId);
+            if (result != null)
+            {
+                return new ServiceResponse<Content>("Found Record", true, result);
+            }
+
+            return new ServiceResponse<Content>("Not Found");
         }
-        return new ServiceResponse<Content>("Not Found");
     }
 
     public async Task<ServiceResponse<Content>> GetAsync(string name)
     {
-        var result = await _context.Content.FirstOrDefaultAsync(c => c.Name == name);
-        if (result != null)
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            return new ServiceResponse<Content>("Found Record", true, result);
+            var result = await ctx.Content.FirstOrDefaultAsync(c => c.Name == name);
+            if (result != null)
+            {
+                return new ServiceResponse<Content>("Found Record", true, result);
+            }
+
+            return new ServiceResponse<Content>("Not Found");
         }
-        return new ServiceResponse<Content>("Not Found");
     }
 
     public async Task<ServiceResponse<Content>> UpdateAsync(Content content)
     {
-        var result = await Task.Run(() => _context.Content.Update(content));
-        if (result != null)
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            return new ServiceResponse<Content>($"Updated content with key {content.ContentId}", true);
+            var result = await Task.Run(() => ctx.Content.Update(content));
+            if (result != null)
+            {
+                return new ServiceResponse<Content>($"Updated content with key {content.ContentId}", true);
+            }
+
+            return new ServiceResponse<Content>($"User with key {content.ContentId} was not updated.");
         }
-        return new ServiceResponse<Content>($"User with key {content.ContentId} was not updated.");
     }
 }
 
