@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using Serilog;
+using BedBrigade.MessageService.Services;
 
 namespace BedBrigade.Client
 {
@@ -41,12 +42,14 @@ namespace BedBrigade.Client
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
             // Add Email Messageing Service config
             // Email Messaging Service
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-            //Mike this is crashing with object reference not set to an instance of an object.  Commenting out
             builder.Services.AddSingleton(emailConfig);
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
+            //builder.Services.AddFluentEmail(emailConfig.From)
+            //    .AddRazorRenderer()
+            //    .AddSmtpSender(emailConfig.SmtpServer, emailConfig.Port, DeliveryMethod);
 
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -62,6 +65,10 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IVolunteerDataService, VolunteerDataService>();
             builder.Services.AddScoped<IConfigurationDataService, ConfigurationDataService>();
             builder.Services.AddScoped<IContentDataService, ContentDataService>();
+
+            builder.Services.AddScoped<IMessageService, Services.MessageService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
@@ -95,7 +102,6 @@ namespace BedBrigade.Client
             app.MapFallbackToPage("/_Host");
             return app;
         }
-
 
         public static async Task SetupDatabase(WebApplication app)
         {
