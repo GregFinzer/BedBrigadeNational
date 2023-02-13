@@ -15,19 +15,19 @@ namespace BedBrigade.Data
         }
 
 
-        public DbSet<BedRequest> BedRequests { get; set; }
-        public DbSet<Configuration> Configurations { get; set; }
-        public DbSet<ContactUs> ContactUs { get; set; }
-        public DbSet<Content> Content { get; set; }
-        public DbSet<Donation> Donations { get; set; }
-        public DbSet<Location> Locations { get; set; }
-        public DbSet<Media> Media { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Volunteer> Volunteers { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<EmailQueue> EmailQueues { get; set; }
+        public virtual DbSet<BedRequest> BedRequests { get; set; }
+        public virtual DbSet<Configuration> Configurations { get; set; }
+        public virtual DbSet<ContactUs> ContactUs { get; set; }
+        public virtual DbSet<Content> Content { get; set; }
+        public virtual DbSet<Donation> Donations { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<Media> Media { get; set; }
+        public virtual DbSet<Schedule> Schedules { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Volunteer> Volunteers { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<EmailQueue> EmailQueues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
