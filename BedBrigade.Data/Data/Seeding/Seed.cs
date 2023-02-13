@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
 
 namespace BedBrigade.Data.Seeding
 {
     public class Seed
     {
-        private const string _seedUserName = "Seed";
-        private const string _seedLocationNational = "National";
-        private const string _seedLocationNationalName = "Bed Brigade Columbus";
+
 
 
 
@@ -54,8 +53,8 @@ namespace BedBrigade.Data.Seeding
             new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
             new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
             new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
-            new User {FirstName =  _seedLocationNational, LastName = "Editor", Role = "National Editor"},
-            new User {FirstName =  _seedLocationNational, LastName = "Admin", Role = "National Admin"},
+            new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Editor", Role = "National Editor"},
+            new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Admin", Role = "National Admin"},
             new User { FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
             new User {FirstName = _seedUserLocation1, LastName = "Author", Role = "Location Author" },
             new User {FirstName = _seedUserLocation1, LastName = "Editor", Role = "Location Editor" },
@@ -77,7 +76,7 @@ namespace BedBrigade.Data.Seeding
         {
             await SeedConfigurations(context);
             await SeedLocations(context);
-            await SeedContents(context);
+            await SeedContentsLogic.SeedContents(context);
             await SeedMedia(context);
             await SeedRoles(context);
             await SeedUser(context);
@@ -87,7 +86,7 @@ namespace BedBrigade.Data.Seeding
 
         private static async Task SeedConfigurations(DataContext context)
         {
-            if (context.Configurations.Any()) return;
+            if (await context.Configurations.AnyAsync()) return;
 
             var configurations = new List<Configuration>
             {
@@ -116,7 +115,8 @@ namespace BedBrigade.Data.Seeding
         }
         private static async Task SeedLocations(DataContext context)
         {
-            if(context.Locations.Any()) return;    
+            if(await context.Locations.AnyAsync()) return;    
+
             try
             {
                 await context.Locations.AddRangeAsync(locations);
@@ -127,35 +127,12 @@ namespace BedBrigade.Data.Seeding
                 Console.WriteLine($"Configuration seed error: {ex.Message}");
             }
         }
-        private static async Task SeedContents(DataContext context)
-        {
-            var header = "Header";
-            if (!context.Content.Any(c => c.ContentType == header))
-            {
-                var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNationalName);
-                var seedHtml = GetHtml("header.html");
-                context.Content.Add(new Content
-                {
-                    Location = location!,
-                    ContentType = header,
-                    Name = header,
-                    ContentHtml = seedHtml
-                }); ;
-            }
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in content {ex.Message}");
-            }
-        }
+
         private static async Task SeedMedia(DataContext context)
         {
             try
             {
-                if (!context.Media.Any(m => m.FileName == "Logo")) // table Media does not have site logo
+                if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
                 {
                     // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
                     // add the first reciord in Media table with National Logo
@@ -170,14 +147,14 @@ namespace BedBrigade.Data.Seeding
                         FileStatus = "seed",
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
-                        CreateUser = _seedUserName,
-                        UpdateUser = _seedUserName,
+                        CreateUser = SeedConstants.SeedUserName,
+                        UpdateUser = SeedConstants.SeedUserName,
                         MachineName = Environment.MachineName
                     });
 
                     await context.SaveChangesAsync();
                 } // add the first media row
-                if (!context.Media.Any(m => m.FileStatus == "test"))
+                if (!await context.Media.AnyAsync(m => m.FileStatus == "test"))
                 {
                     // add additional test files - should be removed in production version - VS 2/9/2023
                     // media table content & physical files synchronization is part of Media Manager
@@ -194,7 +171,7 @@ namespace BedBrigade.Data.Seeding
 
         private static async Task SeedRoles(DataContext context)
         {
-            if (context.Roles.Any()) return;
+            if (await context.Roles.AnyAsync()) return;
             try
             {
                 await context.Roles.AddRangeAsync(Roles);
@@ -209,7 +186,7 @@ namespace BedBrigade.Data.Seeding
         {
             foreach (var user in Users)
             {
-                if (!context.Users.Any(u => u.UserName == $"{user.FirstName}{user.LastName}"))
+                if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
                 {
                     try
                     {
@@ -278,11 +255,7 @@ namespace BedBrigade.Data.Seeding
             }
         }
 
-        private static string GetHtml(string fileName)
-        {
-            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
-            return html;
-        }
+
 
         // added by VS for testing time
         private static readonly List<Media> TestMedia = new()
