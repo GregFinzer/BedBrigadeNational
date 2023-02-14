@@ -1,17 +1,26 @@
 ﻿@using Microsoft.Extensions.Logging
+@using System.Text;
+@using BedBrigade.Client.Services
+
 @inject ILogger<Error> Logger
+@inject IMessageService _svcMessageService
 
 <CascadingValue Value="this">
     @ChildContent
 </CascadingValue>
 
-@code {
+@code {   
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    public void ProcessError(Exception ex)
+    public async Task ProcessError(Exception ex)
     {
+        StringBuilder template = new StringBuilder();
+        template.AppendLine("@Model.FirstName");
+        template.AppendLine("<p>@Model.Body</p>");
+        template.AppendLine("Bed Brigade");
 
-        Logger.LogError("Error:ProcessError - Type: {Type} Message: {Message}",
-            ex.GetType(), ex.Message);
+        Logger.LogError("Error:ProcessError - Type: {0} Message: {1}", ex.GetType(), ex.Message);
+        string errorBody = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
+        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", template.ToString(), new { FirstName = "National Admin", Body = errorBody});
     }
 }
