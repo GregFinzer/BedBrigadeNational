@@ -10,14 +10,11 @@ namespace BedBrigade.Data.Seeding
         private const string _seedLocationNational = "National";
         private const string _seedLocationNationalName = "Bed Brigade Columbus";
 
-
-
         // Table User
         private const string _seedUserPassword = "Password";
         private const string _seedUserLocation = "Location";
         private const string _seedUserLocation1 = "Location1";
         private const string _seedUserLocation2 = "Location2";
-
 
         private static List<Role> Roles = new()
         {
@@ -73,8 +70,11 @@ namespace BedBrigade.Data.Seeding
         };
         static readonly List<User> Users = users;
 
+        List<Volunteer> volunteers = new List<Volunteer>();
+
         public static async Task SeedData(DataContext context)
         {
+            await SeedVolunteers(context);
             await SeedConfigurations(context);
             await SeedLocations(context);
             await SeedContents(context);
@@ -82,8 +82,64 @@ namespace BedBrigade.Data.Seeding
             await SeedRoles(context);
             await SeedUser(context);
             await SeedUserRoles(context);
+
         }
 
+        private static async Task SeedVolunteers(DataContext context)
+        {
+            if (context.Volunteers.Any()) return;
+            try
+            {
+
+                List<string>? volunteeringFor = new List<string> { "Bed Delivery", "Bed Building", "Event Planning", "New Option", "Other" };
+                List<bool> YesOrNo = new List<bool> { true, false };
+                List<string> FirstName = new List<string> { "Bill", "Bob", "Mike", "Val", "Sally", "Sue", "Sandy", "William", "John", "Toby", "Betty", "Steven", "Chris", "Richard", "Ron", "Elliot" };
+                List<string> LastName = new List<string> { "Smith", "Williamson", "McNally", "Fender", "Hauser", "Thompson", "Noble", "William", "Johnson", "Toble", "Bole", "Sith", "Stringer", "Richardson", "Johanson", "Swatrz" };
+                List<string> EmailAgents = new List<string> { "hotmail.com", "gmail.com", "yahoo.com", "outlook.com" };
+
+                List<Volunteer> Volunteers = new List<Volunteer>();
+                for (int i = 0; i < 100; i++)
+                {
+                    var emailAgent = EmailAgents[new Random().Next(EmailAgents.Count - 1)];
+                    var firstName = FirstName[new Random().Next(FirstName.Count - 1)];
+                    var lastName = LastName[new Random().Next(LastName.Count - 1)];
+
+                    var volunteer = new Volunteer
+                    {
+                        Location = locations[new Random().Next(locations.Count - 1)],
+                        VolunteeringFor = volunteeringFor[new Random().Next(volunteeringFor.Count - 1)],
+                        VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(30)),
+                        IHaveVolunteeredBefore = YesOrNo[new Random().Next(2)],
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Email = $"{firstName}.{lastName}@{emailAgent}",
+                        Phone = "(999) 999-9999",
+                        OrganizationOrGroup = string.Empty,
+                        IHaveAMinivan = YesOrNo[new Random().Next(2)],
+                        IHaveAnSUV = YesOrNo[new Random().Next(2)],
+                        IHaveAPickupTruck = YesOrNo[new Random().Next(2)]
+                    };
+                    Volunteers.Add(volunteer);
+                    await context.Volunteers.AddAsync(volunteer);
+                    var count = await context.SaveChangesAsync();
+                }
+                }
+                catch (DbException ex)
+                {
+                    Console.WriteLine($"Error processing volunteer seed - {ex.Message} ");
+                    throw;
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine($"Error processing volunteer seed - {ex.Message} ");
+                    throw;
+                }
+
+
+
+        }
 
         private static async Task SeedConfigurations(DataContext context)
         {
