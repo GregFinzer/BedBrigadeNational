@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop;
+@using BedBrigade.Client.Services;
+
+@((MarkupString)footerContent)
+
+@code {
+    // Client
+    private string footerContent = string.Empty;
+    [Inject] private IContentService _svcContent { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _svcContent.GetAsync("Footer");
+        if(result.Success)
+        {
+            footerContent = result.Data.ContentHtml;
+        }
+    }
+}

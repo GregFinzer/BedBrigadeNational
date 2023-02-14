@@ -1,21 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="">
-    <Header />
+    <Header></Header>
 
     <main>
 
         <article class="content px-4">
             <ErrorBoundary @ref=@errorBoundary >
-              <ChildContent>
+                <ChildContent>
                     @Body
-              </ChildContent>
-            <ErrorContent>
-                <h2 class="w-100 text-center my-4">An Error has occured</h2>
-            </ErrorContent>
+                </ChildContent>
+                <ErrorContent>
+                    <h2 class="w-100 text-center my-4">An Error has occured</h2>
+                </ErrorContent>
             </ErrorBoundary>
-</article>
+        </article>
     </main>
+    <Footer></Footer>
 </div>
 
 @code {
