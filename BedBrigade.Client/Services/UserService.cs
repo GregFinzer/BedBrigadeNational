@@ -92,6 +92,11 @@ public class UserService : IUserService
     {
         return await _data.GetRolesAsync();
     }
+
+    public async Task<ServiceResponse<Role>> GetRoleAsync(int RoleId)
+    {
+        return await _data.GetRoleAsync(RoleId);
+    }
 }
 
 

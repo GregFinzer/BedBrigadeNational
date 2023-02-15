@@ -1,4 +1,5 @@
 ﻿
+using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -82,11 +83,28 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<User>> UpdateAsync(User user)
         {
-            var result = await Task.Run(() => _context.Users.Update(user));
+            var oldRec = await _context.Users.FirstOrDefaultAsync(x => x.UserName == user.UserName);
+            if(oldRec != null)
+            {
+                oldRec.Location = user.Location;
+                oldRec.FkLocation = user.FkLocation;
+                oldRec.FirstName = user.FirstName;
+                oldRec.LastName = user.LastName;
+                oldRec.Email = user.Email;
+                oldRec.Phone = user.Phone.FormatPhoneNumber();
+                oldRec.PasswordHash = user.PasswordHash;
+                oldRec.PasswordSalt = user.PasswordHash;
+                oldRec.Role = user.Role;
+                oldRec.FkRole= user.FkRole;
+            }
+            var result = _context.Users.Update(oldRec);
+            await _context.SaveChangesAsync();
+            //var result = await Task.Run(() => _context.Users.Update(user));
             if (result != null)
             {
                 return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);
             }
+            
             return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
         }
 
@@ -132,6 +150,16 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<Role>>($"Found {result.Count} Roles", true, result);
             }
             return new ServiceResponse<List<Role>>("No Roles found.");
+        }
+
+        public async Task<ServiceResponse<Role>> GetRoleAsync(int roleId)
+        {
+            var result = await _context.Roles.FindAsync(roleId);
+            if(result != null)
+            {
+                return new ServiceResponse<Role>($"Found Role", true, result);
+            }
+            return new ServiceResponse<Role>("No Role found.");
         }
     }
 }
