@@ -70,13 +70,13 @@ public class Seed
 
     public static async Task SeedData(DataContext context)
     {
-        //await SeedConfigurations(context);
-        //await SeedLocations(context);
-        //await SeedContentsLogic.SeedContents(context);
-        //await SeedMedia(context);
-        //await SeedRoles(context);
-        //await SeedUser(context);
-        //await SeedUserRoles(context);
+        await SeedConfigurations(context);
+        await SeedLocations(context);
+        await SeedContentsLogic.SeedContents(context);
+        await SeedMedia(context);
+        await SeedRoles(context);
+        await SeedUser(context);
+        await SeedUserRoles(context);
         await SeedVolunteers(context);
     }
 
