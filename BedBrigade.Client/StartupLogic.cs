@@ -41,6 +41,7 @@ namespace BedBrigade.Client
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
             // Add Email Messageing Service config
