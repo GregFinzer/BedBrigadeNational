@@ -38,6 +38,9 @@ public class User : BaseEntity
     public String? Phone { get; set; } = string.Empty;
 
     public String? Role { get; set; } = string.Empty;
+    [ForeignKey("Role")]
+    public int FkRole { get; set; }
+
 
     public string FullName
     {
