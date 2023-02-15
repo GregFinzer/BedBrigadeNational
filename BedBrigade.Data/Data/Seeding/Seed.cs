@@ -247,6 +247,7 @@ public class Seed
                         Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
                         Phone = "(999) 999-9999",
                         Role = user.Role,
+                        FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                         PasswordHash = passwordHash,
                         PasswordSalt = passwordSalt,
                     };
