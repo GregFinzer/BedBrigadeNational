@@ -6,6 +6,8 @@
 @using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using WrapMode = Syncfusion.Blazor.Grids.WrapMode
+@using SelectionType = Syncfusion.Blazor.Grids.SelectionType
+@using SelectionMode = Syncfusion.Blazor.Grids.SelectionMode
 @using BedBrigade.Data.Models
 
 
@@ -40,6 +42,7 @@ else
                         <GridTextWrapSettings WrapMode="WrapMode.Header" />
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
                         <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="User" />
+                        <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <HeaderTemplate>
                                 @{
