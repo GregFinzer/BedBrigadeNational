@@ -113,5 +113,25 @@ namespace BedBrigade.Data.Services
             }
             return new ServiceResponse<bool>($"User does not exist.", false, false);
         }
+
+        public async Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync()
+        {
+            var result = _context.UserRoles.ToList();
+            if(result != null)
+            {
+                return new ServiceResponse<List<UserRole>>("User Roles", true, result);
+            }
+            return new ServiceResponse<List<UserRole>>("No User Roles found.");
+        }
+
+        public async Task<ServiceResponse<List<Role>>> GetRolesAsync()
+        {
+            var result = _context.Roles.ToList();
+            if (result != null)
+            {
+                return new ServiceResponse<List<Role>>($"Found {result.Count} Roles", true, result);
+            }
+            return new ServiceResponse<List<Role>>("No Roles found.");
+        }
     }
 }

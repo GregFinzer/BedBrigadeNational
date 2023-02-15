@@ -12,5 +12,7 @@ namespace BedBrigade.Client.Services
         Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
         Task<ServiceResponse<User>> UpdateAsync(User user);
         Task<ServiceResponse<bool>> UserExists(string email);
+        Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync();
+        Task <ServiceResponse<List<Role>>> GetRolesAsync();
     }
 }
