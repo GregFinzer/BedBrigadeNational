@@ -10,5 +10,8 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<User>> GetAsync(string UserName);
         Task<ServiceResponse<User>> UpdateAsync(User user);
         Task<ServiceResponse<bool>> UserExistsAsync(string email);
+        Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync();
+        Task<ServiceResponse<List<Role>>> GetRolesAsync();
+        Task<ServiceResponse<Role>> GetRoleAsync(int roleId);
     }
 }

@@ -39,19 +39,11 @@ namespace BedBrigade.Client.Components
         protected int ToastTimeout { get; private set; } = 3000;
         protected string ToastWidth { get; private set; } = "300";
         public List<Location>? Locations { get; private set; }
+        protected UserRegister userRegister { get; set; } = new UserRegister();
+        public User user { get; set; } = new User();
 
-        protected List<Role> Roles = new List<Role>()
-    {
-        new Role { Name = "National Admin" },
-        new Role { Name = "National Editor" },
-        new Role { Name = "Location Admin" },
-        new Role { Name = "Location Contributor" },
-        new Role { Name = "Location Author" },
-        new Role { Name = "Location Editor" },
-        new Role { Name = "Location Scheduler" },
-        new Role { Name = "Location Communications" },
-    };
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "550px" };
+        protected List<Role> Roles { get; private set; }
+        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
 
         protected override async Task OnInitializedAsync()
         {
@@ -67,6 +59,12 @@ namespace BedBrigade.Client.Components
             else
             {
                 ToolBar = new List<string> { "Search" };
+            }
+
+            var getRoles = await _svcUser.GetRolesAsync();
+            if(getRoles.Success)
+            {
+                Roles = getRoles.Data;
             }
             var getUsers = await _svcUser.GetAllAsync();
             if (getUsers.Success)
@@ -156,7 +154,8 @@ namespace BedBrigade.Client.Components
             var user = args.Data;
             if (!string.IsNullOrEmpty(user.UserName))
             {
-
+                user.Role = await GetUserRoleName(user);
+                user.Location = await GetUserLocation(user);
                 //Update User
                 var userUpdate = await _svcUser.UpdateAsync(user);
                 ToastTitle = "Update User";
@@ -201,6 +200,26 @@ namespace BedBrigade.Client.Components
             await Grid.Refresh();
         }
 
+        private async Task<Location> GetUserLocation(User user)
+        {
+            var locationResult = await _svcLocation.GetAsync(user.FkLocation);
+            if (locationResult.Success)
+            {
+               return locationResult.Data;
+            }
+            return new Location();
+        }
+
+        private async Task<string> GetUserRoleName(User user)
+        {
+            var result = await _svcUser.GetRoleAsync(user.FkRole);
+            if (result.Success)
+            {
+                return result.Data.Name;
+            }
+            return string.Empty;
+        }
+
         private void Add()
         {
             HeaderTitle = "Add User";
@@ -234,11 +253,11 @@ namespace BedBrigade.Client.Components
 
         protected async Task Save(User status)
         {
-            await Grid.EndEdit();
+            await Grid.EndEditAsync();
         }
         protected async Task Cancel()
         {
-            await Grid.CloseEdit();
+            await Grid.CloseEditAsync();
         }
         protected async Task DataBound()
         {

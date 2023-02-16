@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -51,14 +53,14 @@ public class Seed
         new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
         new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Editor", Role = "National Editor"},
         new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Admin", Role = "National Admin"},
-        new User { FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
+        new User {FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
         new User {FirstName = _seedUserLocation1, LastName = "Author", Role = "Location Author" },
         new User {FirstName = _seedUserLocation1, LastName = "Editor", Role = "Location Editor" },
         new User {FirstName = _seedUserLocation1, LastName = "Scheduler", Role = "Location Scheduler" },
         new User {FirstName = _seedUserLocation1, LastName = "Treasurer", Role = "Location Treasurer"},
         new User {FirstName = _seedUserLocation1, LastName = "Communications", Role = "Location Communications"},
         new User {FirstName = _seedUserLocation1, LastName = "Admin", Role = "Location Admin"},
-        new User { FirstName = _seedUserLocation2, LastName = "Contributor", Role = "Location Contributor" },
+        new User {FirstName = _seedUserLocation2, LastName = "Contributor", Role = "Location Contributor" },
         new User {FirstName = _seedUserLocation2, LastName = "Author", Role = "Location Author" },
         new User {FirstName = _seedUserLocation2, LastName = "Editor", Role = "Location Editor" },
         new User {FirstName = _seedUserLocation2, LastName = "Scheduler", Role = "Location Scheduler" },
@@ -80,55 +82,10 @@ public class Seed
         await SeedVolunteers(context);
     }
 
-    private static async Task SeedVolunteers(DataContext context)
-    {
-        if (await context.Volunteers.AnyAsync()) return;
-
-        List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
-        List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
-        List<string> VolunteeringFor = new List<string> { "Bed Building", "Bed Delivery", "Event Planning", "New Option", "Other" };
-        List<bool> YesOrNo = new List<bool> { true, false };
-        List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
-
-        for (var i = 0; i <= 100; i++)
-        {
-            var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
-            var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
-            var firstThree = new Random().Next(291, 861);
-            var nextThree = new Random().Next(200, 890);
-            var lastFour = new Random().Next(1000, 9999);
-
-            Volunteer volunteer = new()
-            {
-                Location = locations[new Random().Next(locations.Count - 1)],
-                VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
-                VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
-                IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
-                FirstName = firstName,
-                LastName = lastName,
-                Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
-                Phone = $"({firstThree}) {nextThree}-{lastFour}",
-                IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
-                IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count )],
-                IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
-            };
-            try
-            {
-                await context.AddAsync(volunteer);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error in Volunteer: {ex.Message}");
-                throw;
-            }
-        }
-
-    }
-
 
     private static async Task SeedConfigurations(DataContext context)
     {
+        Log.Logger.Information("SeedConfigurations Started");
         if (await context.Configurations.AnyAsync()) return;
 
         var configurations = new List<Configuration>
@@ -158,6 +115,7 @@ public class Seed
     }
     private static async Task SeedLocations(DataContext context)
     {
+        Log.Logger.Information("SeedLocations Started");
         if (await context.Locations.AnyAsync()) return;
 
         try
@@ -167,12 +125,13 @@ public class Seed
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Configuration seed error: {ex.Message}");
+           Log.Logger.Information($"Configuration seed error: {ex.Message}");
+            throw;
         }
     }
-
     private static async Task SeedMedia(DataContext context)
     {
+        Log.Logger.Information("SeedMedia Started");
         try
         {
             if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
@@ -209,11 +168,12 @@ public class Seed
         catch (Exception ex)
         {
             Console.WriteLine($"Error seed media: {ex.Message}");
+            throw;
         }
     } // Seed Media
-
     private static async Task SeedRoles(DataContext context)
     {
+        Log.Logger.Information("SeedRoles Started");
         if (await context.Roles.AnyAsync()) return;
         try
         {
@@ -223,10 +183,12 @@ public class Seed
         catch (Exception ex)
         {
             Console.WriteLine($"Eroor adding roles {ex.Message}");
+            throw;
         }
     }
     private static async Task SeedUser(DataContext context)
     {
+        Log.Logger.Information("SeedUser Started");
         foreach (var user in Users)
         {
             if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
@@ -247,6 +209,7 @@ public class Seed
                         Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
                         Phone = "(999) 999-9999",
                         Role = user.Role,
+                        FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                         PasswordHash = passwordHash,
                         PasswordSalt = passwordSalt,
                     };
@@ -270,12 +233,14 @@ public class Seed
                 catch (Exception ex)
                 {
                     Console.WriteLine($"SaveChanges Error {ex.Message}");
+                    throw;
                 }
             }
         }
     }
     private static async Task SeedUserRoles(DataContext context)
     {
+        Log.Logger.Information("SeedUserRoles Started");
         try
         {
             var users = context.Users.ToList();
@@ -295,7 +260,54 @@ public class Seed
         catch (Exception ex)
         {
             Console.WriteLine($"Error SeedUserRoles {ex.Message}");
+            throw;
         }
+    }
+    private static async Task SeedVolunteers(DataContext context)
+    {
+        Log.Logger.Information("SeedVolunteers Started");
+        if (await context.Volunteers.AnyAsync()) return;
+
+        List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
+        List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
+        List<string> VolunteeringFor = new List<string> { "Bed Building", "Bed Delivery", "Event Planning", "New Option", "Other" };
+        List<bool> YesOrNo = new List<bool> { true, false };
+        List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
+
+        for (var i = 0; i <= 100; i++)
+        {
+            var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
+            var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+            var firstThree = new Random().Next(291, 861);
+            var nextThree = new Random().Next(200, 890);
+            var lastFour = new Random().Next(1000, 9999);
+
+            Volunteer volunteer = new()
+            {
+                Location = locations[new Random().Next(locations.Count - 1)],
+                VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
+                VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
+                IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
+                FirstName = firstName,
+                LastName = lastName,
+                Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
+                Phone = $"({firstThree}) {nextThree}-{lastFour}",
+                IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
+                IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count)],
+                IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
+            };
+            try
+            {
+                await context.AddAsync(volunteer);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error in Volunteer: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 
 
