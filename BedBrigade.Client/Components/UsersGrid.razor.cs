@@ -154,17 +154,8 @@ namespace BedBrigade.Client.Components
             var user = args.Data;
             if (!string.IsNullOrEmpty(user.UserName))
             {
-
-                var result = await _svcUser.GetRoleAsync(user.FkRole);
-                if (result.Success)
-                {
-                    user.Role = result.Data.Name;
-                }
-                var locationResult = await _svcLocation.GetAsync(user.FkLocation);
-                if (locationResult.Success)
-                {
-                    user.Location = locationResult.Data;
-                }
+                user.Role = await GetUserRoleName(user);
+                user.Location = await GetUserLocation(user);
                 //Update User
                 var userUpdate = await _svcUser.UpdateAsync(user);
                 ToastTitle = "Update User";
@@ -207,6 +198,26 @@ namespace BedBrigade.Client.Components
             }
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
+        }
+
+        private async Task<Location> GetUserLocation(User user)
+        {
+            var locationResult = await _svcLocation.GetAsync(user.FkLocation);
+            if (locationResult.Success)
+            {
+               return locationResult.Data;
+            }
+            return new Location();
+        }
+
+        private async Task<string> GetUserRoleName(User user)
+        {
+            var result = await _svcUser.GetRoleAsync(user.FkRole);
+            if (result.Success)
+            {
+                return result.Data.Name;
+            }
+            return string.Empty;
         }
 
         private void Add()
