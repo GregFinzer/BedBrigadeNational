@@ -56,10 +56,10 @@ else
 
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled="true" Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="form-group col-md-8">
-                                            <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Value" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                 }
@@ -68,12 +68,12 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="PrayerNeed" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="ConfigurationKey" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
-                            <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false" />
+                            <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         </GridColumns>
                     </SfGrid>
 
@@ -83,10 +83,29 @@ else
     </fieldset>
 }
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout>
-    <ToastPosition X="Center" Y="Top"></ToastPosition>
+    <ToastPosition X="Center" Y="Center"></ToastPosition>
 </SfToast>
 
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+
 <style>
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
     .e-toast-container {
         margin-top: 450px;
     }

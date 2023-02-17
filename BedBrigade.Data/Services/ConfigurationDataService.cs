@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
@@ -34,28 +35,42 @@ public class ConfigurationDataService : IConfigurationDataService
 
     public async Task<ServiceResponse<bool>> DeleteAsync(string configurationkey)
     {
-        var user = await _context.Users.FindAsync(configurationkey);
-        if (user == null)
+        var config = await _context.Configurations.FindAsync(configurationkey);
+        if (config == null)
         {
-            return new ServiceResponse<bool>($"User record with key {configurationkey} not found");
+            return new ServiceResponse<bool>($"Configuration record with key {configurationkey} not found");
         }
         try
         {
-            _context.Users.Remove(user);
+            _context.Configurations.Remove(config);
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool>($"Removed record with key {configurationkey}.", true);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"DB error on delete of user record with key {configurationkey} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<bool>($"DB error on delete of configuration record with key {configurationkey} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 
     public async Task<ServiceResponse<Configuration>> UpdateAsync(Configuration configuration)
     {
-        var result = await Task.Run(() => _context.Configurations.Update(configuration));
+        var config = await _context.Configurations.FindAsync(configuration.ConfigurationKey);
+        config.ConfigurationValue = configuration.ConfigurationValue;
+        var result = await Task.Run(() => _context.Configurations.Update(config));
         if (result != null)
         {
+            try
+            { 
+                await _context.SaveChangesAsync();
+            }
+            catch(DbException ex)
+            {
+                Log.Logger.Error("Database exception {0}", ex.ToString());                
+            }
+            catch(Exception ex)
+            {
+                Log.Logger.Error("Error saving configuration {0} ", ex.Message);
+            }
             return new ServiceResponse<Configuration>($"Updated location with key {configuration}", true);
         }
         return new ServiceResponse<Configuration>($"User with key {configuration} was not updated.");
