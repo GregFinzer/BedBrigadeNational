@@ -517,9 +517,8 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<long>("FileSize")
-                        .HasMaxLength(50)
-                        .HasColumnType("bigint");
+                    b.Property<long>("FileSize")                        
+                        .HasColumnType("int");
 
                     b.Property<string>("FileStatus")
                         .HasColumnType("nvarchar(max)");

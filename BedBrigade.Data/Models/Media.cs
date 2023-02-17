@@ -22,8 +22,7 @@ namespace BedBrigade.Data.Models
 		[MaxLength(30)]
         public String? MediaType { get; set; } = string.Empty;
 
-        [MaxLength(50)]
-        public long FileSize { get; set; } // added by VS 2/9/2023
+        public int FileSize { get; set; } // added by VS 2/17/2023
 
 		[MaxLength(255)]
 		public String? AltText { get; set; } = string.Empty;
