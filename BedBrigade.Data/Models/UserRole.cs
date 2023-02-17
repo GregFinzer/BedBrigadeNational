@@ -9,13 +9,14 @@ public class UserRole : BaseEntity
     [Key]
     public int UserRoleId { get; set; }
 
-    //Parent
     [ForeignKey("LocationId")]
-    public int LocationId { get; set; } 
+    public int LocationId { get; set; }
 
-    //Parent
-    public User User { get; set; } = new User();
+    [ForeignKey("UserName1")]
+    public string UserName1 { get; set; }
 
-    //Parent
-    public Role Role { get; set; } = new Role();
+    [ForeignKey("UserName")]
+    public string UserName { get; set; }
+    [ForeignKey("RoleId")]
+    public Int32 RoleId { get; set; } 
 }

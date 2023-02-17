@@ -35,22 +35,22 @@ public class VolunteerDataService : IVolunteerDataService
         return new ServiceResponse<List<Volunteer>>("None found.");
     }
 
-    public async Task<ServiceResponse<bool>> DeleteAsync(string UserName)
+    public async Task<ServiceResponse<bool>> DeleteAsync(int VolunteerId)
     {
-        var user = await _context.Users.FindAsync(UserName);
+        var user = await _context.Users.FindAsync(VolunteerId);
         if (user == null)
         {
-            return new ServiceResponse<bool>($"User record with key {UserName} not found");
+            return new ServiceResponse<bool>($"Volunteer record with key {VolunteerId} not found");
         }
         try
         {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-            return new ServiceResponse<bool>($"Removed record with key {UserName}.", true);
+            return new ServiceResponse<bool>($"Removed record with key {VolunteerId}.", true);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"DB error on delete of user record with key {UserName} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<bool>($"DB error on delete of user record with key {VolunteerId} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 
@@ -78,7 +78,6 @@ public class VolunteerDataService : IVolunteerDataService
         }
 
     }
-
 
 }
 

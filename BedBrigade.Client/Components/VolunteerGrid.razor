@@ -1,0 +1,179 @@
+﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Data.Models
+
+@if (Volunteers == null)
+{
+    <span class="spinner-grow m-5"></span>
+    <span>Loading ....</span>
+}
+else
+{
+    <fieldset class="m-4">
+        <legend>Location</legend>
+        <div class="col-md-12 control-sec">
+            <div class="content-wrapper">
+                <div class="row">
+                    <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true">
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
+                                  }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Volunteer)) IsPrimary="true">@ButtonTitle</SfButton>
+                                <SfButton OnClick="Cancel">Cancel</SfButton>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    Volunteer volunteer = (context as Volunteer)!;
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfTextBox ID="name" @bind-Value=@volunteer.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <SfTextBox @bind-Value=@volunteer.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <SfTextBox @bind-Value=@volunteer.Email Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@volunteer.Phone Enabled="true" Placeholder="Phone" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfTextBox @bind-Value=@volunteer.OrganizationOrGroup Enabled="true" Placeholder="Organization / Group" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfTextBox @bind-Value=@volunteer.Message Enabled="true" Placeholder="Message" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    //<div class="row">
+                                    //    <div class="col-md-4">
+                                    //        <SfCheckBox @bind-Value=@volunteer.IHaveAMinivan Label="Mini Van" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                    //    </div>
+                                    //    <div class="col-md-4">
+                                    //        <SfCheckBox @bind-Value=@volunteer.IHaveAnSUV Label="Mini Van" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                    //    </div>
+                                    //    <div class="col-md-4">
+                                    //        <SfCheckBox @bind-Value=@volunteer.IHaveAPickupTruck Label="Mini Van" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                    //    </div>
+                                    //</div>
+
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="FullName" Direction="SortDirection.Ascending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Volunteer.VolunteerId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                            <GridColumn Field=@nameof(Volunteer.VolunteeringFor) ShowColumnMenu="false" HeaderText="For" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization/Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.IHaveAMinivan) ShowColumnMenu="false" HeaderText="Mini Van" Type="ColumnType.CheckBox" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.IHaveAnSUV) ShowColumnMenu="false" HeaderText="SUV" Type="ColumnType.CheckBox" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.IHaveAPickupTruck) ShowColumnMenu="false" HeaderText="Pickup" Type="ColumnType.CheckBox" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" HeaderText="Volunteered Before" Type="ColumnType.CheckBox" AllowEditing="false" AllowFiltering="false" Width="15" />
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+}
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout>
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+<style>
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+    .e-toast-container {
+        margin-top: 450px;
+    }
+
+        .e-toast-container .e-toast {
+            border: 1px solid black;
+            border-radius: 25px;
+        }
+            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-title {
+                color: deepskyblue;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+            }
+            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: lightskyblue;
+                padding: 5px;
+                width: 100%;
+                height: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+</style>
