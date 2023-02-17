@@ -545,9 +545,6 @@ namespace BedBrigade.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("FkLocation")
-                        .HasColumnType("int");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -582,8 +579,6 @@ namespace BedBrigade.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("UserName");
-
-                    b.HasIndex("FkLocation");
 
                     b.ToTable("Users");
                 });
@@ -744,7 +739,7 @@ namespace BedBrigade.Data.Migrations
                 {
                     b.HasOne("BedBrigade.Shared.Location", "Location")
                         .WithMany("Users")
-                        .HasForeignKey("FkLocation")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -82,7 +82,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.FkLocation Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto" >
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                         </div>
@@ -97,7 +97,7 @@ else
                         </GridEditSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="FkLocation" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
@@ -106,7 +106,7 @@ else
                             <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Role) ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
-                            <GridForeignColumn Field=@nameof(User.FkLocation) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="Location" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="Location" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
 

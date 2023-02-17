@@ -48,7 +48,7 @@ namespace BedBrigade.Data.Services
             if (role.ToLower() != "national admin")
             {
                 int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
-                result = _context.Users.Where(u => u.FkLocation == locationId).ToList();
+                result = _context.Users.Where(u => u.LocationId == locationId).ToList();
             }
             else
             {
@@ -86,8 +86,7 @@ namespace BedBrigade.Data.Services
             var oldRec = await _context.Users.FirstOrDefaultAsync(x => x.UserName == user.UserName);
             if(oldRec != null)
             {
-                oldRec.Location = user.Location;
-                oldRec.FkLocation = user.FkLocation;
+                oldRec.LocationId = user.LocationId;
                 oldRec.FirstName = user.FirstName;
                 oldRec.LastName = user.LastName;
                 oldRec.Email = user.Email;

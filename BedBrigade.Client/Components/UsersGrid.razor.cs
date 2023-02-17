@@ -155,7 +155,7 @@ namespace BedBrigade.Client.Components
             if (!string.IsNullOrEmpty(user.UserName))
             {
                 user.Role = await GetUserRoleName(user);
-                user.Location = await GetUserLocation(user);
+                //user.LocationId = await GetUserLocation(user);
                 //Update User
                 var userUpdate = await _svcUser.UpdateAsync(user);
                 ToastTitle = "Update User";
@@ -202,7 +202,7 @@ namespace BedBrigade.Client.Components
 
         private async Task<Location> GetUserLocation(User user)
         {
-            var locationResult = await _svcLocation.GetAsync(user.FkLocation);
+            var locationResult = await _svcLocation.GetAsync(user.LocationId);
             if (locationResult.Success)
             {
                return locationResult.Data;

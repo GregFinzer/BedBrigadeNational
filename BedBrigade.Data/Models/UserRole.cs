@@ -10,7 +10,8 @@ public class UserRole : BaseEntity
     public int UserRoleId { get; set; }
 
     //Parent
-    public Location Location { get; set; } = new Location();
+    [ForeignKey("LocationId")]
+    public int LocationId { get; set; } 
 
     //Parent
     public User User { get; set; } = new User();

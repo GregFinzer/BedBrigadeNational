@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using Serilog;
 using BedBrigade.MessageService.Services;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Data.Entity.Infrastructure;
 
 namespace BedBrigade.Client
 {
@@ -114,15 +116,17 @@ namespace BedBrigade.Client
             var services = scope.ServiceProvider;
             try
             {
-                var context = services.GetRequiredService<DataContext>();
-                if (app.Environment.IsDevelopment())
+                var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
+                using (var context = dbContextFactory.CreateDbContext())
                 {
-                    Log.Logger.Information("Performing Migration");
-                    await context.Database.MigrateAsync();
+                    if (app.Environment.IsDevelopment())
+                    {
+                        Log.Logger.Information("Performing Migration");
+                        await context.Database.MigrateAsync();
+                    }
                 }
-
                 Log.Logger.Information("Seeding Data");
-                await Seed.SeedData(context);
+                await Seed.SeedData(dbContextFactory);
             }
             catch (Exception ex)
             {
