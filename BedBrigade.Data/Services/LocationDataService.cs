@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
@@ -71,10 +72,38 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<Location>> UpdateAsync(Location location)
     {
-        var result = await Task.Run(() => _context.Locations.Update(location));
-        if (result != null)
+        var loc = await _context.Locations.FindAsync(location.LocationId);
+        if (loc != null)
         {
-            return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
+            loc.Name = location.Name;
+            loc.Route = location.Route;
+            loc.Address1 = location.Address1;
+            loc.Address2 = location.Address2;
+            loc.City = location.City;
+            loc.State = location.State;
+            loc.PostalCode = location.PostalCode;
+            loc.Latitude = location.Latitude;
+            loc.Longitude = location.Longitude;
+        }
+        try
+        {
+
+            _context.Entry(loc).State = EntityState.Modified;
+            var result = await Task.Run(() => _context.Locations.Update(location));
+            await _context.SaveChangesAsync();
+            if (result != null)
+            {
+                return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
+            }
+        }
+        catch (DbException ex)
+        {
+            Log.Logger.Error("Database error updating location {0}", ex.ToString);
+        }
+        catch(Exception ex)
+        {
+            Log.Logger.Error("Error updating location {0}", ex.ToString);
+
         }
         return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
     }
