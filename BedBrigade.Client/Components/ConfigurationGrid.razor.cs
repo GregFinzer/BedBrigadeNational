@@ -30,13 +30,14 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
+        //protected string? AddConfigurationDisplay { get; private set; }
+        //protected string? EditConfigurationDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; }
-
+        protected bool NoPaging { get; private set; }
+        protected bool AddKey { get; set; } = false;
         protected string? RecordText { get; set; } = "Loading Configuration ...";
         protected string? Hide { get; private set; } = "true";
 
@@ -51,7 +52,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("Admin"))
+            if (Identity.IsInRole("National Admin"))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -73,7 +74,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole("Admin"))
+                if (Identity.IsInRole("National Admin"))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -141,10 +142,7 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Delete:
-                    if (Identity.IsInRole("Admin"))
-                    {
-                        await NewMethod(args);
-                    }
+                    await Delete(args);
                     break;
 
                 case Action.Add:
@@ -161,7 +159,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        private async Task NewMethod(ActionEventArgs<Configuration> args)
+        private async Task Delete(ActionEventArgs<Configuration> args)
         {
             List<Configuration> records = await Grid.GetSelectedRecordsAsync();
             foreach (var rec in records)
@@ -185,16 +183,15 @@ namespace BedBrigade.Client.Components
 
         private void Add()
         {
-            HeaderTitle = "Add Need";
-            ButtonTitle = "Add Need";
-            addNeedDisplay = "display;";
-            editNeedDisplay = "none;";
+            HeaderTitle = "Add Configuration";
+            ButtonTitle = "Add Configuration";
+            AddKey = true;
         }
 
         private async Task Save(ActionEventArgs<Configuration> args)
         {
             Configuration Configuration = args.Data;
-            if (string.IsNullOrEmpty(Configuration.ConfigurationKey))
+            if (!string.IsNullOrEmpty(Configuration.ConfigurationKey) && !AddKey )
             {
                 //Update Configuration Record
                 var updateResult = await _svcConfiguration.UpdateAsync(Configuration);
@@ -207,6 +204,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to update Care Need!";
                 }
+                ToastTimeout = 5000;
                 await ToastObj.Show();
             }
             else
@@ -218,13 +216,13 @@ namespace BedBrigade.Client.Components
                     Configuration config = createResult.Data;
                 }
                 ToastTitle = "Create Configuration";
-                if (string.IsNullOrEmpty(Configuration.ConfigurationKey))
+                if (createResult.Success)
                 {
-                    ToastContent = "Care Need Created Successfully!";
+                    ToastContent = "Configuration Created Successfully!";
                 }
                 else
                 {
-                    ToastContent = "Unable to save Care Need!";
+                    ToastContent = "Unable to save configuration!";
                 }
                 await ToastObj.Show();
             }
@@ -232,10 +230,9 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Update Care Need";
-            ButtonTitle = "Update Care Need";
-            addNeedDisplay = "display;";
-            editNeedDisplay = "display;";
+            HeaderTitle = "Update Configuration";
+            ButtonTitle = "Update Configuration";
+            AddKey = false;
         }
 
         protected async Task Save(Configuration need)
@@ -251,7 +248,16 @@ namespace BedBrigade.Client.Components
         protected async Task DataBound()
         {
             if (ConfigRecs.ToList().Count == 0) RecordText = "No configurations found";
-            await Grid.AutoFitColumns();
+            if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)
+            {
+                NoPaging = true;
+            }
+            else
+            {
+                NoPaging = false;
+            }
+
+            // await Grid.AutoFitColumns();
         }
 
         protected async Task PdfExport()
