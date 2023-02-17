@@ -11,9 +11,8 @@ public class User : BaseEntity
     public String UserName { get; set; } = string.Empty;
 
     [Required]
-    public Location Location { get; set; } = new Location();
-    [ForeignKey("Location")]
-    public int FkLocation { get; set; }
+    [ForeignKey("LocationId")]
+    public Int32 LocationId { get; set; }
     [Required]
     [MaxLength(20)]
     public String FirstName { get; set; } = string.Empty;

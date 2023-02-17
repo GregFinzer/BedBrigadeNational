@@ -76,20 +76,6 @@ namespace BedBrigade.Data.Migrations
                 oldMaxLength: 30,
                 oldNullable: true);
 
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "RoleId", "Name" },
-                values: new object[,]
-                {
-                    { 1, "National Admin" },
-                    { 2, "National Editor" },
-                    { 3, "Location Admin" },
-                    { 4, "Location Communications" },
-                    { 5, "Location Treasurer" },
-                    { 6, "Location Scheduler" },
-                    { 7, "Location Editor" },
-                    { 8, "Location Contributor" }
-                });
         }
 
         /// <inheritdoc />

@@ -643,9 +643,6 @@ namespace BedBrigade.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("FkLocation")
-                        .HasColumnType("int");
-
                     b.Property<int>("FkRole")
                         .HasColumnType("int");
 
@@ -683,8 +680,6 @@ namespace BedBrigade.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("UserName");
-
-                    b.HasIndex("FkLocation");
 
                     b.ToTable("Users");
                 });
@@ -890,11 +885,9 @@ namespace BedBrigade.Data.Migrations
                 {
                     b.HasOne("BedBrigade.Data.Models.Location", "Location")
                         .WithMany("Users")
-                        .HasForeignKey("FkLocation")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.UserRole", b =>

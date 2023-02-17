@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace BedBrigade.Data.Seeding;
@@ -19,14 +18,14 @@ public class Seed
     private static List<Role> Roles = new()
     {
         new Role {Name = "National Admin"},
-        new Role {Name = "National Editor" },
+        new Role {Name = "National Editor"},
         new Role {Name = "Location Admin"},
         new Role {Name = "Location Editor"},
+        new Role {Name = "Location Author"},
         new Role {Name = "Location Scheduler"},
         new Role {Name = "Location Contributor"},
         new Role {Name = "Location Treasurer"},
         new Role {Name = "Location Communications"},
-        new Role {Name = "Location Author"}
     };
 
     private static List<Location> locations = new()
@@ -69,202 +68,209 @@ public class Seed
         new User {FirstName = _seedUserLocation2, LastName = "Admin", Role = "Location Admin"},
     };
     static readonly List<User> Users = users;
+    private readonly IDbContextFactory<DataContext> _contextFactory;
 
-    public static async Task SeedData(DataContext context)
+    public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)
     {
-        await SeedConfigurations(context);
-        await SeedLocations(context);
-        await SeedContentsLogic.SeedContents(context);
-        await SeedMedia(context);
-        await SeedRoles(context);
-        await SeedUser(context);
-        await SeedUserRoles(context);
-        await SeedVolunteers(context);
+        await SeedConfigurations(_contextFactory);
+        await SeedLocations(_contextFactory);
+        await SeedContentsLogic.SeedContents(_contextFactory);
+        //await SeedMedia(context);
+        await SeedRoles(_contextFactory);
+        await SeedUser(_contextFactory);
+        await SeedUserRoles(_contextFactory);
+        await SeedVolunteers(_contextFactory);
     }
 
 
-    private static async Task SeedConfigurations(DataContext context)
+    private static async Task SeedConfigurations(IDbContextFactory<DataContext> _contextFactory)
     {
-        Log.Logger.Information("SeedConfigurations Started");
-        if (await context.Configurations.AnyAsync()) return;
-
-        var configurations = new List<Configuration>
+        using (var context = _contextFactory.CreateDbContext())
         {
-            new()
-            {
-                ConfigurationKey = "FromEmailAddress",
-                ConfigurationValue = "webmaster@bedbrigade.org",
-            },
-            new()
-            {
-                ConfigurationKey = "HostName",
-                ConfigurationValue = "mail.bedbrigade.org",
-            },
-            new()
-            {ConfigurationKey = "Port",
-            ConfigurationValue = "8889"},
-            new()
-            {
-                ConfigurationKey = "TokenExpiration",
-                ConfigurationValue = "24"
-            }
-        };
+            Log.Logger.Information("SeedConfigurations Started");
+            if (await context.Configurations.AnyAsync()) return;
 
-        await context.Configurations.AddRangeAsync(configurations);
-        await context.SaveChangesAsync();
-    }
-    private static async Task SeedLocations(DataContext context)
-    {
-        Log.Logger.Information("SeedLocations Started");
-        if (await context.Locations.AnyAsync()) return;
+            var configurations = new List<Configuration>
+            {
+                new()
+                {
+                    ConfigurationKey = "FromEmailAddress",
+                    ConfigurationValue = "webmaster@bedbrigade.org",
+                },
+                new()
+                {
+                    ConfigurationKey = "HostName",
+                    ConfigurationValue = "mail.bedbrigade.org",
+                },
+                new()
+                {ConfigurationKey = "Port",
+                ConfigurationValue = "8889"},
+                new()
+                {
+                    ConfigurationKey = "TokenExpiration",
+                    ConfigurationValue = "24"
+                }
+            };
 
-        try
-        {
-            await context.Locations.AddRangeAsync(locations);
+            await context.Configurations.AddRangeAsync(configurations);
             await context.SaveChangesAsync();
         }
-        catch (Exception ex)
-        {
-           Log.Logger.Information($"Configuration seed error: {ex.Message}");
-            throw;
-        }
     }
-    private static async Task SeedMedia(DataContext context)
+    private static async Task SeedLocations(IDbContextFactory<DataContext> _contextFactory)
     {
-        Log.Logger.Information("SeedMedia Started");
-        try
+        using (var context = _contextFactory.CreateDbContext())
         {
-            if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
-            {
-                // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
-                // add the first reciord in Media table with National Logo
-                context.Media.Add(new Media
-                {
-                    LocationId = 1,
-                    FileName = "logo",
-                    MediaType = "png",
-                    FilePath = "media/national",
-                    FileSize = 9827,
-                    AltText = "Bed Brigade National Logo",
-                    FileStatus = "seed",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now,
-                    CreateUser = SeedConstants.SeedUserName,
-                    UpdateUser = SeedConstants.SeedUserName,
-                    MachineName = Environment.MachineName
-                });
+            Log.Logger.Information("SeedLocations Started");
+            if (await context.Locations.AnyAsync()) return;
 
-                await context.SaveChangesAsync();
-            } // add the first media row
-            if (!await context.Media.AnyAsync(m => m.FileStatus == "test"))
+            try
             {
-                // add additional test files - should be removed in production version - VS 2/9/2023
-                // media table content & physical files synchronization is part of Media Manager
-                await context.Media.AddRangeAsync(TestMedia);
+                await context.Locations.AddRangeAsync(locations);
                 await context.SaveChangesAsync();
             }
-
+            catch (Exception ex)
+            {
+                Log.Logger.Information($"Configuration seed error: {ex.Message}");
+                throw;
+            }
         }
-        catch (Exception ex)
+    }
+    private static async Task SeedMedia(IDbContextFactory<DataContext> _contextFactory)
+    {
+        using (var context = _contextFactory.CreateDbContext())
         {
-            Console.WriteLine($"Error seed media: {ex.Message}");
-            throw;
+            Log.Logger.Information("SeedMedia Started");
+            try
+            {
+                if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
+                {
+                    // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
+                    // add the first reciord in Media table with National Logo
+                    context.Media.Add(new Media
+                    {
+                        LocationId = 1,
+                        FileName = "logo",
+                        MediaType = "png",
+                        FilePath = "media/national",
+                        FileSize = 9827,
+                        AltText = "Bed Brigade National Logo",
+                        FileStatus = "seed",
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                        CreateUser = SeedConstants.SeedUserName,
+                        UpdateUser = SeedConstants.SeedUserName,
+                        MachineName = Environment.MachineName
+                    });
+
+                    await context.SaveChangesAsync();
+                } // add the first media row
+                if (!await context.Media.AnyAsync(m => m.FileStatus == "test"))
+                {
+                    // add additional test files - should be removed in production version - VS 2/9/2023
+                    // media table content & physical files synchronization is part of Media Manager
+                    await context.Media.AddRangeAsync(TestMedia);
+                    await context.SaveChangesAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error seed media: {ex.Message}");
+                throw;
+            }
         }
     } // Seed Media
-    private static async Task SeedRoles(DataContext context)
+    private static async Task SeedRoles(IDbContextFactory<DataContext> _contextFactory)
     {
-        Log.Logger.Information("SeedRoles Started");
-        if (await context.Roles.AnyAsync()) return;
-        try
+        using (var context = _contextFactory.CreateDbContext())
         {
-            await context.Roles.AddRangeAsync(Roles);
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroor adding roles {ex.Message}");
-            throw;
-        }
-    }
-    private static async Task SeedUser(DataContext context)
-    {
-        Log.Logger.Information("SeedUser Started");
-        foreach (var user in Users)
-        {
-            if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
+            Log.Logger.Information("SeedRoles Started");
+            if (await context.Roles.AnyAsync()) return;
+            try
             {
-                try
-                {
-                    SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-
-                    var location = locations[new Random().Next(locations.Count)];
-
-                    // Create the user
-                    var newUser = new User
-                    {
-                        UserName = $"{user.FirstName}{user.LastName}",
-                        Location = location,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
-                        Phone = "(999) 999-9999",
-                        Role = user.Role,
-                        FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
-                        PasswordHash = passwordHash,
-                        PasswordSalt = passwordSalt,
-                    };
-                    context.Users.Add(newUser);
-                    await context.SaveChangesAsync();
-                    //}
-                    //catch (Exception ex) { Console.WriteLine(ex.Message); }
-                    //try
-                    //{ 
-                    // Now store the user and a role
-
-                    //var userrole = new UserRole
-                    //{
-                    //    Location = location,
-                    //    Role = context.Roles.FirstOrDefault(r => r.Name == user.Role),
-                    //    User = newUser
-                    //};
-                    //context.UserRoles.Add(userrole);
-                    //context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"SaveChanges Error {ex.Message}");
-                    throw;
-                }
-            }
-        }
-    }
-    private static async Task SeedUserRoles(DataContext context)
-    {
-        Log.Logger.Information("SeedUserRoles Started");
-        try
-        {
-            var users = context.Users.ToList();
-            foreach (var user in users)
-            {
-                var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
-                UserRole newUserRole = new()
-                {
-                    Location = user.Location,
-                    Role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role),
-                    User = user
-                };
-                await context.AddAsync(newUserRole);
+                await context.Roles.AddRangeAsync(Roles);
                 await context.SaveChangesAsync();
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error SeedUserRoles {ex.Message}");
-            throw;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroor adding roles {ex.Message}");
+                throw;
+            }
         }
     }
-    private static async Task SeedVolunteers(DataContext context)
+    private static async Task SeedUser(IDbContextFactory<DataContext> _contextFactory)
     {
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedUser Started");
+            foreach (var user in Users)
+            {
+                if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
+                {
+                    try
+                    {
+                        SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
+                        List<Location> locations = context.Locations.ToList();
+                        var location = locations[new Random().Next(locations.Count)];
+
+                        // Create the user
+                        var newUser = new User
+                        {
+                            UserName = $"{user.FirstName}{user.LastName}",
+                            LocationId = location.LocationId,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
+                            Phone = "(999) 999-9999",
+                            Role = user.Role,
+                            FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
+                            PasswordHash = passwordHash,
+                            PasswordSalt = passwordSalt,
+                        };
+                        await context.Users.AddAsync(newUser);
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"SaveChanges Error {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+        }
+    }
+    private static async Task SeedUserRoles(IDbContextFactory<DataContext> _contextFactory)
+    {
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedUserRoles Started");
+            try
+            {
+                var users = context.Users.ToList();
+                foreach (var user in users)
+                {
+                    var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
+                    UserRole newUserRole = new()
+                    {
+                        LocationId = user.LocationId,
+                        Role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role),
+                        User = user
+                    };
+                    await context.AddAsync(newUserRole);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error SeedUserRoles {ex.Message}");
+                throw;
+            }
+        }
+    }
+    private static async Task SeedVolunteers(IDbContextFactory<DataContext> _contextFactory)
+    {
+        using(var context = _contextFactory.CreateDbContext())
+        { 
         Log.Logger.Information("SeedVolunteers Started");
         if (await context.Volunteers.AnyAsync()) return;
 
@@ -274,37 +280,38 @@ public class Seed
         List<bool> YesOrNo = new List<bool> { true, false };
         List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
 
-        for (var i = 0; i <= 100; i++)
-        {
-            var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
-            var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
-            var firstThree = new Random().Next(291, 861);
-            var nextThree = new Random().Next(200, 890);
-            var lastFour = new Random().Next(1000, 9999);
+            for (var i = 0; i <= 100; i++)
+            {
+                var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
+                var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+                var firstThree = new Random().Next(291, 861);
+                var nextThree = new Random().Next(200, 890);
+                var lastFour = new Random().Next(1000, 9999);
 
-            Volunteer volunteer = new()
-            {
-                Location = locations[new Random().Next(locations.Count - 1)],
-                VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
-                VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
-                IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
-                FirstName = firstName,
-                LastName = lastName,
-                Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
-                Phone = $"({firstThree}) {nextThree}-{lastFour}",
-                IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
-                IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count)],
-                IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
-            };
-            try
-            {
-                await context.AddAsync(volunteer);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error in Volunteer: {ex.Message}");
-                throw;
+                Volunteer volunteer = new()
+                {
+                    Location = locations[new Random().Next(locations.Count - 1)],
+                    VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
+                    VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
+                    IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
+                    Phone = $"({firstThree}) {nextThree}-{lastFour}",
+                    IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
+                    IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count)],
+                    IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
+                };
+                try
+                {
+                    await context.AddAsync(volunteer);
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error in Volunteer: {ex.Message}");
+                    throw;
+                }
             }
         }
 

@@ -1,19 +1,17 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BedBrigade.Data.Data.Seeding
 {
     public static class SeedContentsLogic
     {
-        public static async Task SeedContents(DataContext context)
+        public static async Task SeedContents(IDbContextFactory<DataContext> _contextFactory)
         {
-            await SeedHeader(context);
-            await SeedFooter(context);
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                await SeedHeader(context);
+                await SeedFooter(context);
+            }
         }
 
         private static async Task SeedHeader(DataContext context)
@@ -23,13 +21,16 @@ namespace BedBrigade.Data.Data.Seeding
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNationalName);
                 var seedHtml = GetHtml("header.html");
-                context.Content.Add(new Content
+                Content content = new Content
                 {
-                    Location = location!,
+                    LocationId = location.LocationId,
                     ContentType = header,
                     Name = header,
                     ContentHtml = seedHtml
-                }); ;
+                };
+              
+                context.Content.Add(content);
+                
             }
             try
             {
@@ -50,11 +51,11 @@ namespace BedBrigade.Data.Data.Seeding
                 var seedHtml = GetHtml("footer.html");
                 context.Content.Add(new Content
                 {
-                    Location = location!,
+                    LocationId = location.LocationId!,
                     ContentType = footer,
                     Name = footer,
                     ContentHtml = seedHtml
-                }); ;
+                });
             }
             try
             {

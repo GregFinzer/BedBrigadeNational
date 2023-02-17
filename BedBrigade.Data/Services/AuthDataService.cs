@@ -95,7 +95,7 @@ namespace BedBrigade.Data.Services
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim("LocationId", user.FkLocation.ToString())
+                new Claim("LocationId", user.LocationId.ToString())
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8

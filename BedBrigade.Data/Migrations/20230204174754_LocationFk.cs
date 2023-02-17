@@ -38,15 +38,6 @@ namespace BedBrigade.Data.Migrations
                 name: "PersistVolunteers",
                 table: "Users");
 
-            migrationBuilder.RenameColumn(
-                name: "LocationId",
-                table: "Users",
-                newName: "FkLocation");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Users_LocationId",
-                table: "Users",
-                newName: "IX_Users_FkLocation");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
@@ -106,32 +97,11 @@ namespace BedBrigade.Data.Migrations
                 oldType: "int",
                 oldNullable: true);
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Users_Locations_FkLocation",
-                table: "Users",
-                column: "FkLocation",
-                principalTable: "Locations",
-                principalColumn: "LocationId",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Locations_FkLocation",
-                table: "Users");
-
-            migrationBuilder.RenameColumn(
-                name: "FkLocation",
-                table: "Users",
-                newName: "LocationId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Users_FkLocation",
-                table: "Users",
-                newName: "IX_Users_LocationId");
-
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
                 table: "Users",
