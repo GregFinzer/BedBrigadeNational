@@ -52,7 +52,7 @@ namespace BedBrigade.Data.Services
             }
             else
             {
-                result = _context.Users.ToList();
+                result = await _context.Users.ToListAsync();
             }
 
             if (result != null)

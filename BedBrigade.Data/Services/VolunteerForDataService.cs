@@ -1,19 +1,23 @@
 ﻿
 using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace BedBrigade.Data.Services;
 
 public class VolunteerForDataService : IVolunteerForDataService
 {
     private readonly DataContext _context;
+    private readonly AuthenticationStateProvider _auth;
+    private ClaimsPrincipal _identity;
 
     public VolunteerForDataService(DataContext context)
     {
         _context = context;
     }
-
     public async Task<ServiceResponse<VolunteerFor>> GetAsync(int volunteerForId)
     {
         var result = await _context.VolunteersFor.FindAsync(volunteerForId);

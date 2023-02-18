@@ -35,7 +35,7 @@ else
                             AllowPdfExport="true"
                             AllowTextWrap="true">
                         <GridTextWrapSettings WrapMode="WrapMode.Header" />
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="10" />
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
                         <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
