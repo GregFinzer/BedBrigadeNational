@@ -12,8 +12,8 @@ namespace BedBrigade.Data.Models
 		[ForeignKey("LocationId")]
 		public Int32 LocationId { get; set; }
 
-		[ForeignKey("VolunteerForId")]
-        public Int32 VolunteerForId { get; set; }
+		[ForeignKey("VolunteeringForId")]
+        public Int32 VolunteeringForId { get; set; }
 
 		[Required]
 		public DateTime VolunteeringForDate { get; set; }

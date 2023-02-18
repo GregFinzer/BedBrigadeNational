@@ -258,7 +258,7 @@ namespace BedBrigade.Data.Migrations
                     VolunteerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LocationId = table.Column<int>(type: "int", nullable: false),
-                    VolunteeringFor = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    VolunteeringForId = table.Column<string>(type: "int", nullable: false),
                     VolunteeringForDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IHaveVolunteeredBefore = table.Column<bool>(type: "bit", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -343,9 +343,9 @@ namespace BedBrigade.Data.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Volunteers_VolunteeringFor",
+                name: "IX_Volunteers_VolunteeringForId",
                 table: "Volunteers",
-                column: "VolunteeringFor");
+                column: "VolunteeringForId");
         }
 
         /// <inheritdoc />

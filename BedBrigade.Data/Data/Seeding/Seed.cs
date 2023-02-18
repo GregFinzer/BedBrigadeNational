@@ -319,7 +319,7 @@ public class Seed
                 Volunteer volunteer = new()
                 {
                     LocationId = location.LocationId,
-                    VolunteerForId = volunteeringFor.VolunteerForId,
+                    VolunteeringForId = volunteeringFor.VolunteerForId,
                     VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
                     FirstName = firstName,
