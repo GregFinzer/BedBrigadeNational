@@ -13,6 +13,7 @@ namespace BedBrigade.Client.Components
     public partial class VolunteerGrid : ComponentBase
     {
         [Inject] private IVolunteerService? _svcVolunteer { get; set; }
+        [Inject] private IVolunteerForService? _svcVolunteerFor { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 

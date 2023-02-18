@@ -37,14 +37,14 @@ public class VolunteerDataService : IVolunteerDataService
 
     public async Task<ServiceResponse<bool>> DeleteAsync(int VolunteerId)
     {
-        var user = await _context.Users.FindAsync(VolunteerId);
-        if (user == null)
+        var volunteer = await _context.Volunteers.FindAsync(VolunteerId);
+        if (volunteer == null)
         {
             return new ServiceResponse<bool>($"Volunteer record with key {VolunteerId} not found");
         }
         try
         {
-            _context.Users.Remove(user);
+            _context.Volunteers.Remove(volunteer);
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool>($"Removed record with key {VolunteerId}.", true);
         }
