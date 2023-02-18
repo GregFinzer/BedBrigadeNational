@@ -53,7 +53,7 @@ namespace BedBrigade.Data
                 .HasIndex(o => o.ScheduleType);
 
             modelBuilder.Entity<Volunteer>()
-                .HasIndex(o => o.VolunteerForId);
+                .HasIndex(o => o.VolunteeringForId);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

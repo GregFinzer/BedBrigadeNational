@@ -61,7 +61,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<IContentService, ContentService>();
             builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-            builder.Services.AddScoped<IVolunteerForService, VolunteerForService>()
+            builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
 
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
