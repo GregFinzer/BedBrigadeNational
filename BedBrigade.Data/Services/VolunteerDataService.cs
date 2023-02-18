@@ -1,7 +1,10 @@
 ﻿
 using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace BedBrigade.Data.Services;
 
@@ -9,10 +12,20 @@ public class VolunteerDataService : IVolunteerDataService
 {
 
     private readonly DataContext _context;
+    private readonly AuthenticationStateProvider _auth;
+    private ClaimsPrincipal _identity;
 
-    public VolunteerDataService(DataContext context)
+    public VolunteerDataService(DataContext context, AuthenticationStateProvider authProvider)
     {
         _context = context;
+        _auth = authProvider;
+        Task.Run(() => GetUserClaims(authProvider));
+    }
+
+    private async Task GetUserClaims(AuthenticationStateProvider provider)
+    {
+        var state = await provider.GetAuthenticationStateAsync();
+        _identity = state.User;
     }
 
     public async Task<ServiceResponse<Volunteer>> GetAsync(int volunteerId)
@@ -27,7 +40,19 @@ public class VolunteerDataService : IVolunteerDataService
 
     public async Task<ServiceResponse<List<Volunteer>>> GetAllAsync()
     {
-        var result = await _context.Volunteers.ToListAsync();
+        var authState = await _auth.GetAuthenticationStateAsync();
+
+        var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+        List<Volunteer> result;
+        if (role.ToLower() != "national admin")
+        {
+            int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+            result = _context.Volunteers.Where(v => v.LocationId == locationId).ToList();
+        } 
+        else
+        {
+            result = await _context.Volunteers.ToListAsync();
+        }
         if (result != null)
         {
             return new ServiceResponse<List<Volunteer>>($"Found {result.Count} records.", true, result);
