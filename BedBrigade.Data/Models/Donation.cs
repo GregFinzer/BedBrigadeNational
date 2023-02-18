@@ -9,13 +9,11 @@ namespace BedBrigade.Data.Models
     {
 		[Key]
 		public Int32 DonationId { get; set; }
-
-		public Location Location { get; set; } = new Location();
-
+		[ForeignKey("LocationId"), Required]
+		public Int32 LocationId { get; set; }
         [Required]
 		[MaxLength(255)]
 		public String Email { get; set; } = string.Empty;
-
         [Required]
         [Column(TypeName = "decimal(18,4)")]
         public Decimal Amount { get; set; }

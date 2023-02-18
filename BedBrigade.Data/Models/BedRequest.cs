@@ -9,8 +9,8 @@ namespace BedBrigade.Data.Models
 		[Key]
 		public Int32 BedRequestId { get; set; }
 
-		//Parent
-		public Location Location { get; set; } = new Location();
+		[ForeignKey("LocationId"), Required]
+		public Int32 LocationId { get; set; } 
 
 		[Required]
 		[MaxLength(20)]

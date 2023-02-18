@@ -3,6 +3,8 @@ using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
 using Serilog;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Data.Common;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -81,8 +83,8 @@ public class Seed
         //await SeedUserRoles(_contextFactory);
         await SeedVolunteersFor(_contextFactory);
         await SeedVolunteers(_contextFactory);
+        await SeedDonations(_contextFactory);
     }
-
 
     private static async Task SeedConfigurations(IDbContextFactory<DataContext> _contextFactory)
     {
@@ -343,6 +345,49 @@ public class Seed
             }
         }
 
+    }
+    private static async Task SeedDonations(IDbContextFactory<DataContext> contextFactory)
+    {
+        using (var context = contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedConfigurations Started");
+            if (await context.Donations.AnyAsync()) return;
+
+            List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
+            List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
+            List<bool> YesOrNo = new List<bool> { true, false };
+            List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
+            List<Location> locations = await context.Locations.ToListAsync();
+
+            for (var i = 0; i < 100;)
+            {
+                var location = locations[new Random().Next(locations.Count - 1)];
+                var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
+                var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+                Donation donation = new()
+                {
+                    LocationId = location.LocationId,
+                    Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
+                    Amount = new decimal(new Random().NextDouble() * 1000),                    
+                    TransactionId = new Random().Next(233999,293737).ToString(),
+                    TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)]
+                };
+                try
+                {
+                    context.Donations.AddAsync(donation);
+                    context.SaveChangesAsync();
+                }
+                catch (DbException ex)
+                {
+                    Log.Logger.Error("Db Error {0} {1}", ex.ToString(), ex.StackTrace);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error("Error in donations {0} {1}", ex.ToString(), ex.StackTrace);
+                }
+            }
+
+        }
     }
 
     private static string GeneratePhoneNumber()

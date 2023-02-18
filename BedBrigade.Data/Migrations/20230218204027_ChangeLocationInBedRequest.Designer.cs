@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230218204027_ChangeLocationInBedRequest")]
+    partial class ChangeLocationInBedRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -866,11 +869,13 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Data.Models.Donation", b =>
                 {
-                    b.HasOne("BedBrigade.Data.Models.Location", null)
+                    b.HasOne("BedBrigade.Data.Models.Location", "Location")
                         .WithMany("Donations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.Media", b =>
