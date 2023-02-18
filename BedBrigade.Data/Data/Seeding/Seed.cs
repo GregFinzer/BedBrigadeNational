@@ -68,7 +68,6 @@ public class Seed
         new User {FirstName = _seedUserLocation2, LastName = "Admin", Role = "Location Admin"},
     };
     static readonly List<User> Users = users;
-    private readonly IDbContextFactory<DataContext> _contextFactory;
 
     public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)
     {
