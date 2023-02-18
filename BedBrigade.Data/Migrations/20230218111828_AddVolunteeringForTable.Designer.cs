@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230218111828_AddVolunteeringForTable")]
+    partial class AddVolunteeringForTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -517,8 +520,9 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<long>("FileSize")                        
-                        .HasColumnType("int");
+                    b.Property<long>("FileSize")
+                        .HasMaxLength(50)
+                        .HasColumnType("bigint");
 
                     b.Property<string>("FileStatus")
                         .HasColumnType("nvarchar(max)");

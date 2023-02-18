@@ -9,11 +9,11 @@ namespace BedBrigade.Data.Models
 		[Key]
 		public Int32 VolunteerId { get; set; }
 
-		public Location Location { get; set; } = new Location();
+		[ForeignKey("LocationId")]
+		public Int32 LocationId { get; set; }
 
-        [Required] 
-        [MaxLength(30)] 
-        public String VolunteeringFor { get; set; } = string.Empty;
+		[ForeignKey("VolunteeringForId")]
+        public Int32 VolunteeringForId { get; set; }
 
 		[Required]
 		public DateTime VolunteeringForDate { get; set; }
@@ -52,6 +52,11 @@ namespace BedBrigade.Data.Models
 		[Required]
 		public Boolean IHaveAPickupTruck { get; set; }
 
-
+		public string FullName {
+			get
+			{
+				return $"{FirstName} {LastName}";
+			}
+		}
 	}
 }

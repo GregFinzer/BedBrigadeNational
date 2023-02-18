@@ -2,6 +2,7 @@
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
 using Serilog;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -68,17 +69,17 @@ public class Seed
         new User {FirstName = _seedUserLocation2, LastName = "Admin", Role = "Location Admin"},
     };
     static readonly List<User> Users = users;
-    private readonly IDbContextFactory<DataContext> _contextFactory;
 
     public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)
     {
         await SeedConfigurations(_contextFactory);
         await SeedLocations(_contextFactory);
         await SeedContentsLogic.SeedContents(_contextFactory);
-        //await SeedMedia(context);
+        //await SeedMedia(_contextFactory);
         await SeedRoles(_contextFactory);
         await SeedUser(_contextFactory);
-        await SeedUserRoles(_contextFactory);
+        //await SeedUserRoles(_contextFactory);
+        await SeedVolunteersFor(_contextFactory);
         await SeedVolunteers(_contextFactory);
     }
 
@@ -214,7 +215,7 @@ public class Seed
                             FirstName = user.FirstName,
                             LastName = user.LastName,
                             Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
-                            Phone = "(999) 999-9999",
+                            Phone = GeneratePhoneNumber(),
                             Role = user.Role,
                             FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                             PasswordHash = passwordHash,
@@ -243,11 +244,11 @@ public class Seed
                 foreach (var user in users)
                 {
                     var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
-                    UserRole newUserRole = new()
+                    UserRole newUserRole = new UserRole
                     {
                         LocationId = user.LocationId,
-                        Role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role),
-                        User = user
+                        RoleId = role.RoleId,
+                        UserName = user.UserName
                     };
                     await context.AddAsync(newUserRole);
                     await context.SaveChangesAsync();
@@ -260,6 +261,33 @@ public class Seed
             }
         }
     }
+    private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> _contextFactory)
+    {
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedVolunteersFor Started");
+            if (await context.VolunteersFor.AnyAsync()) return;
+            List<VolunteerFor> VolunteeringFor = new List<VolunteerFor>
+            {
+                new VolunteerFor{Name = "Bed Building" },
+                new VolunteerFor{Name = "Bed Delivery" },
+                new VolunteerFor { Name = "Event Planning" },
+                new VolunteerFor { Name = "New Option" },
+                new VolunteerFor { Name = "Other" }
+            };
+            try
+            {
+                await context.VolunteersFor.AddRangeAsync(VolunteeringFor);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding volunteers for {ex.Message}");
+                throw;
+            }
+        }
+
+    }
     private static async Task SeedVolunteers(IDbContextFactory<DataContext> _contextFactory)
     {
         using(var context = _contextFactory.CreateDbContext())
@@ -269,28 +297,28 @@ public class Seed
 
         List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
         List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
-        List<string> VolunteeringFor = new List<string> { "Bed Building", "Bed Delivery", "Event Planning", "New Option", "Other" };
         List<bool> YesOrNo = new List<bool> { true, false };
         List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
-
-            for (var i = 0; i <= 100; i++)
+        List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
+        List<Location> locations = context.Locations.ToList();
+        for (var i = 0; i <= 100; i++)
             {
                 var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
                 var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
-                var firstThree = new Random().Next(291, 861);
-                var nextThree = new Random().Next(200, 890);
-                var lastFour = new Random().Next(1000, 9999);
-
+                int firstThree, nextThree, lastFour;
+                var phoneNumber = GeneratePhoneNumber();
+                var location = locations[new Random().Next(locations.Count - 1)];
+                var volunteeringFor = volunteersFor[new Random().Next(volunteersFor.Count - 1)];
                 Volunteer volunteer = new()
                 {
-                    Location = locations[new Random().Next(locations.Count - 1)],
-                    VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
+                    LocationId = location.LocationId,
+                    VolunteeringForId = volunteeringFor.VolunteerForId,
                     VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
                     FirstName = firstName,
                     LastName = lastName,
                     Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
-                    Phone = $"({firstThree}) {nextThree}-{lastFour}",
+                    Phone = phoneNumber,
                     IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
                     IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count)],
                     IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
@@ -308,6 +336,14 @@ public class Seed
             }
         }
 
+    }
+
+    private static string GeneratePhoneNumber()
+    {
+        var firstThree = new Random().Next(291, 861);
+        var nextThree = new Random().Next(200, 890);
+        var lastFour = new Random().Next(1000, 9999);
+        return $"({firstThree}) {nextThree}-{lastFour}";
     }
 
 
