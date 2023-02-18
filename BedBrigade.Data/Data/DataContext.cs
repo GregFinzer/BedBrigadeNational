@@ -28,6 +28,7 @@ namespace BedBrigade.Data
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<EmailQueue> EmailQueues { get; set; }
+        public virtual DbSet<VolunteerFor> VolunteersFor { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,7 +53,7 @@ namespace BedBrigade.Data
                 .HasIndex(o => o.ScheduleType);
 
             modelBuilder.Entity<Volunteer>()
-                .HasIndex(o => o.VolunteeringFor);
+                .HasIndex(o => o.VolunteerForId);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

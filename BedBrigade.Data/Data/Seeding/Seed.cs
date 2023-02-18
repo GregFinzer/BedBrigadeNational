@@ -79,6 +79,7 @@ public class Seed
         await SeedRoles(_contextFactory);
         await SeedUser(_contextFactory);
         //await SeedUserRoles(_contextFactory);
+        await SeedVolunteersFor(_contextFactory);
         await SeedVolunteers(_contextFactory);
     }
 
@@ -254,7 +255,6 @@ public class Seed
                     {
                         LocationId = user.LocationId,
                         RoleId = role.RoleId,
-                        UserName1 = user.UserName,
                         UserName = user.UserName
                     };
                     await context.AddAsync(newUserRole);
@@ -268,6 +268,33 @@ public class Seed
             }
         }
     }
+    private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> _contextFactory)
+    {
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedVolunteersFor Started");
+            if (await context.VolunteersFor.AnyAsync()) return;
+            List<VolunteerFor> VolunteeringFor = new List<VolunteerFor>
+            {
+                new VolunteerFor{Name = "Bed Building" },
+                new VolunteerFor{Name = "Bed Delivery" },
+                new VolunteerFor { Name = "Event Planning" },
+                new VolunteerFor { Name = "New Option" },
+                new VolunteerFor { Name = "Other" }
+            };
+            try
+            {
+                await context.VolunteersFor.AddRangeAsync(VolunteeringFor);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding volunteers for {ex.Message}");
+                throw;
+            }
+        }
+
+    }
     private static async Task SeedVolunteers(IDbContextFactory<DataContext> _contextFactory)
     {
         using(var context = _contextFactory.CreateDbContext())
@@ -277,9 +304,9 @@ public class Seed
 
         List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
         List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
-        List<string> VolunteeringFor = new List<string> { "Bed Building", "Bed Delivery", "Event Planning", "New Option", "Other" };
         List<bool> YesOrNo = new List<bool> { true, false };
         List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
+            List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
             for (var i = 0; i <= 100; i++)
             {
@@ -289,10 +316,11 @@ public class Seed
                 var nextThree = new Random().Next(200, 890);
                 var lastFour = new Random().Next(1000, 9999);
                 var location = locations[new Random().Next(locations.Count-1)];
+                var volunteeringFor = volunteersFor[new Random().Next(volunteersFor.Count - 1)];
                 Volunteer volunteer = new()
                 {
                     LocationId = location.LocationId,
-                    VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
+                    VolunteerForId = volunteeringFor.VolunteerForId,
                     VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
                     FirstName = firstName,
