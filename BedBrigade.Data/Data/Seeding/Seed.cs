@@ -75,7 +75,7 @@ public class Seed
         await SeedConfigurations(_contextFactory);
         await SeedLocations(_contextFactory);
         await SeedContentsLogic.SeedContents(_contextFactory);
-        //await SeedMedia(context);
+        //await SeedMedia(_contextFactory);
         await SeedRoles(_contextFactory);
         await SeedUser(_contextFactory);
         //await SeedUserRoles(_contextFactory);
