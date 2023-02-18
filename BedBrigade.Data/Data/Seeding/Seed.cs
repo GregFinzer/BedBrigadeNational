@@ -78,7 +78,7 @@ public class Seed
         //await SeedMedia(context);
         await SeedRoles(_contextFactory);
         await SeedUser(_contextFactory);
-        await SeedUserRoles(_contextFactory);
+        //await SeedUserRoles(_contextFactory);
         await SeedVolunteers(_contextFactory);
     }
 
@@ -250,11 +250,12 @@ public class Seed
                 foreach (var user in users)
                 {
                     var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
-                    UserRole newUserRole = new()
+                    UserRole newUserRole = new UserRole
                     {
                         LocationId = user.LocationId,
-                        Role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role),
-                        User = user
+                        RoleId = role.RoleId,
+                        UserName1 = user.UserName,
+                        UserName = user.UserName
                     };
                     await context.AddAsync(newUserRole);
                     await context.SaveChangesAsync();
@@ -279,7 +280,7 @@ public class Seed
         List<string> VolunteeringFor = new List<string> { "Bed Building", "Bed Delivery", "Event Planning", "New Option", "Other" };
         List<bool> YesOrNo = new List<bool> { true, false };
         List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
-
+            List<Location> locations = context.Locations.ToList();
             for (var i = 0; i <= 100; i++)
             {
                 var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
@@ -287,10 +288,10 @@ public class Seed
                 var firstThree = new Random().Next(291, 861);
                 var nextThree = new Random().Next(200, 890);
                 var lastFour = new Random().Next(1000, 9999);
-
+                var location = locations[new Random().Next(locations.Count-1)];
                 Volunteer volunteer = new()
                 {
-                    Location = locations[new Random().Next(locations.Count - 1)],
+                    LocationId = location.LocationId,
                     VolunteeringFor = VolunteeringFor[new Random().Next(VolunteeringFor.Count - 1)],
                     VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
