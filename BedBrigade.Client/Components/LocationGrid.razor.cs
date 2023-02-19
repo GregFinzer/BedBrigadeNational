@@ -176,7 +176,7 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                 }
                 ToastTimeout = 6000;
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
             }
         }
@@ -203,7 +203,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to update location!";
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
@@ -222,7 +222,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to save Location!";
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
         }
 
