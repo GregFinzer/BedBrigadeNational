@@ -164,11 +164,11 @@ namespace BedBrigade.Client.Components
                     ToastContent = "User Updated Successfully!";
                 }
                 else
-                {
+                {   
                     ToastContent = "Unable to update User!";
                 }
                 ToastTimeout = 3000;
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
@@ -188,13 +188,13 @@ namespace BedBrigade.Client.Components
                     ToastWidth = "400";
 
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
                 args.Cancel = true;
             }
             var userResult = await _svcUser.GetAllAsync();
             if (userResult.Success)
             {
-                BBUsers = userResult.Data;
+                BBUsers = userResult.Data;  
             }
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
@@ -238,7 +238,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastTitle = "Delete User";
                     ToastContent = "Deleted Successful!";
-                    await ToastObj.Show();
+                    await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
                 }
 
             }
