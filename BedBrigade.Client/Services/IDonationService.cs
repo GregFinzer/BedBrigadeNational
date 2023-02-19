@@ -1,13 +1,12 @@
 ﻿using BedBrigade.Data.Models;
 
-namespace BedBrigade.Data.Services
+namespace BedBrigade.Client.Services
 {
-    public interface IDonationDataService
+    public interface IDonationService
     {
         Task<ServiceResponse<Donation>> CreateAsync(Donation donation);
         Task<ServiceResponse<bool>> DeleteAsync(int donationId);
         Task<ServiceResponse<List<Donation>>> GetAllAsync();
-        Task<ServiceResponse<Donation>> GetAsync(int donationId);
         Task<ServiceResponse<Donation>> UpdateAsync(Donation donation);
     }
 }
