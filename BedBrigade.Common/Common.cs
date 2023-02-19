@@ -8,7 +8,7 @@
             User = 2,
             Location = 3,
             Volunteer = 4,
-            Donations = 5,
+            Donation = 5,
             Content = 6
 
         }

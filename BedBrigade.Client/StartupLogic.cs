@@ -1,14 +1,16 @@
 ﻿using BedBrigade.Client.Services;
+using BedBrigade.Data.Services;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
-using BedBrigade.Data.Services;
 using BedBrigade.MessageService;
-using BedBrigade.MessageService.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Syncfusion.Blazor;
+using Serilog;
+using BedBrigade.MessageService.Services;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Data.Entity.Infrastructure;
 
 namespace BedBrigade.Client
 {
@@ -60,7 +62,6 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContentService, ContentService>();
             builder.Services.AddScoped<IVolunteerService, VolunteerService>();
             builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
-            builder.Services.AddScoped<IMediaService, MediaService>();
 
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
@@ -70,11 +71,10 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IConfigurationDataService, ConfigurationDataService>();
             builder.Services.AddScoped<IContentDataService, ContentDataService>();
             builder.Services.AddScoped<IVolunteerForDataService, VolunteerForDataService>();
-            builder.Services.AddScoped<IMediaDataService, MediaDataService>();
+            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
 
             builder.Services.AddScoped<IMessageService, Services.MessageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
-
 
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>

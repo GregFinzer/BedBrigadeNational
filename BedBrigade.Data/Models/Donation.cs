@@ -30,6 +30,14 @@ namespace BedBrigade.Data.Models
         [Required]
 		public Boolean TaxFormSent { get; set; }
 
+		[Required]
+		public string FullName 
+		{ get
+			{
+				return $"{FirstName} {LastName}";
+			}
+		}
+
 
 	}
 }
