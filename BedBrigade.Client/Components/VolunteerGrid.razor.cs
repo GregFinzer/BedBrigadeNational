@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
+using Syncfusion.Blazor.Notifications.Internal;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
@@ -232,8 +233,8 @@ namespace BedBrigade.Client.Components
                     ToastContent = $"Unable to Delete. Volunteer is in use.";
                     args.Cancel = true;
                 }
-                ToastTimeout = 6000;
-                await ToastObj.Show();
+                ToastTimeout = 4000;
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout});
 
             }
         }
@@ -260,7 +261,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to update location!";
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
@@ -279,7 +280,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to save Volunteer!";
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
         }
 

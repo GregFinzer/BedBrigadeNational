@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using BedBrigade.Data.Data.Seeding;
+﻿using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Common;
 
 namespace BedBrigade.Data.Seeding;
@@ -112,6 +110,36 @@ public class Seed
                 {
                     ConfigurationKey = "TokenExpiration",
                     ConfigurationValue = "24"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "AllowedFileExtensions",
+                    ConfigurationValue = ".jpg, .png, .pdf, .webp"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "AllowedVideoExtensions",
+                    ConfigurationValue = ".mp4"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "MediaFolder",
+                    ConfigurationValue = "media"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "MainMediaSubFolder",
+                    ConfigurationValue = "national"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "MaxFileSize",
+                    ConfigurationValue = "104857600"
+                },
+                new() // added by VS 2/19/2023
+                {
+                    ConfigurationKey = "MaxVideoSize",
+                    ConfigurationValue = "262144000"
                 }
             };
 
@@ -166,15 +194,7 @@ public class Seed
                     });
 
                     await context.SaveChangesAsync();
-                } // add the first media row
-                if (!await context.Media.AnyAsync(m => m.FileStatus == "test"))
-                {
-                    // add additional test files - should be removed in production version - VS 2/9/2023
-                    // media table content & physical files synchronization is part of Media Manager
-                    await context.Media.AddRangeAsync(TestMedia);
-                    await context.SaveChangesAsync();
-                }
-
+                } // add the first media row             
             }
             catch (Exception ex)
             {
@@ -299,18 +319,18 @@ public class Seed
     }
     private static async Task SeedVolunteers(IDbContextFactory<DataContext> _contextFactory)
     {
-        using(var context = _contextFactory.CreateDbContext())
-        { 
-        Log.Logger.Information("SeedVolunteers Started");
-        if (await context.Volunteers.AnyAsync()) return;
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            Log.Logger.Information("SeedVolunteers Started");
+            if (await context.Volunteers.AnyAsync()) return;
 
-        List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
-        List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
-        List<bool> YesOrNo = new List<bool> { true, false };
-        List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
-        List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
-        List<Location> locations = context.Locations.ToList();
-        for (var i = 0; i <= 100; i++)
+            List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
+            List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
+            List<bool> YesOrNo = new List<bool> { true, false };
+            List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
+            List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
+            List<Location> locations = context.Locations.ToList();
+            for (var i = 0; i <= 100; i++)
             {
                 var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
                 var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
@@ -368,8 +388,8 @@ public class Seed
                 {
                     LocationId = location.LocationId,
                     Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
-                    Amount = new decimal(new Random().NextDouble() * 1000),                    
-                    TransactionId = new Random().Next(233999,293737).ToString(),
+                    Amount = new decimal(new Random().NextDouble() * 1000),
+                    TransactionId = new Random().Next(233999, 293737).ToString(),
                     TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)]
                 };
                 try
@@ -397,255 +417,6 @@ public class Seed
         var lastFour = new Random().Next(1000, 9999);
         return $"({firstThree}) {nextThree}-{lastFour}";
     }
-
-
-
-    // added by VS for testing time
-    private static readonly List<Media> TestMedia = new()
-    {
-    new Media     {
-        // MediaId= 2,
-        LocationId= 1,
-        FilePath= "media/national",
-        FileName= "usamap",
-        MediaType= "jpg",
-        AltText= "USA Map",
-        FileSize= 146502,
-        CreateDate= DateTime.Now,
-        CreateUser= "vskordin@gmail.com",
-        UpdateDate= DateTime.Now,
-        UpdateUser= "vskordin@gmail.com",
-        MachineName= "DELLXPS-8930",
-        FileStatus="test"
-    },
-    new Media  {
-        //MediaId= 3,
-        LocationId= 1,
-        FilePath= "media/national",
-        FileName= "CODEFocus",
-        MediaType= "pdf",
-        AltText= "Magazine (PDF Example)",
-        FileSize= 6267940,
-        CreateDate= DateTime.Now,
-        CreateUser= "vskordin@gmail.com",
-        UpdateDate= DateTime.Now,
-        UpdateUser= "vskordin@gmail.com",
-        MachineName= "DELLXPS-8930",
-        FileStatus="test"
-    },
-    new Media  {
-        //MediaId= 4,
-        LocationId= 2,
-        FilePath= "media/ohio",
-        FileName= "ohioflag",
-        MediaType= "png",
-        AltText= "Ohio State Flag",
-        FileSize= 33419,
-        CreateDate= DateTime.Now,
-        CreateUser= "vskordin@gmail.com",
-        UpdateDate= DateTime.Now,
-        UpdateUser= "vskordin@gmail.com",
-        MachineName= "DELLXPS-8930",
-        FileStatus="test"
-    },
-    new Media{
-            //MediaId= 5,
-            LocationId= 2,
-            FilePath= "media/ohio",
-            FileName= "ohiomap",
-            MediaType= "jpg",
-            AltText= "Ohio State Map",
-            FileSize= 468934,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-    new Media{
-            //MediaId= 6,
-            LocationId= 2,
-            FilePath= "media/ohio",
-            FileName= "CODE2023_1",
-            MediaType= "pdf",
-            AltText= "PDF File Example",
-            FileSize= 7773635,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-        new Media{
-            //MediaId= 7,
-            LocationId= 2,
-            FilePath= "media/ohio",
-            FileName= "OhioStateSeal",
-            MediaType= "jpg",
-            AltText= "Ohio State Seal",
-            FileSize= 70694,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-       new Media {
-            //MediaId= 8,
-            LocationId= 2,
-            FilePath= "media/ohio",
-            FileName= "FordExplorer2006",
-            MediaType= "jpg",
-            AltText= "Ford Explorer 2006",
-            FileSize= 51567,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 9,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "arizonamap",
-            MediaType= "jpg",
-            AltText= "Arizona State Map",
-            FileSize= 72696,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-       new Media {
-            //MediaId= 10,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "arizonaflag",
-            MediaType= "png",
-            AltText= "Arizona State Flag",
-            FileSize= 24150,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 11,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "DNCMag49",
-            MediaType= "pdf",
-            AltText= "PDF File Example",
-            FileSize= 19564686,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 12,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "arizonastateseal",
-            MediaType= "webp",
-            AltText= "Arizona State Seal",
-            FileSize= 44802,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 13,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "FordT_1925",
-            MediaType= "jpg",
-            AltText= "Ford Model T 1925",
-            FileSize= 39665,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 14,
-            LocationId= 2,
-            FilePath= "media/ohio",
-            FileName= "Mercury1950",
-            MediaType= "jpg",
-            AltText= "Mercury 1950",
-            FileSize= 35468,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 15,
-            LocationId= 3,
-            FilePath= "media/arizona",
-            FileName= "Lincoln2006",
-            MediaType= "jpg",
-            AltText= "Lincoln Concept 2006",
-            FileSize= 35890,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 16,
-            LocationId= 1,
-            FilePath= "media/national",
-            FileName= "usaseal",
-            MediaType= "jpg",
-            AltText= "Great Seal of USA",
-            FileSize= 103948,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        },
-      new Media  {
-            //MediaId= 17,
-            LocationId= 1,
-            FilePath= "media/national",
-            FileName= "Edsel1958",
-            MediaType= "jpg",
-            AltText= "Ford Edsel 1958",
-            FileSize= 53399,
-            CreateDate= DateTime.Now,
-            CreateUser= "vskordin@gmail.com",
-            UpdateDate= DateTime.Now,
-            UpdateUser= "vskordin@gmail.com",
-            MachineName= "DELLXPS-8930",
-            FileStatus="test"
-        }
-    };
-
-
 
 }
 
