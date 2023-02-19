@@ -73,6 +73,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContentDataService, ContentDataService>();
             builder.Services.AddScoped<IVolunteerForDataService, VolunteerForDataService>();
             builder.Services.AddScoped<IDonationDataService, DonationDataService>();
+
             builder.Services.AddScoped<IMessageService, Services.MessageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
