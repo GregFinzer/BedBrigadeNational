@@ -30,12 +30,10 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        //protected string? AddConfigurationDisplay { get; private set; }
-        //protected string? EditConfigurationDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; }
+        protected int ToastTimeout { get; set; } = 5000;
         protected bool NoPaging { get; private set; }
         protected bool AddKey { get; set; } = false;
         protected string? RecordText { get; set; } = "Loading Configuration ...";
@@ -175,8 +173,7 @@ namespace BedBrigade.Client.Components
                     ToastContent = $"Unable to Delete. Configuration is in use.";
                     args.Cancel = true;
                 }
-                ToastTimeout = 6000;
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
             }
         }
@@ -204,9 +201,8 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to update Care Need!";
                 }
-                ToastTimeout = 5000;
-                await ToastObj.Show();
-            }
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+            }   
             else
             {
                 // new Configuration
@@ -224,7 +220,7 @@ namespace BedBrigade.Client.Components
                 {
                     ToastContent = "Unable to save configuration!";
                 }
-                await ToastObj.Show();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
         }
 
