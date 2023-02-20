@@ -37,7 +37,7 @@ namespace BedBrigade.Client.Components
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; }
-
+        protected string[] groupColumns = new string[] { "LocationId" };
         protected string? RecordText { get; set; } = "Loading Donations ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
@@ -53,9 +53,9 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin"))
+            if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Treasure"))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ToolBar = new List<string> { "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
@@ -77,21 +77,6 @@ namespace BedBrigade.Client.Components
 
         }
 
-        protected override Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (!firstRender)
-            {
-                if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin"))
-                {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
-                    Grid.EditSettings.AllowDeleting = true;
-                    Grid.EditSettings.AllowAdding = true;
-                    Grid.EditSettings.AllowEditing = true;
-                    StateHasChanged();
-                }
-            }
-            return base.OnAfterRenderAsync(firstRender);
-        }
         /// <summary>
         /// On loading of the Grid get the user grid persited data
         /// </summary>
@@ -147,107 +132,10 @@ namespace BedBrigade.Client.Components
                 case Action.Searching:
                     RecordText = "Searching ... Record Not Found.";
                     break;
-
-                case Action.Delete:
-                    await Delete(args);
-                    break;
-
-                case Action.Add:
-                    Add();
-                    break;
-
-                case Action.Save:
-                    await Save(args);
-                    break;
-                case Action.BeginEdit:
-                    BeginEdit();
-                    break;
             }
 
         }
 
-        private async Task Delete(ActionEventArgs<Donation> args)
-        {
-            List<Donation> records = await Grid.GetSelectedRecordsAsync();
-            foreach (var rec in records)
-            {
-                var deleteResult = await _svcDonation.DeleteAsync(rec.DonationId);
-                ToastTitle = "Delete Donation";
-                if (deleteResult.Success)
-                {
-                    ToastContent = "Delete Successful!";
-                }
-                else
-                {
-                    ToastContent = $"Unable to Delete. Donation is in use.";
-                    args.Cancel = true;
-                }
-                ToastTimeout = 6000;
-                await ToastObj.Show();
-
-            }
-        }
-
-        private void Add()
-        {
-            HeaderTitle = "Add Donation";
-            ButtonTitle = "Add Donation";
-        }
-
-        private async Task Save(ActionEventArgs<Donation> args)
-        {
-            Donation Donation = args.Data;
-            if (Donation.DonationId != 0)
-            {
-                //Update Donation Record
-                var updateResult = await _svcDonation.UpdateAsync(Donation);
-                ToastTitle = "Update Donation";
-                if (updateResult.Success)
-                {
-                    ToastContent = "Donation Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update location!";
-                }
-                await ToastObj.Show();
-            }
-            else
-            {
-                // new Donation
-                var result = await _svcDonation.CreateAsync(Donation);
-                if (result.Success)
-                {
-                    Donation location = result.Data;
-                }
-                ToastTitle = "Create Donation";
-                if (Donation.DonationId == 0)
-                {
-                    ToastContent = "Donation Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save Donation!";
-                }
-                await ToastObj.Show();
-            }
-        }
-
-        private void BeginEdit()
-        {
-            HeaderTitle = "Update Donation";
-            ButtonTitle = "Update";
-        }
-
-        protected async Task Save(Donation location)
-        {
-            await Grid.EndEdit();
-        }
-
-        protected async Task Cancel()
-        {
-            await Grid.CloseEdit();
-        }
 
         protected async Task DataBound()
         {
