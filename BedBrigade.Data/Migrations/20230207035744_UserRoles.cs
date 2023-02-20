@@ -11,11 +11,6 @@ namespace BedBrigade.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Name",
-                table: "Media",
-                newName: "FileName");
-
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
