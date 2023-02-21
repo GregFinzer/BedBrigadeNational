@@ -82,7 +82,9 @@ public class Seed
         await SeedVolunteersFor(_contextFactory);
         await SeedVolunteers(_contextFactory);
         await SeedDonations(_contextFactory);
+        await SeedBedRequests(_contextFactory);
     }
+
 
     private static async Task SeedConfigurations(IDbContextFactory<DataContext> _contextFactory)
     {
@@ -372,7 +374,7 @@ public class Seed
         {
             using (var context = contextFactory.CreateDbContext())
             {
-                Log.Logger.Information("SeedConfigurations Started");
+                Log.Logger.Information("SeedDonations Started");
                 if (await context.Donations.AnyAsync()) return;
 
                 List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
@@ -412,6 +414,60 @@ public class Seed
         }
     }
 
+    private static async Task SeedBedRequests(IDbContextFactory<DataContext> contextFactory)
+    {
+        try
+        {
+            using (var context = contextFactory.CreateDbContext())
+            {
+                Log.Logger.Information("Seed BedRequest Started");
+                if (await context.BedRequests.AnyAsync()) return;
+
+                List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
+                List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
+                List<bool> YesOrNo = new List<bool> { true, false };
+                List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
+                List<string> City = new List<string> { "Columbus", "Cleveland", "Cincinnati", "Canton", "Youngston", "Springfield", "Middletown", "Beavercreek" };
+                List<string> StreetName = new List<string> { "E. Bella Ln", "W. Chandler Blvd", "25 St.", "4th Ave.", "G Ave.", "Indian Wells CT.", "N. Arizona" };
+                List<Location> locations = await context.Locations.ToListAsync();
+
+                for (var i = 0; i < 30; i++)
+                {
+                    var location = locations[new Random().Next(locations.Count - 1)];
+                    var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
+                    var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+                    BedRequest bedRequest = new()
+                    {
+                        LocationId = location.LocationId,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
+                        Phone = GeneratePhoneNumber(),
+                        Street = $"{new Random().Next(99999).ToString()} {StreetName[new Random().Next(StreetName.Count -1)]}",
+                        City = City[new Random().Next(City.Count - 1)],
+                        State = "Ohio",
+                        PostalCode = new Random().Next(43001, 43086).ToString(),
+                        NumberOfBeds = new Random().Next(1, 4),
+                        Status = "Building",
+                        TeamNumber = new Random().Next(1, 5),
+                        DeliveryDate = DateTime.Now.AddDays(new Random().Next(10)),
+                        Notes = string.Empty
+                    };
+
+                    context.BedRequests.AddAsync(bedRequest);
+                    context.SaveChangesAsync();
+                }
+            }
+        }
+        catch (DbException ex)
+        {
+            Log.Logger.Error("Db Error {0} {1}", ex.ToString(), ex.StackTrace);
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error("Error in bedrequest {0} {1}", ex.ToString(), ex.StackTrace);
+        }
+    }
 
 
     private static string GeneratePhoneNumber()

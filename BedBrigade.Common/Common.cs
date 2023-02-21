@@ -9,7 +9,8 @@
             Location = 3,
             Volunteer = 4,
             Donation = 5,
-            Content = 6
+            Content = 6,
+            BedRequest = 7
 
         }
     }

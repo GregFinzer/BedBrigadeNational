@@ -36,7 +36,11 @@ namespace BedBrigade.Data.Models
         [MaxLength(20)] 
         public String City { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
+        [MaxLength(30)]
+        public String State { get; set; } = string.Empty;
+
+        [Required]
 		[MaxLength(10)]
 		public String PostalCode { get; set; } = string.Empty;
 
@@ -61,7 +65,14 @@ namespace BedBrigade.Data.Models
 		[MaxLength(255)]
 		public String? Notes { get; set; } = string.Empty;
 
+		public string FullName {
+			get
+			{
+				return $"{FirstName} {LastName}";
+			}
+		}
 
 
-    }
+
+	}
 }
