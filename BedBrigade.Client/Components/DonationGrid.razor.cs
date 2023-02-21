@@ -24,6 +24,8 @@ namespace BedBrigade.Client.Components
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
+        private const string SendTaxForm = "Send Tax Form";
+
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Donation>? Donations { get; set; }
         protected List<Location>? Locations { get; set; }
@@ -58,14 +60,14 @@ namespace BedBrigade.Client.Components
             Identity = authState.User;
             if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Treasure"))
             {
-                ToolBar = new List<string> { "Send Tax Form","Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
             }
             else
             {
                 ToolBar = new List<string> { "Search", "Reset" };
             }
             ContextMenu = new List<object> {
-                new ContextMenuItemModel {Id = "Tax", Text = "Send Tax Form", Target = ".e-content" },
+                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
                 FirstPage,
                 NextPage,
                 PrevPage,
@@ -111,7 +113,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnContextMenuClicked(ContextMenuClickEventArgs<Donation> args)
         {
-            if(args.Item.Text == "Send Tax Form")
+            if(args.Item.Text == SendTaxForm)
             {
                 TaxIsVisible = true;
             }
@@ -119,7 +121,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
-            if(args.Item.Text == "Send Tax Form")
+            if(args.Item.Text == SendTaxForm)
             {
                 TaxIsVisible = true;
                 return;
