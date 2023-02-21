@@ -138,6 +138,7 @@ namespace BedBrigade.Client
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, "An error occurred during migration");
+                Environment.Exit(1);
             }
 
         }
