@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230218111828_AddVolunteeringForTable")]
-    partial class AddVolunteeringForTable
+    [Migration("20230221001851_CreateVolunteersFor")]
+    partial class CreateVolunteersFor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -520,9 +520,8 @@ namespace BedBrigade.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<long>("FileSize")
-                        .HasMaxLength(50)
-                        .HasColumnType("bigint");
+                    b.Property<int>("FileSize")
+                        .HasColumnType("int");
 
                     b.Property<string>("FileStatus")
                         .HasColumnType("nvarchar(max)");
@@ -805,17 +804,17 @@ namespace BedBrigade.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("VolunteerForId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("VolunteeringForDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("VolunteeringForId")
+                        .HasColumnType("int");
 
                     b.HasKey("VolunteerId");
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("VolunteerForId");
+                    b.HasIndex("VolunteeringForId");
 
                     b.ToTable("Volunteers");
                 });
@@ -840,13 +839,11 @@ namespace BedBrigade.Data.Migrations
 
             modelBuilder.Entity("BedBrigade.Data.Models.BedRequest", b =>
                 {
-                    b.HasOne("BedBrigade.Data.Models.Location", "Location")
+                    b.HasOne("BedBrigade.Data.Models.Location", null)
                         .WithMany("BedRequests")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.ContactUs", b =>
@@ -871,13 +868,11 @@ namespace BedBrigade.Data.Migrations
 
             modelBuilder.Entity("BedBrigade.Data.Models.Donation", b =>
                 {
-                    b.HasOne("BedBrigade.Data.Models.Location", "Location")
+                    b.HasOne("BedBrigade.Data.Models.Location", null)
                         .WithMany("Donations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.Media", b =>
