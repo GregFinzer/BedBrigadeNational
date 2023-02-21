@@ -1,7 +1,9 @@
 ﻿
 using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
 
 namespace BedBrigade.Data.Services;
 
@@ -9,10 +11,12 @@ public class DonationDataService : IDonationDataService
 {
 
     private readonly DataContext _context;
+    private readonly AuthenticationStateProvider _auth;
 
-    public DonationDataService(DataContext context)
+    public DonationDataService(DataContext context, AuthenticationStateProvider authProvider)
     {
         _context = context;
+        _auth = authProvider;
     }
 
     public async Task<ServiceResponse<Donation>> GetAsync(int donationId)
@@ -27,7 +31,20 @@ public class DonationDataService : IDonationDataService
 
     public async Task<ServiceResponse<List<Donation>>> GetAllAsync()
     {
-        var result = await _context.Donations.ToListAsync();
+        var authState = await _auth.GetAuthenticationStateAsync();
+
+        var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+        List<Donation> result;
+        if (role.ToLower() != "national admin")
+        {
+            int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+            result = _context.Donations.Where(u => u.LocationId == locationId).ToList();
+        }
+        else
+        {
+            result = await _context.Donations.ToListAsync();
+        }
+
         if (result != null)
         {
             return new ServiceResponse<List<Donation>>($"Found {result.Count} records.", true, result);

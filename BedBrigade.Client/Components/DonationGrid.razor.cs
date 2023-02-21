@@ -41,11 +41,12 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading Donations ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
+        public bool TaxIsVisible { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
         /// <summary>
-        /// Setup the configuration Grid component
+        /// Setup the Donation Grid component
         /// Establish the Claims Principal
         /// </summary>
         /// <returns></returns>
@@ -55,7 +56,7 @@ namespace BedBrigade.Client.Components
             Identity = authState.User;
             if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Treasure"))
             {
-                ToolBar = new List<string> { "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ToolBar = new List<string> { "Send Tax Form","Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
@@ -99,6 +100,11 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
+            if(args.Item.Text == "Send Tax Form")
+            {
+                TaxIsVisible = true;
+                return;
+            }
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistData();
@@ -177,6 +183,11 @@ namespace BedBrigade.Client.Components
             };
 
             await Grid.CsvExport(ExportProperties);
+        }
+
+        protected async Task CloseTaxDialog()
+        {
+            TaxIsVisible = false;
         }
 
 
