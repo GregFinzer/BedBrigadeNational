@@ -2,9 +2,11 @@
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Org.BouncyCastle.Asn1.X509;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
+using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -27,7 +29,7 @@ namespace BedBrigade.Client.Components
         protected List<Location>? Locations { get; set; }
         protected SfGrid<Donation>? Grid { get; set; }
         protected List<string>? ToolBar;
-        protected List<string>? ContextMenu;
+        protected List<object>? ContextMenu;
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
@@ -57,13 +59,23 @@ namespace BedBrigade.Client.Components
             if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Treasure"))
             {
                 ToolBar = new List<string> { "Send Tax Form","Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
             {
                 ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
+            ContextMenu = new List<object> {
+                new ContextMenuItemModel {Id = "Tax", Text = "Send Tax Form", Target = ".e-content" },
+                FirstPage,
+                NextPage,
+                PrevPage,
+                LastPage,
+                "AutoFit",
+                "AutoFitAll",
+                "SortAscending",
+                "SortDescending"
+            }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+
 
             var result = await _svcDonation.GetAllAsync();
             if (result.Success)
@@ -97,6 +109,13 @@ namespace BedBrigade.Client.Components
             await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Donation, UserState = _state });
         }
 
+        protected async Task OnContextMenuClicked(ContextMenuClickEventArgs<Donation> args)
+        {
+            if(args.Item.Text == "Send Tax Form")
+            {
+                TaxIsVisible = true;
+            }
+        }
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {

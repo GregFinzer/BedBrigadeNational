@@ -3,6 +3,14 @@
     overflow: visible;
 }
 
+::deep .e-grid td.e-rowcell.e-focus.e-focused {
+    box-shadow: none;
+}
+
+::deep .e-grid th.e-headercell.e-focus.e-focused {
+    box-shadow: none;
+}
+
 ::deep .e-toast-container {
     margin-top: 450px;
 }

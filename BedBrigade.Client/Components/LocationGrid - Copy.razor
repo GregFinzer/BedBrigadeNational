@@ -1,0 +1,179 @@
+﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Data.Models
+
+@if (Locations == null)
+{
+    <span class="spinner-grow m-5"></span>
+    <span>Loading ....</span>
+}
+else
+{
+    <fieldset class="m-4">
+        <legend>Location</legend>
+        <div class="col-md-12 control-sec">
+            <div class="content-wrapper">
+                <div class="row">
+                    <SfGrid @ref="Grid" TValue="Location" DataSource=@Locations
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true">
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Location" />
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
+                                  }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Location)) IsPrimary="true">@ButtonTitle</SfButton>
+                                <SfButton OnClick="Cancel">Cancel</SfButton>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    Location location = (context as Location)!;
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <SfTextBox @bind-Value=@location.Route Enabled="true" Placeholder="Route" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <SfTextBox @bind-Value=@location.Address1 Enabled="true" Placeholder="Address" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <SfTextBox @bind-Value=@location.Address2 Enabled="true" Placeholder="Suite/PO Box" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfTextBox @bind-Value=@location.City Enabled="true" Placeholder="City" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfTextBox @bind-Value=@location.State Enabled="true" Placeholder="State" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfTextBox @bind-Value=@location.PostalCode Enabled="true" Placeholder="Postal Code" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Latitude Enabled="true" Placeholder="Latitude" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Longitude Enabled="true" Placeholder="Longitude" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                            <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Address1) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Address2) ShowColumnMenu="false" HeaderText="Suite/PO Box" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.City) ShowColumnMenu="false" HeaderText="City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.State) ShowColumnMenu="false" HeaderText="State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.PostalCode) ShowColumnMenu="false" HeaderText="Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" Width="15" />
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+}
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout>
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+<style>
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+    .e-toast-container {
+        margin-top: 450px;
+    }
+
+        .e-toast-container .e-toast {
+            border: 1px solid black;
+            border-radius: 25px;
+        }
+            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-title {
+                color: deepskyblue;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+            }
+            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: lightskyblue;
+                padding: 5px;
+                width: 100%;
+                height: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+</style>

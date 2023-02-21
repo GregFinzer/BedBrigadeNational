@@ -36,8 +36,14 @@ else
                             AllowPdfExport="true"
                             AllowTextWrap="true"
                             AllowGrouping="true">
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
-                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Donation" />
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50})" PageSize="25" />
+                        <GridEvents DataBound=@DataBound 
+                            Destroyed=@OnDestroyed 
+                            OnLoad=@OnLoad 
+                            OnToolbarClick=@OnToolBarClick
+                            ContextMenuItemClicked=@OnContextMenuClicked
+                            OnActionBegin=@OnActionBegin
+                            TValue="Donation" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
                                 <span>@RecordText</span>
