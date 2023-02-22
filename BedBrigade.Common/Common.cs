@@ -13,5 +13,12 @@
             BedRequest = 7
 
         }
+
+        public enum BedRequestStatus
+        {
+           Requested = 1,
+           Scheduled = 2,
+           Delivered = 3,
+        }
     }
 }
