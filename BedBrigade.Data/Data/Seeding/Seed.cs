@@ -1,8 +1,10 @@
 ﻿using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
+using BedBrigade.Common;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -448,7 +450,7 @@ public class Seed
                         State = "Ohio",
                         PostalCode = new Random().Next(43001, 43086).ToString(),
                         NumberOfBeds = new Random().Next(1, 4),
-                        Status = "Building",
+                        Status = (BedRequestStatus) new Random().Next(1,4),
                         TeamNumber = new Random().Next(1, 5),
                         DeliveryDate = DateTime.Now.AddDays(new Random().Next(10)),
                         Notes = string.Empty
