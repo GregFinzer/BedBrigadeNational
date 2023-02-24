@@ -120,7 +120,23 @@ else
                             <GridColumn Field=@nameof(BedRequest.State) ShowColumnMenu="false" HeaderText="State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(BedRequest.PostalCode) ShowColumnMenu="false" HeaderText="Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Bed Requests" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.DeliveryDate) ShowColumnMenu="false" HeaderText="Date Delivered" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(BedRequest.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
+                                <Template>
+                                    @{
+                                        var request = (context as BedRequest);
+                                        var status = Enum.GetName(typeof(Common.Common.BedRequestStatus), request.Status);
+                                        @status
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field=@nameof(BedRequest.DeliveryDate) ShowColumnMenu="false" HeaderText="Date Delivered" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="15" >
+                                <Template>
+                                    @{
+                                        var request = (context as BedRequest);
+                                        @request.DeliveryDate.Value.ToShortDateString();
+                                    }
+                                </Template>
+                            </GridColumn>
                         </GridColumns>
                     </SfGrid>
 
