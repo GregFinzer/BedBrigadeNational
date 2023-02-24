@@ -2,6 +2,7 @@
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Data.Common;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -81,8 +82,39 @@ public class VolunteerDataService : IVolunteerDataService
 
     public async Task<ServiceResponse<Volunteer>> UpdateAsync(Volunteer volunteer)
     {
-        var result = await Task.Run(() => _context.Volunteers.Update(volunteer));
-        if (result != null)
+        int result = 0;
+        var oldVolunteer = _context.Volunteers.Find(volunteer.VolunteerId);
+        if(oldVolunteer != null)
+        {
+            oldVolunteer.LocationId = volunteer.LocationId;
+            oldVolunteer.VolunteeringForDate = volunteer.VolunteeringForDate;
+            oldVolunteer.IHaveVolunteeredBefore = volunteer.IHaveVolunteeredBefore;
+            oldVolunteer.FirstName = volunteer.FirstName;
+            oldVolunteer.VolunteeringForId = volunteer.VolunteeringForId;
+            oldVolunteer.LastName = volunteer.LastName;
+            oldVolunteer.Email = volunteer.Email;
+            oldVolunteer.Phone = volunteer.Phone;
+            oldVolunteer.OrganizationOrGroup = volunteer.OrganizationOrGroup;
+            oldVolunteer.Message = volunteer.Message;
+            oldVolunteer.IHaveAMinivan = volunteer.IHaveAMinivan;
+            oldVolunteer.IHaveAnSUV = volunteer.IHaveAnSUV;
+            oldVolunteer.IHaveAPickupTruck = volunteer.IHaveAPickupTruck;
+        }
+        try
+        {
+
+            await Task.Run(() => _context.Volunteers.Update(oldVolunteer));
+            result = await _context.SaveChangesAsync();
+        }
+        catch(DbException ex)
+        {
+            Log.Logger.Error("Unable to save updated Volunteer record, {0}", ex);
+        }
+        catch(Exception ex)
+        {
+            Log.Logger.Error("Error while updating Volunteer record, {0}", ex.Message);
+        }
+        if (result == 1)
         {
             return new ServiceResponse<Volunteer>($"Updated volunteer with key {volunteer.VolunteerId}", true);
         }
