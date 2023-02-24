@@ -41,7 +41,7 @@ namespace BedBrigade.Client.Components
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; }
+        protected int ToastTimeout { get; set; } = 3000;
         protected SfRichTextEditor RteObject { get; set; }
         protected List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
