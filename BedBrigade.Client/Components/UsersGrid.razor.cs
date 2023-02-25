@@ -152,6 +152,7 @@ namespace BedBrigade.Client.Components
         private async Task Save(ActionEventArgs<User> args)
         {
             var user = args.Data;
+            user.Phone = user.Phone.FormatPhoneNumber();
             if (!string.IsNullOrEmpty(user.UserName))
             {
                 user.Role = await GetUserRoleName(user);
@@ -167,7 +168,6 @@ namespace BedBrigade.Client.Components
                 {   
                     ToastContent = "Unable to update User!";
                 }
-                ToastTimeout = 3000;
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else

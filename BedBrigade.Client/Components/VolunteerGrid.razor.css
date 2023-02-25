@@ -1,28 +1,43 @@
-﻿/***************************************** NeedGrid.razor.css ********************************************/
+﻿/***************************************** VolunteerGrid.razor.css ********************************************/
 
-.e-toast-container {
+::deep .e-grid td.e-rowcell.e-focus.e-focused {
+    box-shadow: none;
+}
+
+::deep .e-grid th.e-headercell.e-focus.e-focused {
+    box-shadow: none;
+}
+
+
+::deep .e-toast-container {
     margin-top: 450px;
 }
 
-    .e-toast-container .e-toast {
-        border: 1px solid black;
-    }
-        /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
-        .e-toast-container .e-toast .e-toast-message .e-toast-title {
-            color: deepskyblue;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-        /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
-        .e-toast-container .e-toast .e-toast-message .e-toast-content {
-            color: black;
-            font-size: 14px;
-            font-weight: bold;
-            background-color: lightskyblue;
-            padding: 5px;
-            width: 100%;
-            height: 50px;
-            vertical-align: middle;
-            text-align: center;
-        }
+::deep .e-toast-container .e-toast {
+     border: 1px solid black;
+     border-radius: 25px;
+}
+/*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+::deep .e-toast-container .e-toast .e-toast-message .e-toast-title {
+    color: deepskyblue;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+/*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+::deep .e-toast-container .e-toast .e-toast-message .e-toast-content {
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: lightskyblue;
+    padding: 5px;
+    width: 100%;
+    height: 50px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+::deep .e-dialog .e-dlg-header {
+    font-size: 1.75rem;
+    font-weight: 700;
+}

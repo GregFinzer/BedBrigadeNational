@@ -7,6 +7,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -36,11 +37,12 @@ namespace BedBrigade.Client.Components
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; }
+        protected int ToastTimeout { get; set; } = 3000;
 
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
+        public List<EnumItem> BedRequestStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -69,6 +71,8 @@ namespace BedBrigade.Client.Components
             {
                 BedRequests = result.Data.ToList();
             }
+
+            BedRequestStatuses = GetBedRequestStatusItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -188,9 +192,11 @@ namespace BedBrigade.Client.Components
             ButtonTitle = "Add BedRequest";
         }
 
+
         private async Task Save(ActionEventArgs<BedRequest> args)
         {
             BedRequest BedRequest = args.Data;
+            BedRequest.Phone = BedRequest.Phone.FormatPhoneNumber();
             if (BedRequest.BedRequestId != 0)
             {
                 //Update BedRequest Record

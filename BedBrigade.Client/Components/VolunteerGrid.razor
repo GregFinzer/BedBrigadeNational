@@ -145,8 +145,8 @@ else
         </div>
     </fieldset>
 }
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout>
-    <ToastPosition X="Center" Y="Top"></ToastPosition>
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
+    <ToastPosition X="Center" Y="Top" ></ToastPosition>
 </SfToast>
 
 @if (NoPaging)
@@ -159,12 +159,11 @@ else
 }
 
 <style>
+    /***************************************** VolunteerGrid.razor.css ********************************************/
 
     .e-grid td.e-rowcell.e-focus.e-focused {
         box-shadow: none;
     }
-
-
 
     .e-grid th.e-headercell.e-focus.e-focused {
         box-shadow: none;
