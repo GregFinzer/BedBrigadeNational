@@ -35,31 +35,34 @@ public class BedRequestDataService : IBedRequestDataService
 
     public async Task<ServiceResponse<bool>> DeleteAsync(int BedRequestId)
     {
-        var user = await _context.Users.FindAsync(BedRequestId);
-        if (user == null)
+        var bedRequest = await _context.BedRequests.FindAsync(BedRequestId);
+        if (bedRequest == null)
         {
-            return new ServiceResponse<bool>($"User record with key {BedRequestId} not found");
+            return new ServiceResponse<bool>($"BedRequest record with key {BedRequestId} not found");
         }
         try
         {
-            _context.Users.Remove(user);
+            _context.BedRequests.Remove(bedRequest);
             await _context.SaveChangesAsync();
             return new ServiceResponse<bool>($"Removed record with key {BedRequestId}.", true);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"DB error on delete of user record with key {BedRequestId} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<bool>($"DB error on delete of Bed Request record with key {BedRequestId} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 
     public async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest bedRequest)
     {
-        var result = await Task.Run(() => _context.BedRequests.Update(bedRequest));
-        if (result != null)
+        var entity = _context.BedRequests.Find(bedRequest.BedRequestId);
+        if (entity != null)
         {
+            _context.Entry(entity).CurrentValues.SetValues(bedRequest);
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.SaveChangesAsync();
             return new ServiceResponse<BedRequest>($"Updated bedRequest with key {bedRequest.BedRequestId}", true);
         }
-        return new ServiceResponse<BedRequest>($"User with key {bedRequest.BedRequestId} was not updated.");
+        return new ServiceResponse<BedRequest>($"Bed Request with key {bedRequest.BedRequestId} was not updated.");
     }
 
     public async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest bedRequest)
@@ -68,11 +71,11 @@ public class BedRequestDataService : IBedRequestDataService
         {
             await _context.BedRequests.AddAsync(bedRequest);
             await _context.SaveChangesAsync();
-            return new ServiceResponse<BedRequest>($"Added bedRequest with key {bedRequest.BedRequestId}", true);
+            return new ServiceResponse<BedRequest>($"Added Bed Request with key {bedRequest.BedRequestId}", true);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<BedRequest>($"DB error on delete of user record with key {bedRequest.BedRequestId} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<BedRequest>($"DB error on delete of Bed Request record with key {bedRequest.BedRequestId} - {ex.Message} ({ex.ErrorCode})");
         }
 
     }

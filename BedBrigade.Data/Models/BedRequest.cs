@@ -15,42 +15,42 @@ public class BedRequest : BaseEntity
 
 	[Required]
 	[MaxLength(20)]
-	public String FirstName { get; set; } = string.Empty;
+	public String? FirstName { get; set; } = string.Empty;
 
-        [Required]
+	[Required]
 	[MaxLength(25)]
 	public String LastName { get; set; } = string.Empty;
 
-        [Required]
+	[Required]
 	[MaxLength(255)]
-	public String Email { get; set; } = string.Empty;
+	public String? Email { get; set; } = string.Empty;
 
-        [Required]
+	[Required]
 	[MaxLength(14)]
-	public String Phone { get; set; } = string.Empty;
+	public String? Phone { get; set; } = string.Empty;
 
-        [Required]
+	[Required]
 	[MaxLength(40)]
-	public String Street { get; set; } = string.Empty;
+	public String? Street { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(20)] 
-        public String City { get; set; } = string.Empty;
+    [Required]
+    [MaxLength(20)] 
+    public String? City { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(30)]
-        public String State { get; set; } = string.Empty;
+    [Required]
+    [MaxLength(30)]
+    public String? State { get; set; } = string.Empty;
 
-        [Required]
+    [Required]
 	[MaxLength(10)]
-	public String PostalCode { get; set; } = string.Empty;
+	public String? PostalCode { get; set; } = string.Empty;
 
 	[Required]
 	public Int32 NumberOfBeds { get; set; }
 
 	[Required]
 	[MaxLength(255)]
-	public String AgesGender { get; set; } = string.Empty;
+	public String? AgesGender { get; set; } = string.Empty;
 
 	[MaxLength(4000)]
 	public String? SpecialInstructions { get; set; } = string.Empty;

@@ -202,7 +202,7 @@ namespace BedBrigade.Client.Components
                     ToastContent = "Unable to update Care Need!";
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }   
+            }
             else
             {
                 // new Configuration
