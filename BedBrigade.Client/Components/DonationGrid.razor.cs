@@ -230,7 +230,7 @@ namespace BedBrigade.Client.Components
         {
             foreach(var recipient in LB_Send.GetDataList() )
             {
-                _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitiable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
+                _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
             }
             await CloseTaxDialog();
         }
