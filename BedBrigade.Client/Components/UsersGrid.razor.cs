@@ -251,7 +251,7 @@ namespace BedBrigade.Client.Components
             await Grid.Refresh();
         }
 
-        protected async Task Save(User status)
+        protected async Task Save(User user)
         {
             await Grid.EndEditAsync();
         }

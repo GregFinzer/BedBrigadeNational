@@ -8,6 +8,8 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
+using BedBrigade.Client.Pages.Administration.Manage;
+using System.Data;
 
 namespace BedBrigade.Client.Components
 {
@@ -15,6 +17,7 @@ namespace BedBrigade.Client.Components
     {
         [Inject] private IBedRequestService? _svcBedRequest { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
+        [Inject] private ILocationService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -25,10 +28,11 @@ namespace BedBrigade.Client.Components
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
         protected List<BedRequest>? BedRequests { get; set; }
+        protected List<Location>? Locations { get; set; }
         protected SfGrid<BedRequest>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
-        protected BedRequest BedRequest { get; set; }
+        protected BedRequest BedRequest { get; set; } = new BedRequest();
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
@@ -38,6 +42,7 @@ namespace BedBrigade.Client.Components
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
+        protected bool OnlyRead { get; set; } = false;
 
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         protected string? Hide { get; private set; } = "true";
@@ -55,7 +60,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("National Admin"))
+            if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Scheduler"))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -66,10 +71,21 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-            var result = await _svcBedRequest.GetAllAsync();
-            if (result.Success)
+            if(Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Scheduler"))
             {
-                BedRequests = result.Data.ToList();
+                OnlyRead = true;
+            }
+
+            var bedRequestResult = await _svcBedRequest.GetAllAsync();
+            if (bedRequestResult.Success)
+            {
+                BedRequests = bedRequestResult.Data.ToList();
+            }
+
+            var locationResult = await _svcLocation.GetAllAsync();
+            if (locationResult.Success)
+            {
+                Locations = locationResult.Data.ToList();
             }
 
             BedRequestStatuses = GetBedRequestStatusItems();
@@ -79,7 +95,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole("National Admin"))
+                if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Scheduler"))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -190,6 +206,7 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Add BedRequest";
             ButtonTitle = "Add BedRequest";
+            BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
         }
 
 
@@ -221,7 +238,7 @@ namespace BedBrigade.Client.Components
                     BedRequest = result.Data;
                 }
                 ToastTitle = "Create BedRequest";
-                if (BedRequest.BedRequestId == 0)
+                if (BedRequest.BedRequestId != 0)
                 {
                     ToastContent = "BedRequest Created Successfully!";
                 }

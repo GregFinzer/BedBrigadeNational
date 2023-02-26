@@ -1,16 +1,29 @@
 ﻿using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace BedBrigade.Data.Services;
 
 public class BedRequestDataService : IBedRequestDataService
 {
     private readonly DataContext _context;
+    private readonly AuthenticationStateProvider _auth;
+    protected ClaimsPrincipal _identity;
 
-    public BedRequestDataService(DataContext context)
+    public BedRequestDataService(DataContext context, AuthenticationStateProvider authProvider)
     {
         _context = context;
+        _auth = authProvider;
+        Task.Run(() => GetUserClaims(authProvider));
+    }
+
+    private async Task GetUserClaims(AuthenticationStateProvider provider)
+    {
+        var state = await provider.GetAuthenticationStateAsync();
+        _identity = state.User;
     }
 
     public async Task<ServiceResponse<BedRequest>> GetAsync(int bedRequestId)
@@ -25,7 +38,20 @@ public class BedRequestDataService : IBedRequestDataService
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllAsync()
     {
-        var result = await _context.BedRequests.ToListAsync();
+        var authState = await _auth.GetAuthenticationStateAsync();
+
+        var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+        List<BedRequest> result;
+        if (role.ToLower() != "national admin")
+        {
+            int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+            result = _context.BedRequests.Where(u => u.LocationId == locationId).ToList();
+        }
+        else
+        {
+            result = await _context.BedRequests.ToListAsync();
+        }
+
         if (result != null)
         {
             return new ServiceResponse<List<BedRequest>>($"Found {result.Count} records.", true, result);
@@ -59,7 +85,7 @@ public class BedRequestDataService : IBedRequestDataService
         {
             _context.Entry(entity).CurrentValues.SetValues(bedRequest);
             _context.Entry(entity).State = EntityState.Modified;
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return new ServiceResponse<BedRequest>($"Updated bedRequest with key {bedRequest.BedRequestId}", true);
         }
         return new ServiceResponse<BedRequest>($"Bed Request with key {bedRequest.BedRequestId} was not updated.");
@@ -71,11 +97,16 @@ public class BedRequestDataService : IBedRequestDataService
         {
             await _context.BedRequests.AddAsync(bedRequest);
             await _context.SaveChangesAsync();
-            return new ServiceResponse<BedRequest>($"Added Bed Request with key {bedRequest.BedRequestId}", true);
+            return new ServiceResponse<BedRequest>($"Added Bed Request with key {bedRequest.BedRequestId}", true, bedRequest);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<BedRequest>($"DB error on delete of Bed Request record with key {bedRequest.BedRequestId} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<BedRequest>($"DB error on create of Bed Request record with key {bedRequest.BedRequestId} - {ex.Message} ({ex.ErrorCode})");
+        }
+        catch(Exception ex) 
+        {
+            return new ServiceResponse<BedRequest>($"Error on create of Bed Request record with key {bedRequest.BedRequestId} - {ex.Message}");
+
         }
 
     }
