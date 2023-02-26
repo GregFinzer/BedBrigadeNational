@@ -56,7 +56,10 @@ else
                             <Template>
                                 @{
                                     Volunteer volunteer = (context as Volunteer)!;
-
+                                    if (volunteer.LocationId == 0)
+                                    {
+                                        volunteer.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+                                    }
                                     <div class="row">
                                         <div class="col-md-4">
                                             <SfTextBox ID="name" @bind-Value=@volunteer.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
@@ -75,26 +78,31 @@ else
                                         <div class="col-md-4">
                                             <SfTextBox @bind-Value=@volunteer.OrganizationOrGroup Enabled="true" Placeholder="Organization" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
-                                        <div class="col-md-4 my-4">
-                                            <SfCheckBox @bind-Checked=@volunteer.IHaveVolunteeredBefore Label="Previous Volunteer" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                        <div class="col-md-4">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@volunteer.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                            </SfDropDownList>
                                         </div>
                                     </div>
                                     <div class="row">
 
                                     </div>
                                     <div class="row my-4">
-                                        <div class="col-md-4 text-center">
+                                        <div class="col-md-3">
+                                            <SfCheckBox @bind-Checked=@volunteer.IHaveVolunteeredBefore Label="Previous Volunteer" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                        </div>
+                                        <div class="col-md-3 text-center">
                                             <SfCheckBox Name="MiniVan" @bind-Checked=@volunteer.IHaveAMinivan Label="Mini Van" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
                                         </div>
-                                        <div class="col-md-4 text-center">
+                                        <div class="col-md-3 text-center">
                                             <SfCheckBox Name="SUV" @bind-Checked=@volunteer.IHaveAnSUV Label="SUV" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
                                         </div>
-                                        <div class="col-md-4 text-center">
+                                        <div class="col-md-3 text-center">
                                             <SfCheckBox @bind-Checked=@volunteer.IHaveAPickupTruck Label="Pickup" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div>Message</div>
+                                        <div>Notes</div>
                                         <div class="col-md-12">
                                             <SfRichTextEditor ID="note" @ref=@RteObject @bind-Value=@volunteer.Message EnableResize="true" Enabled="true" Height="300px">
                                                 <RichTextEditorToolbarSettings Items=@Tools />
@@ -128,7 +136,7 @@ else
                                 </GridColumns>
                             </GridColumn>
                             <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125" />
-                            <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Note" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" AllowEditing="false" Width="100">
+                            <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" AllowEditing="false" Width="100">
                                 <Template>
                                     @{
                                         var volunteer = (context as Volunteer);

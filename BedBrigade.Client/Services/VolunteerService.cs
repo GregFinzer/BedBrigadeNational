@@ -16,14 +16,14 @@ namespace BedBrigade.Client.Services
             _data = dataService;
         }
 
-        public async Task<ServiceResponse<bool>> DeleteAsync(int VolunteerId)
+        public async Task<ServiceResponse<bool>> DeleteAsync(int volunteerId)
         {
-            return await _data.DeleteAsync(VolunteerId);
+            return await _data.DeleteAsync(volunteerId);
         }
 
-        public async Task<ServiceResponse<Volunteer>> GetAsync(int locationId)
+        public async Task<ServiceResponse<Volunteer>> GetAsync(int volunteerId)
         {
-            return await _data.GetAsync(locationId);
+            return await _data.GetAsync(volunteerId);
 
         }
 
@@ -32,14 +32,14 @@ namespace BedBrigade.Client.Services
             return await _data.GetAllAsync();
         }
 
-        public async Task<ServiceResponse<Volunteer>> UpdateAsync(Volunteer location)
+        public async Task<ServiceResponse<Volunteer>> UpdateAsync(Volunteer volunteer)
         {
-            return await _data.UpdateAsync(location);
+            return await _data.UpdateAsync(volunteer);
         }
 
-        public async Task<ServiceResponse<Volunteer>> CreateAsync(Volunteer location)
+        public async Task<ServiceResponse<Volunteer>> CreateAsync(Volunteer volunteer)
         {
-            return await _data.CreateAsync(location);
+            return await _data.CreateAsync(volunteer);
         }
     }
 }
