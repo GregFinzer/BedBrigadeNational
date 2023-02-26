@@ -28,6 +28,7 @@ namespace BedBrigade.Client.Components
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Volunteer>? Volunteers { get; set; }
+        protected Volunteer Volunteer { get; set; } = new Volunteer();
         protected List<VolunteerFor> VolunteersFor { get; private set; }
         protected List<Location> Locations { get; private set; }
         protected SfGrid<Volunteer>? Grid { get; set; }
@@ -81,8 +82,9 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
+        public bool OnlyRead { get; private set; } = false;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "200px" };
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -102,6 +104,11 @@ namespace BedBrigade.Client.Components
             {
                 ToolBar = new List<string> { "Search", "Reset" };
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+            }
+
+            if (Identity.IsInRole("Location Admin") )
+            {
+                OnlyRead = true;
             }
 
             var result = await _svcVolunteer.GetAllAsync();
@@ -243,11 +250,13 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Add Volunteer";
             ButtonTitle = "Add Volunteer";
+            Volunteer.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
         }
 
         private async Task Save(ActionEventArgs<Volunteer> args)
         {
             Volunteer Volunteer = args.Data;
+            Volunteer.Phone = Volunteer.Phone.FormatPhoneNumber();
             if (Volunteer.VolunteerId != 0)
             {
                 //Update Volunteer Record
@@ -282,6 +291,8 @@ namespace BedBrigade.Client.Components
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
+
+            Grid.Refresh();
         }
 
         private void BeginEdit()

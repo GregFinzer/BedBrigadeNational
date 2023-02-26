@@ -60,7 +60,7 @@ else
                             </FooterTemplate>
                             <Template>
                                 @{
-                                    BedRequest BedRequest = (context as BedRequest)!;
+                            BedRequest BedRequest = (context as BedRequest)!;
                                     if(BedRequest.LocationId == 0)
                                     {
                                         BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
