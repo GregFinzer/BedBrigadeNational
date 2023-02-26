@@ -214,7 +214,7 @@ namespace BedBrigade.Client.Components
                     Location location = result.Data;
                 }
                 ToastTitle = "Create Location";
-                if (Location.LocationId == 0)
+                if (Location.LocationId != 0)
                 {
                     ToastContent = "Location Created Successfully!";
                 }
