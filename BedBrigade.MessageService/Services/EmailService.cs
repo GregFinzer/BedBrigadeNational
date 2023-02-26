@@ -8,6 +8,8 @@ using System;
 using System.Diagnostics;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using System.IO;
+using BedBrigade.Common;
 
 namespace BedBrigade.MessageService.Services;
 
@@ -24,9 +26,11 @@ public class EmailService : IEmailService
 
     public async Task<ServiceResponse<SendResponse>> SendEmailAsync(string To, string From, string Subject, string Template, object Model)
     {
-        SendResponse email = new SendResponse();
         try
-        {
+        { 
+            string template = File.ReadAllText(Template.ToApplicationPath("Templates"));
+            SendResponse email = new SendResponse();
+
             var sender = new SmtpSender(() => new SmtpClient(_emailConfig.SmtpServer)
             {
                 EnableSsl = _emailConfig.EnableSsl,
@@ -41,7 +45,7 @@ public class EmailService : IEmailService
                 .From(_emailConfig.From)
                 .To(To)
                 .Subject(Subject)
-                .UsingTemplate(Template, Model)
+                .UsingTemplate(template, Model)
                 .SendAsync();
             var result = await AuditEmailAsync(To, From, Subject, Template, Model, email);
             if (result.Success)
@@ -54,7 +58,7 @@ public class EmailService : IEmailService
         catch (Exception ex)
         {
             Debug.Print(ex.Message);
-            return new ServiceResponse<SendResponse>($"Caught Exception {ex.Message}", false, email);
+            return new ServiceResponse<SendResponse>($"Caught Exception {ex.Message}", false);
         }
 
 

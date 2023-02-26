@@ -55,29 +55,22 @@ else
                                 <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" >
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false">
+                            <CaptionTemplate>
+                                @{
+                                    var caption = (context as CaptionTemplateContext);
+                                    //<div>@caption.Field - @caption.ForeignKey (@caption.Key)</div>
+                                    var locations = Donations.Where(d => d.LocationId.ToString() == caption.Key); //.Sum(s => s.Amount);
+                                    var locTotal = locations.Sum(s => s.Amount);
+                                    //var locName = Locations.FirstOrDefault(l => l.LocationId == donation.LocationId).Name;
+                                    <div class="row">
+                                        <div class="fw-bold col-md-10">@caption.ForeignKey</div>
+                                        <div class="fw-bold col-md-2 text-right">@string.Format("Total: {0:C2}", locTotal) </div>
+                                    </div>
+                                }
+
+                            </CaptionTemplate>
                         </GridGroupSettings>
-                        <GridAggregates>
-                            <GridAggregate>
-                                <GridAggregateColumns>
-                                    <GridAggregateColumn Field=@nameof(Donation.Amount) Type="AggregateType.Sum">
-                                        <GroupFooterTemplate>
-                                            @{
-                                                var aggregate = (context as AggregateTemplateContext);
-                                                <div class="w-100 text-right">
-                                                    <p>
-                                                        @{
-                                                            var num = double.Parse(aggregate.Sum);
-                                                            @string.Format("Total: {0:C2}", num);
-                                                        }
-                                                        </p>
-                                                </div>
-                                            }
-                                        </GroupFooterTemplate>
-                                    </GridAggregateColumn>
-                                </GridAggregateColumns>
-                            </GridAggregate>
-                        </GridAggregates>
 
                         <GridColumns>
                             <GridColumn Field=@nameof(Donation.DonationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
@@ -99,13 +92,43 @@ else
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
 
-<SfDialog Target="#target" Width="400px" Height="400px" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@TaxIsVisible">
+<SfDialog Target="#target" Width="600px" Height="600px" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@TaxIsVisible">
     <DialogTemplates>
-        <Header> Send Tax Form </Header>
-        <Content> This is a Dialog with drag enabled </Content>
+        <Header> Send Tax Forms </Header>
+        <Content>
+            <div class="col-lg-12 control-section">
+                <div id="listbox-control">
+                    <div class="dual-list-wrapper">
+                        <div class="dual-list-groupa">
+                            <h4>Not Sent</h4>
+                            <SfListBox @ref=@LB_NotSent Scope="@scope2" DataSource="@NotSent" TItem="ListItem" Height="330px" TValue="string[]" @attributes="listbox1Attr">
+                                <ListBoxFieldSettings Text="Name" Value="Email"></ListBoxFieldSettings>
+                                <ListBoxToolbarSettings Items="@items"></ListBoxToolbarSettings>
+                                <ListBoxTemplates TItem="ListItem">
+                                    <NoRecordsTemplate>
+                                        <span>Nothing to send</span>
+                                    </NoRecordsTemplate>
+                                </ListBoxTemplates>
+                            </SfListBox>
+                        </div>
+                        <div class="dual-list-groupb">
+                            <h4>Send</h4>
+                            <SfListBox @ref=@LB_Send Scope="@scope1" DataSource="@Send" Height="330px" TItem="ListItem" TValue="string[]" @attributes="listbox2Attr">
+                                <ListBoxFieldSettings Text="Name" Value="Email"></ListBoxFieldSettings>
+                                <ListBoxTemplates TItem="ListItem">
+                                    <NoRecordsTemplate>
+                                        <span>Nothing to send</span>
+                                    </NoRecordsTemplate>
+                                </ListBoxTemplates>
+                            </SfListBox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Content>
     </DialogTemplates>
     <DialogButtons>
-        <DialogButton Content="OK" IsPrimary="true" OnClick="@CloseTaxDialog" />
+        <DialogButton Content="Send Tax Form" IsPrimary="true" OnClick="@SendTax" />
         <DialogButton Content="Cancel" OnClick="@CloseTaxDialog" />
     </DialogButtons>
 </SfDialog>
@@ -165,4 +188,58 @@ else
         font-weight: 700;
     }
 
+    .control-section .dual-list-wrapper {
+        width: 100%;
+        margin: 0 auto 10px;
+        display: flex;
+    }
+
+    .dual-list-groupa {
+        width: 50%;
+    }
+
+
+    .dual-list-groupb {
+        width: 50%;
+    }
+
+        .dual-list-groupb .e-listbox-container,
+        .dual-list-groupb h4 {
+            width: 87%;
+            margin-left: 15px;
+        }
+
+    @@media screen and (max-width: 590px) {
+        .control-section .dual-list-wrapper {
+            width: 100%;
+        }
+
+        .dual-list-groupa {
+            width: 56%;
+        }
+
+        .dual-list-groupb {
+            width: 44%;
+        }
+    }
+
+    @@media screen and (max-width: 400px) {
+        .dual-list-groupa {
+            width: 59%;
+        }
+
+        .dual-list-groupb {
+            width: 41%;
+        }
+    }
+
+    #listbox-control {
+        margin: auto;
+    }
+
+    @@media screen and (max-width: 590px) {
+        #listbox-control {
+            width: 100%;
+        }
+    }
 </style>

@@ -2,9 +2,12 @@
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Asn1.X509;
+using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
+using System.Linq;
 using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
@@ -17,6 +20,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private ILocationService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IMessageService? _messageService { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -76,7 +80,8 @@ namespace BedBrigade.Client.Components
                 "AutoFitAll",
                 "SortAscending",
                 "SortDescending"
-            }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+            }; 
+            
 
 
             var result = await _svcDonation.GetAllAsync();
@@ -89,6 +94,13 @@ namespace BedBrigade.Client.Components
             {
                 Locations = locationResult.Data.ToList();
             }
+
+            var query = from donation in Donations
+                        where donation.TaxFormSent == false
+                        select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };
+                       
+
+            NotSent = query.ToList();
 
         }
 
@@ -206,11 +218,46 @@ namespace BedBrigade.Client.Components
             await Grid.CsvExport(ExportProperties);
         }
 
+
+        #region Send Tax
+
         protected async Task CloseTaxDialog()
         {
             TaxIsVisible = false;
         }
 
+        protected async Task SendTax()
+        {
+            foreach(var recipient in LB_Send.GetDataList() )
+            {
+                _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitiable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
+            }
+            await CloseTaxDialog();
+        }
+
+        private string[] items = new string[] { "MoveTo", "MoveFrom", "MoveAllTo", "MoveAllFrom" };
+        private readonly string scope1 = "scope1";
+        private readonly string scope2 = "scope2";
+        private readonly Dictionary<string, object> listbox1Attr = new Dictionary<string, object>
+        {
+        { "id", "scope1" }
+        };
+        private readonly Dictionary<string, object> listbox2Attr = new Dictionary<string, object>
+        {
+        { "id", "scope2" }
+        };
+        public  SfListBox<string[], ListItem> LB_NotSent;
+        public  SfListBox<string[], ListItem> LB_Send;
+        private List<ListItem> NotSent = new List<ListItem>();
+        private List<ListItem> Send = new List<ListItem>();
+        public class ListItem
+        {
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public decimal Amount { get; set; }
+
+        }
+        #endregion
 
     }
 }
