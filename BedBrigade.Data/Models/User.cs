@@ -24,12 +24,10 @@ public class User : BaseEntity
     [Required]
     [MaxLength(255)]
     public String Email { get; set; } = string.Empty;
-
-    [Required]
+    
     [MaxLength(255)]
     public byte[]? PasswordHash { get; set; }
 
-    [Required]
     [MaxLength(255)]
     public byte[]? PasswordSalt { get; set; }
 
