@@ -37,10 +37,10 @@ public class Seed
         new Location {Name="Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
         new Location {Name="Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
         new Location {Name="Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
-        new Location {Name="Vinyard Church Circleville", Route="/Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
+        new Location {Name="Vinyard Church", Route="/Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
         new Location {Name="Hardbarger Impact", Route="/lancaster", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
-        new Location {Name="Upper Arlington Lutheran Church", Route="/Arlington", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
-        new Location {Name="Greensburg United Methodist Church", Route="/canton", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
+        new Location {Name="Upper Arlington Lutheran", Route="/Arlington", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
+        new Location {Name="Greensburg United Methodist", Route="/canton", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
 
     };
 
