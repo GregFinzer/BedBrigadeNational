@@ -22,15 +22,14 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="User"> The DB column to be saved in the User table</param>
     /// <returns></returns>
-    public async Task<ServiceResponse<string>> GetPersistAsync(Common.Common.PersistGrid User)
+    public async Task<ServiceResponse<string>> GetPersistAsync(Persist persist)
     {
-        /// ToDo: Add GetPersist codes
-        return new ServiceResponse<string>("Persistance", true, "");
+        return await  _data.GetGridPersistance(persist);
+
     }
     public async Task<ServiceResponse<bool>> SavePersistAsync(Persist persist)
     {
-        /// ToDo: Add SavePersist codes
-        return new ServiceResponse<bool>("Saved Persistance data", true);
+        return await _data.SaveGridPersistance(persist);
     }
 
     public async Task<ServiceResponse<bool>> DeleteUserAsync(string userName)

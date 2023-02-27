@@ -9,6 +9,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Linq;
 using System.Security.Claims;
+using static BedBrigade.Common.Common;
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 
@@ -110,17 +111,26 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
-                await Grid.SetPersistData(_state);
+                await Grid.SetPersistData(result.Data);
             }
         }
 
+        /// <summary>
+        /// On destoring of the grid save its current state
+        /// </summary>
+        /// <returns></returns>
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Donation, UserState = _state });
+            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = _state });
+            if (!result.Success)
+            {
+                //Log the results
+            }
+
         }
 
         protected async Task OnContextMenuClicked(ContextMenuClickEventArgs<Donation> args)

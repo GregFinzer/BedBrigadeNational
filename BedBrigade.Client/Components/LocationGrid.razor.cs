@@ -7,6 +7,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -91,17 +92,26 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
-                await Grid.SetPersistData(_state);
+                await Grid.SetPersistData(result.Data);
             }
         }
 
+        /// <summary>
+        /// On destoring of the grid save its current state
+        /// </summary>
+        /// <returns></returns>
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
+            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = _state });
+            if (!result.Success)
+            {
+                //Log the results
+            }
+
         }
 
 

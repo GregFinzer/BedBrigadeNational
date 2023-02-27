@@ -2,11 +2,16 @@
 using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog.Core;
 using System.Data.Common;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static BedBrigade.Common.Common;
+
 namespace BedBrigade.Data.Services
 {
     public class UserDataService : IUserDataService
@@ -159,6 +164,108 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<Role>($"Found Role", true, result);
             }
             return new ServiceResponse<Role>("No Role found.");
+        }
+
+        public async Task<ServiceResponse<bool>> SaveGridPersistance(Persist persist)
+        {
+            var userName = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            if (userName != null)
+            {
+                var user = await _context.Users.FindAsync(userName);
+                if (user != null)
+                {
+                    // 1 = Recipient, 2 = Facility, 3 = Need 4 = Status, 5 = User
+                    switch ((PersistGrid)persist.GridId)
+                    {
+                        case PersistGrid.Configuration:
+                            user.PersistConfig = persist.UserState;
+                            break;
+                        case PersistGrid.User:
+                            user.PersistUser = persist.UserState;
+                            break;
+                        case PersistGrid.Location:
+                            user.PersistLocation = persist.UserState;
+                            break;
+                        case PersistGrid.Volunteer:
+                            user.PersistVolunteers = persist.UserState;
+                            break;
+                        case PersistGrid.Donation:
+                            user.PersistDonation = persist.UserState;
+                            break;
+                        case PersistGrid.Content:
+//                            user.PersistContent = persist.UserState;
+                            break;
+                        case PersistGrid.BedRequest:
+                            user.PersistBedRequest = persist.UserState;
+                            break;
+                        case PersistGrid.Media:
+                            user.PersistMedia = persist.UserState;
+                            break;
+                    }
+                    try
+                    {
+                        var result = _context.Users.Update(user);
+                        await _context.SaveChangesAsync();
+                        return new ServiceResponse<bool>($"Grid Persistance Saved for  {userName}");
+
+
+                    }
+                    catch (DbException ex)
+                    {
+                        return new ServiceResponse<bool>($"DB error on persist grid record with key {userName} - {ex.Message} ({ex.ErrorCode})");
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ServiceResponse<bool>($"Error on persist grid record with key {userName} - {ex.Message} ");
+
+                    }
+                }
+            }
+            return new ServiceResponse<bool>($"Unable to find user {userName}");
+        }
+
+        public async Task<ServiceResponse<string>> GetGridPersistance(Persist persist)
+        {
+            var userName = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier).Value;
+            if (userName != null)
+            {
+                var user = await _context.Users.FindAsync(userName);
+                if (user != null)
+                {
+                    var response = new ServiceResponse<string>($"Grid peristance found for user {userName}", true,string.Empty);
+                    // 1 = Recipient, 2 = Facility, 3 = Need 4 = Status, 5 = User
+                    switch ((PersistGrid)persist.GridId)
+                    {
+                        case PersistGrid.Configuration:
+                            response.Data = user.PersistConfig;
+                            break;
+                        case PersistGrid.User:
+                            response.Data = user.PersistUser;
+                            break;
+                        case PersistGrid.Location:
+                            response.Data = response.Data = user.PersistLocation;
+                            break;
+                        case PersistGrid.Volunteer:
+                            response.Data = user.PersistVolunteers;
+                            break;
+                        case PersistGrid.Donation:
+                            response.Data = user.PersistDonation;
+                            break;
+                        case PersistGrid.Content:
+                            //                            user.PersistContent = persist.UserState;
+                            break;
+                        case PersistGrid.BedRequest:
+                            response.Data = user.PersistBedRequest;
+                            break;
+                        case PersistGrid.Media:
+                            response.Data = user.PersistMedia;  
+                            break;
+                    }
+                    return response;
+
+                }
+            }
+            return new ServiceResponse<string>($"Unable to find user {userName}");
         }
     }
 }

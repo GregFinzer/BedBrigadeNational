@@ -38,6 +38,25 @@ public class User : BaseEntity
     [ForeignKey("Role")]
     public int FkRole { get; set; }
 
+    // Persist the state of the grid component 
+
+    [MaxLength(4000)]
+    public string PersistConfig { get; set; }
+    [MaxLength(4000)]
+    public string PersistDonation { get; set; }
+    [MaxLength(4000)]
+    public string PersistLocation { get; set; }
+    [MaxLength(4000)]
+    public string PersistPages { get; set; }
+    [MaxLength(4000)]
+    public string PersistUser { get; set; }
+    [MaxLength(4000)]
+    public string PersistVolunteers { get; set; }
+    [MaxLength(4000)]
+    public string PersistMedia { get; set;}
+    [MaxLength(4000)]
+    public string PersistBedRequest { get; set; }
+
 
     public string FullName
     {

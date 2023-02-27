@@ -8,6 +8,7 @@ using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Notifications.Internal;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
+using static BedBrigade.Common.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -150,23 +151,33 @@ namespace BedBrigade.Client.Components
             }
             return base.OnAfterRenderAsync(firstRender);
         }
+
         /// <summary>
         /// On loading of the Grid get the user grid persited data
         /// </summary>
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
-                await Grid.SetPersistData(_state);
+                await Grid.SetPersistData(result.Data);
             }
         }
 
+        /// <summary>
+        /// On destoring of the grid save its current state
+        /// </summary>
+        /// <returns></returns>
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Volunteer, UserState = _state });
+            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
+            if (!result.Success)
+            {
+                //Log the results
+            }
+
         }
 
 
