@@ -7,7 +7,7 @@ namespace BedBrigade.Client.Services
         Task<ServiceResponse<User>> CreateAsync(User user);
         Task<ServiceResponse<bool>> DeleteUserAsync(string userName);
         Task<ServiceResponse<List<User>>> GetAllAsync();
-        Task<ServiceResponse<string>> GetPersistAsync(Common.Common.PersistGrid User);
+        Task<ServiceResponse<string>> GetPersistAsync(Persist presist);
         Task<ServiceResponse<User>> GetUserAsync(string userName);
         Task<ServiceResponse<bool>> SavePersistAsync(Persist persist);
         Task<ServiceResponse<User>> UpdateAsync(User user);

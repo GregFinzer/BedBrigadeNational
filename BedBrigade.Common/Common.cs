@@ -21,7 +21,8 @@ namespace BedBrigade.Common
             Volunteer = 4,
             Donation = 5,
             Content = 6,
-            BedRequest = 7
+            BedRequest = 7,
+            Media = 8,
 
         }
 

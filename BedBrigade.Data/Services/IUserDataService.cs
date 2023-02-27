@@ -13,5 +13,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync();
         Task<ServiceResponse<List<Role>>> GetRolesAsync();
         Task<ServiceResponse<Role>> GetRoleAsync(int roleId);
+        Task<ServiceResponse<string>> GetGridPersistance(Persist grid);
+        Task<ServiceResponse<bool>> SaveGridPersistance(Persist grid);
     }
 }
