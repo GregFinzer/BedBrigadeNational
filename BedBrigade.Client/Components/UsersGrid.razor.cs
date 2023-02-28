@@ -8,6 +8,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -78,6 +79,34 @@ namespace BedBrigade.Client.Components
             }
 
             //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
+
+        }
+
+        /// <summary>
+        /// On loading of the Grid get the user grid persited data
+        /// </summary>
+        /// <returns></returns>
+        protected async Task OnLoad()
+        {
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = await Grid.GetPersistData() });
+            if (result.Success)
+            {
+                await Grid.SetPersistData(result.Data);
+            }
+        }
+
+        /// <summary>
+        /// On destoring of the grid save its current state
+        /// </summary>
+        /// <returns></returns>
+        protected async Task OnDestroyed()
+        {
+            _state = await Grid.GetPersistData();
+            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = _state });
+            if (!result.Success)
+            {
+                //Log the results
+            }
 
         }
 
@@ -173,6 +202,7 @@ namespace BedBrigade.Client.Components
             else
             {
                 // new 
+
                 userRegister.user = user;
                 userRegister.ConfirmPassword = userRegister.Password;
                 var registerResult = await _svcAuth.RegisterAsync(userRegister);
@@ -190,7 +220,7 @@ namespace BedBrigade.Client.Components
 
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-                args.Cancel = true;
+                //args.Cancel = true;
             }
             var userResult = await _svcUser.GetAllAsync();
             if (userResult.Success)
