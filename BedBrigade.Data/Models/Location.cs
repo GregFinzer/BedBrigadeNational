@@ -20,24 +20,24 @@ public class Location : BaseEntity
 	[MaxLength(128)]
 	public String? Address1 { get; set; } = string.Empty;
 
-        [MaxLength(128)]
+    [MaxLength(128)]
 	public String? Address2 { get; set; } = string.Empty;
 
-        [MaxLength(128)]
+    [MaxLength(128)]
 	public String? City { get; set; } = string.Empty;
 
-        [MaxLength(128)] 
-        public String? State { get; set; } = string.Empty;
+    [MaxLength(128)] 
+    public String? State { get; set; } = string.Empty;
 
 	[Required]
 	[MaxLength(10)]
 	public String PostalCode { get; set; } = string.Empty;
 
-        [Column(TypeName = "decimal(18,10)")]
-        public Decimal? Latitude { get; set; }
+    [Column(TypeName = "decimal(18,10)")]
+    public Decimal? Latitude { get; set; }
 
-        [Column(TypeName = "decimal(18,10)")]
-        public Decimal? Longitude { get; set; }
+    [Column(TypeName = "decimal(18,10)")]
+    public Decimal? Longitude { get; set; }
 
 
 	public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();

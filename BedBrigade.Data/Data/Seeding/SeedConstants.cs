@@ -5,6 +5,6 @@ namespace BedBrigade.Data.Data.Seeding
     {
         public const string SeedUserName = "Seed";
         public const string SeedLocationNational = "National";
-        public const string SeedLocationNationalName = "Bed Brigade Columbus";
+        //public const string SeedLocationNationalName = "Bed Brigade Columbus";
     }
 }
