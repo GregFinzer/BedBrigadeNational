@@ -33,7 +33,7 @@ public class Seed
 
     private static List<Location> locations = new()
     {
-        new Location {Name="Columbus", Route="/", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+        new Location {Name=SeedConstants.SeedLocationNational, Route="/", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
         new Location {Name="Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
         new Location {Name="Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
         new Location {Name="Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
@@ -253,6 +253,14 @@ public class Seed
                             FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                             PasswordHash = passwordHash,
                             PasswordSalt = passwordSalt,
+                            PersistBedRequest = String.Empty,
+                            PersistConfig = String.Empty,
+                            PersistDonation = string.Empty,
+                            PersistLocation = string.Empty,
+                            PersistMedia = string.Empty,
+                            PersistPages = string.Empty,
+                            PersistUser = string.Empty,
+                            PersistVolunteers = string.Empty
                         };
                         await context.Users.AddAsync(newUser);
                         await context.SaveChangesAsync();

@@ -19,7 +19,7 @@ namespace BedBrigade.Data.Data.Seeding
             var header = "Header";
             if (!await context.Content.AnyAsync(c => c.ContentType == header))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNationalName);
+                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("header.html");
                 Content content = new Content
                 {
@@ -47,7 +47,7 @@ namespace BedBrigade.Data.Data.Seeding
             var footer = "Footer";
             if (!await context.Content.AnyAsync(c => c.ContentType == footer))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNationalName);
+                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("footer.html");
                 context.Content.Add(new Content
                 {
