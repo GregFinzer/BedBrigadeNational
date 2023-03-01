@@ -8,6 +8,7 @@
 @using WrapMode = Syncfusion.Blazor.Grids.WrapMode
 @using SelectionType = Syncfusion.Blazor.Grids.SelectionType
 @using SelectionMode = Syncfusion.Blazor.Grids.SelectionMode
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using BedBrigade.Data.Models
 
 
@@ -33,7 +34,7 @@ else
                         AllowSorting="true"
                         AllowExcelExport="true"
                         ShowColumnMenu="true"
-                        AllowFiltering="false"
+                        AllowFiltering="true"
                         AllowReordering="true"
                         AllowResizing="true"
                         AllowSelection="true"
@@ -95,6 +96,7 @@ else
                                 }
                             </Template>
                         </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
                                 <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
@@ -106,7 +108,7 @@ else
                             <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" AutoFit="false" />
                             <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
-                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="Location" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
 
