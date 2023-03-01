@@ -11,10 +11,10 @@ namespace BedBrigade.Data.Models
         public Int32 LocationId { get; set; }
         //  public Location Location { get; set; } = new Location(); - creates false locations - commented temporary by VS 2/9/2023
 
-        [MaxLength(255)]
+        [MaxLength(260)]
         public String? FilePath { get; set; } = string.Empty; // renamed from Path by VS 2/9/2023
 
-        [MaxLength(30)]
+        [MaxLength(255)]
         public String? FileName { get; set; } = string.Empty;
         [MaxLength(0)]
         public String? FileStatus { get; set; } = string.Empty; // added by VS 2/9/2023
