@@ -279,7 +279,7 @@ namespace BedBrigade.Client.Components
                 }
                 else
                 {
-                    ToastContent = "Unable to update location!";
+                    ToastContent = "Unable to update Volunteer!";
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
@@ -292,7 +292,7 @@ namespace BedBrigade.Client.Components
                     Volunteer location = result.Data;
                 }
                 ToastTitle = "Create Volunteer";
-                if (Volunteer.VolunteerId == 0)
+                if (Volunteer.VolunteerId != 0)
                 {
                     ToastContent = "Volunteer Created Successfully!";
                 }
