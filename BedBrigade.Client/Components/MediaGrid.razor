@@ -1,0 +1,324 @@
+﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.DropDowns
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Data.Models
+@inject NavigationManager NavigationManager
+
+    @if (ErrorMessage.Length > 0)
+    {
+        <div class="alert alert-danger" role="alert" style="font-size: smaller;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;@ErrorMessage
+        </div>
+    }
+
+@if (MediaFiles == null)
+{
+    <span class="spinner-grow m-5"></span>
+    <span>Loading Media Files Catalog...</span>
+}
+else
+{
+    <fieldset class="m-4">        
+                <div class="row">
+                    <div class="col">
+                            <h3>Media Library Files</h3>
+                    </div>
+                    <div class="col" style="text-align:right; font-size: small">                          
+                    <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@CurrentUserRole&nbsp;
+                @if (UserLocationId > 0)
+                {
+                    <span>[Location: @UserLocationFolder]</span>
+                }
+                <br />@CurrentUserName
+            </div>
+                </div>        
+        <div class="col-md-12 control-sec">
+            <div class="content-wrapper">
+                <div class="row">
+                    <SfGrid @ref="Grid" TValue="Media" DataSource=@MediaFiles
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            Width="100%"
+                            AllowTextWrap="true">
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Media" />
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridEditSettings  Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                    @{
+                                        if (@editHeaderTitle.Contains("Upload"))
+                                        {
+                                            <div class="row">
+                                                        <div class="col">
+                                                               <h2>@editHeaderTitle</h2>
+                                                        </div>
+                                                        <div class="col" style="text-align:right">
+                                                        To Location Folder:
+                                                         </div>
+                                                         <div class="col">
+                                                            <SfDropDownList ID="ddlFileUploadTarget" TValue="string" Placeholder="- Media Folder -" TItem="string" Width="100%" @bind-Value="@DropFileFolder" DataSource="@FolderList">
+                                                                <DropDownListFieldSettings Value="FolderName"></DropDownListFieldSettings>
+                                                            </SfDropDownList>
+                                                         </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @editHeaderTitle
+                                        }
+                                    }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                @if (editHeaderTitle.Contains("Upload"))
+                                {
+                                    <SfButton OnClick="Cancel">Close</SfButton>
+                                }
+                                else
+                                {
+                                    <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Media)) IsPrimary="true" >@ButtonTitle</SfButton>                               
+                                    <SfButton OnClick="Cancel" >Cancel</SfButton>
+                                }
+                            </FooterTemplate>
+                            <Template>
+                                    @{
+                                        if (editHeaderTitle.Contains("Upload"))
+                                        {
+                                            <div class="col-lg-12 control-section">
+                                               
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                        <SfTab CssClass=@("default-tab e-fill")>
+                                                                <TabItems>
+                                                                    <TabItem>
+                                                                        <ChildContent>
+                                                                            <TabHeader Text="Images & Documents"></TabHeader>
+                                                                        </ChildContent>
+                                                                        <ContentTemplate>
+                                                                        <div class="card">
+                                                                            <div class="card-body"  style="height: 300px">
+                                                                                <SfUploader ID="UploadFiles" AutoUpload="true" SequentialUpload="true" AllowedExtensions="@FileTypes" MaxFileSize="@FileSizeLimit" AllowMultiple="true" style="height: 100px">
+                                                                                    <UploaderEvents ValueChange="OnUploadFileChange"></UploaderEvents>
+                                                                                </SfUploader>
+                                                                            </div>                                                                           
+                                                                             <div class="card-footer" >Upload Image & Document files (<b>@FileTypes</b>) with file upload size limit <b>@FormatFileSize(FileSizeLimit)</b></div>
+                                                                        </div>
+                                                                        </ContentTemplate>
+                                                                    </TabItem>
+                                                                    <TabItem>
+                                                                        <ChildContent>
+                                                                            <TabHeader Text="Video"></TabHeader>
+                                                                        </ChildContent>
+                                                                        <ContentTemplate>
+                                                                        <div class="card">                                                                          
+                                                                            <div class="card-body"  style="height: 300px" >
+                                                                                <SfUploader ID="UploadVideo" AutoUpload="true" AllowedExtensions="@VideoFileTypes" MaxFileSize="@VideoSizeLimit" AllowMultiple="true" style="height: 100px">
+                                                                                    <UploaderEvents ValueChange="OnUploadVideoChange"></UploaderEvents>
+                                                                                </SfUploader>
+                                                                            </div>
+                                                                            <div class="card-footer" >Upload Video Files (<b>@VideoFileTypes</b>) with file upload size limit <b>@FormatFileSize(VideoSizeLimit)</b></div>
+                                                                        </div>
+                                                                        </ContentTemplate>
+                                                                    </TabItem>                                                                  
+                                                                </TabItems>
+                                                            </SfTab>
+                                                        </div>
+                                                    </div>                                                   
+                                                
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            Media EditFile = (context as Media)!;
+                                            string myMarkup = EditFile.FilePath + "/" + EditFile.FileName + "." + EditFile.MediaType;
+
+                                            <div class="container">
+                                                <div class="row">
+                                                    <span style="font-size: larger; font-weight: bold">@((MarkupString)myMarkup)</span>
+                                                </div>
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <SfTextBox ID="name" @bind-Value=@EditFile.FileName Enabled="true" Placeholder="New File Name" FloatLabelType="FloatLabelType.Auto" />
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <SfTextBox @bind-Value=@EditFile.AltText Enabled="true" Placeholder="Alt Text" FloatLabelType="FloatLabelType.Auto" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }                                    
+                            </Template>
+                        </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="MediaId" Direction="SortDirection.Descending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridTextWrapSettings WrapMode="Syncfusion.Blazor.Grids.WrapMode.Content"></GridTextWrapSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Media.MediaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" HeaderText="Media Id" />
+                            <GridColumn Field=@nameof(Media.MediaId) ShowColumnMenu="false" HeaderText="Id" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" Width="15"  />
+                                <GridColumn Field=@nameof(Media.LocationId) ShowColumnMenu="false" HeaderText="Location Id" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" Width="20" >
+                                <Template>
+                                        @{
+                                            var myFile = (context as Media);
+                                            if (myFile.LocationId > 0)
+                                            {
+                                                <span>@myFile.LocationId</span>
+                                            }
+                                            else
+                                            {
+                                                <span title="File not linked to Bed Brigade Location"><i class="fa fa-question-circle" aria-hidden="true" style="color: red"></i></span>
+                                            }
+                                            
+                                        }
+                                </Template>
+                            </GridColumn>
+                                <GridColumn Field=@nameof(Media.FilePath) ShowColumnMenu="false" HeaderText="File Path" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="30" />
+                            <GridColumn Field=@nameof(Media.FileName) ShowColumnMenu="false" HeaderText="File Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="30" >
+                                <HeaderTemplate>
+                                        <span title="Editable"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;&nbsp;File Name</span>
+                                </HeaderTemplate>
+                                <Template>
+                                        @{
+                                            var myFile = (context as Media);
+                                            @if(IsFileExists(myFile))
+                                            {
+                                                var FileUrl = "/" + myFile.FilePath + "/" + myFile.FileName + "." + myFile.MediaType;
+                                                <a href="@FileUrl" target="_blank" title="Click to view in new browser tab" >@myFile.FileName</a>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: red; text-decoration: line-through; " title="File not found on server">
+                                                    <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: red"></i>
+                                                    @myFile.FileName
+                                                </span>
+                                            }
+                                        }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field=@nameof(Media.MediaType) ShowColumnMenu="false" HeaderText="File Type" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="30"  >
+                                <Template>
+                                    @{
+                                        var myFile = (context as Media);
+                                        string[] imgTypes = { "png", "jpg", "webp" };
+                                        if (imgTypes.Contains(myFile.MediaType.ToLower()))
+                                        {
+                                            <span>Image (@myFile.MediaType.ToLower())</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@myFile.MediaType</span>
+                                        }
+                                    }
+                                </Template>
+                                </GridColumn>
+                            <GridColumn Field=@nameof(Media.AltText) ShowColumnMenu="false" HeaderText="Alt Text" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="80" >
+                                    <HeaderTemplate>
+                                        <span title="Editable"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;&nbsp;Alt Text</span>
+                                    </HeaderTemplate>
+                             </GridColumn>
+                            <GridColumn Field=@nameof(Media.FileSize) ShowColumnMenu="false" HeaderText="Size" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" Width="15" >
+                                <Template>
+                                        @{
+                                            var myFile=(context as Media);
+                                            var stringSize = FormatFileSize(myFile.FileSize);
+                                            <span>@stringSize</span>
+                                        }                                       
+                                </Template>
+                              </GridColumn>
+                            <GridColumn Field=@nameof(Media.UpdateDate) ShowColumnMenu="false" HeaderText="Date Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="30" Format="MM/dd/yy HH:mm" />
+                             
+                            <GridColumn Field=@nameof(Media.UpdateUser) ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="30" />
+                         </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+}
+
+
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#LocationTarget">
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>
+
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+<style>
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+    .e-toast-container {
+        margin-top: 450px;
+    }
+
+        .e-toast-container .e-toast {
+            border: 1px solid black;
+            border-radius: 25px;
+        }
+            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-title {
+                color: deepskyblue;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+            }
+            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: lightskyblue;
+                padding: 5px;
+                width: 100%;
+                height: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+</style>
+
+

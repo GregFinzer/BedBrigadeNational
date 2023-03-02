@@ -16,7 +16,7 @@ namespace BedBrigade.Data.Models
 
         [MaxLength(255)]
         public String? FileName { get; set; } = string.Empty;
-        [MaxLength(0)]
+        [MaxLength(30)]
         public String? FileStatus { get; set; } = string.Empty; // added by VS 2/9/2023
 
         [MaxLength(30)]

@@ -56,6 +56,7 @@ public class MediaDataService : IMediaDataService
     public async Task<ServiceResponse<Media>> UpdateAsync(Media media) // update Media record (object)
     {
         var result = await Task.Run(() =>_context.Media.Update(media));
+        await _context.SaveChangesAsync();
         if (result != null)
         {
             return new ServiceResponse<Media>($"Updated Media with ID = {media.MediaId}", true);
