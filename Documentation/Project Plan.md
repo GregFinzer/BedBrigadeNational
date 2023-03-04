@@ -29,13 +29,13 @@ One thing you will notice about the following project plan is the lack of due da
     * Home Page Header :heavy_check_mark:
     * Image Rotator
     * Home Page Middle
-    * Home Page Footer
+    * Home Page Footer :heavy_check_mark:
     
 * Basic Administration
-    * Login
+    * Login :heavy_check_mark:
     * Logout :heavy_check_mark:
-    * Administration Dashboard
-    * Edit Configuration
+    * Administration Dashboard :heavy_check_mark:
+    * Edit Configuration :heavy_check_mark:
     * Edit Home Page
     * Edit Header
     * Edit Footer
@@ -69,21 +69,21 @@ One thing you will notice about the following project plan is the lack of due da
     * Grove City Partners    
     
 * Manage Locations
-    * Manage Locations Page
-    * Edit Location
-    * Add Location
+    * Manage Locations Page :heavy_check_mark:
+    * Edit Location :heavy_check_mark:
+    * Add Location :heavy_check_mark:
     * Deactivate/Activate Location
     
 * Location Request Bed
     * Request Bed Page
-    * Manage Bed Requests
+    * Manage Bed Requests :heavy_check_mark:
     * Schedule Deliveries
     * Delivery Checklist
     * Bulk Email Scheduled Deliveries
     
 * Location Volunteer    
     * Volunteer Page
-    * Manage Volunteers
+    * Manage Volunteers :heavy_check_mark:
     * Bulk Email Volunteers
     
 * Location Contact Us
@@ -93,14 +93,14 @@ One thing you will notice about the following project plan is the lack of due da
 * Location Donations
     * Grove City Donate
     * Polaris Donate
-    * Manage Donations
+    * Manage Donations :heavy_check_mark:
     * Email Tax Forms
     
 * Manage Users
-    * User List
-    * Add User
-    * Edit User
-    * Delete User
+    * User List :heavy_check_mark:
+    * Add User :heavy_check_mark:
+    * Edit User :heavy_check_mark:
+    * Delete User :heavy_check_mark:
     
 * National News
     * National News Sample Story
