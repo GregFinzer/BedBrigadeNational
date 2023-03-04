@@ -142,7 +142,14 @@ else
                                 </Template>
                             </GridColumn>
                             <GridForeignColumn Field=@nameof(BedRequest.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(BedRequest.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
+                                <Template>
+                                    @{
+                                        var request = (context as BedRequest);
+                                        @request.Phone.FormatPhoneNumber();
+                                    }
+                                </Template>
+                            </GridColumn>
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Bed Requests" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(BedRequest.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
                                 <Template>
