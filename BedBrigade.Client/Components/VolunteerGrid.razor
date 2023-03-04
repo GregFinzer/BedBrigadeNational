@@ -132,7 +132,14 @@ else
                             <GridForeignColumn Field=@nameof(Volunteer.VolunteeringForId) ForeignDataSource=@VolunteersFor ForeignKeyField="VolunteerForId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers For" Type="ColumnType.String" AutoFit="true" AllowEditing="false" AllowFiltering="false" Width="110" />
                             <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"  />
                             <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" >
+                                                                <Template>
+                                    @{
+                                        var request = (context as Volunteer);
+                                        @request.Phone.FormatPhoneNumber();
+                                    }
+                                </Template>
+                            </GridColumn>
                             <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers At" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn HeaderText="Vehicle" HeaderTextAlign="TextAlign.Center" AutoFit="true" >
