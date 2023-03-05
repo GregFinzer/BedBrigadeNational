@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components
             HeaderTitle = "Update User";
             ButtonTitle = "Update User";
             AddUser = false;
-            if (Identity.IsInRole("Admin"))
+            if (Identity.IsInRole("National Admin"))
             {
                 UserPass = true;
             }
