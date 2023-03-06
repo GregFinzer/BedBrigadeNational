@@ -185,8 +185,10 @@ namespace BedBrigade.Client.Components
             user.Role = await GetUserRoleName(user);
             if (user.PasswordHash != null)
             {
-                //user.LocationId = await GetUserLocation(user);
-                //Update User
+                if(string.IsNullOrEmpty(userRegister.Password))
+                {
+
+                }
                 var userUpdate = await _svcUser.UpdateAsync(user);
                 ToastTitle = "Update User";
                 if (userUpdate.Success)

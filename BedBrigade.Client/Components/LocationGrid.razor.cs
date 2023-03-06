@@ -92,7 +92,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistData() });
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistDataAsync() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
