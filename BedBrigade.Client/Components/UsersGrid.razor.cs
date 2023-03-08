@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components
             HeaderTitle = "Update User";
             ButtonTitle = "Update User";
             AddUser = false;
-            if (Identity.IsInRole("National Admin"))
+            if (Identity.HasRole("National Admin, Location Admin"))
             {
                 UserPass = true;
             }
@@ -185,43 +185,13 @@ namespace BedBrigade.Client.Components
             user.Role = await GetUserRoleName(user);
             if (user.PasswordHash != null)
             {
-                if(string.IsNullOrEmpty(userRegister.Password))
-                {
-
-                }
-                var userUpdate = await _svcUser.UpdateAsync(user);
-                ToastTitle = "Update User";
-                if (userUpdate.Success)
-                {
-                    ToastContent = "User Updated Successfully!";
-                }
-                else
-                {   
-                    ToastContent = "Unable to update User!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                await UpdateUser(user);
             }
             else
             {
                 // new 
 
-                userRegister.user = user;
-                userRegister.ConfirmPassword = userRegister.Password;
-                var registerResult = await _svcAuth.RegisterAsync(userRegister);
-                ToastTitle = "Create User";
-                if (registerResult.Success)
-                {
-                    ToastContent = "User Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = $"Unable to create User!<br/>Correct the following errors:<br/>";
-                    ToastContent += registerResult.Message + "<br/>";
-                    ToastTimeout = 20000;
-                    ToastWidth = "400";
-
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                await AddNewUser(user);
                 //args.Cancel = true;
             }
             var userResult = await _svcUser.GetAllAsync();
@@ -231,6 +201,57 @@ namespace BedBrigade.Client.Components
             }
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
+        }
+
+        private async Task AddNewUser(User user)
+        {
+            userRegister.user = user;
+            userRegister.ConfirmPassword = userRegister.Password;
+            var registerResult = await _svcAuth.RegisterAsync(userRegister);
+            ToastTitle = "Create User";
+            if (registerResult.Success)
+            {
+                ToastContent = "User Created Successfully!";
+            }
+            else
+            {
+                ToastContent = $"Unable to create User!<br/>Correct the following errors:<br/>";
+                ToastContent += registerResult.Message + "<br/>";
+                ToastTimeout = 20000;
+                ToastWidth = "400";
+
+            }
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+        }
+
+        private async Task UpdateUser(User user)
+        {
+            if (string.IsNullOrEmpty(userRegister.Password))
+            {
+
+            }
+            var userUpdate = await _svcUser.UpdateAsync(user);
+            ToastTitle = "Update User";
+            string passwordChanged = string.Empty;
+            if (userUpdate.Success)
+            {
+                if (!string.IsNullOrEmpty(userRegister.Password))
+                {
+                    userRegister.user = user;
+                    var result = await _svcAuth.UpdateAsync(userRegister);
+                    if (result.Success)
+                    {
+                        passwordChanged = "and password updated ";
+                    }
+                }
+                ToastContent = $"User Updated {passwordChanged}Successfully!";
+
+            }
+            else
+            {
+                ToastContent = "Unable to update User!";
+            }
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
         private async Task<Location> GetUserLocation(User user)

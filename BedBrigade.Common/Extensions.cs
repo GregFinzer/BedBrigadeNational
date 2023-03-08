@@ -60,7 +60,7 @@ namespace BedBrigade.Common
             var roleArray = roles.Split(',');
             foreach (var role in roleArray)
             {
-                if (identity.HasRole(role.Trim()))
+                if (identity.IsInRole(role.Trim()))
                 {
                     return true;
                 }
