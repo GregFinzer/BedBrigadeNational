@@ -268,7 +268,6 @@ namespace BedBrigade.Data.Services
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-
                 var userName = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier).Value;
                 if (userName != null)
                 {
@@ -305,11 +304,9 @@ namespace BedBrigade.Data.Services
                                 break;
                         }
                         return response;
-
                     }
                 }
                 return new ServiceResponse<string>($"Unable to find user {userName}");
-
             }
         }
     }
