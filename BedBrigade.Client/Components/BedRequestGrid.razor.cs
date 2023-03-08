@@ -48,7 +48,7 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
-        public List<EnumItem> BedRequestStatuses { get; private set; }
+        public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 

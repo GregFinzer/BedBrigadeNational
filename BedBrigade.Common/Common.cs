@@ -4,9 +4,16 @@ using static BedBrigade.Common.Common;
 namespace BedBrigade.Common
 {
 
-    public class EnumItem
+    public class BedRequestEnumItem
     {
         public BedRequestStatus Value { get; set; }
+        public string? Name { get; set; }
+
+    }
+
+    public class ConfigSectionEnumItem
+    {
+        public ConfigSection Value { get; set; }
         public string? Name { get; set; }
 
     }
@@ -33,6 +40,22 @@ namespace BedBrigade.Common
            Delivered = 3,
         }
 
+        /// <summary>
+        /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
+        /// </summary>
+        /// <returns>List<EnumItem></EnumItem></returns>
+        public static List<BedRequestEnumItem> GetBedRequestStatusItems() 
+        {
+            var type = typeof(BedRequestStatus);
+            return Enum.GetValues(type).OfType<BedRequestStatus>().ToList()
+                            .Select(x => new BedRequestEnumItem
+                            { 
+                                Value = (BedRequestStatus) x,
+                                Name = Enum.GetName(type, x) 
+                            })
+                            .ToList();
+        }
+
         public enum ConfigSection
         {
             System = 1,
@@ -40,18 +63,19 @@ namespace BedBrigade.Common
             Email = 3
         }
 
+
         /// <summary>
-        /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
+        /// Get a list of Enum Items suitable for a dropdown list from the ConfigSection enum.
         /// </summary>
         /// <returns>List<EnumItem></EnumItem></returns>
-        public static List<EnumItem> GetBedRequestStatusItems() 
+        public static List<ConfigSectionEnumItem> GetConfigSectionItems()
         {
-            var type = typeof(BedRequestStatus);
-            return Enum.GetValues(type).OfType<BedRequestStatus>().ToList()
-                            .Select(x => new EnumItem
-                            { 
-                                Value = (BedRequestStatus)x,
-                                Name = Enum.GetName(type, x) 
+            var type = typeof(ConfigSection);
+            return Enum.GetValues(type).OfType<ConfigSection>().ToList()
+                            .Select(x => new ConfigSectionEnumItem
+                            {
+                                Value = (ConfigSection) x,
+                                Name = Enum.GetName(type, x)
                             })
                             .ToList();
         }

@@ -39,6 +39,7 @@ namespace BedBrigade.Client.Components
         protected bool AddKey { get; set; } = false;
         protected string? RecordText { get; set; } = "Loading Configuration ...";
         protected string? Hide { get; private set; } = "true";
+        public List<ConfigSectionEnumItem> ConfigSectionEnumItems { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -67,6 +68,8 @@ namespace BedBrigade.Client.Components
             {
                 ConfigRecs = result.Data.ToList();
             }
+
+            ConfigSectionEnumItems = GetConfigSectionItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
