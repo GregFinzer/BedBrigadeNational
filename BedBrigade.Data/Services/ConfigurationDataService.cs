@@ -39,7 +39,7 @@ public class ConfigurationDataService : IConfigurationDataService
     /// </summary>
     /// <param name="section"></param>
     /// <returns>List of configuration records from a given section </returns>
-    public async Task<ServiceResponse<List<Configuration>>> GetAsyncAll(ConfigSection section)
+    public async Task<ServiceResponse<List<Configuration>>> GetAllAsync(ConfigSection section)
     {
         var result = await _context.Configurations.Where(c => c.Section == section).ToListAsync();
         if (result != null)
@@ -107,10 +107,6 @@ public async Task<ServiceResponse<bool>> DeleteAsync(string configurationkey)
 
     }
 
-    public Task<ServiceResponse<Configuration>> GetAsync(Common.Common.ConfigSection cection)
-    {
-        throw new NotImplementedException();
-    }
 }
 
 
