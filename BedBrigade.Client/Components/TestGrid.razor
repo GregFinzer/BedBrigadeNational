@@ -124,12 +124,12 @@ else
 
     protected async Task Save(User user)
     {
-        EmpGrid.EndEdit();
+        await EmpGrid.EndEditAsync();
     }
 
     protected async Task Cancel()
     {
-        EmpGrid.CloseEdit();
+        EmpGrid.CloseEditAsync();
     }
 
 }
