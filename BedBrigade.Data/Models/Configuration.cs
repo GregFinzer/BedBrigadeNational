@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.PortableExecutable;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -11,6 +13,13 @@ namespace BedBrigade.Data.Models
 
         [MaxLength(255), Required] 
         public String? ConfigurationValue { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Defines the section that configuration value belongs to. Defaulted to overall system.
+        /// The enum is defined in BedBrigade.Common
+        /// </summary>
+        [Required]
+        public ConfigSection Section { get; set; } = ConfigSection.System;
 
 
 	}

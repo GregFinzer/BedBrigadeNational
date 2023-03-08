@@ -5,6 +5,8 @@
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Data.Models
+@using BedBrigade.Common
+@using static BedBrigade.Common.Common;
 
 @if (ConfigRecs == null)
 {
@@ -53,12 +55,18 @@ else
                             <Template>
                                 @{
                                     Configuration configRec = (context as Configuration)!;
-
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="Configuration Section" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                                            </SfDropDownList>
+                                        </div>
+                                        <div class="col-md-6">
                                             <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
-                                        <div class="form-group col-md-8">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
                                             <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
@@ -68,12 +76,22 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="ConfigurationKey" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="Section" Direction="SortDirection.Descending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false" />
                             <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                            <GridColumn Field=@nameof(Configuration.Section) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" >
+                                <Template>
+                                    @{
+                                        var request = (context as Configuration);
+                                        var sectionConfig = Enum.GetName(typeof(Common.ConfigSection), request.Section);
+                                        @sectionConfig
+                                    }
+                                </Template>
+                            </GridColumn>
+                                
                         </GridColumns>
                     </SfGrid>
 

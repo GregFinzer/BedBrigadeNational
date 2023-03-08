@@ -111,7 +111,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = await Grid.GetPersistData() });
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = await Grid.GetPersistDataAsync() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -240,7 +240,7 @@ namespace BedBrigade.Client.Components
         {
             foreach(var recipient in LB_Send.GetDataList() )
             {
-                _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
+                await _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
             }
             await CloseTaxDialog();
         }
