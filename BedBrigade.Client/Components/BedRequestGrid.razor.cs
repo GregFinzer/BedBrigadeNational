@@ -61,7 +61,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin") || Identity.IsInRole("Location Scheduler"))
+            if (Identity.HasRole("National Admin, Location Admin, Location Scheduler"))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };

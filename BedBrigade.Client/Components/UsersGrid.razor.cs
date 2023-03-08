@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components
             HeaderTitle = "Update User";
             ButtonTitle = "Update User";
             AddUser = false;
-            if (Identity.IsInRole("National Admin"))
+            if (Identity.HasRole("National Admin, Location Admin"))
             {
                 UserPass = true;
             }
@@ -189,9 +189,20 @@ namespace BedBrigade.Client.Components
                 //Update User
                 var userUpdate = await _svcUser.UpdateAsync(user);
                 ToastTitle = "Update User";
+                string passwordChanged = string.Empty;
                 if (userUpdate.Success)
                 {
-                    ToastContent = "User Updated Successfully!";
+                    if(!string.IsNullOrEmpty(userRegister.Password))
+                    {
+                        userRegister.user = user;
+                        var result = await _svcAuth.UpdateAsync(userRegister);
+                        if(result.Success)
+                        {
+                            passwordChanged = "and password updated ";
+                        }
+                    }
+                    ToastContent = $"User Updated {passwordChanged}Successfully!";
+                    
                 }
                 else
                 {   

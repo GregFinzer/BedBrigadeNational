@@ -34,5 +34,10 @@ namespace BedBrigade.Client.Services
         {
                 return await _data.Register(request.user, request.Password);
         }
+
+        public async Task<ServiceResponse<bool>> UpdateAsync(UserRegister request)
+        {
+            return await _data.Update(request);
+        }
     }
 }

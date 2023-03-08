@@ -8,5 +8,6 @@ namespace BedBrigade.Client.Services
         Task<bool> IsUserAuthenticated();
         Task<ServiceResponse<string>> Login(UserLogin request);
         Task<ServiceResponse<bool>> RegisterAsync(UserRegister request);
+        Task<ServiceResponse<bool>> UpdateAsync(UserRegister request);
     }
 }
