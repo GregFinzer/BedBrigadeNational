@@ -33,6 +33,13 @@ namespace BedBrigade.Common
            Delivered = 3,
         }
 
+        public enum ConfigSection
+        {
+            System = 1,
+            Media = 2,
+            Email = 3
+        }
+
         /// <summary>
         /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
         /// </summary>
