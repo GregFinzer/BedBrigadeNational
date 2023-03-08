@@ -2,6 +2,7 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Json;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Services
 {
@@ -33,6 +34,10 @@ namespace BedBrigade.Client.Services
         public async Task<ServiceResponse<List<Configuration>>> GetAllAsync()
         {
             return await _data.GetAllAsync();
+        }
+        public async Task<ServiceResponse<List<Configuration>>> GetAllAsync(ConfigSection section)
+        {
+            return await _data.GetAllAsync(section);
         }
     }
 }

@@ -106,7 +106,7 @@ else
                                         </div>
 
                                         <div class="col-md-6" >
-                                            <SfDropDownList TItem="EnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@BedRequest.Status Enabled="true" Placeholder="Status" FloatLabelType="FloatLabelType.Auto" >
+                                            <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@BedRequest.Status Enabled="true" Placeholder="Status" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                             </SfDropDownList>
                                         </div>
