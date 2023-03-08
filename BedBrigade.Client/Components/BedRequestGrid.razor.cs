@@ -48,7 +48,7 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
-        public List<EnumItem> BedRequestStatuses { get; private set; }
+        public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -116,7 +116,7 @@ namespace BedBrigade.Client.Components
             var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int) PersistGrid.BedRequest, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
-                await Grid.SetPersistData(result.Data);
+                await Grid.SetPersistDataAsync(result.Data);
             }
         }
 
@@ -315,8 +315,10 @@ namespace BedBrigade.Client.Components
                 FileName = "BedRequest " + DateTime.Now.ToShortDateString() + ".csv",
 
             };
-
-            await Grid.CsvExport(ExportProperties);
+            if (Grid != null)
+            {
+                await Grid.CsvExport(ExportProperties);
+            }
         }
 
 

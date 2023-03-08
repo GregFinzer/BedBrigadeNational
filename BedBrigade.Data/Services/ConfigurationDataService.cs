@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Services;
 
@@ -33,7 +34,22 @@ public class ConfigurationDataService : IConfigurationDataService
         return new ServiceResponse<List<Configuration>>("None found.");
     }
 
-    public async Task<ServiceResponse<bool>> DeleteAsync(string configurationkey)
+    /// <summary>
+    /// Get all the configuration record within a given section, e.g. System, Email, Media
+    /// </summary>
+    /// <param name="section"></param>
+    /// <returns>List of configuration records from a given section </returns>
+    public async Task<ServiceResponse<List<Configuration>>> GetAllAsync(ConfigSection section)
+    {
+        var result = await _context.Configurations.Where(c => c.Section == section).ToListAsync();
+        if (result != null)
+        { 
+            return new ServiceResponse<List<Configuration>>("Found Record", true, result);
+        }
+        return new ServiceResponse<List<Configuration>>("Not Found");
+    }
+
+public async Task<ServiceResponse<bool>> DeleteAsync(string configurationkey)
     {
         var config = await _context.Configurations.FindAsync(configurationkey);
         if (config == null)
@@ -90,7 +106,6 @@ public class ConfigurationDataService : IConfigurationDataService
         }
 
     }
-
 
 }
 

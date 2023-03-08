@@ -93,7 +93,7 @@ namespace BedBrigade.Client.Components
         private async Task LoadUserData()
         {
             // User Identity
-            var authState = await _authState.GetAuthenticationStateAsync();
+            var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
 
             if(Identity != null){
@@ -119,7 +119,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadLocations()
         {
-            var dataLocations = await _svcLocation.GetAllAsync(); 
+            var dataLocations = await _svcLocation!.GetAllAsync(); 
 
             if (dataLocations.Success) // 
             {
@@ -141,9 +141,9 @@ namespace BedBrigade.Client.Components
 
                     if (dataMedia.Success)
                     {
-                        if (dataMedia.Data.Count > 0)
+                        if (dataMedia!.Data.Count > 0)
                         {
-                            dbMedia = dataMedia.Data; // retrieve existing media records to temp list
+                            dbMedia = dataMedia!.Data; // retrieve existing media records to temp list
                         }
                         else
                         {
@@ -182,7 +182,7 @@ namespace BedBrigade.Client.Components
                 FileStatus = "seed"
             };
 
-            var newMedia = await _svcMedia.CreateAsync(initMedia);
+            var newMedia = await _svcMedia!.CreateAsync(initMedia);
             if (newMedia.Success)
             {
                 var dataMedia = await _svcMedia.GetAllAsync(); // get Media
@@ -242,7 +242,7 @@ namespace BedBrigade.Client.Components
            // var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
           //  if (result.Success)
            // {
-           //     await Grid.SetPersistData(_state);
+           //     await Grid.SetPersistDataAsync(_state);
            // }
         }
 
