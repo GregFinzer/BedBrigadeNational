@@ -101,49 +101,61 @@ public class Seed
                 {
                     ConfigurationKey = "FromEmailAddress",
                     ConfigurationValue = "webmaster@bedbrigade.org",
+                    Section = ConfigSection.Email
                 },
                 new()
                 {
                     ConfigurationKey = "HostName",
                     ConfigurationValue = "mail.bedbrigade.org",
+                    Section = ConfigSection.Email
                 },
                 new()
-                {ConfigurationKey = "Port",
-                ConfigurationValue = "8889"},
+                {
+                    ConfigurationKey = "Port",
+                    ConfigurationValue = "8889",
+                    Section = ConfigSection.Email
+                },
                 new()
                 {
                     ConfigurationKey = "TokenExpiration",
-                    ConfigurationValue = "24"
+                    ConfigurationValue = "24",
+                    Section = ConfigSection.System
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "AllowedFileExtensions",
-                    ConfigurationValue = ".jpg, .png, .pdf, .webp"
+                    ConfigurationValue = ".jpg, .png, .pdf, .webp",
+                    Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "AllowedVideoExtensions",
-                    ConfigurationValue = ".mp4"
+                    ConfigurationValue = ".mp4",
+                    Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "MediaFolder",
-                    ConfigurationValue = "media"
+                    ConfigurationValue = "media",
+                    Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "MainMediaSubFolder",
-                    ConfigurationValue = "national"
+                    ConfigurationValue = "national",
+                    Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "MaxFileSize",
-                    ConfigurationValue = "104857600"
+                    ConfigurationValue = "104857600",
+                    Section = ConfigSection.Media    
                 },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = "MaxVideoSize",
-                    ConfigurationValue = "262144000"
+                    ConfigurationValue = "262144000",
+                    Section = ConfigSection.Media
                 }
             };
 
