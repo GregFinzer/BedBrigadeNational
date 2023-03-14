@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using BedBrigade.Client.Pages.Administration.Manage;
 using System.Linq.Expressions;
 using System.Drawing.Imaging;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -104,7 +105,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadConfigurations()
         {
-            var dataConfiguration = await _svcConfiguration.GetAllAsync(); // Configuration ============================
+            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.Media); // Configuration ============================
             if (dataConfiguration.Success && dataConfiguration != null)
             {
               dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
