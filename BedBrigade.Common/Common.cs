@@ -18,6 +18,14 @@ namespace BedBrigade.Common
 
     }
 
+    public class FileUseEnumItem
+    {
+        public FileUse Value { get; set; }
+        public string? Name { get; set; }
+
+    }
+
+
     public static class Common
     {
         public enum PersistGrid
@@ -44,17 +52,44 @@ namespace BedBrigade.Common
         /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
         /// </summary>
         /// <returns>List<EnumItem></EnumItem></returns>
-        public static List<BedRequestEnumItem> GetBedRequestStatusItems() 
+        public static List<BedRequestEnumItem> GetBedRequestStatusItems()
         {
             var type = typeof(BedRequestStatus);
             return Enum.GetValues(type).OfType<BedRequestStatus>().ToList()
                             .Select(x => new BedRequestEnumItem
-                            { 
-                                Value = (BedRequestStatus) x,
-                                Name = Enum.GetName(type, x) 
+                            {
+                                Value = (BedRequestStatus)x,
+                                Name = Enum.GetName(type, x)
                             })
                             .ToList();
         }
+
+        public enum FileUse
+        {
+            Logo = 1, // an image used as a logo
+            Image = 2, // an image used as an image
+            Download = 3, // a downloadable file (pdf,csv,etc)
+            Text = 4, // a text file
+            Html = 5, // Raw Html
+            Icon = 6
+        }
+
+        /// <summary>
+        /// Get a list of Enum Items suitable for a dropdown list from the ConfigSection enum.
+        /// </summary>
+        /// <returns>List<EnumItem></EnumItem></returns>
+        public static List<FileUseEnumItem> GetFileUseItems()
+        {
+            var type = typeof(FileUse);
+            return Enum.GetValues(type).OfType<FileUse>().ToList()
+                            .Select(x => new FileUseEnumItem
+                            {
+                                Value = (FileUse)x,
+                                Name = Enum.GetName(type, x)
+                            })
+                            .ToList();
+        }
+
 
         public enum ConfigSection
         {
