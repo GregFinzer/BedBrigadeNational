@@ -109,9 +109,14 @@ namespace BedBrigade.Client
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapControllers();
 
-            app.MapBlazorHub();
-            app.MapFallbackToPage("/_Host");
+            });
+
             return app;
         }
 
