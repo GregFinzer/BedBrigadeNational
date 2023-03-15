@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
+    <Content Remove="wwwroot\Media\arizona\Phoenix\arizonastateseal.webp" />
+    <Content Remove="wwwroot\Media\arizona\Prescott Valley\arizonastateseal.webp" />
+    <Content Remove="wwwroot\Media\arizona\Prescott\arizonastateseal.webp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +23,9 @@
     <None Include="wwwroot\css\open-iconic\README.md" />
     <None Include="wwwroot\Media\arizona\arizonastateseal.webp" />
     <None Include="wwwroot\Media\arizona\DNCMag49.pdf" />
+    <None Include="wwwroot\Media\arizona\Phoenix\arizonastateseal.webp" />
+    <None Include="wwwroot\Media\arizona\Prescott Valley\arizonastateseal.webp" />
+    <None Include="wwwroot\Media\arizona\Prescott\arizonastateseal.webp" />
     <None Include="wwwroot\Media\national\CODEFocus.pdf" />
     <None Include="wwwroot\Media\ohio\CODE2023_1.pdf" />
     <None Include="wwwroot\scripts\cookie.js" />
@@ -46,6 +52,16 @@
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
     <ProjectReference Include="..\BedBrigade.Data\BedBrigade.Data.csproj" />
     <ProjectReference Include="..\BedBrigade.MessageService\BedBrigade.MessageService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Media\ohio\Arlington\" />
+    <Folder Include="wwwroot\Media\ohio\canton\" />
+    <Folder Include="wwwroot\Media\ohio\Circleville\" />
+    <Folder Include="wwwroot\Media\ohio\lancaster\" />
+    <Folder Include="wwwroot\Media\ohio\linden\" />
+    <Folder Include="wwwroot\Media\ohio\newark\" />
+    <Folder Include="wwwroot\Media\ohio\rock\" />
   </ItemGroup>
 
 

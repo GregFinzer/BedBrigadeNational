@@ -4,10 +4,11 @@ using Syncfusion.Blazor.FileManager;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BedBrigade.Client.Controllers
 {
-
+    //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
