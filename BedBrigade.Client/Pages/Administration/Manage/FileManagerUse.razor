@@ -1,11 +1,11 @@
-﻿@page "/fm"
-
+﻿@layout BedBrigade.Client.Shared.AdminLayout
+@page "/administration/manage/fm"
+@attribute [Authorize(Roles = "National Admin, Location Admin, Location Author")]
 @using Syncfusion.Blazor.FileManager;
 
-@inject IJSRuntime JsRuntime;
 <div class="control-section">
     @* Initialization of default File Manager component *@
-    <SfFileManager TValue="FileManagerDirectoryContent">
+    <SfFileManager TValue="FileManagerDirectoryContent" CssClass="file-manager">
         <FileManagerAjaxSettings Url="https://localhost:7065/FileManager/FileOperations"
                                  UploadUrl="https://localhost:7065/FileManager/Upload"
                                  DownloadUrl="https://localhost:7065/FileManager/Download"
@@ -14,7 +14,9 @@
     </SfFileManager>
 </div>
 
+<MediaGrid />
 
 @code {
 
 }
+
