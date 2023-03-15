@@ -1,0 +1,20 @@
+﻿@page "/fm"
+
+@using Syncfusion.Blazor.FileManager;
+
+@inject IJSRuntime JsRuntime;
+<div class="control-section">
+    @* Initialization of default File Manager component *@
+    <SfFileManager TValue="FileManagerDirectoryContent">
+        <FileManagerAjaxSettings Url="https://localhost:7065/FileManager/FileOperations"
+                                 UploadUrl="https://localhost:7065/FileManager/Upload"
+                                 DownloadUrl="https://localhost:7065/FileManager/Download"
+                                 GetImageUrl="https://localhost:7065/FileManager/GetImage">
+        </FileManagerAjaxSettings>
+    </SfFileManager>
+</div>
+
+
+@code {
+
+}
