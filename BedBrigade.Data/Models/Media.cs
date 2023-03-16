@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -26,6 +27,9 @@ namespace BedBrigade.Data.Models
 
         [MaxLength(255)]
         public String? AltText { get; set; } = string.Empty;
+
+        [Required]
+        public FileUse FileUse { get; set; } = FileUse.Unknown;
 
 
     }
