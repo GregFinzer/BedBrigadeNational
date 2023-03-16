@@ -106,7 +106,7 @@ namespace BedBrigade.Client
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseAuthorization();
+            app.UseAuthorization(); // This must appear after the UseRouting middleware and before UseEndpoints
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
