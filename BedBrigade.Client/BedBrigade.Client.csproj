@@ -9,9 +9,6 @@
 
   <ItemGroup>
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
-    <Content Remove="wwwroot\Media\arizona\Phoenix\arizonastateseal.webp" />
-    <Content Remove="wwwroot\Media\arizona\Prescott Valley\arizonastateseal.webp" />
-    <Content Remove="wwwroot\Media\arizona\Prescott\arizonastateseal.webp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,13 +18,6 @@
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
-    <None Include="wwwroot\Media\arizona\arizonastateseal.webp" />
-    <None Include="wwwroot\Media\arizona\DNCMag49.pdf" />
-    <None Include="wwwroot\Media\arizona\Phoenix\arizonastateseal.webp" />
-    <None Include="wwwroot\Media\arizona\Prescott Valley\arizonastateseal.webp" />
-    <None Include="wwwroot\Media\arizona\Prescott\arizonastateseal.webp" />
-    <None Include="wwwroot\Media\national\CODEFocus.pdf" />
-    <None Include="wwwroot\Media\ohio\CODE2023_1.pdf" />
     <None Include="wwwroot\scripts\cookie.js" />
     <None Include="wwwroot\scripts\scriptLoader.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
@@ -55,13 +45,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Media\ohio\Arlington\" />
-    <Folder Include="wwwroot\Media\ohio\canton\" />
-    <Folder Include="wwwroot\Media\ohio\Circleville\" />
-    <Folder Include="wwwroot\Media\ohio\lancaster\" />
-    <Folder Include="wwwroot\Media\ohio\linden\" />
-    <Folder Include="wwwroot\Media\ohio\newark\" />
-    <Folder Include="wwwroot\Media\ohio\rock\" />
+    <Folder Include="wwwroot\Media\national\" />
+    <Folder Include="wwwroot\Media\columbus\" />
+    <Folder Include="wwwroot\Media\newark\" />
+    <Folder Include="wwwroot\Media\linden\" />
+    <Folder Include="wwwroot\Media\circleville\" />
+    <Folder Include="wwwroot\Media\lancaster\" />
+    <Folder Include="wwwroot\Media\arlington\" />
+    <Folder Include="wwwroot\Media\canton\" />
+    <Folder Include="wwwroot\Media\rock\" />
   </ItemGroup>
 
 
