@@ -33,7 +33,8 @@ public class Seed
 
     private static List<Location> locations = new()
     {
-        new Location {Name=SeedConstants.SeedLocationNational, Route="/", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+        new Location {Name=SeedConstants.SeedLocationNational, Route="/national", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+        new Location {Name="Columbus", Route="/columbus", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
         new Location {Name="Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
         new Location {Name="Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
         new Location {Name="Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
