@@ -202,6 +202,7 @@ public class Seed
                         FileSize = 9827,
                         AltText = "Bed Brigade National Logo",
                         FileStatus = "seed",
+                        FileUse = FileUse.Unknown,
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
                         CreateUser = SeedConstants.SeedUserName,
