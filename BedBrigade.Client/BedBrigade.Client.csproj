@@ -45,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Media\national\" />
     <Folder Include="wwwroot\Media\columbus\" />
     <Folder Include="wwwroot\Media\newark\" />
     <Folder Include="wwwroot\Media\linden\" />
