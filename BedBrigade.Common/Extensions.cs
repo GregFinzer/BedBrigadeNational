@@ -53,7 +53,12 @@ namespace BedBrigade.Common
             }
             return decode ? HttpUtility.HtmlDecode(stripped) : stripped;
         }
-
+        /// <summary>
+        /// Checks if the role is authorized (found) by the Claims
+        /// </summary>
+        /// <param name="identity">A ClaimsPrincipal Object</param>
+        /// <param name="roles">A string of comma seperated roles of which the user must have at least one</param>
+        /// <returns> true or false</returns>
         public static bool HasRole(this ClaimsPrincipal identity, string roles)
         {
             
@@ -69,6 +74,12 @@ namespace BedBrigade.Common
 
         }
 
+        /// <summary>
+        /// Returns the path to the file contained in the specified foldername
+        /// </summary>
+        /// <param name="fileName">The name of the file to find</param>
+        /// <param name="folderName">A string terminating in a folder to be searched (Note this may be a path of folders)</param>
+        /// <returns>A string containing where the file was found</returns>
         public static string ToApplicationPath(this string fileName, string folderName = "")
         {
             var exePath = Path.GetDirectoryName(System.Reflection
