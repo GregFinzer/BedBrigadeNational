@@ -1,5 +1,4 @@
-﻿
-using BedBrigade.Data.Models;
+﻿using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 
@@ -78,6 +77,24 @@ public class MediaDataService : IMediaDataService
         }
     } // add new media
 
+    public async Task<ServiceResponse<List<Media>>> GetLogos()
+    {
+        List<Media> result;
+        try
+        {
+            result = await _context.Media.Where(m => m.FileUse == Common.Common.FileUse.Logo).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<List<Media>>($"Error at media logo fetch - {ex.Message}");
+        }
+        if (result != null)
+        {
+            return new ServiceResponse<List<Media>>($"Found {result.Count} media records.", true, result);
+        }
+        return new ServiceResponse<List<Media>>("None Media records found.");
+
+    }
 } // end class MediaDataService
 
 

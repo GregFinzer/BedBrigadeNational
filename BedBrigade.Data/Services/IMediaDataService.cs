@@ -9,5 +9,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<Media>>> GetAllAsync();
         Task<ServiceResponse<Media>> GetAsync(int MediaId);
         Task<ServiceResponse<Media>> UpdateAsync(Media media);
+        Task<ServiceResponse<List<Media>>> GetLogos();
     }
 }
