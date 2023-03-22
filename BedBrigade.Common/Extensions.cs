@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace BedBrigade.Common
 {
@@ -82,12 +83,71 @@ namespace BedBrigade.Common
         /// <returns>A string containing where the file was found</returns>
         public static string ToApplicationPath(this string fileName, string folderName = "")
         {
-            var exePath = Path.GetDirectoryName(System.Reflection
-                                .Assembly.GetExecutingAssembly().CodeBase);
+            string appRoot = GetAppRoot(folderName);
+            return Path.Combine(appRoot , fileName);
+        }
+
+
+        public static bool DirectoryExists(this string directoryName)
+        {
+            var appRoot = GetAppRoot(directoryName);
+            return Directory.Exists(appRoot);
+        }
+
+        public static DirectoryInfo CreateDirectory(this string directoryName)
+        {
+            var appRoot = GetAppRoot(directoryName);
+            try
+            {
+                return Directory.CreateDirectory(appRoot);
+            }
+           catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+        }
+        public static void DeleteDirectory(this string directoryName, bool recursiveDelete)
+        {
+            var appRoot = GetAppRoot(directoryName);
+            try 
+            {                
+                Directory.Delete(appRoot, recursiveDelete);
+            }
+            catch (Exception ex)
+            {
+                throw(ex);
+            }
+
+        }
+
+        public static void DeleteFiles(this string directoryName)
+        {
+            var appRoot = GetAppRoot(directoryName);
+            try
+            {
+                string[] files = Directory.GetFiles(appRoot);
+                foreach ( string file in files )
+                {
+                    File.Delete( file );
+                }
+            }
+            catch (Exception ex)
+            {
+                throw(ex);
+            }
+
+        }
+
+        private static string GetAppRoot(string directoryName)
+        {
+            var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
             Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
             var appRoot = appPathMatcher.Match(exePath).Value;
-            return Path.Combine(appRoot + $"\\wwwroot\\{folderName}", fileName);
+            return $"{appRoot}\\wwwroot\\Media\\{directoryName}";
         }
+
+
 
     }
 }

@@ -8,6 +8,7 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace BedBrigade.Client.Components
 {
@@ -171,21 +172,34 @@ namespace BedBrigade.Client.Components
 
         private async Task Delete(ActionEventArgs<Location> args)
         {
+            string reason = string.Empty;
             List<Location> records = await Grid.GetSelectedRecordsAsync();
+            ToastTitle = "Delete Location";
+            ToastTimeout = 6000;
+            ToastContent = $"Unable to Delete. {reason}";
             foreach (var rec in records)
             {
-                var deleteResult = await _svcLocation.DeleteAsync(rec.LocationId);
-                ToastTitle = "Delete Location";
-                if (deleteResult.Success)
+                try
                 {
-                    ToastContent = "Delete Successful!";
+                    rec.Route.DeleteDirectory(true);
+                    var deleteResult = await _svcLocation.DeleteAsync(rec.LocationId);
+                    if (deleteResult.Success)
+                    {
+                        ToastContent = "Delete Successful!";
+                    }
+                    else
+                    {
+                        args.Cancel = true;
+                    }
+
                 }
-                else
+                catch (Exception ex) 
                 {
-                    ToastContent = $"Unable to Delete. Location is in use.";
                     args.Cancel = true;
+                    reason = ex.Message;
+
                 }
-                ToastTimeout = 6000;
+
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
             }
@@ -217,11 +231,16 @@ namespace BedBrigade.Client.Components
             }
             else
             {
+
                 // new Location
                 var result = await _svcLocation.CreateAsync(Location);
                 if (result.Success)
                 {
                     Location location = result.Data;
+                    if (!Location.Route.DirectoryExists())
+                    {
+                        Location.Route.CreateDirectory();
+                    }
                 }
                 ToastTitle = "Create Location";
                 if (Location.LocationId != 0)
@@ -244,6 +263,12 @@ namespace BedBrigade.Client.Components
 
         protected async Task Save(Location location)
         {
+            location.Route.ToLower();
+            if(!location.Route.StartsWith('\\'))
+            {
+
+            };
+
             await Grid.EndEdit();
         }
 
