@@ -149,14 +149,15 @@ namespace BedBrigade.Data.Services
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-
+                var location = await context.Locations.FindAsync(user.LocationId);
                 List<Claim> claims = new List<Claim>
-            {
+                {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim("LocationId", user.LocationId.ToString())
-            };
+                new Claim("LocationId", user.LocationId.ToString()),
+                new Claim("UserRoute", location.Route)
+                };
 
                 var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
                     .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
