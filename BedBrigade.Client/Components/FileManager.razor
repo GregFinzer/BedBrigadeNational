@@ -1,19 +1,99 @@
-﻿@using Syncfusion.Blazor.FileManager;
+﻿@using Syncfusion.Blazor.FileManager
+@using System.Diagnostics
+@using BedBrigade.Client.Components
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
 
-
+<div class="row"><div class="col">&nbsp;</div></div>
+<div class="row">
+        <div class="col">
+           <h3>Media File Manager</h3>
+         </div>
+         <div class="col" style="text-align:right; font-size: small">                          
+              <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
+                @if (userLocationId > 1)
+                {
+                <span>[Folder: @userRoute]</span>
+                }
+                <br />@userName
+          </div>
+</div> 
+          
+<div class="row">
+<div class="col-md-12">
 <div class="control-section">
-    @* Initialization of default File Manager component *@
-    <SfFileManager TValue="FileManagerDirectoryContent" CssClass="file-manager">
-        <FileManagerAjaxSettings Url="https://localhost:7065/FileManager/FileOperations"
-                                 UploadUrl="https://localhost:7065/FileManager/Upload"
-                                 DownloadUrl="https://localhost:7065/FileManager/Download"
-                                 GetImageUrl="https://localhost:7065/FileManager/GetImage">
+        <SfFileManager  
+                TValue="FileManagerDirectoryContent"
+                CssClass="file-manager"
+                AllowMultiSelection="true"
+                Height="700px"
+                Width="100%"
+                >
+                <FileManagerAjaxSettings 
+                    Url="@dctUrlX["Operations"]"
+                    UploadUrl="@dctUrlX["Upload"]"
+                    DownloadUrl="@dctUrlX["Download"]"
+                    GetImageUrl="@dctUrlX["Image"]"
+        >
         </FileManagerAjaxSettings>
+                <FileManagerEvents TValue="FileManagerDirectoryContent" 
+                    OnSend="onsend"                    
+                    BeforeImageLoad="beforeImageLoad" 
+                >
+                </FileManagerEvents> 
+                <FileManagerUploadSettings
+                    AllowedExtensions="@AllowedExtensions"
+                    MaxFileSize="@MaxFileSize"
+                >
+                </FileManagerUploadSettings>
     </SfFileManager>
 </div>
+</div>
+</div>
 
-@code {
+@userLocationId<br />
+@userRoute
 
-    [Parameter] public string LocationId { get; set; }
+@code{
+
+    public string currentUrl=String.Empty;
+    public string? DownloadUrl { get; set; }
+    private Dictionary<string, string> dctUrlX = new Dictionary<string, string>();
+    public bool isRead = true;     
+
+    // custom data dictionary
+
+    protected override void OnInitialized()
+    {       
+        currentUrl = NavigationManager.BaseUri.ToString() + "FileManager/";
+        dctUrlX.Add("Operations", currentUrl+"FileOperations");
+        dctUrlX.Add("Upload", currentUrl + "Upload");
+        dctUrlX.Add("Download", currentUrl + "Download");
+        dctUrlX.Add("Image", currentUrl + "GetImage");
+    }
+
+    public void onsend(BeforeSendEventArgs args)    {      
+
+        if (isRead && args.Action == "read")
+        {
+            // send only not for national admin           
+
+            if (userLocationId>1) // Not Admin User
+            {
+                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
+            }
+            isRead = false;
+        }
+    }// onsend
+  
+    public void beforeImageLoad(BeforeImageLoadEventArgs<FileManagerDirectoryContent> args)
+    {      
+       if (userLocationId>1)
+       {
+           args.ImageUrl = args.ImageUrl + "&SubFolder=" + userRoute;
+       }
+    } // before Image Load
+
 
 }
+

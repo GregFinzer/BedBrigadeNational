@@ -5,30 +5,45 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
 using Microsoft.AspNetCore.Authorization;
+using Syncfusion.Blazor.FileManager.Base;
+using System.Diagnostics;
 
 namespace BedBrigade.Client.Controllers
 {
-    //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
+    public class FileManagerDirectoryContentExtend : FileManagerDirectoryContent
+    {      
+
+        public string? customvalue { get; set; }
+        public string? SubFolder { get; set; }
+
+        public Dictionary<string, object>? CustomData { get; set; }
+    }
+
+     //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
-        public PhysicalFileProvider operation;
-        public string basePath;
-
+        private const string DoubleBackSlash = "\\";
+        public PhysicalFileProvider? operation;
+        public string? basePath;
+        string root = "wwwroot\\Media"; // new
+        string mainFolder = "media";
+              
         [Obsolete]
         public FileManagerController(IHostingEnvironment hostingEnvironment)
-        {
-            basePath = hostingEnvironment.ContentRootPath;
-            operation = new PhysicalFileProvider();
-            operation.RootFolder(basePath + "\\wwwroot\\Media"); // Data\\Files denotes in which files and folders are available.
+        {                     
+            this.basePath = hostingEnvironment.ContentRootPath;
+            this.operation = new PhysicalFileProvider();
+            this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root); 
         }
-
 
         // Processing the File Manager operations
         [Route("FileOperations")]
         public object FileOperations([FromBody] FileManagerDirectoryContent args)
         {
-            switch (args.Action)
+           SetUserRoot(); // new
+
+           switch (args.Action)
             {
                 // Add your custom action here
                 case "read":
@@ -47,8 +62,9 @@ namespace BedBrigade.Client.Controllers
                     // Path - Current path where details of file/folder is requested; Name - Names of the requested folders
                     return operation.ToCamelCase(operation.Details(args.Path, args.Names));
                 case "create":
-                    // Path - Current path where the folder is to be created; Name - Name of the new folder
+                    // Path - Current path where the folder is to be created; Name - Name of the new folder / block creation on top level
                     return operation.ToCamelCase(operation.Create(args.Path, args.Name));
+                    //return Content("Prohibited");
                 case "search":
                     // Path - Current path where the search is performed; SearchString - String typed in the searchbox; CaseSensitive - Boolean value which specifies whether the search must be casesensitive
                     return operation.ToCamelCase(operation.Search(args.Path, args.SearchString, args.ShowHiddenItems, args.CaseSensitive));
@@ -63,16 +79,39 @@ namespace BedBrigade.Client.Controllers
         {
             //Invoking download operation with the required paramaters
             // path - Current path where the file is downloaded; Names - Files to be downloaded;
-            FileManagerDirectoryContent args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(downloadInput);
-            return operation.Download(args.Path, args.Names);
-        }
+            try
+            {
+                FileManagerDirectoryContentExtend args = JsonConvert.DeserializeObject<FileManagerDirectoryContentExtend>(downloadInput);
+                var root = args.customvalue;
+                this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + root);
+                // check args path
+                return operation.Download(args.Path, args.Names, args.Data);
+            }
+            catch (Exception ex)
+            {
+                FileManagerDirectoryContent args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(downloadInput);
+                return operation.Download(args.Path, args.Names);
+            }           
+        } // dowbload
+
+
         [Route("Upload")]
-        public IActionResult Upload(string path, IList<IFormFile> uploadFiles, string action)
+        public async Task<IActionResult> UploadAsync(string path, IList<IFormFile> uploadFiles, string action, string CustomData)
         {
+            string fullPath = this.root;
             //Invoking upload operation with the required paramaters
             // path - Current path where the file is to uploaded; uploadFiles - Files to be uploaded; action - name of the operation(upload)
+            try
+            {
+                string newroot = HttpContext.Request.Headers["rootfolder"].ToString().Split(',')[0];
+                operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
+                fullPath = fullPath + Path.AltDirectorySeparatorChar + newroot;
+            }
+            catch {}
 
-            var uploadResponse = operation.Upload(path, uploadFiles, action, null);
+           
+            FileManagerResponse uploadResponse;
+            uploadResponse = operation.Upload(path, uploadFiles, action, null);
             if (uploadResponse.Error != null)
             {
                 Response.Clear();
@@ -80,19 +119,48 @@ namespace BedBrigade.Client.Controllers
                 Response.StatusCode = Convert.ToInt32(uploadResponse.Error.Code);
                 Response.HttpContext.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpResponseFeature>().ReasonPhrase = uploadResponse.Error.Message;
             }
+            
             return Content("");
         }
+
         [Route("GetImage")]
-        public IActionResult GetImage(FileManagerDirectoryContent args)
+        public IActionResult GetImage(FileManagerDirectoryContentExtend args)
         {
             //Invoking GetImage operation with the required paramaters
             // path - Current path of the image file; Id - Image file id;
-            return operation.GetImage(args.Path, args.Id, false, null, null);
+           var root = args.SubFolder;
+           operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + root);
+           return operation.GetImage(args.Path, args.Id, false, null, null);
         }
         public IActionResult Index()
         {
+
             return View();
         }
-    }
-}
+
+        private void SetUserRoot()
+        {
+            string newroot = String.Empty;
+            try
+            {
+                var requestedroot = HttpContext.Request.Headers["rootfolder"];
+                Debug.WriteLine(requestedroot);
+                newroot = requestedroot.ToString();                
+
+                if (newroot != null && newroot.Length > 0)
+                {
+                    var newFullRoot = this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot;
+                    Debug.WriteLine(newFullRoot);
+                    operation.RootFolder(newFullRoot); // new
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        } // set User Root
+
+    } // class
+} // namespace
 
