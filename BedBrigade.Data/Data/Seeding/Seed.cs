@@ -46,7 +46,7 @@ public class Seed
 
     private static readonly List<User> users = new()
     {
-        new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = "Location Contributor" },
+        new User {FirstName = _seedUserLocation, LastName = "Contributor", Role = "Location Contributor" },
         new User {FirstName = _seedUserLocation, LastName = "Author", Role = "Location Author" },
         new User {FirstName = _seedUserLocation, LastName = "Editor", Role = "Location Editor" },
         new User {FirstName = _seedUserLocation, LastName = "Scheduler", Role = "Location Scheduler" },
@@ -252,6 +252,10 @@ public class Seed
                         SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
                         List<Location> locations = context.Locations.ToList();
                         var location = locations[new Random().Next(locations.Count)];
+                        if (user.FirstName == "National")
+                        {
+                            location = locations.Single(l => l.Name == "National");
+                        }
 
                         // Create the user
                         var newUser = new User
