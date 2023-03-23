@@ -51,15 +51,13 @@
 </div>
 </div>
 
-@userLocationId<br />
-@userRoute
-
 @code{
 
     public string currentUrl=String.Empty;
     public string? DownloadUrl { get; set; }
     private Dictionary<string, string> dctUrlX = new Dictionary<string, string>();
-    public bool isRead = true;     
+    public bool isRead = true;    
+
 
     // custom data dictionary
 
@@ -72,13 +70,13 @@
         dctUrlX.Add("Image", currentUrl + "GetImage");
     }
 
-    public void onsend(BeforeSendEventArgs args)    {      
+    public void onsend(BeforeSendEventArgs args)    {
 
         if (isRead && args.Action == "read")
         {
             // send only not for national admin           
 
-            if (userLocationId>1) // Not Admin User
+            if (isLocationAdmin) // Not Admin User
             {
                     args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
             }
@@ -88,7 +86,7 @@
   
     public void beforeImageLoad(BeforeImageLoadEventArgs<FileManagerDirectoryContent> args)
     {      
-       if (userLocationId>1)
+        if (isLocationAdmin)
        {
            args.ImageUrl = args.ImageUrl + "&SubFolder=" + userRoute;
        }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using BedBrigade.Client.Services;
+using BedBrigade.Data.Models;
 using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
@@ -10,7 +11,7 @@ namespace BedBrigade.Client.Components
     {
        // Data Services
         [Inject] private IConfigurationService? _svcConfiguration { get; set; }
-         
+        [Inject] private ILocationService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
                 
@@ -28,11 +29,14 @@ namespace BedBrigade.Client.Components
         private string userRoute = String.Empty;
         private string userRole = String.Empty;
         private string userName = String.Empty;
-              
+        public bool isLocationAdmin = false;
+        private List<Location>? lstLocations;
+
         //protected List<Location>? lstLocations;
-        
+
         protected override async Task OnInitializedAsync()
-        {                
+        {
+           
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
             userName = Identity.Identity.Name;
@@ -42,19 +46,20 @@ namespace BedBrigade.Client.Components
 
             if (Identity.IsInRole("National Admin")) // not perfect! for initial testing
             {
-                userRole = "National Admin";
-                userLocationId = 1;                
+                userRole = "National Admin";                
             }
             else // Location User
             {
                 if (Identity.IsInRole("Location Admin"))
                 {                   
                     userRole = "Location Admin";
+                    isLocationAdmin = true;
                 }
 
                 if (Identity.IsInRole("Location Author"))
                 {
                    userRole = "Location Author";
+                   isLocationAdmin = true;
                 }
             }                 
                        
@@ -74,7 +79,35 @@ namespace BedBrigade.Client.Components
 
             }
 
+            await CheckLocationFolders();
+
         } // Init
+
+        private async Task CheckLocationFolders()
+        { // Loop in location list & create location folder, if not exist
+
+            var dataLocations = await _svcLocation!.GetAllAsync();
+
+            if (dataLocations.Success) // 
+            {
+                lstLocations = dataLocations.Data;
+
+                foreach (var location in lstLocations)
+                {
+                    if (location.Route != "/")
+                    {
+                        // Check Folder
+                        var TargetFolder = MediaRoot + location.Route;
+                        if (!System.IO.Directory.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder)))
+                        {
+                            Directory.CreateDirectory(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder));
+                        }
+                    }
+                }
+            }
+
+        } // Check Location Folders
+
 
 
 
