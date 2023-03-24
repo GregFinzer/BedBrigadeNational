@@ -1,0 +1,56 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop;
+@using BedBrigade.Client.Services;
+@using System.Security.Claims;
+@using BedBrigade.Common;
+
+@((MarkupString)headerContent)
+
+@code {
+    // Client
+    [Inject] private IJSRuntime _js { get; set; }
+    [Inject] private IContentService _svcContent { get; set; }
+    [Inject] private AuthenticationStateProvider _authState { get; set; }
+
+    // Roles
+    const string NationalAdmin = "National Admin";
+    const string LocationAdmin = "Location Admin";
+    const string LocationAuthor = "Location Author";
+    const string LocationScheduler = "Location Scheduler";
+
+    private string headerContent = string.Empty;
+    protected string Login = "login";
+    private ClaimsPrincipal Identity { get; set; }
+    private bool IsAuthenicated { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _svcContent.GetAsync("Header");
+        if(result.Success)
+        {
+            headerContent = result.Data.ContentHtml;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(!firstRender){
+            var authState = await _authState.GetAuthenticationStateAsync();
+
+            if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
+            {
+                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", "loginElement", "Logout");
+                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", "loginElement", "href", "/home/logout");
+            }
+            else
+            {
+                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", "loginElement", "Login");
+                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", "loginElement", "href", "/home/login");
+            }
+
+
+        }
+
+    }
+
+}

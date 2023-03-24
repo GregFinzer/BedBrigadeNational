@@ -10,7 +10,10 @@
     protected override async Task OnInitializedAsync()
     {
         await _local.RemoveItemAsync("authToken");
-        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+     
+
         NavigationManager.NavigateTo("/");
     }
+
+
 }
