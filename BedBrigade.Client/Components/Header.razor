@@ -17,6 +17,7 @@
     const string LocationAdmin = "Location Admin";
     const string LocationAuthor = "Location Author";
     const string LocationScheduler = "Location Scheduler";
+    const string LoginElement = "loginElement";
 
     private string headerContent = string.Empty;
     protected string Login = "login";
@@ -39,13 +40,13 @@
 
             if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
             {
-                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", "loginElement", "Logout");
-                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", "loginElement", "href", "/home/logout");
+                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Logout");
+                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
             }
             else
             {
-                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", "loginElement", "Login");
-                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", "loginElement", "href", "/home/login");
+                await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Login");
+                await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
             }
 
 
