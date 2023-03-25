@@ -47,14 +47,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Media\columbus\" />
-    <Folder Include="wwwroot\Media\newark\" />
-    <Folder Include="wwwroot\Media\linden\" />
-    <Folder Include="wwwroot\Media\circleville\" />
-    <Folder Include="wwwroot\Media\lancaster\" />
-    <Folder Include="wwwroot\Media\arlington\" />
-    <Folder Include="wwwroot\Media\canton\" />
-    <Folder Include="wwwroot\Media\rock\" />
+    <Folder Include="wwwroot\Media\arlington\pages\stories\left\" />
+    <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
+    <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
+    <Folder Include="wwwroot\Media\columbus\pages\news\left\" />
   </ItemGroup>
 
 
