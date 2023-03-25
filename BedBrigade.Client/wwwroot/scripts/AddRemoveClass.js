@@ -12,6 +12,7 @@
                 elements[i].classList.remove(value);
             }
             el = document.getElementById(element);
+            if (el == null) return;
             el.classList.add(value);
         }
     }
