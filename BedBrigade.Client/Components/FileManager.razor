@@ -11,7 +11,7 @@
          </div>
          <div class="col" style="text-align:right; font-size: small">                          
               <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-                @if (userLocationId > 1)
+                 @if (isLocationAdmin)
                 {
                 <span>[Folder: @userRoute]</span>
                 }
@@ -22,7 +22,7 @@
 <div class="row">
 <div class="col-md-12">
 <div class="control-section">
-        <SfFileManager  
+            <SfFileManager @ref="fileManager"
                 TValue="FileManagerDirectoryContent"
                 CssClass="file-manager"
                 AllowMultiSelection="true"
@@ -36,7 +36,9 @@
                     GetImageUrl="@dctUrlX["Image"]"
         >
         </FileManagerAjaxSettings>
-                <FileManagerEvents TValue="FileManagerDirectoryContent" 
+                <FileManagerEvents TValue="FileManagerDirectoryContent"
+                    OnSuccess="success"
+                    MenuOpened="OnMenuOpen"
                     OnSend="onsend"                    
                     BeforeImageLoad="beforeImageLoad" 
                 >
@@ -53,11 +55,13 @@
 
 @code{
 
+    public SfFileManager<FileManagerDirectoryContent>? fileManager;
     public string currentUrl=String.Empty;
     public string? DownloadUrl { get; set; }
     private Dictionary<string, string> dctUrlX = new Dictionary<string, string>();
     public bool isRead = true;    
-
+    public string[] toolbarItems = { "NewFolder" };
+    public string[] menuItems = { "Copy", "Paste", "Delete", "Rename" };
 
     // custom data dictionary
 
@@ -69,6 +73,43 @@
         dctUrlX.Add("Download", currentUrl + "Download");
         dctUrlX.Add("Image", currentUrl + "GetImage");
     }
+
+    public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
+    {
+       
+        if (!isLocationAdmin && fileManager.Path == PathDivider) // For National Admin only
+        {
+            fileManager.DisableToolbarItems(toolbarItems);
+            //fileManager.DisableMenuItems(toolbarItems);
+        }
+        else
+        {
+            fileManager.EnableToolbarItems(toolbarItems);
+            // fileManager.EnableMenuItems(toolbarItems);
+        }
+
+    } // success
+
+    public void OnMenuOpen(MenuOpenEventArgs<FileManagerDirectoryContent> args)
+    {
+
+        if (!isLocationAdmin) // For National Admin only
+        {
+            if (fileManager.Path == PathDivider)
+            {
+                fileManager.DisableMenuItems(toolbarItems);
+                fileManager.DisableMenuItems(menuItems);
+            }
+            else // Location Folder Selected?
+            {
+                if (isLocationFolder())
+                {
+                    fileManager.DisableMenuItems(menuItems);
+                }
+            }
+        } // National Admin
+    } // Context Menu Open
+
 
     public void onsend(BeforeSendEventArgs args)    {
 
@@ -92,6 +133,43 @@
        }
     } // before Image Load
 
+    public bool isLocationFolder()
+    {
+        bool bLocation = false;
+        string folderPath = String.Empty;
+        string selectedLocation = PathDivider;
+
+        if (fileManager.Path != null)
+        {
+            folderPath = fileManager.Path.ToString().Trim();
+        }
+        else
+        {
+            return (false);
+        }
+
+        // check location name in Path /xxxxxxx/ - when selected in left panel list
+        int slashCount = folderPath.Count(t => t == '/');
+        if (slashCount == 2)
+        { // take text between /xxxxx/
+            var arLocation = folderPath.Split(PathDivider);
+            if (arLocation[1].ToLower() != "national") // special validation, because route "/" is national
+            {
+                selectedLocation += arLocation[1];
+            }
+
+            if (lstLocations != null)
+            {
+                int index = lstLocations.FindIndex(item => item.Route.ToLower() == selectedLocation.ToLower());
+                //Debug.WriteLine(selectedLocation + " => " + index);
+                if (index > -1)
+                {  bLocation = true; }
+            }
+        }
+
+        return (bLocation);
+
+    } // Is Location Folder
 
 }
 
