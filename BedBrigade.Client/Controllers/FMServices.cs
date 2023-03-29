@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Controllers
     public class FileManagerController : Controller
     {
         private const string DoubleBackSlash = "\\";
+        private const string Slash = "/";
         public PhysicalFileProvider? operation;
         public string? basePath;
         string root = "wwwroot\\Media"; // new
@@ -76,27 +77,18 @@ namespace BedBrigade.Client.Controllers
         }
         [Route("Download")]
         public IActionResult Download(string downloadInput)
-        {
-            //Invoking download operation with the required paramaters
-            // path - Current path where the file is downloaded; Names - Files to be downloaded;
-            try
-            {
-                FileManagerDirectoryContentExtend args = JsonConvert.DeserializeObject<FileManagerDirectoryContentExtend>(downloadInput);
-                var root = args.customvalue;
-                this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + root);
-                // check args path
-                return operation.Download(args.Path, args.Names, args.Data);
-            }
-            catch (Exception ex)
-            {
-                FileManagerDirectoryContent args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(downloadInput);
-                return operation.Download(args.Path, args.Names);
-            }           
-        } // dowbload
+        {               
+            Debug.WriteLine(downloadInput);
+
+            string newJson = ModifyDownloadJson(downloadInput);
+            FileManagerDirectoryContent? args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(newJson);            
+            return operation.Download(args.Path, args.Names, args.Data);
+           
+        } // download
 
 
         [Route("Upload")]
-        public async Task<IActionResult> UploadAsync(string path, IList<IFormFile> uploadFiles, string action, string CustomData)
+        public async Task<IActionResult> UploadAsync(string path, IList<IFormFile> uploadFiles, string action)
         {
             string fullPath = this.root;
             //Invoking upload operation with the required paramaters
@@ -144,13 +136,13 @@ namespace BedBrigade.Client.Controllers
             try
             {
                 var requestedroot = HttpContext.Request.Headers["rootfolder"];
-                Debug.WriteLine(requestedroot);
+                //Debug.WriteLine(requestedroot);
                 newroot = requestedroot.ToString();                
 
                 if (newroot != null && newroot.Length > 0)
                 {
                     var newFullRoot = this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot;
-                    Debug.WriteLine(newFullRoot);
+                    //Debug.WriteLine(newFullRoot);
                     operation.RootFolder(newFullRoot); // new
                 }
 
@@ -160,6 +152,31 @@ namespace BedBrigade.Client.Controllers
                 Debug.WriteLine(ex.Message);
             }
         } // set User Root
+
+        private string ModifyDownloadJson(string argJson)
+        {
+            dynamic? jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(argJson);
+            if (jsonObj != null)
+            {
+                string? path = jsonObj["path"].ToString();
+                string filterPath = jsonObj["data"][0]["filterPath"].ToString();
+                if (path == Slash) // restore missing path
+                {
+                    jsonObj["path"] = filterPath;            
+                }
+                else
+                {                    
+                    if(filterPath != path && filterPath.Contains(path)) // missing root path
+                    {
+                        jsonObj["path"] = filterPath;
+                    }
+                }
+
+                argJson = jsonObj.ToString();
+                // Debug.WriteLine(argJson);
+            }           
+            return argJson;
+        } // modify download JSON
 
     } // class
 } // namespace
