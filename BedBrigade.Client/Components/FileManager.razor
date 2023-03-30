@@ -41,6 +41,7 @@
                     MenuOpened="OnMenuOpen"
                     OnSend="onsend"                    
                     BeforeImageLoad="beforeImageLoad" 
+                    BeforeDownload="beforeDownload"
                 >
                 </FileManagerEvents> 
                 <FileManagerUploadSettings
@@ -55,13 +56,11 @@
 
 @code{
 
-    public SfFileManager<FileManagerDirectoryContent>? fileManager;
+   
     public string currentUrl=String.Empty;
     public string? DownloadUrl { get; set; }
     private Dictionary<string, string> dctUrlX = new Dictionary<string, string>();
-    public bool isRead = true;    
-    public string[] toolbarItems = { "NewFolder" };
-    public string[] menuItems = { "Copy", "Paste", "Delete", "Rename" };
+    
 
     // custom data dictionary
 
@@ -74,102 +73,7 @@
         dctUrlX.Add("Image", currentUrl + "GetImage");
     }
 
-    public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
-    {
-       
-        if (!isLocationAdmin && fileManager.Path == PathDivider) // For National Admin only
-        {
-            fileManager.DisableToolbarItems(toolbarItems);
-            //fileManager.DisableMenuItems(toolbarItems);
-        }
-        else
-        {
-            fileManager.EnableToolbarItems(toolbarItems);
-            // fileManager.EnableMenuItems(toolbarItems);
-        }
-
-    } // success
-
-    public void OnMenuOpen(MenuOpenEventArgs<FileManagerDirectoryContent> args)
-    {
-
-        if (!isLocationAdmin) // For National Admin only
-        {
-            if (fileManager.Path == PathDivider)
-            {
-                fileManager.DisableMenuItems(toolbarItems);
-                fileManager.DisableMenuItems(menuItems);
-            }
-            else // Location Folder Selected?
-            {
-                if (isLocationFolder())
-                {
-                    fileManager.DisableMenuItems(menuItems);
-                }
-            }
-        } // National Admin
-    } // Context Menu Open
-
-
-    public void onsend(BeforeSendEventArgs args)    {
-
-        if (isRead && args.Action == "read")
-        {
-            // send only not for national admin           
-
-            if (isLocationAdmin) // Not Admin User
-            {
-                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
-            }
-            isRead = false;
-        }
-    }// onsend
   
-    public void beforeImageLoad(BeforeImageLoadEventArgs<FileManagerDirectoryContent> args)
-    {      
-        if (isLocationAdmin)
-       {
-           args.ImageUrl = args.ImageUrl + "&SubFolder=" + userRoute;
-       }
-    } // before Image Load
-
-    public bool isLocationFolder()
-    {
-        bool bLocation = false;
-        string folderPath = String.Empty;
-        string selectedLocation = PathDivider;
-
-        if (fileManager.Path != null)
-        {
-            folderPath = fileManager.Path.ToString().Trim();
-        }
-        else
-        {
-            return (false);
-        }
-
-        // check location name in Path /xxxxxxx/ - when selected in left panel list
-        int slashCount = folderPath.Count(t => t == '/');
-        if (slashCount == 2)
-        { // take text between /xxxxx/
-            var arLocation = folderPath.Split(PathDivider);
-            if (arLocation[1].ToLower() != "national") // special validation, because route "/" is national
-            {
-                selectedLocation += arLocation[1];
-            }
-
-            if (lstLocations != null)
-            {
-                int index = lstLocations.FindIndex(item => item.Route.ToLower() == selectedLocation.ToLower());
-                //Debug.WriteLine(selectedLocation + " => " + index);
-                if (index > -1)
-                {  bLocation = true; }
-            }
-        }
-
-        return (bLocation);
-
-    } // Is Location Folder
 
 }
 
