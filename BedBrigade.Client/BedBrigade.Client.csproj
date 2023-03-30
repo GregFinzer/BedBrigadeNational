@@ -9,7 +9,13 @@
 
   <ItemGroup>
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
+    <Content Remove="wwwroot\css\bedBrigade\theme.css" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Components\AngleImageView.razor.css" />
+    <None Remove="Components\WhoWeAre.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
