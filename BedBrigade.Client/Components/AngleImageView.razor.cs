@@ -31,11 +31,18 @@ namespace BedBrigade.Client.Components
             List<string> LeftFileNames = GetLeftImages(Path);
             List<string> MiddleFileNames = GetMiddleImages(Path);
             List<string> RightFileNames = GetRightImages(Path);
-            LeftFileName = LeftFileNames[0].Replace(startPath, "");
-            MiddleFileName = MiddleFileNames[0].Replace(startPath, "");         
-            RightFileName = RightFileNames[0].Replace(startPath, "");
+            LeftFileName = ComputeImageToDisplay(LeftFileNames);
+            MiddleFileName = ComputeImageToDisplay(MiddleFileNames);
+            RightFileName = ComputeImageToDisplay(RightFileNames);
 
             return base.OnParametersSetAsync();
+        }
+
+        private string ComputeImageToDisplay(List<string> FileNames)
+        {         
+            var unit = DateTime.Now.Hour * 2 + (DateTime.Now.Minute > 30 ? 1 : 0);
+            var imageIndex = unit % FileNames.Count;
+            return FileNames[imageIndex].Replace("wwwroot/","");           
         }
 
         private List<string> GetLeftImages(string path)
