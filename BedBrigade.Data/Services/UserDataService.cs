@@ -98,34 +98,47 @@ namespace BedBrigade.Data.Services
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-
                 var oldRec = await context.Users.FindAsync(user.UserName);
+
                 if (oldRec != null)
                 {
-                    try
+                    var result = RecordUpdate(oldRec, user);
+                    if (result.Result.Success)
                     {
-                        context.Entry(oldRec).CurrentValues.SetValues(user);
-                        context.Entry(oldRec).State = EntityState.Modified; 
-                        context.Users.Update(oldRec);
-                        var result = await context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);
-                        }
-                    }
-                    catch (DbException ex)
-                    {
-                        Log.Logger.Error("Unable to save updated Volunteer record, {0}", ex);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Logger.Error("Error while updating Volunteer record, {0}", ex.Message);
+                        return result.Result; 
                     }
                 }
             }
             return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
-
         }
+
+        private async Task<ServiceResponse<User>> RecordUpdate(User oldRec, User user)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                try
+                {
+                    context.Entry(oldRec).CurrentValues.SetValues(user);
+                    context.Entry(oldRec).State = EntityState.Modified;
+                    context.Users.Update(oldRec);
+                    var result = await context.SaveChangesAsync();
+                    if (result > 0)
+                    {
+                        return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);
+                    }
+                }
+                catch (DbException ex)
+                {
+                    Log.Logger.Error("Unable to save updated Volunteer record, {0}", ex);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error("Error while updating Volunteer record, {0}", ex.Message);
+                }
+            }
+            return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
+        }
+
         public async Task<ServiceResponse<User>> CreateAsync(User user)
             {
                 using (var context = _contextFactory.CreateDbContext())
