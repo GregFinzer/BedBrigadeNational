@@ -4,7 +4,7 @@ namespace BedBrigade.Client.Services
 {
     public interface IAuthService
     {
-        Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request);
+        Task<ServiceResponse<User>> ChangePassword(UserChangePassword request);
         Task<bool> IsUserAuthenticated();
         Task<ServiceResponse<string>> Login(UserLogin request);
         Task<ServiceResponse<bool>> RegisterAsync(UserRegister request);

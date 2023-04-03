@@ -1,0 +1,23 @@
+﻿@page "/page" 
+
+<SfSplitter>
+
+
+</SfSplitter>
+
+<SfDialog Width="500" @bind-Visible=@DialogVisible >
+    <DialogTemplates>
+        <Header>
+            <h3>Page Body</h3>
+        </Header>
+        <Content>
+            <p class="text-center">Choose Template</p>
+        </Content>
+        <FooterTemplate>
+            <SfTextBox ID="inVal" Type="InputType.Text" Placeholder="Enter your message here!" />
+            <button id="sendButton" class="e-control e-btn e-primary" data-ripple="true">Send</button>
+        </FooterTemplate>
+
+    </DialogTemplates>
+
+</SfDialog>

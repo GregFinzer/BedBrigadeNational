@@ -41,6 +41,7 @@ namespace BedBrigade.Client.Components
         protected string ToastWidth { get; private set; } = "300";
         public List<Location>? Locations { get; private set; }
         protected UserRegister userRegister { get; set; } = new UserRegister();
+        protected string Password { get; set; } = string.Empty;
         public User user { get; set; } = new User();
 
         protected List<Role> Roles { get; private set; }
@@ -226,25 +227,23 @@ namespace BedBrigade.Client.Components
 
         private async Task UpdateUser(User user)
         {
-            if (string.IsNullOrEmpty(userRegister.Password))
+            string passwordChanged = string.Empty;
+            if (!string.IsNullOrEmpty(userRegister.Password))
             {
-
+                UserChangePassword changePassword = new UserChangePassword() { UserId = user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
+                var result = await _svcAuth.ChangePassword(changePassword);
+                if (result.Success)
+                {
+                    user = result.Data;                   
+                    passwordChanged = "and password updated ";
+                }
             }
+
             var userUpdate = await _svcUser.UpdateAsync(user);
             ToastTitle = "Update User";
-            string passwordChanged = string.Empty;
             if (userUpdate.Success)
             {
-                if (!string.IsNullOrEmpty(userRegister.Password))
-                {
-                    userRegister.user = user;
-                    var result = await _svcAuth.UpdateAsync(userRegister);
-                    if (result.Success)
-                    {
-                        passwordChanged = "and password updated ";
-                    }
-                }
-                ToastContent = $"User Updated {passwordChanged}Successfully!";
+                ToastContent = $"User Updated {passwordChanged} Successfully!";
 
             }
             else
