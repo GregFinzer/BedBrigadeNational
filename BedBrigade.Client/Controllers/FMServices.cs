@@ -77,10 +77,8 @@ namespace BedBrigade.Client.Controllers
         }
         [Route("Download")]
         public IActionResult Download(string downloadInput)
-        {               
-            Debug.WriteLine(downloadInput);
-
-            string newJson = ModifyDownloadJson(downloadInput);
+        {           
+           string newJson = ModifyDownloadJson(downloadInput);
             FileManagerDirectoryContent? args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(newJson);            
             return operation.Download(args.Path, args.Names, args.Data);
            
@@ -118,11 +116,16 @@ namespace BedBrigade.Client.Controllers
         [Route("GetImage")]
         public IActionResult GetImage(FileManagerDirectoryContentExtend args)
         {
-            //Invoking GetImage operation with the required paramaters
-            // path - Current path of the image file; Id - Image file id;
-           var root = args.SubFolder;
-           operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + root);
-           return operation.GetImage(args.Path, args.Id, false, null, null);
+            if (args.SubFolder != null)
+            {
+                string newroot = args.SubFolder;
+                if (args.Path != null && args.Path.Contains(newroot))
+                {  // fix bug in Syncfusion Path
+                    args.Path = args.Path.Replace(newroot, "");
+                }
+                this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
+            }
+            return operation.GetImage(args.Path, args.Id, false, null, null);
         }
         public IActionResult Index()
         {
@@ -170,6 +173,14 @@ namespace BedBrigade.Client.Controllers
                     {
                         jsonObj["path"] = filterPath;
                     }
+                }
+
+
+                // check broken File Name
+                string FileName = jsonObj["names"][0].ToString();
+                if (string.IsNullOrEmpty(FileName) || FileName != jsonObj["data"][0]["name"].ToString())
+                {
+                    jsonObj["names"][0] = jsonObj["data"][0]["name"].ToString();
                 }
 
                 argJson = jsonObj.ToString();
