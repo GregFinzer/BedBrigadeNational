@@ -27,7 +27,7 @@ One thing you will notice about the following project plan is the lack of due da
     
 * Home Page
     * Home Page Header :heavy_check_mark:
-    * Image Rotator
+    * Image Rotator :heavy_check_mark:
     * Home Page Middle
     * Home Page Footer :heavy_check_mark:
     
@@ -41,12 +41,12 @@ One thing you will notice about the following project plan is the lack of due da
     * Edit Footer
     
 * Manage Images and Videos
-    * List Images and Videos
-    * Upload Image
+    * List Images and Videos :heavy_check_mark:
+    * Upload Image :heavy_check_mark:
     * View Image
-    * Delete Image
-    * Rename Image
-    * New Folder
+    * Delete Image :heavy_check_mark:
+    * Rename Image :heavy_check_mark:
+    * New Folder :heavy_check_mark:
     
 * Manage Web Pages
     * List Pages
