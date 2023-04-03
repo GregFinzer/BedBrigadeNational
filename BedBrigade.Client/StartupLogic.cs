@@ -11,11 +11,16 @@ using Serilog;
 using BedBrigade.MessageService.Services;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Entity.Infrastructure;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+using IApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 
 namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
+        private static ILocalStorageService _local;
+        private static IHostingEnvironment _env;
+
         public static void ConfigureLogger(WebApplicationBuilder builder)
         {
             //Read logging configuration from appsettings.json

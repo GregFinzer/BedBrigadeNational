@@ -176,25 +176,31 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> ChangePassword(string userId, string newPassword)
+        public async Task<ServiceResponse<User>> ChangePassword(string userId, string newPassword)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using ( var context = _contextFactory.CreateDbContext())
             {
 
                 var user = await context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    return new ServiceResponse<bool>("User not found.");
+                    return new ServiceResponse<User>("User not found.");
                 }
 
                 CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    return new ServiceResponse<User>($"Error changing password - {ex.Message}");
+                }
 
-                await context.SaveChangesAsync();
-
-                return new ServiceResponse<bool>("Password has been changed.", true, true);
+                return new ServiceResponse<User>("Password has been changed.", true, user);
             }
         }
 

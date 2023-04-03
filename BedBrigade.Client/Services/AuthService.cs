@@ -15,7 +15,7 @@ namespace BedBrigade.Client.Services
             _data = dataService;
         }
 
-        public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
+        public async Task<ServiceResponse<User>> ChangePassword(UserChangePassword request)
         {
             return await _data.ChangePassword(request.UserId, request.Password);
         }
