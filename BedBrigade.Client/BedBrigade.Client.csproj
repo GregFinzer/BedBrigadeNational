@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
-    <Content Remove="wwwroot\css\bedBrigade\theme.css" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
   </ItemGroup>
 
@@ -58,6 +57,25 @@
     <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
     <Folder Include="wwwroot\Media\columbus\pages\news\left\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\Media\national\pages\Home\banner_img.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Home\ministry-img.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Home\TwoWildBeds.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Home\work-img1.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 
