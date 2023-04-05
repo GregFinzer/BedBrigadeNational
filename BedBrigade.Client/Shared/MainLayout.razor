@@ -1,25 +1,35 @@
 ﻿@inherits LayoutComponentBase
-
+@using Microsoft.AspNetCore.Components.Web
+@inject IWebHostEnvironment HostEnvironment
 <div class="">
     <Header />
 
     <main>
 
         <article class="content px-4">
-            <ErrorBoundary @ref=@errorBoundary >
-                <ChildContent>
-                    @Body
-                </ChildContent>
-                <ErrorContent>
-                    <h2 class="w-100 text-center my-4">An Error has occured</h2>
-                </ErrorContent>
-            </ErrorBoundary>
+            @if(HostEnvironment.IsDevelopment())
+            {
+                @Body
+            }
+            else
+            {
+                <ErrorBoundary @ref=@errorBoundary >
+                    <ChildContent>
+                        @Body
+                    </ChildContent>
+                    <ErrorContent>
+                        <h2 class="w-100 text-center my-4">An Error has occured</h2>
+                    </ErrorContent>
+                </ErrorBoundary>
+            }
         </article>
     </main>
     <Footer></Footer>
 </div>
 
 @code {
+    [Inject] Microsoft.Extensions.Hosting.IHostingEnvironment _env { get; set; }
+
     private ErrorBoundary errorBoundary;
 
     protected override void OnParametersSet()
