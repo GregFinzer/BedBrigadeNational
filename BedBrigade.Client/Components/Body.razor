@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop;
+@using BedBrigade.Client.Services;
+@using System.Security.Claims;
+@using BedBrigade.Common;
+
+@((MarkupString)BodyContent)
+
+@code {
+    // Client
+    [Inject] private IJSRuntime _js { get; set; }
+    [Inject] private IContentService _svcContent { get; set; }
+    [Inject] private AuthenticationStateProvider _authState { get; set; }
+    [Inject] private NavigationManager _nv { get; set; }
+
+    [Parameter] public string PageName { get; set;}
+
+    // Roles
+    const string NationalAdmin = "National Admin";
+    const string LocationAdmin = "Location Admin";
+    const string LocationAuthor = "Location Author";
+    const string LocationScheduler = "Location Scheduler";
+    const string LoginElement = "loginElement";
+
+    private string BodyContent = string.Empty;
+    protected string Login = "login";
+    private ClaimsPrincipal Identity { get; set; }
+    private bool IsAuthenicated { get; set; } = false;
+    private string Menu { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _svcContent.GetAsync(PageName);
+        if (result.Success)
+        {
+            BodyContent = result.Data.ContentHtml;
+        }
+        Menu = FindMenu();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //if (!firstRender)
+        //{
+        //    var authState = await _authState.GetAuthenticationStateAsync();
+
+        //    if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
+        //    {
+        //        await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Logout");
+        //        await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
+        //    }
+        //    else
+        //    {
+        //        await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Login");
+        //        await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
+        //    }
+
+        //    await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
+        //}
+
+    }
+
+    protected string FindMenu()
+    {
+        var location = _nv.Uri.Split('/');
+        return location[location.Length - 1];
+    }
+}
