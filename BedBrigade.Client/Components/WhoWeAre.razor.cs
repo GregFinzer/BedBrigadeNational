@@ -13,9 +13,9 @@ namespace BedBrigade.Client.Components
 
         protected override Task OnParametersSetAsync()
         {
-            if(!ImagePathExists(ImagePath))
+            if(!ImagePathExists(ImagePath) || string.IsNullOrEmpty(ImagePath))
             {
-                ImagePath = "National/pages/Error/";
+                ImagePath = "National/pages/Error/Left";
             }
             FileNames = GetImages(ImagePath);
             FileName = ComputeImageToDisplay(FileNames);

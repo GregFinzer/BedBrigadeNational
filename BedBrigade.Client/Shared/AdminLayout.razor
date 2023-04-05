@@ -1,6 +1,6 @@
-﻿@using BedBrigade.Data
-
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Web
+@inject IWebHostEnvironment HostEnvironment
 
 
 <Header />
@@ -11,14 +11,21 @@
 
     <main>
         <article class="content px-4">
-            <ErrorBoundary @ref=@errorBoundary >
-                <ChildContent>
-                   @Body
-                </ChildContent>
-            <ErrorContent>
-                    <h2 class="w-100 text-center my-4">An Error has occured</h2>
-                </ErrorContent>
-            </ErrorBoundary>
+            @if(HostEnvironment.IsDevelopment())
+            {
+                @Body
+            }
+            else
+            {
+                <ErrorBoundary @ref=@errorBoundary >
+                    <ChildContent>
+                       @Body
+                    </ChildContent>
+                    <ErrorContent>
+                        <h2 class="w-100 text-center my-4">An Error has occured</h2>
+                    </ErrorContent>
+                </ErrorBoundary>             
+            }        
         </article>
     </main>
 </div>
