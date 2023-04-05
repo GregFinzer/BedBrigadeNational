@@ -17,14 +17,17 @@
             }
             else
             {
-                <ErrorBoundary @ref=@errorBoundary >
-                    <ChildContent>
-                       @Body
-                    </ChildContent>
-                    <ErrorContent>
-                        <h2 class="w-100 text-center my-4">An Error has occured</h2>
-                    </ErrorContent>
-                </ErrorBoundary>             
+
+
+            <ErrorBoundary @ref=@errorBoundary >
+                <ChildContent>
+                   @Body
+                </ChildContent>
+                <ErrorContent>
+                    <h2 class="w-100 text-center my-4">An Error has occured</h2>
+                </ErrorContent>
+            </ErrorBoundary>
+      
             }        
         </article>
     </main>
