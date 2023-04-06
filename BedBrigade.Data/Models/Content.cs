@@ -26,13 +26,17 @@ namespace BedBrigade.Data.Models
 
 		public String? ContentHtml { get; set; } = string.Empty;
 
-        public Int32 MainMediaId { get; set; }
+		// Used to hold HTML element ID for rotator
 
-		public Int32 LeftMediaId { get; set; }
+        public String? HeaderMediaId { get; set; } // holds image for who we are banner
 
-		public Int32 MiddleMediaId { get; set; }
+		public String? FooterMediaId { get; set; } // holds image for footer banner
 
-		public Int32 RightMediaId { get; set; }
+		public String? LeftMediaId { get; set; }
+
+		public String? MiddleMediaId { get; set; }
+
+		public String? RightMediaId { get; set; }
 
 
 	}
