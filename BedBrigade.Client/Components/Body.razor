@@ -38,6 +38,8 @@
     const string LocationAuthor = "Location Author";
     const string LocationScheduler = "Location Scheduler";
     const string LoginElement = "loginElement";
+    const string Src = "src";
+    const string Id = "id";
 
     private Content content { get; set; }
     private string BodyContent = string.Empty;
@@ -97,27 +99,27 @@
         var nodes = doc.DocumentNode.SelectNodes("//img");
         foreach(var node in nodes)
         {
-            if (node.Attributes["id"] != null)
+            if (node.Attributes[Id] != null)
             {
-                if (node.Attributes["id"].Value == content.LeftMediaId)
+                if (node.Attributes[Id].Value == content.LeftMediaId)
                 {
-                    node.Attributes["src"].Value = LeftFileName;
+                    node.Attributes[Src].Value = LeftFileName;
                 }
-                else if (node.Attributes["id"].Value == content.MiddleMediaId)
+                else if (node.Attributes[Id].Value == content.MiddleMediaId)
                 {
-                    node.Attributes["src"].Value = MiddleFileName;
+                    node.Attributes[Src].Value = MiddleFileName;
                 }
-                else if (node.Attributes["id"].Value == content.RightMediaId)
+                else if (node.Attributes[Id].Value == content.RightMediaId)
                 {
-                    node.Attributes["src"].Value = RightFileName;
+                    node.Attributes[Src].Value = RightFileName;
                 }
-                else if (node.Attributes["id"].Value == content.HeaderMediaId)
+                else if (node.Attributes[Id].Value == content.HeaderMediaId)
                 {
-                    node.Attributes["src"].Value = HeaderFileName;
+                    node.Attributes[Src].Value = HeaderFileName;
                 }
-                else if (node.Attributes["id"].Value == content.FooterMediaId)
+                else if (node.Attributes[Id].Value == content.FooterMediaId)
                 {
-                    node.Attributes["src"].Value = FooterFileName;
+                    node.Attributes[Src].Value = FooterFileName;
                 }
             }
             else
