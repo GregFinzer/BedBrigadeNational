@@ -12,6 +12,32 @@
     <None Remove="Shared\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Data\Seeding\SeedHtml\About-us.html" />
+    <None Remove="Data\Seeding\SeedHtml\History-of-bed-brigade.html" />
+    <None Remove="Data\Seeding\SeedHtml\Locations.html" />
+    <None Remove="Data\Seeding\SeedHtml\News.html" />
+    <None Remove="Data\Seeding\SeedHtml\Partners.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\Seeding\SeedHtml\About-us.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\History-of-bed-brigade.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\Locations.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\News.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\Partners.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
   
   
     <ItemGroup>
