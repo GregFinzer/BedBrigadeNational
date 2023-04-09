@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
+    <Content Remove="Pages\Home\National\Stories.razor" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
   </ItemGroup>
 
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <None Include="Pages\Administration\AdminTasks\Email.razor" />
+    <None Include="Pages\Home\National\Stories.razor" />
     <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
@@ -33,6 +35,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -60,15 +63,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\Media\national\pages\Home\banner_img.jpg">
+    <Content Update="wwwroot\Media\national\pages\Home\Header\banner_img.jpg">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Update="wwwroot\Media\national\pages\Home\ministry-img.jpg">
+    <Content Update="wwwroot\Media\national\pages\Home\Footer\ministry-img.jpg">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Update="wwwroot\Media\national\pages\Home\TwoWildBeds.jpg">
+    <Content Update="wwwroot\Media\national\pages\Home\Header\TwoWildBeds.jpg">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -76,6 +79,14 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Home\National\Stories.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Home\National\Stories.razor" />
   </ItemGroup>
 
 

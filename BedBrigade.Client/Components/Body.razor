@@ -3,6 +3,7 @@
 @using BedBrigade.Client.Services;
 @using System.Security.Claims;
 @using BedBrigade.Common;
+@using HtmlAgilityPack;
 
 @((MarkupString)BodyContent)
 
@@ -14,6 +15,22 @@
     [Inject] private NavigationManager _nv { get; set; }
 
     [Parameter] public string PageName { get; set;}
+    [Parameter] public string Caption { get; set; } = "Bed Brigade";
+    [Parameter] public string Path { get; set; } = "National";
+
+    string FileName { get; set; } = "NoImageFound.jpg";
+    string LeftFileName { get; set; }
+    string MiddleFileName { get; set; }
+    string RightFileName { get; set; }
+    string HeaderFileName { get; set; }
+    string FooterFileName { get; set; }
+    List<string> LeftFileNames { get; set; }
+    List<string> MiddleFileNames { get; set; }
+    List<string> RightFileNames { get; set; }
+    List<string> HeaderFileNames { get; set; }
+    List<string> FooterFileNames { get; set; }
+
+    const string ErrorImagePath = "media/national/pages/Error/left/NoImageFound.jpg";
 
     // Roles
     const string NationalAdmin = "National Admin";
@@ -21,8 +38,12 @@
     const string LocationAuthor = "Location Author";
     const string LocationScheduler = "Location Scheduler";
     const string LoginElement = "loginElement";
+    const string Src = "src";
+    const string Id = "id";
 
+    private Content content { get; set; }
     private string BodyContent = string.Empty;
+
     protected string Login = "login";
     private ClaimsPrincipal Identity { get; set; }
     private bool IsAuthenicated { get; set; } = false;
@@ -33,9 +54,155 @@
         var result = await _svcContent.GetAsync(PageName);
         if (result.Success)
         {
+            content = result.Data;
             BodyContent = result.Data.ContentHtml;
         }
         Menu = FindMenu();
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        const string startPath = "wwwroot/";
+        if (!PathExist(Path))
+        {
+            Path = "National/pages/Error/";
+            Caption = "Image Files Do Not Exist";
+        }
+        if (content.LeftMediaId != null || content.MiddleMediaId != null || content.RightMediaId != null)
+        {
+            LeftFileNames = GetLeftImages(Path);
+            MiddleFileNames = GetMiddleImages(Path);
+            RightFileNames = GetRightImages(Path);
+            LeftFileName = ComputeImageToDisplay(LeftFileNames);
+            MiddleFileName = ComputeImageToDisplay(MiddleFileNames);
+            RightFileName = ComputeImageToDisplay(RightFileNames);
+
+        }
+        if(content.HeaderMediaId != null)
+        {
+            HeaderFileNames = GetHeaderImages(Path);
+            HeaderFileName = ComputeImageToDisplay(HeaderFileNames);
+        }
+        if (content.FooterMediaId != null)
+        {
+            FooterFileNames = GetFooterImages(Path);
+            FooterFileName = ComputeImageToDisplay(FooterFileNames);
+        }
+        SetImagesAsync();
+    }
+
+    private void SetImagesAsync()
+    {  
+        var doc = new HtmlDocument();
+        doc.LoadHtml(BodyContent);
+        var nodes = doc.DocumentNode.SelectNodes("//img");
+        foreach(var node in nodes)
+        {
+            if (node.Attributes[Id] != null)
+            {
+                if (node.Attributes[Id].Value == content.LeftMediaId)
+                {
+                    node.Attributes[Src].Value = LeftFileName;
+                }
+                else if (node.Attributes[Id].Value == content.MiddleMediaId)
+                {
+                    node.Attributes[Src].Value = MiddleFileName;
+                }
+                else if (node.Attributes[Id].Value == content.RightMediaId)
+                {
+                    node.Attributes[Src].Value = RightFileName;
+                }
+                else if (node.Attributes[Id].Value == content.HeaderMediaId)
+                {
+                    node.Attributes[Src].Value = HeaderFileName;
+                }
+                else if (node.Attributes[Id].Value == content.FooterMediaId)
+                {
+                    node.Attributes[Src].Value = FooterFileName;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        var fileName = (($"{DateTime.UtcNow}.html").Replace("/", "").Replace(" ", "")).Replace(":", "");
+        doc.Save($"../BedBrigade.Client/pages/{fileName}");
+        BodyContent = File.ReadAllText($"../BedBrigade.Client/pages/{fileName}");
+        File.Delete($"../BedBrigade.Client/pages/{fileName}");
+    }
+
+    private string ComputeImageToDisplay(List<string> FileNames)
+    {
+        if (FileNames.Count > 0)
+        {
+            var unit = DateTime.Now.Hour * 2 + (DateTime.Now.Minute > 30 ? 1 : 0);
+            var imageIndex = unit % FileNames.Count;
+            return FileNames[imageIndex].Replace("wwwroot/", "");
+        }
+        return ErrorImagePath;
+    }
+
+    private List<string> GetLeftImages(string path)
+    {
+        if (PathExist($"{path}/Left"))
+        {
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Left").ToList();
+            return fileNames;
+        }
+        return new List<string>();
+    }
+
+    private List<string> GetMiddleImages(string path)
+    {
+        if (PathExist($"{path}/Middle"))
+        {
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Middle").ToList();
+            return fileNames;
+        }
+        return new List<string>();
+    }
+
+    private List<string> GetRightImages(string path)
+    {
+        if (PathExist($"{path}/Left"))
+        {
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Right").ToList();
+            return fileNames;
+        }
+        return new List<string>();
+    }
+
+    private List<string> GetHeaderImages(string path)
+    {
+        if (PathExist($"{path}/Header"))
+        {
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Header").ToList();
+            return fileNames;
+        }
+        return new List<string>();
+    }
+
+    private List<string> GetFooterImages(string path)
+    {
+        if (PathExist($"{path}/Footer"))
+        {
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Footer").ToList();
+            return fileNames;
+        }
+        return new List<string>();
+    }
+
+
+    private bool PathExist(string path)
+    {
+        if (Directory.Exists($"wwwroot/media/{path}"))
+        {
+            return true;
+
+        }
+        return false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
