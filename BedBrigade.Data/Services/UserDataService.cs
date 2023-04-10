@@ -98,34 +98,31 @@ namespace BedBrigade.Data.Services
         {
             using (var context = _contextFactory.CreateDbContext())
             {
-                var oldRec = await context.Users.FindAsync(user.UserName);
+                var entity = await context.Users.FindAsync(user.UserName);
 
-                if (oldRec != null)
+                if (entity != null)
                 {
-                    var result = RecordUpdate(oldRec, user);
-                    if (result.Result.Success)
-                    {
-                        return result.Result; 
-                    }
+                    context.Entry(entity).CurrentValues.SetValues(user);
+                    context.Entry(entity).State = EntityState.Modified;
+                    await context.SaveChangesAsync();
                 }
+                return new ServiceResponse<User>($"User record was updated.",true,user);
             }
             return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
         }
 
         private async Task<ServiceResponse<User>> RecordUpdate(User oldRec, User user)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var ctx = _contextFactory.CreateDbContext())
             {
                 try
                 {
-                    context.Entry(oldRec).CurrentValues.SetValues(user);
-                    context.Entry(oldRec).State = EntityState.Modified;
-                    context.Users.Update(oldRec);
-                    var result = await context.SaveChangesAsync();
-                    if (result > 0)
+                    var result = await Task.Run(() => ctx.Users.Update(user));
+                    if (result != null)
                     {
                         return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);
                     }
+
                 }
                 catch (DbException ex)
                 {

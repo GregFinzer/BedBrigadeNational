@@ -98,18 +98,23 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<Content>> UpdateAsync(Content content)
     {
-        using (var ctx = _contextFactory.CreateDbContext())
+        using (var context = _contextFactory.CreateDbContext())
         {
-            var result = await Task.Run(() => ctx.Content.Update(content));
-            if (result != null)
-            {
-                return new ServiceResponse<Content>($"Updated content with key {content.ContentId}", true);
-            }
+            var entity = await context.Users.FindAsync(content.ContentId);
 
-            return new ServiceResponse<Content>($"User with key {content.ContentId} was not updated.");
+            if (entity != null)
+            {
+                context.Entry(entity).CurrentValues.SetValues(content);
+                context.Entry(entity).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+            }
+            return new ServiceResponse<Content>($"Content record was updated.", true, content);
+        }
+
+        return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
         }
     }
-}
+
 
 
 
