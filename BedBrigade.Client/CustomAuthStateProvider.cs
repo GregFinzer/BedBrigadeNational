@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -8,9 +9,9 @@ namespace BedBrigade.Client
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
-        private readonly ILocalStorageService _localStorageService;
+        private readonly ISessionStorageService _localStorageService;
 
-        public CustomAuthStateProvider(ILocalStorageService localStorageService)
+        public CustomAuthStateProvider(ISessionStorageService localStorageService)
         {
             _localStorageService = localStorageService;
         }
