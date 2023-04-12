@@ -8,38 +8,38 @@
 @((MarkupString)BodyContent)
 
 @code {
-    // Client
-    [Inject] private IJSRuntime _js { get; set; }
-    [Inject] private IContentService _svcContent { get; set; }
-    [Inject] private AuthenticationStateProvider _authState { get; set; }
-    [Inject] private NavigationManager _nv { get; set; }
+        // Client
+        [Inject] private IJSRuntime _js { get; set; }
+        [Inject] private IContentService _svcContent { get; set; }
+        [Inject] private AuthenticationStateProvider _authState { get; set; }
+        [Inject] private NavigationManager _nv { get; set; }
 
-    [Parameter] public string PageName { get; set;}
-    [Parameter] public string Caption { get; set; } = "Bed Brigade";
-    [Parameter] public string Path { get; set; } = "National";
+        [Parameter] public string PageName { get; set;}
+        [Parameter] public string Caption { get; set; } = "Bed Brigade";
+        [Parameter] public string Path { get; set; } = "National";
 
-    string FileName { get; set; } = "NoImageFound.jpg";
-    string LeftFileName { get; set; }
-    string MiddleFileName { get; set; }
-    string RightFileName { get; set; }
-    string HeaderFileName { get; set; }
-    string FooterFileName { get; set; }
-    List<string> LeftFileNames { get; set; }
-    List<string> MiddleFileNames { get; set; }
-    List<string> RightFileNames { get; set; }
-    List<string> HeaderFileNames { get; set; }
-    List<string> FooterFileNames { get; set; }
+        string FileName { get; set; } = "NoImageFound.jpg";
+        string LeftFileName { get; set; }
+        string MiddleFileName { get; set; }
+        string RightFileName { get; set; }
+        string HeaderFileName { get; set; }
+        string FooterFileName { get; set; }
+        List<string> LeftFileNames { get; set; }
+        List<string> MiddleFileNames { get; set; }
+        List<string> RightFileNames { get; set; }
+        List<string> HeaderFileNames { get; set; }
+        List<string> FooterFileNames { get; set; }
 
-    const string ErrorImagePath = "media/national/pages/Error/left/NoImageFound.jpg";
+        const string ErrorImagePath = "media/national/pages/Error/left/NoImageFound.jpg";
 
-    // Roles
-    const string NationalAdmin = "National Admin";
-    const string LocationAdmin = "Location Admin";
-    const string LocationAuthor = "Location Author";
-    const string LocationScheduler = "Location Scheduler";
-    const string LoginElement = "loginElement";
-    const string Src = "src";
-    const string Id = "id";
+        // Roles
+        const string NationalAdmin = "National Admin";
+        const string LocationAdmin = "Location Admin";
+        const string LocationAuthor = "Location Author";
+        const string LocationScheduler = "Location Scheduler";
+        const string LoginElement = "loginElement";
+        const string Src = "src";
+        const string Id = "id";
 
     private Content content { get; set; }
     private string BodyContent = string.Empty;
@@ -58,6 +58,10 @@
             BodyContent = result.Data.ContentHtml;
         }
         Menu = FindMenu();
+        if(string.IsNullOrEmpty(Menu))
+        {
+            Menu = "home";
+        };
     }
 
 
@@ -90,6 +94,8 @@
             FooterFileName = ComputeImageToDisplay(FooterFileNames);
         }
         SetImagesAsync();
+        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
+
     }
 
     private void SetImagesAsync()
@@ -121,10 +127,6 @@
                 {
                     node.Attributes[Src].Value = FooterFileName;
                 }
-            }
-            else
-            {
-                break;
             }
         }
         var fileName = (($"{DateTime.UtcNow}.html").Replace("/", "").Replace(" ", "")).Replace(":", "");

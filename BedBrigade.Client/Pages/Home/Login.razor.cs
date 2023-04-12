@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Data.Models;
 using BedBrigade.Client.Services;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -14,7 +15,7 @@ namespace BedBrigade.Client.Pages.Home
     {
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
-        [Inject] private ILocalStorageService _local { get; set; }
+        [Inject] private ISessionStorageService _local { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
 

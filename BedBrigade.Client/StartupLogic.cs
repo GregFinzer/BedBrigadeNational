@@ -4,6 +4,7 @@ using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.MessageService;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
@@ -13,13 +14,12 @@ using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Entity.Infrastructure;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
-        private static ILocalStorageService _local;
-        private static IHostingEnvironment _env;
 
         public static void ConfigureLogger(WebApplicationBuilder builder)
         {
@@ -44,6 +44,7 @@ namespace BedBrigade.Client
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -104,6 +105,8 @@ namespace BedBrigade.Client
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
+                // Do not compress when using Hot Reload
+                app.UseResponseCompression();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -119,8 +122,26 @@ namespace BedBrigade.Client
                 endpoints.MapControllers();
 
             });
+            Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
+            // Connect the application lifetime
+            IHostApplicationLifetime Lifetime = app.Lifetime;
+            Lifetime.ApplicationStopping.Register(OnStopping);
+            Lifetime.ApplicationStarted.Register(OnStarting);
+            
 
+            //Task.Run(async () => await  app.StopAsync());
             return app;
+        }
+
+        private static void OnStarting()
+        {
+            Log.Information($"Application Starting");
+        }
+
+        private static void OnStopping()
+        {
+            Log.Information($"Application Stopping");
+            Log.CloseAndFlush();
         }
 
         public static async Task SetupDatabase(WebApplication app)
