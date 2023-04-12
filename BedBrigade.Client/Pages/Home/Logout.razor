@@ -1,10 +1,10 @@
 ﻿@page "/home/logout"
-@using Blazored.LocalStorage;
+@using Blazored.SessionStorage;
 
 @code {
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private ILocalStorageService _local { get; set; }
+    [Inject] private ISessionStorageService _local { get; set; }
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
