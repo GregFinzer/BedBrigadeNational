@@ -13,23 +13,45 @@
 @using System.Data;
 @using BedBrigade.Client.Pages.Home;
 
-<SfRichTextEditor @ref=@RTE EditorMode="EditorMode.HTML">
-    @((MarkupString)Body)
+<div class="rte-container">
+    <SfRichTextEditor @ref=@RTE EditorMode="EditorMode.HTML" Height="850">
+        <RichTextEditorToolbarSettings Items="@Tools">
+            <RichTextEditorCustomToolbarItems>
+                <RichTextEditorCustomToolbarItem Name="Save">
+                    <Template>
+                        <SfButton @onclick="ClickHandler">Save</SfButton>
+                    </Template>
+                </RichTextEditorCustomToolbarItem>
+            </RichTextEditorCustomToolbarItems>
+        </RichTextEditorToolbarSettings>
+        @((MarkupString)Body)
 </SfRichTextEditor>
+</div>
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Target="#UserTarget" Content=@ToastContent>
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+    <ToastButtons>
+        <ToastButton Content = "Close" OnClick=@HideToast />
+    </ToastButtons>
+</SfToast>
 
 @code {
-        [Inject] public IContentService _svcContent { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] public IContentService _svcContent { get; set; }
+    [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private NavigationManager _nav { get; set; }
 
-        [Parameter] public string ContentType { get; set; }
+    [Parameter] public string PageName { get; set; }
 
     private SfRichTextEditor RTE { get; set; }
     private ClaimsPrincipal? Identity { get; set; }
     private string Body { get; set; }
+    private Content Content { get; set; }
+    private SfToast ToastObj { get; set; }
+    private string? ToastTitle { get; set; } = string.Empty;
+    private int ToastTimeout { get; set; } = 6000;
+    private string ToastContent { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {   
-
         var authState = await _authState.GetAuthenticationStateAsync();
         Identity = authState.User;
         if (Identity.HasRole("National Admin, Location Admin, National Editor"))
@@ -38,13 +60,112 @@
         else
         {
         }
-        var result = await _svcContent.GetAsync("HomePageBody");
+        ToastTitle = $"Edit Page {PageName}";
+        var result = await _svcContent.GetAsync(PageName);
         if(result.Success)
         {
-            Body = result.Data.ContentHtml;
-            Body += "<style> @import 'css/bedbrigade/theme.css'; </style>";
-
+            Body = "<style> @import 'css/bedbrigade/theme.css'; </style>";
+            Body += result.Data.ContentHtml;
+            Content = result.Data;
+        }
+        else
+        {
+            ToastContent = $"Unable to load page {PageName}!";
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, ShowCloseButton=true });
         }
     }
 
+    private async Task HideToast()
+    {
+        await this.ToastObj.HideAsync();
+        _nav.NavigateTo("/administration/dashboard");
+    }
+
+    private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
+    {
+        new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+        new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+        new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+        new ToolbarItemModel() { Command = ToolbarCommand.Alignments },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.Indent },
+        new ToolbarItemModel() { Command = ToolbarCommand.Outdent },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat },
+        new ToolbarItemModel() { Command = ToolbarCommand.RemoveLink },
+        new ToolbarItemModel() { Command = ToolbarCommand.SourceCode },
+        new ToolbarItemModel() { Command = ToolbarCommand.FullScreen },
+        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.SuperScript },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontName },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.Formats },
+        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat },
+        new ToolbarItemModel() { Command = ToolbarCommand.FullScreen },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
+        new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+
+        new ToolbarItemModel() { Name = "Save",   TooltipText = "Save File" }
+    };
+    private async Task ClickHandler()
+    {
+        ToastTitle = $"Save {PageName} Page";
+        Content.ContentHtml = await RTE.GetXhtmlAsync();
+        var result = await _svcContent.UpdateAsync(Content);
+        if(result.Success)
+        {
+            ToastContent = "Saved Successfully!";
+        }
+        else
+        {
+            ToastContent = "Unable to save the content!";
+        }
+        await ToastObj.ShowAsync();
+    }
+
 }
+
+<style>
+
+    .rte-container {
+        width: 100%;
+        height: 900px;
+    }
+    .e-toast-container {
+        margin-top: 450px;
+        height: 600px;
+    }
+
+        .e-toast-container .e-toast {
+            border: 1px solid black;
+            border-radius: 25px;
+        }
+            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-title {
+                color: deepskyblue;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+            }
+            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: lightskyblue;
+                padding: 5px;
+                width: 100%;
+                height: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+</style>
