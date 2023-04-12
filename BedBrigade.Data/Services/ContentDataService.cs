@@ -100,7 +100,7 @@ public class ContentDataService : IContentDataService
     {
         using (var context = _contextFactory.CreateDbContext())
         {
-            var entity = await context.Users.FindAsync(content.ContentId);
+            var entity = await context.Content.FindAsync(content.ContentId);
 
             if (entity != null)
             {
