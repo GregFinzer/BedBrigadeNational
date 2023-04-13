@@ -25,7 +25,7 @@
             </RichTextEditorCustomToolbarItems>
         </RichTextEditorToolbarSettings>
         @((MarkupString)Body)
-</SfRichTextEditor>
+    </SfRichTextEditor>
 </div>
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Target="#UserTarget" Content=@ToastContent>
     <ToastPosition X="Center" Y="Top"></ToastPosition>
@@ -36,7 +36,7 @@
 
 @code {
     [Inject] public IContentService _svcContent { get; set; }
-    [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    //[Inject] private AuthenticationStateProvider? _authState { get; set; }
     [Inject] private NavigationManager _nav { get; set; }
 
     [Parameter] public string PageName { get; set; }
@@ -52,20 +52,19 @@
 
     protected override async Task OnInitializedAsync()
     {   
-        var authState = await _authState.GetAuthenticationStateAsync();
-        Identity = authState.User;
-        if (Identity.HasRole("National Admin, Location Admin, National Editor"))
-        {
-        }
-        else
-        {
-        }
+        //var authState = await _authState.GetAuthenticationStateAsync();
+        //Identity = authState.User;
+        //if (Identity.HasRole("National Admin, Location Admin, National Editor"))
+        //{
+        //}
+        //else
+        //{
+        //}
         ToastTitle = $"Edit Page {PageName}";
         var result = await _svcContent.GetAsync(PageName);
         if(result.Success)
         {
-            Body = "<style> @import 'css/bedbrigade/theme.css'; </style>";
-            Body += result.Data.ContentHtml;
+            Body = result.Data.ContentHtml;
             Content = result.Data;
         }
         else

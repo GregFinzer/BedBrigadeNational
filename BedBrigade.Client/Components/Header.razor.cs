@@ -28,6 +28,8 @@ namespace BedBrigade.Client.Components
         const string LocationAuthor = "Location Author";
         const string LocationScheduler = "Location Scheduler";
         const string LoginElement = "loginElement";
+        const string AdminElement = "adminElement";
+        const string SetInnerHTML = "SetGetValue.SetInnerHtml";
         private string headerContent = string.Empty;
         protected string Login = "login";
         private ClaimsPrincipal Identity { get; set; }
@@ -53,13 +55,16 @@ namespace BedBrigade.Client.Components
                 var authState = await _authState.GetAuthenticationStateAsync();
                 if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
                 {
-                    await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Logout");
+                    await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
+                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "Admin");
                 }
                 else
                 {
-                    await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Login");
+                    await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Login");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
+                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "");
+
                 }
             }
         }

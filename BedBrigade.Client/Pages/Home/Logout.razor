@@ -7,10 +7,8 @@
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
-    {
+    {  
         await _local.RemoveItemAsync("authToken");
-     
-
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", true);
     }
 }
