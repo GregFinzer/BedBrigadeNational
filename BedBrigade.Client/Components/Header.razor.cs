@@ -1,3 +1,4 @@
+using BedBrigade.Client.Pages.Administration;
 using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
@@ -58,6 +59,10 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
                     await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "Admin");
+                    if (Menu == "dashboard")
+                    {
+                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
+                    }
                 }
                 else
                 {
