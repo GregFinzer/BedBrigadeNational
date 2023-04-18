@@ -314,7 +314,6 @@ namespace BedBrigade.Client.Components
         }
         protected async Task DataBound()
         {
-            await Grid.AutoFitColumns();
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

@@ -15,5 +15,12 @@
             if (el == null) return;
             el.classList.add(value);
         }
+    },
+
+    RemoveClass: function (element, value) {
+        if (element == '') return;
+        el = document.getElementById(element);
+        if (el == null) return;
+        el.classList.remove(value);
     }
 }
