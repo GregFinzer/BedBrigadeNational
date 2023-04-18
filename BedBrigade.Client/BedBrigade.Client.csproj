@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <None Remove="Components\AngleImageView.razor.css" />
-    <None Remove="Components\WhoWeAre.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
