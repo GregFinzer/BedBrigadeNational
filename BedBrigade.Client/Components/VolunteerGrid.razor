@@ -129,10 +129,10 @@ else
                         </GridSortSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Volunteer.VolunteerId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridForeignColumn Field=@nameof(Volunteer.VolunteeringForId) ForeignDataSource=@VolunteersFor ForeignKeyField="VolunteerForId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers For" Type="ColumnType.String" AutoFit="true" AllowEditing="false" AllowFiltering="false" Width="110" />
-                            <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"  />
-                            <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" >
+                            <GridForeignColumn Field=@nameof(Volunteer.VolunteeringForId) ForeignDataSource=@VolunteersFor ForeignKeyField="VolunteerForId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers For" Type="ColumnType.String"AllowEditing="false" AllowFiltering="false" Width="110" />
+                            <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                            <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false"/>
+                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false">
                                 <Template>
                                     @{
                                         var request = (context as Volunteer);
@@ -140,13 +140,13 @@ else
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers At" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn HeaderText="Vehicle" HeaderTextAlign="TextAlign.Center" AutoFit="true" >
+                            <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false"/>
+                            <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers At" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                            <GridColumn HeaderText="Vehicle" HeaderTextAlign="TextAlign.Center" >
                                 <GridColumns>                            
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAMinivan) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Mini Van" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAnSUV) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="SUV" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAPickupTruck) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Pickup" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
+                                    <GridColumn Field=@nameof(Volunteer.IHaveAMinivan) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Mini Van" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
+                                    <GridColumn Field=@nameof(Volunteer.IHaveAnSUV) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="SUV" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
+                                    <GridColumn Field=@nameof(Volunteer.IHaveAPickupTruck) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Pickup" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
                                 </GridColumns>
                             </GridColumn>
                             <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125" />

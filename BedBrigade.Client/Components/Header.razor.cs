@@ -58,18 +58,17 @@ namespace BedBrigade.Client.Components
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
-                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "Administration");
+                    await _js.InvokeVoidAsync("DisplayToggle.Toggle", "administration");
                     if (Menu == "dashboard")
                     {
-                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
+                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "dropdown-toggle active");
                     }
                 }
                 else
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Login");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
-                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "");
-
+                    await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", AdminElement, "dropdown-toggle");
                 }
             }
         }
