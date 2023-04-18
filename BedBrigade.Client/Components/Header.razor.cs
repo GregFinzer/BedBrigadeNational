@@ -58,7 +58,7 @@ namespace BedBrigade.Client.Components
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
-                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "Admin");
+                    await _js.InvokeVoidAsync(SetInnerHTML, AdminElement, "Administration");
                     if (Menu == "dashboard")
                     {
                         await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
