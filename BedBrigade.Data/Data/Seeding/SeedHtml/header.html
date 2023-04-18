@@ -52,23 +52,56 @@
                     </li>
                     <li class="nav-item">
                         <a id="adminElement" class="nav-link" href="administration/dashboard"></a>
+                        <ul class="dropdown-menu">
+                            <li id="admin" class="fw-bold" onclick="DisplayToggle.Toggle('adminAdmin');">Admin</li>
+                            <div id="adminAdmin" style="display: none;">
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="nav-link nav-"><a class="dropdown-item mx-2" href="administration/admintasks/email">Send Email</a></li>
+                    </div>
+                    <li><hr class="dropdown-divider"></li>
+                    <li id="edit" class="download-toggle fw-bold" onclick="DisplayToggle.Toggle('editAdmin');">Edit</li>
+                    <div id="editAdmin" style="display: none;">
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="nav-link nav-"><a class="dropdown-item mx-2" href="administration/edit/home">Home Page</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="/about-us">Request a Bed</a></li>
+                        <li class="nav-link nav-"><a class="dropdown-item mx-2" href="administration/edit/header">Header</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/edit/Footer">Footer</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/edit/volunteer">Volunteer</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/edit/donate">Donate</a></li>
+                    </div>
+                    <li><hr class="dropdown-divider"></li>
+                    <li id="manage" class="fw-bold" onclick="DisplayToggle.Toggle('manageAdmin');">Manage</li>
+                    <div id="manageAdmin" style="display: none;">
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="nav-link nav-"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
+                        <li class="nav-link"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
+                    </div>
+                    </ul>
                     </li>
 
+                    </ul>
+                </div>
+                </div>
+            </nav>
+            <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-mobile-menu menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/request-bed">Request A Bed</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/volunteer">Volunteer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donations">Donate</a>
+                    </li>
                 </ul>
             </div>
-        </div>
-    </nav>
-    <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-mobile-menu menu">
-            <li class="nav-item">
-                <a class="nav-link" href="/request-bed">Request A Bed</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/volunteer">Volunteer</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/donations">Donate</a>
-            </li>
-        </ul>
-    </div>
-</header>
+        </header>
