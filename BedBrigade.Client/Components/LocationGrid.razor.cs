@@ -253,6 +253,8 @@ namespace BedBrigade.Client.Components
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
+            await Grid.CallStateHasChangedAsync();
+            await Grid.Refresh();
         }
 
         private void BeginEdit()
