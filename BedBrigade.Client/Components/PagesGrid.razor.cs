@@ -12,9 +12,9 @@ using Org.BouncyCastle.Asn1.X509;
 
 namespace BedBrigade.Client.Components
 {
-    public partial class LocationGrid : ComponentBase
+    public partial class PagesGrid : ComponentBase
     {
-        [Inject] private ILocationService? _svcLocation { get; set; }
+        [Inject] private IContentService? _svcContent { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
@@ -25,8 +25,9 @@ namespace BedBrigade.Client.Components
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
-        protected List<Location>? Locations { get; set; }
-        protected SfGrid<Location>? Grid { get; set; }
+        protected List<Content>? Pages { get; set; }
+        protected Content content { get; set; }
+        protected SfGrid<Content>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
         protected string? _state { get; set; }
@@ -39,7 +40,7 @@ namespace BedBrigade.Client.Components
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
 
-        protected string? RecordText { get; set; } = "Loading Locations ...";
+        protected string? RecordText { get; set; } = "Loading Pages ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
 
@@ -65,10 +66,10 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-            var result = await _svcLocation.GetAllAsync();
+            var result = await _svcContent.GetAllAsync();
             if (result.Success)
             {
-                Locations = result.Data.ToList();
+                Pages = result.Data.ToList();
             }
         }
 
@@ -93,7 +94,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistDataAsync() });
+            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Pages, UserState = await Grid.GetPersistDataAsync() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -107,7 +108,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = _state });
+            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Pages, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -122,7 +123,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
+                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Pages, UserState = _state });
                 return;
             }
 
@@ -143,7 +144,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        public async Task OnActionBegin(ActionEventArgs<Location> args)
+        public async Task OnActionBegin(ActionEventArgs<Content> args)
         {
             var requestType = args.RequestType;
             switch (requestType)
@@ -170,19 +171,18 @@ namespace BedBrigade.Client.Components
 
         }
 
-        private async Task Delete(ActionEventArgs<Location> args)
+        private async Task Delete(ActionEventArgs<Content> args)
         {
             string reason = string.Empty;
-            List<Location> records = await Grid.GetSelectedRecordsAsync();
-            ToastTitle = "Delete Location";
+            List<Content> records = await Grid.GetSelectedRecordsAsync();
+            ToastTitle = "Delete Page";
             ToastTimeout = 6000;
             ToastContent = $"Unable to Delete. {reason}";
             foreach (var rec in records)
             {
                 try
                 {
-                    rec.Route.DeleteDirectory(true);
-                    var deleteResult = await _svcLocation.DeleteAsync(rec.LocationId);
+                    var deleteResult = await _svcContent.DeleteAsync(rec.ContentId);
                     if (deleteResult.Success)
                     {
                         ToastContent = "Delete Successful!";
@@ -207,21 +207,21 @@ namespace BedBrigade.Client.Components
 
         private void Add()
         {
-            HeaderTitle = "Add Location";
-            ButtonTitle = "Add Location";
+            HeaderTitle = "Add Page";
+            ButtonTitle = "Add Page";
         }
 
-        private async Task Save(ActionEventArgs<Location> args)
+        private async Task Save(ActionEventArgs<Content> args)
         {
-            Location Location = args.Data;
-            if (Location.LocationId != 0)
+            Content Page = args.Data;
+            if (Page.ContentId != 0)
             {
-                //Update Location Record
-                var updateResult = await _svcLocation.UpdateAsync(Location);
-                ToastTitle = "Update Location";
+                //Update Content  Record
+                var updateResult = await _svcContent.UpdateAsync(Page);
+                ToastTitle = "Update Page";
                 if (updateResult.Success)
                 {
-                    ToastContent = "Location Updated Successfully!";
+                    ToastContent = "Page Updated Successfully!";
                 }
                 else
                 {
@@ -232,24 +232,20 @@ namespace BedBrigade.Client.Components
             else
             {
 
-                // new Location
-                var result = await _svcLocation.CreateAsync(Location);
+                // new Page
+                var result = await _svcContent.CreateAsync(Page);
                 if (result.Success)
                 {
-                    Location location = result.Data;
-                    if (!Location.Route.DirectoryExists())
-                    {
-                        Location.Route.CreateDirectory();
-                    }
+                    Content Content = result.Data;
                 }
-                ToastTitle = "Create Location";
-                if (Location.LocationId != 0)
+                ToastTitle = "Create Page";
+                if (Page.ContentId != 0)
                 {
-                    ToastContent = "Location Created Successfully!";
+                    ToastContent = "Page Created Successfully!";
                 }
                 else
                 {
-                    ToastContent = "Unable to save Location!";
+                    ToastContent = "Unable to save Page!";
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
@@ -259,18 +255,12 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Update Location";
+            HeaderTitle = "Update Page";
             ButtonTitle = "Update";
         }
 
-        protected async Task Save(Location location)
+        protected async Task Save(Content page)
         {
-            location.Route.ToLower();
-            if(!location.Route.StartsWith('\\'))
-            {
-
-            };
-
             await Grid.EndEdit();
         }
 
@@ -281,7 +271,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task DataBound()
         {
-            if (Locations.Count == 0) RecordText = "No Location records found";
+            if (Pages.Count == 0) RecordText = "No Page records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;
@@ -295,7 +285,7 @@ namespace BedBrigade.Client.Components
         {
             PdfExportProperties ExportProperties = new PdfExportProperties
             {
-                FileName = "Location" + DateTime.Now.ToShortDateString() + ".pdf",
+                FileName = "Pages" + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
             await Grid.PdfExport(ExportProperties);
@@ -304,7 +294,7 @@ namespace BedBrigade.Client.Components
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Location " + DateTime.Now.ToShortDateString() + ".xlsx",
+                FileName = "Pages " + DateTime.Now.ToShortDateString() + ".xlsx",
 
             };
 
@@ -314,7 +304,7 @@ namespace BedBrigade.Client.Components
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Location " + DateTime.Now.ToShortDateString() + ".csv",
+                FileName = "Pages " + DateTime.Now.ToShortDateString() + ".csv",
 
             };
 

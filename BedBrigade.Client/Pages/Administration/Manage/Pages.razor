@@ -2,8 +2,4 @@
 @page "/administration/manage/pages"
 @attribute [Authorize(Roles = "National Admin, National Editor, Location Admin, Location Editor, Location Contributor")]
 
-<h3 class="w-100 text-center my-4">Manage Pages</h3>
-
-@code {
-
-}
+<PagesGrid />
