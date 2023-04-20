@@ -46,7 +46,8 @@ namespace BedBrigade.Client.Components
         public bool IsLocationAdmin { get; private set; }
         public bool IsLocationAuthor { get; private set; }
         public bool IsLocationScheduler { get; private set; }
-        public bool IsLocationTreasure { get; private set; }
+        public bool IsLocationTreasurer { get; private set; }
+        public bool IsLocationEditor { get; private set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -55,14 +56,17 @@ namespace BedBrigade.Client.Components
             {
                 headerContent = result.Data.ContentHtml;
             }
+
             authState = await _authState.GetAuthenticationStateAsync();
+
             IsNationalAdmin = authState.User.HasRole(NationalAdmin);
             IsNationalEditor = authState.User.HasRole(NationalEditor);
 
             IsLocationAdmin = authState.User.HasRole(LocationAdmin);
             IsLocationAuthor = authState.User.HasRole(LocationAuthor);
             IsLocationScheduler = authState.User.HasRole(LocationScheduler);
-            IsLocationTreasure = authState.User.HasRole(LocationTreasurer);
+            IsLocationTreasurer = authState.User.HasRole(LocationTreasurer);
+            IsLocationEditor = authState.User.HasRole(LocationEditor);
 
             Menu = FindMenu();
         }
