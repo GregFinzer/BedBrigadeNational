@@ -37,6 +37,7 @@ public static class Common
         Content = 6,
         BedRequest = 7,
         Media = 8,
+        Pages = 9
 
     }
 
