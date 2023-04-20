@@ -25,18 +25,29 @@ namespace BedBrigade.Client.Components
 
         // Roles
         const string NationalAdmin = "National Admin";
+        const string NationalEditor = "National Editor";
         const string LocationAdmin = "Location Admin";
         const string LocationAuthor = "Location Author";
         const string LocationScheduler = "Location Scheduler";
+        const string LocationTreasurer = "Location Treasurer";
+        const string LocationEditor = "Location Editor";
+
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
+
         private string headerContent = string.Empty;
         protected string Login = "login";
-        private ClaimsPrincipal Identity { get; set; }
-
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
+        private AuthenticationState authState { get; set; }
+        public bool IsNationalAdmin { get; private set; }
+        public bool IsNationalEditor { get; private set; }
+        public bool IsLocationAdmin { get; private set; }
+        public bool IsLocationAuthor { get; private set; }
+        public bool IsLocationScheduler { get; private set; }
+        public bool IsLocationTreasurer { get; private set; }
+        public bool IsLocationEditor { get; private set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -46,6 +57,17 @@ namespace BedBrigade.Client.Components
                 headerContent = result.Data.ContentHtml;
             }
 
+            authState = await _authState.GetAuthenticationStateAsync();
+
+            IsNationalAdmin = authState.User.HasRole(NationalAdmin);
+            IsNationalEditor = authState.User.HasRole(NationalEditor);
+
+            IsLocationAdmin = authState.User.HasRole(LocationAdmin);
+            IsLocationAuthor = authState.User.HasRole(LocationAuthor);
+            IsLocationScheduler = authState.User.HasRole(LocationScheduler);
+            IsLocationTreasurer = authState.User.HasRole(LocationTreasurer);
+            IsLocationEditor = authState.User.HasRole(LocationEditor);
+
             Menu = FindMenu();
         }
 
@@ -53,7 +75,6 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                var authState = await _authState.GetAuthenticationStateAsync();
                 if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
