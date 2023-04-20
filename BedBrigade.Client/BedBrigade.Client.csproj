@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="compilerconfig.json" />
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
     <Content Remove="wwwroot\scripts\DisplayToggle.js" />
@@ -18,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="compilerconfig.json" />
     <None Include="Pages\Administration\AdminTasks\Email.razor" />
     <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />

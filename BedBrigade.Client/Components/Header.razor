@@ -6,7 +6,12 @@
 
 @((MarkupString)headerContent) 
 
+
 <style>
+
+    .nadmin, .ladmin, .lsched, .ltreasure, .lauthor, .neditor, .leditor {
+        display: none;
+    }
     #edit, #admin, #manage {
         cursor: pointer;
         font-size: 15px;
@@ -17,3 +22,62 @@
             content: '';
         }
 </style>
+
+@if(IsNationalAdmin )
+{
+    <style>
+        .nadmin {
+            display: block;
+        }
+    </style>
+
+}
+@if (IsNationalEditor)
+{
+    <style>
+        .neditor {
+            display: block;
+        }
+    </style>
+}
+@if(IsLocationAdmin)
+{ 
+     <style>
+        .ladmin {
+            display: block;
+        }
+        
+     </style>
+}
+@if (IsLocationScheduler)
+{
+    <style>
+        .lscheduler {
+            display: block;
+        }
+    </style>
+}
+@if (IsLocationTreasurer)
+{
+    <style>
+        .ltreasurer {
+            display: block;
+        }
+    </style>
+}
+@if (IsLocationScheduler)
+{
+    <style>
+        .lscheduler {
+            display: block;
+        }
+    </style>
+}
+@if (IsLocationEditor)
+{
+    <style>
+        .leditor {
+            display: block;
+        }
+    </style>
+}
