@@ -1,5 +1,7 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/manage/users"
+@attribute [Authorize(Roles = "National Admin, Location Admin")]
+
 @using BedBrigade.Client.Components
 
 <UsersGrid />

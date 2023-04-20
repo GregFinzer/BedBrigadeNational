@@ -1,5 +1,5 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/manage/donations"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "National Admin, Location Admin, Location Treasurer")]
 
 <DonationGrid />
