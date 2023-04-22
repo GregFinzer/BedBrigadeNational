@@ -66,6 +66,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Pages\Administration\Edit\Stories.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Update="wwwroot\Media\national\pages\Home\Header\banner_img.jpg">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

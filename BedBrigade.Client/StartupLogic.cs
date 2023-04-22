@@ -87,6 +87,11 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IMessageService, Services.MessageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
+            builder.Services.AddSignalR(e =>
+            {
+                e.MaximumReceiveMessageSize = 1024000;
+            });
+
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
