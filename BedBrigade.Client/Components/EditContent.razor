@@ -14,6 +14,7 @@
 
 <div class="rte-container">
     <SfRichTextEditor @ref=@RTE EditorMode="EditorMode.HTML" Height="850">
+        <RichTextEditorImageSettings Path="/media/National/" AllowedTypes="AllowedTypes" />
         <RichTextEditorToolbarSettings Items="@Tools">
             <RichTextEditorCustomToolbarItems>
                 <RichTextEditorCustomToolbarItem Name="Save">
@@ -33,13 +34,68 @@
     </ToastButtons>
 </SfToast>
 
+<SfDialog Width="800" MinHeight="200" @bind-Visible=@DialogVisible IsModal="true" ShowCloseIcon="true" >
+    
+    <DialogTemplates>
+        <Header>Add New Page</Header>
+        <Content>
+            <EditForm Model=@Content OnValidSubmit=@DialogOnClickHandler>
+                <DataAnnotationsValidator />
+                <div class="row">
+                <div class="col-md-4">
+                    <SfTextBox ID="name" @bind-Value=@Content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
+                    <ValidationMessage For="@(() => Content.Name)" >@validationMessage</ValidationMessage>
+                </div>
+                <div class="col-md-8">
+                    <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <SfTextBox @bind-Value=@Content.LeftMediaId Enabled="true" Placeholder="Left Media Id" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+                <div class="form-group col-md-4">
+                    <SfTextBox @bind-Value=@Content.MiddleMediaId Enabled="true" Placeholder="Middle Media Id" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+                <div class="col-md-4">
+                    <SfTextBox @bind-Value=@Content.RightMediaId Enabled="true" Placeholder="Right Media Id" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <SfTextBox @bind-Value=@Content.HeaderMediaId Enabled="true" Placeholder="Header Media Id" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+                <div class="col-md-4">
+                    <SfTextBox @bind-Value=@Content.FooterMediaId Enabled="true" Placeholder="Footer Media Id" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <SfTextBox @bind-Value=@Content.UpdateUser Enabled="true" Placeholder="Updated By" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+                <div class="col-md-4">
+                    <SfDateTimePicker @bind-Value=@Content.UpdateDate Enabled="true" Placeholder="Updated On" FloatLabelType="FloatLabelType.Auto" />
+                </div>
+            </div>
+            <div class="e-footer-content">
+                <SfButton>Save Page</SfButton>
+            </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
 @code {
     [Inject] public IContentService _svcContent { get; set; }
-    //[Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private AuthenticationStateProvider? _authState { get; set; }
     [Inject] private NavigationManager _nav { get; set; }
 
     [Parameter] public string PageName { get; set; }
+    [Parameter] public bool IsNewPage { get; set; }
 
+    private string validationMessage { get; set;  } = "My Message";
+    private List<string> AllowedTypes = new() {".jpg",".png", ".gif" };
+    private bool DialogVisible { get; set; } = false;
     private SfRichTextEditor RTE { get; set; }
     private ClaimsPrincipal? Identity { get; set; }
     private string Body { get; set; }
@@ -48,36 +104,7 @@
     private string? ToastTitle { get; set; } = string.Empty;
     private int ToastTimeout { get; set; } = 6000;
     private string ToastContent { get; set; } = string.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {   
-        //var authState = await _authState.GetAuthenticationStateAsync();
-        //Identity = authState.User;
-        //if (Identity.HasRole("National Admin, Location Admin, National Editor"))
-        //{
-        //}
-        //else
-        //{
-        //}
-        ToastTitle = $"Edit Page {PageName}";
-        var result = await _svcContent.GetAsync(PageName);
-        if(result.Success)
-        {
-            Body = result.Data.ContentHtml;
-            Content = result.Data;
-        }
-        else
-        {
-            ToastContent = $"Unable to load page {PageName}!";
-            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, ShowCloseButton=true });
-        }
-    }
-
-    private async Task HideToast()
-    {
-        await this.ToastObj.HideAsync();
-        _nav.NavigateTo("/administration/dashboard");
-    }
+    private string ButtonCaption { get; set; } = "Save As ...";
 
     private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
     {
@@ -111,15 +138,83 @@
         new ToolbarItemModel() { Command = ToolbarCommand.Redo },
         new ToolbarItemModel() { Command = ToolbarCommand.Undo },
 
-        new ToolbarItemModel() { Name = "Save",   TooltipText = "Save File" }
+        new ToolbarItemModel() { Name = "Save", TooltipText = "Save File" }
     };
-    private async Task ClickHandler()
+
+
+    protected override async Task OnInitializedAsync()
     {
-        ToastTitle = $"Save {PageName} Page";
-        Content.ContentHtml = await RTE.GetXhtmlAsync();
-        var result = await _svcContent.UpdateAsync(Content);
+        var authState = await _authState.GetAuthenticationStateAsync();
+        if (IsNewPage)
+        {
+            ToastTitle = $"Save Page as {PageName}";
+        }
+        else
+        {
+            ToastTitle = $"Edit Page {PageName}";
+        }
+        var result = await _svcContent.GetAsync(PageName);
         if(result.Success)
         {
+            int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+
+            Body = result.Data.ContentHtml;
+            Content = result.Data;
+            Content.ContentId = 0;
+            Content.UpdateDate = DateTime.Now;
+            Content.CreateDate = DateTime.Now;
+            Content.CreateUser = Content.UpdateUser = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            Content.LocationId = locationId;
+            Content.Name = string.Empty;
+        }
+        else
+        {
+            ToastContent = $"Unable to load page {PageName}!";
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, ShowCloseButton=true });
+        }
+    }
+
+    private async Task HideToast()
+    {
+        await this.ToastObj.HideAsync();
+        _nav.NavigateTo("/administration/dashboard");
+    }
+
+    private async Task ClickHandler()
+    {
+        Content.ContentHtml = await RTE.GetXhtmlAsync();
+        if(Content.ContentId != 0)
+        {
+            var result = await _svcContent.UpdateAsync(Content);
+            if (result.Success)
+            {
+                ToastContent = "Saved Successfully!";
+            }
+            else
+            {
+                ToastContent = "Unable to save the content!";
+            }
+            await ToastObj.ShowAsync();
+
+        }
+        else
+        {
+            DialogVisible = true;
+        }
+    }
+
+    private async Task DialogOnClickHandler()
+    {
+        var found = await _svcContent.GetAsync(Content.Name);
+        if(found.Success)
+        {
+            // Make Name invalid
+            return;
+        }
+        var result = await _svcContent.CreateAsync(Content);
+        if (result.Success)
+        {
+            DialogVisible = false;
             ToastContent = "Saved Successfully!";
         }
         else
@@ -127,6 +222,7 @@
             ToastContent = "Unable to save the content!";
         }
         await ToastObj.ShowAsync();
+
     }
 
 }
@@ -138,6 +234,7 @@
         width: 100%;
         height: 100%;
     }
+
     .e-toast-container {
         margin-top: 450px;
         height: 600px;

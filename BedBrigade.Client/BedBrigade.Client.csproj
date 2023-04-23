@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Location\**" />
+    <Content Remove="Pages\Location\**" />
+    <EmbeddedResource Remove="Pages\Location\**" />
+    <None Remove="Pages\Location\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="compilerconfig.json" />
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
@@ -57,7 +64,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Location\Columbus\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\left\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
