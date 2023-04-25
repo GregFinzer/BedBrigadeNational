@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Syncfusion.Blazor.FileManager;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
-using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
-using Microsoft.AspNetCore.Authorization;
 using Syncfusion.Blazor.FileManager.Base;
 using System.Diagnostics;
+using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace BedBrigade.Client.Controllers
 {
     public class FileManagerDirectoryContentExtend : FileManagerDirectoryContent
-    {      
+    {
 
         public string? customvalue { get; set; }
         public string? SubFolder { get; set; }
@@ -19,7 +18,7 @@ namespace BedBrigade.Client.Controllers
         public Dictionary<string, object>? CustomData { get; set; }
     }
 
-     //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
+    //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
@@ -29,22 +28,22 @@ namespace BedBrigade.Client.Controllers
         public string? basePath;
         string root = "wwwroot\\Media"; // new
         string mainFolder = "media";
-              
+
         [Obsolete]
         public FileManagerController(IHostingEnvironment hostingEnvironment)
-        {                     
+        {
             this.basePath = hostingEnvironment.ContentRootPath;
             this.operation = new PhysicalFileProvider();
-            this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root); 
+            this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root);
         }
 
         // Processing the File Manager operations
         [Route("FileOperations")]
         public object FileOperations([FromBody] FileManagerDirectoryContent args)
         {
-           SetUserRoot(); // new
+            SetUserRoot(); // new
 
-           switch (args.Action)
+            switch (args.Action)
             {
                 // Add your custom action here
                 case "read":
@@ -65,7 +64,7 @@ namespace BedBrigade.Client.Controllers
                 case "create":
                     // Path - Current path where the folder is to be created; Name - Name of the new folder / block creation on top level
                     return operation.ToCamelCase(operation.Create(args.Path, args.Name));
-                    //return Content("Prohibited");
+                //return Content("Prohibited");
                 case "search":
                     // Path - Current path where the search is performed; SearchString - String typed in the searchbox; CaseSensitive - Boolean value which specifies whether the search must be casesensitive
                     return operation.ToCamelCase(operation.Search(args.Path, args.SearchString, args.ShowHiddenItems, args.CaseSensitive));
@@ -77,11 +76,11 @@ namespace BedBrigade.Client.Controllers
         }
         [Route("Download")]
         public IActionResult Download(string downloadInput)
-        {           
-           string newJson = ModifyDownloadJson(downloadInput);
-            FileManagerDirectoryContent? args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(newJson);            
+        {
+            string newJson = ModifyDownloadJson(downloadInput);
+            FileManagerDirectoryContent? args = JsonConvert.DeserializeObject<FileManagerDirectoryContent>(newJson);
             return operation.Download(args.Path, args.Names, args.Data);
-           
+
         } // download
 
 
@@ -97,9 +96,9 @@ namespace BedBrigade.Client.Controllers
                 operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
                 fullPath = fullPath + Path.AltDirectorySeparatorChar + newroot;
             }
-            catch {}
+            catch { }
 
-           
+
             FileManagerResponse uploadResponse;
             uploadResponse = operation.Upload(path, uploadFiles, action, null);
             if (uploadResponse.Error != null)
@@ -109,7 +108,7 @@ namespace BedBrigade.Client.Controllers
                 Response.StatusCode = Convert.ToInt32(uploadResponse.Error.Code);
                 Response.HttpContext.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpResponseFeature>().ReasonPhrase = uploadResponse.Error.Message;
             }
-            
+
             return Content("");
         }
 
@@ -140,7 +139,7 @@ namespace BedBrigade.Client.Controllers
             {
                 var requestedroot = HttpContext.Request.Headers["rootfolder"];
                 //Debug.WriteLine(requestedroot);
-                newroot = requestedroot.ToString();                
+                newroot = requestedroot.ToString();
 
                 if (newroot != null && newroot.Length > 0)
                 {
@@ -165,11 +164,11 @@ namespace BedBrigade.Client.Controllers
                 string filterPath = jsonObj["data"][0]["filterPath"].ToString();
                 if (path == Slash) // restore missing path
                 {
-                    jsonObj["path"] = filterPath;            
+                    jsonObj["path"] = filterPath;
                 }
                 else
-                {                    
-                    if(filterPath != path && filterPath.Contains(path)) // missing root path
+                {
+                    if (filterPath != path && filterPath.Contains(path)) // missing root path
                     {
                         jsonObj["path"] = filterPath;
                     }
@@ -185,7 +184,7 @@ namespace BedBrigade.Client.Controllers
 
                 argJson = jsonObj.ToString();
                 // Debug.WriteLine(argJson);
-            }           
+            }
             return argJson;
         } // modify download JSON
 

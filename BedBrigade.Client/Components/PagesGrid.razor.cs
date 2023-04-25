@@ -17,6 +17,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentService? _svcContent { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private NavigationManager? _nm { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -119,6 +120,11 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
+            if(args.Item.Text == "Add")
+            {
+                _nm.NavigateTo("/administration/admintasks/addpage");
+
+            }
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistData();
