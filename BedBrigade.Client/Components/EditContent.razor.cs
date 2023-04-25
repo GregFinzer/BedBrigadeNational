@@ -54,118 +54,34 @@ namespace BedBrigade.Client.Components
             {
                 Command = ToolbarCommand.Italic
             },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Underline
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Alignments
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Separator
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.OrderedList
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.UnorderedList
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Separator
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Indent
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Outdent
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Separator
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.ClearFormat
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.RemoveLink
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.SourceCode
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.FullScreen
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.LowerCase
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.UpperCase
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.SuperScript
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.FontName
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.FontColor
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.FontSize
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Separator
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.BackgroundColor
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Formats
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.ClearFormat
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.FullScreen
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Separator
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Redo
-            },
-            new ToolbarItemModel()
-            {
-                Command = ToolbarCommand.Undo
-            },
-            new ToolbarItemModel()
-            { Name = "Save",
-                TooltipText = "Save File"
-            }
+            new ToolbarItemModel()   {                Command = ToolbarCommand.Underline            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Alignments            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Separator            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.OrderedList            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.UnorderedList            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Separator            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Indent            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Outdent            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Separator            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.ClearFormat            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.RemoveLink            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.SourceCode            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.FullScreen            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.LowerCase            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.UpperCase            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.SuperScript            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.FontName            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.FontColor            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.FontSize            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Separator            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.BackgroundColor            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Formats            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.ClearFormat            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.FullScreen            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Separator            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Redo            },
+            new ToolbarItemModel()            {                Command = ToolbarCommand.Undo            },
+            new ToolbarItemModel()            { Name = "Save",                TooltipText = "Save File"            }
         };
         protected override async Task OnInitializedAsync()
         {

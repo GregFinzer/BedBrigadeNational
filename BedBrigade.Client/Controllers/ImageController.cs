@@ -40,37 +40,11 @@ namespace ImageUpload.Controllers
                     if (UploadFiles != null)
                     {
                         string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media\\{locationName}";
-                        string targetPath =  $"\\pages\\{page}";
+                        string targetPath = $"\\pages\\{page}";
                         string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
-                        // Create a new directory, if it does not exists
-                        if (!Directory.Exists(targetLocation))
-                        {
-                            Directory.CreateDirectory(targetLocation);
-
-                        }
-                        if (!Directory.Exists(targetLocation + targetPath))
-                        {
-                            Directory.CreateDirectory(targetLocation + targetPath);
-                        }
-
-                        // Name which is used to save the image
-                        filename = targetLocation + targetPath + $@"\{filename}";
-
-                        if (!System.IO.File.Exists(filename))
-                        {
-                            // Upload a image, if the same file name does not exist in the directory
-                            using (FileStream fs = System.IO.File.Create(filename))
-                            {
-                                file.CopyTo(fs);
-                                fs.Flush();
-                            }
-                            Response.StatusCode = 200;
-                        }
-                        else
-                        {
-                            Response.StatusCode = 204;
-                        }
+                        FolderExist(targetLocation, targetPath);
+                        filename = CreateFile(file, targetLocation, targetPath, filename);
                     }
                 }
             }
@@ -79,6 +53,44 @@ namespace ImageUpload.Controllers
                 Response.Clear();
                 Response.ContentType = "application/json; charset=utf-8";
                 Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = e.Message;
+            }
+        }
+
+        private string CreateFile(IFormFile file, string targetLocation, string targetPath, string filename)
+        {
+
+            // Name which is used to save the image
+            filename = targetLocation + targetPath + $@"\{filename}";
+
+            if (!System.IO.File.Exists(filename))
+            {
+                // Upload a image, if the same file name does not exist in the directory
+                using (FileStream fs = System.IO.File.Create(filename))
+                {
+                    file.CopyTo(fs);
+                    fs.Flush();
+                }
+                Response.StatusCode = 200;
+            }
+            else
+            {
+                Response.StatusCode = 204;
+            }
+
+            return filename;
+        }
+
+        private static void FolderExist(string targetLocation, string targetPath)
+        {
+            // Create a new directory, if it does not exists
+            if (!Directory.Exists(targetLocation))
+            {
+                Directory.CreateDirectory(targetLocation);
+
+            }
+            if (!Directory.Exists(targetLocation + targetPath))
+            {
+                Directory.CreateDirectory(targetLocation + targetPath);
             }
         }
     }
