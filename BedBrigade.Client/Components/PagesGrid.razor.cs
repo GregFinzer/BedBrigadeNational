@@ -16,6 +16,7 @@ namespace BedBrigade.Client.Components
     {
         [Inject] private IContentService? _svcContent { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
+        [Inject] private ILocationService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private NavigationManager? _nm { get; set; }
 
@@ -44,6 +45,7 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading Pages ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
+        public List<Location> Locations { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -56,7 +58,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("National Admin"))
+            if (Identity.HasRole("National Admin, Location Admin, Location Author, National Author"))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -72,13 +74,18 @@ namespace BedBrigade.Client.Components
             {
                 Pages = result.Data.ToList();
             }
+            var locResult = await _svcLocation.GetAllAsync();
+            if (locResult.Success)
+            {
+                Locations = locResult.Data;
+            }
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole("National Admin"))
+                if (Identity.HasRole("National Admin, Location Admin, Location Author, National Author"))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;

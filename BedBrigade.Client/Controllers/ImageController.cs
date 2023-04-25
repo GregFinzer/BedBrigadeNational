@@ -33,19 +33,16 @@ namespace ImageUpload.Controllers
                 var result = await _svcLocation.GetAsync(Id);
                 if(result.Success)
                 {
-                    locationName = result.Data.Name;
+                    locationName = result.Data.Route;
                 }
                 foreach (var file in UploadFiles)
                 {
-                    if (UploadFiles != null)
-                    {
-                        string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media\\{locationName}";
-                        string targetPath = $"\\pages\\{page}";
-                        string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media{locationName}";
+                    string targetPath = $"\\pages\\{page}";
+                    string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
-                        FolderExist(targetLocation, targetPath);
-                        filename = CreateFile(file, targetLocation, targetPath, filename);
-                    }
+                    FolderExist(targetLocation, targetPath);
+                    filename = CreateFile(file, targetLocation, targetPath, filename);
                 }
             }
             catch (Exception e)

@@ -11,7 +11,6 @@
         // Client
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IContentService _svcContent { get; set; }
-        [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private NavigationManager _nv { get; set; }
 
         [Parameter] public string PageName { get; set;}
@@ -207,27 +206,6 @@
         return false;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //if (!firstRender)
-        //{
-        //    var authState = await _authState.GetAuthenticationStateAsync();
-
-        //    if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
-        //    {
-        //        await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Logout");
-        //        await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
-        //    }
-        //    else
-        //    {
-        //        await _js.InvokeVoidAsync("SetGetValue.SetInnerHtml", LoginElement, "Login");
-        //        await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
-        //    }
-
-        //    await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
-        //}
-
-    }
 
     protected string FindMenu()
     {
