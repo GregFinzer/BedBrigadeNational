@@ -14,8 +14,7 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly AuthenticationStateProvider _auth;
-
-        protected ClaimsPrincipal _identity;
+        private ClaimsPrincipal _identity;
 
         public UserDataService(IDbContextFactory<DataContext> dbContextFactory, AuthenticationStateProvider authProvider)
         {
