@@ -40,13 +40,13 @@
         <Header>Add New Page</Header>
         <Content>
             <EditForm Model=@Content OnValidSubmit=@DialogOnClickHandler>
-                <DataAnnotationsValidator />
-                <div class="row">
+@*                <DataAnnotationsValidator />*@
+            <div class="row">
                 <div class="col-md-4">
-                    <SfTextBox ID="name" @bind-Value=@Content.Name Enabled="false" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
+                    <SfTextBox ID="name" @bind-Value=@newPageName Enabled="false" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
                 </div>
                 <div class="col-md-8">
-                    <SfTextBox @bind-Value=@Content.Title Enabled="false" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
+                    <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
                 </div>
             </div>
             <div class="row">

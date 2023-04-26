@@ -150,7 +150,6 @@ namespace BedBrigade.Client.Components
             imagePath = $"media/{locationRoute}/pages/{content.Name}/";
 
             _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
-
         }
 
 
@@ -161,7 +160,7 @@ namespace BedBrigade.Client.Components
                 DialogPageNameVisible = true;
                 //saveUrl = "api/image/save/5/Test4";
                 //_nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
-
+                args.Cancel = true;
 
             }
             if (args.Item.Text == "Reset")
