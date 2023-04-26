@@ -33,6 +33,7 @@ namespace BedBrigade.Client.Components
         };
         private bool DialogVisible { get; set; } = false;
         private SfRichTextEditor RteObj { get; set; }
+        public string newPageName { get; private set; }
         private ClaimsPrincipal? Identity { get; set; }
         private string Body { get; set; }
         private Content Content { get; set; }
@@ -87,12 +88,14 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            string[] pageParameters = saveUrl.Split('/');
+            newPageName = pageParameters[4];
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             string location = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
             int.TryParse(location, out int id);
             if (IsNewPage)
             {
-                ToastTitle = $"Save Page as {PageName}";
+                ToastTitle = $"Save Page as {newPageName}";
             }
             else
             {
@@ -109,7 +112,7 @@ namespace BedBrigade.Client.Components
                 Content.CreateDate = DateTime.Now;
                 Content.CreateUser = Content.UpdateUser = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 Content.LocationId = id;
-                Content.Name = string.Empty;
+                Content.Name = newPageName;
             }
             else
             {
