@@ -1,16 +1,30 @@
 ﻿using BedBrigade.Data.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace BedBrigade.Data.Services;
 
 public class ContentDataService : IContentDataService
 {
     private readonly IDbContextFactory<DataContext> _contextFactory;
+    private readonly AuthenticationStateProvider _auth;
 
-    public ContentDataService(IDbContextFactory<DataContext> contextFactory)
+    private ClaimsPrincipal _identity { get; set; } = null;
+
+    public ContentDataService(IDbContextFactory<DataContext> contextFactory, AuthenticationStateProvider authProvider)
     {
         _contextFactory = contextFactory;
+        _auth = authProvider;
+        Task.Run(() => GetUserClaims(authProvider));
+    }
+
+    private async Task GetUserClaims(AuthenticationStateProvider provider)
+    {
+        var state = await provider.GetAuthenticationStateAsync();
+        _identity = state.User;
     }
 
     public async Task<ServiceResponse<Content>> CreateAsync(Content content)
@@ -58,7 +72,21 @@ public class ContentDataService : IContentDataService
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
-            var result = await ctx.Content.ToListAsync();
+            var authState = await _auth.GetAuthenticationStateAsync();
+
+            var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            List<Content> result;
+            if (role.ToLower() != "national admin")
+            {
+                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+                result = ctx.Content.Where(u => u.LocationId == locationId).ToList();
+            }
+            else
+            {
+                result = ctx.Content.ToList();
+            }
+
+
             if (result != null)
             {
                 return new ServiceResponse<List<Content>>($"Found {result.Count} records.", true, result);
@@ -86,12 +114,30 @@ public class ContentDataService : IContentDataService
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
-            var result = await ctx.Content.FirstOrDefaultAsync(c => c.Name == name);
+            //int locationId;
+            Content result;
+            //var authState = await _auth.GetAuthenticationStateAsync();
+            //if (authState.User.Claims.ToList().Count == 0 )
+            //{
+            //    locationId = (await ctx.Locations.FirstOrDefaultAsync(l => l.Name.ToLower() == "national")).LocationId;
+            //}
+            //else
+            //{
+            //    var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            //    locationId = int.Parse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
+            //}
+            result = await ctx.Content.FirstOrDefaultAsync(u => u.Name == name);
+
             if (result != null)
             {
                 return new ServiceResponse<Content>("Found Record", true, result);
             }
-
+            //if(name.ToLower() == "header" || name.ToLower() == "newpage")
+            //{
+            //    locationId = (await ctx.Locations.FirstOrDefaultAsync(l => l.Name.ToLower() == "national")).LocationId;
+            //    result = ctx.Content.FirstOrDefault(u => u.LocationId == locationId && u.Name == name);
+            //    return new ServiceResponse<Content>("Found Record", true, result);
+            //}
             return new ServiceResponse<Content>("Not Found");
         }
     }
@@ -107,14 +153,11 @@ public class ContentDataService : IContentDataService
                 context.Entry(entity).CurrentValues.SetValues(content);
                 context.Entry(entity).State = EntityState.Modified;
                 await context.SaveChangesAsync();
+                return new ServiceResponse<Content>($"Content record was updated.", true, content);
             }
-            return new ServiceResponse<Content>($"Content record was updated.", true, content);
-        }
-
-        return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
+            return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
         }
     }
-
-
+}
 
 

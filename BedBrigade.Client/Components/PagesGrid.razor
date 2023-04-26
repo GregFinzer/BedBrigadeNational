@@ -96,11 +96,13 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
+                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
                                 <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                            <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.LeftMediaId) ShowColumnMenu="false" HeaderText="LeftMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
