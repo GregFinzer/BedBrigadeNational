@@ -93,32 +93,46 @@ public class LocationDataService : BaseDataService, ILocationDataService
             var loc = await ctx.Locations.FindAsync(location.LocationId);
             if (loc != null)
             {
-                ctx.Entry(loc).CurrentValues.SetValues(location);
-                try
+                var result = await UpdateLocationAsync(loc, location);
+                if (result.Success)
                 {
-
-                    ctx.Entry(loc).State = EntityState.Modified;
-                    ctx.Locations.Update(loc);
-                    var result = await ctx.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
-                    }
-                }
-                catch (DbException ex)
-                {
-                    Log.Logger.Error("Database error updating location {0}", ex.ToString);
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Error("Error updating location {0}", ex.ToString);
-
+                    return result;
                 }
             }
-            return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
         }
+        return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
+        
     }
+
+    private async Task<ServiceResponse<Location>> UpdateLocationAsync(Location loc, Location location)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            try
+            {
+                ctx.Entry(loc).CurrentValues.SetValues(location);
+
+                ctx.Entry(loc).State = EntityState.Modified;
+                ctx.Locations.Update(loc);
+                var result = await ctx.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error("Error updating location {0}", ex.ToString);
+            }
+            return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
+
+        }
+
+    }
+
 }
+
+
 
 
 
