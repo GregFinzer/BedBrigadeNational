@@ -15,6 +15,7 @@ using System.Data.Entity.Infrastructure;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BedBrigade.Client
 {
@@ -40,6 +41,8 @@ namespace BedBrigade.Client
         public static void AddServicesToTheContainer(WebApplicationBuilder builder)
         {
             // Add services to the container.
+            builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();

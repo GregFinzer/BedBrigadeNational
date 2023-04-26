@@ -1,6 +1,7 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/admintasks/addpage"
+@page "/administration/admintasks/addpage/{*imageRoute}"
 
 <h3 class="w-100 text-center my-4">Add Page</h3>
 
-<EditContent PageName="NewPage" IsNewPage="true"/>
+<EditContent PageName="NewPage" IsNewPage="true" saveUrl="@imageRoute"/>

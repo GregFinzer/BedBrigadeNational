@@ -8,7 +8,7 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
-using Org.BouncyCastle.Asn1.X509;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BedBrigade.Client.Components
 {
@@ -41,11 +41,14 @@ namespace BedBrigade.Client.Components
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
-
         protected string? RecordText { get; set; } = "Loading Pages ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public List<Location> Locations { get; private set; }
+        public EditContext formContext { get; set; }
+        private string? saveUrl { get; set; }
+        public string imagePath { get; private set; }
+        public bool DialogPageNameVisible { get; private set; } = false;
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -68,7 +71,7 @@ namespace BedBrigade.Client.Components
                 ToolBar = new List<string> { "Search", "Reset" };
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
-
+            content = new Content();
             var result = await _svcContent.GetAllAsync();
             if (result.Success)
             {
@@ -123,13 +126,42 @@ namespace BedBrigade.Client.Components
             }
 
         }
+        private async Task DialogPageNewOnClickHandler()
+        {
+            var found = await _svcContent.GetAsync(content.Name);
+            if (found.Success)
+            {
+                ToastTitle = "Page Name Error";
+                ToastContent = $"Page {content.Name} already exists!";
+                await ToastObj.ShowAsync();
+                return;
+            }
+            DialogPageNameVisible = false;
+            var locationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
+            var locResult = await _svcLocation.GetAsync(locationId);
+            string locationRoute = string.Empty;
+            if (locResult.Success)
+            {
+                locationRoute = locResult.Data.Route;
+                var locationName = locResult.Data.Name;
+            }
+
+            saveUrl = $"api/image/save/{locationId}/{content.Name}";
+            imagePath = $"media/{locationRoute}/pages/{content.Name}/";
+
+            _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
+
+        }
 
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
             if(args.Item.Text == "Add")
             {
-                _nm.NavigateTo("/administration/admintasks/addpage");
+                DialogPageNameVisible = true;
+                //saveUrl = "api/image/save/5/Test4";
+                //_nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
+
 
             }
             if (args.Item.Text == "Reset")

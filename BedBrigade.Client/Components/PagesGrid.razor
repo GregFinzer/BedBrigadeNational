@@ -120,9 +120,35 @@ else
         </div>
     </fieldset>
 }
+
+
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#LocationTarget">
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
+
+<SfDialog Width="800" MinHeight="50" @bind-Visible=@DialogPageNameVisible IsModal="true" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>Page Name & Title</Header>
+        <Content>
+            <EditForm id="Page" Model=@content OnValidSubmit=@DialogPageNewOnClickHandler>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-md-4">
+                        <SfTextBox ID="name" @bind-Value=@content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => content.Name)" />
+                    </div>
+                    <div class="col-md-8">
+                        <SfTextBox @bind-Value=@content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
+                    </div>
+                </div>
+                <div class="e-footer-content">
+                    <SfButton>Save</SfButton>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
 
 @if (NoPaging)
 {
