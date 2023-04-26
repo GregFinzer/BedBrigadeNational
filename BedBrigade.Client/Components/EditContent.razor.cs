@@ -19,10 +19,10 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationService _svcLocation { get; set; }
 
         [Parameter] public string PageName { get; set; }
-
         [Parameter] public bool IsNewPage { get; set; }
+        [Parameter] public string saveUrl { get; set; }
 
-        private string saveUrl { get; set; } = "api/image/save/1/Images";
+        //private string saveUrl { get; set; } = "api/image/save/1/Images";
         private string imagePath { get; set; } = "media/National/Pages/Images/";
         private string validationMessage { get; set; } = "My Message";
         private List<string> AllowedTypes = new()
@@ -32,9 +32,7 @@ namespace BedBrigade.Client.Components
             ".gif"
         };
         private bool DialogVisible { get; set; } = false;
-        private bool DialogPageNameVisible { get; set; } = false;
         private SfRichTextEditor RteObj { get; set; }
-        private RichTextEditorImageSettings ImageSettings { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
         private string Body { get; set; }
         private Content Content { get; set; }
@@ -76,11 +74,17 @@ namespace BedBrigade.Client.Components
              new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
              new ToolbarItemModel() {Command = ToolbarCommand.FullScreen },
+             new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
+             new ToolbarItemModel() { Command = ToolbarCommand.Image },
+             new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
              new ToolbarItemModel() {Command = ToolbarCommand.Undo },
-             new ToolbarItemModel() { Name = "Save",TooltipText = "Save File" }
+              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+            new ToolbarItemModel() { Name = "Save",TooltipText = "Save File" }
         };
+
         protected override async Task OnInitializedAsync()
         {
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
@@ -89,7 +93,6 @@ namespace BedBrigade.Client.Components
             if (IsNewPage)
             {
                 ToastTitle = $"Save Page as {PageName}";
-                DialogPageNameVisible = true;
             }
             else
             {
@@ -119,22 +122,22 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
-            {
-                locationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
-                var locResult = await _svcLocation.GetAsync(locationId);
-                if (locResult.Success)
-                {
-                    locationRoute = locResult.Data.Route;
-                    locationName = locResult.Data.Name;
-                }
+            //if (!firstRender)
+            //{
+            //    locationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
+            //    var locResult = await _svcLocation.GetAsync(locationId);
+            //    if (locResult.Success)
+            //    {
+            //        locationRoute = locResult.Data.Route;
+            //        locationName = locResult.Data.Name;
+            //    }
 
 //                saveUrl = $"api/image/save/{locationId}/{Content.Name}";
 //                imagePath = $"media/{locationRoute}/pages/{Content.Name}/";
 //#if DEBUG   
 //                Console.WriteLine($"saveUrl: {saveUrl} imagePath: {imagePath} ");
 //#endif
-            }
+            //}
         }
 
         private async Task HideToast()
@@ -166,18 +169,6 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task DialogPageNewOnClickHandler()
-        {
-            var found = await _svcContent.GetAsync(Content.Name);
-            if (found.Success)
-            {
-                ToastTitle = "Page Name Error";
-                ToastContent = $"Page {Content.Name} already exists!";
-                await ToastObj.ShowAsync();
-                return;
-            }
-            DialogPageNameVisible = false;
-        }
 
         private async Task DialogOnClickHandler()
         {

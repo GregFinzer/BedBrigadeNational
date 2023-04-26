@@ -28,34 +28,13 @@
         @((MarkupString)Body)
     </SfRichTextEditor>
 </div>
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Target="#UserTarget" Content=@ToastContent>
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Timeout=@ToastTimeout Target="#UserTarget" Content=@ToastContent>
     <ToastPosition X="Center" Y="Top"></ToastPosition>
     <ToastButtons>
         <ToastButton Content = "Close" OnClick=@HideToast />
     </ToastButtons>
 </SfToast>
-<SfDialog Width="800" MinHeight="50" @bind-Visible=@DialogPageNameVisible IsModal="true" ShowCloseIcon="true" >
-    <DialogTemplates>
-        <Header>Page Name & Title</Header>
-        <Content>
-            <EditForm Model=@Content OnValidSubmit=@DialogPageNewOnClickHandler>
-                <DataAnnotationsValidator />
-                <div class="row">
-                    <div class="col-md-4">
-                        <SfTextBox ID="name" @bind-Value=@Content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.Name)" />
-                    </div>
-                    <div class="col-md-8">
-                        <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
-                    </div>
-                </div>
-                <div class="e-footer-content">
-                    <SfButton>Save</SfButton>
-                </div>
-            </EditForm>
-        </Content>
-    </DialogTemplates>
-</SfDialog>
+
 <SfDialog Width="800" MinHeight="200" @bind-Visible=@DialogVisible IsModal="true" ShowCloseIcon="true" >
     <DialogTemplates>
         <Header>Add New Page</Header>
