@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -10,11 +11,10 @@ namespace BedBrigade.Data.Models
 		public Int32 ContentId { get; set; }
 
 		[ForeignKey("LocationId")]
-		public Int32 LocationId { get; set; } 
+		public Int32 LocationId { get; set; }
 
-        [Required]
-		[MaxLength(30)]
-		public String ContentType { get; set; } = string.Empty;
+		[Required]
+		public ContentType ContentType { get; set; } = ContentType.Body;
 
 		[Required]
 		[MaxLength(30)]

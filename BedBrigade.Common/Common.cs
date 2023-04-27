@@ -3,6 +3,12 @@ using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Common;
 
+public class ContentTypeEnumItem
+{
+    public ContentType Value { get; set; }
+    public string? Name { get; set; }
+
+}
 
 public class BedRequestEnumItem
 {
@@ -27,6 +33,13 @@ public class FileUseEnumItem
 
 public static class Common
 {
+    public enum ContentType
+    {
+        Header = 1,
+        Footer = 2,
+        Body = 3,
+    }
+
     public enum PersistGrid
     {
         Configuration = 1,
@@ -47,6 +60,23 @@ public static class Common
        Scheduled = 2,
        Delivered = 3,
     }
+
+    /// <summary>
+    /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
+    /// </summary>
+    /// <returns>List<EnumItem></EnumItem></returns>
+    public static List<ContentTypeEnumItem> GetContentTypeItems()
+    {
+        var type = typeof(ContentType);
+        return Enum.GetValues(type).OfType<ContentType>().ToList()
+                        .Select(x => new ContentTypeEnumItem
+                        {
+                            Value = (ContentType)x,
+                            Name = Enum.GetName(type, x)
+                        })
+                        .ToList();
+    }
+
 
     /// <summary>
     /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
