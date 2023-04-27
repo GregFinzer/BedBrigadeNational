@@ -49,6 +49,7 @@ namespace BedBrigade.Client.Components
         private string? saveUrl { get; set; }
         public string imagePath { get; private set; }
         public bool DialogPageNameVisible { get; private set; } = false;
+        public List<ContentTypeEnumItem> ContentTypes { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
@@ -82,6 +83,8 @@ namespace BedBrigade.Client.Components
             {
                 Locations = locResult.Data;
             }
+
+            ContentTypes = GetContentTypeItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
