@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 using Microsoft.AspNetCore.Components.Forms;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -17,6 +18,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentService? _svcContent { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private ILocationService? _svcLocation { get; set; }
+        [Inject] private IWebHostEnvironment _svcEnv { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private NavigationManager? _nm { get; set; }
 
@@ -233,6 +235,10 @@ namespace BedBrigade.Client.Components
                     if (deleteResult.Success)
                     {
                         ToastContent = "Delete Successful!";
+                        var locationRoute = Locations.Find(l => l.LocationId == rec.LocationId).Route;
+                        var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{rec.Name}";
+                        DeleteDirectory(folderPath);
+                        Log.Information($"Deleted Page Folder at {folderPath}");
                     }
                     else
                     {
@@ -244,7 +250,8 @@ namespace BedBrigade.Client.Components
                 {
                     args.Cancel = true;
                     reason = ex.Message;
-
+                    Log.Information($"Error: {reason}");
+                    return;
                 }
 
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
@@ -302,8 +309,8 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Update Page";
-            ButtonTitle = "Update";
+            HeaderTitle = "Edit Page";
+            ButtonTitle = "Edit Page";
         }
 
         protected async Task Save(Content page)
