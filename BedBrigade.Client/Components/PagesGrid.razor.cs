@@ -250,7 +250,8 @@ namespace BedBrigade.Client.Components
                 {
                     args.Cancel = true;
                     reason = ex.Message;
-
+                    Log.Information($"Error: {reason}");
+                    return;
                 }
 
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
