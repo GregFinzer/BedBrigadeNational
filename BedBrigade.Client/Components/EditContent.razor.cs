@@ -2,11 +2,8 @@ using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http.Features;
-using Newtonsoft.Json;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.RichTextEditor;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 
 namespace BedBrigade.Client.Components
@@ -41,11 +38,11 @@ namespace BedBrigade.Client.Components
         private string? ToastTitle { get; set; } = string.Empty;
         private int ToastTimeout { get; set; } = 6000;
         private string ToastContent { get; set; } = string.Empty;
-        private string ButtonCaption { get; set; } = "Save As ...";
-        private string locationRoute { get; set; } = string.Empty;
-        private string locationName { get; set; } = string.Empty;
-
-        private int locationId { get; set; }
+        //private string ButtonCaption { get; set; } = "Save As ...";
+        //private string locationRoute { get; set; } = string.Empty;
+        //private string locationName { get; set; } = string.Empty;
+        private int LocationId { get; set; }
+        string[] pageParameters { get; set; }
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -82,19 +79,20 @@ namespace BedBrigade.Client.Components
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
              new ToolbarItemModel() {Command = ToolbarCommand.Undo },
-              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
-            new ToolbarItemModel() { Name = "Save",TooltipText = "Save File" }
+             new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Name = "Save",TooltipText = "Save File" }
         };
 
         protected override async Task OnInitializedAsync()
         {
-            string[] pageParameters = saveUrl.Split('/');
-            newPageName = pageParameters[4];
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
-            string location = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
-            int.TryParse(location, out int id);
             if (IsNewPage)
             {
+                pageParameters = saveUrl.Split('/');
+                newPageName = pageParameters[4];
+                string location = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
+                LocationId = int.Parse(location);
+
                 ToastTitle = $"Save Page as {newPageName}";
             }
             else
@@ -107,12 +105,15 @@ namespace BedBrigade.Client.Components
             {
                 Body = result.Data.ContentHtml;
                 Content = result.Data;
-                Content.ContentId = 0;
                 Content.UpdateDate = DateTime.Now;
                 Content.CreateDate = DateTime.Now;
                 Content.CreateUser = Content.UpdateUser = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                Content.LocationId = id;
-                Content.Name = newPageName;
+                if (IsNewPage)
+                {
+                    Content.LocationId = LocationId;
+                    Content.Name = newPageName;
+                    Content.ContentId = 0;
+                }
             }
             else
             {
@@ -135,11 +136,11 @@ namespace BedBrigade.Client.Components
             //        locationName = locResult.Data.Name;
             //    }
 
-//                saveUrl = $"api/image/save/{locationId}/{Content.Name}";
-//                imagePath = $"media/{locationRoute}/pages/{Content.Name}/";
-//#if DEBUG   
-//                Console.WriteLine($"saveUrl: {saveUrl} imagePath: {imagePath} ");
-//#endif
+            //                saveUrl = $"api/image/save/{locationId}/{Content.Name}";
+            //                imagePath = $"media/{locationRoute}/pages/{Content.Name}/";
+            //#if DEBUG   
+            //                Console.WriteLine($"saveUrl: {saveUrl} imagePath: {imagePath} ");
+            //#endif
             //}
         }
 
