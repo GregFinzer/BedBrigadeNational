@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Data.Seeding
 {
@@ -29,7 +30,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedContactBody(DataContext context)
         {
             var name = "Contact";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -37,7 +37,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -59,7 +59,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedStoriesBody(DataContext context)
         {
             var name = "Stories";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -67,7 +66,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -89,7 +88,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedHistoryBody(DataContext context)
         {
             var name = "History";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -97,7 +95,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -119,7 +117,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedLocationsBody(DataContext context)
         {
             var name = "Locations";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -127,7 +124,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -149,7 +146,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedNewsBody(DataContext context)
         {
             var name = "News";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -157,7 +153,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -179,7 +175,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedPartnerBody(DataContext context)
         {
             var name = "Partners";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -187,7 +182,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -209,7 +204,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedAssemblyBody(DataContext context)
         {
             var name = "Assembly";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -217,7 +211,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -239,7 +233,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedAboutUsBody(DataContext context)
         {
             var name = "About";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -247,7 +240,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -269,7 +262,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedDonateBody(DataContext context)
         {
             var name = "Donate";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -277,7 +269,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -299,7 +291,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedVolunteerBody(DataContext context)
         {
             var name = "Volunteer";
-            var contentType = "Body";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -307,7 +298,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -328,7 +319,6 @@ namespace BedBrigade.Data.Data.Seeding
 
         private static async Task SeedRequestBedBody(DataContext context)
         {
-            var contentType = "Body";
             var name = "RequestBed";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
@@ -337,7 +327,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -358,7 +348,6 @@ namespace BedBrigade.Data.Data.Seeding
 
         private static async Task SeedHomePageBody(DataContext context)
         {
-            var contentType = "Body";
             var name = "Home";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
@@ -367,7 +356,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     LeftMediaId = "imageLeft",
@@ -388,7 +377,6 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedHeader(DataContext context)
         {
             var name = "Header";
-            var contentType = "Header";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
@@ -396,7 +384,7 @@ namespace BedBrigade.Data.Data.Seeding
                 Content content = new Content
                 {
                     LocationId = location.LocationId,
-                    ContentType = contentType,
+                    ContentType = ContentType.Header,
                     Name = name,
                     ContentHtml = seedHtml,
                     FooterMediaId = "imageFooter",
@@ -418,7 +406,6 @@ namespace BedBrigade.Data.Data.Seeding
 
         private static async Task SeedFooter(DataContext context)
         {
-            var contentType = "Footer";
             var name = "Footer";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
@@ -427,7 +414,7 @@ namespace BedBrigade.Data.Data.Seeding
                 context.Content.Add(new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = contentType,
+                    ContentType = ContentType.Footer,
                     Name = name,
                     ContentHtml = seedHtml
                 });
