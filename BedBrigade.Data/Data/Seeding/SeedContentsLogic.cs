@@ -24,6 +24,36 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedAboutUsBody(context);
                 await SeedStoriesBody(context);
                 await SeedContactBody(context);
+                await SeedNewPageBody(content);
+            }
+        }
+
+        private static async Task SeedNewPageBody(DataContext context)
+        {
+            var name = "NewPage";
+            if (!await context.Content.AnyAsync(c => c.Name == name))
+            {
+                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var seedHtml = GetHtml($"{name}.html");
+                context.Content.Add(new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.Body,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    LeftMediaId = "imageLeft",
+                    MiddleMediaId = "imageMiddle",
+                    RightMediaId = "imageRight",
+                    Title = "Contact Us"
+                });
+            }
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in content {ex.Message}");
             }
         }
 

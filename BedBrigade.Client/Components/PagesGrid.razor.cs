@@ -133,6 +133,7 @@ namespace BedBrigade.Client.Components
         }
         private async Task DialogPageNewOnClickHandler()
         {
+            content.Name = content.Name.Replace(' ', '_');
             var found = await _svcContent.GetAsync(content.Name);
             if (found.Success)
             {
