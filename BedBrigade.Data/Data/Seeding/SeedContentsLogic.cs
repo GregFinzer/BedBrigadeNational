@@ -24,7 +24,7 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedAboutUsBody(context);
                 await SeedStoriesBody(context);
                 await SeedContactBody(context);
-                await SeedNewPageBody(content);
+                await SeedNewPageBody(context);
             }
         }
 
@@ -44,7 +44,7 @@ namespace BedBrigade.Data.Data.Seeding
                     LeftMediaId = "imageLeft",
                     MiddleMediaId = "imageMiddle",
                     RightMediaId = "imageRight",
-                    Title = "Contact Us"
+                    Title = "New Page"
                 });
             }
             try
