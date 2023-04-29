@@ -369,12 +369,12 @@ namespace BedBrigade.Client.Components
 
         private void ChangeMediaId(string? headerMediaId1, string name, string? headerMediaId2)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         private void ChangeTitle(string name, string title)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         private void RenamePage(string? newName, string? oldName, int LocationId)
