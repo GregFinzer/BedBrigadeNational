@@ -34,7 +34,8 @@ else
                             AllowResizing="true"
                             AllowSelection="true"
                             AllowPdfExport="true"
-                            AllowTextWrap="true">
+                            AllowTextWrap="true"
+                            AllowGrouping="true">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="10" />
                         <GridEvents DataBound=@DataBound
                             Destroyed=@OnDestroyed
@@ -60,7 +61,7 @@ else
                             </FooterTemplate>
                             <Template>
                                 @{
-                            BedRequest BedRequest = (context as BedRequest)!;
+                                    BedRequest BedRequest = (context as BedRequest)!;
                                     if(BedRequest.LocationId == 0)
                                     {
                                         BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
@@ -128,6 +129,7 @@ else
                                 <GridSortColumn Field="FullName" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridColumn Field=@nameof(BedRequest.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
@@ -141,7 +143,7 @@ else
 
                                 </Template>
                             </GridColumn>
-                            <GridForeignColumn Field=@nameof(BedRequest.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridForeignColumn Field=@nameof(BedRequest.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" />
                             <GridColumn Field=@nameof(BedRequest.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
                                 <Template>
                                     @{
@@ -151,7 +153,7 @@ else
                                 </Template>
                             </GridColumn>
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Bed Requests" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
+                            <GridColumn Field=@nameof(BedRequest.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" >
                                 <Template>
                                     @{
                                         var request = (context as BedRequest);

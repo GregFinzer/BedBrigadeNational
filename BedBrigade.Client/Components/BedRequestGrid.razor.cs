@@ -34,6 +34,7 @@ namespace BedBrigade.Client.Components
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
         protected BedRequest BedRequest { get; set; } = new BedRequest();
+        protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }

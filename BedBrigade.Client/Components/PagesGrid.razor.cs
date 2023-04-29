@@ -10,6 +10,7 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BedBrigade.Client.Components
 {
@@ -31,12 +32,15 @@ namespace BedBrigade.Client.Components
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Content>? Pages { get; set; }
         protected Content content { get; set; }
+        protected Content CurrentValues { get; set; }
         protected SfGrid<Content>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
+        protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
+        public string EditTitle { get; private set; }
         protected string? addNeedDisplay { get; private set; }
         protected string? editNeedDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
@@ -264,6 +268,7 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Add Page";
             ButtonTitle = "Add Page";
+            EditTitle = "Edit Page"; 
         }
 
         private async Task Save(ActionEventArgs<Content> args)
@@ -310,13 +315,81 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Edit Page";
-            ButtonTitle = "Edit Page";
+            HeaderTitle = "Save & Edit Page";
+            ButtonTitle = "Save";
+            EditTitle = "Save & Edit Page";
         }
 
         protected async Task Save(Content page)
         {
+            CurrentValues = Pages.Find(p => p.ContentId == page.ContentId);
+            CheckValues(page, CurrentValues);
             await Grid.EndEdit();
+        }
+        /// <summary>
+        /// Method to compare properties between to objects
+        /// </summary>
+        /// <param name="page">Object with possible changed values</param>
+        /// <param name="currentValues">Object with values before possible change</param>
+        /// <returns>True if a value was changed</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool CheckValues(Content page, Content values)
+        {
+            if(page.Title != values.Title)
+            {
+                ChangeTitle(values.Name, page.Title);
+            }
+            if (page.HeaderMediaId != values.HeaderMediaId)
+            {
+                ChangeMediaId(values.Name, values.HeaderMediaId, page.HeaderMediaId);
+            }
+            if (page.FooterMediaId != values.FooterMediaId)
+            {
+                ChangeMediaId(values.Name, values.FooterMediaId, page.FooterMediaId);
+            }
+            if (page.LeftMediaId != values.LeftMediaId)
+            {
+                ChangeMediaId(values.Name, values.LeftMediaId, page.LeftMediaId);
+            }
+            if (page.MiddleMediaId != values.MiddleMediaId)
+            {
+                ChangeMediaId(values.Name, values.MiddleMediaId, page.MiddleMediaId);
+            }
+            if (page.RightMediaId != values.RightMediaId)
+            {
+                ChangeMediaId(values.Name, values.RightMediaId, page.RightMediaId);
+            }
+            // This if must be the last
+            if (page.Name != values.Name)
+            {
+                RenamePage(page.Name, values.Name, values.LocationId);
+            }
+            return true;
+        }
+
+        private void ChangeMediaId(string? headerMediaId1, string name, string? headerMediaId2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ChangeTitle(string name, string title)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RenamePage(string? newName, string? oldName, int LocationId)
+        {
+            var locationRoute = Locations.Find(l => l.LocationId == LocationId).Route;
+            var oldPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{oldName}";
+            var newPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{newName}"; 
+            Directory.Move(oldPath, newPath);
+            Log.Information($"Renamed Page Folder at {oldPath} to {newPath}");
+        }
+
+        protected async Task EditPage(Content page)
+        {
+            await Grid.EndEditAsync();
+            _nm.NavigateTo($"/administration/edit/editpage/{page.Name}");
         }
 
         protected async Task Cancel()
