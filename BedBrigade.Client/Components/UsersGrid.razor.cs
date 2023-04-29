@@ -26,6 +26,7 @@ namespace BedBrigade.Client.Components
         protected SfDropDownList<string, Role>? RoleDD { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
+        protected string[] groupColumns = new string[] { "LocationId" };
         protected List<User>? BBUsers { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }

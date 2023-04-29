@@ -32,8 +32,9 @@ else
                             AllowResizing="true"
                             AllowSelection="true"
                             AllowPdfExport="true"
-                            AllowTextWrap="true">
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
+                            AllowTextWrap="true"
+                            AllowGrouping="true">
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,30,35,40})" PageSize="40" />
                         <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Content" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
@@ -46,14 +47,9 @@ else
                                     @HeaderTitle
                                   }
                             </HeaderTemplate>
-                            <FooterTemplate>
-                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Content)) IsPrimary="true">@ButtonTitle</SfButton>
-                                <SfButton OnClick="Cancel">Cancel</SfButton>
-                            </FooterTemplate>
                             <Template>
                                 @{
-                                    Content content = (context as Content)!;
-
+                                    Content content = (context as Content);
                                     <div class="row">
                                         <div class="col-md-4">
                                             <SfTextBox ID="name" @bind-Value=@content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
@@ -92,6 +88,11 @@ else
 
                                 }
                             </Template>
+                            <FooterTemplate>
+                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Content)) IsPrimary="true">@ButtonTitle</SfButton>
+                                <SfButton CssClass="btn btn-primary" OnClick=@(() => EditPage(context as Content)) IsPrimary="true">@EditTitle</SfButton>
+                                <SfButton OnClick="Cancel">Cancel</SfButton>
+                            </FooterTemplate>
                         </GridEditSettings>
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
@@ -100,6 +101,7 @@ else
                                 <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="false" Width="15" />
