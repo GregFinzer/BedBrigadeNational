@@ -109,7 +109,7 @@ namespace BedBrigade.Client
         {
             Log.Logger.Information("Create and configure application");
             WebApplication app = builder.Build();
-
+            app.UsePathBase("/National");
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -136,7 +136,7 @@ namespace BedBrigade.Client
             Lifetime.ApplicationStopping.Register(OnStopping);
             Lifetime.ApplicationStarted.Register(OnStarting);
             
-
+            
             //Task.Run(async () => await  app.StopAsync());
             return app;
         }

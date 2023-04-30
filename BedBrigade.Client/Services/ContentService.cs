@@ -48,5 +48,10 @@ namespace BedBrigade.Client.Services
         {
             return await _data.GetAsync(name);
         }
+
+        public async Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
+        {
+            return await _data.GetAsync(name, locationId);
+        }
     }
 }

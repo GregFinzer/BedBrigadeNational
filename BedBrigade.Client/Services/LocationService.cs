@@ -41,5 +41,10 @@ namespace BedBrigade.Client.Services
         {
             return await _data.CreateAsync(location);
         }
+
+        public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string route)
+        {
+            return await _data.GetLocationByRouteAsync(route);
+        }
     }
 }

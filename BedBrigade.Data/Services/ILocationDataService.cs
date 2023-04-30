@@ -8,6 +8,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> DeleteAsync(int locationId);
         Task<ServiceResponse<List<Location>>> GetAllAsync();
         Task<ServiceResponse<Location>> GetAsync(int locationId);
+        Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName);
         Task<ServiceResponse<Location>> UpdateAsync(Location location);
     }
 }
