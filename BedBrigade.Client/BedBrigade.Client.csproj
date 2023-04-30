@@ -64,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Home\circleville\" />
+    <Folder Include="Pages\Home\Circleville\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\left\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
