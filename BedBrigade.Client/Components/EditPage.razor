@@ -18,10 +18,11 @@
 </SfRichTextEditor>
 
 @code {
-        [Inject] public IContentService _svcContent { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] public IContentService _svcContent { get; set; }
+    [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private NavigationManager _nv { get; set; }
 
-        [Parameter] public string ContentType { get; set; }
+    [Parameter] public string ContentType { get; set; }
 
     private SfRichTextEditor RTE { get; set; }
     private ClaimsPrincipal? Identity { get; set; }
@@ -38,7 +39,8 @@
         else
         {
         }
-        var result = await _svcContent.GetAsync("HomePageBody");
+        string[] pageParameters = _nv.Uri.Split('/');
+        var result = await _svcContent.GetAsync("HomePageBody", 1);
         if(result.Success)
         {
             Body = result.Data.ContentHtml;

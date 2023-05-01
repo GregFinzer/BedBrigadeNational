@@ -1,3 +1,10 @@
 ﻿@page "/"
 
-<Body PageName="Home" Path="National/Pages/Home" />
+@code {
+    [Inject] NavigationManager _nm { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _nm.NavigateTo("/National");
+    }
+}

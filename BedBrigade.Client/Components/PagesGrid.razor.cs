@@ -138,7 +138,7 @@ namespace BedBrigade.Client.Components
         private async Task DialogPageNewOnClickHandler()
         {
             content.Name = content.Name.Replace(' ', '_');
-            var found = await _svcContent.GetAsync(content.Name);
+            var found = await _svcContent.GetAsync(content.Name, 1);
             if (found.Success)
             {
                 ToastTitle = "Page Name Error";

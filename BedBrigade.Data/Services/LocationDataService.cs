@@ -84,6 +84,19 @@ public class LocationDataService : BaseDataService, ILocationDataService
         }
     }
 
+    public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var loc = await ctx.Locations.FirstOrDefaultAsync(l => l.Route == routeName);
+            if (loc != null)
+            {
+                return new ServiceResponse<Location>($"{routeName} found", true, loc);
+            }
+            return new ServiceResponse<Location>("Not Found");
+        }
+    }
+
 
     public async Task<ServiceResponse<Location>> UpdateAsync(Location location)
     {
