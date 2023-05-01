@@ -14,6 +14,7 @@ namespace BedBrigade.Tests
         public void Setup()
         {
             _qualityLogic = new QualityLogic(TestHelper.KellermanUserName, TestHelper.KellermanLicenseKey);
+            _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
