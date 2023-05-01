@@ -46,17 +46,17 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             string[] routePath = _nm.Uri.Split('/');
-            if ("https:" == routePath[0].ToLower()) routePath[0] = "National";
-            var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[0]}");
+            if (routePath[3] == "") routePath[3] = "National";
+            var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
             if (result.Success)
             {
-                var contentResult = await _svcContent.GetAsync("Header",result.Data.LocationId);
+                var contentResult = await _svcContent.GetAsync("Header", result.Data.LocationId);
                 if (contentResult.Success)
                 {
                     headerContent = contentResult.Data.ContentHtml;
                 }
             }
-            else
+            
             authState = await _authState.GetAuthenticationStateAsync();
             if (authState != null)
             {
