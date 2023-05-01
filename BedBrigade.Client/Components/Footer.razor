@@ -13,8 +13,8 @@
     protected override async Task OnInitializedAsync()
     {
         string[] routePath = _nm.Uri.Split('/');
-        if (string.IsNullOrEmpty(routePath[0])) routePath[0] = "National";
-        var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[0]}");
+        if (routePath[3] == "") routePath[3] = "National";
+        var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
         if (result.Success)
         {
             var contentResult = await _svcContent.GetAsync("Footer", result.Data.LocationId);
