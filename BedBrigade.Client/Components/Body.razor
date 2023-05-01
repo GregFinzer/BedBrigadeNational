@@ -12,7 +12,7 @@
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private IContentService _svcContent { get; set; }
     [Inject] private ILocationService _svcLocation {get; set; }
-    [Inject] private NavigationManager _nv { get; set; }
+    [Inject] private NavigationManager _nm { get; set; }
 
     [Parameter] public string PageName { get; set;}
     [Parameter] public string Caption { get; set; } = "Bed Brigade";
@@ -43,7 +43,7 @@
 
     private Content content { get; set; }
     private string BodyContent = string.Empty;
-    private string[] RoutePath;
+    private string[] routePath;
     protected string Login = "login";
     private ClaimsPrincipal Identity { get; set; }
     private bool IsAuthenicated { get; set; } = false;
@@ -51,8 +51,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        RoutePath = Path.Split('/');
-        var result = await _svcLocation.GetLocationByRouteAsync($"/{RoutePath[0]}");
+        routePath = _nm.Uri.Split('/');
+        var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
         if (result.Success)
         {
             var contentResult = await _svcContent.GetAsync(PageName, result.Data.LocationId);
@@ -60,6 +60,10 @@
             {
                 content = contentResult.Data;
                 BodyContent = contentResult.Data.ContentHtml;
+            }
+            else
+            {
+                _nm.NavigateTo($"/{routePath[3]}/sorry");
             }
         }
         Menu = FindMenu();
@@ -215,7 +219,7 @@
 
     protected string FindMenu()
     {
-        var location = _nv.Uri.Split('/');
+        var location = _nm.Uri.Split('/');
         return location[location.Length - 1];
     }
 }
