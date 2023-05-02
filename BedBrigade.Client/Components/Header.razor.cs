@@ -46,7 +46,7 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             string[] routePath = _nm.Uri.Split('/');
-            if (routePath[3] == "") routePath[3] = "National";
+            if (routePath[3] == ""|| routePath[3] == "Administration") routePath[3] = "National";
             var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
             if (result.Success)
             {
@@ -81,9 +81,9 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
                     await _js.InvokeVoidAsync("DisplayToggle.Toggle", "administration");
-                    if (Menu == "dashboard")
+                    if (Menu.ToLower() == "dashboard")
                     {
-                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "dropdown-toggle active");
+                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
                     }
                 }
                 else
