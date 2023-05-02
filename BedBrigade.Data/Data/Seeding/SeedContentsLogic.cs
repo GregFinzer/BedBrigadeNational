@@ -34,7 +34,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "NewPage";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml($"{name}.html");
                 context.Content.Add(new Content
                 {
@@ -63,7 +63,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Contact";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml($"{name}.html");
                 context.Content.Add(new Content
                 {
@@ -92,7 +92,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Stories";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Stories.html");
                 context.Content.Add(new Content
                 {
@@ -121,7 +121,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "History";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("History-of-bed-brigade.html");
                 context.Content.Add(new Content
                 {
@@ -150,7 +150,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Locations";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Locations.html");
                 context.Content.Add(new Content
                 {
@@ -179,7 +179,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "News";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("News.html");
                 context.Content.Add(new Content
                 {
@@ -208,7 +208,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Partners";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Partners.html");
                 context.Content.Add(new Content
                 {
@@ -237,7 +237,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Assembly";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Assembly.html");
                 context.Content.Add(new Content
                 {
@@ -266,7 +266,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "About";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("About-us.html");
                 context.Content.Add(new Content
                 {
@@ -295,7 +295,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Donate";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Donate.html");
                 context.Content.Add(new Content
                 {
@@ -324,7 +324,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Volunteer";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("Volunteer.html");
                 context.Content.Add(new Content
                 {
@@ -353,7 +353,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "RequestBed";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+                var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 var seedHtml = GetHtml("RequestBed.html");
                 context.Content.Add(new Content
                 {
@@ -380,7 +380,7 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedHomePageBody(DataContext context)
         {
            var name = "Home";
-           var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+           var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
            if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
                 var seedHtml = GetHtml("HomePageBody.html");
@@ -408,7 +408,7 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedHeader(DataContext context)
         {
             var name = "Header";
-            var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+            var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
             if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
                 var seedHtml = GetHtml("header.html");
@@ -466,7 +466,7 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedFooter(DataContext context)
         {
             var name = "Footer";
-            var location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationNational);
+            var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
             if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
                 var seedHtml = GetHtml("footer.html");
@@ -478,7 +478,7 @@ namespace BedBrigade.Data.Data.Seeding
                     ContentHtml = seedHtml
                 });               
             }
-            location = await context.Locations.FirstAsync(l => l.Name == SeedConstants.SeedLocationCircleville);
+            location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationCircleville);
             if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
                 var seedHtml = GetHtml("circleville-footer.html");
