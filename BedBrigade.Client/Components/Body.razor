@@ -103,6 +103,7 @@
             FooterFileName = ComputeImageToDisplay(FooterFileNames);
         }
         SetImagesAsync();
+        Console.WriteLine($"Set active on {Menu}");
         await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
 
     }
@@ -220,6 +221,10 @@
     protected string FindMenu()
     {
         var location = _nm.Uri.Split('/');
-        return location[location.Length - 1];
+        if(location.Length <= 4)
+        {
+            return "home";
+        }
+        return location[location.Length - 1].ToLower();
     }
 }
