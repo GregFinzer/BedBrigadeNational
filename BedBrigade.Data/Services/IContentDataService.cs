@@ -9,6 +9,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<Content>>> GetAllAsync();
         Task<ServiceResponse<Content>> GetAsync(int contentId);
         Task<ServiceResponse<Content>> GetAsync(string name);
+        Task<ServiceResponse<Content>> GetAsync(string name, int locationId);
         Task<ServiceResponse<Content>> UpdateAsync(Content content);
     }
 }

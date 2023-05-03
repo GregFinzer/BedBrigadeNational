@@ -8,12 +8,24 @@
     // Client
     private string footerContent = string.Empty;
     [Inject] private IContentService _svcContent { get; set; }
+    [Inject] private ILocationService _svcLocation { get; set; }
+    [Inject] NavigationManager _nm { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        var result = await _svcContent.GetAsync("Footer");
-        if(result.Success)
+        string[] routePath = _nm.Uri.Split('/');
+        if (routePath[3] == "") routePath[3] = "National";
+        var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
+        if (result.Success)
         {
-            footerContent = result.Data.ContentHtml;
+            var contentResult = await _svcContent.GetAsync("Footer", result.Data.LocationId);
+            if (contentResult.Success)
+            {
+                footerContent = contentResult.Data.ContentHtml;
+            }
+            else
+            {
+                
+            }
         }
     }
 }

@@ -1,27 +1,21 @@
-using BedBrigade.Client.Pages.Administration;
 using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.JSInterop;
-using System.Security.Claims;
 
 namespace BedBrigade.Client.Components
 {
     public partial class Header
     {
         // Client
-        [Inject]
-        private IJSRuntime _js { get; set; }
+        [Inject] private IJSRuntime _js { get; set; }
+        [Inject] private IContentService _svcContent { get; set; }
+        [Inject] private ILocationService _svcLocation { get; set; }
+        [Inject] private AuthenticationStateProvider _authState { get; set; }
+        [Inject] private NavigationManager _nm { get; set; }
 
-        [Inject]
-        private IContentService _svcContent { get; set; }
-
-        [Inject]
-        private AuthenticationStateProvider _authState { get; set; }
-
-        [Inject]
-        private NavigationManager _nv { get; set; }
 
         // Roles
         const string NationalAdmin = "National Admin";
@@ -41,48 +35,55 @@ namespace BedBrigade.Client.Components
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
         private AuthenticationState authState { get; set; }
-        public bool IsNationalAdmin { get; private set; }
-        public bool IsNationalEditor { get; private set; }
-        public bool IsLocationAdmin { get; private set; }
-        public bool IsLocationAuthor { get; private set; }
-        public bool IsLocationScheduler { get; private set; }
-        public bool IsLocationTreasurer { get; private set; }
-        public bool IsLocationEditor { get; private set; }
+        public bool IsNationalAdmin { get; private set; } = false;
+        public bool IsNationalEditor { get; private set; } = false;
+        public bool IsLocationAdmin { get; private set; } = false;
+        public bool IsLocationAuthor { get; private set; } = false;
+        public bool IsLocationScheduler { get; private set; } = false;
+        public bool IsLocationTreasurer { get; private set; } = false;
+        public bool IsLocationEditor { get; private set; } = false;
 
         protected override async Task OnInitializedAsync()
         {
-            var result = await _svcContent.GetAsync("Header");
+            string[] routePath = _nm.Uri.Split('/');
+            if (routePath[3] == ""|| routePath[3] == "Administration") routePath[3] = "National";
+            var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
             if (result.Success)
             {
-                headerContent = result.Data.ContentHtml;
+                var contentResult = await _svcContent.GetAsync("Header", result.Data.LocationId);
+                if (contentResult.Success)
+                {
+                    headerContent = contentResult.Data.ContentHtml;
+                }
             }
-
+            
             authState = await _authState.GetAuthenticationStateAsync();
+            if (authState != null)
+            {
+                IsNationalAdmin = authState.User.HasRole(NationalAdmin);
+                IsNationalEditor = authState.User.HasRole(NationalEditor);
 
-            IsNationalAdmin = authState.User.HasRole(NationalAdmin);
-            IsNationalEditor = authState.User.HasRole(NationalEditor);
-
-            IsLocationAdmin = authState.User.HasRole(LocationAdmin);
-            IsLocationAuthor = authState.User.HasRole(LocationAuthor);
-            IsLocationScheduler = authState.User.HasRole(LocationScheduler);
-            IsLocationTreasurer = authState.User.HasRole(LocationTreasurer);
-            IsLocationEditor = authState.User.HasRole(LocationEditor);
-
+                IsLocationAdmin = authState.User.HasRole(LocationAdmin);
+                IsLocationAuthor = authState.User.HasRole(LocationAuthor);
+                IsLocationScheduler = authState.User.HasRole(LocationScheduler);
+                IsLocationTreasurer = authState.User.HasRole(LocationTreasurer);
+                IsLocationEditor = authState.User.HasRole(LocationEditor);
+            }
             Menu = FindMenu();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
+            if (!firstRender && authState != null)
             {
                 if (authState.User.HasRole($"{NationalAdmin}, {LocationAdmin}, {LocationAuthor}, {LocationScheduler}"))
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
                     await _js.InvokeVoidAsync("DisplayToggle.Toggle", "administration");
-                    if (Menu == "dashboard")
+                    if (Menu.ToLower() == "dashboard")
                     {
-                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "dropdown-toggle active");
+                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
                     }
                 }
                 else
@@ -96,7 +97,7 @@ namespace BedBrigade.Client.Components
 
         protected string FindMenu()
         {
-            var location = _nv.Uri.Split('/');
+            var location = _nm.Uri.Split('/');
             return location[location.Length - 1];
         }
     }

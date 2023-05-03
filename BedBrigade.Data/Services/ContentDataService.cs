@@ -110,7 +110,7 @@ public class ContentDataService : IContentDataService
         }
     }
 
-    public async Task<ServiceResponse<Content>> GetAsync(string name)
+    public async Task<ServiceResponse<Content>> GetAsync(string name, int location)
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -126,7 +126,7 @@ public class ContentDataService : IContentDataService
             //    var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             //    locationId = int.Parse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
             //}
-            result = await ctx.Content.FirstOrDefaultAsync(u => u.Name == name);
+            result = await ctx.Content.FirstOrDefaultAsync(u => u.Name.ToLower() == name.ToLower() && u.LocationId == location);
 
             if (result != null)
             {
@@ -156,6 +156,38 @@ public class ContentDataService : IContentDataService
                 return new ServiceResponse<Content>($"Content record was updated.", true, content);
             }
             return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
+        }
+    }
+
+    public async Task<ServiceResponse<Content>> GetAsync(string name)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            //int locationId;
+            Content result;
+            //var authState = await _auth.GetAuthenticationStateAsync();
+            //if (authState.User.Claims.ToList().Count == 0 )
+            //{
+            //    locationId = (await ctx.Locations.FirstOrDefaultAsync(l => l.Name.ToLower() == "national")).LocationId;
+            //}
+            //else
+            //{
+            //    var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            //    locationId = int.Parse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
+            //}
+            result = await ctx.Content.FirstOrDefaultAsync(u => u.Name == name);
+
+            if (result != null)
+            {
+                return new ServiceResponse<Content>("Found Record", true, result);
+            }
+            //if(name.ToLower() == "header" || name.ToLower() == "newpage")
+            //{
+            //    locationId = (await ctx.Locations.FirstOrDefaultAsync(l => l.Name.ToLower() == "national")).LocationId;
+            //    result = ctx.Content.FirstOrDefault(u => u.LocationId == locationId && u.Name == name);
+            //    return new ServiceResponse<Content>("Found Record", true, result);
+            //}
+            return new ServiceResponse<Content>("Not Found");
         }
     }
 }

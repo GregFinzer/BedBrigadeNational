@@ -100,7 +100,7 @@ namespace BedBrigade.Client.Components
                 ToastTitle = $"Edit Page {PageName}";
             }
 
-            var result = await _svcContent.GetAsync(PageName);
+            var result = await _svcContent.GetAsync(PageName, Convert.ToInt32(pageParameters[3]));
             if (result.Success)
             {
                 Body = result.Data.ContentHtml;
