@@ -5,6 +5,8 @@ using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
 using static BedBrigade.Common.Common;
 using Syncfusion.Blazor.FileManager;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace BedBrigade.Client.Components
 {
@@ -37,7 +39,7 @@ namespace BedBrigade.Client.Components
         private List<Location>? lstLocations;
         public bool isRead = true;
         public string[] toolbarItems = { "NewFolder" };
-        public string[] menuItems = { "Copy", "Paste", "Delete", "Rename" };
+        public string[] menuItems = {"Cut", "Copy", "Paste", "Delete", "Rename" };
 
         //protected List<Location>? lstLocations;
 
@@ -118,37 +120,118 @@ namespace BedBrigade.Client.Components
         public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
         {
 
-            if (!isLocationAdmin && fileManager.Path == PathDivider) // For National Admin only
+            Debug.WriteLine("success: " + JsonConvert.SerializeObject(args));
+
+            bool isFile = args.Result.CWD.IsFile;
+            bool isPagesFolder = false;
+            bool isMediaRoot = false;
+
+           if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration["MediaFolder"].ToString().ToLower() ) // For National Admin only
+           {
+                    isMediaRoot = true;
+           }
+
+            if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
             {
-                fileManager.DisableToolbarItems(toolbarItems);
-                //fileManager.DisableMenuItems(toolbarItems);
+                isPagesFolder = true;
             }
-            else
-            {
-                fileManager.EnableToolbarItems(toolbarItems);
-                // fileManager.EnableMenuItems(toolbarItems);
-            }
+
+            SetMenu(isFile, isPagesFolder, isMediaRoot);
 
         } // success
 
-        public void OnMenuOpen(MenuOpenEventArgs<FileManagerDirectoryContent> args)
+        public void objectSelected(FileSelectEventArgs<FileManagerDirectoryContent> args)
         {
-            if (!isLocationAdmin && args.FileDetails[0].Type.ToString().Trim().Length == 0) // For National Admin & Folder only
+            Debug.WriteLine("object selected: " + JsonConvert.SerializeObject(args));
+           
+            bool isPagesFolder = false;
+            bool isFile = false;
+            string selectedFolder = String.Empty;
+            try
             {
-                if (fileManager.Path == PathDivider)
+                if (args.FileDetails.Name != null) // sametimes null or error
                 {
-                    fileManager.DisableMenuItems(toolbarItems);
-                    fileManager.DisableMenuItems(menuItems);
-                }
-                else // Location Folder Selected?
-                {
-                    if (isLocationFolder())
+                    if (args.FileDetails.Name.ToString().ToLower() == "pages")
                     {
-                        fileManager.DisableMenuItems(menuItems);
+                        isPagesFolder = true;
                     }
+                    isFile = args.FileDetails.IsFile;
                 }
-            } // National Admin
+            }
+            catch(Exception ex) { }                  
+
+            SetMenu(isFile, isPagesFolder);           
+           
+
+        } // selection folder or file
+
+        public void OnMenuOpen(MenuOpenEventArgs<FileManagerDirectoryContent> args)
+        {         
+            bool isPagesFolder = false;
+            bool isFile = false;
+
+            if (args.FileDetails != null)
+            {
+                isFile = args.FileDetails[0].IsFile;
+                if (args.FileDetails[0].Name.ToString() == "pages")
+                {
+                    isPagesFolder = true;
+                }                
+            }
+
+            if (!isFile) { 
+                SetMenu(isFile, isPagesFolder);
+            }
+
         } // Context Menu Open
+
+        public void SetMenu(bool isFile = false, bool isPagesFolder = false, bool isMediaRoot=false)  
+        {
+            // for folders only
+            // For National Admin - no manage location folders
+            // For all Admin - no manage /pages Folder
+            // additional validation fileManager.Path
+            // enable all menu items by default          
+            // enable all menu items by default
+            fileManager.EnableToolbarItems(toolbarItems);
+            fileManager.EnableToolbarItems(menuItems);
+                                  
+            bool bDisableEditing = false;
+
+            if (!isLocationAdmin) // National Admin 
+            {
+                if (isMediaRoot)
+                {
+                    bDisableEditing = true;   
+                }
+            }
+           
+            if (fileManager.Path != null)
+            {
+                if (fileManager.Path.ToString().ToLower().Contains("/pages"))
+                { // for all admin
+                    bDisableEditing = true;
+                }
+
+                if (!isLocationAdmin && (fileManager.Path == PathDivider || isLocationFolder()))
+                {
+                    bDisableEditing = true;
+                }
+            }
+
+            if (isFile)
+            {
+                bDisableEditing = false;
+            }                                       
+
+            if (bDisableEditing)
+            {
+                fileManager.DisableToolbarItems(toolbarItems);
+                fileManager.DisableToolbarItems(menuItems);
+                fileManager.DisableMenuItems(menuItems);
+            }
+
+        } // Set Menu
 
 
         public void onsend(BeforeSendEventArgs args)
@@ -242,6 +325,7 @@ namespace BedBrigade.Client.Components
 
         } // Is Location Folder
 
+       
 
     } // File Manager Class
 } // Namespace
