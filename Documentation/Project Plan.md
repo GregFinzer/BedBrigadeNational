@@ -4,7 +4,7 @@ One thing you will notice about the following project plan is the lack of due da
 
  :heavy_check_mark: Means Done
  
-* Project Setup (Sprint 0)
+* Project Setup (Sprint 0) :heavy_check_mark:
     * Information Architecture Diagram :heavy_check_mark:
     * Define Roles :heavy_check_mark:
     * Git Repository :heavy_check_mark:
@@ -25,10 +25,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Code Quality Check Razor Pages :heavy_check_mark:
     * Setup Deployment :heavy_check_mark:
     
-* Home Page
+* Home Page :heavy_check_mark:
     * Home Page Header :heavy_check_mark:
     * Image Rotator :heavy_check_mark:
-    * Home Page Middle
+    * Home Page Middle :heavy_check_mark:
     * Home Page Footer :heavy_check_mark:
     
 * Basic Administration
@@ -49,18 +49,18 @@ One thing you will notice about the following project plan is the lack of due da
     * New Folder :heavy_check_mark:
     
 * Manage Web Pages
-    * List Pages
+    * List Pages :heavy_check_mark:
     * Add Page
     * Edit Page
     * Delete Page
     * Rename Page
     
 * National Pages
-    * National About Us Page
-    * National History of Bed Brigade Page
+    * National About Us Page :heavy_check_mark:
+    * National History of Bed Brigade Page :heavy_check_mark:
     
 * Locations
-    * Location List
+    * Location List :heavy_check_mark:
     * Grove City Location Home Page
     * Polaris Location Home Page
     * Bed Brigade Near Me
@@ -99,7 +99,7 @@ One thing you will notice about the following project plan is the lack of due da
 * Manage Users
     * User List :heavy_check_mark:
     * Add User :heavy_check_mark:
-    * Edit User :heavy_check_mark:
+    * Edit User 
     * Delete User :heavy_check_mark:
     
 * National News
