@@ -17,7 +17,6 @@ namespace BedBrigade.Client.Pages.Home
         [Inject] private IAuthService AuthService { get; set; }
         [Inject] private ISessionStorageService _local { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-        [Inject] private IJSRuntime _js { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }

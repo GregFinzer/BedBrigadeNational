@@ -33,7 +33,7 @@ public class Seed
 
     private static List<Location> locations = new()
     {
-        new Location {Name=SeedConstants.SeedLocationNational, Route="/national", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
+        new Location {Name=SeedConstants.SeedNationalName, Route="/national", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
         new Location {Name="Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
         new Location {Name="Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
         new Location {Name="Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
@@ -53,8 +53,8 @@ public class Seed
         new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
         new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
         new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
-        new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Editor", Role = "National Editor"},
-        new User {FirstName =  SeedConstants.SeedLocationNational, LastName = "Admin", Role = "National Admin"},
+        new User {FirstName =  SeedConstants.SeedNationalName, LastName = "Editor", Role = "National Editor"},
+        new User {FirstName =  SeedConstants.SeedNationalName, LastName = "Admin", Role = "National Admin"},
         new User {FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
         new User {FirstName = _seedUserLocation1, LastName = "Author", Role = "Location Author" },
         new User {FirstName = _seedUserLocation1, LastName = "Editor", Role = "Location Editor" },
