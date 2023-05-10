@@ -7,6 +7,8 @@ using static BedBrigade.Common.Common;
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using Microsoft.JSInterop;
+using System.Linq.Expressions;
 
 namespace BedBrigade.Client.Components
 {
@@ -40,6 +42,11 @@ namespace BedBrigade.Client.Components
         public bool isRead = true;
         public string[] toolbarItems = { "NewFolder" };
         public string[] menuItems = {"Cut", "Copy", "Paste", "Delete", "Rename" };
+
+        // preview file 
+        private string? previewFileName { get; set; }
+        private string? previewFileUrl { get; set; }
+        private bool previewVisibility { get; set; } = false;
 
         //protected List<Location>? lstLocations;
 
@@ -120,29 +127,39 @@ namespace BedBrigade.Client.Components
         public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
         {
 
-            Debug.WriteLine("success: " + JsonConvert.SerializeObject(args));
-
-            bool isFile = args.Result.CWD.IsFile;
+           // Debug.WriteLine("success: " + JsonConvert.SerializeObject(args));
+                       
             bool isPagesFolder = false;
             bool isMediaRoot = false;
+            bool isFile = false;
 
-           if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration["MediaFolder"].ToString().ToLower() ) // For National Admin only
-           {
-                    isMediaRoot = true;
-           }
-
-            if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
+            try
             {
-                isPagesFolder = true;
-            }
+                if (args.Result != null)
+                {
 
-            SetMenu(isFile, isPagesFolder, isMediaRoot);
+                    isFile = args.Result.CWD.IsFile; // NULL?
+
+                    if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration["MediaFolder"].ToString().ToLower()) // For National Admin only
+                    {
+                        isMediaRoot = true;
+                    }
+
+                    if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
+                    {
+                        isPagesFolder = true;
+                    }
+
+                    SetMenu(isFile, isPagesFolder, isMediaRoot);
+                }
+            }
+            catch(Exception ex) { }
 
         } // success
 
         public void objectSelected(FileSelectEventArgs<FileManagerDirectoryContent> args)
         {
-            Debug.WriteLine("object selected: " + JsonConvert.SerializeObject(args));
+           //  Debug.WriteLine("object selected: " + JsonConvert.SerializeObject(args));
            
             bool isPagesFolder = false;
             bool isFile = false;
@@ -325,7 +342,50 @@ namespace BedBrigade.Client.Components
 
         } // Is Location Folder
 
-       
+        public async Task fileOpen(FileOpenEventArgs<FileManagerDirectoryContent> args)
+        {
+            //Debug.WriteLine("File Open: " + JsonConvert.SerializeObject(args));
+
+            string[] myFiles = { ".webp", ".pdf", ".mp4" };
+
+            try
+            {
+                if (args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
+                {
+                    previewFileName = args.FileDetails.Name;
+                    previewFileUrl = NavigationManager.BaseUri.ToString() + dctConfiguration["MediaFolder"];
+                    if (isLocationAdmin)
+                    {
+                        previewFileUrl = previewFileUrl + PathDivider + userRoute;
+                    }
+
+                    previewFileUrl = previewFileUrl + args.FileDetails.FilterPath + args.FileDetails.Name;
+                   // Debug.WriteLine(previewFileUrl);
+
+                    switch (args.FileDetails.Type)
+                    {
+                        case ".webp":
+                            this.previewVisibility = true;
+                            args.Cancel = true;
+                            break;
+                        case ".pdf":
+                        case ".mp4":
+                            await jsRuntime.InvokeVoidAsync("window.open", previewFileUrl, "_blank");
+                            args.Cancel = true;
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+
+            }
+            catch (Exception ex) { 
+                Debug.WriteLine(ex.Message);
+            }
+
+        } // file Open
+
 
     } // File Manager Class
 } // Namespace
