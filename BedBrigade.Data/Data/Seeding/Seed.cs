@@ -426,9 +426,9 @@ public class Seed
                         TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)]
                     };
 
-                    context.Donations.AddAsync(donation);
-                    context.SaveChangesAsync();
+                    await context.Donations.AddAsync(donation);
                 }
+                await context.SaveChangesAsync();
             }
         }
         catch (DbException ex)
@@ -481,8 +481,8 @@ public class Seed
                         Notes = string.Empty
                     };
 
-                    context.BedRequests.AddAsync(bedRequest);
-                    context.SaveChangesAsync();
+                    await context.BedRequests.AddAsync(bedRequest);
+                    await context.SaveChangesAsync();
                 }
             }
         }
