@@ -101,7 +101,7 @@ else
                                 <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
+                        <GridGroupSettings Columns=@groupColumns EnableLazyLoading="true" ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="false" Width="15" />

@@ -184,6 +184,7 @@ namespace BedBrigade.Client.Components
         {
             var user = args.Data;
             user.Phone = user.Phone.FormatPhoneNumber();
+
             user.Role = await GetUserRoleName(user);
             if (user.PasswordHash != null)
             {
@@ -208,7 +209,7 @@ namespace BedBrigade.Client.Components
         private async Task AddNewUser(User user)
         {
             userRegister.user = user;
-            userRegister.ConfirmPassword = userRegister.Password;
+            userRegister.ConfirmPassword = userRegister.Password = user.Password;
             var registerResult = await _svcAuth.RegisterAsync(userRegister);
             ToastTitle = "Create User";
             if (registerResult.Success)
