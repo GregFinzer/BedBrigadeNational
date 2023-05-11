@@ -13,17 +13,20 @@ public class User : BaseEntity
     [Required]
     [ForeignKey("LocationId")]
     public Int32 LocationId { get; set; }
-    [Required]
+    [Required(ErrorMessage = "First name is required")]
     [MaxLength(20)]
     public String FirstName { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Last name is required")]
     [MaxLength(25)]
     public String LastName { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "An email address is required")]
     [MaxLength(255)]
     public String Email { get; set; } = string.Empty;
+    [NotMapped]
+    [MinLength(6, ErrorMessage = "Password must be a minimum of 6 characters")]
+    public string Password { get; set; } = string.Empty;
     
     [MaxLength(255)]
     public byte[]? PasswordHash { get; set; }
