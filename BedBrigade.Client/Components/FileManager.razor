@@ -1,4 +1,5 @@
 ﻿@using Syncfusion.Blazor.FileManager
+@using Syncfusion.Blazor.Popups
 @using System.Diagnostics
 @using BedBrigade.Client.Components
 @inject NavigationManager NavigationManager
@@ -43,7 +44,7 @@
                     BeforeImageLoad="beforeImageLoad" 
                     BeforeDownload="beforeDownload"
                     FileSelected="objectSelected"
-                >
+                    OnFileOpen="fileOpen">
                 </FileManagerEvents> 
                 <FileManagerUploadSettings
                     AllowedExtensions="@AllowedExtensions"
@@ -53,6 +54,26 @@
     </SfFileManager>
 </div>
 </div>
+</div>
+
+<div class="control-section">
+    <SfDialog id="imgPreview"
+              Width="500px"
+              Height="500px"
+              ShowCloseIcon="true"
+              @bind-Visible="previewVisibility"
+              AllowPrerender="true"
+              IsModal="true"
+              EnableResize="true">
+        <DialogTemplates>
+            <Header>@previewFileName</Header>
+            <Content>
+                <div class="col" style="text-align: center">
+                    <img src="@previewFileUrl" />
+                </div>
+            </Content>
+        </DialogTemplates>
+    </SfDialog>
 </div>
 
 @code{
