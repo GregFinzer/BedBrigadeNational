@@ -9,6 +9,7 @@
 @using SelectionType = Syncfusion.Blazor.Grids.SelectionType
 @using SelectionMode = Syncfusion.Blazor.Grids.SelectionMode
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using ValidationRules = Syncfusion.Blazor.Grids.ValidationRules
 @using BedBrigade.Data.Models
 
 
@@ -57,21 +58,24 @@ else
                             </FooterTemplate>
                             <Template>
                                 @{
+                                        
                                     var user = (context as User);
                                     <div class="row">
                                         <div class="col-md-6">
                                             <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="User Name" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="password" @bind-Value=@userRegister.Password Enabled=@UserPass Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="password" @bind-Value=@user.Password Enabled=@UserPass Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <SfTextBox ID="firstname" CssClass="form-control" @bind-Value=@user.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <ValidationMessage For="@(() => user.FirstName)" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfTextBox ID="lastname" CssClass="form-control" @bind-Value=@user.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <ValidationMessage For="@(() => user.LastName)" />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -103,7 +107,7 @@ else
                                 <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true" />
                         <GridColumns>
                             <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
