@@ -2,7 +2,7 @@
 @page "/administration/edit/editpage/{pageName}"
 @attribute [Authorize]
 
-<EditContent PageName=@pageName IsNewPage=false />
+<EditContent PageName=@pageName IsNewPage=false  />
 
 @code {
     [Parameter] public string? pageName { get; set; }
