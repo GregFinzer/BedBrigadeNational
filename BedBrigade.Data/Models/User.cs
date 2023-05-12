@@ -7,10 +7,10 @@ namespace BedBrigade.Data.Models;
 [Table("Users")]
 public class User : BaseEntity
 {
-    [Key, MaxLength(50), Required]
+    [Key, MaxLength(50), Required(ErrorMessage = "User name is required")]
     public String UserName { get; set; } = string.Empty;
 
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a location for the user")]
     [ForeignKey("LocationId")]
     public Int32 LocationId { get; set; }
     [Required(ErrorMessage = "First name is required")]
@@ -35,10 +35,12 @@ public class User : BaseEntity
     public byte[]? PasswordSalt { get; set; }
 
     [MaxLength(14)]
+    [Required(ErrorMessage = "Please enter a phone number")]
     public String? Phone { get; set; } = string.Empty;
 
     public String? Role { get; set; } = string.Empty;
     [ForeignKey("Role")]
+    [Range(1,int.MaxValue, ErrorMessage = "Please select a role for the user")]
     public int FkRole { get; set; }
 
     // Persist the state of the grid component 

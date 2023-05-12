@@ -116,15 +116,22 @@ namespace BedBrigade.Client.Components
             }
 
         }
+        protected async Task OnRowDeselected(RowDeselectEventArgs<User> args)
+        {
+            var record = await Grid.GetSelectedRecordsAsync();
+            if (record != null)
+            {
+                await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
+            }
+        }
 
         protected async Task OnRowSelected(RowSelectEventArgs<User> args)
         {
             var record = await Grid.GetSelectedRecordsAsync();
             if (record != null)
+            {
                 await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, true);
-            else
-                await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
-
+            }
         }
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)

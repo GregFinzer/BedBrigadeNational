@@ -44,7 +44,7 @@ else
                         AllowGrouping="true">
                         <GridTextWrapSettings WrapMode="WrapMode.Header" />
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
-                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected OnLoad=@OnLoad TValue="User" />
+                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad TValue="User" />
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <Validator>
@@ -65,6 +65,11 @@ else
                                     <div class="row">
                                         <div class="col-md-6">
                                             <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="User Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <ValidationMessage For="@(() => user.UserName)" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@user.Password Enabled=@AddUser Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                            <ValidationMessage For="@(() => user.Password)" />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -92,11 +97,13 @@ else
                                             <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
+                                            <ValidationMessage For="@(() => user.LocationId)" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfDropDownList ID="role" TItem="Role" TValue="Int32" DataSource="Roles" @bind-Value=@user.FkRole Enabled="true" Placeholder="Role" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="RoleId" />
                                             </SfDropDownList>
+                                            <ValidationMessage For="@(() => user.FkRole)" />
                                         </div>
                                     </div>
                                 }
