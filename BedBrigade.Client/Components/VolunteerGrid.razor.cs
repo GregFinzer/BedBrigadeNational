@@ -32,6 +32,7 @@ namespace BedBrigade.Client.Components
         protected Volunteer Volunteer { get; set; } = new Volunteer();
         protected List<VolunteerFor> VolunteersFor { get; private set; }
         protected List<Location> Locations { get; private set; }
+        protected string[] groupColumns = new string[] { "LocationId" };
         protected SfGrid<Volunteer>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
@@ -163,6 +164,11 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.SetPersistData(result.Data);
             }
+            if (!Identity.IsInRole("National Admin"))
+            {
+                await Grid.ExpandAllGroupAsync();
+            }
+
         }
 
         /// <summary>

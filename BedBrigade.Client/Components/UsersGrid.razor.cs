@@ -46,18 +46,21 @@ namespace BedBrigade.Client.Components
         public User user { get; set; } = new User();
 
         protected List<Role> Roles { get; private set; }
+        public bool PasswordVisible { get; private set; }
+        public string displayError { get; private set; } = "none;";
+
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
 
         protected override async Task OnInitializedAsync()
         {
             _logger.LogInformation("Starting User Grid");
+            PasswordVisible = false;
             var authState = await _authState.GetAuthenticationStateAsync();
-            
             Identity = authState.User;
             if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin"))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ToolBar = new List<string> { "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
             {
@@ -65,7 +68,7 @@ namespace BedBrigade.Client.Components
             }
 
             var getRoles = await _svcUser.GetRolesAsync();
-            if(getRoles.Success)
+            if (getRoles.Success)
             {
                 Roles = getRoles.Data;
             }
@@ -75,7 +78,7 @@ namespace BedBrigade.Client.Components
                 BBUsers = getUsers.Data;
             }
             var getLocations = await _svcLocation.GetAllAsync();
-            if(getLocations.Success)
+            if (getLocations.Success)
             {
                 Locations = getLocations.Data;
             }
@@ -84,10 +87,6 @@ namespace BedBrigade.Client.Components
 
         }
 
-        /// <summary>
-        /// On loading of the Grid get the user grid persited data
-        /// </summary>
-        /// <returns></returns>
         protected async Task OnLoad()
         {
             var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = await Grid.GetPersistData() });
@@ -95,6 +94,12 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.SetPersistData(result.Data);
             }
+            await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
+            if(!Identity.IsInRole("National Admin"))
+            {
+                await Grid.ExpandAllGroupAsync();
+            }
+
         }
 
         /// <summary>
@@ -112,6 +117,15 @@ namespace BedBrigade.Client.Components
 
         }
 
+        protected async Task OnRowSelected(RowSelectEventArgs<User> args)
+        {
+            var record = await Grid.GetSelectedRecordsAsync();
+            if (record != null)
+                await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, true);
+            else
+                await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
+
+        }
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
@@ -121,7 +135,12 @@ namespace BedBrigade.Client.Components
                 _state = await Grid.GetPersistData();
                 await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.User, UserState = _state });
                 return;
+            }
 
+            if (args.Item.Text == "Password")
+            {
+                await ChangePasswordAsync();
+                return;
             }
 
             if (args.Item.Text == "Pdf Export")
@@ -141,6 +160,46 @@ namespace BedBrigade.Client.Components
             }
 
         }
+
+        private async Task ChangePasswordAsync()
+        {
+            userRegister.ConfirmPassword = userRegister.Password = string.Empty;
+            displayError = "none;";
+            
+            PasswordVisible = true;
+        }
+        protected async Task NewPassword()
+        {
+            var records = await Grid.GetSelectedRecords();
+            if (records != null)
+            {
+                userRegister.user = records[0];
+            }
+            string passwordChanged = string.Empty;
+            if (!string.IsNullOrEmpty(userRegister.Password) && userRegister.Password == userRegister.ConfirmPassword)
+            {
+                UserChangePassword changePassword = new UserChangePassword() { UserId = userRegister.user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
+                var result = await _svcAuth.ChangePassword(changePassword);
+                ToastTitle = "Change Password";
+                if (result.Success)
+                {
+                    ToastContent = $"User password changed successfully!";
+                    displayError = "none;";
+                    PasswordVisible = false;
+                }
+                else
+                {
+                    ToastContent = "Unable to change password!";
+                }
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+
+            }
+            else
+            {
+                displayError = "block;"; 
+            }
+        }
+
         public async Task OnActionBegin(ActionEventArgs<User> args)
         {
 
@@ -229,23 +288,11 @@ namespace BedBrigade.Client.Components
 
         private async Task UpdateUser(User user)
         {
-            string passwordChanged = string.Empty;
-            if (!string.IsNullOrEmpty(userRegister.Password))
-            {
-                UserChangePassword changePassword = new UserChangePassword() { UserId = user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
-                var result = await _svcAuth.ChangePassword(changePassword);
-                if (result.Success)
-                {
-                    user = result.Data;                   
-                    passwordChanged = "and password updated ";
-                }
-            }
-
             var userUpdate = await _svcUser.UpdateAsync(user);
             ToastTitle = "Update User";
             if (userUpdate.Success)
             {
-                ToastContent = $"User Updated {passwordChanged} Successfully!";
+                ToastContent = $"User Updated Successfully!";
 
             }
             else

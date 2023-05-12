@@ -42,6 +42,9 @@ else
                             </EmptyRecordTemplate>
                         </GridTemplates>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <Validator>
+                                <DataAnnotationsValidator />
+                            </Validator>
                             <HeaderTemplate>
                                 @{
                                     @HeaderTitle

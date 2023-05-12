@@ -191,6 +191,7 @@ namespace BedBrigade.Data.Services
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
+                context.Users.Update(user);
                 try
                 {
                     await context.SaveChangesAsync();
