@@ -86,9 +86,9 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
+            pageParameters = saveUrl.Split('/');
             if (IsNewPage)
             {
-                pageParameters = saveUrl.Split('/');
                 newPageName = pageParameters[4];
                 string location = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
                 LocationId = int.Parse(location);
@@ -99,7 +99,7 @@ namespace BedBrigade.Client.Components
             {
                 ToastTitle = $"Edit Page {PageName}";
             }
-
+            
             var result = await _svcContent.GetAsync(PageName, Convert.ToInt32(pageParameters[3]));
             if (result.Success)
             {

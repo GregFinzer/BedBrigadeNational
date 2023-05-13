@@ -1,9 +1,16 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
-@page "/administration/edit/editpage/{pageName}"
+@page "/administration/edit/editpage/{*imagePath}"
 @attribute [Authorize]
 
-<EditContent PageName=@pageName IsNewPage=false  />
+<EditContent PageName=@pageParameters[4] IsNewPage=false saveUrl=@imagePath  />
 
 @code {
-    [Parameter] public string? pageName { get; set; }
+    [Parameter] public string? imagePath { get; set; }
+
+    private string[] pageParameters { get; set; }
+
+    protected override void OnInitialized()
+    {
+        pageParameters = imagePath.Split('/');
+    }
 }
