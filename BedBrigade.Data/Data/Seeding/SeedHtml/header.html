@@ -3,9 +3,9 @@
         <div class="container">
             <a class="navbar-brand" href="/"><img src="/media/national/logo.png" class="img-fluid" alt="Bed Brigade National Logo" /></a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars ms-1"></i></button>
-
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
+                    <li class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
                     <li id="home" class="nav-item active">
                         <a class="nav-link" href="/National">Home</a>
                     </li>
@@ -50,47 +50,35 @@
                     <li class="nav-item">
                         <a id="loginElement" class="nav-link" href="home/Login">Login</a>
                     </li>
-                    <div id="administration" style="display: none;">
-                    <li id="adminElement" class="nav-item">
+                    <li id="administration" class="dropdown nav-item" style="display: none;">
                         <a class="dropdown-toggle nav-link" href="administration/dashboard">Administration</a>
                         <ul class="dropdown-menu">
-                            <li class="fw-bold dropdown-toggle nadmin ladmin lsched" id="admin" onclick="DisplayToggle.Toggle('adminAdmin');">Admin</li>
-                            <div id="adminAdmin" style="display: none;">
-                            <li><hr class="dropdown-divider"></li>
-                            <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/admintasks/email">Send Email</a></li>
+                            <li class="dropdown nav-item">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('adminAdmin'); DisplayToggle.SetDisplay('manageAdmin','none');" href="javascript:void(0);">Admin</a>
+                                <ul id="adminAdmin" class="dropdown-menu" style="display: none;">
+                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/admintasks/email">Send Email</a></li>
+                                </ul>
+                            </li>
+                            <li class="nadmin ladmin"><hr class="dropdown-divider"></li>
+                            <li class="dropdown nav-item">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('manageAdmin'); DisplayToggle.SetDisplay('adminAdmin', 'none');" href="javascript:void(0);">Manage</a>
+                                <ul id="manageAdmin" class="dropdown-menu" style="display: none;">
+                                    <li class="nav-link nadmin ladmin lsched ltreasurer"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
+                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
+                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
+                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
+                                    <li class="nav-link nadmin ladmin nedit leditor"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
+                                    <li class="nav-link nadmin nedit ladmin leditor"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            <!--<li><hr class="dropdown-divider"></li>
-            <li id="edit" class="dropdown-toggle fw-bold nadmin ladmin" onclick="DisplayToggle.Toggle('editAdmin');">Edit</li>
-            <div id="editAdmin" style="display: none;">
-                <li><hr class="dropdown-divider"></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/donate">Donate</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/Footer">Footer</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/header">Header</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/home">Home Page</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/bed">Request a Bed</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/stories">Stories</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/edit/volunteer">Volunteer</a></li>
-            </div>-->
-            <li><hr class="dropdown-divider"></li>
-            <li id="manage" class="dropdown-toggle fw-bold nadmin nedit ladmin lsched leditor ltreasurer" onclick="DisplayToggle.Toggle('manageAdmin');">Manage</li>
-            <div id="manageAdmin" style="display: none;">
-                <li class="nadmin ladmin"><hr class="dropdown-divider"></li>
-                <li class="nav-link nadmin ladmin lsched ltreasurer"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
-                <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
-                <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
-                <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
-                <li class="nav-link nadmin ladmin nedit leditor"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
-                <li class="nav-link nadmin nedit ladmin leditor"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
-                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
-            </div>
-        </div>
-        </ul>
-        </li>
-        </ul>
-        </div>
         </div>
     </nav>
     <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">

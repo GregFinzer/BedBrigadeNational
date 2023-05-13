@@ -6,13 +6,20 @@
     
     Toggle: function (element) {
         if (element == '') return;
-        const x = document.getElementById(element);
-        if (x == null) return;
-        if (x.style.display === "none") {
-            x.style.display = "block";
+        var ele = document.getElementById(element);
+        if (ele == null) return;
+        if (ele.style.display === "none") {
+            ele.style.display = "block";
         }
         else {
-            x.style.display = "none";
+            ele.style.display = "none";
         }
+    },
+
+    SetDisplay: function (element, value) {
+        if (element == '' || value == '') return;
+        var ele = document.getElementById(element);
+        if (ele == null || (value != "none" && value != "block") ) return;
+        ele.style.display = value;
     }
 }

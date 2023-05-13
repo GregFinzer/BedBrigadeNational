@@ -389,7 +389,8 @@ namespace BedBrigade.Client.Components
         protected async Task EditPage(Content page)
         {
             await Grid.EndEditAsync();
-            _nm.NavigateTo($"/administration/edit/editpage/{page.Name}");
+            saveUrl = $"api/image/save/{page.LocationId}/{page.Name}";
+            _nm.NavigateTo($"/administration/edit/editpage/{saveUrl}");
         }
 
         protected async Task Cancel()
