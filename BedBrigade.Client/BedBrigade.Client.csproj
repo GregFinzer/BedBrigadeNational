@@ -72,7 +72,6 @@
     <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
     <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
     <Folder Include="wwwroot\Media\columbus\pages\news\left\" />
-    <Folder Include="wwwroot\Media\national\pages\Contact\" />
   </ItemGroup>
 
   <ItemGroup>
