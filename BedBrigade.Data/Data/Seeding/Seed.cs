@@ -410,7 +410,7 @@ public class Seed
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
 
-                for (var i = 0; i < 100;)
+                for (var i = 0; i < 100; i++)
                 {
                     var location = locations[new Random().Next(locations.Count - 1)];
                     var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];

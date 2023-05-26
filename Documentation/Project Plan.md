@@ -85,6 +85,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Volunteer Page
     * Manage Volunteers :heavy_check_mark:
     * Bulk Email Volunteers
+    * Manage Build and Delivery Schedule
     
 * Location Contact Us
     * Contact Us Page
