@@ -4,8 +4,6 @@ namespace BedBrigade.Tests
 {
     public static class TestHelper
     {
-        public static string KellermanUserName => "Bed Brigade 10101";
-
         public static bool RunningInPipeline
         {
             get
@@ -16,20 +14,6 @@ namespace BedBrigade.Tests
             }
         }
         
-        public static string KellermanLicenseKey
-        {
-            get
-            {
-                string? licenseKey = Environment.GetEnvironmentVariable("GOLD");
-                if (string.IsNullOrEmpty(licenseKey))
-                {
-                    throw new Exception("GOLD environment variable not set");
-                }
-
-                return licenseKey;
-            }
-        }
-
         public static string GetSolutionPath()
         {
             string currentPath = AppDomain.CurrentDomain.BaseDirectory;

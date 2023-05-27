@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using BedBrigade.Data.Services;
 using KellermanSoftware.HTMLReports;
 using KellermanSoftware.StaticCodeAnalysis;
 
@@ -13,7 +14,7 @@ namespace BedBrigade.Tests
         [SetUp]
         public void Setup()
         {
-            _qualityLogic = new QualityLogic(TestHelper.KellermanUserName, TestHelper.KellermanLicenseKey);
+            _qualityLogic = new QualityLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
             _solutionPath = TestHelper.GetSolutionPath();
         }
