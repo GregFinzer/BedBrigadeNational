@@ -20,7 +20,8 @@ namespace BedBrigade.Client.Services
 
         public async Task<ServiceResponse<bool>> DeleteAsync(int contentId)
         {
-            return await _data.DeleteAsync(contentId);
+            var result = await _data.DeleteAsync(contentId);
+            return result;
         }
 
         public async Task<ServiceResponse<Content>> GetAsync(int contentId)

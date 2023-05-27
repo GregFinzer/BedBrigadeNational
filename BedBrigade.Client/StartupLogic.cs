@@ -43,6 +43,7 @@ namespace BedBrigade.Client
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
+            
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
@@ -63,6 +64,7 @@ namespace BedBrigade.Client
             //    .AddRazorRenderer()
             //    .AddSmtpSender(emailConfig.SmtpServer, emailConfig.Port, DeliveryMethod);
 
+            builder.Services.AddSingleton<ICachingService, CachingService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();

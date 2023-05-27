@@ -21,4 +21,8 @@
     <PackageReference Include="StaticCodeAnalysis" Version="1.17.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
+  </ItemGroup>
+
 </Project>
