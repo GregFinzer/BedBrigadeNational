@@ -1,7 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
 using System.Data.Common;
 
@@ -13,7 +12,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public LocationDataService(IDbContextFactory<DataContext> contextFactory, AuthenticationStateProvider authProvider) : base(authProvider)
     {
-        _contextFactory = contextFactory; 
+        _contextFactory = contextFactory;
     }
 
     public async Task<ServiceResponse<Location>> CreateAsync(Location location)
@@ -114,7 +113,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
             }
         }
         return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
-        
+
     }
 
     private async Task<ServiceResponse<Location>> UpdateLocationAsync(Location loc, Location location)

@@ -9,13 +9,9 @@
 
   <ItemGroup>
     <Compile Remove="Pages\Location\**" />
-    <Compile Remove="wwwroot\Media\circleville\pages\Test3\**" />
     <Content Remove="Pages\Location\**" />
-    <Content Remove="wwwroot\Media\circleville\pages\Test3\**" />
     <EmbeddedResource Remove="Pages\Location\**" />
-    <EmbeddedResource Remove="wwwroot\Media\circleville\pages\Test3\**" />
     <None Remove="Pages\Location\**" />
-    <None Remove="wwwroot\Media\circleville\pages\Test3\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,30 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Media\arlington\pages\stories\left\" />
-    <Folder Include="wwwroot\Media\arlington\pages\stories\middle\" />
-    <Folder Include="wwwroot\Media\arlington\pages\stories\right\" />
-    <Folder Include="wwwroot\Media\columbus\pages\news\left\" />
-    <Folder Include="wwwroot\Media\national\pages\Contact\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\Media\national\pages\Home\Header\banner_img.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Home\Footer\ministry-img.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Home\Header\TwoWildBeds.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Home\work-img1.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <Folder Include="wwwroot\Media\rock\pages\" />
   </ItemGroup>
 
 

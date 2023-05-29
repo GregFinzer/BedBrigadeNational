@@ -107,6 +107,7 @@ namespace BedBrigade.Common
             }
 
         }
+
         public static void DeleteDirectory(this string directoryName, bool recursiveDelete)
         {
             var appRoot = GetAppRoot(directoryName);

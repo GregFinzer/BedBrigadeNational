@@ -231,7 +231,6 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-
                 // new Location
                 var result = await _svcLocation.CreateAsync(Location);
                 if (result.Success)
