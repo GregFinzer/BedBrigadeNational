@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
 using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Extensions;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -43,7 +45,6 @@ public class Seed
         new Location {Name="Greensburg United Methodist", Route="/canton", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
 
     };
-
     private static readonly List<User> users = new()
     {
         new User {FirstName = _seedUserLocation, LastName = "Contributor", Role = "Location Contributor" },
@@ -74,6 +75,7 @@ public class Seed
 
     public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)
     {
+
         await SeedConfigurations(_contextFactory);
         await SeedLocations(_contextFactory);
         await SeedContentsLogic.SeedContents(_contextFactory);
@@ -163,6 +165,12 @@ public class Seed
             await context.SaveChangesAsync();
         }
     }
+
+    /// <summary>
+    /// Creates the Location table in the DB and also creates location folders in the wwwroot/media folder based upon the route data
+    /// </summary>
+    /// <param name="_contextFactory"></param>
+    /// <returns></returns>
     private static async Task SeedLocations(IDbContextFactory<DataContext> _contextFactory)
     {
         using (var context = _contextFactory.CreateDbContext())
@@ -174,6 +182,11 @@ public class Seed
             {
                 await context.Locations.AddRangeAsync(locations);
                 await context.SaveChangesAsync();
+                foreach(var location in locations)
+                {
+                    var loc = location.Route + "/pages";
+                    loc.CreateDirectory();
+                }
             }
             catch (Exception ex)
             {
@@ -182,6 +195,7 @@ public class Seed
             }
         }
     }
+
     private static async Task SeedMedia(IDbContextFactory<DataContext> _contextFactory)
     {
         using (var context = _contextFactory.CreateDbContext())
@@ -220,6 +234,7 @@ public class Seed
             }
         }
     } // Seed Media
+
     private static async Task SeedRoles(IDbContextFactory<DataContext> _contextFactory)
     {
         using (var context = _contextFactory.CreateDbContext())
