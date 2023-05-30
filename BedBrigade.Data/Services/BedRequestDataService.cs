@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Security.Claims;
 using System.Security.Principal;
+using BedBrigade.Common;
 
 namespace BedBrigade.Data.Services;
 
@@ -42,7 +43,7 @@ public class BedRequestDataService : IBedRequestDataService
 
         var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
         List<BedRequest> result;
-        if (role.ToLower() != "national admin")
+        if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
         {
             int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
             result = _context.BedRequests.Where(u => u.LocationId == locationId).ToList();

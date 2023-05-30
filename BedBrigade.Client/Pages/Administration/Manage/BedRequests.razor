@@ -1,5 +1,6 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/manage/bedrequests"
-@attribute [Authorize(Roles = "National Admin, Location Admin, Location Scheduler")]
+@using BedBrigade.Common
+@attribute [Authorize(Roles = RoleNames.CanManageBedRequests)]
 
 <BedRequestGrid />

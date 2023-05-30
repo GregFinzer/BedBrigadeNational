@@ -1,7 +1,8 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @using BedBrigade.Client.Components
+@using BedBrigade.Common
 @page "/administration/manage/mediagrid"
-@attribute [Authorize(Roles = "National Admin, Location Admin, Location Author")]
+@attribute [Authorize(Roles = RoleNames.CanManageMedia)]
 
 <MediaGrid />
 

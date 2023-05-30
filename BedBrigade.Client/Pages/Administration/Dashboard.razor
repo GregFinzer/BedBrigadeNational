@@ -1,7 +1,8 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/dashboard"
+@using BedBrigade.Common
 
-@attribute [Authorize(Roles = "National Admin, Location Admin, Location Scheduler")]
+@attribute [Authorize(Roles = RoleNames.CanViewAdminDashboard)]
 <h3 class="w-100 text-center">Administrative Dashboard</h3>
 
 

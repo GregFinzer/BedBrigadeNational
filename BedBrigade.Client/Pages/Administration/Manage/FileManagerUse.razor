@@ -1,6 +1,7 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/manage/fm"
-@attribute [Authorize(Roles = "National Admin, Location Admin, Location Author")]
+@using BedBrigade.Common
+@attribute [Authorize(Roles = RoleNames.CanManageMedia)]
 
 <FileManager />
 

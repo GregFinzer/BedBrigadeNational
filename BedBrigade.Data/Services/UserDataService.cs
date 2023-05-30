@@ -5,6 +5,7 @@ using Serilog;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Security.Claims;
+using BedBrigade.Common;
 using static BedBrigade.Common.Common;
 using EntityState = Microsoft.EntityFrameworkCore.EntityState;
 
@@ -52,7 +53,7 @@ namespace BedBrigade.Data.Services
 
                 var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 List<User> result;
-                if (role.ToLower() != "national admin")
+                if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
                 {
                     int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
                     result = context.Users.Where(u => u.LocationId == locationId).ToList();

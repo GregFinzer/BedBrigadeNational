@@ -1,6 +1,7 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @using BedBrigade.Client.Components
+@using BedBrigade.Common
 @page "/administration/manage/locations"
-@attribute [Authorize(Roles = "National Admin")]
+@attribute [Authorize(Roles = RoleNames.NationalAdmin)]
 
 <LocationGrid />

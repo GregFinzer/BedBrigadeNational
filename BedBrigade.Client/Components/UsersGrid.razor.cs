@@ -57,7 +57,7 @@ namespace BedBrigade.Client.Components
             PasswordVisible = false;
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole("National Admin") || Identity.IsInRole("Location Admin"))
+            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -95,7 +95,7 @@ namespace BedBrigade.Client.Components
                 await Grid.SetPersistData(result.Data);
             }
             await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
-            if(!Identity.IsInRole("National Admin"))
+            if(!Identity.IsInRole(RoleNames.NationalAdmin))
             {
                 await Grid.ExpandAllGroupAsync();
             }
@@ -236,7 +236,7 @@ namespace BedBrigade.Client.Components
             HeaderTitle = "Update User";
             ButtonTitle = "Update User";
             AddUser = false;
-            if (Identity.HasRole("National Admin, Location Admin"))
+            if (Identity.HasRole(RoleNames.CanManageUsers))
             {
                 UserPass = true;
             }
