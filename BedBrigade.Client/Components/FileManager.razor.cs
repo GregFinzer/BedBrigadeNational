@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Microsoft.JSInterop;
 using System.Linq.Expressions;
+using BedBrigade.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -60,21 +61,21 @@ namespace BedBrigade.Client.Components
             userRoute = Identity.Claims.FirstOrDefault(c => c.Type == "UserRoute").Value;
             userRoute = userRoute.Replace(PathDivider, "");
 
-            if (Identity.IsInRole("National Admin")) // not perfect! for initial testing
+            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
             {
-                userRole = "National Admin";                
+                userRole = RoleNames.NationalAdmin;                
             }
             else // Location User
             {
-                if (Identity.IsInRole("Location Admin"))
+                if (Identity.IsInRole(RoleNames.LocationAdmin))
                 {                   
-                    userRole = "Location Admin";
+                    userRole = RoleNames.LocationAdmin;
                     isLocationAdmin = true;
                 }
 
-                if (Identity.IsInRole("Location Author"))
+                if (Identity.IsInRole(RoleNames.LocationAuthor))
                 {
-                   userRole = "Location Author";
+                   userRole = RoleNames.LocationAuthor;
                    isLocationAdmin = true;
                 }
             }                 

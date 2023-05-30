@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Common;
 using System.Security.Claims;
+using BedBrigade.Common;
 
 namespace BedBrigade.Data.Services;
 
@@ -46,7 +47,7 @@ public class DonationDataService : IDonationDataService
         {
 
             List<Donation> result;
-            if (role.ToLower() != "national admin")
+            if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
             {
                 int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
                 result = context.Donations.Where(u => u.LocationId == locationId).ToList();
