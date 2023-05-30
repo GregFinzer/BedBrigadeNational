@@ -18,7 +18,6 @@ namespace BedBrigade.Client.Controllers
         public Dictionary<string, object>? CustomData { get; set; }
     }
 
-    //[Authorize(Roles ="National Admin, Location Admin, Location Author")]
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
