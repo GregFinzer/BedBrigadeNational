@@ -16,6 +16,9 @@ namespace BedBrigade.Tests
         {
             _qualityLogic = new QualityLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
+
+            //This has duplicate strings but it is okay since roles have multiple similar permissions
+            _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
