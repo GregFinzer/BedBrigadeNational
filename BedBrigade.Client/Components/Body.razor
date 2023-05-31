@@ -53,9 +53,11 @@
     {
         routePath = _nm.Uri.Split('/');
         var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
+        Console.WriteLine($"Location passed {routePath[3]} Location {result.Data.LocationId} ");
         if (result.Success)
         {
             var contentResult = await _svcContent.GetAsync(PageName, result.Data.LocationId);
+            Console.WriteLine($"Page: {PageName} Location: {result.Data.LocationId}");
             if (contentResult.Success)
             {
                 content = contentResult.Data;

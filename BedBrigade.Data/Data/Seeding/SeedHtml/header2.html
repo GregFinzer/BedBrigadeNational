@@ -1,0 +1,97 @@
+﻿<header class="fixed-top bg-white shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-dark" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="/"><img src="/media/national/logo.png" class="img-fluid" alt="Bed Brigade National Logo" /></a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars ms-1"></i></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
+                    <li class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
+                    <li id="home" class="nav-item active">
+                        <a class="nav-link" href="/Newark">Home</a>
+                    </li>
+                    <li id="bed" class="nav-item">
+                        <a class="nav-link" href="/Newark/bed">Request A Bed</a>
+                    </li>
+                    <li id="volunteer" class="nav-item">
+                        <a class="nav-link" href="/Newark/volunteer">Volunteer</a>
+                    </li>
+                    <li id="donate" class="nav-item">
+                        <a class="nav-link" href="/Newark/donate">Donate</a>
+                    </li>
+                    <li id="stories" class="nav-item">
+                        <a class="nav-link" href="/Newark/stories">Stories</a>
+                    </li>
+                    <li id="about" class="dropdown nav-item">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);">About</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/Newark/about-us">About Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/Newark/assembly-instructions">Assembly Instructions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/Newark/contact-us">Contact Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/Newark/history-of-bed-brigade">History of Bed Brigade</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/Newark/partners">Partners</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="dropdown-item" href="/Newark/news">News</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/Newark/locations">Locations</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a id="loginElement" class="nav-link" href="home/Login">Login</a>
+                    </li>
+                    <li id="administration" class="dropdown nav-item" style="display: none;">
+                        <a class="dropdown-toggle nav-link" href="administration/dashboard">Administration</a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown nav-item">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('adminAdmin'); DisplayToggle.SetDisplay('manageAdmin','none');" href="javascript:void(0);">Admin</a>
+                                <ul id="adminAdmin" class="dropdown-menu" style="display: none;">
+                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/admintasks/email">Send Email</a></li>
+                                </ul>
+                            </li>
+                            <li class="nadmin ladmin"><hr class="dropdown-divider"></li>
+                            <li class="dropdown nav-item">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('manageAdmin'); DisplayToggle.SetDisplay('adminAdmin', 'none');" href="javascript:void(0);">Manage</a>
+                                <ul id="manageAdmin" class="dropdown-menu" style="display: none;">
+                                    <li class="nav-link nadmin ladmin lsched ltreasurer"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
+                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
+                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
+                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
+                                    <li class="nav-link nadmin ladmin nedit leditor"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
+                                    <li class="nav-link nadmin nedit ladmin leditor"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
+                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-mobile-menu menu">
+            <li class="nav-item">
+                <a class="nav-link" href="/request-bed">Request A Bed</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/volunteer">Volunteer</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/donations">Donate</a>
+            </li>
+        </ul>
+    </div>
+</header>

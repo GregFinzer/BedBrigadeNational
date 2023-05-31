@@ -140,7 +140,7 @@ namespace BedBrigade.Common
 
         }
 
-        private static string GetAppRoot(string directoryName)
+        public static string GetAppRoot(string directoryName)
         {
             var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
             Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
