@@ -2,7 +2,6 @@ using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components
@@ -43,8 +42,10 @@ namespace BedBrigade.Client.Components
                 var contentResult = await _svcContent.GetAsync("Header", result.Data.LocationId);
                 if (contentResult.Success)
                 {
+                    await Console.Out.WriteLineAsync($"loaded locations header for loction id {result.Data.LocationId}");
                     headerContent = contentResult.Data.ContentHtml;
                 }
+
             }
             
             authState = await _authState.GetAuthenticationStateAsync();

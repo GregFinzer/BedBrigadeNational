@@ -64,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Media\rock\pages\" />
+    <Folder Include="wwwroot\Media\" />
   </ItemGroup>
 
 
