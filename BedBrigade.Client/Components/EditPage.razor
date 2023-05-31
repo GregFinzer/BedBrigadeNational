@@ -33,7 +33,7 @@
 
         var authState = await _authState.GetAuthenticationStateAsync();
         Identity = authState.User;
-        if (Identity.HasRole("National Admin, Location Admin, National Editor"))
+        if (Identity.HasRole(RoleNames.CanManagePages))
         {
         }
         else

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
 using static BedBrigade.Common.Common;
-using static BedBrigade.Common.Extensions;
-using BedBrigade.Data.Services;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -22,55 +20,98 @@ public class Seed
 
     private static List<Role> Roles = new()
     {
-        new Role {Name = "National Admin"},
-        new Role {Name = "National Editor"},
-        new Role {Name = "Location Admin"},
-        new Role {Name = "Location Editor"},
-        new Role {Name = "Location Author"},
-        new Role {Name = "Location Scheduler"},
-        new Role {Name = "Location Contributor"},
-        new Role {Name = "Location Treasurer"},
-        new Role {Name = "Location Communications"},
+        new Role {Name = RoleNames.NationalAdmin},
+        new Role {Name = RoleNames.NationalEditor},
+        new Role {Name = RoleNames.LocationAdmin},
+        new Role {Name = RoleNames.LocationEditor},
+        new Role {Name = RoleNames.LocationAuthor},
+        new Role {Name = RoleNames.LocationScheduler},
+        new Role {Name = RoleNames.LocationContributor},
+        new Role {Name = RoleNames.LocationTreasurer},
+        new Role {Name = RoleNames.LocationCommunications},
     };
 
     private static List<Location> locations = new()
     {
-        new Location {Name=SeedConstants.SeedNationalName, Route="/national", Address1="", Address2="", City="Columbus", State="Ohio", PostalCode=""},
-        new Location {Name="Living Hope Church", Route="/newark", Address1="", Address2="", City="Newark", State="Ohio", PostalCode=""},
-        new Location {Name="Rock City Polaris", Route="/rock", Address1="", Address2="", City="Rock City", State="Ohio", PostalCode=""},
-        new Location {Name="Peace Lutheran", Route="/linden", Address1="", Address2="", City="Linden", State="Ohio", PostalCode=""},
-        new Location {Name="Vinyard Church", Route="/Circleville", Address1="", Address2="", City="Circleville", State="Ohio", PostalCode=""},
-        new Location {Name="Hardbarger Impact", Route="/lancaster", Address1="", Address2="", City="Lancaster", State="Ohio", PostalCode=""},
-        new Location {Name="Upper Arlington Lutheran", Route="/Arlington", Address1="", Address2="", City="Arlington", State="Ohio", PostalCode=""},
-        new Location {Name="Greensburg United Methodist", Route="/canton", Address1="", Address2="", City="Canton", State="Ohio", PostalCode=""}
+        new Location
+        {
+            Name = SeedConstants.SeedNationalName, Route = "/national", Address1 = "", Address2 = "", City = "Columbus",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Living Hope Church", Route = "/newark", Address1 = "", Address2 = "", City = "Newark",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Rock City Polaris", Route = "/rock", Address1 = "", Address2 = "", City = "Rock City",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Peace Lutheran", Route = "/linden", Address1 = "", Address2 = "", City = "Linden", State = "Ohio",
+            PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Vinyard Church", Route = "/Circleville", Address1 = "", Address2 = "", City = "Circleville",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Hardbarger Impact", Route = "/lancaster", Address1 = "", Address2 = "", City = "Lancaster",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Upper Arlington Lutheran", Route = "/Arlington", Address1 = "", Address2 = "", City = "Arlington",
+            State = "Ohio", PostalCode = ""
+        },
+        new Location
+        {
+            Name = "Greensburg United Methodist", Route = "/canton", Address1 = "", Address2 = "", City = "Canton",
+            State = "Ohio", PostalCode = ""
+        }
 
     };
+
     private static readonly List<User> users = new()
     {
-        new User {FirstName = _seedUserLocation, LastName = "Contributor", Role = "Location Contributor" },
-        new User {FirstName = _seedUserLocation, LastName = "Author", Role = "Location Author" },
-        new User {FirstName = _seedUserLocation, LastName = "Editor", Role = "Location Editor" },
-        new User {FirstName = _seedUserLocation, LastName = "Scheduler", Role = "Location Scheduler" },
-        new User {FirstName = _seedUserLocation, LastName = "Treasurer", Role = "Location Treasurer"},
-        new User {FirstName = _seedUserLocation, LastName = "Communications", Role = "Location Communications"},
-        new User {FirstName = _seedUserLocation, LastName = "Admin", Role = "Location Admin"},
-        new User {FirstName =  SeedConstants.SeedNationalName, LastName = "Editor", Role = "National Editor"},
-        new User {FirstName =  SeedConstants.SeedNationalName, LastName = "Admin", Role = "National Admin"},
-        new User {FirstName = _seedUserLocation1, LastName = "Contributor", Role = "Location Contributor" },
-        new User {FirstName = _seedUserLocation1, LastName = "Author", Role = "Location Author" },
-        new User {FirstName = _seedUserLocation1, LastName = "Editor", Role = "Location Editor" },
-        new User {FirstName = _seedUserLocation1, LastName = "Scheduler", Role = "Location Scheduler" },
-        new User {FirstName = _seedUserLocation1, LastName = "Treasurer", Role = "Location Treasurer"},
-        new User {FirstName = _seedUserLocation1, LastName = "Communications", Role = "Location Communications"},
-        new User {FirstName = _seedUserLocation1, LastName = "Admin", Role = "Location Admin"},
-        new User {FirstName = _seedUserLocation2, LastName = "Contributor", Role = "Location Contributor" },
-        new User {FirstName = _seedUserLocation2, LastName = "Author", Role = "Location Author" },
-        new User {FirstName = _seedUserLocation2, LastName = "Editor", Role = "Location Editor" },
-        new User {FirstName = _seedUserLocation2, LastName = "Scheduler", Role = "Location Scheduler" },
-        new User {FirstName = _seedUserLocation2, LastName = "Treasurer", Role = "Location Treasurer"},
-        new User {FirstName = _seedUserLocation2, LastName = "Communications", Role = "Location Communications"},
-        new User {FirstName = _seedUserLocation2, LastName = "Admin", Role = "Location Admin"},
+        new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = _seedUserLocation, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = _seedUserLocation, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = _seedUserLocation, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = _seedUserLocation, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        new User
+        {
+            FirstName = _seedUserLocation, LastName = "Communications", Role = RoleNames.LocationCommunications
+        },
+        new User { FirstName = _seedUserLocation, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        new User { FirstName = SeedConstants.SeedNationalName, LastName = "Editor", Role = RoleNames.NationalEditor },
+        new User { FirstName = SeedConstants.SeedNationalName, LastName = "Admin", Role = RoleNames.NationalAdmin },
+        new User { FirstName = _seedUserLocation1, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = _seedUserLocation1, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = _seedUserLocation1, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = _seedUserLocation1, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = _seedUserLocation1, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        new User
+        {
+            FirstName = _seedUserLocation1, LastName = "Communications", Role = RoleNames.LocationCommunications
+        },
+        new User { FirstName = _seedUserLocation1, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        new User { FirstName = _seedUserLocation2, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = _seedUserLocation2, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = _seedUserLocation2, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = _seedUserLocation2, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = _seedUserLocation2, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        new User
+        {
+            FirstName = _seedUserLocation2, LastName = "Communications", Role = RoleNames.LocationCommunications
+        },
+        new User { FirstName = _seedUserLocation2, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
+
     static readonly List<User> Users = users;
 
     public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)

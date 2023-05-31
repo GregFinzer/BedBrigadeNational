@@ -1,7 +1,8 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/manage/Configuration"
 @using BedBrigade.Client.Components
-@attribute [Authorize(Roles = "National Admin")]
+@using BedBrigade.Common
+@attribute [Authorize(Roles = RoleNames.NationalAdmin)]
 
 <ConfigurationGrid />
 

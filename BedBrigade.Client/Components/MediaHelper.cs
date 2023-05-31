@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Drawing.Drawing2D;
 using System.Security.Claims;
+using BedBrigade.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -82,18 +83,18 @@ namespace BedBrigade.Client.Components
         {
             MediaUser.Name = Identity.Identity.Name;
 
-            if (Identity.IsInRole("National Admin")) // not perfect! for initial testing
+            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
             {
                 MediaUser.IsAdmin = true;
-                MediaUser.Role = "National Admin";
+                MediaUser.Role = RoleNames.NationalAdmin;
 
             }
             else // Location User
             {
-                if (Identity.IsInRole("Location Admin"))
+                if (Identity.IsInRole(RoleNames.LocationAdmin))
                 {
                     MediaUser.IsAdmin = true;
-                    MediaUser.Role = "Location Admin";
+                    MediaUser.Role = RoleNames.LocationAdmin;
                 }
 
                 MediaUser.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
@@ -200,7 +201,7 @@ namespace BedBrigade.Client.Components
             // throw new NotImplementedException();
             // if Not National Admin User linked to location, Grid should show only location files
 
-            if (mediaUser.LocationId > 1 || mediaUser.Role == "Location Admin" && mediaUser.LocationId == 1)
+            if (mediaUser.LocationId > 1 || mediaUser.Role == RoleNames.LocationAdmin && mediaUser.LocationId == 1)
             {
                 List<Media> LocationFiles = dbFileList.FindAll(a => a.LocationId == mediaUser.LocationId);
                 return LocationFiles;

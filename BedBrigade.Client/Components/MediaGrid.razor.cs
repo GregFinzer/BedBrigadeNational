@@ -223,7 +223,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                //  if (Identity.IsInRole("National Admin")  || Identity.IsInRole("Location Admin"))
+                //  if (Identity.IsInRole(RoleNames.NationalAdmin)  || Identity.IsInRole(RoleNames.LocationAdmin))
                 // {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;

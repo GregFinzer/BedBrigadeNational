@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Security.Claims;
+using BedBrigade.Common;
 
 namespace BedBrigade.Data.Services;
 
@@ -80,7 +81,7 @@ public class ContentDataService : IContentDataService
 
             var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
             List<Content> result;
-            if (role.ToLower() != "national admin")
+            if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
             {
                 int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
                 result = ctx.Content.Where(u => u.LocationId == locationId).ToList();

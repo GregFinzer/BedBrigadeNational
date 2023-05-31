@@ -1,6 +1,7 @@
 ﻿@using Microsoft.Extensions.Logging
 @using System.Text;
 @using BedBrigade.Client.Services
+@using BedBrigade.Common
 
 @inject ILogger<Error> Logger
 @inject IMessageService _svcMessageService
@@ -21,6 +22,6 @@
 
         Logger.LogError("Error:ProcessError - Type: {0} Message: {1}", ex.GetType(), ex.Message);
         string errorBody = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
-        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", template.ToString(), new { FirstName = "National Admin", Body = errorBody});
+        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", template.ToString(), new { FirstName = RoleNames.NationalAdmin, Body = errorBody});
     }
 }
