@@ -168,6 +168,11 @@ namespace BedBrigade.Client.Components
 
         }
 
+        private async Task HandleValidSubmit()
+        {
+
+        }
+
         private async Task ChangePasswordAsync()
         {
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
@@ -175,7 +180,7 @@ namespace BedBrigade.Client.Components
             
             PasswordVisible = true;
         }
-        protected async Task NewPassword()
+        private async Task NewPassword()
         {
             var records = await Grid.GetSelectedRecords();
             if (records != null)
