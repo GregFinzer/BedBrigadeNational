@@ -238,7 +238,7 @@ namespace BedBrigade.Client.Components
         /// On loading of the Grid get the user grid persited data
         /// </summary>
      
-        protected async Task OnLoad()
+        protected void OnLoad()
         {
            // var result = await _svcUser.GetPersistAsync(Common.Common.PersistGrid.User);
           //  if (result.Success)
@@ -247,7 +247,7 @@ namespace BedBrigade.Client.Components
            // }
         }
 
-        protected async Task OnDestroyed()
+        protected void OnDestroyed()
         {
            // _state = await Grid.GetPersistData();
            // await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
@@ -414,7 +414,7 @@ namespace BedBrigade.Client.Components
             await Grid.CloseEditAsync();
         }
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (MediaFiles == null || MediaFiles.Count == 0) RecordText = "No Registered Files records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 

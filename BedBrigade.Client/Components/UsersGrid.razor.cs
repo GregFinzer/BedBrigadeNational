@@ -168,11 +168,6 @@ namespace BedBrigade.Client.Components
 
         }
 
-        private async Task HandleValidSubmit()
-        {
-
-        }
-
         private async Task ChangePasswordAsync()
         {
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
@@ -280,7 +275,7 @@ namespace BedBrigade.Client.Components
         private async Task AddNewUser(User user)
         {
             userRegister.user = user;
-            userRegister.ConfirmPassword = userRegister.Password = user.Password;
+            userRegister.ConfirmPassword = userRegister.Password;
             var registerResult = await _svcAuth.RegisterAsync(userRegister);
             ToastTitle = "Create User";
             if (registerResult.Success)
@@ -373,7 +368,7 @@ namespace BedBrigade.Client.Components
         {
             await Grid.CloseEditAsync();
         }
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {

@@ -398,7 +398,7 @@ namespace BedBrigade.Client.Components
             await Grid.CloseEdit();
         }
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (Pages.Count == 0) RecordText = "No Page records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 

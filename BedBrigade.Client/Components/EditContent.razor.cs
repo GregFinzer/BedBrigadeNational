@@ -124,26 +124,6 @@ namespace BedBrigade.Client.Components
 
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //if (!firstRender)
-            //{
-            //    locationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
-            //    var locResult = await _svcLocation.GetAsync(locationId);
-            //    if (locResult.Success)
-            //    {
-            //        locationRoute = locResult.Data.Route;
-            //        locationName = locResult.Data.Name;
-            //    }
-
-            //                saveUrl = $"api/image/save/{locationId}/{Content.Name}";
-            //                imagePath = $"media/{locationRoute}/pages/{Content.Name}/";
-            //#if DEBUG   
-            //                Console.WriteLine($"saveUrl: {saveUrl} imagePath: {imagePath} ");
-            //#endif
-            //}
-        }
-
         private async Task HideToast()
         {
             await this.ToastObj.HideAsync();
