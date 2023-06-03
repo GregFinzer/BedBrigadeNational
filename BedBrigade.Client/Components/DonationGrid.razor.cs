@@ -134,7 +134,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        protected async Task OnContextMenuClicked(ContextMenuClickEventArgs<Donation> args)
+        protected void OnContextMenuClicked(ContextMenuClickEventArgs<Donation> args)
         {
             if(args.Item.Text == SendTaxForm)
             {
@@ -174,7 +174,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        public async Task OnActionBegin(ActionEventArgs<Donation> args)
+        public void OnActionBegin(ActionEventArgs<Donation> args)
         {
             var requestType = args.RequestType;
             switch (requestType)
@@ -187,7 +187,7 @@ namespace BedBrigade.Client.Components
         }
 
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (Donations.Count == 0) RecordText = "No Donation records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
@@ -235,6 +235,7 @@ namespace BedBrigade.Client.Components
         protected async Task CloseTaxDialog()
         {
             TaxIsVisible = false;
+
         }
 
         protected async Task SendTax()

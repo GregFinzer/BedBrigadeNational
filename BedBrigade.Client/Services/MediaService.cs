@@ -50,7 +50,7 @@ public class MediaService : IMediaService
     /// </summary>
     /// <param name="media"></param>
     /// <returns></returns>
-    public async Task<string> MediaLocationPathAsync(Media media)
+    public string  MediaLocationPathAsync(Media media)
     {
             string? response = string.Empty;
             var fileFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/" + media.FilePath);
@@ -61,6 +61,11 @@ public class MediaService : IMediaService
             }
             return response;     
 
+    }
+
+    Task<string> IMediaService.MediaLocationPathAsync(Media media)
+    {
+        throw new NotImplementedException();
     }
 } //end MediaService class
 // namespace

@@ -68,8 +68,8 @@ else
                                             <ValidationMessage For="@(() => user.UserName)" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@user.Password Enabled=@AddUser Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.Password)" />
+                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@userRegister.Password Enabled=@AddUser Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                            <ValidationMessage For="@(() => userRegister.Password)" />
                                         </div>
                                     </div>
                                     <div class="row">

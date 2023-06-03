@@ -254,7 +254,7 @@ namespace BedBrigade.Client.Components
             await Grid.CloseEdit();
         }
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (ConfigRecs.ToList().Count == 0) RecordText = "No configurations found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)
