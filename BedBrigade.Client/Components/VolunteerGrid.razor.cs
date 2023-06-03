@@ -328,7 +328,7 @@ namespace BedBrigade.Client.Components
             await Grid.CloseEdit();
         }
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (Volunteers.Count == 0) RecordText = "No Volunteer records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 

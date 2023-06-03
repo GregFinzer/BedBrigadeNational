@@ -22,7 +22,6 @@ namespace BedBrigade.Client.Components
 
         protected override Task OnParametersSetAsync()
         {
-            const string startPath = "wwwroot/";
             if(!PathExist(Path))
             {
                 Path = "National/pages/Error/";

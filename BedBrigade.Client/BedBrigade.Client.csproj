@@ -63,9 +63,5 @@
     <ProjectReference Include="..\BedBrigade.MessageService\BedBrigade.MessageService.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\Media\" />
-  </ItemGroup>
-
 
 </Project>

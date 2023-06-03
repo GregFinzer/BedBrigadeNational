@@ -110,7 +110,7 @@ else
 
     }
 
-    protected async Task OnDataBound()
+    protected void OnDataBound()
     {
         if(EmployeeData.Count > 0)
         {
@@ -127,7 +127,7 @@ else
         await EmpGrid.EndEditAsync();
     }
 
-    protected async Task Cancel()
+    protected void Cancel()
     {
         EmpGrid.CloseEditAsync();
     }

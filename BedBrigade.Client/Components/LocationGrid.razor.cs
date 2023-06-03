@@ -278,7 +278,7 @@ namespace BedBrigade.Client.Components
             await Grid.CloseEdit();
         }
 
-        protected async Task DataBound()
+        protected void DataBound()
         {
             if (Locations.Count == 0) RecordText = "No Location records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 

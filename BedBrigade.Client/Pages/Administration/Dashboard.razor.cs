@@ -36,7 +36,6 @@ namespace BedBrigade.Client.Pages.Administration
             TotalDonationsThisMonth = 4232.00;
             TotalDonationsThisYear = 4232.00;
 
-
         }
 
         //        private async Task<List<GraphData>> GetUserRolesAsync()
