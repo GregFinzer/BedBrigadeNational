@@ -1,12 +1,16 @@
 ﻿@page "/"
+@page "/{location}"
+@page "/{location}/{pageName}"
+
+<Body />
 
 @code {
-    [Inject] NavigationManager _nm { get; set; }
+    [Parameter] public string location { get; set; } = "National";
+    [Parameter] public string pageName { get; set; } = "Home";
 
     protected override void OnInitialized()
     {
-        _nm.NavigateTo("National");
-
+       Console.WriteLine($"Calling {pageName} for location {location}");
     }
 
 }

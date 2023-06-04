@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 
-namespace BedBrigade.Client.Pages.Home
+namespace BedBrigade.Client.Pages
 {
     public partial class LoginBase : ComponentBase
     {
