@@ -1,96 +1,96 @@
 ﻿<header class="fixed-top bg-white shadow-sm">
     <nav class="navbar navbar-expand-md navbar-dark" id="mainNav">
         <div class="container">
-            <a class="navbar-brand" href="/"><img src="/media/national/logo.png" class="img-fluid" alt="Bed Brigade National Logo" /></a>
+            <a class="navbar-brand" href="javascript: location.href = ' /Arlington/Home'"><img src="/media/national/logo.png" class="img-fluid" alt="Bed Brigade Arlington Logo" /></a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu <i class="fas fa-bars ms-1"></i></button>
+
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
-                    <li class="navbar-nav ms-auto mb-2 mb-lg-0 menu-main-menu menu">
                     <li id="home" class="nav-item active">
-                        <a class="nav-link" href="/Arlington">Home</a>
+                        <a class="nav-link" href="javascript: location.href = '/Arlington/home' ">Home</a>
                     </li>
                     <li id="bed" class="nav-item">
-                        <a class="nav-link" href="/Arlington/bed">Request A Bed</a>
+                        <a class="nav-link" href="javascript: location.href = '/Arlington/requestbed'">Request A Bed</a>
                     </li>
                     <li id="volunteer" class="nav-item">
-                        <a class="nav-link" href="/Arlington/volunteer">Volunteer</a>
+                        <a class="nav-link" href="javascript: location.href = '/Arlington/volunteer'">Volunteer</a>
                     </li>
                     <li id="donate" class="nav-item">
-                        <a class="nav-link" href="/Arlington/donate">Donate</a>
+                        <a class="nav-link" href="javascript: location.href = ' /Arlington/donate">Donate</a>
                     </li>
                     <li id="stories" class="nav-item">
-                        <a class="nav-link" href="/Arlington/stories">Stories</a>
+                        <a class="nav-link" href="javascript: location.href = '/Arlington/stories'">Stories</a>
                     </li>
                     <li id="about" class="dropdown nav-item">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);">About</a>
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript: location.href = ' javascript:void(0);">About</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item">
-                                <a class="dropdown-item" href="/Arlington/about-us">About Us</a>
+                                <a class="dropdown-item" href="javascript: location.href = '/Arlington/aboutus'">About Us</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/Arlington/assembly-instructions">Assembly Instructions</a>
+                                <a href="javascript: location.href = '/Arlington/assembly'">Assembly Instructions</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="/Arlington/contact-us">Contact Us</a>
+                                <a class="dropdown-item" href="javascript: location.href = '/Arlington/contact'">Contact Us</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="/Arlington/history-of-bed-brigade">History of Bed Brigade</a>
+                                <a class="dropdown-item" href="javascript: location.href = '/Arlington/history'">History of Bed Brigade</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="/Arlington/partners">Partners</a>
+                                <a class="dropdown-item" href="javascript: location.href = '/Arlington/partners'">Partners</a>
                             </li>
                             <li class="nav-item">
-                                <a class="dropdown-item" href="/Arlington/news">News</a>
+                                <a class="dropdown-item" href="javascript: location.href = '/Arlington/news'">News</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/Arlington/locations">Locations</a>
+                                <a href="javascript: location.href = '/Arlington/locations'">Locations</a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a id="loginElement" class="nav-link" href="home/Login">Login</a>
+                        <a id="loginElement" class="nav-link" href="javascript: location.href = ' /Login">Login</a>
                     </li>
-                    <li id="administration" class="dropdown nav-item" style="display: none;">
-                        <a class="dropdown-toggle nav-link" href="administration/dashboard">Administration</a>
+                    <div id="administration" style="display: none;">
+                    <li id="adminElement" class="nav-item">
+                        <a class="dropdown-toggle nav-link" href="/Arlingtonadministration/dashboard">Administration</a>
                         <ul class="dropdown-menu">
-                            <li class="dropdown nav-item">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('adminAdmin'); DisplayToggle.SetDisplay('manageAdmin','none');" href="javascript:void(0);">Admin</a>
-                                <ul id="adminAdmin" class="dropdown-menu" style="display: none;">
-                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/admintasks/email">Send Email</a></li>
-                                </ul>
-                            </li>
-                            <li class="nadmin ladmin"><hr class="dropdown-divider"></li>
-                            <li class="dropdown nav-item">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" onclick="DisplayToggle.Toggle('manageAdmin'); DisplayToggle.SetDisplay('adminAdmin', 'none');" href="javascript:void(0);">Manage</a>
-                                <ul id="manageAdmin" class="dropdown-menu" style="display: none;">
-                                    <li class="nav-link nadmin ladmin lsched ltreasurer"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
-                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
-                                    <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
-                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
-                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
-                                    <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
-                                    <li class="nav-link nadmin ladmin nedit leditor"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
-                                    <li class="nav-link nadmin nedit ladmin leditor"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
-                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
-                                    <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                            <li class="fw-bold dropdown-toggle nadmin ladmin lsched" id="admin" onclick="DisplayToggle.Toggle('adminAdmin');">Admin</li>
+                            <div id="adminAdmin" style="display: none;">
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="/administration/admintasks/email">Send Email</a></li>
             </div>
+            <li><hr class="dropdown-divider"></li>
+            <li id="manage" class="dropdown-toggle fw-bold nadmin nedit ladmin lsched leditor ltreasurer" onclick="DisplayToggle.Toggle('manageAdmin');">Manage</li>
+            <div id="manageAdmin" style="display: none;">
+                <li class="nadmin ladmin"><hr class="dropdown-divider"></li>
+                <li class="nav-link nadmin ladmin lsched ltreasurer"><a class="dropdown-item mx-2" href="administration/manage/bedrequests">Bed Requests</a></li>
+                <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/configuration">Configuration</a></li>
+                <li class="nav-link nadmin ladmin lsched"><a class="dropdown-item mx-2" href="administration/manage/Contacts">Contacts</a></li>
+                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/deliveries">Deliveries</a></li>
+                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/donations">Donations</a></li>
+                <li class="nav-link nadmin"><a class="dropdown-item mx-2" href="administration/manage/locations">Locations</a></li>
+                <li class="nav-link nadmin ladmin nedit leditor"><a class="dropdown-item mx-2" href="administration/manage/fm">Media</a></li>
+                <li class="nav-link nadmin nedit ladmin leditor"><a class="dropdown-item mx-2" href="administration/manage/pages">Pages</a></li>
+                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/users">Users</a></li>
+                <li class="nav-link nadmin ladmin"><a class="dropdown-item mx-2" href="administration/manage/Volunteers">Volunteers</a></li>
+            </div>
+        </div>
+        </ul>
+        </li>
+        </ul>
+        </div>
         </div>
     </nav>
     <div class="head-mobile-view d-block d-md-none text-center ps-2 pe-2">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 menu-mobile-menu menu">
             <li class="nav-item">
-                <a class="nav-link" href="/Arlington/request-bed">Request A Bed</a>
+                <a class="nav-link" href="javascript: location.href = '/Arlington/request-bed'">Request A Bed</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/Arlington/volunteer">Volunteer</a>
+                <a class="nav-link" href="javascript: location.href = '/Arlington/volunteer'">Volunteer</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/Arlington/donations">Donate</a>
+                <a class="nav-link" href="javascript: location.href = '/Arlington/donate'">Donate</a>
             </li>
         </ul>
     </div>

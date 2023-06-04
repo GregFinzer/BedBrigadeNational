@@ -273,6 +273,7 @@ namespace BedBrigade.Client.Components
 
         private async Task Save(ActionEventArgs<Content> args)
         {
+
             Content Page = args.Data;
             if (Page.ContentId != 0)
             {
@@ -326,6 +327,7 @@ namespace BedBrigade.Client.Components
             CheckValues(page, CurrentValues);
             await Grid.EndEdit();
         }
+
         /// <summary>
         /// Method to compare properties between to objects
         /// </summary>
