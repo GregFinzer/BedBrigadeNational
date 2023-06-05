@@ -25,7 +25,7 @@ namespace BedBrigade.Client.Components
 
         private const string PathDivider = "/";
         private const string DoubleBackSlash = "\\";
-        private const string SubfolderKey = "MainMediaSubFolder";
+        private const string SubfolderKey = ConfigNames.MainMediaSubFolder;
         private const string SiteRoot = "wwwroot/";
         private string? MainAdminFolder { get; set; } = String.Empty;
         private string @ErrorMessage = String.Empty;
@@ -84,9 +84,9 @@ namespace BedBrigade.Client.Components
             if (dataConfiguration.Success && dataConfiguration != null)
             {
                 dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
-                AllowedExtensions = dctConfiguration["AllowedFileExtensions"].ToString() + "," + dctConfiguration["AllowedVideoExtensions"].ToString();
-                MaxFileSize = Convert.ToDouble(dctConfiguration["MaxVideoSize"]);
-                MediaRoot = SiteRoot + dctConfiguration["MediaFolder"];
+                AllowedExtensions = dctConfiguration[ConfigNames.AllowedFileExtensions].ToString() + "," + dctConfiguration[ConfigNames.AllowedVideoExtensions].ToString();
+                MaxFileSize = Convert.ToDouble(dctConfiguration[ConfigNames.MaxVideoSize]);
+                MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];
                 MainAdminFolder = dctConfiguration[SubfolderKey];
 
                 if (userLocationId == 1)
@@ -141,7 +141,7 @@ namespace BedBrigade.Client.Components
 
                     isFile = args.Result.CWD.IsFile; // NULL?
 
-                    if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration["MediaFolder"].ToString().ToLower()) // For National Admin only
+                    if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration[ConfigNames.MediaFolder].ToString().ToLower()) // For National Admin only
                     {
                         isMediaRoot = true;
                     }
@@ -354,7 +354,7 @@ namespace BedBrigade.Client.Components
                 if (args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
                 {
                     previewFileName = args.FileDetails.Name;
-                    previewFileUrl = NavigationManager.BaseUri.ToString() + dctConfiguration["MediaFolder"];
+                    previewFileUrl = NavigationManager.BaseUri.ToString() + dctConfiguration[ConfigNames.MediaFolder];
                     if (isLocationAdmin)
                     {
                         previewFileUrl = previewFileUrl + PathDivider + userRoute;

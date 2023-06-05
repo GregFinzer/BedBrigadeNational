@@ -142,64 +142,70 @@ public class Seed
             {
                 new()
                 {
-                    ConfigurationKey = "FromEmailAddress",
+                    ConfigurationKey = ConfigNames.FromEmailAddress,
                     ConfigurationValue = "webmaster@bedbrigade.org",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
-                    ConfigurationKey = "HostName",
+                    ConfigurationKey = ConfigNames.HostName,
                     ConfigurationValue = "mail.bedbrigade.org",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
-                    ConfigurationKey = "Port",
+                    ConfigurationKey = ConfigNames.Port,
                     ConfigurationValue = "8889",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
-                    ConfigurationKey = "TokenExpiration",
+                    ConfigurationKey = ConfigNames.TokenExpiration,
                     ConfigurationValue = "24",
                     Section = ConfigSection.System
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "AllowedFileExtensions",
+                    ConfigurationKey = ConfigNames.AllowedFileExtensions,
                     ConfigurationValue = ".jpg, .png, .pdf, .webp",
                     Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "AllowedVideoExtensions",
+                    ConfigurationKey = ConfigNames.AllowedVideoExtensions,
                     ConfigurationValue = ".mp4",
                     Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "MediaFolder",
+                    ConfigurationKey = ConfigNames.MediaFolder,
                     ConfigurationValue = "media",
                     Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "MainMediaSubFolder",
+                    ConfigurationKey = ConfigNames.MainMediaSubFolder,
                     ConfigurationValue = "national",
                     Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "MaxFileSize",
+                    ConfigurationKey = ConfigNames.MaxFileSize,
                     ConfigurationValue = "104857600",
                     Section = ConfigSection.Media    
                 },
                 new() // added by VS 2/19/2023
                 {
-                    ConfigurationKey = "MaxVideoSize",
+                    ConfigurationKey = ConfigNames.MaxVideoSize,
                     ConfigurationValue = "262144000",
                     Section = ConfigSection.Media
-                }
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.IsCachingEnabled,
+                    ConfigurationValue = "true",
+                    Section = ConfigSection.System
+                },
             };
 
             await context.Configurations.AddRangeAsync(configurations);

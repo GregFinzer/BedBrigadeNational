@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.PortableExecutable;
 using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models

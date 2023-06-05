@@ -62,7 +62,7 @@ namespace BedBrigade.Client.Components
 
         private const string PathDivider = "/";
         private const string PathDot = ".";
-        private const string SubfolderKey = "MainMediaSubFolder";
+        private const string SubfolderKey = ConfigNames.MainMediaSubFolder;
         private const string SiteRoot = "wwwroot/";
 
         private ClaimsPrincipal? Identity { get; set; }
@@ -109,7 +109,7 @@ namespace BedBrigade.Client.Components
             if (dataConfiguration.Success && dataConfiguration != null)
             {
               dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
-              MediaRoot = SiteRoot + dctConfiguration["MediaFolder"];                       
+              MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];                       
               MediaUser.DropFileFolder = PathDivider + dctConfiguration[SubfolderKey];
             }
             else
@@ -177,7 +177,7 @@ namespace BedBrigade.Client.Components
                 LocationId = 1,
                 FileName = "logo",
                 MediaType = "png",
-                FilePath = dctConfiguration["MediaFolder"] + PathDivider + dctConfiguration[SubfolderKey],
+                FilePath = dctConfiguration[ConfigNames.MediaFolder] + PathDivider + dctConfiguration[SubfolderKey],
                 FileSize = 9827,
                 AltText = "Bed Brigade National Logo",
                 FileStatus = "seed"
@@ -493,7 +493,7 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-                string FilePath = dctConfiguration["MediaFolder"] + TargetFolder;
+                string FilePath = dctConfiguration[ConfigNames.MediaFolder] + TargetFolder;
                 Media myMedia = new Media
                 {
                     LocationId = GetLocationId(TargetFolder),

@@ -12,6 +12,7 @@ using Serilog;
 using BedBrigade.MessageService.Services;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Entity.Infrastructure;
+using BedBrigade.Common;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 using IApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
 using Microsoft.AspNetCore.Components.Server.Circuits;
@@ -185,5 +186,34 @@ namespace BedBrigade.Client
 
         }
 
+        public static async Task SetupCaching(WebApplication app)
+        {
+            Log.Logger.Information("Setup Caching");
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
+            using (var context = dbContextFactory.CreateDbContext())
+            {
+                var config = await context.Configurations.FindAsync(ConfigNames.IsCachingEnabled);
+                if (config != null)
+                {
+                    if (config != null)
+                    {
+                        var cachingService = services.GetRequiredService<ICachingService>();
+                        cachingService.IsCachingEnabled = true;
+                        bool isCachingEnabled;
+
+                        if (bool.TryParse(config.ConfigurationValue, out isCachingEnabled))
+                        {
+                            cachingService.IsCachingEnabled = isCachingEnabled;
+                        }
+
+                        Log.Logger.Information(cachingService.IsCachingEnabled
+                            ? "Caching is enabled"
+                            : "Caching is disabled");
+                    }
+                }
+            }
+        }
     }
 }

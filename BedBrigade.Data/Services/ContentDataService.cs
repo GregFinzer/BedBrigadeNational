@@ -10,6 +10,7 @@ namespace BedBrigade.Data.Services;
 public class ContentDataService : IContentDataService
 {
     private const string FoundRecord = "Found Record";
+    private const string CacheSection = "Content";
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly AuthenticationStateProvider _auth;
@@ -38,7 +39,7 @@ public class ContentDataService : IContentDataService
             {
                 await ctx.Content.AddAsync(content);
                 await ctx.SaveChangesAsync();
-                _cachingService.Cache.ClearAll();
+                _cachingService.ClearAll();
                 return new ServiceResponse<Content>($"Added content with key {content.Name}.", true);
             }
         }
@@ -62,7 +63,7 @@ public class ContentDataService : IContentDataService
             {
                 ctx.Content.Remove(content);
                 await ctx.SaveChangesAsync();
-                _cachingService.Cache.ClearAll();
+                _cachingService.ClearAll();
                 return new ServiceResponse<bool>($"Removed record with key {contentId}.", true);
             }
             catch (DbException ex)
@@ -103,8 +104,8 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<Content>> GetAsync(int contentId)
     {
-        string cacheKey = _cachingService.BuildContentCacheKey(contentId);
-        var cachedContent = _cachingService.Cache.Get<Content>(cacheKey);
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, contentId);
+        var cachedContent = _cachingService.Get<Content>(cacheKey);
 
         if (cachedContent != null)
             return new ServiceResponse<Content>(FoundRecord, true, cachedContent); ;
@@ -114,7 +115,7 @@ public class ContentDataService : IContentDataService
             var result = await ctx.Content.FindAsync(contentId);
             if (result != null)
             {
-                _cachingService.Cache.Set<Content>(cacheKey, result);
+                _cachingService.Set<Content>(cacheKey, result);
                 return new ServiceResponse<Content>(FoundRecord, true, result);
             }
 
@@ -124,8 +125,8 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<Content>> GetAsync(string name, int location)
     {
-        string cacheKey = _cachingService.BuildContentCacheKey(name, location);
-        var cachedContent = _cachingService.Cache.Get<Content>(cacheKey);
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, location, name);
+        var cachedContent = _cachingService.Get<Content>(cacheKey);
 
         if (cachedContent != null)
             return new ServiceResponse<Content>(FoundRecord, true, cachedContent); 
@@ -148,7 +149,7 @@ public class ContentDataService : IContentDataService
 
             if (result != null)
             {
-                _cachingService.Cache.Set<Content>(cacheKey, result);
+                _cachingService.Set<Content>(cacheKey, result);
                 return new ServiceResponse<Content>(FoundRecord, true, result);
             }
             //if(name.ToLower() == "header" || name.ToLower() == "newpage")
@@ -172,7 +173,7 @@ public class ContentDataService : IContentDataService
                 context.Entry(entity).CurrentValues.SetValues(content);
                 context.Entry(entity).State = EntityState.Modified;
                 await context.SaveChangesAsync();
-                _cachingService.Cache.ClearAll();
+                _cachingService.ClearAll();
                 return new ServiceResponse<Content>($"Content record was updated.", true, content);
             }
             return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
@@ -181,8 +182,8 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<Content>> GetAsync(string name)
     {
-        string cacheKey = _cachingService.BuildContentCacheKey(name);
-        var cachedContent = _cachingService.Cache.Get<Content>(cacheKey);
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, name);
+        var cachedContent = _cachingService.Get<Content>(cacheKey);
 
         if (cachedContent != null)
             return new ServiceResponse<Content>(FoundRecord, true, cachedContent);
@@ -205,7 +206,7 @@ public class ContentDataService : IContentDataService
 
             if (result != null)
             {
-                _cachingService.Cache.Set<Content>(cacheKey, result);
+                _cachingService.Set<Content>(cacheKey, result);
                 return new ServiceResponse<Content>(FoundRecord, true, result);
             }
             //if(name.ToLower() == "header" || name.ToLower() == "newpage")

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
+using BedBrigade.Common;
 
 namespace BedBrigade.Data.Services
 {
@@ -163,7 +164,7 @@ namespace BedBrigade.Data.Services
                     .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var tokenExpiresIn = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigurationKey == "TokenExpiration");
+                var tokenExpiresIn = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigurationKey == ConfigNames.TokenExpiration);
                 int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
                 var token = new JwtSecurityToken(
                         claims: claims,
