@@ -5,7 +5,8 @@ namespace BedBrigade.Data.Services
 {
     public class CachingService : ICachingService
     {
-        public SmartCache Cache { get; private set; }
+        private SmartCache _cache;
+        public bool IsCachingEnabled { get; set; }
 
         public CachingService()
         {
@@ -15,30 +16,60 @@ namespace BedBrigade.Data.Services
             SmartConfig config = new SmartConfig(provider);
             config.UserName = LicenseLogic.KellermanUserName;
             config.LicenseKey = LicenseLogic.KellermanLicenseKey;
-            Cache = new SmartCache(config);
+            _cache = new SmartCache(config);
         }
 
-        public string BuildContentCacheKey(int contentId)
+        public string BuildCacheKey(string section, int key)
         {
             Dictionary<string, object> parms = new Dictionary<string, object>();
-            parms.Add("ContentId", contentId);
-            return Cache.BuildCacheKey("Content", parms);
+            parms.Add("IntegerKey", key);
+            return _cache.BuildCacheKey(section, parms);
+
         }
 
-        public string BuildContentCacheKey(string name)
+        public string BuildCacheKey(string section, string key)
         {
             Dictionary<string, object> parms = new Dictionary<string, object>();
-            parms.Add("Name", name);
-            return Cache.BuildCacheKey("Content", parms);
+            parms.Add("StringKey", key);
+            return _cache.BuildCacheKey(section, parms);
         }
 
-        public string BuildContentCacheKey(string name, int location)
+        public string BuildCacheKey(string section, int location, string key)
         {
             Dictionary<string, object> parms = new Dictionary<string, object>();
-            parms.Add("Name", name);
             parms.Add("Location", location);
-            return Cache.BuildCacheKey("Content", parms);
+            parms.Add("StringKey", key);
+            return _cache.BuildCacheKey(section, parms);
         }
 
+        public void ClearAll()
+        {
+            if (!IsCachingEnabled)
+            {
+                return;
+            }
+
+            _cache.ClearAll();
+        }
+
+        public void Set<T>(string cacheKey, T value)
+        {
+            if (!IsCachingEnabled)
+            {
+                return;
+            }
+
+            _cache.Set<T>(cacheKey, value);
+        }
+
+        public T? Get<T>(string cacheKey)
+        {
+            if (!IsCachingEnabled)
+            {
+                return default(T);
+            }
+
+            return _cache.Get<T>(cacheKey);
+        }
     }
 }

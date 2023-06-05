@@ -7,6 +7,7 @@
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Data.Models
+@using BedBrigade.Common
 @inject NavigationManager NavigationManager
 
     @if (ErrorMessage.Length > 0)
@@ -113,11 +114,11 @@ else
                                                                         <ContentTemplate>
                                                                         <div class="card">
                                                                             <div class="card-body"  style="height: 350px; overflow-y: scroll" >
-                                                                            <SfUploader ID="UploadFiles" AutoUpload="true" SequentialUpload="true" AllowedExtensions="@dctConfiguration["AllowedFileExtensions"]" MaxFileSize="@Convert.ToInt32(dctConfiguration["MaxFileSize"])" AllowMultiple="true" style="height: 100px">
+                                                                            <SfUploader ID="UploadFiles" AutoUpload="true" SequentialUpload="true" AllowedExtensions="@dctConfiguration[ConfigNames.AllowedFileExtensions]" MaxFileSize="@Convert.ToInt32(dctConfiguration[ConfigNames.MaxFileSize])" AllowMultiple="true" style="height: 100px">
                                                                                     <UploaderEvents ValueChange="OnUploadFileChange"></UploaderEvents>
                                                                                 </SfUploader>
                                                                             </div>
-                                                                        <div class="card-footer">Upload Image & Document files (<b>@dctConfiguration["AllowedFileExtensions"]</b>) with file upload size limit <b>@MediaHelper.FormatFileSize(Convert.ToInt32(dctConfiguration["MaxFileSize"]))</b></div>
+                                                                        <div class="card-footer">Upload Image & Document files (<b>@dctConfiguration[ConfigNames.AllowedFileExtensions]</b>) with file upload size limit <b>@MediaHelper.FormatFileSize(Convert.ToInt32(dctConfiguration[ConfigNames.MaxFileSize]))</b></div>
                                                                         </div>
                                                                         </ContentTemplate>
                                                                     </TabItem>
@@ -128,11 +129,11 @@ else
                                                                         <ContentTemplate>
                                                                         <div class="card">
                                                                         <div class="card-body" style="height: 350px; overflow-y: scroll"  >
-                                                                            <SfUploader ID="UploadVideo" AutoUpload="true" AllowedExtensions="@dctConfiguration["AllowedVideoExtensions"]" MaxFileSize="@Convert.ToInt32(dctConfiguration["MaxVideoSize"])" AllowMultiple="true" style="height: 100px">
+                                                                            <SfUploader ID="UploadVideo" AutoUpload="true" AllowedExtensions="@dctConfiguration[ConfigNames.AllowedVideoExtensions]" MaxFileSize="@Convert.ToInt32(dctConfiguration[ConfigNames.MaxVideoSize])" AllowMultiple="true" style="height: 100px">
                                                                                     <UploaderEvents ValueChange="OnUploadFileChange"></UploaderEvents>
                                                                                 </SfUploader>
                                                                             </div>
-                                                                        <div class="card-footer">Upload Video Files (<b>@dctConfiguration["AllowedVideoExtensions"]</b>) with file upload size limit <b>@MediaHelper.FormatFileSize(Convert.ToInt32(dctConfiguration["MaxVideoSize"]))</b></div>
+                                                                        <div class="card-footer">Upload Video Files (<b>@dctConfiguration[ConfigNames.AllowedVideoExtensions]</b>) with file upload size limit <b>@MediaHelper.FormatFileSize(Convert.ToInt32(dctConfiguration[ConfigNames.MaxVideoSize]))</b></div>
                                                                         </div>
                                                                         </ContentTemplate>
                                                                     </TabItem>                                                                  

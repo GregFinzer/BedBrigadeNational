@@ -1,15 +1,16 @@
-﻿using KellermanSoftware.NetCachingLibrary;
-
-namespace BedBrigade.Data.Services
+﻿namespace BedBrigade.Data.Services
 {
     public interface ICachingService
     {
         //Properties
-        SmartCache Cache { get; }
+        bool IsCachingEnabled { get; set; }
 
         //Methods
-        string BuildContentCacheKey(int contentId);
-        string BuildContentCacheKey(string name);
-        string BuildContentCacheKey(string name, int location);
+        string BuildCacheKey(string section, int key);
+        string BuildCacheKey(string section, string key);
+        string BuildCacheKey(string section, int location, string key);
+        void ClearAll();
+        void Set<T>(string cacheKey, T value);
+        T? Get<T>(string cacheKey);
     }
 }
