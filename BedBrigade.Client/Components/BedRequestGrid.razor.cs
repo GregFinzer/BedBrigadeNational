@@ -8,9 +8,6 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
-using BedBrigade.Client.Pages.Administration.Manage;
-using System.Data;
-using BedBrigade.Client.Pages.Home;
 
 namespace BedBrigade.Client.Components
 {

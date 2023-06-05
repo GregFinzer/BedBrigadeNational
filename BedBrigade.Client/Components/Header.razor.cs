@@ -70,7 +70,7 @@ namespace BedBrigade.Client.Components
                 if (authState.User.HasRole($"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}, {RoleNames.LocationAuthor}, {RoleNames.LocationScheduler}"))
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
-                    await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/logout");
+                    await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
                     await _js.InvokeVoidAsync("DisplayToggle.Toggle", "administration");
                     if (Menu.ToLower() == "dashboard")
                     {
@@ -80,7 +80,7 @@ namespace BedBrigade.Client.Components
                 else
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Login");
-                    await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/home/login");
+                    await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/login");
                     await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", AdminElement, "dropdown-toggle");
                 }
             }
