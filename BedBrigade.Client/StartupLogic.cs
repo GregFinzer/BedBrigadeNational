@@ -130,6 +130,7 @@ namespace BedBrigade.Client
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
 
             });
             Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
