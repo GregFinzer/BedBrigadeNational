@@ -30,9 +30,6 @@
 </div>
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Timeout=@ToastTimeout Target="#UserTarget" Content=@ToastContent>
     <ToastPosition X="Center" Y="Top"></ToastPosition>
-    <ToastButtons>
-        <ToastButton Content = "Close" OnClick=@HideToast />
-    </ToastButtons>
 </SfToast>
 
 <SfDialog Width="800" MinHeight="200" @bind-Visible=@DialogVisible IsModal="true" ShowCloseIcon="true" >
