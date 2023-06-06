@@ -251,7 +251,7 @@ namespace BedBrigade.Data.Data.Seeding
             {
                 foreach (var location in context.Locations)
                 {
-                    var seedHtml = GetHtml("History-of-bed-brigade.html");
+                    var seedHtml = GetHtml("History.html");
                     context.Content.Add(new Content
                     {
                         LocationId = location.LocationId!,
