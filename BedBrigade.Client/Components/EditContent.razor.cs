@@ -36,7 +36,7 @@ namespace BedBrigade.Client.Components
         private Content Content { get; set; }
         private SfToast ToastObj { get; set; }
         private string? ToastTitle { get; set; } = string.Empty;
-        private int ToastTimeout { get; set; } = 6000;
+        private int ToastTimeout { get; set; } = 1000;
         private string ToastContent { get; set; } = string.Empty;
         //private string ButtonCaption { get; set; } = "Save As ...";
         //private string locationRoute { get; set; } = string.Empty;
@@ -145,7 +145,7 @@ namespace BedBrigade.Client.Components
                     ToastContent = "Unable to save the content!";
                 }
 
-                await ToastObj.ShowAsync();
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
