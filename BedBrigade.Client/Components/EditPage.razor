@@ -20,7 +20,7 @@
 @code {
     [Inject] public IContentService _svcContent { get; set; }
     [Inject] private AuthenticationStateProvider? _authState { get; set; }
-    [Inject] private NavigationManager _nv { get; set; }
+    [Inject] private NavigationManager _nm { get; set; }
 
     [Parameter] public string ContentType { get; set; }
 
@@ -39,7 +39,7 @@
         else
         {
         }
-        string[] pageParameters = _nv.Uri.Split('/');
+        string[] pageParameters = _nm.Uri.Split('/');
         var result = await _svcContent.GetAsync("HomePageBody", 1);
         if(result.Success)
         {
