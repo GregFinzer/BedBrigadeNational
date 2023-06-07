@@ -138,10 +138,10 @@ namespace BedBrigade.Client
 
             });
             Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
-            // Connect the application lifetime
-            IHostApplicationLifetime Lifetime = app.Lifetime;
-            Lifetime.ApplicationStopping.Register(OnStopping);
-            Lifetime.ApplicationStarted.Register(OnStarting);
+            //// Connect the application lifetime
+            //IHostApplicationLifetime Lifetime = app.Lifetime;
+            //Lifetime.ApplicationStopping.Register(OnStopping);
+            //Lifetime.ApplicationStarted.Register(OnStarting);
             
             
             //Task.Run(async () => await  app.StopAsync());
