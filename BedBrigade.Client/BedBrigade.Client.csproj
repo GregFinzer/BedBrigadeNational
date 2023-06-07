@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Content Remove="compilerconfig.json" />
+    <Content Remove="Components\EditPage.razor" />
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
     <Content Remove="wwwroot\scripts\DisplayToggle.js" />
