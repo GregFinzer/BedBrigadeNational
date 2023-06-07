@@ -22,6 +22,7 @@ namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
+        private static ServiceProvider _svcProvider;
 
         public static void ConfigureLogger(WebApplicationBuilder builder)
         {
@@ -44,7 +45,6 @@ namespace BedBrigade.Client
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
@@ -55,6 +55,7 @@ namespace BedBrigade.Client
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.UseApplicationServiceProvider(_svcProvider);
             });
 
             // Add Email Messageing Service config
@@ -106,6 +107,8 @@ namespace BedBrigade.Client
 
             builder.Services.AddSyncfusionBlazor();
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjIyMjE1NUAzMjMxMmUzMDJlMzBTR09FTlpnUWlNS1k5N0pualJ5UHdlYXNEVk1yakxlaTQrUmE0dEhBU1pJPQ==");
+
+            _svcProvider = builder.Services.BuildServiceProvider();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
