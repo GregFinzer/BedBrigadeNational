@@ -62,6 +62,7 @@ namespace BedBrigade.Client
             // Email Messaging Service
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             builder.Services.AddSingleton(emailConfig);
+
             ClientServices(builder);
 
             DataServices(builder);
@@ -144,14 +145,8 @@ namespace BedBrigade.Client
 
             });
             Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
-            // Connect the application lifetime
-            IHostApplicationLifetime Lifetime = app.Lifetime;
-            Lifetime.ApplicationStopping.Register(OnStopping);
-            Lifetime.ApplicationStarted.Register(OnStarting);
             
-            
-            //Task.Run(async () => await  app.StopAsync());
-            return app;
+                        return app;
         }
 
         public static async Task SetupDatabase(WebApplication app)
