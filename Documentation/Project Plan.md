@@ -100,40 +100,39 @@ One thing you will notice about the following project plan is the lack of due da
 * Manage Users
     * User List :heavy_check_mark:
     * Add User :heavy_check_mark:
-    * Edit User 
+    * Edit User :heavy_check_mark: 
     * Delete User :heavy_check_mark:
     
-* National News
-    * National News Sample Story
+* News
+    * National News Sample Story :heavy_check_mark:
     * List of News
     * News Detail
+    * Manage News
     * Add News
     * Edit News
     * Delete News
     
-* Location Stories
+* Stories
     * Grove City Sample Story
     * Polaris Sample Story
     * List of Stories
     * Story Detail
+    * Manage Stories
     * Add Story
     * Edit Story
     * Delete Story
 
-* Added Scope
-    * Email Bed Brigade Location Prayer Requests to all volunteers and national officers.
+* For Version 2
+    * Search
+        * Search Indexing
+        * Search Bar
+        * Search Results
+        
+    * Advanced Features
+        * Remove Image Geolocation
+        * Convert Image to WebP
+        * Page Versioning
+        * Page History
+        * Restore Version
     
-* Search
-    * Search Indexing
-    * Search Bar
-    * Search Results
-    
-* Advanced Features
-    * Remove Image Geolocation
-    * Convert Image to WebP
-    * Page Versioning
-    * Page History
-    * Restore Version
-    
-* Scope Added
-    * Email Prayer Requests
+
