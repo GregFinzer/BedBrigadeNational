@@ -1,7 +1,9 @@
 ﻿using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace BedBrigade.Data
 {
@@ -56,10 +58,14 @@ namespace BedBrigade.Data
                 .HasIndex(o => o.VolunteeringForId);
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            SetAudit();
-            return base.SaveChangesAsync(cancellationToken);
+            var provider = this.GetService<AuthenticationStateProvider>();
+            //var authState = await provider.GetAuthenticationStateAsync();
+            //var name = authState.User.Identity.Name;
+
+            SetAudit("Seed");
+            return await base.SaveChangesAsync(cancellationToken);
         }
         /// <summary>
         /// Populate the audit part of the db records
@@ -67,17 +73,16 @@ namespace BedBrigade.Data
         /// <returns></returns>
         public override int SaveChanges()
         {
-            SetAudit();
+            var provider = this.GetService<AuthenticationStateProvider>();
+            //var authState = Task.Run(provider.GetAuthenticationStateAsync());
+           // var name = authState.User.Identity.Name;
+
+            SetAudit("Seed");
             return base.SaveChanges();
         }
 
-        private void SetAudit()
+        private void SetAudit(string userId)
         {
-            string userId = "seed";
-            if (_httpContext != null)
-            {
-                userId = _httpContext.HttpContext.User.Identity.Name;
-            }
             var tracker = ChangeTracker;
             foreach (var entry in tracker.Entries())
             {

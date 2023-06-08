@@ -22,6 +22,7 @@ namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
+        private static ServiceProvider _svcProvider;
 
         public static void ConfigureLogger(WebApplicationBuilder builder)
         {
@@ -44,7 +45,6 @@ namespace BedBrigade.Client
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
@@ -55,40 +55,17 @@ namespace BedBrigade.Client
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.UseApplicationServiceProvider(_svcProvider);
             });
 
             // Add Email Messageing Service config
             // Email Messaging Service
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             builder.Services.AddSingleton(emailConfig);
-            //builder.Services.AddFluentEmail(emailConfig.From)
-            //    .AddRazorRenderer()
-            //    .AddSmtpSender(emailConfig.SmtpServer, emailConfig.Port, DeliveryMethod);
 
-            builder.Services.AddSingleton<ICachingService, CachingService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
-            builder.Services.AddScoped<ILocationService, LocationService>();
-            builder.Services.AddScoped<IContentService, ContentService>();
-            builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-            builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
-            builder.Services.AddScoped<IMediaService, MediaService>();
-            builder.Services.AddScoped<IDonationService, DonationService>();
-            builder.Services.AddScoped<IBedRequestService, BedRequestService>();
+            ClientServices(builder);
 
-            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
-            builder.Services.AddScoped<IUserDataService, UserDataService>();
-            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
-            builder.Services.AddScoped<ILocationDataService, LocationDataService>();
-            builder.Services.AddScoped<IVolunteerDataService, VolunteerDataService>();
-            builder.Services.AddScoped<IConfigurationDataService, ConfigurationDataService>();
-            builder.Services.AddScoped<IContentDataService, ContentDataService>();
-            builder.Services.AddScoped<IVolunteerForDataService, VolunteerForDataService>();
-            builder.Services.AddScoped<IMediaDataService, MediaDataService>();
-            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
-            builder.Services.AddScoped<IBedRequestDataService, BedRequestDataService>();
+            DataServices(builder);
 
             builder.Services.AddScoped<IMessageService, Services.MessageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
@@ -106,6 +83,39 @@ namespace BedBrigade.Client
 
             builder.Services.AddSyncfusionBlazor();
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjIyMjE1NUAzMjMxMmUzMDJlMzBTR09FTlpnUWlNS1k5N0pualJ5UHdlYXNEVk1yakxlaTQrUmE0dEhBU1pJPQ==");
+
+            _svcProvider = builder.Services.BuildServiceProvider();
+        }
+
+        private static void DataServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+            builder.Services.AddScoped<IUserDataService, UserDataService>();
+            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
+            builder.Services.AddScoped<ILocationDataService, LocationDataService>();
+            builder.Services.AddScoped<IVolunteerDataService, VolunteerDataService>();
+            builder.Services.AddScoped<IConfigurationDataService, ConfigurationDataService>();
+            builder.Services.AddScoped<IContentDataService, ContentDataService>();
+            builder.Services.AddScoped<IVolunteerForDataService, VolunteerForDataService>();
+            builder.Services.AddScoped<IMediaDataService, MediaDataService>();
+            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
+            builder.Services.AddScoped<IBedRequestDataService, BedRequestDataService>();
+        }
+
+        private static void ClientServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<ICachingService, CachingService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<IContentService, ContentService>();
+            builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+            builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
+            builder.Services.AddScoped<IMediaService, MediaService>();
+            builder.Services.AddScoped<IDonationService, DonationService>();
+            builder.Services.AddScoped<IBedRequestService, BedRequestService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
@@ -135,25 +145,8 @@ namespace BedBrigade.Client
 
             });
             Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
-            // Connect the application lifetime
-            IHostApplicationLifetime Lifetime = app.Lifetime;
-            Lifetime.ApplicationStopping.Register(OnStopping);
-            Lifetime.ApplicationStarted.Register(OnStarting);
             
-            
-            //Task.Run(async () => await  app.StopAsync());
-            return app;
-        }
-
-        private static void OnStarting()
-        {
-            Log.Information($"Application Starting");
-        }
-
-        private static void OnStopping()
-        {
-            Log.Information($"Application Stopping");
-            Log.CloseAndFlush();
+                        return app;
         }
 
         public static async Task SetupDatabase(WebApplication app)
