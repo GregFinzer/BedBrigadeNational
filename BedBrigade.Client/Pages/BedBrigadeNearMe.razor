@@ -1,0 +1,39 @@
+﻿@layout BedBrigade.Client.Shared.MainLayout
+@inject NavigationManager NavigationManager
+@page "/bed-brigade-near-me"
+
+
+<h1>Bed Brigade Near Me</h1>
+
+<ul>
+    @foreach (var link in Links)
+    {
+        <li><a href="" @onclick="(() => HandleLinkClick(link))">@link.Text</a></li>
+    }
+</ul>
+
+
+@code {
+    private List<Link> Links { get; set; } = new List<Link>
+    {
+        new Link { Text = "Kellerman Software", Path = "https://www.kellermansoftware.com" },
+        new Link { Text = "Google", Path = "https://www.google.com" },
+        new Link { Text = "Bing", Path = "https://www.bing.com" }
+    };
+
+    private void HandleLinkClick(Link link)
+    {
+    // Perform logic here
+    // For example, you can show a confirmation dialog or update some data
+
+    // Redirect to the specified path
+        NavigationManager.NavigateTo(link.Path);
+    }
+
+    public class Link
+    {
+        public string Text { get; set; }
+        public string Path { get; set; }
+    }
+}
+

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using BedBrigade.Data.Services;
+using BedBrigade.Common;
 using KellermanSoftware.HTMLReports;
 using KellermanSoftware.StaticCodeAnalysis;
 

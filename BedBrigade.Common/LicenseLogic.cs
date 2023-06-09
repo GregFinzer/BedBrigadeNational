@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Data.Services
+﻿namespace BedBrigade.Common
 {
     public static class LicenseLogic
     {

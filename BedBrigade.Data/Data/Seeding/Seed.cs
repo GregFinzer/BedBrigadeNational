@@ -40,38 +40,43 @@ public class Seed
         },
         new Location
         {
-            Name = "Living Hope Church", Route = "/newark", Address1 = "", Address2 = "", City = "Newark",
-            State = "Ohio", PostalCode = ""
+            Name = "Bed Brigade Grove City", Route = "/grove=city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
+            State = "Ohio", PostalCode = "43123"
         },
         new Location
         {
-            Name = "Rock City Polaris", Route = "/rock", Address1 = "", Address2 = "", City = "Rock City",
-            State = "Ohio", PostalCode = ""
+            Name = "Living Hope Church Bed Brigade", Route = "/living-hope-church", Address1 = "9286 York Rd SW", Address2 = "", City = "Pataskala",
+            State = "Ohio", PostalCode = "43062"
         },
         new Location
         {
-            Name = "Peace Lutheran", Route = "/linden", Address1 = "", Address2 = "", City = "Linden", State = "Ohio",
-            PostalCode = ""
+            Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", Address1 = "1250 Gemini Pl", Address2 = "", City = "Columbus",
+            State = "Ohio", PostalCode = "43240"
         },
         new Location
         {
-            Name = "Vinyard Church", Route = "/Circleville", Address1 = "", Address2 = "", City = "Circleville",
-            State = "Ohio", PostalCode = ""
+            Name = "Peace Lutheran Bed Brigade", Route = "/peace-lutheran", Address1 = "455 Clark State Rd", Address2 = "", City = "Gahanna", State = "Ohio",
+            PostalCode = "43230"
         },
         new Location
         {
-            Name = "Hardbarger Impact", Route = "/lancaster", Address1 = "", Address2 = "", City = "Lancaster",
-            State = "Ohio", PostalCode = ""
+            Name = "Vineyard Church Bed Brigade", Route = "/vineyard-circleville", Address1 = "911 S Pickaway St", Address2 = "", City = "Circleville",
+            State = "Ohio", PostalCode = "43113"
         },
         new Location
         {
-            Name = "Upper Arlington Lutheran", Route = "/Arlington", Address1 = "", Address2 = "", City = "Arlington",
-            State = "Ohio", PostalCode = ""
+            Name = "Hardbarger Impact Bed Brigade", Route = "/lancaster", Address1 = "1780 Victor Road", Address2 = "", City = "Lancaster",
+            State = "Ohio", PostalCode = "43130"
         },
         new Location
         {
-            Name = "Greensburg United Methodist", Route = "/canton", Address1 = "", Address2 = "", City = "Canton",
-            State = "Ohio", PostalCode = ""
+            Name = "Upper Arlington Lutheran Bed Brigade", Route = "/upper-arlington-lutheran", Address1 = "2300 Lytham Road", Address2 = "", City = "Upper Arlington",
+            State = "Ohio", PostalCode = "43220"
+        },
+        new Location
+        {
+            Name = "Greensburg United Methodist Bed Brigade", Route = "/canton", Address1 = "2161 Greensburg Rd", Address2 = "", City = "North Canton",
+            State = "Ohio", PostalCode = "44720"
         }
 
     };
@@ -204,6 +209,12 @@ public class Seed
                 {
                     ConfigurationKey = ConfigNames.IsCachingEnabled,
                     ConfigurationValue = "true",
+                    Section = ConfigSection.System
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.BedBrigadeNearMeMaxMiles,
+                    ConfigurationValue = "30",
                     Section = ConfigSection.System
                 },
             };

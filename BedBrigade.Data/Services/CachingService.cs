@@ -1,4 +1,5 @@
-﻿using KellermanSoftware.NetCachingLibrary;
+﻿using BedBrigade.Common;
+using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 
 namespace BedBrigade.Data.Services

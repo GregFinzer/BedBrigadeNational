@@ -3,15 +3,27 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
+using System.Runtime.InteropServices;
+using BedBrigade.Common;
+using KellermanSoftware.AddressParser;
 
 namespace BedBrigade.Data.Services;
 
 public class LocationDataService : BaseDataService, ILocationDataService
 {
+    private const string CacheSection = "Location";
+    private const string FoundRecord = "Found Record";
+    private readonly ICachingService _cachingService;
+    private readonly IConfigurationDataService _configurationDataService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
 
-    public LocationDataService(IDbContextFactory<DataContext> contextFactory, AuthenticationStateProvider authProvider) : base(authProvider)
+    public LocationDataService(ICachingService cachingService, 
+        IConfigurationDataService configurationDataService,
+        IDbContextFactory<DataContext> contextFactory, 
+        AuthenticationStateProvider authProvider) : base(authProvider)
     {
+        _cachingService = cachingService;
+        _configurationDataService = configurationDataService;
         _contextFactory = contextFactory;
     }
 
@@ -23,6 +35,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
             {
                 await ctx.Locations.AddAsync(location);
                 await ctx.SaveChangesAsync();
+                _cachingService.ClearAll();
                 return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true);
             }
             catch (DbException ex)
@@ -46,6 +59,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
             {
                 ctx.Locations.Remove(location);
                 await ctx.SaveChangesAsync();
+                _cachingService.ClearAll();
                 return new ServiceResponse<bool>($"Removed record with key {locationId}.", true);
             }
             catch (DbException ex)
@@ -57,12 +71,18 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<List<Location>>> GetAllAsync()
     {
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, "GetAllAsync");
+        var cachedLocations = _cachingService.Get<List<Location>>(cacheKey);
+
+        if (cachedLocations != null)
+            return new ServiceResponse<List<Location>>($"Found {cachedLocations.Count} records.", true, cachedLocations); ;
+
         using (var ctx = _contextFactory.CreateDbContext())
         {
-
             var result = await ctx.Locations.ToListAsync();
             if (result != null)
             {
+                _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<Location>>($"Found {result.Count} records.", true, result);
             }
             return new ServiceResponse<List<Location>>("None found.");
@@ -71,12 +91,19 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<Location>> GetAsync(int locationId)
     {
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, locationId);
+        var cachedLocation = _cachingService.Get<Location>(cacheKey);
+
+        if (cachedLocation != null)
+            return new ServiceResponse<Location>(FoundRecord, true, cachedLocation); 
+
         using (var ctx = _contextFactory.CreateDbContext())
         {
 
             var result = await ctx.Locations.FindAsync(locationId);
             if (result != null)
             {
+                _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<Location>("Found Record", true, result);
             }
             return new ServiceResponse<Location>("Not Found");
@@ -85,11 +112,18 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
+        string cacheKey = _cachingService.BuildCacheKey(CacheSection, routeName);
+        var cachedLocation = _cachingService.Get<Location>(cacheKey);
+
+        if (cachedLocation != null)
+            return new ServiceResponse<Location>($"{routeName} found", true, cachedLocation);
+
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var loc = await ctx.Locations.FirstOrDefaultAsync(l => l.Route == routeName);
             if (loc != null)
             {
+                _cachingService.Set(cacheKey, loc);
                 return new ServiceResponse<Location>($"{routeName} found", true, loc);
             }
             return new ServiceResponse<Location>("Not Found");
@@ -108,12 +142,72 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 var result = await UpdateLocationAsync(loc, location);
                 if (result.Success)
                 {
+                    _cachingService.ClearAll();
                     return result;
                 }
             }
         }
         return new ServiceResponse<Location>($"User with key {location.LocationId} was not updated.");
 
+    }
+
+    public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string postalCode)
+    {
+        AddressParser parser = new AddressParser(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+
+        if (!parser.IsValidZipCode(postalCode))
+        {
+            return new ServiceResponse<List<LocationDistance>>($"Invalid postal code {postalCode}");
+        }
+
+        var zipCodeInfo = parser.GetInfoForZipCode(postalCode);
+        
+        if (zipCodeInfo.Latitude == null || zipCodeInfo.Longitude == null)
+        {
+            return new ServiceResponse<List<LocationDistance>>($"Postal code {postalCode} is a military or PO Box and cannot be used");
+        }
+
+        int maxMiles;
+        var milesResult = await _configurationDataService.GetAsync(ConfigNames.BedBrigadeNearMeMaxMiles);
+        if (milesResult.Success && milesResult.Data != null && milesResult.Data.ConfigurationValue != null)
+        {
+            maxMiles = int.Parse(milesResult.Data.ConfigurationValue);
+        }
+        else
+        {
+            return new ServiceResponse<List<LocationDistance>>($"BedBrigadeNearMeMaxMiles is not set or is not an integer");
+        }
+
+        var locationsResult = await GetAllAsync();
+        bool anyPostalCodes = locationsResult.Data.Any(l => !string.IsNullOrEmpty(l.PostalCode));
+
+        if (!anyPostalCodes)
+        {
+            return new ServiceResponse<List<LocationDistance>>($"No locations have postal codes");
+        }
+
+        var result = new List<LocationDistance>();
+        foreach (var loc in locationsResult.Data)
+        {
+            if (!string.IsNullOrEmpty(loc.PostalCode))
+            {
+                var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
+                if (distance < maxMiles)
+                {
+                    LocationDistance locationDistance = (LocationDistance) loc;
+                    locationDistance.Distance = distance;
+                    result.Add(locationDistance);
+                }
+            }
+        }
+        result = result.OrderByDescending(r => r.Distance).ToList();
+
+        if (result.Count == 0)
+        {
+            return new ServiceResponse<List<LocationDistance>>($"No locations found within {maxMiles} miles of {postalCode}", true, result);
+        }
+
+        return new ServiceResponse<List<LocationDistance>>($"Found {result.Count} locations within {maxMiles} miles of {postalCode}", true, result);
     }
 
     private async Task<ServiceResponse<Location>> UpdateLocationAsync(Location loc, Location location)
@@ -129,6 +223,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 var result = await ctx.SaveChangesAsync();
                 if (result > 0)
                 {
+                    _cachingService.ClearAll();
                     return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
                 }
             }
@@ -141,6 +236,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
         }
 
     }
+
 
 }
 
