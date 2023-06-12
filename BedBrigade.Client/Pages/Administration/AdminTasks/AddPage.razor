@@ -2,6 +2,4 @@
 @page "/administration/admintasks/addpage"
 @page "/administration/admintasks/addpage/{*imageRoute}"
 
-<h5 class="w-100 text-center my-4">Add Page "@newPageName" To @LocationName</h5>
-
-<EditContent PageName="NewPage" IsNewPage="true" saveUrl="@imageRoute"/>
+<EditContent PageName="@newPageName" IsNewPage="true" saveUrl="@imageRoute"/>

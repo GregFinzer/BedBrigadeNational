@@ -69,9 +69,14 @@ namespace BedBrigade.Client.Components
             if (result.Success)
             {
                 Locations = result.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+
+                }
             }
         }
-
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)

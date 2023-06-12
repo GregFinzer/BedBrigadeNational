@@ -14,16 +14,23 @@ public partial class AddPage : ComponentBase
     private int locationIndex = 3;
     private int pageNameIndex = 4;
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var parameters = imageRoute.Split('/');
         newPageName = parameters[pageNameIndex];
-        var locationId = Convert.ToInt32(parameters[locationIndex]); ;
-        var result = await _svcLocation.GetAsync(locationId);
-        if (result.Success)
+        var locationId = Convert.ToInt32(parameters[locationIndex]);
+        try
         {
-            LocationName = result.Data.Name;
+            var result = await _svcLocation.GetAsync(locationId);
+            if (result.Success)
+            {
+                LocationName = result.Data.Name;
+            }
         }
-        base.OnInitialized();
+        catch (Exception ex)
+        {
+            var msg = ex.Message;
+        }
+
     }
 }

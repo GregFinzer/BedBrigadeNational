@@ -172,7 +172,6 @@ namespace BedBrigade.Client.Components
         {
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
             displayError = "none;";
-            
             PasswordVisible = true;
         }
         private async Task NewPassword()

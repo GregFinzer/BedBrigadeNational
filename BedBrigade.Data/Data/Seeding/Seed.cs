@@ -35,6 +35,10 @@ public class Seed
     {
         new Location
         {
+            Name="Templates",Route="/templates", Address1 = "", Address2 = "", City = "",State = "", PostalCode = ""
+        },
+        new Location
+        {
             Name = SeedConstants.SeedNationalName, Route = "/national", Address1 = "", Address2 = "", City = "Columbus",
             State = "Ohio", PostalCode = ""
         },
@@ -313,6 +317,12 @@ public class Seed
                     {
                         SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
                         List<Location> locations = context.Locations.ToList();
+                        var item = locations.Single(r => r.LocationId == 0);
+                        if (item != null)
+                        {
+                            locations.Remove(item);
+                        }
+
                         var location = locations[new Random().Next(locations.Count)];
                         if (user.FirstName == "National")
                         {
@@ -421,6 +431,12 @@ public class Seed
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
+            var item = locations.Single(r => r.LocationId == 0);
+            if (item != null)
+            {
+                locations.Remove(item);
+            }
+
             for (var i = 0; i <= 100; i++)
             {
                 var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
@@ -471,6 +487,11 @@ public class Seed
                 List<bool> YesOrNo = new List<bool> { true, false };
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
+                var item = locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    locations.Remove(item);
+                }
 
                 for (var i = 0; i < 100; i++)
                 {
@@ -519,7 +540,12 @@ public class Seed
                 List<string> City = new List<string> { "Columbus", "Cleveland", "Cincinnati", "Canton", "Youngston", "Springfield", "Middletown", "Beavercreek" };
                 List<string> StreetName = new List<string> { "E. Bella Ln", "W. Chandler Blvd", "25 St.", "4th Ave.", "G Ave.", "Indian Wells CT.", "N. Arizona" };
                 List<Location> locations = await context.Locations.ToListAsync();
+                var item = locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    locations.Remove(item);
 
+                }
                 for (var i = 0; i < 30; i++)
                 {
                     var location = locations[new Random().Next(locations.Count - 1)];
