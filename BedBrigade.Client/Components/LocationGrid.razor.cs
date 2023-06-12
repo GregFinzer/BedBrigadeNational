@@ -253,9 +253,6 @@ namespace BedBrigade.Client.Components
                             locationRoute = locationRoute + "/pages/Home";
                             CreateDirectory(locationRoute);
                             CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/Templates/pages/Home", locationRoute);
-                            //DeleteDirectory(locationRoute + "/pages/NewPage");
-                            //DeleteDirectory(locationRoute + "/pages/Header");
-                            //DeleteDirectory(locationRoute + "/pages/Footer");
                         }
 
                         await CreateHeaderAsync(location.LocationId);
