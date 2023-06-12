@@ -11,6 +11,9 @@ namespace BedBrigade.Client.Components
     public partial class EditContent
     {
         const int UseTemplates = 0;
+        const string none = "none;";
+        const string display = "display;";
+
         [Inject] public IContentService _svcContent { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private ILocationService _svcLocation { get; set; }
@@ -141,29 +144,29 @@ namespace BedBrigade.Client.Components
                 switch (Content.ContentType)
                 {
                     case Common.Common.ContentType.Body:
-                        DisplayBody = "display;";
-                        DisplayHeader = "none;";
-                        DisplayHome = "none;";
-                        DisplayTitle = "display;";
-                        ShowMediaId = "none;";
+                        DisplayBody = display;
+                        DisplayHeader = none;
+                        DisplayHome = none;
+                        DisplayTitle = display;
+                        ShowMediaId = none;
                         break;
                     case Common.Common.ContentType.Home:
-                        DisplayBody = "none;";
-                        DisplayHeader = "none;";
-                        DisplayHome = "display;";
-                        DisplayTitle = "display;";
+                        DisplayBody = none;
+                        DisplayHeader = none;
+                        DisplayHome = display;
+                        DisplayTitle = display;
                         break;
                     case Common.Common.ContentType.Header:
-                        DisplayBody = "none;";
-                        DisplayHeader = "none;";
-                        DisplayHome = "none;";
-                        DisplayTitle = "none;";
+                        DisplayBody = none;
+                        DisplayHeader = none;
+                        DisplayHome = none;
+                        DisplayTitle = none;
                         break;
                     case Common.Common.ContentType.Footer:
-                        DisplayBody = "none;";
-                        DisplayHeader = "none;";
-                        DisplayHome = "none;";
-                        DisplayTitle = "none;";
+                        DisplayBody = none;
+                        DisplayHeader = none;
+                        DisplayHome = none;
+                        DisplayTitle = none;
                         break;
                 }
 
@@ -220,12 +223,12 @@ namespace BedBrigade.Client.Components
         {
             if(showMedia)
             {
-                ShowMediaId = "none;";
+                ShowMediaId = none;
                 showMedia = false;
             }
             else
             {
-                ShowMediaId = "display;";
+                ShowMediaId = display;
                 showMedia = true;
             }
         }
