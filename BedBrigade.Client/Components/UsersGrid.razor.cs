@@ -172,7 +172,6 @@ namespace BedBrigade.Client.Components
         {
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
             displayError = "none;";
-            
             PasswordVisible = true;
         }
         private async Task NewPassword()
@@ -269,7 +268,7 @@ namespace BedBrigade.Client.Components
                 BBUsers = userResult.Data;  
             }
             await Grid.CallStateHasChangedAsync();
-            Grid.Refresh();
+            await Grid.Refresh();
         }
 
         private async Task AddNewUser(User user)
@@ -357,7 +356,7 @@ namespace BedBrigade.Client.Components
                 BBUsers = result.Data;
             }
             await Grid.CallStateHasChangedAsync();
-            Grid.Refresh();
+            await Grid.Refresh();
         }
 
         protected async Task Save(User user)

@@ -10,6 +10,7 @@ namespace BedBrigade.Client.Components
 {
     public partial class EditContent
     {
+        const int UseTemplates = 0;
         [Inject] public IContentService _svcContent { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private ILocationService _svcLocation { get; set; }
@@ -94,18 +95,21 @@ namespace BedBrigade.Client.Components
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             pageParameters = saveUrl.Split('/');
             var pageNameParameters = pageParameters[4].Split("_");
+            ServiceResponse<Content> contentResult;
             if (IsNewPage)
             {
                 newPageName = pageParameters[4];
                 workTitle = "Adding";
                 workType = $"Add {pageParameters[4]}";
                 ToastTitle = $"Save Page as {pageParameters[4]}";
+                contentResult = await _svcContent.GetAsync(pageNameParameters[0], UseTemplates);
             }
             else
             {
                 workTitle = "Editing";
                 workType = $"Updating {pageParameters[4]}";
                 ToastTitle = $"Edit Page {PageName}";
+                contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
             }
             var locationResult = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
             if(locationResult.Success)
@@ -114,7 +118,7 @@ namespace BedBrigade.Client.Components
                 imagePath = $"media{Location.Route}/Pages/Images/";
             }
 
-            var contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
+            
             if (contentResult.Success)
             {
                 Body = contentResult.Data.ContentHtml;

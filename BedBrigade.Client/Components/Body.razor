@@ -69,7 +69,7 @@
             {
                 content = contentResult.Data;
                 BodyContent = contentResult.Data.ContentHtml;
-                RandomizeImagesAsync();
+                await RandomizeImagesAsync();
                 Menu = FindMenu();
                 if (string.IsNullOrEmpty(Menu))
                 {

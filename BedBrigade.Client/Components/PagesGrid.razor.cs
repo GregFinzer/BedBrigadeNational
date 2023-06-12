@@ -215,11 +215,12 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Add:
-                    Add(args);
+                    await Add(args);
+                    args.Cancel = true;
                     break;
 
                 case Action.BeginEdit:
-                    BeginEdit(args);
+                    await BeginEdit(args);
                     break;
             }
 
@@ -248,6 +249,7 @@ namespace BedBrigade.Client.Components
                     else
                     {
                         args.Cancel = true;
+                        return;
                     }
 
                 }
@@ -264,12 +266,12 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async void Add(ActionEventArgs<Content> args)
+        private async Task Add(ActionEventArgs<Content> args)
         {
             content = new Content();
-            args.Cancel = true;
             AddContentVisible = true;
-        }
+            return;
+       }
 
 
         private async Task BeginEdit(ActionEventArgs<Content> args)
