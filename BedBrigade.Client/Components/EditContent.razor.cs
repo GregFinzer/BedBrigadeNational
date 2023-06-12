@@ -12,7 +12,6 @@ namespace BedBrigade.Client.Components
     {
         [Inject] public IContentService _svcContent { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-        [Inject] private NavigationManager _nav { get; set; }
         [Inject] private ILocationService _svcLocation { get; set; }
 
         [Parameter] public string PageName { get; set; }
@@ -20,29 +19,38 @@ namespace BedBrigade.Client.Components
         [Parameter] public string saveUrl { get; set; }
 
         //private string saveUrl { get; set; } = "api/image/save/1/Images";
-        private string imagePath { get; set; } = "media/National/Pages/Images/";
-        private string validationMessage { get; set; } = "My Message";
+        private string imagePath { get; set; }
         private List<string> AllowedTypes = new()
         {
             ".jpg",
             ".png",
             ".gif"
         };
-        private bool DialogVisible { get; set; } = false;
         private SfRichTextEditor RteObj { get; set; }
+
+        private string workTitle;
+        private string workType;
+
         public string newPageName { get; private set; }
         private ClaimsPrincipal? Identity { get; set; }
         private string Body { get; set; }
         private Content Content { get; set; }
+        private Location Location { get; set; }
         private SfToast ToastObj { get; set; }
         private string? ToastTitle { get; set; } = string.Empty;
-        private int ToastTimeout { get; set; } = 1000;
+        private int ToastTimeout { get; set; } = 2000;
         private string ToastContent { get; set; } = string.Empty;
         //private string ButtonCaption { get; set; } = "Save As ...";
         //private string locationRoute { get; set; } = string.Empty;
         //private string locationName { get; set; } = string.Empty;
         private int LocationId { get; set; }
         string[] pageParameters { get; set; }
+        public string DisplayBody { get; private set; }
+        public string DisplayHeader { get; private set; }
+        public string DisplayHome { get; private set; }
+        public string DisplayTitle { get; private set; }
+        public string ShowMediaId { get; private set; }
+        public bool showMedia { get; private set; } = false;
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -78,96 +86,141 @@ namespace BedBrigade.Client.Components
              new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
-             new ToolbarItemModel() {Command = ToolbarCommand.Undo },
-             new ToolbarItemModel() {Command = ToolbarCommand.Separator },
-             new ToolbarItemModel() { Name = "Save",TooltipText = "Save File" }
-        };
+             new ToolbarItemModel() {Command = ToolbarCommand.Undo }
 
+        };
         protected override async Task OnInitializedAsync()
-        {
+        { 
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             pageParameters = saveUrl.Split('/');
+            var pageNameParameters = pageParameters[4].Split("_");
             if (IsNewPage)
             {
                 newPageName = pageParameters[4];
-                string location = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
-                LocationId = int.Parse(location);
-
-                ToastTitle = $"Save Page as {newPageName}";
+                workTitle = "Adding";
+                workType = $"Add {pageParameters[4]}";
+                ToastTitle = $"Save Page as {pageParameters[4]}";
             }
             else
             {
+                workTitle = "Editing";
+                workType = $"Updating {pageParameters[4]}";
                 ToastTitle = $"Edit Page {PageName}";
             }
-            
-            var result = await _svcContent.GetAsync(PageName, Convert.ToInt32(pageParameters[3]));
-            if (result.Success)
+            var locationResult = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
+            if(locationResult.Success)
             {
-                Body = result.Data.ContentHtml;
-                Content = result.Data;
+                Location = locationResult.Data;
+                imagePath = $"media{Location.Route}/Pages/Images/";
+            }
+
+            var contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
+            if (contentResult.Success)
+            {
+                Body = contentResult.Data.ContentHtml;
+                Content = contentResult.Data;
                 Content.UpdateDate = DateTime.Now;
                 Content.CreateDate = DateTime.Now;
                 Content.CreateUser = Content.UpdateUser = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 if (IsNewPage)
                 {
-                    Content.LocationId = LocationId;
+                    //Content.LocationId = LocationId;
                     Content.Name = newPageName;
                     Content.ContentId = 0;
+                    Content.Title = "N/A";
                 }
+                switch (Content.ContentType)
+                {
+                    case Common.Common.ContentType.Body:
+                        DisplayBody = "display;";
+                        DisplayHeader = "none;";
+                        DisplayHome = "none;";
+                        DisplayTitle = "display;";
+                        ShowMediaId = "none;";
+                        break;
+                    case Common.Common.ContentType.Home:
+                        DisplayBody = "none;";
+                        DisplayHeader = "none;";
+                        DisplayHome = "display;";
+                        DisplayTitle = "display;";
+                        break;
+                    case Common.Common.ContentType.Header:
+                        DisplayBody = "none;";
+                        DisplayHeader = "none;";
+                        DisplayHome = "none;";
+                        DisplayTitle = "none;";
+                        break;
+                    case Common.Common.ContentType.Footer:
+                        DisplayBody = "none;";
+                        DisplayHeader = "none;";
+                        DisplayHome = "none;";
+                        DisplayTitle = "none;";
+                        break;
+                }
+
             }
             else
             {
                 ToastContent = $"Unable to load page {PageName}!";
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, ShowCloseButton = true });
             }
-
+            Console.WriteLine($"SaveUrl: {saveUrl} Path: {imagePath} AllowedTypes: {AllowedTypes}");
 
         }
 
-        private async Task HideToast()
-        {
-            await this.ToastObj.HideAsync();
-            _nav.NavigateTo("/administration/dashboard");
-        }
-
-        private async Task ClickHandler()
+        protected async Task OnValidSubmit()
         {
             Content.ContentHtml = await RteObj.GetXhtmlAsync();
             if (Content.ContentId != 0)
             {
-                var result = await _svcContent.UpdateAsync(Content);
-                if (result.Success)
+                //Update Content  Record
+                var updateResult = await _svcContent.UpdateAsync(Content);
+                ToastTitle = "Update Page";
+                if (updateResult.Success)
                 {
-                    ToastContent = "Saved Successfully!";
+                    ToastContent = "Page Updated Successfully!";
                 }
                 else
                 {
-                    ToastContent = "Unable to save the content!";
+                    ToastContent = "Unable to update location!";
                 }
-
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
-                DialogVisible = true;
+
+                // new Page
+                var result = await _svcContent.CreateAsync(Content);
+                if (result.Success)
+                {
+                    Content Content = result.Data;
+                }
+                ToastTitle = "Create Page";
+                if (Content.ContentId != 0)
+                {
+                    ToastContent = "Page Created Successfully!";
+                }
+                else
+                {
+                    ToastContent = "Unable to save Page!";
+                }
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
         }
 
-
-        private async Task DialogOnClickHandler()
+        protected async Task DisplayMedia()
         {
-            var result = await _svcContent.CreateAsync(Content);
-            if (result.Success)
+            if(showMedia)
             {
-                DialogVisible = false;
-                ToastContent = "Saved Successfully!";
+                ShowMediaId = "none;";
+                showMedia = false;
             }
             else
             {
-                ToastContent = "Unable to save the content!";
+                ShowMediaId = "display;";
+                showMedia = true;
             }
-
-            await ToastObj.ShowAsync();
         }
+
     }
 }

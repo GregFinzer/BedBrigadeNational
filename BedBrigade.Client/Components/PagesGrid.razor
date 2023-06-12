@@ -5,6 +5,7 @@
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Data.Models
+@using ContentType = BedBrigade.Common.Common.ContentType
 
 @if (Pages == null)
 {
@@ -41,62 +42,6 @@ else
                                 <span>@RecordText</span>
                             </EmptyRecordTemplate>
                         </GridTemplates>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                            <Validator>
-                                <DataAnnotationsValidator />
-                            </Validator>
-                            <HeaderTemplate>
-                                @{
-                                    @HeaderTitle
-                                  }
-                            </HeaderTemplate>
-                            <Template>
-                                @{
-                                    Content content = (context as Content);
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox ID="name" @bind-Value=@content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-8">
-                                            <SfTextBox @bind-Value=@content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-4">
-                                            <SfTextBox @bind-Value=@content.LeftMediaId Enabled="true" Placeholder="Left Media Id" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <SfTextBox @bind-Value=@content.MiddleMediaId Enabled="true" Placeholder="Middle Media Id" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@content.RightMediaId Enabled="true" Placeholder="Right Media Id" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@content.HeaderMediaId Enabled="true" Placeholder="Header Media Id" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@content.FooterMediaId Enabled="true" Placeholder="Footer Media Id" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@content.UpdateUser Enabled="true" Placeholder="Updated By" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfDateTimePicker @bind-Value=@content.UpdateDate Enabled="true" Placeholder="Updated On" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-
-                                }
-                            </Template>
-                            <FooterTemplate>
-                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Content)) IsPrimary="true">@ButtonTitle</SfButton>
-                                <SfButton CssClass="btn btn-primary" OnClick=@(() => EditPage(context as Content)) IsPrimary="true">@EditTitle</SfButton>
-                                <SfButton OnClick="Cancel">Cancel</SfButton>
-                            </FooterTemplate>
-                        </GridEditSettings>
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
@@ -132,22 +77,25 @@ else
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
 
-<SfDialog Width="400" MinHeight="50" @bind-Visible=@DialogPageNameVisible IsModal="true" ShowCloseIcon="true">
+<SfDialog Width="400" MinHeight="50" @bind-Visible=@AddContentVisible IsModal="true" ShowCloseIcon="true">
     <DialogTemplates>
-        <Header>Page Name</Header>
+        <Header>Add Content</Header>
         <Content>
-            <EditForm id="Page" Model=@content OnValidSubmit=@DialogPageNewOnClickHandler>
+            <EditForm id="Page" Model=@content OnValidSubmit=@AddContentHandler>
                 <div class="row">
-                    <div class="col-md-12">
-                        <SfTextBox ID="name" @bind-Value=@content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
+                    <div class="col-md-6">
+                        <SfDropDownList TItem="Location" TValue="int" DataSource=@Locations ID="loc" @bind-Value=@content.LocationId Enabled="true" Placeholder="Add to location" FloatLabelType="FloatLabelType.Auto" >
+                            <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                        </SfDropDownList>
                     </div>
-@*                    <div class="col-md-8">
-                        <SfTextBox @bind-Value=@content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
-                    </div>
-                    *@
+                    <div class="col-md-6">
+                        <SfDropDownList TItem="ContentTypeEnumItem" TValue="ContentType" DataSource=@ContentTypes ID="contentType" @bind-Value=@content.ContentType Enabled="true" Placeholder="Create Content Type" FloatLabelType="FloatLabelType.Auto">
+                            <DropDownListFieldSettings Text="Name" Value="Value" />
+                        </SfDropDownList>
+                    </div>                    
                 </div>
                 <div class="e-footer-content">
-                    <SfButton>Save</SfButton>
+                    <SfButton>Create Content</SfButton>
                 </div>
             </EditForm>
         </Content>

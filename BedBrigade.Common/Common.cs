@@ -33,11 +33,12 @@ public class FileUseEnumItem
 
 public static class Common
 {
-    public enum ContentType
-    {
+    public enum ContentType 
+    { 
         Header = 1,
         Footer = 2,
         Body = 3,
+        Home = 4,
     }
 
     public enum PersistGrid

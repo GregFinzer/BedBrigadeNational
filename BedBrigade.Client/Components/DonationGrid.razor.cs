@@ -95,13 +95,15 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success)
             {
                 Locations = locationResult.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
             }
-
             var query = from donation in Donations
-                        where donation.TaxFormSent == false
-                        select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };
-                       
-
+                    where donation.TaxFormSent == false
+                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
             NotSent = query.ToList();
 
         }

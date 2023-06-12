@@ -3,7 +3,8 @@ using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Authorization;
-
+using System.Net.Mime;
+using ContentType = BedBrigade.Common.Common.ContentType;
 namespace BedBrigade.Client.Services
 {
     public class ContentService : IContentService
@@ -53,6 +54,11 @@ namespace BedBrigade.Client.Services
         public async Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
         {
             return await _data.GetAsync(name, locationId);
+        }
+
+        public async Task<ServiceResponse<List<Content>>> GetAllAsync(ContentType type, int locationId)
+        {
+            return await _data.GetAllAsync(type, locationId);
         }
     }
 }

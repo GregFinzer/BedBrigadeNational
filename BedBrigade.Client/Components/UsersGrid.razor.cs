@@ -269,7 +269,7 @@ namespace BedBrigade.Client.Components
                 BBUsers = userResult.Data;  
             }
             await Grid.CallStateHasChangedAsync();
-            await Grid.Refresh();
+            Grid.Refresh();
         }
 
         private async Task AddNewUser(User user)
@@ -357,7 +357,7 @@ namespace BedBrigade.Client.Components
                 BBUsers = result.Data;
             }
             await Grid.CallStateHasChangedAsync();
-            await Grid.Refresh();
+            Grid.Refresh();
         }
 
         protected async Task Save(User user)

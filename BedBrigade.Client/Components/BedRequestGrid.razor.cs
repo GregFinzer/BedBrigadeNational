@@ -85,9 +85,13 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success)
             {
                 Locations = locationResult.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
             }
-
-            BedRequestStatuses = GetBedRequestStatusItems();
+                BedRequestStatuses = GetBedRequestStatusItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -256,7 +260,7 @@ namespace BedBrigade.Client.Components
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
-            await Grid.Refresh();
+            Grid.Refresh();
         }
 
         private void BeginEdit()
