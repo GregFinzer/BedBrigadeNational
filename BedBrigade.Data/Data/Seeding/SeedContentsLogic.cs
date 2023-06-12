@@ -590,10 +590,5 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static string GetHtml(string fileName)
-        {
-            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
-            return html;
-        }
     }
 }

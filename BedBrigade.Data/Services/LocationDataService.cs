@@ -23,7 +23,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
             {
                 await ctx.Locations.AddAsync(location);
                 await ctx.SaveChangesAsync();
-                return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true);
+                return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true, location);
             }
             catch (DbException ex)
             {
