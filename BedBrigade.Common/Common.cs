@@ -202,4 +202,9 @@ public static class Common
         }
     }
 
+    public static string GetHtml(string fileName)
+    {
+        var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
+        return html;
+    }
 }
