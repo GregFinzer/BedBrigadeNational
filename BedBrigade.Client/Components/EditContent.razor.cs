@@ -91,7 +91,7 @@ namespace BedBrigade.Client.Components
 
         };
         protected override async Task OnInitializedAsync()
-        { 
+        {
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             pageParameters = saveUrl.Split('/');
             var pageNameParameters = pageParameters[4].Split("_");
@@ -112,13 +112,18 @@ namespace BedBrigade.Client.Components
                 contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
             }
             var locationResult = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
-            if(locationResult.Success)
+            if (locationResult.Success)
             {
                 Location = locationResult.Data;
                 imagePath = $"media{Location.Route}/Pages/Images/";
             }
 
-            
+            await CheckContent(contentResult);
+
+        }
+
+        private async Task CheckContent(ServiceResponse<Content> contentResult)
+        {
             if (contentResult.Success)
             {
                 Body = contentResult.Data.ContentHtml;
@@ -169,7 +174,6 @@ namespace BedBrigade.Client.Components
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, ShowCloseButton = true });
             }
             Console.WriteLine($"SaveUrl: {saveUrl} Path: {imagePath} AllowedTypes: {AllowedTypes}");
-
         }
 
         protected async Task OnValidSubmit()
