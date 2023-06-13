@@ -10,5 +10,6 @@ namespace BedBrigade.Client.Services
         Task<ServiceResponse<Location>> GetAsync(int locationId);
         Task<ServiceResponse<Location>> GetLocationByRouteAsync(string route);
         Task<ServiceResponse<Location>> UpdateAsync(Location location);
+        Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string zipCode);
     }
 }

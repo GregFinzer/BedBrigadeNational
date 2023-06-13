@@ -1,6 +1,6 @@
-﻿namespace BedBrigade.Data.Services
+﻿namespace BedBrigade.Common
 {
-    public static class LicenseLogic
+    internal static class LicenseLogic
     {
         public static string KellermanUserName => "Bed Brigade 10101";
         public static string KellermanLicenseKey

@@ -1,4 +1,5 @@
-﻿using KellermanSoftware.NetCachingLibrary;
+﻿using BedBrigade.Common;
+using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 
 namespace BedBrigade.Data.Services
@@ -13,9 +14,7 @@ namespace BedBrigade.Data.Services
             MemoryCacheProvider provider = new MemoryCacheProvider();
             //TODO:  Load from config
             provider.DefaultExpirationInMinutes = 10;
-            SmartConfig config = new SmartConfig(provider);
-            config.UserName = LicenseLogic.KellermanUserName;
-            config.LicenseKey = LicenseLogic.KellermanLicenseKey;
+            SmartConfig config = LibraryFactory.CreateSmartConfig(provider);
             _cache = new SmartCache(config);
         }
 
