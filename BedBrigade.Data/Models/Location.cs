@@ -30,7 +30,6 @@ public class Location : BaseEntity
     [MaxLength(128)] 
     public String? State { get; set; } = string.Empty;
 
-	[Required]
 	[MaxLength(10)]
 	public String PostalCode { get; set; } = string.Empty;
 

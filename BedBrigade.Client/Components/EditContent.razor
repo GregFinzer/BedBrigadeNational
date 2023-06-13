@@ -12,74 +12,89 @@
 @using System.Data;
 @using BedBrigade.Client.Pages;
 
-<div class="rte-container">
-    <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="800">
-        <RichTextEditorImageSettings SaveUrl=@saveUrl Path=@imagePath AllowedTypes="AllowedTypes" />
-        <RichTextEditorEvents  />
-        <RichTextEditorToolbarSettings Items="@Tools">
-            <RichTextEditorCustomToolbarItems>
-                <RichTextEditorCustomToolbarItem Name="Save">
-                    <Template>
-                        <SfButton @onclick="ClickHandler">Save</SfButton>
-                    </Template>
-                </RichTextEditorCustomToolbarItem>
-            </RichTextEditorCustomToolbarItems>
-        </RichTextEditorToolbarSettings>
-        @((MarkupString)Body)
-    </SfRichTextEditor>
-</div>
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Timeout=@ToastTimeout Target="#UserTarget" Content=@ToastContent>
-    <ToastPosition X="Center" Y="Top"></ToastPosition>
-</SfToast>
+@if (Content == null)
+{
+    <span class="spinner-grow m-5"></span>
 
-<SfDialog Width="800" MinHeight="200" @bind-Visible=@DialogVisible IsModal="true" ShowCloseIcon="true" >
-    <DialogTemplates>
-        <Header>Add New Page</Header>
-        <Content>
-            <EditForm Model=@Content OnValidSubmit=@DialogOnClickHandler>
-@*                <DataAnnotationsValidator />*@
+    <span>Loading ....</span>
+}
+else 
+{
+    <div class="container my-3 ">
+        <h3 class="text-center">@workTitle "@Content.Name" Location "@Location.Name"</h3>
+        <EditForm Model="Content" OnValidSubmit=@OnValidSubmit>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
             <div class="row">
-                <div class="col-md-4">
-                    <SfTextBox ID="name" @bind-Value=@newPageName Enabled="false" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-                <div class="col-md-8">
+                <div class="col-md-8" style="display: @DisplayTitle">
                     <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
+                    <ValidationMessage For="@(() => Content.Title)" />
+                </div>
+                <div class="col-md-4">
+                    <SfTextBox ID="name" @bind-Value=@Content.Name Enabled="true" Placeholder="Content Name" FloatLabelType="FloatLabelType.Auto" />
+                    <ValidationMessage For="@(() => Content.Name)" />
+                </div>
+            </div>
+            <div style="display: @ShowMediaId">
+                <div class="row" style="display: @DisplayBody">
+                    <div class="col-md-4">
+                        <SfTextBox @bind-Value=@Content.LeftMediaId Enabled=true Placeholder="Left Media Id" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => Content.LeftMediaId)" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <SfTextBox @bind-Value=@Content.MiddleMediaId Enabled="true" Placeholder="Middle Media Id" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => Content.MiddleMediaId)" />
+                    </div>
+                    <div class="col-md-4">
+                        <SfTextBox @bind-Value=@Content.RightMediaId Enabled="true" Placeholder="Right Media Id" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => Content.RightMediaId)" />
+                    </div>
+                </div>
+                <div class="row" style="display: @DisplayHome">
+                    <div class="col-md-4">
+                        <SfTextBox @bind-Value=@Content.HeaderMediaId Enabled="true" Placeholder="Header Media Id" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => Content.HeaderMediaId)" />
+                    </div>
+                    <div class="col-md-4">
+                        <SfTextBox @bind-Value=@Content.FooterMediaId Enabled="true" Placeholder="Footer Media Id" FloatLabelType="FloatLabelType.Auto" />
+                        <ValidationMessage For="@(() => Content.FooterMediaId)" />
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-md-4">
-                    <SfTextBox @bind-Value=@Content.LeftMediaId Enabled="true" Placeholder="Left Media Id" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-                <div class="form-group col-md-4">
-                    <SfTextBox @bind-Value=@Content.MiddleMediaId Enabled="true" Placeholder="Middle Media Id" FloatLabelType="FloatLabelType.Auto" />
-                </div>
                 <div class="col-md-4">
-                    <SfTextBox @bind-Value=@Content.RightMediaId Enabled="true" Placeholder="Right Media Id" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <SfTextBox @bind-Value=@Content.HeaderMediaId Enabled="true" Placeholder="Header Media Id" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-                <div class="col-md-4">
-                    <SfTextBox @bind-Value=@Content.FooterMediaId Enabled="true" Placeholder="Footer Media Id" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <SfTextBox @bind-Value=@Content.UpdateUser Enabled="true" Placeholder="Updated By" FloatLabelType="FloatLabelType.Auto"/>
+                    <SfTextBox @bind-Value=@Content.UpdateUser Enabled="true" Placeholder="Updated By" FloatLabelType="FloatLabelType.Auto" />
                 </div>
                 <div class="col-md-4">
                     <SfDateTimePicker @bind-Value=@Content.UpdateDate Enabled="true" Placeholder="Updated On" FloatLabelType="FloatLabelType.Auto" />
                 </div>
+                <div class="col-md-2 my-4">
+                    <button type="submit" class="btn btn-primary">@workType</button>
+                </div>
+                <div class="col-md-2 my-4">
+                    <input type="checkbox" checked=@showMedia @onchange=@DisplayMedia />
+                    <label for="showPassword">Advanced</label>
+                </div>
             </div>
-            <div class="e-footer-content">
-                <SfButton>Save Page</SfButton>
-            </div>
-            </EditForm>
-        </Content>
-    </DialogTemplates>
-</SfDialog>
+        </EditForm>
+    </div>
+
+    <div class="rte-container">
+        <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="800">
+            <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
+            <RichTextEditorEvents />
+            <RichTextEditorToolbarSettings Items="@Tools">
+                <RichTextEditorCustomToolbarItems>
+                </RichTextEditorCustomToolbarItems>
+            </RichTextEditorToolbarSettings>
+            @((MarkupString)Body)
+        </SfRichTextEditor>
+    </div>
+}
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Timeout=@ToastTimeout Target="#UserTarget" Content=@ToastContent>
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>
+
 
 
 
@@ -107,8 +122,8 @@
                 font-weight: bold;
                 text-align: center;
             }
-            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
-            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+            /*Use the following CSS to customize the default toast’s Content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-Content {
                 color: black;
                 font-size: 14px;
                 font-weight: bold;

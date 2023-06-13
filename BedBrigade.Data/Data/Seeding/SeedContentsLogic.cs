@@ -60,8 +60,6 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Header,
                         Name = name,
                         ContentHtml = seedHtml,
-                        FooterMediaId = "imageFooter",
-                        HeaderMediaId = "imageHeader",
                     };
 
                     context.Content.Add(content);
@@ -114,12 +112,14 @@ namespace BedBrigade.Data.Data.Seeding
                     context.Content.Add(new Content
                     {
                         LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
+                        ContentType = ContentType.Home,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "imageLeft",
-                        MiddleMediaId = "imageMiddle",
-                        RightMediaId = "imageRight"
+                        LeftMediaId = "",
+                        MiddleMediaId = "",
+                        RightMediaId = "",
+                        HeaderMediaId = "imageHeader",
+                        FooterMediaId = "imageFooter"
                     });
                     //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
                 }
@@ -590,10 +590,5 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static string GetHtml(string fileName)
-        {
-            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
-            return html;
-        }
     }
 }

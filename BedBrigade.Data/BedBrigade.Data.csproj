@@ -18,6 +18,18 @@
     <None Remove="Data\Seeding\SeedHtml\Locations.html" />
     <None Remove="Data\Seeding\SeedHtml\News.html" />
     <None Remove="Data\Seeding\SeedHtml\Partners.html" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\banner_img.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\FlowerBed.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\Footer\ministry-img.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\Header\banner_img.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\Header\TwoWildBeds.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\Layer-8.png" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\TwoBeds.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\TwoWildBeds.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\Home\work-img1.jpg" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Left\ReplaceImage.png" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Middle\ReplaceImage.png" />
+    <None Remove="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Right\ReplaceImage.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +47,62 @@
     </Content>
     <Content Include="Data\Seeding\SeedHtml\Partners.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\banner_img.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\FlowerBed.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Footer\ministry-img.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Footer\ReplaceImage.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Header\banner_img.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Header\ReplaceImage.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Header\TwoWildBeds.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\Layer-8.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\TwoBeds.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\TwoWildBeds.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\Home\work-img1.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Left\ReplaceImage.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Middle\ReplaceImage.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedImages\pages\Templates\pages\NewPage\Right\ReplaceImage.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
@@ -66,6 +134,13 @@
   
     <ItemGroup>
       <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
+    </ItemGroup>
+
+  
+  
+    <ItemGroup>
+      <Folder Include="Data\Seeding\SeedImages\pages\Templates\pages\Footer\" />
+      <Folder Include="Data\Seeding\SeedImages\pages\Templates\pages\Header\" />
     </ItemGroup>
 
 </Project>

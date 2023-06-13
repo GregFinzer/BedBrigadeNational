@@ -10,7 +10,8 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using ContentType = BedBrigade.Common.Common.ContentType;
+
 
 namespace BedBrigade.Client.Components
 {
@@ -51,13 +52,12 @@ namespace BedBrigade.Client.Components
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public List<Location> Locations { get; private set; }
-        public EditContext formContext { get; set; }
         private string? saveUrl { get; set; }
         public string imagePath { get; private set; }
-        public bool DialogPageNameVisible { get; private set; } = false;
         public List<ContentTypeEnumItem> ContentTypes { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
+        private bool AddContentVisible;
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -88,6 +88,11 @@ namespace BedBrigade.Client.Components
             if (locResult.Success)
             {
                 Locations = locResult.Data;
+                var item = Locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
             }
 
             ContentTypes = GetContentTypeItems();
@@ -135,29 +140,34 @@ namespace BedBrigade.Client.Components
             }
 
         }
-        private async Task DialogPageNewOnClickHandler()
+        private async Task AddContentHandler()
         {
-            content.Name = content.Name.Replace(' ', '_');
-            var found = await _svcContent.GetAsync(content.Name, 1);
-            if (found.Success)
+            AddContentVisible = false;
+            switch(content.ContentType)
             {
-                ToastTitle = "Page Name Error";
-                ToastContent = $"Page {content.Name} already exists!";
-                await ToastObj.ShowAsync();
-                return;
+                case ContentType.Body:
+                    content.Name = "NewPage";
+                    break;
+                case ContentType.Header:
+                    content.Name = "Header";
+                    break;
+                case ContentType.Footer:
+                    content.Name = "Footer";
+                    break;
+                case ContentType.Home:
+                    content.Name = "Home";
+                    break;
             }
-            DialogPageNameVisible = false;
-            var locationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0");
-            var locResult = await _svcLocation.GetAsync(locationId);
-            string locationRoute = string.Empty;
-            if (locResult.Success)
+            var totalOfType = 1;
+            var result = await _svcContent.GetAllAsync(content.ContentType, content.LocationId);
+            if (result.Success)
             {
-                locationRoute = locResult.Data.Route;
-                var locationName = locResult.Data.Name;
+                totalOfType = result.Data.Count();
             }
 
-            saveUrl = $"api/image/save/{locationId}/{content.Name}";
-            imagePath = $"media/{locationRoute}/pages/{content.Name}/";
+            content.Name = $"{content.Name}_{content.LocationId}_{totalOfType++}";
+            saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
+            imagePath = $"media/Templates/pages/{content.Name}/";
 
             _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
         }
@@ -165,14 +175,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
-            if(args.Item.Text == "Add")
-            {
-                DialogPageNameVisible = true;
-                //saveUrl = "api/image/save/5/Test4";
-                //_nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
-                args.Cancel = true;
 
-            }
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistData();
@@ -212,14 +215,12 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Add:
-                    Add();
+                    await Add(args);
+                    args.Cancel = true;
                     break;
 
-                case Action.Save:
-                    await Save(args);
-                    break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    await BeginEdit(args);
                     break;
             }
 
@@ -248,6 +249,7 @@ namespace BedBrigade.Client.Components
                     else
                     {
                         args.Cancel = true;
+                        return;
                     }
 
                 }
@@ -264,61 +266,20 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private void Add()
+        private async Task Add(ActionEventArgs<Content> args)
         {
-            HeaderTitle = "Add Page";
-            ButtonTitle = "Add Page";
-            EditTitle = "Edit Page"; 
-        }
+            content = new Content();
+            AddContentVisible = true;
+            return;
+       }
 
-        private async Task Save(ActionEventArgs<Content> args)
+
+        private async Task BeginEdit(ActionEventArgs<Content> args)
         {
-
-            Content Page = args.Data;
-            if (Page.ContentId != 0)
-            {
-                //Update Content  Record
-                var updateResult = await _svcContent.UpdateAsync(Page);
-                ToastTitle = "Update Page";
-                if (updateResult.Success)
-                {
-                    ToastContent = "Page Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update location!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-            else
-            {
-
-                // new Page
-                var result = await _svcContent.CreateAsync(Page);
-                if (result.Success)
-                {
-                    Content Content = result.Data;
-                }
-                ToastTitle = "Create Page";
-                if (Page.ContentId != 0)
-                {
-                    ToastContent = "Page Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save Page!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-            await Grid.CallStateHasChangedAsync();
-            await Grid.Refresh();
-        }
-
-        private void BeginEdit()
-        {
-            HeaderTitle = "Save & Edit Page";
-            ButtonTitle = "Save";
-            EditTitle = "Save & Edit Page";
+            content = args.Data;
+            await Grid.EndEditAsync();
+            saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
+            _nm.NavigateTo($"/administration/edit/editpage/{saveUrl}");
         }
 
         protected async Task Save(Content page)

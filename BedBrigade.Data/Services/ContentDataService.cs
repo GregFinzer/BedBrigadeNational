@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Security.Claims;
 using BedBrigade.Common;
+using ContentType = BedBrigade.Common.Common.ContentType;
 
 namespace BedBrigade.Data.Services;
 
@@ -217,6 +218,35 @@ public class ContentDataService : IContentDataService
             //}
             return new ServiceResponse<Content>("Not Found");
         }
+    }
+
+    public async Task<ServiceResponse<List<Content>>> GetAllAsync(ContentType type, int locationId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            //var authState = await _auth.GetAuthenticationStateAsync();
+
+            //var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            //List<Content> result;
+            //if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
+            //{
+            //    int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
+            //    result = ctx.Content.Where(u => u.LocationId == locationId).ToList();
+            //}
+            //else
+            //{
+                var result = ctx.Content.Where(c => c.ContentType == type && c.LocationId == locationId).ToList();
+            //}
+
+
+            if (result != null)
+            {
+                return new ServiceResponse<List<Content>>($"Found {result.Count} records.", true, result);
+            }
+
+            return new ServiceResponse<List<Content>>("None found.");
+        }
+
     }
 }
 

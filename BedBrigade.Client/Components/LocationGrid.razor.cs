@@ -8,13 +8,15 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
-using Org.BouncyCastle.Asn1.X509;
+using static BedBrigade.Common.Extensions;
+using ContentType = BedBrigade.Common.Common.ContentType;
 
 namespace BedBrigade.Client.Components
 {
     public partial class LocationGrid : ComponentBase
     {
         [Inject] private ILocationService? _svcLocation { get; set; }
+        [Inject] private IContentService? _svcContent { get; set; }
         [Inject] private IUserService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
@@ -37,7 +39,7 @@ namespace BedBrigade.Client.Components
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
+        protected int ToastTimeout { get; set; } = 1000;
 
         protected string? RecordText { get; set; } = "Loading Locations ...";
         protected string? Hide { get; private set; } = "true";
@@ -69,9 +71,14 @@ namespace BedBrigade.Client.Components
             if (result.Success)
             {
                 Locations = result.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == 0);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+
+                }
             }
         }
-
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)
@@ -157,12 +164,13 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Add:
-                    Add();
+                    Add(args);
                     break;
 
                 case Action.Save:
                     await Save(args);
                     break;
+
                 case Action.BeginEdit:
                     BeginEdit();
                     break;
@@ -205,7 +213,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private void Add()
+        private void Add(ActionEventArgs<Location> args)
         {
             HeaderTitle = "Add Location";
             ButtonTitle = "Add Location";
@@ -239,6 +247,17 @@ namespace BedBrigade.Client.Components
                     if (!Location.Route.DirectoryExists())
                     {
                         Location.Route.CreateDirectory();
+                        var locationRoute = GetAppRoot(location.Route);
+                        if (!Directory.Exists(locationRoute + "/pages"))
+                        {
+                            locationRoute = locationRoute + "/pages/Home";
+                            CreateDirectory(locationRoute);
+                            CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/Templates/pages/Home", locationRoute);
+                        }
+
+                        await CreateHeaderAsync(location.LocationId);
+                        await CreateFooterAsync(location.LocationId);
+
                     }
                 }
                 ToastTitle = "Create Location";
@@ -254,6 +273,38 @@ namespace BedBrigade.Client.Components
             }
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
+        }
+
+        private async Task CreateFooterAsync(int locationId)
+        {
+            var name = "Footer";
+            var seedHtml = GetHtml($"footer0.html");
+            Content content = new Content
+            {
+                LocationId = locationId,
+                ContentType = ContentType.Footer,
+                Name = name,
+                ContentHtml = seedHtml,
+            };
+
+            var result = await _svcContent.CreateAsync(content);
+        }
+
+        private async Task CreateHeaderAsync(int locationId)
+        {
+            var name = "Header";
+            var seedHtml = GetHtml($"header0.html");
+            Content content = new Content
+            {
+                LocationId = locationId,
+                ContentType = ContentType.Header,
+                Name = name,
+                ContentHtml = seedHtml,
+            };
+
+            var locationResult = await _svcContent.CreateAsync(content);
+
+                
         }
 
         private void BeginEdit()

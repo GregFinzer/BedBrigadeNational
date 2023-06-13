@@ -16,7 +16,7 @@ namespace BedBrigade.Data.Migrations
                 columns: table => new
                 {
                     LocationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("SqlServer:Identity", "0, 1"),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Route = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Address1 = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),

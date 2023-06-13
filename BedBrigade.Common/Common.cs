@@ -33,11 +33,12 @@ public class FileUseEnumItem
 
 public static class Common
 {
-    public enum ContentType
-    {
+    public enum ContentType 
+    { 
         Header = 1,
         Footer = 2,
         Body = 3,
+        Home = 4,
     }
 
     public enum PersistGrid
@@ -201,4 +202,9 @@ public static class Common
         }
     }
 
+    public static string GetHtml(string fileName)
+    {
+        var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
+        return html;
+    }
 }
