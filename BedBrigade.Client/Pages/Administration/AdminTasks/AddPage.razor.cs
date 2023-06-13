@@ -1,36 +1,27 @@
 using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
+using static BedBrigade.Common.Extensions;
 
 namespace BedBrigade.Client.Pages.Administration.AdminTasks;
 
 public partial class AddPage : ComponentBase
 {
-    [Inject] private ILocationService _svcLocation { get; set; }
     [Parameter] public string? imageRoute { get; set; }
 
     private string newPageName { get; set; }
-    private string LocationName { get; set; }
 
-    private int locationIndex = 3;
-    private int pageNameIndex = 4;
+    private const int PageName = 5;
+    private const int Location = 4;
 
     protected override async Task OnInitializedAsync()
     {
         var parameters = imageRoute.Split('/');
-        newPageName = parameters[pageNameIndex];
-        var locationId = Convert.ToInt32(parameters[locationIndex]);
-        try
-        {
-            var result = await _svcLocation.GetAsync(locationId);
-            if (result.Success)
-            {
-                LocationName = result.Data.Name;
-            }
-        }
-        catch (Exception ex)
-        {
-            var msg = ex.Message;
-        }
 
+        newPageName = parameters[PageName];
+        var media = GetAppRoot($"temp-work\\{parameters[Location]}\\pages");
+        if(!Directory.Exists(media))
+        {
+            Directory.CreateDirectory($"{media}\\{newPageName}\\images");
+        }
     }
 }

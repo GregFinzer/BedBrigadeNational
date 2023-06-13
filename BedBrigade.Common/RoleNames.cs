@@ -25,6 +25,7 @@
         public const string CanManageDonations = "National Admin, Location Admin, Location Treasurer";
         public const string CanManageUsers = "National Admin, Location Admin";
         public const string CanCreateNationalNewsPost = "National Admin, National Editor";
+        public const string CanCreateContentForLocations = "National Admin, National Editor";
 
         public const string CanManagePages = "National Admin, Location Admin, Location Author, National Author";
         public const string CanViewPages =

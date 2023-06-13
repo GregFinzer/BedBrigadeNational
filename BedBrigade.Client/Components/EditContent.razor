@@ -21,11 +21,31 @@
 else 
 {
     <div class="container my-3 ">
-        <h3 class="text-center">@workTitle "@Content.Name" Location "@Location.Name"</h3>
+        <h3 class="">@workTitle </h3>
         <EditForm Model="Content" OnValidSubmit=@OnValidSubmit>
             <DataAnnotationsValidator />
-            <ValidationSummary />
+            <div class="row" style="display: @SelectLocation">
+                <div class="col-md-8" style="display: @DisplayTitle">
+                    <SfDropDownList TItem="Location" TValue="int" DataSource=@Locations ID="loc" @bind-Value=@Content.LocationId Enabled="true" Placeholder="Add to location" FloatLabelType="FloatLabelType.Auto">
+                        <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                    </SfDropDownList>
+                    <ValidationMessage For="@(() => Content.LocationId)" />
+                </div>
+            </div>
             <div class="row">
+                 <div class="col-md-8" style="display: @DisplayTitle">
+                    <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
+                    <ValidationMessage For="@(() => Content.Title)" />
+                 </div>
+             </div>
+            <div class="row">
+                <div class="col-md-8" style="display: @DisplayTitle">
+                    <SfTextBox @bind-Value=@Content.Name Enabled="true" Placeholder="Page Name" FloatLabelType="FloatLabelType.Auto" />
+                    <ValidationMessage For="@(() => Content.Name)" />
+                </div>
+            </div>
+
+@*            <div class="row">
                 <div class="col-md-8" style="display: @DisplayTitle">
                     <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
                     <ValidationMessage For="@(() => Content.Title)" />
@@ -76,20 +96,25 @@ else
                     <label for="showPassword">Advanced</label>
                 </div>
             </div>
+*@ 
+            <div class="rte-container">
+                <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500">
+                    <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
+                    <RichTextEditorEvents />
+                    <RichTextEditorToolbarSettings Items="@Tools">
+                        <RichTextEditorCustomToolbarItems>
+                        </RichTextEditorCustomToolbarItems>
+                    </RichTextEditorToolbarSettings>
+                    @((MarkupString)Body)
+                </SfRichTextEditor>
+            </div>
+            <div >
+                <SfButton CssClass="e-primary">Submit</SfButton> <SfButton CssClass="e-info" >Cancel</SfButton>
+
+            </div>
         </EditForm>
     </div>
 
-    <div class="rte-container">
-        <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="800">
-            <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
-            <RichTextEditorEvents />
-            <RichTextEditorToolbarSettings Items="@Tools">
-                <RichTextEditorCustomToolbarItems>
-                </RichTextEditorCustomToolbarItems>
-            </RichTextEditorToolbarSettings>
-            @((MarkupString)Body)
-        </SfRichTextEditor>
-    </div>
 }
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Height="150" Timeout=@ToastTimeout Target="#UserTarget" Content=@ToastContent>
     <ToastPosition X="Center" Y="Top"></ToastPosition>

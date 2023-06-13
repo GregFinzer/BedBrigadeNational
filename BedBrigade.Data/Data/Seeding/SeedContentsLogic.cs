@@ -442,7 +442,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "AboutUs";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("About-us.html");
+                var seedHtml = GetHtml("Aboutus.html");
                 //var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 foreach (var location in context.Locations)
                 {
