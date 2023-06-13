@@ -36,7 +36,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 await ctx.Locations.AddAsync(location);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearAll();
-                return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true);
+                return new ServiceResponse<Location>($"Added location record with key {location.Name}.", true, location);
             }
             catch (DbException ex)
             {
@@ -227,7 +227,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 if (result > 0)
                 {
                     _cachingService.ClearAll();
-                    return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true);
+                    return new ServiceResponse<Location>($"Updated location with key {location.LocationId}", true, location);
                 }
             }
             catch (Exception ex)
