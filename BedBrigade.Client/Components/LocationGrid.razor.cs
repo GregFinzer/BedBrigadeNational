@@ -227,61 +227,72 @@ namespace BedBrigade.Client.Components
             if (Location.LocationId != 0)
             {
                 //Update Location Record
-                var updateResult = await _svcLocation.UpdateAsync(Location);
-                ToastTitle = "Update Location";
-                if (updateResult.Success)
-                {
-                    ToastContent = "Location Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update location!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                await UpdateLocationAsync(Location);
             }
             else
             {
-                // new Location
-                var result = await _svcLocation.CreateAsync(Location);
-                if (result.Success)
-                {
-                    Location location = result.Data;
-                    if (!Location.Route.DirectoryExists())
-                    {
-                        Location.Route.CreateDirectory();
-                        var locationRoute = GetAppRoot(location.Route);
-                        if (!Directory.Exists(locationRoute + "/pages"))
-                        {
-                            locationRoute = locationRoute + "/pages";
-                            CreateDirectory(locationRoute);
-                            CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/", locationRoute);
-                        }
-
-                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Body);
-                        PageNames.Clear();
-                        PageNames.Add("Header0");
-                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Header);
-                        PageNames.Clear();
-                        PageNames.Add("Footer0");
-                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Footer);
-                        PageNames.Clear();
-                        PageNames.Add($"Home0");
-                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Home);
-                    }
-                }
-                ToastTitle = "Create Location";
-                if (Location.LocationId != 0)
-                {
-                    ToastContent = "Location Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save Location!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                await AddNewLocationAsync(Location);
             }
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
+        }
+
+        private async Task AddNewLocationAsync(Location Location)
+        {
+
+            // new Location
+            var result = await _svcLocation.CreateAsync(Location);
+            if (result.Success)
+            {
+                Location location = result.Data;
+                if (!Location.Route.DirectoryExists())
+                {
+                    Location.Route.CreateDirectory();
+                    var locationRoute = GetAppRoot(location.Route);
+                    if (!Directory.Exists(locationRoute + "/pages"))
+                    {
+                        locationRoute = locationRoute + "/pages";
+                        CreateDirectory(locationRoute);
+                        CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/", locationRoute);
+                    }
+
+                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Body);
+                    PageNames.Clear();
+                    PageNames.Add("Header0");
+                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Header);
+                    PageNames.Clear();
+                    PageNames.Add("Footer0");
+                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Footer);
+                    PageNames.Clear();
+                    PageNames.Add($"Home0");
+                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Home);
+                }
+            }
+            ToastTitle = "Create Location";
+            if (Location.LocationId != 0)
+            {
+                ToastContent = "Location Created Successfully!";
+            }
+            else
+            {
+                ToastContent = "Unable to save Location!";
+            }
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+        }
+
+        private async Task UpdateLocationAsync(Location Location)
+        {
+            var updateResult = await _svcLocation.UpdateAsync(Location);
+            ToastTitle = "Update Location";
+            if (updateResult.Success)
+            {
+                ToastContent = "Location Updated Successfully!";
+            }
+            else
+            {
+                ToastContent = "Unable to update location!";
+            }
+            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
         private async Task CreateContentAsync(int locationId, string LocationName, List<string> names, ContentType type)
