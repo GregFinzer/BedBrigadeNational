@@ -13,7 +13,11 @@
     protected override async Task OnInitializedAsync()
     {
         string[] routePath = _nm.Uri.Split('/');
-        if (routePath[3] == "") routePath[3] = "National";
+        if (routePath[3] == "" || routePath[3] == "bed-brigade-near-me")
+        {
+            routePath[3] = "National";
+        }
+
         var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
         if (result.Success)
         {

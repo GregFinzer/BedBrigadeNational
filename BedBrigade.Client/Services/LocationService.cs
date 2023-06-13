@@ -37,6 +37,11 @@ namespace BedBrigade.Client.Services
             return await _data.UpdateAsync(location);
         }
 
+        public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string zipCode)
+        {
+            return await _data.GetBedBrigadeNearMe(zipCode);
+        }
+
         public async Task<ServiceResponse<Location>> CreateAsync(Location location)
         {
             return await _data.CreateAsync(location);

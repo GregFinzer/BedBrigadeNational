@@ -35,7 +35,11 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             string[] routePath = _nm.Uri.ToLower().Split('/');
-            if (routePath[3] == ""|| routePath[3] == "administration") routePath[3] = "national";
+            if (routePath[3] == "" || routePath[3] == "administration" || routePath[3] == "bed-brigade-near-me")
+            {
+                routePath[3] = "national";
+            }
+
             var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
             if (result.Success)
             {
