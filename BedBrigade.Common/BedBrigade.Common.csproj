@@ -10,4 +10,10 @@
     <Compile Remove="CustomAtributes.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BetterAddressParser" Version="1.17.0" />
+    <PackageReference Include="NetCachingLibrary" Version="3.18.0" />
+    <PackageReference Include="StaticCodeAnalysis" Version="1.18.0" />
+  </ItemGroup>
+
 </Project>

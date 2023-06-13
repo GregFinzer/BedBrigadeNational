@@ -14,9 +14,7 @@ namespace BedBrigade.Data.Services
             MemoryCacheProvider provider = new MemoryCacheProvider();
             //TODO:  Load from config
             provider.DefaultExpirationInMinutes = 10;
-            SmartConfig config = new SmartConfig(provider);
-            config.UserName = LicenseLogic.KellermanUserName;
-            config.LicenseKey = LicenseLogic.KellermanLicenseKey;
+            SmartConfig config = LibraryFactory.CreateSmartConfig(provider);
             _cache = new SmartCache(config);
         }
 

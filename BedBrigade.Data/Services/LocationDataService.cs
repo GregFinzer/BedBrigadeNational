@@ -153,7 +153,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
 
     public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string postalCode)
     {
-        AddressParser parser = new AddressParser(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+        AddressParser parser = LibraryFactory.CreateAddressParser();
 
         if (!parser.IsValidZipCode(postalCode))
         {
@@ -194,13 +194,16 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
                 if (distance < maxMiles)
                 {
-                    LocationDistance locationDistance = (LocationDistance) loc;
+                    LocationDistance locationDistance = new LocationDistance();
+                    locationDistance.LocationId = loc.LocationId;
+                    locationDistance.Name = loc.Name;
+                    locationDistance.Route = loc.Route;
                     locationDistance.Distance = distance;
                     result.Add(locationDistance);
                 }
             }
         }
-        result = result.OrderByDescending(r => r.Distance).ToList();
+        result = result.OrderBy(r => r.Distance).ToList();
 
         if (result.Count == 0)
         {

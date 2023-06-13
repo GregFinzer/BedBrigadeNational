@@ -40,7 +40,7 @@ public class Seed
         },
         new Location
         {
-            Name = "Bed Brigade Grove City", Route = "/grove=city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
+            Name = "Bed Brigade Grove City", Route = "/grove-city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
             State = "Ohio", PostalCode = "43123"
         },
         new Location
@@ -65,7 +65,7 @@ public class Seed
         },
         new Location
         {
-            Name = "Hardbarger Impact Bed Brigade", Route = "/lancaster", Address1 = "1780 Victor Road", Address2 = "", City = "Lancaster",
+            Name = "Hardbarger Impact Bed Brigade", Route = "/hardbarger-impact", Address1 = "1780 Victor Road", Address2 = "", City = "Lancaster",
             State = "Ohio", PostalCode = "43130"
         },
         new Location
@@ -75,7 +75,7 @@ public class Seed
         },
         new Location
         {
-            Name = "Greensburg United Methodist Bed Brigade", Route = "/canton", Address1 = "2161 Greensburg Rd", Address2 = "", City = "North Canton",
+            Name = "Greensburg United Methodist Bed Brigade", Route = "/greensburg-umc", Address1 = "2161 Greensburg Rd", Address2 = "", City = "North Canton",
             State = "Ohio", PostalCode = "44720"
         }
 

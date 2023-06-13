@@ -1,39 +1,97 @@
 ﻿@layout BedBrigade.Client.Shared.MainLayout
 @inject NavigationManager NavigationManager
+@inject ILocationService LocationService
 @page "/bed-brigade-near-me"
+@using System.Text.RegularExpressions
+@using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs
+<div style="padding:20px">
+    <p>&nbsp;</p>
+    <h1>Find a Bed Brigade Near Me</h1>
 
+    <div class="form-group">
+        <label for="postalCode">Zip Code</label>
+        <input id="postalCode" type="text" @bind="PostalCode" @oninput="HandleInputChange" @onkeyup="@HandleKeyDown" maxlength="5" class="form-control" placeholder="Enter the zip code where you live">
+        @if (!string.IsNullOrEmpty(PostalCodeError))
+        {
+            <p class="text-danger">@PostalCodeError</p>
+        }
 
-<h1>Bed Brigade Near Me</h1>
+        <div class="widget-body">
+            <button id="search" type="button" class="btn btn-primary" @onclick="(() => HandleSearchClick())">Search</button>
+        </div>
 
-<ul>
-    @foreach (var link in Links)
+    </div>
+
+    @if (!string.IsNullOrEmpty(PostalCodeSuccess))
     {
-        <li><a href="" @onclick="(() => HandleLinkClick(link))">@link.Text</a></li>
+        <p class="text-success">@PostalCodeSuccess</p>
     }
-</ul>
-
+    <ul>
+        @foreach (var location in Locations)
+        {
+            <li><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.Distance.ToString("#.##") miles away</li>
+        }
+    </ul>
+</div>
 
 @code {
-    private List<Link> Links { get; set; } = new List<Link>
-    {
-        new Link { Text = "Kellerman Software", Path = "https://www.kellermansoftware.com" },
-        new Link { Text = "Google", Path = "https://www.google.com" },
-        new Link { Text = "Bing", Path = "https://www.bing.com" }
-    };
+    private string PostalCode { get; set; } = string.Empty;
+    private string PostalCodeError { get; set; } = string.Empty;
+    private string PostalCodeSuccess { get; set; } = string.Empty;
+    private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
 
-    private void HandleLinkClick(Link link)
+    private bool ValidatePostalCode()
     {
-    // Perform logic here
-    // For example, you can show a confirmation dialog or update some data
+        if (string.IsNullOrEmpty(PostalCode))
+        {
+            PostalCodeError = "Please enter a zip code";
+            return false;
+        }
+        if (!Regex.IsMatch(PostalCode, @"^\d{5}$"))
+        {
+            PostalCodeError = "Zip code must be numeric and have a length of 5.";
+            return false;
+        }
 
-    // Redirect to the specified path
-        NavigationManager.NavigateTo(link.Path);
+        PostalCodeError = null;
+        return true;
     }
 
-    public class Link
+    private void HandleInputChange(ChangeEventArgs e)
     {
-        public string Text { get; set; }
-        public string Path { get; set; }
+        PostalCode = e.Value.ToString();
     }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            StateHasChanged();
+            await HandleSearchClick();
+        }
+    }
+
+    private async Task HandleSearchClick()
+    {
+        if (!ValidatePostalCode())
+            return;
+
+        var response = await LocationService.GetBedBrigadeNearMe(PostalCode);
+
+        if (response.Success && response.Data != null)
+        {
+            PostalCodeSuccess = response.Message;
+            Locations = response.Data;
+        }
+        else
+        {
+            PostalCodeError = response.Message;
+            Locations = new List<LocationDistance>();
+        }
+    }
+
+
+
+
 }
 

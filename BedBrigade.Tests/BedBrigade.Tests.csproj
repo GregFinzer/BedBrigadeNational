@@ -18,7 +18,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
-    <PackageReference Include="StaticCodeAnalysis" Version="1.17.0" />
+    <PackageReference Include="StaticCodeAnalysis" Version="1.18.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
