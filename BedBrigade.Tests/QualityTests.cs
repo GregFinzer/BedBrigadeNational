@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using BedBrigade.Data.Services;
+using BedBrigade.Common;
 using KellermanSoftware.HTMLReports;
 using KellermanSoftware.StaticCodeAnalysis;
 
@@ -14,7 +14,7 @@ namespace BedBrigade.Tests
         [SetUp]
         public void Setup()
         {
-            _qualityLogic = new QualityLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+            _qualityLogic = LibraryFactory.CreateQualityLogic();
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
 
             //This has duplicate strings but it is okay since roles have multiple similar permissions
