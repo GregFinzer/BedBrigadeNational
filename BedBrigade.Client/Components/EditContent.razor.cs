@@ -1,9 +1,12 @@
 using BedBrigade.Client.Services;
+using BedBrigade.Common;
 using BedBrigade.Data.Models;
+using static BedBrigade.Common.RoleNames;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.RichTextEditor;
+using System.Drawing.Text;
 using System.Security.Claims;
 
 namespace BedBrigade.Client.Components
@@ -40,6 +43,7 @@ namespace BedBrigade.Client.Components
         private string Body { get; set; }
         private Content Content { get; set; }
         private Location Location { get; set; }
+        private List<Location> Locations { get; set; }
         private SfToast ToastObj { get; set; }
         private string? ToastTitle { get; set; } = string.Empty;
         private int ToastTimeout { get; set; } = 2000;
@@ -55,6 +59,7 @@ namespace BedBrigade.Client.Components
         public string DisplayTitle { get; private set; }
         public string ShowMediaId { get; private set; }
         public bool showMedia { get; private set; } = false;
+        public string SelectLocation { get; private set; } = "none;";
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -87,42 +92,60 @@ namespace BedBrigade.Client.Components
              new ToolbarItemModel() { Command = ToolbarCommand.Separator },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
              new ToolbarItemModel() { Command = ToolbarCommand.Image },
+             new ToolbarItemModel() { Command = ToolbarCommand.Video },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
              new ToolbarItemModel() {Command = ToolbarCommand.Undo }
 
         };
+
         protected override async Task OnInitializedAsync()
         {
+            
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             pageParameters = saveUrl.Split('/');
             var pageNameParameters = pageParameters[4].Split("_");
             ServiceResponse<Content> contentResult;
+            ServiceResponse<List<Location>> locationResult;
+            locationResult = await _svcLocation.GetAllAsync();
+            if(locationResult.Success) 
+            {
+                Locations = locationResult.Data;
+            }
             if (IsNewPage)
             {
-                newPageName = pageParameters[4];
-                workTitle = "Adding";
-                workType = $"Add {pageParameters[4]}";
-                ToastTitle = $"Save Page as {pageParameters[4]}";
-                contentResult = await _svcContent.GetAsync(pageNameParameters[0], UseTemplates);
+                workTitle = "Add Page";
+                workType = $"Add {PageName}";
+                ToastTitle = $"Save Page as {PageName}";
+                //contentResult = await _svcContent.GetAsync(pageNameParameters[0], UseTemplates);
+                string LocationId = Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value;
+                if(Identity.HasRole(CanCreateContentForLocations))
+                {
+                    SelectLocation = "display;";
+                };
+                Content = new()
+                {
+                    LocationId = Convert.ToInt32(LocationId)
+                };
             }
             else
             {
                 workTitle = "Editing";
-                workType = $"Updating {pageParameters[4]}";
+                workType = $"Updating {PageName}";
                 ToastTitle = $"Edit Page {PageName}";
                 contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
-            }
-            var locationResult = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
-            if (locationResult.Success)
-            {
-                Location = locationResult.Data;
-                imagePath = $"media{Location.Route}/Pages/Images/";
-            }
 
-            await CheckContent(contentResult);
+                var LocationService = await _svcLocation.GetAllAsync();
 
+                var result = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
+                if (result.Success)
+                {
+                    Location = result.Data;
+                    imagePath = $"media{Location.Route}/Pages/Images/";
+                }
+                await CheckContent(contentResult);
+            }
         }
 
         private async Task CheckContent(ServiceResponse<Content> contentResult)

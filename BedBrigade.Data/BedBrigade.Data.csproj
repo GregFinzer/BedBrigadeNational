@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Data\Seeding\SeedHtml\About-us.html" />
+    <None Remove="Data\Seeding\SeedHtml\Aboutus.html" />
     <None Remove="Data\Seeding\SeedHtml\History.html" />
     <None Remove="Data\Seeding\SeedHtml\Locations.html" />
     <None Remove="Data\Seeding\SeedHtml\News.html" />
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Data\Seeding\SeedHtml\About-us.html">
+    <Content Include="Data\Seeding\SeedHtml\Aboutus.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Include="Data\Seeding\SeedHtml\History.html">

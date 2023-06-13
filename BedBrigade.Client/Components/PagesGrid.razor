@@ -77,30 +77,6 @@ else
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
 
-<SfDialog Width="400" MinHeight="50" @bind-Visible=@AddContentVisible IsModal="true" ShowCloseIcon="true">
-    <DialogTemplates>
-        <Header>Add Content</Header>
-        <Content>
-            <EditForm id="Page" Model=@content OnValidSubmit=@AddContentHandler>
-                <div class="row">
-                    <div class="col-md-6">
-                        <SfDropDownList TItem="Location" TValue="int" DataSource=@Locations ID="loc" @bind-Value=@content.LocationId Enabled="true" Placeholder="Add to location" FloatLabelType="FloatLabelType.Auto" >
-                            <DropDownListFieldSettings Text="Name" Value="LocationId" />
-                        </SfDropDownList>
-                    </div>
-                    <div class="col-md-6">
-                        <SfDropDownList TItem="ContentTypeEnumItem" TValue="ContentType" DataSource=@ContentTypes ID="contentType" @bind-Value=@content.ContentType Enabled="true" Placeholder="Create Content Type" FloatLabelType="FloatLabelType.Auto">
-                            <DropDownListFieldSettings Text="Name" Value="Value" />
-                        </SfDropDownList>
-                    </div>                    
-                </div>
-                <div class="e-footer-content">
-                    <SfButton>Create Content</SfButton>
-                </div>
-            </EditForm>
-        </Content>
-    </DialogTemplates>
-</SfDialog>
 
 
 @if (NoPaging)

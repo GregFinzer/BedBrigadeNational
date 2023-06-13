@@ -22,6 +22,8 @@ namespace BedBrigade.Client.Components
 
         [Parameter] public string? Id { get; set; }
 
+        List<string> PageNames = new List<string> { "AboutUs", "Assembly", "Contact", "Donate", "History", "Locations", "News", "Partners", "RequestBed", "Stories", "Volunteer" };
+
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
@@ -250,14 +252,21 @@ namespace BedBrigade.Client.Components
                         var locationRoute = GetAppRoot(location.Route);
                         if (!Directory.Exists(locationRoute + "/pages"))
                         {
-                            locationRoute = locationRoute + "/pages/Home";
+                            locationRoute = locationRoute + "/pages";
                             CreateDirectory(locationRoute);
-                            CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/Templates/pages/Home", locationRoute);
+                            CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/", locationRoute);
                         }
 
-                        await CreateHeaderAsync(location.LocationId);
-                        await CreateFooterAsync(location.LocationId);
-
+                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Body);
+                        PageNames.Clear();
+                        PageNames.Add("Header0");
+                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Header);
+                        PageNames.Clear();
+                        PageNames.Add("Footer0");
+                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Footer);
+                        PageNames.Clear();
+                        PageNames.Add($"Home0");
+                        await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Home);
                     }
                 }
                 ToastTitle = "Create Location";
@@ -275,36 +284,40 @@ namespace BedBrigade.Client.Components
             await Grid.Refresh();
         }
 
-        private async Task CreateFooterAsync(int locationId)
+        private async Task CreateContentAsync(int locationId, string LocationName, List<string> names, ContentType type)
         {
-            var name = "Footer";
-            var seedHtml = GetHtml($"footer0.html");
-            Content content = new Content
+            foreach (var pageName in names)
             {
-                LocationId = locationId,
-                ContentType = ContentType.Footer,
-                Name = name,
-                ContentHtml = seedHtml,
-            };
+                var seedHtml = GetHtml($"{pageName}.html");
+                var name = string.Empty;
+                switch (type)
+                {
+                    case ContentType.Home:
+                        name = "Home";
+                        break;
+                    case ContentType.Header:
+                        name = "Header";
+                        seedHtml = seedHtml.Replace("Template", LocationName);
+                        break;
+                    case ContentType.Footer:
+                        name = "Footer";
+                        seedHtml = seedHtml.Replace("Template", LocationName);
+                        break;
+                    default:
+                        name = pageName;
+                        break;
 
-            var result = await _svcContent.CreateAsync(content);
-        }
+                }
+                Content content = new Content
+                {
+                    LocationId = locationId,
+                    ContentType = type,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                };
 
-        private async Task CreateHeaderAsync(int locationId)
-        {
-            var name = "Header";
-            var seedHtml = GetHtml($"header0.html");
-            Content content = new Content
-            {
-                LocationId = locationId,
-                ContentType = ContentType.Header,
-                Name = name,
-                ContentHtml = seedHtml,
-            };
-
-            var locationResult = await _svcContent.CreateAsync(content);
-
-                
+                var result = await _svcContent.CreateAsync(content);
+            }
         }
 
         private void BeginEdit()

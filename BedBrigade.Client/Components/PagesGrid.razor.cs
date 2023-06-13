@@ -140,37 +140,43 @@ namespace BedBrigade.Client.Components
             }
 
         }
-        private async Task AddContentHandler()
-        {
-            AddContentVisible = false;
-            switch(content.ContentType)
-            {
-                case ContentType.Body:
-                    content.Name = "NewPage";
-                    break;
-                case ContentType.Header:
-                    content.Name = "Header";
-                    break;
-                case ContentType.Footer:
-                    content.Name = "Footer";
-                    break;
-                case ContentType.Home:
-                    content.Name = "Home";
-                    break;
-            }
-            var totalOfType = 1;
-            var result = await _svcContent.GetAllAsync(content.ContentType, content.LocationId);
-            if (result.Success)
-            {
-                totalOfType = result.Data.Count();
-            }
 
-            content.Name = $"{content.Name}_{content.LocationId}_{totalOfType++}";
-            saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
-            imagePath = $"media/Templates/pages/{content.Name}/";
+        /// <summary>
+        /// Create a new content of a specific type
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        //private async Task AddContentHandler()
+        //{
+        //    AddContentVisible = false;
+        //    switch(content.ContentType)
+        //    {
+        //        case ContentType.Body:
+        //            content.Name = "NewPage";
+        //            break;
+        //        case ContentType.Header:
+        //            content.Name = "Header";
+        //            break;
+        //        case ContentType.Footer:
+        //            content.Name = "Footer";
+        //            break;
+        //        case ContentType.Home:
+        //            content.Name = "Home";
+        //            break;
+        //    }
+        //    var totalOfType = 1;
+        //    var result = await _svcContent.GetAllAsync(content.ContentType, content.LocationId);
+        //    if (result.Success)
+        //    {
+        //        totalOfType = result.Data.Count();
+        //    }
 
-            _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
-        }
+        //    content.Name = $"{content.Name}_{content.LocationId}_{totalOfType++}";
+        //    saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
+        //    imagePath = $"media/Templates/pages/{content.Name}/";
+
+        //    _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
+        //}
 
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
@@ -268,8 +274,11 @@ namespace BedBrigade.Client.Components
 
         private async Task Add(ActionEventArgs<Content> args)
         {
-            content = new Content();
-            AddContentVisible = true;
+            //content = new Content();
+            //AddContentVisible = true;
+            var user = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            saveUrl = $"api/image/save/temp-work/{user}/Page-to-Add";
+            _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
             return;
        }
 
