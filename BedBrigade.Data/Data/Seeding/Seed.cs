@@ -13,12 +13,9 @@ public class Seed
 
     // Table User
     private const string _seedUserPassword = "Password";
-    private const string _seedUserLocation = "Location";
-    private const string _seedUserLocation1 = "Location1";
-    private const string _seedUserLocation2 = "Location2";
 
 
-    private static List<Role> Roles = new()
+    private static readonly List<Role> _roles = new()
     {
         new Role {Name = RoleNames.NationalAdmin},
         new Role {Name = RoleNames.NationalEditor},
@@ -31,12 +28,8 @@ public class Seed
         new Role {Name = RoleNames.LocationCommunications},
     };
 
-    private static List<Location> locations = new()
+    private static readonly List<Location> _locations = new()
     {
-        new Location
-        {
-            Name="Templates",Route="/templates", Address1 = "", Address2 = "", City = "",State = "", PostalCode = ""
-        },
         new Location
         {
             Name = SeedConstants.SeedNationalName, Route = "/national", Address1 = "", Address2 = "", City = "Columbus",
@@ -44,105 +37,68 @@ public class Seed
         },
         new Location
         {
-            Name = "Bed Brigade Grove City", Route = "/grove-city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
+            Name = "Grove City Bed Brigade", Route = "/grove-city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
             State = "Ohio", PostalCode = "43123"
-        },
-        new Location
-        {
-            Name = "Living Hope Church Bed Brigade", Route = "/living-hope-church", Address1 = "9286 York Rd SW", Address2 = "", City = "Pataskala",
-            State = "Ohio", PostalCode = "43062"
         },
         new Location
         {
             Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", Address1 = "1250 Gemini Pl", Address2 = "", City = "Columbus",
             State = "Ohio", PostalCode = "43240"
-        },
-        new Location
-        {
-            Name = "Peace Lutheran Bed Brigade", Route = "/peace-lutheran", Address1 = "455 Clark State Rd", Address2 = "", City = "Gahanna", State = "Ohio",
-            PostalCode = "43230"
-        },
-        new Location
-        {
-            Name = "Vineyard Church Bed Brigade", Route = "/vineyard-circleville", Address1 = "911 S Pickaway St", Address2 = "", City = "Circleville",
-            State = "Ohio", PostalCode = "43113"
-        },
-        new Location
-        {
-            Name = "Hardbarger Impact Bed Brigade", Route = "/hardbarger-impact", Address1 = "1780 Victor Road", Address2 = "", City = "Lancaster",
-            State = "Ohio", PostalCode = "43130"
-        },
-        new Location
-        {
-            Name = "Upper Arlington Lutheran Bed Brigade", Route = "/upper-arlington-lutheran", Address1 = "2300 Lytham Road", Address2 = "", City = "Upper Arlington",
-            State = "Ohio", PostalCode = "43220"
-        },
-        new Location
-        {
-            Name = "Greensburg United Methodist Bed Brigade", Route = "/greensburg-umc", Address1 = "2161 Greensburg Rd", Address2 = "", City = "North Canton",
-            State = "Ohio", PostalCode = "44720"
         }
-
     };
 
-    private static readonly List<User> users = new()
+    private static readonly List<User> _users = new()
     {
-        new User { FirstName = _seedUserLocation, LastName = "Contributor", Role = RoleNames.LocationContributor },
-        new User { FirstName = _seedUserLocation, LastName = "Author", Role = RoleNames.LocationAuthor },
-        new User { FirstName = _seedUserLocation, LastName = "Editor", Role = RoleNames.LocationEditor },
-        new User { FirstName = _seedUserLocation, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
-        new User { FirstName = _seedUserLocation, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
-        new User
-        {
-            FirstName = _seedUserLocation, LastName = "Communications", Role = RoleNames.LocationCommunications
-        },
-        new User { FirstName = _seedUserLocation, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        //National Users
         new User { FirstName = SeedConstants.SeedNationalName, LastName = "Editor", Role = RoleNames.NationalEditor },
         new User { FirstName = SeedConstants.SeedNationalName, LastName = "Admin", Role = RoleNames.NationalAdmin },
-        new User { FirstName = _seedUserLocation1, LastName = "Contributor", Role = RoleNames.LocationContributor },
-        new User { FirstName = _seedUserLocation1, LastName = "Author", Role = RoleNames.LocationAuthor },
-        new User { FirstName = _seedUserLocation1, LastName = "Editor", Role = RoleNames.LocationEditor },
-        new User { FirstName = _seedUserLocation1, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
-        new User { FirstName = _seedUserLocation1, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+
+        //Grove City Users
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
         new User
         {
-            FirstName = _seedUserLocation1, LastName = "Communications", Role = RoleNames.LocationCommunications
+            FirstName = SeedConstants.SeedGroveCityName, LastName = "Communications", Role = RoleNames.LocationCommunications
         },
-        new User { FirstName = _seedUserLocation1, LastName = "Admin", Role = RoleNames.LocationAdmin },
-        new User { FirstName = _seedUserLocation2, LastName = "Contributor", Role = RoleNames.LocationContributor },
-        new User { FirstName = _seedUserLocation2, LastName = "Author", Role = RoleNames.LocationAuthor },
-        new User { FirstName = _seedUserLocation2, LastName = "Editor", Role = RoleNames.LocationEditor },
-        new User { FirstName = _seedUserLocation2, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
-        new User { FirstName = _seedUserLocation2, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
+
+        //Rock City Users
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
         new User
         {
-            FirstName = _seedUserLocation2, LastName = "Communications", Role = RoleNames.LocationCommunications
+            FirstName = SeedConstants.SeedRockCityName, LastName = "Communications", Role = RoleNames.LocationCommunications
         },
-        new User { FirstName = _seedUserLocation2, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
 
-    static readonly List<User> Users = users;
+    
 
-    public static async Task SeedData(IDbContextFactory<DataContext> _contextFactory)
+    public static async Task SeedData(IDbContextFactory<DataContext> contextFactory)
     {
 
-        await SeedConfigurations(_contextFactory);
-        await SeedLocations(_contextFactory);
-        await SeedContentsLogic.SeedContents(_contextFactory);
-        await SeedMedia(_contextFactory);
-        await SeedRoles(_contextFactory);
-        await SeedUser(_contextFactory);
-        //await SeedUserRoles(_contextFactory);
-        await SeedVolunteersFor(_contextFactory);
-        await SeedVolunteers(_contextFactory);
-        await SeedDonations(_contextFactory);
-        await SeedBedRequests(_contextFactory);
+        await SeedConfigurations(contextFactory);
+        await SeedLocations(contextFactory);
+        await SeedContentsLogic.SeedContents(contextFactory);
+        await SeedMedia(contextFactory);
+        await SeedRoles(contextFactory);
+        await SeedUser(contextFactory);
+        await SeedVolunteersFor(contextFactory);
+        await SeedVolunteers(contextFactory);
+        await SeedDonations(contextFactory);
+        await SeedBedRequests(contextFactory);
     }
 
 
-    private static async Task SeedConfigurations(IDbContextFactory<DataContext> _contextFactory)
+    private static async Task SeedConfigurations(IDbContextFactory<DataContext> contextFactory)
     {
-        using (var context = _contextFactory.CreateDbContext())
+        using (var context = contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedConfigurations Started");
             if (await context.Configurations.AnyAsync()) return;
@@ -231,36 +187,36 @@ public class Seed
     /// <summary>
     /// Creates the Location table in the DB and also creates location folders in the wwwroot/media folder based upon the route data
     /// </summary>
-    /// <param name="_contextFactory"></param>
+    /// <param name="contextFactory"></param>
     /// <returns></returns>
-    private static async Task SeedLocations(IDbContextFactory<DataContext> _contextFactory)
+    private static async Task SeedLocations(IDbContextFactory<DataContext> contextFactory)
     {
-        using (var context = _contextFactory.CreateDbContext())
+        using (var context = contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedLocations Started");
             if (await context.Locations.AnyAsync()) return;
 
             try
             {
-                await context.Locations.AddRangeAsync(locations);
-                await context.SaveChangesAsync();
-                foreach(var location in locations)
+                foreach (var location in _locations)
                 {
                     var loc = location.Route + "/pages";
                     loc.CreateDirectory();
+                    context.Locations.Add(location);
+                    await context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
-                Log.Logger.Information($"Configuration seed error: {ex.Message}");
+                Log.Logger.Information($"Location seed error: {ex.Message}");
                 throw;
             }
         }
     }
 
-    private static async Task SeedMedia(IDbContextFactory<DataContext> _contextFactory)
+    private static async Task SeedMedia(IDbContextFactory<DataContext> contextFactory)
     {
-        using (var context = _contextFactory.CreateDbContext())
+        using (var context = contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedMedia Started");
             try
@@ -271,7 +227,7 @@ public class Seed
                     // add the first reciord in Media table with National Logo
                     context.Media.Add(new Media
                     {
-                        LocationId = 1,
+                        LocationId = (int)LocationNumber.National,
                         FileName = "logo",
                         MediaType = "png",
                         FilePath = "media/national",
@@ -305,7 +261,7 @@ public class Seed
             if (await context.Roles.AnyAsync()) return;
             try
             {
-                await context.Roles.AddRangeAsync(Roles);
+                await context.Roles.AddRangeAsync(_roles);
                 await context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -320,31 +276,36 @@ public class Seed
         using (var context = _contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedUser Started");
-            foreach (var user in Users)
+            foreach (var user in _users)
             {
                 if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
                 {
                     try
                     {
                         SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                        List<Location> locations = context.Locations.ToList();
-                        var item = locations.Single(r => r.LocationId == 0);
-                        if (item != null)
-                        {
-                            locations.Remove(item);
-                        }
 
-                        var location = locations[new Random().Next(locations.Count)];
-                        if (user.FirstName == "National")
+                        int locationId;
+
+                        switch (user.FirstName)
                         {
-                            location = locations.Single(l => l.Name == "National");
+                            case SeedConstants.SeedNationalName:
+                                locationId = (int)LocationNumber.National;
+                                break;
+                            case SeedConstants.SeedGroveCityName:
+                                locationId = (int)LocationNumber.GroveCity;
+                                break;
+                            case SeedConstants.SeedRockCityName:
+                                locationId = (int)LocationNumber.RockCity;
+                                break;
+                            default:
+                                throw new Exception("Invalid location name: " + user.FirstName);
                         }
 
                         // Create the user
                         var newUser = new User
                         {
                             UserName = $"{user.FirstName}{user.LastName}",
-                            LocationId = location.LocationId,
+                            LocationId = locationId,
                             FirstName = user.FirstName,
                             LastName = user.LastName,
                             Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
@@ -374,37 +335,10 @@ public class Seed
             }
         }
     }
-    private static async Task SeedUserRoles(IDbContextFactory<DataContext> _contextFactory)
+
+    private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> contextFactory)
     {
-        using (var context = _contextFactory.CreateDbContext())
-        {
-            Log.Logger.Information("SeedUserRoles Started");
-            try
-            {
-                var users = context.Users.ToList();
-                foreach (var user in users)
-                {
-                    var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == user.Role);
-                    UserRole newUserRole = new UserRole
-                    {
-                        LocationId = user.LocationId,
-                        RoleId = role.RoleId,
-                        UserName = user.UserName
-                    };
-                    await context.AddAsync(newUserRole);
-                    await context.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error SeedUserRoles {ex.Message}");
-                throw;
-            }
-        }
-    }
-    private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> _contextFactory)
-    {
-        using (var context = _contextFactory.CreateDbContext())
+        using (var context = contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedVolunteersFor Started");
             if (await context.VolunteersFor.AnyAsync()) return;
@@ -429,9 +363,9 @@ public class Seed
         }
 
     }
-    private static async Task SeedVolunteers(IDbContextFactory<DataContext> _contextFactory)
+    private static async Task SeedVolunteers(IDbContextFactory<DataContext> contextFactory)
     {
-        using (var context = _contextFactory.CreateDbContext())
+        using (var context = contextFactory.CreateDbContext())
         {
             Log.Logger.Information("SeedVolunteers Started");
             if (await context.Volunteers.AnyAsync()) return;
@@ -442,7 +376,7 @@ public class Seed
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
-            var item = locations.Single(r => r.LocationId == 0);
+            var item = locations.Single(r => r.LocationId == (int) LocationNumber.National);
             if (item != null)
             {
                 locations.Remove(item);
@@ -482,8 +416,8 @@ public class Seed
                 }
             }
         }
-
     }
+
     private static async Task SeedDonations(IDbContextFactory<DataContext> contextFactory)
     {
         try
@@ -498,7 +432,7 @@ public class Seed
                 List<bool> YesOrNo = new List<bool> { true, false };
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
-                var item = locations.Single(r => r.LocationId == 0);
+                var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
                 if (item != null)
                 {
                     locations.Remove(item);
@@ -551,7 +485,7 @@ public class Seed
                 List<string> City = new List<string> { "Columbus", "Cleveland", "Cincinnati", "Canton", "Youngston", "Springfield", "Middletown", "Beavercreek" };
                 List<string> StreetName = new List<string> { "E. Bella Ln", "W. Chandler Blvd", "25 St.", "4th Ave.", "G Ave.", "Indian Wells CT.", "N. Arizona" };
                 List<Location> locations = await context.Locations.ToListAsync();
-                var item = locations.Single(r => r.LocationId == 0);
+                var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
                 if (item != null)
                 {
                     locations.Remove(item);

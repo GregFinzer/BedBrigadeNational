@@ -57,7 +57,7 @@ else
                             <Template>
                                 @{
                                     Volunteer volunteer = (context as Volunteer)!;
-                                    if (volunteer.LocationId == 0)
+                                    if (volunteer.LocationId == (int)LocationNumber.National)
                                     {
                                         volunteer.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
                                     }

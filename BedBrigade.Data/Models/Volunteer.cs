@@ -7,7 +7,8 @@ namespace BedBrigade.Data.Models
 	public class Volunteer : BaseEntity
     {
 		[Key]
-		public Int32 VolunteerId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 VolunteerId { get; set; }
 
 		[ForeignKey("LocationId")]
 		public Int32 LocationId { get; set; }

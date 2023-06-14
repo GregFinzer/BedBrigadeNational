@@ -8,12 +8,16 @@ namespace BedBrigade.Data.Models
 	public class Donation : BaseEntity
     {
 		[Key]
-		public Int32 DonationId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 DonationId { get; set; }
+
 		[ForeignKey("LocationId"), Required]
 		public Int32 LocationId { get; set; }
+
         [Required]
 		[MaxLength(255)]
 		public String Email { get; set; } = string.Empty;
+
         [Required]
         [Column(TypeName = "decimal(18,4)")]
         public Decimal Amount { get; set; }

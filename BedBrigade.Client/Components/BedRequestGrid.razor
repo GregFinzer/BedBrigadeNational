@@ -62,7 +62,7 @@ else
                             <Template>
                                 @{
                                     BedRequest BedRequest = (context as BedRequest)!;
-                                    if(BedRequest.LocationId == 0)
+                                    if(BedRequest.LocationId == (int) LocationNumber.National)
                                     {
                                         BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 

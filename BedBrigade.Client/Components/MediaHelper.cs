@@ -201,7 +201,7 @@ namespace BedBrigade.Client.Components
             // throw new NotImplementedException();
             // if Not National Admin User linked to location, Grid should show only location files
 
-            if (mediaUser.LocationId > 1 || mediaUser.Role == RoleNames.LocationAdmin && mediaUser.LocationId == 1)
+            if (mediaUser.LocationId > (int)LocationNumber.National || mediaUser.Role == RoleNames.LocationAdmin && mediaUser.LocationId == (int)LocationNumber.National)
             {
                 List<Media> LocationFiles = dbFileList.FindAll(a => a.LocationId == mediaUser.LocationId);
                 return LocationFiles;

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BedBrigade.Common;
 using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models;
@@ -9,7 +8,8 @@ namespace BedBrigade.Data.Models;
 public class BedRequest : BaseEntity
 {
 	[Key]
-	public Int32 BedRequestId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Int32 BedRequestId { get; set; }
 
 	[ForeignKey("LocationId"), Required]
 	public Int32 LocationId { get; set; } 

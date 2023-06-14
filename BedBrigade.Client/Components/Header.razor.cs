@@ -34,22 +34,11 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            string[] routePath = _nm.Uri.ToLower().Split('/');
-            if (routePath[3] == "" || routePath[3] == "administration" || routePath[3] == "bed-brigade-near-me")
+            var contentResult = await _svcContent.GetAsync("Header", (int) LocationNumber.National);
+            if (contentResult.Success)
             {
-                routePath[3] = "national";
-            }
-
-            var result = await _svcLocation.GetLocationByRouteAsync($"/{routePath[3]}");
-            if (result.Success)
-            {
-                var contentResult = await _svcContent.GetAsync("Header", result.Data.LocationId);
-                if (contentResult.Success)
-                {
-                    await Console.Out.WriteLineAsync($"loaded locations header for loction id {result.Data.LocationId}");
-                    headerContent = contentResult.Data.ContentHtml;
-                }
-
+                await Console.Out.WriteLineAsync($"Loaded Header");
+                headerContent = contentResult.Data.ContentHtml;
             }
             
             authState = await _authState.GetAuthenticationStateAsync();

@@ -174,7 +174,7 @@ namespace BedBrigade.Client.Components
             var newMediaList = new List<Media>();
             var initMedia = new Media
             {
-                LocationId = 1,
+                LocationId = (int) LocationNumber.National,
                 FileName = "logo",
                 MediaType = "png",
                 FilePath = dctConfiguration[ConfigNames.MediaFolder] + PathDivider + dctConfiguration[SubfolderKey],
@@ -542,7 +542,7 @@ namespace BedBrigade.Client.Components
       
         private int GetLocationId(string Route)
         {
-            var LocationId = 1; // MainMediaSubFolder
+            var LocationId = (int)LocationNumber.National; 
 
             if (Route == PathDivider + dctConfiguration[SubfolderKey])
             {

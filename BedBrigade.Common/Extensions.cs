@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Diagnostics;
@@ -97,47 +92,23 @@ namespace BedBrigade.Common
         public static DirectoryInfo CreateDirectory(this string directoryName)
         {
             var appRoot = GetAppRoot(directoryName);
-            try
-            {
-                return Directory.CreateDirectory(appRoot);
-            }
-           catch (Exception ex)
-            {
-                throw (ex);
-            }
-
+            return Directory.CreateDirectory(appRoot);
         }
 
         public static void DeleteDirectory(this string directoryName, bool recursiveDelete)
         {
             var appRoot = GetAppRoot(directoryName);
-            try 
-            {                
-                Directory.Delete(appRoot, recursiveDelete);
-            }
-            catch (Exception ex)
-            {
-                throw(ex);
-            }
-
+            Directory.Delete(appRoot, recursiveDelete);
         }
 
         public static void DeleteFiles(this string directoryName)
         {
             var appRoot = GetAppRoot(directoryName);
-            try
+            string[] files = Directory.GetFiles(appRoot);
+            foreach ( string file in files )
             {
-                string[] files = Directory.GetFiles(appRoot);
-                foreach ( string file in files )
-                {
-                    File.Delete( file );
-                }
+                File.Delete( file );
             }
-            catch (Exception ex)
-            {
-                throw(ex);
-            }
-
         }
 
         public static string GetAppRoot(string directoryName)

@@ -7,7 +7,8 @@ namespace BedBrigade.Data.Models
 	public class Schedule : BaseEntity
     {
 		[Key]
-		public Int32 ScheduleId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 ScheduleId { get; set; }
 
 		public Location Location { get; set; } = new Location();
 
