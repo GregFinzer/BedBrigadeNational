@@ -8,7 +8,8 @@ namespace BedBrigade.Data.Models
     public class Content : BaseEntity
     {
 		[Key]
-		public Int32 ContentId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 ContentId { get; set; }
 
 		[ForeignKey("LocationId")]
 		public Int32 LocationId { get; set; }

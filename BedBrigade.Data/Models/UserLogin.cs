@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BedBrigade.Data.Models
 {
@@ -11,6 +6,7 @@ namespace BedBrigade.Data.Models
     {
         [Required]
         public string Email { get; set; } = string.Empty;
+
         [Required]
         public string Password { get; set; } = string.Empty;
     }

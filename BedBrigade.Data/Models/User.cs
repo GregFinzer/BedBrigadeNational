@@ -13,6 +13,7 @@ public class User : BaseEntity
     [Range(1, int.MaxValue, ErrorMessage = "Please select a location for the user")]
     [ForeignKey("LocationId")]
     public Int32 LocationId { get; set; }
+
     [Required(ErrorMessage = "First name is required")]
     [MaxLength(20)]
     public String FirstName { get; set; } = string.Empty;
@@ -36,6 +37,7 @@ public class User : BaseEntity
     public String? Phone { get; set; } = string.Empty;
 
     public String? Role { get; set; } = string.Empty;
+
     [ForeignKey("Role")]
     [Range(1,int.MaxValue, ErrorMessage = "Please select a role for the user")]
     public int FkRole { get; set; }
@@ -44,18 +46,25 @@ public class User : BaseEntity
 
     [MaxLength(4000)]
     public string PersistConfig { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistDonation { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistLocation { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistPages { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistUser { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistVolunteers { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistMedia { get; set; } = string.Empty;
+
     [MaxLength(4000)]
     public string PersistBedRequest { get; set; } = string.Empty;
 
@@ -68,5 +77,4 @@ public class User : BaseEntity
         }
     }
 
-    public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

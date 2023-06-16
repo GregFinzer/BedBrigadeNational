@@ -1,16 +1,13 @@
 ﻿using BedBrigade.Data.Models;
-using BedBrigade.Data.Seeding;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BedBrigade.Data
 {
     public class DataContext : DbContext
     {
-        private HttpContextAccessor _httpContext;
-
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
             
@@ -28,13 +25,17 @@ namespace BedBrigade.Data
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Volunteer> Volunteers { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<EmailQueue> EmailQueues { get; set; }
         public virtual DbSet<VolunteerFor> VolunteersFor { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateIndexes(modelBuilder);
+            SetSeedForLocation(modelBuilder);
+        }
+
+        private void SetSeedForLocation(ModelBuilder modelBuilder)
+        {
         }
 
         /// <summary>

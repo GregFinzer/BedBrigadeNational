@@ -89,7 +89,7 @@ namespace BedBrigade.Client.Components
                 MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];
                 MainAdminFolder = dctConfiguration[SubfolderKey];
 
-                if (userLocationId == 1)
+                if (userLocationId == (int) LocationNumber.National)
                 {
                     userRoute = MainAdminFolder;
                 }

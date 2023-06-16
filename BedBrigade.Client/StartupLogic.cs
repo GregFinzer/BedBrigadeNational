@@ -10,12 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using Serilog;
 using BedBrigade.MessageService.Services;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Data.Entity.Infrastructure;
 using BedBrigade.Common;
-using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-using IApplicationLifetime = Microsoft.Extensions.Hosting.IApplicationLifetime;
-using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BedBrigade.Client

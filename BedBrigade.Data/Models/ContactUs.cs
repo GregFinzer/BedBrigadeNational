@@ -7,7 +7,8 @@ namespace BedBrigade.Data.Models
 	public class ContactUs : BaseEntity
     {
 		[Key]
-		public Int32 ContactUsId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 ContactUsId { get; set; }
 
 		public Location Location { get; set; } = new Location();
 

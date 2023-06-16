@@ -168,19 +168,6 @@ namespace BedBrigade.Data.Services
                 }
             }
 
-            public async Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync()
-            {
-                using (var context = _contextFactory.CreateDbContext())
-                {
-
-                    var result = context.UserRoles.ToList();
-                    if (result != null)
-                    {
-                        return new ServiceResponse<List<UserRole>>("User Roles", true, result);
-                    }
-                    return new ServiceResponse<List<UserRole>>("No User Roles found.");
-                }
-            }
 
             public async Task<ServiceResponse<List<Role>>> GetRolesAsync()
             {

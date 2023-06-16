@@ -82,11 +82,6 @@ public class UserService : IUserService
         return await _data.UserExistsAsync(email);
     }
 
-    public async Task<ServiceResponse<List<UserRole>>> GetUserRolesAsync()
-    {
-        return await _data.GetUserRolesAsync();
-    }
-
     public async Task<ServiceResponse<List<Role>>> GetRolesAsync()
     {
         return await _data.GetRolesAsync();

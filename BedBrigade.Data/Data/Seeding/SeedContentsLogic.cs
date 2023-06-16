@@ -20,8 +20,6 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedFooter(context);
                 await SeedAboutUsBody(context);
                 await SeedHomePageBody(context);
-                await SeedRequestBedBody(context);
-                await SeedVolunteerBody(context);
                 await SeedDonateBody(context);
                 await SeedHistoryBody(context);
                 await SeedLocationsBody(context);
@@ -29,7 +27,6 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedPartnerBody(context);
                 await SeedAssemblyBody(context);
                 await SeedStoriesBody(context);
-                await SeedContactBody(context);
                 await SeedNewPageBody(context);
             }
         }
@@ -39,9 +36,10 @@ namespace BedBrigade.Data.Data.Seeding
             foreach (var location in context.Locations)
             {
                 var locationRoute = GetAppRoot(location.Route);
-                if (!Directory.Exists(locationRoute + "/pages"))
+                var pagesRoute = Path.Combine(locationRoute, "pages");
+                if (!Directory.Exists( pagesRoute))
                 {
-                    CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", GetAppRoot(location.Route));
+                    CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", locationRoute);
                 }
             }
         }
@@ -51,20 +49,17 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Header";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+                var seedHtml = GetHtml("Header.html");
+                Content content = new Content
                 {
-                    var seedHtml = GetHtml($"header{location.LocationId}.html");
-                    Content content = new Content
-                    {
-                        LocationId = location.LocationId,
-                        ContentType = ContentType.Header,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                    };
+                    LocationId = (int) LocationNumber.National,
+                    ContentType = ContentType.Header,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                };
 
-                    context.Content.Add(content);
+                context.Content.Add(content);
 
-                }
                 try
                 {
                     await context.SaveChangesAsync();
@@ -80,17 +75,15 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Footer";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+                var seedHtml = GetHtml($"Footer.html");
+                context.Content.Add(new Content
                 {
-                    var seedHtml = GetHtml($"footer{location.LocationId}.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Footer,
-                        Name = name,
-                        ContentHtml = seedHtml
-                    });
-                }
+                    LocationId = (int)LocationNumber.National,
+                    ContentType = ContentType.Footer,
+                    Name = name,
+                    ContentHtml = seedHtml
+                });
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -106,23 +99,21 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Home";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+                var seedHtml = GetHtml($"Home.html");
+                context.Content.Add(new Content
                 {
-                    var seedHtml = GetHtml($"Home{location.LocationId}.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Home,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        LeftMediaId = "",
-                        MiddleMediaId = "",
-                        RightMediaId = "",
-                        HeaderMediaId = "imageHeader",
-                        FooterMediaId = "imageFooter"
-                    });
-                    //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
-                }
+                    LocationId = (int)LocationNumber.National,
+                    ContentType = ContentType.Home,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    LeftMediaId = "",
+                    MiddleMediaId = "",
+                    RightMediaId = "",
+                    HeaderMediaId = "imageHeader",
+                    FooterMediaId = "imageFooter"
+                });
+                //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -172,43 +163,7 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedContactBody(DataContext context)
-        {
-            var name = "Contact";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
-                    var seedHtml = GetHtml($"{name}.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        LeftMediaId = "imageLeft",
-                        MiddleMediaId = "imageMiddle",
-                        RightMediaId = "imageRight",
-                        Title = "Contact Us"
-                    });
-                    var leftPath = $"{location.Route}/pages/{name}/Left";
-                    var middlePath = $"{location.Route}/pages/{name}/Middle";
-                    var rightPath = $"{location.Route}/pages/{name}/Right";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
-                    //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
+
 
         private static async Task SeedStoriesBody(DataContext context)
         {
@@ -514,81 +469,9 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedVolunteerBody(DataContext context)
-        {
-            var name = "Volunteer";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
-                    var seedHtml = GetHtml("Volunteer.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        LeftMediaId = "imageLeft",
-                        MiddleMediaId = "imageMiddle",
-                        RightMediaId = "imageRight",
-                        Title = "Volunteer"
-                    });
-                    var leftPath = $"{location.Route}/pages/{name}/Left";
-                    var middlePath = $"{location.Route}/pages/{name}/Middle";
-                    var rightPath = $"{location.Route}/pages/{name}/Right";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
-                    //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
 
-        private static async Task SeedRequestBedBody(DataContext context)
-        {
-            var name = "RequestBed";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
-                    var seedHtml = GetHtml("RequestBed.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        LeftMediaId = "imageLeft",
-                        MiddleMediaId = "imageMiddle",
-                        RightMediaId = "imageRight",
-                        Title = "Request A Bed"
-                    });
-                    var leftPath = $"{location.Route}/pages/{name}/Left";
-                    var middlePath = $"{location.Route}/pages/{name}/Middle";
-                    var rightPath = $"{location.Route}/pages/{name}/Right";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
-                    //CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/{name}", GetAppRoot(location.Route));
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
+
+
 
     }
 }
