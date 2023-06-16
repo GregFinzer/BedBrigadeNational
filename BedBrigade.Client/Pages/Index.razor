@@ -1,16 +1,39 @@
 ﻿@page "/"
-@page "/{location}"
-@page "/{location}/{pageName}"
+@page "/{mylocation}"
+@page "/{mylocation}/{mypageName}"
 
-<Body />
+<Body @ref="myBody"/>
 
 @code {
-    [Parameter] public string location { get; set; } = "National";
-    [Parameter] public string pageName { get; set; } = "Home";
+    Body myBody;
+    [Parameter] public string mylocation { get; set; }
+    [Parameter] public string mypageName { get; set; }
+    public string location { get; set; } 
+    public string pageName { get; set; } 
+
+    protected override async Task OnParametersSetAsync()
+    {
+        const string defaultLocation = "National";
+        const string defaultPageName = "Home";
+        location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
+        pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
+        
+        mylocation = null;
+        mypageName = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            await myBody.LoadBody();
+            myBody.RefreshState();
+        }
+    }
 
     protected override void OnInitialized()
     {
-       Console.WriteLine($"Calling {pageName} for location {location}");
+       Console.WriteLine($"Calling {mypageName} for location {mylocation}");
     }
 
 }

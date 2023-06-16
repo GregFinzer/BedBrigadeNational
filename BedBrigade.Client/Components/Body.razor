@@ -4,6 +4,7 @@
 @using System.Security.Claims;
 @using BedBrigade.Common;
 @using HtmlAgilityPack;
+@inject IJSRuntime JS
 
 @((MarkupString)BodyContent)
 
@@ -43,6 +44,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadBody();
+    }
+
+    public void RefreshState()
+    {
+        StateHasChanged();
+    }
+
+    public async Task LoadBody()
+    {
         var url = _nm.Uri;
         var PageName = string.Empty;
         var Location = string.Empty;
@@ -52,6 +63,11 @@
             Location = "National";
             PageName = "Home";
         }
+        else if (routePath.Length < 5)
+        {
+            _nm.NavigateTo("/National/Sorry", true);
+            return;
+        }
         else
         {
             Location = routePath[3];
@@ -59,9 +75,10 @@
         }
         Path = $"/{Location}/pages/{PageName}";
         var result = await _svcLocation.GetLocationByRouteAsync($"/{Location}");
-        Console.WriteLine($"Location passed {Location} Location {result.Data.LocationId} ");
-        if (result.Success)
+        
+        if (result.Success && result.Data != null)
         {
+            Console.WriteLine($"Location passed {Location} Location {result.Data.LocationId} ");
             var contentResult = await _svcContent.GetAsync(PageName, result.Data.LocationId);
             Console.WriteLine($"Page: {PageName} Location: {result.Data.LocationId}");
             if (contentResult.Success)
@@ -81,7 +98,6 @@
             }
         }
     }
-
 
     protected async Task RandomizeImagesAsync()
     {

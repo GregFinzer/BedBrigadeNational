@@ -116,7 +116,9 @@ namespace BedBrigade.Common
             var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
             Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
             var appRoot = appPathMatcher.Match(exePath).Value;
-            return $"{appRoot}\\wwwroot\\Media\\{directoryName}";
+            var result = $"{appRoot}\\wwwroot\\Media\\{directoryName}";
+            result = result.Replace("\\/", "\\");
+            return result;
         }
 
 

@@ -36,9 +36,10 @@ namespace BedBrigade.Data.Data.Seeding
             foreach (var location in context.Locations)
             {
                 var locationRoute = GetAppRoot(location.Route);
-                if (!Directory.Exists(locationRoute + "/pages"))
+                var pagesRoute = Path.Combine(locationRoute, "pages");
+                if (!Directory.Exists( pagesRoute))
                 {
-                    CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", GetAppRoot(location.Route));
+                    CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", locationRoute);
                 }
             }
         }
