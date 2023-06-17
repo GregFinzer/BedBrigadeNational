@@ -22,16 +22,8 @@ else
 {
     <div class="container my-3 ">
         <h3 class="">@workTitle </h3>
-        <EditForm Model="Content" OnValidSubmit=@OnValidSubmit>
+        <EditForm Model="Content">
             <DataAnnotationsValidator />
-            <div class="row" style="display: @SelectLocation">
-                <div class="col-md-8" style="display: @DisplayTitle">
-                    <SfDropDownList TItem="Location" TValue="int" DataSource=@Locations ID="loc" @bind-Value=@Content.LocationId Enabled="true" Placeholder="Add to location" FloatLabelType="FloatLabelType.Auto">
-                        <DropDownListFieldSettings Text="Name" Value="LocationId" />
-                    </SfDropDownList>
-                    <ValidationMessage For="@(() => Content.LocationId)" />
-                </div>
-            </div>
             <div class="row">
                  <div class="col-md-8" style="display: @DisplayTitle">
                     <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
@@ -44,59 +36,6 @@ else
                     <ValidationMessage For="@(() => Content.Name)" />
                 </div>
             </div>
-
-@*            <div class="row">
-                <div class="col-md-8" style="display: @DisplayTitle">
-                    <SfTextBox @bind-Value=@Content.Title Enabled="true" Placeholder="Page Title" FloatLabelType="FloatLabelType.Auto" />
-                    <ValidationMessage For="@(() => Content.Title)" />
-                </div>
-                <div class="col-md-4">
-                    <SfTextBox ID="name" @bind-Value=@Content.Name Enabled="true" Placeholder="Content Name" FloatLabelType="FloatLabelType.Auto" />
-                    <ValidationMessage For="@(() => Content.Name)" />
-                </div>
-            </div>
-            <div style="display: @ShowMediaId">
-                <div class="row" style="display: @DisplayBody">
-                    <div class="col-md-4">
-                        <SfTextBox @bind-Value=@Content.LeftMediaId Enabled=true Placeholder="Left Media Id" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.LeftMediaId)" />
-                    </div>
-                    <div class="form-group col-md-4">
-                        <SfTextBox @bind-Value=@Content.MiddleMediaId Enabled="true" Placeholder="Middle Media Id" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.MiddleMediaId)" />
-                    </div>
-                    <div class="col-md-4">
-                        <SfTextBox @bind-Value=@Content.RightMediaId Enabled="true" Placeholder="Right Media Id" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.RightMediaId)" />
-                    </div>
-                </div>
-                <div class="row" style="display: @DisplayHome">
-                    <div class="col-md-4">
-                        <SfTextBox @bind-Value=@Content.HeaderMediaId Enabled="true" Placeholder="Header Media Id" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.HeaderMediaId)" />
-                    </div>
-                    <div class="col-md-4">
-                        <SfTextBox @bind-Value=@Content.FooterMediaId Enabled="true" Placeholder="Footer Media Id" FloatLabelType="FloatLabelType.Auto" />
-                        <ValidationMessage For="@(() => Content.FooterMediaId)" />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <SfTextBox @bind-Value=@Content.UpdateUser Enabled="true" Placeholder="Updated By" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-                <div class="col-md-4">
-                    <SfDateTimePicker @bind-Value=@Content.UpdateDate Enabled="true" Placeholder="Updated On" FloatLabelType="FloatLabelType.Auto" />
-                </div>
-                <div class="col-md-2 my-4">
-                    <button type="submit" class="btn btn-primary">@workType</button>
-                </div>
-                <div class="col-md-2 my-4">
-                    <input type="checkbox" checked=@showMedia @onchange=@DisplayMedia />
-                    <label for="showPassword">Advanced</label>
-                </div>
-            </div>
-*@ 
             <div class="rte-container">
                 <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500">
                     <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
@@ -109,8 +48,8 @@ else
                 </SfRichTextEditor>
             </div>
             <div >
-                <SfButton CssClass="e-primary">Submit</SfButton> <SfButton CssClass="e-info" >Cancel</SfButton>
-
+                <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveClick())">Save</button>
+                <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
             </div>
         </EditForm>
     </div>

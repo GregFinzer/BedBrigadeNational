@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.RichTextEditor;
-using System.Drawing.Text;
 using System.Security.Claims;
 
 namespace BedBrigade.Client.Components
@@ -20,6 +19,7 @@ namespace BedBrigade.Client.Components
         [Inject] public IContentService _svcContent { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private ILocationService _svcLocation { get; set; }
+        [Inject] private NavigationManager _nm { get; set; }
 
         [Parameter] public string PageName { get; set; }
         [Parameter] public bool IsNewPage { get; set; }
@@ -43,14 +43,10 @@ namespace BedBrigade.Client.Components
         private string Body { get; set; }
         private Content Content { get; set; }
         private Location Location { get; set; }
-        private List<Location> Locations { get; set; }
         private SfToast ToastObj { get; set; }
         private string? ToastTitle { get; set; } = string.Empty;
         private int ToastTimeout { get; set; } = 2000;
         private string ToastContent { get; set; } = string.Empty;
-        //private string ButtonCaption { get; set; } = "Save As ...";
-        //private string locationRoute { get; set; } = string.Empty;
-        //private string locationName { get; set; } = string.Empty;
         private int LocationId { get; set; }
         string[] pageParameters { get; set; }
         public string DisplayBody { get; private set; }
@@ -58,7 +54,6 @@ namespace BedBrigade.Client.Components
         public string DisplayHome { get; private set; }
         public string DisplayTitle { get; private set; }
         public string ShowMediaId { get; private set; }
-        public bool showMedia { get; private set; } = false;
         public string SelectLocation { get; private set; } = "none;";
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
@@ -100,6 +95,16 @@ namespace BedBrigade.Client.Components
 
         };
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (Content != null 
+                && RteObj != null 
+                && (Content.ContentType == Common.Common.ContentType.Header || Content.ContentType == Common.Common.ContentType.Footer))
+            {
+                await RteObj.ShowSourceCodeAsync();
+            }
+        }        
+
         protected override async Task OnInitializedAsync()
         {
             
@@ -107,12 +112,7 @@ namespace BedBrigade.Client.Components
             pageParameters = saveUrl.Split('/');
             var pageNameParameters = pageParameters[4].Split("_");
             ServiceResponse<Content> contentResult;
-            ServiceResponse<List<Location>> locationResult;
-            locationResult = await _svcLocation.GetAllAsync();
-            if(locationResult.Success) 
-            {
-                Locations = locationResult.Data;
-            }
+
             if (IsNewPage)
             {
                 workTitle = "Add Page";
@@ -131,12 +131,10 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                workTitle = "Editing";
+                workTitle = $"Editing {PageName}" ;
                 workType = $"Updating {PageName}";
                 ToastTitle = $"Edit Page {PageName}";
                 contentResult = await _svcContent.GetAsync(pageNameParameters[0], Convert.ToInt32(pageParameters[3]));
-
-                var LocationService = await _svcLocation.GetAllAsync();
 
                 var result = await _svcLocation.GetAsync(Convert.ToInt32(pageParameters[3]));
                 if (result.Success)
@@ -184,6 +182,7 @@ namespace BedBrigade.Client.Components
                         DisplayHeader = none;
                         DisplayHome = none;
                         DisplayTitle = none;
+                        
                         break;
                     case Common.Common.ContentType.Footer:
                         DisplayBody = none;
@@ -202,21 +201,25 @@ namespace BedBrigade.Client.Components
             Console.WriteLine($"SaveUrl: {saveUrl} Path: {imagePath} AllowedTypes: {AllowedTypes}");
         }
 
-        protected async Task OnValidSubmit()
+
+
+
+
+        private async Task HandleSaveClick()
         {
             Content.ContentHtml = await RteObj.GetXhtmlAsync();
             if (Content.ContentId != 0)
             {
                 //Update Content  Record
                 var updateResult = await _svcContent.UpdateAsync(Content);
-                ToastTitle = "Update Page";
+                ToastTitle = "Update " + Content.ContentType;
                 if (updateResult.Success)
                 {
-                    ToastContent = "Page Updated Successfully!";
+                    ToastContent = Content.ContentType + " Updated Successfully!";
                 }
                 else
                 {
-                    ToastContent = "Unable to update location!";
+                    ToastContent = "Unable to update!";
                 }
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
@@ -242,19 +245,9 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        protected async Task DisplayMedia()
+        private async Task HandleCancelClick()
         {
-            if(showMedia)
-            {
-                ShowMediaId = none;
-                showMedia = false;
-            }
-            else
-            {
-                ShowMediaId = display;
-                showMedia = true;
-            }
+            _nm.NavigateTo("/Administration/Dashboard");
         }
-
     }
 }
