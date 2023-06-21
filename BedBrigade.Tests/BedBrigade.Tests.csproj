@@ -26,4 +26,13 @@
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestFiles\OriginalHeader.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestFiles\UpdatedHeader.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
