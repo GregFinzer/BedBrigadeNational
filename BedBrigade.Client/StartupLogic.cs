@@ -1,4 +1,5 @@
-﻿using BedBrigade.Client.Services;
+﻿using BedBrigade.Client.Components;
+using BedBrigade.Client.Services;
 using BedBrigade.Data.Services;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
@@ -64,7 +65,7 @@ namespace BedBrigade.Client
 
             builder.Services.AddScoped<IMessageService, Services.MessageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
-
+            builder.Services.AddScoped<ToastService, ToastService>();
             builder.Services.AddSignalR(e =>
             {
                 e.MaximumReceiveMessageSize = 1024000;

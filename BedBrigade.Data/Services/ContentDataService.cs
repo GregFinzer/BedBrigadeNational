@@ -171,8 +171,11 @@ public class ContentDataService : IContentDataService
 
             if (entity != null)
             {
-                context.Entry(entity).CurrentValues.SetValues(content);
+                entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
+                entity.UpdateDate = DateTime.Now;
+                entity.UpdateUser = content.UpdateUser;
                 context.Entry(entity).State = EntityState.Modified;
+               // context.Content.Update(entity);
                 await context.SaveChangesAsync();
                 _cachingService.ClearAll();
                 return new ServiceResponse<Content>($"Content record was updated.", true, content);

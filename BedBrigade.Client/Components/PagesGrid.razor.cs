@@ -287,8 +287,7 @@ namespace BedBrigade.Client.Components
         {
             content = args.Data;
             await Grid.EndEditAsync();
-            saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
-            _nm.NavigateTo($"/administration/edit/editpage/{saveUrl}");
+            _nm.NavigateTo($"/administration/edit/editcontent/{content.LocationId}/{content.Name}");
         }
 
         protected async Task Save(Content page)
@@ -362,7 +361,7 @@ namespace BedBrigade.Client.Components
         {
             await Grid.EndEditAsync();
             saveUrl = $"api/image/save/{page.LocationId}/{page.Name}";
-            _nm.NavigateTo($"/administration/edit/editpage/{saveUrl}");
+            _nm.NavigateTo($"/administration/edit/editcontent/{saveUrl}");
         }
 
         protected async Task Cancel()
