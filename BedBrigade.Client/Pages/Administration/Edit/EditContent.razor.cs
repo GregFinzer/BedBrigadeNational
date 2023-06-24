@@ -21,6 +21,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
         private string? Body { get; set; }
         private Content? Content { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
+        private bool Refreshed { get; set; }
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -62,6 +63,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
 
         protected override async Task OnInitializedAsync()
         {
+            Refreshed = false;
             Identity = (await _authState.GetAuthenticationStateAsync()).User;
             WorkTitle = $"Editing {ContentName}";
 
@@ -69,13 +71,8 @@ namespace BedBrigade.Client.Pages.Administration.Edit
 
             if (!int.TryParse(Location, out locationId))
             {
-                _toastService.Open(new ToastOptions
-                {
-                    Title = "Error",
-                    Content = $"Could not parse location as integer: {Location}",
-                    CssClass = "e-toast-danger",
-                    Icon = "e-error toast-icons"
-                });
+                _toastService.Error("Error",
+                    $"Could not parse location as integer: {Location}");
             }
 
             var contentResult = await _svcContent.GetAsync(ContentName, locationId);
@@ -89,16 +86,12 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             }
             else
             {
-                //https://www.syncfusion.com/forums/173239/how-to-keep-toast-visible-when-navigating-to-another-page
-                _toastService.Open(new ToastOptions
-                {
-                    Title = "Error",
-                    Content = $"Content not found for location {Location} with name of {ContentName}",
-                    CssClass = "e-toast-danger",
-                    Icon = "e-error toast-icons"
-                });
+                _toastService.Error("Error",
+                    $"Could not load Content for location {Location} with name of {ContentName}");
             }
         }
+
+
 
         private async Task HandleSaveClick()
         {
@@ -108,24 +101,14 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             var updateResult = await _svcContent.UpdateAsync(Content);
             if (updateResult.Success)
             {
-                _toastService.Open(new ToastOptions
-                {
-                    Title = "Content Saved",
-                    Content = $"Content saved for location {Location} with name of {ContentName}",
-                    CssClass = "e-toast-success",
-                    Icon = "e-success toast-icons"
-                });
+                _toastService.Success("Content Saved", 
+                    $"Content saved for location {Location} with name of {ContentName}");
                 _nm.NavigateTo("/administration/manage/pages");
             }
             else
             {
-                _toastService.Open(new ToastOptions
-                {
-                    Title = "Error",
-                    Content = $"Could not save Content for location {Location} with name of {ContentName}",
-                    CssClass = "e-toast-danger",
-                    Icon = "e-error toast-icons"
-                });
+                _toastService.Error("Error",
+                    $"Could not save Content for location {Location} with name of {ContentName}");
             }
             
         }

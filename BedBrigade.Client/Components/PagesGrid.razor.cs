@@ -88,11 +88,6 @@ namespace BedBrigade.Client.Components
             if (locResult.Success)
             {
                 Locations = locResult.Data;
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
-                if (item != null)
-                {
-                    Locations.Remove(item);
-                }
             }
 
             ContentTypes = GetContentTypeItems();
