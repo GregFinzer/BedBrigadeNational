@@ -100,25 +100,44 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Home";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml($"Home.html");
-                context.Content.Add(new Content
+                foreach (var location in context.Locations)
                 {
-                    LocationId = (int)LocationNumber.National,
-                    ContentType = ContentType.Home,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                });
+                    var seedHtml = GetHtml($"Home.html");
 
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
+                    switch (location.LocationId)
+                    {
+                        case (int)LocationNumber.National:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade");
+                            break;
+                        case (int)LocationNumber.GroveCity:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
+                            break;
+                        case (int)LocationNumber.RockCity:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
+                            break;
+                    }
+
+                    context.Content.Add(new Content
+                    {
+                        LocationId = location.LocationId!,
+                        ContentType = ContentType.Home,
+                        Name = name,
+                        ContentHtml = seedHtml,
+                        Title = name
+                    });
+
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in content {ex.Message}");
+                    }
                 }
             }
         }
+
         private static async Task SeedNewPageBody(DataContext context)
         {
             var name = "NewPage";
