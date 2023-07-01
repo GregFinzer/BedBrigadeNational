@@ -37,13 +37,13 @@ One thing you will notice about the following project plan is the lack of due da
     * Administration Dashboard :heavy_check_mark:
     * Edit Configuration :heavy_check_mark:
     * Edit Home Page
-    * Edit Header
-    * Edit Footer
+    * Edit Header :heavy_check_mark:
+    * Edit Footer :heavy_check_mark:
     
 * Manage Images and Videos
     * List Images and Videos :heavy_check_mark:
     * Upload Image :heavy_check_mark:
-    * View Image
+    * View Image :heavy_check_mark:
     * Delete Image :heavy_check_mark:
     * Rename Image :heavy_check_mark:
     * New Folder :heavy_check_mark:
@@ -63,7 +63,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Location List :heavy_check_mark:
     * Grove City Location Home Page
     * Polaris Location Home Page
-    * Bed Brigade Near Me
+    * Bed Brigade Near Me :heavy_check_mark:
     * Grove City Assembly Instructions
     * Polaris Assembly Instructions
     * Grove City Partners    
@@ -104,7 +104,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Delete User :heavy_check_mark:
     
 * News
-    * National News Sample Story :heavy_check_mark:
+    * National News Sample Story 
     * List of News
     * News Detail
     * Manage News
