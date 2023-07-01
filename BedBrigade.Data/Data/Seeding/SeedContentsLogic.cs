@@ -100,25 +100,30 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Home";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml($"Home.html");
-                context.Content.Add(new Content
+                foreach (var location in context.Locations)
                 {
-                    LocationId = (int)LocationNumber.National,
-                    ContentType = ContentType.Home,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                });
+                    var seedHtml = GetHtml($"Home.html");
+                    context.Content.Add(new Content
+                    {
+                        LocationId = location.LocationId!,
+                        ContentType = ContentType.Home,
+                        Name = name,
+                        ContentHtml = seedHtml,
+                        Title = name
+                    });
 
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in content {ex.Message}");
+                    }
                 }
             }
         }
+
         private static async Task SeedNewPageBody(DataContext context)
         {
             var name = "NewPage";
