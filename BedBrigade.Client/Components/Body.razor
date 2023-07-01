@@ -14,7 +14,7 @@
     [Inject] private IContentService _svcContent { get; set; }
     [Inject] private ILocationService _svcLocation {get; set; }
     [Inject] private NavigationManager _nm { get; set; }
-
+    [Inject] private ICachingService _caching { get; set; }
 
     string FileName { get; set; } = "NoImageFound.jpg";
     string LeftFileName { get; set; }
@@ -29,7 +29,7 @@
     List<string> HeaderFileNames { get; set; }
     List<string> FooterFileNames { get; set; }
 
-    const string ErrorImagePath = "media/national/pages/Error/left/NoImageFound.jpg";
+    
     const string Src = "src";
     const string Id = "id";
 
@@ -104,6 +104,7 @@
 
         try
         {
+            ImageRotatorLogic imageRotatorLogic = new ImageRotatorLogic();
             if(content == null)
             {
             }
@@ -118,20 +119,20 @@
                 LeftFileNames = GetLeftImages(Path);
                 MiddleFileNames = GetMiddleImages(Path);
                 RightFileNames = GetRightImages(Path);
-                LeftFileName = ComputeImageToDisplay(LeftFileNames);
-                MiddleFileName = ComputeImageToDisplay(MiddleFileNames);
-                RightFileName = ComputeImageToDisplay(RightFileNames);
+                LeftFileName = imageRotatorLogic.ComputeImageToDisplay(LeftFileNames);
+                MiddleFileName = imageRotatorLogic.ComputeImageToDisplay(MiddleFileNames);
+                RightFileName = imageRotatorLogic.ComputeImageToDisplay(RightFileNames);
 
             }
             if (content.HeaderMediaId != null)
             {
                 HeaderFileNames = GetHeaderImages(Path);
-                HeaderFileName = ComputeImageToDisplay(HeaderFileNames);
+                HeaderFileName = imageRotatorLogic.ComputeImageToDisplay(HeaderFileNames);
             }
             if (content.FooterMediaId != null)
             {
                 FooterFileNames = GetFooterImages(Path);
-                FooterFileName = ComputeImageToDisplay(FooterFileNames);
+                FooterFileName = imageRotatorLogic.ComputeImageToDisplay(FooterFileNames);
             }
             SetImagesAsync();
             Console.WriteLine($"Set active on {Menu}");
@@ -180,65 +181,53 @@
         File.Delete($"../BedBrigade.Client/pages/{fileName}");
     }
 
-    private string ComputeImageToDisplay(List<string> FileNames)
-    {
-        if (FileNames.Count > 0)
-        {
-            var unit = DateTime.Now.Hour * 2 + (DateTime.Now.Minute > 30 ? 1 : 0);
-            var imageIndex = unit % FileNames.Count;
-            return FileNames[imageIndex].Replace("wwwroot/", "");
-        }
-        return ErrorImagePath;
-    }
+
 
     private List<string> GetLeftImages(string path)
     {
-        if (PathExist($"{path}/Left"))
+        return GetImagesForArea(path, "Left");
+    }
+
+    private List<string> GetImagesForArea(string path, string area)
+    {
+        string directory = $"wwwroot/media/{path}/{area}";
+        directory = directory.Replace("//", "/");
+        string cacheKey = _caching.BuildCacheKey("Directory.GetFiles", directory);
+        List<string>? cachedFiles = _caching.Get<List<string>?>(cacheKey);
+        if (cachedFiles != null)
         {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Left").ToList();
+            return cachedFiles;
+        }
+
+        if (Directory.Exists(directory))
+        {
+            var fileNames = Directory.GetFiles(directory).ToList();
+            _caching.Set(cacheKey, fileNames);
             return fileNames;
         }
+
+        _caching.Set(cacheKey, new List<string>());
         return new List<string>();
     }
 
     private List<string> GetMiddleImages(string path)
     {
-        if (PathExist($"{path}/Middle"))
-        {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Middle").ToList();
-            return fileNames;
-        }
-        return new List<string>();
+        return GetImagesForArea(path, "Middle");
     }
 
     private List<string> GetRightImages(string path)
     {
-        if (PathExist($"{path}/Left"))
-        {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Right").ToList();
-            return fileNames;
-        }
-        return new List<string>();
+        return GetImagesForArea(path, "Right");
     }
 
     private List<string> GetHeaderImages(string path)
     {
-        if (PathExist($"{path}/Header"))
-        {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Header").ToList();
-            return fileNames;
-        }
-        return new List<string>();
+        return GetImagesForArea(path, "Header");
     }
 
     private List<string> GetFooterImages(string path)
     {
-        if (PathExist($"{path}/Footer"))
-        {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Footer").ToList();
-            return fileNames;
-        }
-        return new List<string>();
+        return GetImagesForArea(path, "Footer");
     }
 
 

@@ -15,7 +15,7 @@ namespace BedBrigade.Client.Components
         {
             if(!ImagePathExists(ImagePath) || string.IsNullOrEmpty(ImagePath))
             {
-                ImagePath = "National/pages/Error/Left";
+                ImagePath = "National/pages/Error/leftImageRotator";
             }
             FileNames = GetImages(ImagePath);
             FileName = ComputeImageToDisplay(FileNames);

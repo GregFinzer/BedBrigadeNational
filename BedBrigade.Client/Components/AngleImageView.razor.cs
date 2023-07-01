@@ -46,25 +46,25 @@ namespace BedBrigade.Client.Components
 
         private List<string> GetLeftImages(string path)
         {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Left").ToList();
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/leftImageRotator").ToList();
             return fileNames;
         }
 
         private List<string> GetMiddleImages(string path)
         {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Middle").ToList();
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/middleImageRotator").ToList();
             return fileNames;
         }
 
         private List<string> GetRightImages(string path)
         {
-            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/Right").ToList();
+            var fileNames = Directory.GetFiles($"wwwroot/media/{path}/rightImageRotator").ToList();
             return fileNames;
         }
 
         private bool PathExist(string path)
         {
-           if(Directory.Exists($"wwwroot/media/{path}/Left") && Directory.Exists($"wwwroot/media/{path}/Middle") && Directory.Exists($"wwwroot/media/{path}/Right"))
+           if(Directory.Exists($"wwwroot/media/{path}/leftImageRotator") && Directory.Exists($"wwwroot/media/{path}/middleImageRotator") && Directory.Exists($"wwwroot/media/{path}/rightImageRotator"))
             {
                 return true;
 
