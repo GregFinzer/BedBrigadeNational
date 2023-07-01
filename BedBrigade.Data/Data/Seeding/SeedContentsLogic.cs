@@ -103,6 +103,20 @@ namespace BedBrigade.Data.Data.Seeding
                 foreach (var location in context.Locations)
                 {
                     var seedHtml = GetHtml($"Home.html");
+
+                    switch (location.LocationId)
+                    {
+                        case (int)LocationNumber.National:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade");
+                            break;
+                        case (int)LocationNumber.GroveCity:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
+                            break;
+                        case (int)LocationNumber.RockCity:
+                            seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
+                            break;
+                    }
+
                     context.Content.Add(new Content
                     {
                         LocationId = location.LocationId!,
