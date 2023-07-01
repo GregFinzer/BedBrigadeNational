@@ -18,16 +18,13 @@ namespace BedBrigade.Data.Data.Seeding
                 // The following seed the content db
                 await SeedHeader(context);
                 await SeedFooter(context);
-                await SeedAboutUsBody(context);
-                await SeedHomePageBody(context);
-                await SeedDonateBody(context);
-                await SeedHistoryBody(context);
-                await SeedLocationsBody(context);
-                await SeedNewsBody(context);
-                await SeedPartnerBody(context);
-                await SeedAssemblyBody(context);
-                await SeedStoriesBody(context);
-                await SeedNewPageBody(context);
+                await SeedAboutPage(context);
+                await SeedHomePage(context);
+                await SeedDonatePage(context);
+                await SeedNationalHistoryPage(context);
+                await SeedNationalLocations(context);
+                await SeedGroveCityPartners(context);
+                await SeedAssemblyInstructions(context);
             }
         }
 
@@ -95,7 +92,7 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
         }
-        private static async Task SeedHomePageBody(DataContext context)
+        private static async Task SeedHomePage(DataContext context)
         {
             var name = "Home";
             if (!await context.Content.AnyAsync(c => c.Name == name))
@@ -138,82 +135,21 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedNewPageBody(DataContext context)
-        {
-            var name = "NewPage";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
 
-                    var seedHtml = GetHtml($"{name}.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "New Page"
-                    });
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
-
-
-
-        private static async Task SeedStoriesBody(DataContext context)
-        {
-            var name = "Stories";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
-                    var seedHtml = GetHtml("Stories.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "Stories"
-                    });
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
-
-        private static async Task SeedHistoryBody(DataContext context)
+        private static async Task SeedNationalHistoryPage(DataContext context)
         {
             var name = "History";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+                var seedHtml = GetHtml("History.html");
+                context.Content.Add(new Content
                 {
-                    var seedHtml = GetHtml("History.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "History of Bed Brigade"
-                    });
-                }
+                    LocationId = (int)LocationNumber.National,
+                    ContentType = ContentType.Body,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    Title = "History of Bed Brigade"
+                });
                 try
                 {
                     await context.SaveChangesAsync();
@@ -225,50 +161,21 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedLocationsBody(DataContext context)
+        private static async Task SeedNationalLocations(DataContext context)
         {
             var name = "Locations";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+                var seedHtml = GetHtml("Locations.html");
+                context.Content.Add(new Content
                 {
-                    var seedHtml = GetHtml("Locations.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "Locations"
-                    });
-                }
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
-        private static async Task SeedNewsBody(DataContext context)
-        {
-            var name = "News";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-                foreach (var location in context.Locations)
-                {
-                    var seedHtml = GetHtml("News.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "News"
-                    });
-                }
+                    LocationId = (int)LocationNumber.National,
+                    ContentType = ContentType.Body,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    Title = "Locations"
+                });
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -280,23 +187,24 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedPartnerBody(DataContext context)
+
+
+        private static async Task SeedGroveCityPartners(DataContext context)
         {
             var name = "Partners";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                foreach (var location in context.Locations)
+
+                var seedHtml = GetHtml("Partners.html");
+                context.Content.Add(new Content
                 {
-                    var seedHtml = GetHtml("Partners.html");
-                    context.Content.Add(new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "Partners"
-                    });
-                }
+                    LocationId = (int)LocationNumber.GroveCity,
+                    ContentType = ContentType.Body,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    Title = "Partners"
+                });
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -308,13 +216,19 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedAssemblyBody(DataContext context)
+        private static async Task SeedAssemblyInstructions(DataContext context)
         {
             var name = "Assembly";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 foreach (var location in context.Locations)
                 {
+                    //Assembly instructions are location specific
+                    if (location.LocationId == (int)LocationNumber.National)
+                    {
+                        continue;
+                    }
+
                     var seedHtml = GetHtml("Assembly.html");
                     context.Content.Add(new Content
                     {
@@ -335,13 +249,12 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
         }
-        private static async Task SeedAboutUsBody(DataContext context)
+        private static async Task SeedAboutPage(DataContext context)
         {
             var name = "AboutUs";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var seedHtml = GetHtml("Aboutus.html");
-                //var location = await context.Locations.FirstAsync(l => l.Route.ToLower() == SeedConstants.SeedLocationNational);
                 foreach (var location in context.Locations)
                 {
                     context.Content.Add(new Content
@@ -364,13 +277,17 @@ namespace BedBrigade.Data.Data.Seeding
             }   
         }
 
-        private static async Task SeedDonateBody(DataContext context)
+        private static async Task SeedDonatePage(DataContext context)
         {
             var name = "Donate";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 foreach (var location in context.Locations)
                 {
+                    //We don't take donations at the national level
+                    if (location.LocationId == (int)LocationNumber.National)
+                        continue;
+
                     var seedHtml = GetHtml("Donate.html");
                     context.Content.Add(new Content
                     {
@@ -391,10 +308,5 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
         }
-
-
-
-
-
     }
 }
