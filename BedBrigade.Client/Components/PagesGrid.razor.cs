@@ -305,26 +305,27 @@ namespace BedBrigade.Client.Components
             {
                 ChangeTitle(values.Name, page.Title);
             }
-            if (page.HeaderMediaId != values.HeaderMediaId)
-            {
-                ChangeMediaId(values.Name, values.HeaderMediaId, page.HeaderMediaId);
-            }
-            if (page.FooterMediaId != values.FooterMediaId)
-            {
-                ChangeMediaId(values.Name, values.FooterMediaId, page.FooterMediaId);
-            }
-            if (page.LeftMediaId != values.LeftMediaId)
-            {
-                ChangeMediaId(values.Name, values.LeftMediaId, page.LeftMediaId);
-            }
-            if (page.MiddleMediaId != values.MiddleMediaId)
-            {
-                ChangeMediaId(values.Name, values.MiddleMediaId, page.MiddleMediaId);
-            }
-            if (page.RightMediaId != values.RightMediaId)
-            {
-                ChangeMediaId(values.Name, values.RightMediaId, page.RightMediaId);
-            }
+            //TODO:  Tech Debt - Need to add logic to check for changes in media
+            //if (page.HeaderMediaId != values.HeaderMediaId)
+            //{
+            //    ChangeMediaId(values.Name, values.HeaderMediaId, page.HeaderMediaId);
+            //}
+            //if (page.FooterMediaId != values.FooterMediaId)
+            //{
+            //    ChangeMediaId(values.Name, values.FooterMediaId, page.FooterMediaId);
+            //}
+            //if (page.LeftMediaId != values.LeftMediaId)
+            //{
+            //    ChangeMediaId(values.Name, values.LeftMediaId, page.LeftMediaId);
+            //}
+            //if (page.MiddleMediaId != values.MiddleMediaId)
+            //{
+            //    ChangeMediaId(values.Name, values.MiddleMediaId, page.MiddleMediaId);
+            //}
+            //if (page.RightMediaId != values.RightMediaId)
+            //{
+            //    ChangeMediaId(values.Name, values.RightMediaId, page.RightMediaId);
+            //}
             // This if must be the last
             if (page.Name != values.Name)
             {

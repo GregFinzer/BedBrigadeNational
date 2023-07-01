@@ -107,11 +107,6 @@ namespace BedBrigade.Data.Data.Seeding
                     ContentType = ContentType.Home,
                     Name = name,
                     ContentHtml = seedHtml,
-                    LeftMediaId = "",
-                    MiddleMediaId = "",
-                    RightMediaId = "",
-                    HeaderMediaId = "headerImageRotator",
-                    FooterMediaId = "footerImageRotator"
                 });
 
                 try
@@ -139,17 +134,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "New Page"
                     });
-                    var leftPath = $"{location.Route}/pages/NewPage/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/NewPage/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/NewPage/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -178,17 +164,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "Stories"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -215,18 +192,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "History of Bed Brigade"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
-
                 }
                 try
                 {
@@ -253,17 +220,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "Locations"
                     });
-                    var leftPath = $"{location.Route}";
-                    var middlePath = $"{location.Route}";
-                    var rightPath = $"{location.Route}";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -289,17 +247,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "News"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -326,17 +275,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "Partners"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -363,17 +303,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "Assembly Instructions"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -400,17 +331,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "About Us"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
@@ -437,17 +359,8 @@ namespace BedBrigade.Data.Data.Seeding
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
-                        LeftMediaId = "leftImageRotator",
-                        MiddleMediaId = "middleImageRotator",
-                        RightMediaId = "rightImageRotator",
                         Title = "Donate To Beed Brigade"
                     });
-                    var leftPath = $"{location.Route}/pages/{name}/leftImageRotator";
-                    var middlePath = $"{location.Route}/pages/{name}/middleImageRotator";
-                    var rightPath = $"{location.Route}/pages/{name}/rightImageRotator";
-                    leftPath.CreateDirectory();
-                    middlePath.CreateDirectory();
-                    rightPath.CreateDirectory();
                 }
                 try
                 {
