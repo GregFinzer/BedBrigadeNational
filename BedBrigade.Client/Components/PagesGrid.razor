@@ -56,11 +56,6 @@ else
                             <GridColumn Field=@nameof(Content.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridForeignColumn Field=@nameof(Content.ContentType) ForeignDataSource=@ContentTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Type" ShowColumnMenu="false" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Content.LeftMediaId) ShowColumnMenu="false" HeaderText="LeftMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Content.MiddleMediaId) ShowColumnMenu="false" HeaderText="MiddleMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Content.RightMediaId) ShowColumnMenu="false" HeaderText="RightMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Content.HeaderMediaId) ShowColumnMenu="false" HeaderText="HeaderMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Content.FooterMediaId) ShowColumnMenu="false" HeaderText="FooterMediaId" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.UpdateUser) ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" Format="###.##" AllowEditing="false" AllowFiltering="false" Width="15" />
                             <GridColumn Field=@nameof(Content.UpdateDate) ShowColumnMenu="false" HeaderText="Updated On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="15" />
                         </GridColumns>

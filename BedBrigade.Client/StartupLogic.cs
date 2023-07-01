@@ -112,6 +112,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IMediaService, MediaService>();
             builder.Services.AddScoped<IDonationService, DonationService>();
             builder.Services.AddScoped<IBedRequestService, BedRequestService>();
+            builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

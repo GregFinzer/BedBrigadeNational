@@ -13,32 +13,15 @@
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private IContentService _svcContent { get; set; }
     [Inject] private ILocationService _svcLocation {get; set; }
-    [Inject] private NavigationManager _nm { get; set; }
-    [Inject] private ICachingService _caching { get; set; }
+    [Inject] private NavigationManager _navigationManager { get; set; }
+    [Inject] private ILoadImagesService _loadImagesService { get; set; }
 
     string FileName { get; set; } = "NoImageFound.jpg";
-    string LeftFileName { get; set; }
-    string MiddleFileName { get; set; }
-    string RightFileName { get; set; }
-    string HeaderFileName { get; set; }
-    string FooterFileName { get; set; }
-    string Caption { get; set; }
-    List<string> LeftFileNames { get; set; }
-    List<string> MiddleFileNames { get; set; }
-    List<string> RightFileNames { get; set; }
-    List<string> HeaderFileNames { get; set; }
-    List<string> FooterFileNames { get; set; }
 
-    
-    const string Src = "src";
-    const string Id = "id";
 
     private Content content { get; set; }
     private string BodyContent = string.Empty;
     private string[] routePath;
-    protected string Login = "login";
-    private ClaimsPrincipal Identity { get; set; }
-    private bool IsAuthenicated { get; set; } = false;
     private string Menu { get; set; }
     private string Path { get; set; }
 
@@ -54,7 +37,7 @@
 
     public async Task LoadBody()
     {
-        var url = _nm.Uri;
+        var url = _navigationManager.Uri;
         var PageName = string.Empty;
         var Location = string.Empty;
         var routePath = url.Split('/');
@@ -65,7 +48,7 @@
         }
         else if (routePath.Length < 5)
         {
-            _nm.NavigateTo("/National/Sorry", true);
+            _navigationManager.NavigateTo("/National/Sorry", true);
             return;
         }
         else
@@ -84,8 +67,10 @@
             if (contentResult.Success)
             {
                 content = contentResult.Data;
-                BodyContent = contentResult.Data.ContentHtml;
-                await RandomizeImagesAsync();
+                string html = _loadImagesService.SetImagesForHtml(Path, contentResult.Data.ContentHtml);
+                BodyContent = html;
+                Console.WriteLine($"Set active on {Menu}");
+                await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
                 Menu = FindMenu();
                 if (string.IsNullOrEmpty(Menu))
                 {
@@ -94,157 +79,15 @@
             }
             else
             {
-                _nm.NavigateTo("/National/Sorry", true);
+                _navigationManager.NavigateTo("/National/Sorry", true);
             }
         }
-    }
-
-    protected async Task RandomizeImagesAsync()
-    {
-
-        try
-        {
-            ImageRotatorLogic imageRotatorLogic = new ImageRotatorLogic();
-            if(content == null)
-            {
-            }
-            const string startPath = "wwwroot/";
-            if (!PathExist(Path))
-            {
-                Path = "National/pages/Error/";
-                Caption = "Image Files Do Not Exist";
-            }
-            if (content.LeftMediaId != null || content.MiddleMediaId != null || content.RightMediaId != null)
-            {
-                LeftFileNames = GetLeftImages(Path);
-                MiddleFileNames = GetMiddleImages(Path);
-                RightFileNames = GetRightImages(Path);
-                LeftFileName = imageRotatorLogic.ComputeImageToDisplay(LeftFileNames);
-                MiddleFileName = imageRotatorLogic.ComputeImageToDisplay(MiddleFileNames);
-                RightFileName = imageRotatorLogic.ComputeImageToDisplay(RightFileNames);
-
-            }
-            if (content.HeaderMediaId != null)
-            {
-                HeaderFileNames = GetHeaderImages(Path);
-                HeaderFileName = imageRotatorLogic.ComputeImageToDisplay(HeaderFileNames);
-            }
-            if (content.FooterMediaId != null)
-            {
-                FooterFileNames = GetFooterImages(Path);
-                FooterFileName = imageRotatorLogic.ComputeImageToDisplay(FooterFileNames);
-            }
-            SetImagesAsync();
-            Console.WriteLine($"Set active on {Menu}");
-            await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
-        }
-        catch(Exception ex)
-        {
-                _nm.NavigateTo("/sorry", true);
-        }
-    }
-
-    private void SetImagesAsync()
-    {  
-        var doc = new HtmlDocument();
-        doc.LoadHtml(BodyContent);
-        var nodes = doc.DocumentNode.SelectNodes("//img");
-        foreach(var node in nodes)
-        {
-            if (node.Attributes[Id] != null)
-            {
-                if (node.Attributes[Id].Value == content.LeftMediaId)
-                {
-                    node.Attributes[Src].Value = LeftFileName;
-                }
-                else if (node.Attributes[Id].Value == content.MiddleMediaId)
-                {
-                    node.Attributes[Src].Value = MiddleFileName;
-                }
-                else if (node.Attributes[Id].Value == content.RightMediaId)
-                {
-                    node.Attributes[Src].Value = RightFileName;
-                }
-                else if (node.Attributes[Id].Value == content.HeaderMediaId)
-                {
-                    node.Attributes[Src].Value = HeaderFileName;
-                }
-                else if (node.Attributes[Id].Value == content.FooterMediaId)
-                {
-                    node.Attributes[Src].Value = FooterFileName;
-                }
-            }
-        }
-        var fileName = (($"{DateTime.UtcNow}.html").Replace("/", "").Replace(" ", "")).Replace(":", "");
-        doc.Save($"../BedBrigade.Client/pages/{fileName}");
-        BodyContent = File.ReadAllText($"../BedBrigade.Client/pages/{fileName}");
-        File.Delete($"../BedBrigade.Client/pages/{fileName}");
-    }
-
-
-
-    private List<string> GetLeftImages(string path)
-    {
-        return GetImagesForArea(path, "Left");
-    }
-
-    private List<string> GetImagesForArea(string path, string area)
-    {
-        string directory = $"wwwroot/media/{path}/{area}";
-        directory = directory.Replace("//", "/");
-        string cacheKey = _caching.BuildCacheKey("Directory.GetFiles", directory);
-        List<string>? cachedFiles = _caching.Get<List<string>?>(cacheKey);
-        if (cachedFiles != null)
-        {
-            return cachedFiles;
-        }
-
-        if (Directory.Exists(directory))
-        {
-            var fileNames = Directory.GetFiles(directory).ToList();
-            _caching.Set(cacheKey, fileNames);
-            return fileNames;
-        }
-
-        _caching.Set(cacheKey, new List<string>());
-        return new List<string>();
-    }
-
-    private List<string> GetMiddleImages(string path)
-    {
-        return GetImagesForArea(path, "Middle");
-    }
-
-    private List<string> GetRightImages(string path)
-    {
-        return GetImagesForArea(path, "Right");
-    }
-
-    private List<string> GetHeaderImages(string path)
-    {
-        return GetImagesForArea(path, "Header");
-    }
-
-    private List<string> GetFooterImages(string path)
-    {
-        return GetImagesForArea(path, "Footer");
-    }
-
-
-    private bool PathExist(string path)
-    {
-        if (Directory.Exists($"wwwroot/media/{path}"))
-        {
-            return true;
-
-        }
-        return false;
     }
 
 
     protected string FindMenu()
     {
-        var location = _nm.Uri.Split('/');
+        var location = _navigationManager.Uri.Split('/');
         if(location.Length <= 4)
         {
             return "home";
