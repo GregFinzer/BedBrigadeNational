@@ -10,6 +10,7 @@ using Syncfusion.Blazor.Notifications;
 using System.Linq;
 using System.Security.Claims;
 using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using static BedBrigade.Common.Common;
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
@@ -18,9 +19,9 @@ namespace BedBrigade.Client.Components
 {
     public partial class DonationGrid : ComponentBase
     {
-        [Inject] private IDonationService? _svcDonation { get; set; }
-        [Inject] private IUserService? _svcUser { get; set; }
-        [Inject] private ILocationService? _svcLocation { get; set; }
+        [Inject] private IDonationDataService? _svcDonation { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private IMessageService? _messageService { get; set; }
 
@@ -114,7 +115,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = await Grid.GetPersistDataAsync() });
+            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.Donation, UserState = await Grid.GetPersistDataAsync() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -128,7 +129,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Donation, UserState = _state });
+            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Donation, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -155,7 +156,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Donation, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Donation, UserState = _state });
                 return;
             }
 

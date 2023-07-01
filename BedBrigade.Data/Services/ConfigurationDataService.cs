@@ -76,23 +76,23 @@ public class ConfigurationDataService : IConfigurationDataService
         return new ServiceResponse<List<Configuration>>("Not Found");
     }
 
-    public async Task<ServiceResponse<bool>> DeleteAsync(string configurationkey)
+    public async Task<ServiceResponse<bool>> DeleteAsync(string configurationKey)
     {
-        var config = await _context.Configurations.FindAsync(configurationkey);
+        var config = await _context.Configurations.FindAsync(configurationKey);
         if (config == null)
         {
-            return new ServiceResponse<bool>($"Configuration record with key {configurationkey} not found");
+            return new ServiceResponse<bool>($"Configuration record with key {configurationKey} not found");
         }
         try
         {
             _context.Configurations.Remove(config);
             await _context.SaveChangesAsync();
             _cachingService.ClearAll();
-            return new ServiceResponse<bool>($"Removed record with key {configurationkey}.", true);
+            return new ServiceResponse<bool>($"Removed record with key {configurationKey}.", true);
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"DB error on delete of configuration record with key {configurationkey} - {ex.Message} ({ex.ErrorCode})");
+            return new ServiceResponse<bool>($"DB error on delete of configuration record with key {configurationKey} - {ex.Message} ({ex.ErrorCode})");
         }
     }
 

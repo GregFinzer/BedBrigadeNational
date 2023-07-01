@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
+using BedBrigade.Data.Services;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 
@@ -13,8 +14,8 @@ namespace BedBrigade.Client.Components
 {
     public partial class ConfigurationGrid : ComponentBase
     {
-        [Inject] private IConfigurationService? _svcConfiguration { get; set; }
-        [Inject] private IUserService? _svcUser { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -93,7 +94,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Configuration, UserState = await Grid.GetPersistData() })!;
+            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.Configuration, UserState = await Grid.GetPersistData() })!;
             if (result.Success)
             {
                 await Grid.SetPersistDataAsync(result.Data);
@@ -107,7 +108,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Configuration, UserState = _state });
+            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Configuration, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -122,7 +123,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Configuration, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Configuration, UserState = _state });
                 return;
             }
 
@@ -175,7 +176,7 @@ namespace BedBrigade.Client.Components
             List<Configuration> records = await Grid.GetSelectedRecordsAsync();
             foreach (var rec in records)
             {
-                var deleteResult = await _svcConfiguration.DeleteConfigAsync(rec.ConfigurationKey);
+                var deleteResult = await _svcConfiguration.DeleteAsync(rec.ConfigurationKey);
                 ToastTitle = "Delete Configuration";
                 if (deleteResult.Success)
                 {
@@ -219,7 +220,7 @@ namespace BedBrigade.Client.Components
             else
             {
                 // new Configuration
-                var createResult = await _svcConfiguration.CreateConfigAsync(Configuration);
+                var createResult = await _svcConfiguration.CreateAsync(Configuration);
                 if (createResult.Success)
                 {
                     Configuration config = createResult.Data;

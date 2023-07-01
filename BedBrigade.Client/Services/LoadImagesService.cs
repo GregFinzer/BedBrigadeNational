@@ -1,7 +1,8 @@
 ﻿using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using HtmlAgilityPack;
 
-namespace BedBrigade.Data.Services
+namespace BedBrigade.Client.Services
 {
     public class LoadImagesService : ILoadImagesService
     {

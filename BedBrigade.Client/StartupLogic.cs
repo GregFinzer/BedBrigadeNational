@@ -103,15 +103,15 @@ namespace BedBrigade.Client
             builder.Services.AddSingleton<ICachingService, CachingService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
-            builder.Services.AddScoped<ILocationService, LocationService>();
-            builder.Services.AddScoped<IContentService, ContentService>();
-            builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-            builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
-            builder.Services.AddScoped<IMediaService, MediaService>();
-            builder.Services.AddScoped<IDonationService, DonationService>();
-            builder.Services.AddScoped<IBedRequestService, BedRequestService>();
+            //builder.Services.AddScoped<IUserService, UserService>();
+            //builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
+            //builder.Services.AddScoped<ILocationService, LocationService>();
+            //builder.Services.AddScoped<IContentService, ContentService>();
+            //builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+            //builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
+            //builder.Services.AddScoped<IMediaService, MediaService>();
+            //builder.Services.AddScoped<IDonationService, DonationService>();
+            //builder.Services.AddScoped<IBedRequestService, BedRequestService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 

@@ -7,8 +7,8 @@
 @code {
     // Client
     private string footerContent = string.Empty;
-    [Inject] private IContentService _svcContent { get; set; }
-    [Inject] private ILocationService _svcLocation { get; set; }
+    [Inject] private IContentDataService _svcContent { get; set; }
+    [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] NavigationManager _nm { get; set; }
     protected override async Task OnInitializedAsync()
     {

@@ -10,14 +10,15 @@ using Newtonsoft.Json;
 using Microsoft.JSInterop;
 using System.Linq.Expressions;
 using BedBrigade.Common;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client.Components
 {
     public partial class FileManager: ComponentBase
     {
        // Data Services
-        [Inject] private IConfigurationService? _svcConfiguration { get; set; }
-        [Inject] private ILocationService? _svcLocation { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
 
