@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using BedBrigade.Client.Components;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client.Pages.Administration.Edit
 {
     public partial class EditContent : ComponentBase
     {
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-        [Inject] private IContentService _svcContent { get; set; }
+        [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Parameter] public string Location { get; set; }

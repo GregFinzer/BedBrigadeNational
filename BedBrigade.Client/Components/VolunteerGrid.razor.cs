@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using BedBrigade.Data.Models;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -15,10 +16,10 @@ namespace BedBrigade.Client.Components
 {
     public partial class VolunteerGrid : ComponentBase
     {
-        [Inject] private IVolunteerService? _svcVolunteer { get; set; }
-        [Inject] private IVolunteerForService? _svcVolunteerFor { get; set; }
-        [Inject] private IUserService? _svcUser { get; set; }
-        [Inject] private ILocationService _svcLocation { get; set; }
+        [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
+        [Inject] private IVolunteerForDataService? _svcVolunteerFor { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -159,7 +160,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = await Grid.GetPersistData() });
+            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -178,7 +179,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
+            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -193,7 +194,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Volunteer, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Volunteer, UserState = _state });
                 return;
             }
 

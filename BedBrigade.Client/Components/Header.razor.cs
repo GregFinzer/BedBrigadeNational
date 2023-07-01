@@ -1,5 +1,6 @@
 using BedBrigade.Client.Services;
 using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -10,8 +11,8 @@ namespace BedBrigade.Client.Components
     {
         // Client
         [Inject] private IJSRuntime _js { get; set; }
-        [Inject] private IContentService _svcContent { get; set; }
-        [Inject] private ILocationService _svcLocation { get; set; }
+        [Inject] private IContentDataService _svcContent { get; set; }
+        [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
 

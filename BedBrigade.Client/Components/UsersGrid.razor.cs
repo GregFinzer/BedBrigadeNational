@@ -7,6 +7,7 @@ using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
+using BedBrigade.Data.Services;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 
@@ -15,9 +16,9 @@ namespace BedBrigade.Client.Components
 
     public partial class UsersGrid : ComponentBase
     {
-        [Inject] private IUserService _svcUser { get; set; }
+        [Inject] private IUserDataService _svcUser { get; set; }
         [Inject] private IAuthService _svcAuth { get; set; }
-        [Inject] private ILocationService _svcLocation { get; set; }
+        [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
 
@@ -89,7 +90,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = await Grid.GetPersistData() });
+            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.User, UserState = await Grid.GetPersistData() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -109,7 +110,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.User, UserState = _state });
+            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.User, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -140,7 +141,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.User, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.User, UserState = _state });
                 return;
             }
 
@@ -341,7 +342,7 @@ namespace BedBrigade.Client.Components
             List<User> records = await Grid.GetSelectedRecords();
             foreach (var rec in records)
             {
-                var deleted = await _svcUser.DeleteUserAsync(rec.UserName);
+                var deleted = await _svcUser.DeleteAsync(rec.UserName);
                 if (deleted.Success)
                 {
                     ToastTitle = "Delete User";

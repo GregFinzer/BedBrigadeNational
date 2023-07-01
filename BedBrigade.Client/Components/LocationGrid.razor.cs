@@ -10,14 +10,15 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 using static BedBrigade.Common.Extensions;
 using ContentType = BedBrigade.Common.Common.ContentType;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client.Components
 {
     public partial class LocationGrid : ComponentBase
     {
-        [Inject] private ILocationService? _svcLocation { get; set; }
-        [Inject] private IContentService? _svcContent { get; set; }
-        [Inject] private IUserService? _svcUser { get; set; }
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
+        [Inject] private IContentDataService? _svcContent { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -102,7 +103,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetPersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistDataAsync() });
+            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.Location, UserState = await Grid.GetPersistDataAsync() });
             if (result.Success)
             {
                 await Grid.SetPersistData(result.Data);
@@ -116,7 +117,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnDestroyed()
         {
             _state = await Grid.GetPersistData();
-            var result = await _svcUser.SavePersistAsync(new Persist { GridId = (int)PersistGrid.Location, UserState = _state });
+            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Location, UserState = _state });
             if (!result.Success)
             {
                 //Log the results
@@ -131,7 +132,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SavePersistAsync(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
                 return;
             }
 

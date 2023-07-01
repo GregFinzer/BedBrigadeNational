@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Data.Services;
+﻿namespace BedBrigade.Client.Services;
 
 public interface ILoadImagesService
 {

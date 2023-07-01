@@ -17,16 +17,17 @@ using BedBrigade.Client.Pages.Administration.Manage;
 using System.Linq.Expressions;
 using System.Drawing.Imaging;
 using static BedBrigade.Common.Common;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client.Components
 {
     public partial class MediaGrid : ComponentBase
     {
         // Data Services
-        [Inject] private IConfigurationService? _svcConfiguration { get; set; }
-        [Inject] private ILocationService? _svcLocation { get; set; }
-        [Inject] private IUserService? _svcUser { get; set; }
-        [Inject] private IMediaService? _svcMedia { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private IMediaDataService? _svcMedia { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         // Syncfusion Grid variables
