@@ -31,6 +31,19 @@ public class FileUseEnumItem
 
 }
 
+public class EventTypeEnumItem // added by VS 7/1/2023
+{
+    public EventType Value { get; set; }
+    public string? Name { get; set; }
+
+}
+public class EventStatusEnumItem // added by VS 7/1/2023
+{
+    public EventStatus Value { get; set; }
+    public string? Name { get; set; }
+
+}
+
 public static class Common
 {
     public enum ContentType 
@@ -39,6 +52,25 @@ public static class Common
         Footer = 2,
         Body = 3,
         Home = 4,
+    }
+
+    public enum EventType // added by VS 7/1/2023
+    {
+        NA = 0,
+        Cut = 1,
+        Build = 2,
+        Delivery = 3,
+        Other = 4,
+    }
+
+    public enum EventStatus // added by VS 7/1/2023
+    {
+        Scheduled = 1,
+        Rescheduled = 2,
+        Hold = 3,
+        Postponed = 4,
+        Completed = 5,
+        Canceled = 6,
     }
 
     public enum PersistGrid
@@ -51,8 +83,8 @@ public static class Common
         Content = 6,
         BedRequest = 7,
         Media = 8,
-        Pages = 9
-
+        Pages = 9, 
+        Schedule = 10  // added by VS 7/1/2023
     }
 
     public enum BedRequestStatus
@@ -61,6 +93,24 @@ public static class Common
        Scheduled = 2,
        Delivered = 3,
     }
+
+    /// <summary>
+    /// Get a list of Enum Items suitable for a dropdown list from the EventTypeEnumItems
+    /// </summary>
+    /// <returns>List<EnumItem></EnumItem></returns>
+    public static List<EventTypeEnumItem> GetEventTypeItems() // added by VS 7/1/2023
+    {
+        var type = typeof(EventType);
+        return Enum.GetValues(type).OfType<EventType>().ToList()
+                        .Select(x => new EventTypeEnumItem
+                        {
+                            Value = (EventType)x,
+                            Name = Enum.GetName(type, x)
+                        })
+                        .ToList();
+    }
+
+   
 
     /// <summary>
     /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
@@ -78,12 +128,24 @@ public static class Common
                         .ToList();
     }
 
+    public static List<EventStatusEnumItem> GetEventStatusItems() // added by VS 7/1/2023
+    {
+        var type = typeof(EventStatus);
+        return Enum.GetValues(type).OfType<EventStatus>().ToList()
+                        .Select(x => new EventStatusEnumItem
+                        {
+                            Value = (EventStatus)x,
+                            Name = Enum.GetName(type, x)
+                        })
+                        .ToList();
+    } // Get Event Status Items
 
-    /// <summary>
-    /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
-    /// </summary>
-    /// <returns>List<EnumItem></EnumItem></returns>
-    public static List<BedRequestEnumItem> GetBedRequestStatusItems()
+
+        /// <summary>
+        /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
+        /// </summary>
+        /// <returns>List<EnumItem></EnumItem></returns>
+        public static List<BedRequestEnumItem> GetBedRequestStatusItems()
     {
         var type = typeof(BedRequestStatus);
         return Enum.GetValues(type).OfType<BedRequestStatus>().ToList()

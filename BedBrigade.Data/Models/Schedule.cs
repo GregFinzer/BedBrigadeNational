@@ -3,23 +3,33 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Data.Models
 {
-	[Table("Schedules")]
-	public class Schedule : BaseEntity
+    [Table("Schedules")]
+    public class Schedule : BaseEntity
     {
-		[Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        // identification ans relationships (2)
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]                
         public Int32 ScheduleId { get; set; }
-
-		public Location Location { get; set; } = new Location();
-
+        [ForeignKey("LocationId")]
+        public Int32 LocationId { get; set; }
+        // Event Description (3)
+        [Required, MaxLength(50)]
+        public string? EventName { get; set; } = string.Empty;
+          [MaxLength(4000)]
+        public String? EventNote { get; set; } = string.Empty;
+        [MaxLength(50)]
+        public string? GroupName { get; set; } = string.Empty;
+        // Event Type & Status (2)
+        public Byte EventType { get; set; } = 0;
+        public Byte EventStatus { get; set; } = 1;
+        // Event Dates (2)
         [Required]
-        public DateTime Date { get; set; }
-        
-        [Required]
-		[MaxLength(30)]
-		public String ScheduleType { get; set; } = string.Empty;
-
-        [MaxLength(4000)]
-        public String? Notes { get; set; } = string.Empty;
+        public DateTime EventDateScheduled { get; set; }
+        public DateTime EventDateCompleted { get; set; }
+        // Event Resources  (3)          
+        public Byte VehiclesDeliveryMax { get; set; } = 0;
+        public Byte VehiclesNormalMax { get; set; } = 0;
+        public Byte VolunteersMax { get; set; } = 0;
     }
 }
+
