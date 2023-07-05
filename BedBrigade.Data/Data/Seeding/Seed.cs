@@ -98,9 +98,10 @@ public class Seed
 
     private static async Task SeedConfigurations(IDbContextFactory<DataContext> contextFactory)
     {
+        Log.Logger.Information("SeedConfigurations Started");
+
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedConfigurations Started");
             if (await context.Configurations.AnyAsync()) return;
 
             var configurations = new List<Configuration>
@@ -191,9 +192,10 @@ public class Seed
     /// <returns></returns>
     private static async Task SeedLocations(IDbContextFactory<DataContext> contextFactory)
     {
+        Log.Logger.Information("SeedLocations Started");
+
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedLocations Started");
             if (await context.Locations.AnyAsync()) return;
 
             try
@@ -216,9 +218,10 @@ public class Seed
 
     private static async Task SeedMedia(IDbContextFactory<DataContext> contextFactory)
     {
+        Log.Logger.Information("SeedMedia Started");
+
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedMedia Started");
             try
             {
                 if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
@@ -255,9 +258,10 @@ public class Seed
 
     private static async Task SeedRoles(IDbContextFactory<DataContext> _contextFactory)
     {
+        Log.Logger.Information("SeedRoles Started");
+
         using (var context = _contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedRoles Started");
             if (await context.Roles.AnyAsync()) return;
             try
             {
@@ -273,9 +277,10 @@ public class Seed
     }
     private static async Task SeedUser(IDbContextFactory<DataContext> _contextFactory)
     {
+        Log.Logger.Information("SeedUser Started");
+
         using (var context = _contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedUser Started");
             foreach (var user in _users)
             {
                 if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
@@ -338,9 +343,10 @@ public class Seed
 
     private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> contextFactory)
     {
+        Log.Logger.Information("SeedVolunteersFor Started");
+
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedVolunteersFor Started");
             if (await context.VolunteersFor.AnyAsync()) return;
             List<VolunteerFor> VolunteeringFor = new List<VolunteerFor>
             {
@@ -365,9 +371,10 @@ public class Seed
     }
     private static async Task SeedVolunteers(IDbContextFactory<DataContext> contextFactory)
     {
+        Log.Logger.Information("SeedVolunteers Started");
+
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("SeedVolunteers Started");
             if (await context.Volunteers.AnyAsync()) return;
 
             List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
@@ -422,9 +429,10 @@ public class Seed
     {
         try
         {
+            Log.Logger.Information("SeedDonations Started");
+
             using (var context = contextFactory.CreateDbContext())
             {
-                Log.Logger.Information("SeedDonations Started");
                 if (await context.Donations.AnyAsync()) return;
 
                 List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
@@ -473,9 +481,10 @@ public class Seed
     {
         try
         {
+            Log.Logger.Information("Seed BedRequest Started");
+
             using (var context = contextFactory.CreateDbContext())
             {
-                Log.Logger.Information("Seed BedRequest Started");
                 if (await context.BedRequests.AnyAsync()) return;
 
                 List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
