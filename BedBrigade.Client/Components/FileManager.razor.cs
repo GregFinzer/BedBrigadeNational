@@ -20,6 +20,13 @@ namespace BedBrigade.Client.Components
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
+
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        [Parameter]
+        public string FolderPath { get; set; } = String.Empty;
+
         private ClaimsPrincipal? Identity { get; set; }
 
         public SfFileManager<FileManagerDirectoryContent>? fileManager;
@@ -54,7 +61,11 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-           
+            if (String.IsNullOrEmpty(FolderPath))
+            {
+                FolderPath = MediaRoot;
+            }
+
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
             userName = Identity.Identity.Name;
@@ -90,17 +101,39 @@ namespace BedBrigade.Client.Components
                 MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];
                 MainAdminFolder = dctConfiguration[SubfolderKey];
 
-                if (userLocationId == (int) LocationNumber.National)
+                if (userLocationId == (int)LocationNumber.National)
                 {
                     userRoute = MainAdminFolder;
                 }
-
             }
 
-            await CheckLocationFolders();
+            //if (String.IsNullOrEmpty(FolderPath))
+            //{
+            //    await CheckLocationFolders();
+            //}
 
         } // Init
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            //if (firstRender)
+            //{
+            //    if (fileManager != null && !String.IsNullOrEmpty(FolderPath))
+            //    {
+            //        fileManager.Path = FolderPath;
+            //    }
+            //}
+        }
+
+        public async Task SetFileManagerPath(string folderPath)
+        {
+            //if (fileManager != null && !String.IsNullOrEmpty(folderPath))
+            //{
+            //    fileManager.Path = folderPath;
+            //    await fileManager.RefreshLayoutAsync();
+            //}
+        }
+        
         private async Task CheckLocationFolders()
         { // Loop in location list & create location folder, if not exist
 
@@ -352,7 +385,7 @@ namespace BedBrigade.Client.Components
 
             try
             {
-                if (args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
+                if (args.FileDetails != null && args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
                 {
                     previewFileName = args.FileDetails.Name;
                     previewFileUrl = NavigationManager.BaseUri.ToString() + dctConfiguration[ConfigNames.MediaFolder];

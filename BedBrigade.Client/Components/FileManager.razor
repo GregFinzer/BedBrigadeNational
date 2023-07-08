@@ -5,52 +5,55 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime jsRuntime
 
-<div class="row"><div class="col">&nbsp;</div></div>
-<div class="row">
-        <div class="col">
-           <h3>Media File Manager</h3>
-         </div>
-         <div class="col" style="text-align:right; font-size: small">                          
-              <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-                 @if (isLocationAdmin)
-                {
-                <span>[Folder: @userRoute]</span>
-                }
-                <br />@userName
-          </div>
-</div> 
-          
+@if (ShowHeader)
+{
+    <div class="row"><div class="col">&nbsp;</div></div>
+    <div class="row">
+            <div class="col">
+               <h3>Media File Manager</h3>
+             </div>
+             <div class="col" style="text-align:right; font-size: small">                          
+                  <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
+                     @if (isLocationAdmin)
+                    {
+                    <span>[Folder: @userRoute]</span>
+                    }
+                    <br />@userName
+              </div>
+    </div> 
+}   
 <div class="row">
 <div class="col-md-12">
 <div class="control-section">
-            <SfFileManager @ref="fileManager"
-                TValue="FileManagerDirectoryContent"
-                CssClass="file-manager"
-                AllowMultiSelection="false"
-                Height="700px"
-                Width="100%"
-                >
-                <FileManagerAjaxSettings 
-                    Url="@dctUrlX["Operations"]"
-                    UploadUrl="@dctUrlX["Upload"]"
-                    DownloadUrl="@dctUrlX["Download"]"
-                    GetImageUrl="@dctUrlX["Image"]"
+    <SfFileManager @ref="fileManager"
+
+                   TValue="FileManagerDirectoryContent"
+                   CssClass="file-manager"
+                   AllowMultiSelection="false"
+                   Height="700px"
+                   Width="100%"
+    >
+        <FileManagerAjaxSettings 
+            Url="@dctUrlX["Operations"]"
+            UploadUrl="@dctUrlX["Upload"]"
+            DownloadUrl="@dctUrlX["Download"]"
+            GetImageUrl="@dctUrlX["Image"]"
         >
         </FileManagerAjaxSettings>
-                <FileManagerEvents TValue="FileManagerDirectoryContent"
-                    OnSuccess="success"
-                    MenuOpened="OnMenuOpen"
-                    OnSend="onsend"                    
-                    BeforeImageLoad="beforeImageLoad" 
-                    BeforeDownload="beforeDownload"
-                    FileSelected="objectSelected"
-                    OnFileOpen="fileOpen">
-                </FileManagerEvents> 
-                <FileManagerUploadSettings
-                    AllowedExtensions="@AllowedExtensions"
-                    MaxFileSize="@MaxFileSize"
-                >
-                </FileManagerUploadSettings>
+        <FileManagerEvents TValue="FileManagerDirectoryContent"
+                           OnSuccess="success"
+                           MenuOpened="OnMenuOpen"
+                           OnSend="onsend"                    
+                           BeforeImageLoad="beforeImageLoad" 
+                           BeforeDownload="beforeDownload"
+                           FileSelected="objectSelected"
+                           OnFileOpen="fileOpen">
+        </FileManagerEvents> 
+        <FileManagerUploadSettings
+            AllowedExtensions="@AllowedExtensions"
+            MaxFileSize="@MaxFileSize"
+        >
+        </FileManagerUploadSettings>
     </SfFileManager>
 </div>
 </div>
