@@ -51,8 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
-    <PackageReference Include="Blazored.SessionStorage" Version="2.3.0" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.5" />

@@ -1,4 +1,6 @@
 ﻿using BedBrigade.Client.Components;
+using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Popups;
 
@@ -6,12 +8,12 @@ namespace BedBrigade.Client.Pages.Administration.Manage
 {
     public partial class TestMediaControl : ComponentBase
     {
+        [Inject] private ICustomSessionService _sessionService { get; set; }
         private string AllowedExtensions = String.Empty;
-
-        public string FolderPath { get; set; }
 
         SfDialog MediaDialog;
         FileManager FileManagerComponent;
+        public string FolderPath { get; set; }
 
         private async Task OpenDialog()
         {
@@ -29,13 +31,8 @@ namespace BedBrigade.Client.Pages.Administration.Manage
 
         private async Task ShowLeft()
         {
-            FolderPath = @"/national/pages/AboutUs/middleImageRotator/";
+            FolderPath = @"national/pages/AboutUs/leftImageRotator/";
             await OpenDialog();
-
-            if (FileManagerComponent != null)
-            {
-                FileManagerComponent.SetFileManagerPath("/national/pages/AboutUs/leftImageRotator");
-            }
         }
 
 

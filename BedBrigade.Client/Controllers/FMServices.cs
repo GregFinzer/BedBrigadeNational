@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Syncfusion.Blazor.FileManager;
 using Syncfusion.Blazor.FileManager.Base;
 using System.Diagnostics;
+using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
@@ -131,6 +133,8 @@ namespace BedBrigade.Client.Controllers
             return View();
         }
 
+
+
         private void SetUserRoot()
         {
             string newroot = String.Empty;
@@ -140,7 +144,7 @@ namespace BedBrigade.Client.Controllers
                 //Debug.WriteLine(requestedroot);
                 newroot = requestedroot.ToString();
 
-                if (newroot != null && newroot.Length > 0)
+                if (!String.IsNullOrEmpty(newroot))
                 {
                     var newFullRoot = this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot;
                     //Debug.WriteLine(newFullRoot);

@@ -16,7 +16,7 @@ namespace BedBrigade.Client.Components
 {
     public partial class FileManager: ComponentBase
     {
-       // Data Services
+        // Data Services
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
@@ -61,11 +61,6 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            if (String.IsNullOrEmpty(FolderPath))
-            {
-                FolderPath = MediaRoot;
-            }
-
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
             userName = Identity.Identity.Name;
@@ -107,32 +102,10 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-            //if (String.IsNullOrEmpty(FolderPath))
-            //{
-            //    await CheckLocationFolders();
-            //}
-
+            //await CheckLocationFolders();
         } // Init
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //if (firstRender)
-            //{
-            //    if (fileManager != null && !String.IsNullOrEmpty(FolderPath))
-            //    {
-            //        fileManager.Path = FolderPath;
-            //    }
-            //}
-        }
 
-        public async Task SetFileManagerPath(string folderPath)
-        {
-            //if (fileManager != null && !String.IsNullOrEmpty(folderPath))
-            //{
-            //    fileManager.Path = folderPath;
-            //    await fileManager.RefreshLayoutAsync();
-            //}
-        }
         
         private async Task CheckLocationFolders()
         { // Loop in location list & create location folder, if not exist
@@ -291,9 +264,13 @@ namespace BedBrigade.Client.Components
 
             if (isRead && args.Action == "read")
             {
+                //This is when we are overriding the FolderPath with a dialog
+                if (!String.IsNullOrEmpty(FolderPath))
+                {
+                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", FolderPath);
+                }
                 // send only not for national admin           
-
-                if (isLocationAdmin) // Not Admin User
+                else if (isLocationAdmin) // Not Admin User
                 {
                     args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
                 }

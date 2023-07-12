@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Data.Models;
 using BedBrigade.Client.Services;
-using Blazored.LocalStorage;
+using BedBrigade.Common;
+using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -15,7 +16,7 @@ namespace BedBrigade.Client.Pages
     {
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
-        [Inject] private ISessionStorageService _local { get; set; }
+        [Inject] private ICustomSessionService _sessionService { get; set; }
         [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
         [Parameter] public string? User { get; set; }
@@ -68,7 +69,7 @@ namespace BedBrigade.Client.Pages
             if (result.Success)
             {
 
-                await _local.SetItemAsync("authToken", result.Data);
+                await _sessionService.SetItemAsStringAsync(Constants.AuthToken, result.Data);
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 NavigationManager.NavigateTo("/Administration/Dashboard");
             }

@@ -1,23 +1,23 @@
-﻿using Blazored.SessionStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.Text.Json;
+using BedBrigade.Common;
+using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
-        private readonly ISessionStorageService _localStorageService;
+        private readonly ICustomSessionService _sessionService;
 
-        public CustomAuthStateProvider(ISessionStorageService localStorageService)
+        public CustomAuthStateProvider(ICustomSessionService sessionService)
         {
-            _localStorageService = localStorageService;
+            _sessionService = sessionService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            string authToken = await _localStorageService.GetItemAsStringAsync("authToken");
+            string authToken = await _sessionService.GetItemAsStringAsync(Constants.AuthToken);
 
             var identity = new ClaimsIdentity();
 
@@ -29,7 +29,7 @@ namespace BedBrigade.Client
                 }
                 catch
                 {
-                    await _localStorageService.RemoveItemAsync("authToken");
+                    await _sessionService.RemoveItemAsync(Constants.AuthToken);
                     identity = new ClaimsIdentity();
                 }
             }
