@@ -9,8 +9,5 @@ WebApplication app = StartupLogic.CreateAndConfigureApplication(builder);
 await StartupLogic.SetupDatabase(app);
 await StartupLogic.SetupCaching(app);
 
-// testing seed Schedules- temporary changes
-SeedSchedules.LoadTestSchedules(false); // set true to truncate table - remove all data
-
 app.Run();
 

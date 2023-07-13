@@ -34,7 +34,7 @@
     <div class="content-wrapper">
         <div class="row">
             <div style="width: 100%">
-                <SfGrid @ref="Grid" TValue="Schedule"  DataSource="@lstSchedules"
+                <SfGrid @ref="Grid" TValue="Schedule"  DataSource="@lstSchedules" 
                         ShowColumnChooser="true"                        
                         AllowPaging="true"
                         AllowSorting="true"
@@ -57,7 +57,7 @@
                         AllowAdding="true" 
                         AllowEditing="true" 
                         AllowDeleting="true"
-                        Dialog=@DialogParams
+                        Dialog=@DialogParams                        
                         Mode="EditMode.Dialog"
                         ShowConfirmDialog="true"
                         ShowDeleteConfirmDialog="true">
@@ -73,99 +73,112 @@
                                 </div>
                                 <div class="col-md-6" style="text-align: right">
                                     <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</SfButton>
-                                    <SfButton  CssClass="btn btn-danger" OnClick="Cancel">Cancel</SfButton>
+                                    <SfButton CssClass="btn btn-danger" OnClick="Cancel">Cancel</SfButton>
                                 </div>
                             </div>
                         </FooterTemplate>
                           <Template >                             
                                 @{
                                     Schedule schedule = (context as Schedule)!; 
-                                   <div class="container w-auto" style="min-height: 500px" >
-                                    <div class="row" >
-                                   
+                                                                     
+                                   <div class="row" >
                                         <div class="col-md-6">
-                                         <div class="control-wrapper">
-                                            <label class="example-label required"><b>Location</b></label>
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="lstLocations" @bind-Value=@schedule.LocationId Enabled="@enabledLocationSelector" Placeholder="Location" >
-                                                <DropDownListFieldSettings Text="Name" Value="LocationId"  />
-                                            </SfDropDownList>
-                                        </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                              <div class="control-wrapper">
-                                                    <label class="example-label required"><b>Event Name</b></label>
-                                            <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="Event Name" maxlength="50" minlength="5"  ValidateOnInput="true" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                     <div class="row">
-                                        <div class="col-md-6">
-                                         <div class="control-wrapper">
-                                            <label class="example-label required"><b>Event Type</b></label>
-                                            <SfDropDownList TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="Event Type" >
-                                                <DropDownListFieldSettings Text="Name" Value="Value" />
-                                            </SfDropDownList>
-                                        </div>
-                                         </div>
-                                         <div class="col-md-6">
-                                        <div class="control-wrapper">
-                                            <label class="example-label required"><b>Event Date</b></label>
-                                            <SfDatePicker ID="EventDateScheduled" TValue="DateTime"  @bind-Value="@schedule.EventDateScheduled" Placeholder="Choose a Date" ShowClearButton="true" Enabled="true" ></SfDatePicker>
-                                        </div>
-                                        </div>
-                                     </div>
-                                       <div class="row">
-                                            <div class="col-md-6">
-                                                 <div class="control-wrapper">
-                                                    <label class="example-label"><b>Group Name</b></label>
-                                            <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="Group Name" maxlength="50" />
-                                                  </div>
-                                             </div>                                       
-                                            <div class="col-md-6">
-                                                <div class="control-wrapper">
-                                                    <label class="example-label"><b>Event Status</b></label>
-                                                        <SfDropDownList TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="Event Status">
-                                                            <DropDownListFieldSettings Text="Name" Value="Value" />
-                                                        </SfDropDownList>
+                                            <fieldset class="border rounded-3 p-1">
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Event Details</b></legend>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label required"><b>Location</b></label>
+                                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="lstLocations" @bind-Value=@schedule.LocationId Enabled="@enabledLocationSelector" Placeholder="Location">
+                                                                <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                                            </SfDropDownList>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label required"><b>Event Name</b></label>
+                                                            <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="Event Name" maxlength="50" minlength="5" ValidateOnInput="true" />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                             </div>
-                                       </div>
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="control-wrapper">
-                                                    <label class="example-label"><b>Volunteers</b></label>
-                                            <SfNumericTextBox ID="VolunteersMax" TValue="Int32" @bind-Value="@schedule.VolunteersMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label required"><b>Event Type</b></label>
+                                                            <SfDropDownList TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="Event Type">
+                                                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                                                            </SfDropDownList>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label required"><b>Event Date</b></label>
+                                                            <SfDatePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="Choose a Date" ShowClearButton="true" Enabled="true"></SfDatePicker>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                    <div class="col-md-4">
-                                        <div class="control-wrapper">
-                                            <label class="example-label"><b>Vehicles (Delivery)</b></label>
-                                                <SfNumericTextBox ID="VehiclesDeliveryMax" TValue="Int32" @bind-Value="@schedule.VehiclesDeliveryMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label"><b>Group Name</b></label>
+                                                            <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="Group Name" maxlength="50" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label"><b>Event Status</b></label>
+                                                            <SfDropDownList TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="Event Status">
+                                                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                                                            </SfDropDownList>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </fieldset>
                                         </div>
-                                    </div>
-                                            <div class="col-md-4">
-                                                <div class="control-wrapper">
-                                            <label class="example-label"><b>Vehicles (Normal)</b></label>
-                                                <SfNumericTextBox ID="VehiclesNormalMax" TValue="Int32" @bind-Value="@schedule.VehiclesNormalMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                         <div class="col-md-3">
+                                            <fieldset class="border rounded-3 p-1">
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Resources</b></legend>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label"><b>Volunteers</b></label>
+                                                            <SfNumericTextBox ID="VolunteersMax" TValue="Int32" @bind-Value="@schedule.VolunteersMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>                                         
-                                        </div> 
-                                       <div class="row">
-                                            <div class="col-md-12">                                           
-                                                <div class="control-wrapper">
-                                                    <label class="example-label"><b>Event Note / Description / Comment</b></label>
-                                                <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="Event Note" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label"><b>Vehicles (Delivery)</b></label>
+                                                            <SfNumericTextBox ID="VehiclesDeliveryMax" TValue="Int32" @bind-Value="@schedule.VehiclesDeliveryMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>                                        
-                                      </div>
-                                      </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="control-wrapper">
+                                                            <label class="example-label"><b>Vehicles (Normal)</b></label>
+                                                            <SfNumericTextBox ID="VehiclesNormalMax" TValue="Int32" @bind-Value="@schedule.VehiclesNormalMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                                                        </div>
+                                                    </div>
+                                                </div>                                                
+                                            </fieldset>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <fieldset class="border rounded-3 p-1">
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Note / Comment</b></legend>
+                                                <div class="control-wrapper">                                                   
+                                                    <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="Event Note" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                   </div>                                                                                                                                                                                                    
+                                 
                                 }                           
                            </Template>
 
                     </GridEditSettings>                                                                                              
-                                                        
-                    
-                    
+          
                     <GridColumns>
                              <GridColumn Field=@nameof(Schedule.ScheduleId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
                             <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@userLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
@@ -213,7 +226,11 @@
   font-weight: bold;
   margin-right: 4px; 
   color: red; 
-} 
+}
+
+    .e-dialog.e-control.e-popup {
+       overflow: hidden;
+    }
 </style>
 
 

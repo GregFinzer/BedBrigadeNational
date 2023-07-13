@@ -67,7 +67,7 @@ namespace BedBrigade.Client.Components
         public bool OnlyRead { get; private set; } = false;
         public int selectedScheduleId = 0;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "500px", Height="500px", EnableResize=true };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "700px", MinHeight="200px", EnableResize=true };
 
 
         protected override async Task OnInitializedAsync()
@@ -467,7 +467,7 @@ namespace BedBrigade.Client.Components
         private string cssClass { get; set; } = "e-outline";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
-            { "rows", "4" },
+            { "rows", "7" },
         };
 
         Dictionary<string, object> htmlattributeSize = new Dictionary<string, object>()

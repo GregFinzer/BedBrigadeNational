@@ -22,7 +22,7 @@ namespace BedBrigade.Data.Models
         [MaxLength(50)]
         public string? GroupName { get; set; } = string.Empty;
         // Event Type & Status (2)
-        public EventType EventType { get; set; } = EventType.Other;
+        public EventType EventType { get; set; } = EventType.Delivery; // default value
         public EventStatus EventStatus { get; set; } = EventStatus.Scheduled;
         // Event Dates (2)
         [Required]
