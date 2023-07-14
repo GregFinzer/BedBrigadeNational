@@ -1,10 +1,12 @@
 ﻿using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
+using System.Data.SqlClient;
 using BedBrigade.Common;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
 using static BedBrigade.Common.Common;
+using System.Diagnostics;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -93,7 +95,55 @@ public class Seed
         await SeedVolunteers(contextFactory);
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
+        SeedSchedules(contextFactory);
+
     }
+
+    public static void SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
+    {
+        Log.Logger.Information("Seed Schedules Started");
+        string? sqlConnectionString = string.Empty; //"server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False"; //connection string
+        string script = String.Empty;
+
+        using (var context = contextFactory.CreateDbContext())
+        {
+            sqlConnectionString = context.Database.GetConnectionString();
+        if (bTruncateData) // clear table
+        {
+            script = "truncate table dbo.Schedules";
+            Log.Logger.Information("Schedules will be truncated");
+        }
+        else // load data to table
+        {
+            var path = Environment.CurrentDirectory + "\\wwwroot\\data\\" + ($"CreateSchedules.sql");
+            FileInfo file = new FileInfo(path);
+            Log.Logger.Information("Schedules will be created");
+            Log.Logger.Information("Schedules SQL script file: " + file.FullName);
+            script = file.OpenText().ReadToEnd();
+        }
+            if (script.Length > 0)
+            {
+                SqlConnection tmpConn;
+                tmpConn = new SqlConnection();
+                tmpConn.ConnectionString = sqlConnectionString;
+
+                SqlCommand myCommand = new SqlCommand(script, tmpConn);
+                try
+                {
+                    tmpConn.Open();
+                    var result = myCommand.ExecuteNonQuery();
+                    Log.Logger.Information("Schedules records affected: "+result.ToString());
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Information(ex.Message);
+                }
+            } //context
+
+        }
+    } // Seed Schedules
+
 
 
     private static async Task SeedConfigurations(IDbContextFactory<DataContext> contextFactory)

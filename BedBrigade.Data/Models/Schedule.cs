@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -11,6 +12,7 @@ namespace BedBrigade.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]                
         public Int32 ScheduleId { get; set; }
         [ForeignKey("LocationId")]
+        [Required]
         public Int32 LocationId { get; set; }
         // Event Description (3)
         [Required, MaxLength(50)]
@@ -20,16 +22,16 @@ namespace BedBrigade.Data.Models
         [MaxLength(50)]
         public string? GroupName { get; set; } = string.Empty;
         // Event Type & Status (2)
-        public Byte EventType { get; set; } = 0;
-        public Byte EventStatus { get; set; } = 1;
+        public EventType EventType { get; set; } = EventType.Delivery; // default value
+        public EventStatus EventStatus { get; set; } = EventStatus.Scheduled;
         // Event Dates (2)
         [Required]
         public DateTime EventDateScheduled { get; set; }
         public DateTime EventDateCompleted { get; set; }
         // Event Resources  (3)          
-        public Byte VehiclesDeliveryMax { get; set; } = 0;
-        public Byte VehiclesNormalMax { get; set; } = 0;
-        public Byte VolunteersMax { get; set; } = 0;
+        public int VehiclesDeliveryMax { get; set; } = 0;
+        public int VehiclesNormalMax { get; set; } = 0;
+        public int VolunteersMax { get; set; } = 0;
     }
 }
 

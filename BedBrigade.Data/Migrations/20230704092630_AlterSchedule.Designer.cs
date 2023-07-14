@@ -56,13 +56,13 @@ namespace BedBrigade.Data.Migrations
 
                     // Event Type & Status
 
-                    b.Property<byte>("EventType")    
+                    b.Property<int>("EventType")    
                      .HasDefaultValue(0)
-                     .HasColumnType("tinyint");
+                     .HasColumnType("int");
 
-                    b.Property<byte>("EventType")
+                    b.Property<int>("EventType")
                       .HasDefaultValue(1)
-                      .HasColumnType("tinyint");
+                      .HasColumnType("int");
 
                     // Event Date
                     b.Property<DateTime?>("EventDateScheduled")
@@ -75,17 +75,17 @@ namespace BedBrigade.Data.Migrations
 
                     // Event Resources
 
-                    b.Property<byte>("VehiclesDeliveryMax")
+                    b.Property<int>("VehiclesDeliveryMax")
                     .HasDefaultValue(0)
-                    .HasColumnType("tinyint");
+                    .HasColumnType("int");
 
-                    b.Property<byte>("VehiclesNormalMax")
+                    b.Property<int>("VehiclesNormalMax")
                      .HasDefaultValue(0)
-                     .HasColumnType("tinyint");
+                     .HasColumnType("int");
 
-                    b.Property<byte>("VolunteersMax")
+                    b.Property<int>("VolunteersMax")
                     .HasDefaultValue(0)
-                    .HasColumnType("tinyint");
+                    .HasColumnType("int");
 
                     // System Fields
 
