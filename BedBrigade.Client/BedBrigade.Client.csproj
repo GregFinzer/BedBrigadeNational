@@ -18,6 +18,8 @@
     <Content Remove="compilerconfig.json" />
     <Content Remove="Components\EditPage.razor" />
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
+    <Content Remove="wwwroot\Data\CreateSchedules.sql" />
+    <Content Remove="wwwroot\Media\national\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
     <Content Remove="wwwroot\scripts\DisplayToggle.js" />
   </ItemGroup>
@@ -34,6 +36,7 @@
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
+    <None Include="wwwroot\Data\CreateSchedules.sql" />
     <None Include="wwwroot\Media\Arlington\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\canton\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\Circleville\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
@@ -360,6 +363,37 @@
     <Folder Include="wwwroot\Media\templates\pages\Templates\pages\Volunteer\Left\" />
     <Folder Include="wwwroot\Media\templates\pages\Templates\pages\Volunteer\Middle\" />
     <Folder Include="wwwroot\Media\templates\pages\Templates\pages\Volunteer\Right\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\Media\national\pages\Assembly\BottomLeft-min.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\BottomRight-min.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\leftImageRotator\OSB-min.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\middleImageRotator\DoorHinge-min.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\rightImageRotator\1x4-min.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\TopLeft-min.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\Media\national\pages\Assembly\TopRight-min.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 

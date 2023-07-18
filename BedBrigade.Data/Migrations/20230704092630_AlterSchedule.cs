@@ -26,15 +26,15 @@ namespace BedBrigade.Data.Migrations
                     EventNote = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     GroupName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     // type & status (2)
-                    EventType = table.Column<byte>(type: "tinyint", nullable: true),
-                    EventStatus = table.Column<byte>(type: "tinyint", nullable: true),
+                    EventType = table.Column<int>(type: "int", nullable: true),
+                    EventStatus = table.Column<int>(type: "int", nullable: true),
                     // Event Dates (2)
                     EventDateScheduled = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EventDateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true),
                     // Event Resources (3)
-                    VehiclesDeliveryMax = table.Column<byte>(type: "tinyint", nullable: true),
-                    VehiclesNormalMax = table.Column<byte>(type: "tinyint", nullable: true),
-                    VolunteersMax = table.Column<byte>(type: "tinyint", nullable: true),
+                    VehiclesDeliveryMax = table.Column<int>(type: "int", nullable: true),
+                    VehiclesNormalMax = table.Column<int>(type: "int", nullable: true),
+                    VolunteersMax = table.Column<int>(type: "int", nullable: true),
 
                     // system fields (5)
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),

@@ -1,4 +1,4 @@
-﻿
+﻿using System.ComponentModel;
 using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Common;
@@ -55,8 +55,7 @@ public static class Common
     }
 
     public enum EventType // added by VS 7/1/2023
-    {
-        NA = 0,
+    {      
         Cut = 1,
         Build = 2,
         Delivery = 3,
@@ -66,11 +65,8 @@ public static class Common
     public enum EventStatus // added by VS 7/1/2023
     {
         Scheduled = 1,
-        Rescheduled = 2,
-        Hold = 3,
-        Postponed = 4,
-        Completed = 5,
-        Canceled = 6,
+        Canceled = 2,       
+        Completed = 3,        
     }
 
     public enum PersistGrid
