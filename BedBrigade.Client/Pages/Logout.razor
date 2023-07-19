@@ -1,14 +1,15 @@
 ﻿@page "/logout"
+@using Constants = BedBrigade.Common.Constants
 
 @code {
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private ISessionStorageService _local { get; set; }
+    [Inject] private ICustomSessionService _sessionService { get; set; }
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
     {  
-        await _local.RemoveItemAsync("authToken");
+        await _sessionService.RemoveItemAsync(Constants.AuthToken);
         NavigationManager.NavigateTo("/", true);
     }
 }

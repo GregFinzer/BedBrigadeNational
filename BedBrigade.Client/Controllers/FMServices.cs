@@ -21,6 +21,7 @@ namespace BedBrigade.Client.Controllers
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
+        private const string rootFolderHeaderName = "rootFolder";
         private const string DoubleBackSlash = "\\";
         private const string Slash = "/";
         public PhysicalFileProvider? operation;
@@ -91,7 +92,7 @@ namespace BedBrigade.Client.Controllers
             // path - Current path where the file is to uploaded; uploadFiles - Files to be uploaded; action - name of the operation(upload)
             try
             {
-                string newroot = HttpContext.Request.Headers["rootfolder"].ToString().Split(',')[0];
+                string newroot = HttpContext.Request.Headers[rootFolderHeaderName].ToString().Split(',')[0];
                 operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
                 fullPath = fullPath + Path.AltDirectorySeparatorChar + newroot;
             }
@@ -131,16 +132,18 @@ namespace BedBrigade.Client.Controllers
             return View();
         }
 
+
+
         private void SetUserRoot()
         {
             string newroot = String.Empty;
             try
             {
-                var requestedroot = HttpContext.Request.Headers["rootfolder"];
+                var requestedroot = HttpContext.Request.Headers[rootFolderHeaderName];
                 //Debug.WriteLine(requestedroot);
                 newroot = requestedroot.ToString();
 
-                if (newroot != null && newroot.Length > 0)
+                if (!String.IsNullOrEmpty(newroot))
                 {
                     var newFullRoot = this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot;
                     //Debug.WriteLine(newFullRoot);

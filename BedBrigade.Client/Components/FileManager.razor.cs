@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
 using static BedBrigade.Common.Common;
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using Microsoft.JSInterop;
-using System.Linq.Expressions;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
 
@@ -16,10 +13,17 @@ namespace BedBrigade.Client.Components
 {
     public partial class FileManager: ComponentBase
     {
-       // Data Services
+        // Data Services
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
+
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        [Parameter]
+        public string FolderPath { get; set; } = String.Empty;
+
         private ClaimsPrincipal? Identity { get; set; }
 
         public SfFileManager<FileManagerDirectoryContent>? fileManager;
@@ -54,7 +58,6 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-           
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
             userName = Identity.Identity.Name;
@@ -90,72 +93,38 @@ namespace BedBrigade.Client.Components
                 MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];
                 MainAdminFolder = dctConfiguration[SubfolderKey];
 
-                if (userLocationId == (int) LocationNumber.National)
+                if (userLocationId == (int)LocationNumber.National)
                 {
                     userRoute = MainAdminFolder;
                 }
-
             }
-
-            await CheckLocationFolders();
 
         } // Init
 
-        private async Task CheckLocationFolders()
-        { // Loop in location list & create location folder, if not exist
 
-            var dataLocations = await _svcLocation!.GetAllAsync();
-
-            if (dataLocations.Success) // 
-            {
-                lstLocations = dataLocations.Data;
-
-                foreach (var location in lstLocations)
-                {
-                    if (location.Route != "/")
-                    {
-                        // Check Folder
-                        var TargetFolder = MediaRoot + location.Route;
-                        if (!System.IO.Directory.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder)))
-                        {
-                            Directory.CreateDirectory(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder));
-                        }
-                    }
-                }
-            }
-
-        } // Check Location Folders
 
         public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
         {
-
-           // Debug.WriteLine("success: " + JsonConvert.SerializeObject(args));
-                       
             bool isPagesFolder = false;
             bool isMediaRoot = false;
-            bool isFile = false;
 
-            try
+            if (args.Result != null && args.Result.CWD != null)
             {
-                if (args.Result != null)
+                bool isFile = args.Result.CWD.IsFile; 
+
+                if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration[ConfigNames.MediaFolder].ToString().ToLower()) // For National Admin only
                 {
-
-                    isFile = args.Result.CWD.IsFile; // NULL?
-
-                    if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration[ConfigNames.MediaFolder].ToString().ToLower()) // For National Admin only
-                    {
-                        isMediaRoot = true;
-                    }
-
-                    if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
-                    {
-                        isPagesFolder = true;
-                    }
-
-                    SetMenu(isFile, isPagesFolder, isMediaRoot);
+                    isMediaRoot = true;
                 }
+
+                if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
+                {
+                    isPagesFolder = true;
+                }
+
+                SetMenu(isFile, isPagesFolder, isMediaRoot);
             }
-            catch(Exception ex) { }
+
 
         } // success
 
@@ -165,19 +134,14 @@ namespace BedBrigade.Client.Components
            
             bool isPagesFolder = false;
             bool isFile = false;
-            string selectedFolder = String.Empty;
-            try
+            if (args.FileDetails != null && args.FileDetails.Name != null) 
             {
-                if (args.FileDetails.Name != null) // sametimes null or error
+                if (args.FileDetails.Name.ToString().ToLower() == "pages")
                 {
-                    if (args.FileDetails.Name.ToString().ToLower() == "pages")
-                    {
-                        isPagesFolder = true;
-                    }
-                    isFile = args.FileDetails.IsFile;
+                    isPagesFolder = true;
                 }
+                isFile = args.FileDetails.IsFile;
             }
-            catch(Exception ex) { }                  
 
             SetMenu(isFile, isPagesFolder);           
            
@@ -255,14 +219,24 @@ namespace BedBrigade.Client.Components
 
         public void onsend(BeforeSendEventArgs args)
         {
+            const string rootFolder = "rootfolder";
+            //This is when we are overriding the FolderPath with a dialog
+            if (!String.IsNullOrEmpty(FolderPath))
+            {
+                //Clear previous rootfolder header
+                if (args.HttpClientInstance.DefaultRequestHeaders.Contains(rootFolder))
+                {
+                    args.HttpClientInstance.DefaultRequestHeaders.Remove(rootFolder);
+                }
 
-            if (isRead && args.Action == "read")
+                args.HttpClientInstance.DefaultRequestHeaders.Add(rootFolder, FolderPath);
+            }
+            else if (isRead && args.Action == "read")
             {
                 // send only not for national admin           
-
                 if (isLocationAdmin) // Not Admin User
                 {
-                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
+                    args.HttpClientInstance.DefaultRequestHeaders.Add(rootFolder, userRoute); // UserPath cannot be empty
                 }
                 isRead = false;
             }
@@ -270,7 +244,11 @@ namespace BedBrigade.Client.Components
 
         public void beforeImageLoad(BeforeImageLoadEventArgs<FileManagerDirectoryContent> args)
         {
-            if (isLocationAdmin)
+            if (!String.IsNullOrEmpty(FolderPath))
+            {
+                args.ImageUrl = args.ImageUrl + "&SubFolder=" + FolderPath;
+            }
+            else if (isLocationAdmin)
             {
                 args.ImageUrl = args.ImageUrl + "&SubFolder=" + userRoute;
             }
@@ -352,7 +330,7 @@ namespace BedBrigade.Client.Components
 
             try
             {
-                if (args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
+                if (args.FileDetails != null && args.FileDetails.IsFile == true && myFiles.Contains(args.FileDetails.Type))
                 {
                     previewFileName = args.FileDetails.Name;
                     previewFileUrl = NavigationManager.BaseUri.ToString() + dctConfiguration[ConfigNames.MediaFolder];

@@ -110,6 +110,7 @@
   
     <ItemGroup>
     <PackageReference Include="BetterAddressParser" Version="1.17.0" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.3.0" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.2" />

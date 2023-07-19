@@ -4,7 +4,6 @@ using BedBrigade.Data.Services;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.MessageService;
-using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +43,6 @@ namespace BedBrigade.Client
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddDbContextFactory<DataContext>(options =>
@@ -85,6 +83,7 @@ namespace BedBrigade.Client
 
         private static void DataServices(WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
             builder.Services.AddScoped<IDonationDataService, DonationDataService>();
@@ -104,15 +103,6 @@ namespace BedBrigade.Client
             builder.Services.AddSingleton<ICachingService, CachingService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            //builder.Services.AddScoped<IUserService, UserService>();
-            //builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
-            //builder.Services.AddScoped<ILocationService, LocationService>();
-            //builder.Services.AddScoped<IContentService, ContentService>();
-            //builder.Services.AddScoped<IVolunteerService, VolunteerService>();
-            //builder.Services.AddScoped<IVolunteerForService, VolunteerForService>();
-            //builder.Services.AddScoped<IMediaService, MediaService>();
-            //builder.Services.AddScoped<IDonationService, DonationService>();
-            //builder.Services.AddScoped<IBedRequestService, BedRequestService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 
