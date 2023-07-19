@@ -219,23 +219,24 @@ namespace BedBrigade.Client.Components
 
         public void onsend(BeforeSendEventArgs args)
         {
+            const string rootFolder = "rootfolder";
             //This is when we are overriding the FolderPath with a dialog
             if (!String.IsNullOrEmpty(FolderPath))
             {
                 //Clear previous rootfolder header
-                if (args.HttpClientInstance.DefaultRequestHeaders.Contains("rootfolder"))
+                if (args.HttpClientInstance.DefaultRequestHeaders.Contains(rootFolder))
                 {
-                    args.HttpClientInstance.DefaultRequestHeaders.Remove("rootfolder");
+                    args.HttpClientInstance.DefaultRequestHeaders.Remove(rootFolder);
                 }
 
-                args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", FolderPath);
+                args.HttpClientInstance.DefaultRequestHeaders.Add(rootFolder, FolderPath);
             }
             else if (isRead && args.Action == "read")
             {
                 // send only not for national admin           
                 if (isLocationAdmin) // Not Admin User
                 {
-                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
+                    args.HttpClientInstance.DefaultRequestHeaders.Add(rootFolder, userRoute); // UserPath cannot be empty
                 }
                 isRead = false;
             }
