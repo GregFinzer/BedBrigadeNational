@@ -38,7 +38,7 @@ public class BedRequest : BaseEntity
     [MaxLength(20)] 
     public String? City { get; set; } = string.Empty;
 
-    [Required]
+    //[Required]
     [MaxLength(30)]
     public String? State { get; set; } = string.Empty;
 
@@ -47,7 +47,7 @@ public class BedRequest : BaseEntity
 	public String? PostalCode { get; set; } = string.Empty;
 
 	[Required]
-	public Int32 NumberOfBeds { get; set; }
+	public Int32 NumberOfBeds { get; set; } = 1; 
 
 	[Required]
 	[MaxLength(255)]
@@ -59,7 +59,7 @@ public class BedRequest : BaseEntity
 	[Required]
     public BedRequestStatus Status { get; set; } = BedRequestStatus.Requested;
 
-	public Int32? TeamNumber { get; set; }
+	public Int32? TeamNumber { get; set; } = 0;
 
 	public DateTime? DeliveryDate { get; set; }
 
