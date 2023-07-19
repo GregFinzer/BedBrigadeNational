@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
 using static BedBrigade.Common.Common;
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using Microsoft.JSInterop;
-using System.Linq.Expressions;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
 
@@ -102,66 +99,32 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-            //await CheckLocationFolders();
         } // Init
 
 
-        
-        private async Task CheckLocationFolders()
-        { // Loop in location list & create location folder, if not exist
-
-            var dataLocations = await _svcLocation!.GetAllAsync();
-
-            if (dataLocations.Success) // 
-            {
-                lstLocations = dataLocations.Data;
-
-                foreach (var location in lstLocations)
-                {
-                    if (location.Route != "/")
-                    {
-                        // Check Folder
-                        var TargetFolder = MediaRoot + location.Route;
-                        if (!System.IO.Directory.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder)))
-                        {
-                            Directory.CreateDirectory(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), TargetFolder));
-                        }
-                    }
-                }
-            }
-
-        } // Check Location Folders
 
         public void success(SuccessEventArgs<FileManagerDirectoryContent> args)
         {
-
-           // Debug.WriteLine("success: " + JsonConvert.SerializeObject(args));
-                       
             bool isPagesFolder = false;
             bool isMediaRoot = false;
-            bool isFile = false;
 
-            try
+            if (args.Result != null && args.Result.CWD != null)
             {
-                if (args.Result != null)
+                bool isFile = args.Result.CWD.IsFile; 
+
+                if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration[ConfigNames.MediaFolder].ToString().ToLower()) // For National Admin only
                 {
-
-                    isFile = args.Result.CWD.IsFile; // NULL?
-
-                    if (fileManager.Path == PathDivider || args.Result.CWD.Name.ToString().ToLower() == dctConfiguration[ConfigNames.MediaFolder].ToString().ToLower()) // For National Admin only
-                    {
-                        isMediaRoot = true;
-                    }
-
-                    if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
-                    {
-                        isPagesFolder = true;
-                    }
-
-                    SetMenu(isFile, isPagesFolder, isMediaRoot);
+                    isMediaRoot = true;
                 }
+
+                if (args.Result.CWD.Name.ToString().ToLower().Contains("/pages"))
+                {
+                    isPagesFolder = true;
+                }
+
+                SetMenu(isFile, isPagesFolder, isMediaRoot);
             }
-            catch(Exception ex) { }
+
 
         } // success
 
@@ -171,19 +134,14 @@ namespace BedBrigade.Client.Components
            
             bool isPagesFolder = false;
             bool isFile = false;
-            string selectedFolder = String.Empty;
-            try
+            if (args.FileDetails != null && args.FileDetails.Name != null) 
             {
-                if (args.FileDetails.Name != null) // sametimes null or error
+                if (args.FileDetails.Name.ToString().ToLower() == "pages")
                 {
-                    if (args.FileDetails.Name.ToString().ToLower() == "pages")
-                    {
-                        isPagesFolder = true;
-                    }
-                    isFile = args.FileDetails.IsFile;
+                    isPagesFolder = true;
                 }
+                isFile = args.FileDetails.IsFile;
             }
-            catch(Exception ex) { }                  
 
             SetMenu(isFile, isPagesFolder);           
            
@@ -261,16 +219,21 @@ namespace BedBrigade.Client.Components
 
         public void onsend(BeforeSendEventArgs args)
         {
-
-            if (isRead && args.Action == "read")
+            //This is when we are overriding the FolderPath with a dialog
+            if (!String.IsNullOrEmpty(FolderPath))
             {
-                //This is when we are overriding the FolderPath with a dialog
-                if (!String.IsNullOrEmpty(FolderPath))
+                //Clear previous rootfolder header
+                if (args.HttpClientInstance.DefaultRequestHeaders.Contains("rootfolder"))
                 {
-                    args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", FolderPath);
+                    args.HttpClientInstance.DefaultRequestHeaders.Remove("rootfolder");
                 }
+
+                args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", FolderPath);
+            }
+            else if (isRead && args.Action == "read")
+            {
                 // send only not for national admin           
-                else if (isLocationAdmin) // Not Admin User
+                if (isLocationAdmin) // Not Admin User
                 {
                     args.HttpClientInstance.DefaultRequestHeaders.Add("rootfolder", userRoute); // UserPath cannot be empty
                 }
@@ -280,7 +243,11 @@ namespace BedBrigade.Client.Components
 
         public void beforeImageLoad(BeforeImageLoadEventArgs<FileManagerDirectoryContent> args)
         {
-            if (isLocationAdmin)
+            if (!String.IsNullOrEmpty(FolderPath))
+            {
+                args.ImageUrl = args.ImageUrl + "&SubFolder=" + FolderPath;
+            }
+            else if (isLocationAdmin)
             {
                 args.ImageUrl = args.ImageUrl + "&SubFolder=" + userRoute;
             }

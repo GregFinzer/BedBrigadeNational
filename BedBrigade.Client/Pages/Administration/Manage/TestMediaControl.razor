@@ -1,14 +1,8 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
-@using BedBrigade.Client.Components
-@using BedBrigade.Common
 @page "/administration/manage/testmediacontrol"
-@*@attribute [Authorize]*@
+@attribute [Authorize]
 
-@*<SfUploader AllowedExtensions="*.png" MaxFileSize="1000000">
-    <UploaderEvents ValueChange="OnChange"
-                    OnRemove="OnRemove"
-                    ></UploaderEvents>
-</SfUploader>*@
+
 
 <button id="showMediaControl" type="button" class="btn btn-primary" @onclick="(() => ShowLeft())">Left</button>
 <button id="showMediaControl" type="button" class="btn btn-primary" @onclick="(() => ShowMiddle())">Middle</button>
@@ -20,7 +14,7 @@
         <Header>Upload Files</Header>
         <Content>
 
-            <FileManager @ref="FileManagerComponent" ShowHeader="false" FolderPath="@FolderPath" />
+            <FileManager ShowHeader="false" FolderPath="@FolderPath"/>
 
         </Content>
     </DialogTemplates>
@@ -29,32 +23,4 @@
     </DialogButtons>
 </SfDialog>
 
-@code
-{
-    //This is for the file uploader
-    //private void OnChange(UploadChangeEventArgs args)
-    //{
-    //    foreach (var file in args.Files)
-    //    {
-    //        string path = Path.Combine("wwwroot", "media", file.FileInfo.Name);
-    //        using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
-    //        {
-    //            file.Stream.WriteTo(fs);
-    //        }
-    //    }
-    //}
 
-    //private void OnRemove(RemovingEventArgs args)
-    //{
-    //    foreach (var file in args.FilesData)
-    //    {
-    //        string path = Path.Combine("wwwroot", "media", file.Name);
-
-    //        if (File.Exists(path))
-    //        {
-    //            File.Delete(path);
-    //        }
-    //    }
-    //}
-
-}

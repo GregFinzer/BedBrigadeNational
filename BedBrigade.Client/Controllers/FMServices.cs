@@ -3,8 +3,6 @@ using Newtonsoft.Json;
 using Syncfusion.Blazor.FileManager;
 using Syncfusion.Blazor.FileManager.Base;
 using System.Diagnostics;
-using BedBrigade.Common;
-using BedBrigade.Data.Services;
 using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
