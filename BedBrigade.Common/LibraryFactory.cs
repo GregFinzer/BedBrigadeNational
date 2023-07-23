@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KellermanSoftware.AddressParser;
+﻿using KellermanSoftware.AddressParser;
 using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
+using KellermanSoftware.NetEmailValidation;
 using KellermanSoftware.StaticCodeAnalysis;
-using OfficeOpenXml.FormulaParsing.Utilities;
 
 namespace BedBrigade.Common
 {
@@ -32,6 +27,13 @@ namespace BedBrigade.Common
             QualityLogic logic = new QualityLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
             return logic;
         }
-        
+
+        public static EmailValidation CreateEmailValidation()
+        {
+            EmailValidation validation =
+                new EmailValidation(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+            return validation;
+        }
+
     }
 }
