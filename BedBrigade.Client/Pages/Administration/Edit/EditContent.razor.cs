@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using BedBrigade.Client.Components;
+using BedBrigade.Common;
 using BedBrigade.Data.Services;
+using Syncfusion.Blazor.Popups;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BedBrigade.Client.Pages.Administration.Edit
 {
@@ -15,14 +18,21 @@ namespace BedBrigade.Client.Pages.Administration.Edit
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-        [Parameter] public string Location { get; set; }
+        [Inject] private ILoadImagesService _loadImagesService { get; set; }
+        [Inject] private ILocationDataService _svcLocation { get; set; }
+        [Inject] private ICachingService _svcCaching { get; set; }
+        [Parameter] public string LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
         private string? WorkTitle { get; set; }
         private string? Body { get; set; }
         private Content? Content { get; set; }
+        private Dictionary<string, string>? ImageButtonList { get; set; } = null;
         private ClaimsPrincipal? Identity { get; set; }
         private bool Refreshed { get; set; }
+        SfDialog MediaDialog;
+        public string FolderPath { get; set; }
+        private string LocationName { get; set; } = "";
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -70,28 +80,69 @@ namespace BedBrigade.Client.Pages.Administration.Edit
 
             int locationId;
 
-            if (!int.TryParse(Location, out locationId))
+            if (!int.TryParse(LocationId, out locationId))
             {
                 _toastService.Error("Error",
-                    $"Could not parse location as integer: {Location}");
+                    $"Could not parse location as integer: {LocationId}");
+                return;
             }
 
-            var contentResult = await _svcContent.GetAsync(ContentName, locationId);
+            await SetLocationName(locationId);
+
+            ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, locationId);
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                Body = contentResult.Data.ContentHtml;
+                Body = await ProcessHtml(contentResult.Data.ContentHtml, locationId);
                 Content = contentResult.Data;
                 Content.UpdateDate = DateTime.Now;
                 Content.UpdateUser =  Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                ImageButtonList = GetImageButtonList(Body);
             }
             else
             {
                 _toastService.Error("Error",
-                    $"Could not load Content for location {Location} with name of {ContentName}");
+                    $"Could not load Content for location {LocationId} with name of {ContentName}");
             }
         }
 
+        private Dictionary<string, string> GetImageButtonList(string? html)
+        {
+            if (String.IsNullOrEmpty(html))
+                return new Dictionary<string, string>();
+
+            Dictionary<string, string> imageButtonList = new Dictionary<string, string>();
+            var rotatorImages=  _loadImagesService.GetImgIdsWithRotator(html);
+
+            foreach (var rotatorImage in rotatorImages)
+            {
+                string firstLetterCapitalized = rotatorImage.First().ToString().ToUpper() + rotatorImage.Substring(1);
+                string imagePath = StringUtil.InsertSpaces(firstLetterCapitalized);
+                
+                imageButtonList.Add($"Upload and maintain images for {imagePath}", rotatorImage);
+            }
+
+            imageButtonList.Add("Upload and maintain all images", string.Empty);
+            return imageButtonList;
+        }
+
+        private async Task SetLocationName(int locationId)
+        {
+            var locationResult = await _svcLocation.GetAsync(locationId);
+            if (locationResult.Success && locationResult.Data != null)
+            {
+                LocationName = locationResult.Data.Name;
+            }
+        }
+
+        private async Task<string?> ProcessHtml(string? html, int locationId)
+        {
+            string path = $"{LocationName}/pages/{ContentName}";
+            html = html ?? string.Empty;
+            _loadImagesService.EnsureDirectoriesExist(path, html);
+            html = _loadImagesService.SetImgSourceForImageRotators(path, html);
+            return html;
+        }
 
 
         private async Task HandleSaveClick()
@@ -103,13 +154,13 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             if (updateResult.Success)
             {
                 _toastService.Success("Content Saved", 
-                    $"Content saved for location {Location} with name of {ContentName}");
+                    $"Content saved for location {LocationName} with name of {ContentName}");
                 _nm.NavigateTo("/administration/manage/pages");
             }
             else
             {
                 _toastService.Error("Error",
-                    $"Could not save Content for location {Location} with name of {ContentName}");
+                    $"Could not save Content for location {LocationName} with name of {ContentName}");
             }
             
         }
@@ -117,6 +168,38 @@ namespace BedBrigade.Client.Pages.Administration.Edit
         private async Task HandleCancelClick()
         {
             _nm.NavigateTo("/administration/manage/pages");
+        }
+
+        private async Task HandleImageButtonClick(string itemValue)
+        {
+            FolderPath = $"{LocationName}/pages/{ContentName}/{itemValue}";
+            await OpenDialog();
+        }
+
+        private async Task OpenDialog()
+        {
+            await this.MediaDialog.ShowAsync();
+        }
+        private async Task CloseDialog()
+        {
+            await this.MediaDialog.HideAsync();
+
+            int locationId;
+
+            if (!int.TryParse(LocationId, out locationId))
+            {
+                return;
+            }
+            _svcCaching.ClearAll();
+            Body = await ProcessHtml(Body, locationId);
+            await this.RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
+
+        private void onOpen(BeforeOpenEventArgs args)
+        {
+            // setting maximum height to the Dialog
+            args.MaxHeight = "90%";
         }
     }
 }
