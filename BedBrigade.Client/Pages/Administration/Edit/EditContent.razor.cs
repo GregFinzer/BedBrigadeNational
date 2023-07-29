@@ -33,6 +33,14 @@ namespace BedBrigade.Client.Pages.Administration.Edit
         SfDialog MediaDialog;
         public string FolderPath { get; set; }
         private string LocationName { get; set; } = "";
+        private string saveUrl { get; set; }
+        private string imagePath { get; set; }
+        private List<string> AllowedTypes = new()
+        {
+            ".jpg",
+            ".png",
+            ".gif"
+        };
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -51,9 +59,6 @@ namespace BedBrigade.Client.Pages.Administration.Edit
              new ToolbarItemModel() {Command = ToolbarCommand.RemoveLink },
              new ToolbarItemModel() {Command = ToolbarCommand.SourceCode },
              new ToolbarItemModel() {Command = ToolbarCommand.FullScreen },
-             new ToolbarItemModel() {Command = ToolbarCommand.LowerCase },
-             new ToolbarItemModel() {Command = ToolbarCommand.UpperCase },
-             new ToolbarItemModel() {Command = ToolbarCommand.SuperScript },
              new ToolbarItemModel() {Command = ToolbarCommand.FontName },
              new ToolbarItemModel() {Command = ToolbarCommand.FontColor },
              new ToolbarItemModel() {Command = ToolbarCommand.FontSize },
@@ -61,9 +66,9 @@ namespace BedBrigade.Client.Pages.Administration.Edit
              new ToolbarItemModel() {Command = ToolbarCommand.BackgroundColor },
              new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
-             new ToolbarItemModel() {Command = ToolbarCommand.FullScreen },
              new ToolbarItemModel() { Command = ToolbarCommand.Separator },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
+             new ToolbarItemModel() { Command = ToolbarCommand.Image },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
@@ -132,6 +137,8 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
+                imagePath = $"media/{LocationName}/pages/{ContentName}";
+                saveUrl = $"api/image/save/{locationId}/pages/{ContentName}";
             }
         }
 
