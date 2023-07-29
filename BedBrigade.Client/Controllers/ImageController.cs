@@ -23,9 +23,9 @@ namespace ImageUpload.Controllers
             _svcLocation = location;
         }
         
-        [Route("Save/{id:int}/{page}")]
+        [Route("Save/{id:int}/{contentType}/{contentName}")]
         [HttpPost]
-        public async Task Save( IList<IFormFile> UploadFiles, int Id, string page)
+        public async Task Save( IList<IFormFile> UploadFiles, int Id, string contentType, string contentName)
         {
             
             string locationName = string.Empty;
@@ -38,12 +38,14 @@ namespace ImageUpload.Controllers
                 }
                 foreach (var file in UploadFiles)
                 {
-                    string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media{locationName}";
-                    string targetPath = $"\\pages\\{page}";
+                    string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media{locationName}\\{contentType}\\{contentName}";
+                    if (!Directory.Exists(targetLocation))
+                    {
+                        Directory.CreateDirectory(targetLocation);
+                    }
                     string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
-                    FolderExist(targetLocation, targetPath);
-                    filename = CreateFile(file, targetLocation, targetPath, filename);
+                    CreateFile(file, targetLocation,  filename);
                 }
             }
             catch (Exception e)
@@ -54,11 +56,11 @@ namespace ImageUpload.Controllers
             }
         }
 
-        private string CreateFile(IFormFile file, string targetLocation, string targetPath, string filename)
+        private string CreateFile(IFormFile file, string targetLocation, string filename)
         {
 
             // Name which is used to save the image
-            filename = targetLocation + targetPath + $@"\{filename}";
+            filename = targetLocation +  $@"\{filename}";
 
             if (!System.IO.File.Exists(filename))
             {
@@ -78,18 +80,6 @@ namespace ImageUpload.Controllers
             return filename;
         }
 
-        private static void FolderExist(string targetLocation, string targetPath)
-        {
-            // Create a new directory, if it does not exists
-            if (!Directory.Exists(targetLocation))
-            {
-                Directory.CreateDirectory(targetLocation);
 
-            }
-            if (!Directory.Exists(targetLocation + targetPath))
-            {
-                Directory.CreateDirectory(targetLocation + targetPath);
-            }
-        }
     }
 }

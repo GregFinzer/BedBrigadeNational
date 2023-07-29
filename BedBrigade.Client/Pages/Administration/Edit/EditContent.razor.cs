@@ -137,7 +137,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
-                imagePath = $"media/{LocationName}/pages/{ContentName}";
+                imagePath = $"media/{LocationName}/pages/{ContentName}/";
                 saveUrl = $"api/image/save/{locationId}/pages/{ContentName}";
             }
         }
