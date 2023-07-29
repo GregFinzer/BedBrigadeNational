@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BedBrigade.Common
@@ -90,6 +91,7 @@ namespace BedBrigade.Common
         /// <returns></returns>
         public static string InsertSpaces(string input)
         {
+            const string space = " ";
             bool isSpace = false;
             bool isUpperOrNumber = false;
             bool isLower = false;
@@ -102,9 +104,9 @@ namespace BedBrigade.Common
             StringBuilder sb = new StringBuilder(input.Length + (int)(input.Length / 2));
 
             //Replace underline with spaces
-            input = input.Replace("_", " ");
-            input = input.Replace("-", " ");
-            input = input.Replace("  ", " ");
+            input = input.Replace("_", space);
+            input = input.Replace("-", space);
+            input = input.Replace("  ", space);
 
             //Trim any spaces
             input = input.Trim();
@@ -142,7 +144,7 @@ namespace BedBrigade.Common
             }
 
             //Replace double spaces
-            sb.Replace("  ", " ");
+            sb.Replace("  ", space);
 
             return sb.ToString();
         }
