@@ -36,4 +36,10 @@ public interface ILoadImagesService
     /// area = "headerImageRotator
     /// </example>
     List<string> GetImagesForArea(string path, string area);
+
+    List<string> GetImgIdsWithRotator(string html);
+
+    void EnsureDirectoriesExist(string path, string html);
+
+    string SetImgSourceForImageRotators(string path, string html);
 }

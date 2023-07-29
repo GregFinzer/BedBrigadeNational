@@ -6,7 +6,83 @@ namespace BedBrigade.Client.Services
 {
     public class LoadImagesService : ILoadImagesService
     {
+        private const string imageRotatorTag = "ImageRotator";
+        const string mediaDirectory = "wwwroot/media";
         private readonly ICachingService _cachingService;
+
+        public string SetImgSourceForImageRotators(string path, string html)
+        {
+            List<string> imgIds = GetImgIdsWithRotator(html);
+            foreach (var imgId in imgIds)
+            {
+                List<string> images = GetImagesForArea(path, imgId);
+
+                if (images.Count > 0)
+                {
+                    var image =  images.First().Replace("wwwroot/", "");
+                    html = ReplaceImageSrc(html, imgId, image);
+                }
+            }
+
+            return html;
+        }
+
+        public void EnsureDirectoriesExist(string path, string html)
+        {
+            //Ensure directory exists for the path
+            string directory = $"{mediaDirectory}/{path}";
+            directory = directory.Replace("//", "/");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            //Ensure directory exists for each image rotator
+            List<string> imgIds = GetImgIdsWithRotator(html);
+            foreach (var imgId in imgIds)
+            {
+                directory = $"{mediaDirectory}/{path}/{imgId}";
+                directory = directory.Replace("//", "/");
+
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+            }
+        }
+
+        public string ReplaceImageSrc(string html, string id, string newSrc)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var imgNode = doc.DocumentNode.SelectSingleNode($"//img[@id='{id}']");
+            if (imgNode != null)
+            {
+                imgNode.SetAttributeValue("src", newSrc);
+            }
+
+            return doc.DocumentNode.OuterHtml;
+        }
+
+        public List<string> GetImgIdsWithRotator(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var imgIds = new List<string>();
+
+            foreach (var img in doc.DocumentNode.Descendants("img"))
+            {
+                var idAttribute = img.Attributes["id"];
+                if (idAttribute != null && idAttribute.Value.Contains(imageRotatorTag))
+                {
+                    imgIds.Add(idAttribute.Value);
+                }
+            }
+
+            return imgIds;
+        }
 
         public LoadImagesService(ICachingService cachingService)
         {
@@ -51,7 +127,7 @@ namespace BedBrigade.Client.Services
                 if (node.Attributes[Id] != null)
                 {
                     string attributeValue = node.Attributes[Id].Value;
-                    if (attributeValue.Contains("ImageRotator"))
+                    if (attributeValue.Contains(imageRotatorTag))
                     {
                         node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
                     }
@@ -73,7 +149,7 @@ namespace BedBrigade.Client.Services
         /// </example>
         public List<string> GetImagesForArea(string path, string area)
         {
-            string directory = $"wwwroot/media/{path}/{area}";
+            string directory = $"{mediaDirectory}/{path}/{area}";
             directory = directory.Replace("//", "/");
             string cacheKey = _cachingService.BuildCacheKey("Directory.GetFiles", directory);
             List<string>? cachedFiles = _cachingService.Get<List<string>?>(cacheKey);
