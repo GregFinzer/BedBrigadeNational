@@ -38,7 +38,7 @@ public class BedRequest : BaseEntity
     [MaxLength(20)] 
     public String? City { get; set; } = string.Empty;
 
-    [Required]
+    //[Required]
     [MaxLength(30)]
     public String? State { get; set; } = string.Empty;
 
