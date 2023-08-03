@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230803180706_Templates")]
+    partial class Templates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -670,7 +673,7 @@ namespace BedBrigade.Server.Migrations
 
                     b.HasKey("TemplateId");
 
-                    b.ToTable("Templates");
+                    b.ToTable("Template");
                 });
 
             modelBuilder.Entity("BedBrigade.Data.Models.User", b =>

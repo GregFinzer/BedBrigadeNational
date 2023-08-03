@@ -9,9 +9,7 @@ using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
-using Microsoft.AspNetCore.Components.Forms;
 using Serilog;
-using ContentType = BedBrigade.Common.Common.ContentType;
 
 
 namespace BedBrigade.Client.Components
@@ -23,7 +21,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IWebHostEnvironment _svcEnv { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-        [Inject] private NavigationManager? _nm { get; set; }
+        [Inject] private NavigationManager? _navigationManager { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -137,42 +135,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        /// <summary>
-        /// Create a new content of a specific type
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        //private async Task AddContentHandler()
-        //{
-        //    AddContentVisible = false;
-        //    switch(content.ContentType)
-        //    {
-        //        case ContentType.Body:
-        //            content.Name = "NewPage";
-        //            break;
-        //        case ContentType.Header:
-        //            content.Name = "Header";
-        //            break;
-        //        case ContentType.Footer:
-        //            content.Name = "Footer";
-        //            break;
-        //        case ContentType.Home:
-        //            content.Name = "Home";
-        //            break;
-        //    }
-        //    var totalOfType = 1;
-        //    var result = await _svcContent.GetAllAsync(content.ContentType, content.LocationId);
-        //    if (result.Success)
-        //    {
-        //        totalOfType = result.Data.Count();
-        //    }
 
-        //    content.Name = $"{content.Name}_{content.LocationId}_{totalOfType++}";
-        //    saveUrl = $"api/image/save/{content.LocationId}/{content.Name}";
-        //    imagePath = $"media/Templates/pages/{content.Name}/";
-
-        //    _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
-        //}
 
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
@@ -272,9 +235,9 @@ namespace BedBrigade.Client.Components
         {
             //content = new Content();
             //AddContentVisible = true;
-            var user = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            saveUrl = $"api/image/save/temp-work/{user}/Page-to-Add";
-            _nm.NavigateTo($"/administration/admintasks/addpage/{@saveUrl}");
+            //var user = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            //saveUrl = $"api/image/save/temp-work/{user}/Page-to-Add";
+            _navigationManager.NavigateTo($"/administration/admintasks/addpage");
             return;
        }
 
@@ -283,7 +246,7 @@ namespace BedBrigade.Client.Components
         {
             content = args.Data;
             await Grid.EndEditAsync();
-            _nm.NavigateTo($"/administration/edit/editcontent/{content.LocationId}/{content.Name}");
+            _navigationManager.NavigateTo($"/administration/edit/editcontent/{content.LocationId}/{content.Name}");
         }
 
         protected async Task Save(Content page)
@@ -358,7 +321,7 @@ namespace BedBrigade.Client.Components
         {
             await Grid.EndEditAsync();
             saveUrl = $"api/image/save/{page.LocationId}/{page.Name}";
-            _nm.NavigateTo($"/administration/edit/editcontent/{saveUrl}");
+            _navigationManager.NavigateTo($"/administration/edit/editcontent/{saveUrl}");
         }
 
         protected async Task Cancel()

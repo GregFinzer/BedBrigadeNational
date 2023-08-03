@@ -96,8 +96,8 @@ public class Seed
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
         SeedSchedules(contextFactory);
-
     }
+
 
     public static void SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
     {

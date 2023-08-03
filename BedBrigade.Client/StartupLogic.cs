@@ -96,6 +96,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IDonationDataService, DonationDataService>();
             builder.Services.AddScoped<IBedRequestDataService, BedRequestDataService>();
             builder.Services.AddScoped<IScheduleDataService, ScheduleDataService>();
+            builder.Services.AddScoped<ITemplateDataService, TemplateDataService>();
         }
 
         private static void ClientServices(WebApplicationBuilder builder)

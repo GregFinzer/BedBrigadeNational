@@ -16,7 +16,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
     {
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
-        [Inject] private NavigationManager _nm { get; set; }
+        [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private ILoadImagesService _loadImagesService { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
@@ -162,7 +162,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             {
                 _toastService.Success("Content Saved", 
                     $"Content saved for location {LocationName} with name of {ContentName}");
-                _nm.NavigateTo("/administration/manage/pages");
+                _navigationManager.NavigateTo("/administration/manage/pages");
             }
             else
             {
@@ -174,7 +174,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
 
         private async Task HandleCancelClick()
         {
-            _nm.NavigateTo("/administration/manage/pages");
+            _navigationManager.NavigateTo("/administration/manage/pages");
         }
 
         private async Task HandleImageButtonClick(string itemValue)
