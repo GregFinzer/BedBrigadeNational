@@ -26,6 +26,7 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedNationalLocations(context);
                 await SeedGroveCityPartners(context);
                 await SeedAssemblyInstructions(context);
+                await SeedThreeRotatorPageTemplate(context);
             }
         }
 
@@ -39,7 +40,7 @@ namespace BedBrigade.Data.Data.Seeding
                 Directory.CreateDirectory(mediaPath);
             }
 
-            if (Directory.GetDirectories(mediaPath).Length == 0)
+            if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
             {
                 CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", mediaPath);
             }
@@ -55,7 +56,7 @@ namespace BedBrigade.Data.Data.Seeding
                 var seedHtml = GetHtml("Header.html");
                 Content content = new Content
                 {
-                    LocationId = (int) LocationNumber.National,
+                    LocationId = (int)LocationNumber.National,
                     ContentType = ContentType.Header,
                     Name = name,
                     ContentHtml = seedHtml,
@@ -73,6 +74,7 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
         }
+
         private static async Task SeedFooter(DataContext context)
         {
             Log.Logger.Information("SeedFooter Started");
@@ -259,6 +261,7 @@ namespace BedBrigade.Data.Data.Seeding
                         Title = "Assembly Instructions"
                     });
                 }
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -269,6 +272,7 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
         }
+
         private static async Task SeedAboutPage(DataContext context)
         {
             Log.Logger.Information("SeedAboutPage Started");
@@ -288,6 +292,7 @@ namespace BedBrigade.Data.Data.Seeding
                         Title = "About Us"
                     });
                 }
+
                 try
                 {
                     await context.SaveChangesAsync();
@@ -296,7 +301,7 @@ namespace BedBrigade.Data.Data.Seeding
                 {
                     Console.WriteLine($"Error in content {ex.Message}");
                 }
-            }   
+            }
         }
 
         private static async Task SeedDonatePage(DataContext context)
@@ -322,6 +327,33 @@ namespace BedBrigade.Data.Data.Seeding
                         Title = "Donate To Beed Brigade"
                     });
                 }
+
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in content {ex.Message}");
+                }
+            }
+        }
+
+        private static async Task SeedThreeRotatorPageTemplate(DataContext context)
+        {
+            Log.Logger.Information("Seed ThreeRotatorPageTemplate Started");
+
+            var name = "ThreeRotatorPageTemplate";
+            if (!await context.Templates.AnyAsync(c => c.Name == name))
+            {
+                var seedHtml = GetHtml("ThreeRotatorPageTemplate.html");
+                context.Templates.Add(new Template
+                {
+                    ContentType = ContentType.Body,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                });
+
                 try
                 {
                     await context.SaveChangesAsync();

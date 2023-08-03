@@ -28,6 +28,8 @@ namespace BedBrigade.Data
         public virtual DbSet<EmailQueue> EmailQueues { get; set; }
         public virtual DbSet<VolunteerFor> VolunteersFor { get; set; } 
 
+        public virtual DbSet<Template> Templates { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateIndexes(modelBuilder);

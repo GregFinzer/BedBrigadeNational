@@ -15,7 +15,7 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly AuthenticationStateProvider _auth;
-        private ClaimsPrincipal _identity;
+        private ClaimsPrincipal? _identity;
 
         public UserDataService(IDbContextFactory<DataContext> dbContextFactory, AuthenticationStateProvider authProvider)
         {
@@ -30,12 +30,27 @@ namespace BedBrigade.Data.Services
             _identity = state.User;
         }
 
-        public async Task<ServiceResponse<User>> GetAsync(string UserName)
+        public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
+        {
+            if (_identity == null)
+                return new ServiceResponse<User>("Identity is null");
+
+            Claim nameIdentifier = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
+
+            if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
+            {
+                return await GetAsync(nameIdentifier.Value);
+            }
+
+            return new ServiceResponse<User>("NameIdentifier is null or empty");
+        }
+        
+        public async Task<ServiceResponse<User>> GetAsync(string userName)
         {
             using (var context = _contextFactory.CreateDbContext())
             {
 
-                var result = await context.Users.FindAsync(UserName);
+                var result = await context.Users.FindAsync(userName);
                 if (result != null)
                 {
                     return new ServiceResponse<User>("Found Record", true, result);
@@ -310,5 +325,7 @@ namespace BedBrigade.Data.Services
                     return new ServiceResponse<string>($"Unable to find user {userName}");
                 }
             }
+
+            
         }
     }

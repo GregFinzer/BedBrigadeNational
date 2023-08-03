@@ -77,6 +77,8 @@ public class ContentDataService : IContentDataService
 
     public async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
+        
+
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var authState = await _auth.GetAuthenticationStateAsync();

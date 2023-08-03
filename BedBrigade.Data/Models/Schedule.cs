@@ -24,10 +24,10 @@ namespace BedBrigade.Data.Models
         // Event Type & Status (2)
         public EventType EventType { get; set; } = EventType.Delivery; // default value
         public EventStatus EventStatus { get; set; } = EventStatus.Scheduled;
-        // Event Dates (2)
+        
         [Required]
         public DateTime EventDateScheduled { get; set; }
-        public DateTime EventDateCompleted { get; set; }
+
         // Event Resources  (3)          
         public int VehiclesDeliveryMax { get; set; } = 0;
         public int VehiclesNormalMax { get; set; } = 0;

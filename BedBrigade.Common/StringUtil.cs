@@ -11,6 +11,19 @@ namespace BedBrigade.Common
         private const string javaScriptExpression = @"<a.+javascript[^>]+>[^>]+>";
         private static Regex _javaScriptRegex = new Regex(javaScriptExpression, RegexOptions.Compiled);
 
+        public static string FilterAlphanumericAndDash(string input)
+        {
+            var sb = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (char.IsLetterOrDigit(c) || c == '-')
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+        
         public static string RestoreHrefWithJavaScript(string? original, string? updated)
         {
             original ??= string.Empty;
