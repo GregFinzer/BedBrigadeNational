@@ -12,10 +12,23 @@ a, .btn-link {
     color: #0071c1;
 }
 
-.btn-primary {
+/*.btn-primary {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
+}*/
+
+.btn-primary {
+    background-color: #ffce0a;
+    font-size: 15px;
+    font-weight: bold;
+    color: #171717;
+    border-color: #ffce0a;
+    font-family: "Comfortaa";
+    border-radius: 100px;
+    padding: 9px 40px;
+    margin: 20px 0 0;
+    transition: 0.7s ease;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

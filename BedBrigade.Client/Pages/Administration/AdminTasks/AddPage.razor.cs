@@ -30,7 +30,7 @@ public partial class AddPage : ComponentBase
         string pageTitle = e.Value.ToString();
         string pageName = pageTitle.Replace(' ', '-');
         pageName = StringUtil.FilterAlphanumericAndDash(pageName);
-        Model.PageName = pageName.ToLower();
+        Model.PageName = pageName;
     }
 
     private void FilterPageName(ChangeEventArgs e)
