@@ -1,5 +1,4 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Models;
+﻿using BedBrigade.Data.Models;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -69,8 +68,8 @@ namespace BedBrigade.Client.Components
             Identity = authState.User;
             if (Identity.HasRole(RoleNames.CanManagePages))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ToolBar = new List<string> { "Add", "Edit", "Rename", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", "Rename", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
             {
@@ -164,6 +163,11 @@ namespace BedBrigade.Client.Components
                 return;
             }
 
+            if (args.Item.Text == "Rename")
+            { 
+                RenamePage();
+                return;
+            }
         }
 
         public async Task OnActionBegin(ActionEventArgs<Content> args)
@@ -249,85 +253,18 @@ namespace BedBrigade.Client.Components
             _navigationManager.NavigateTo($"/administration/edit/editcontent/{content.LocationId}/{content.Name}");
         }
 
-        protected async Task Save(Content page)
+
+
+
+
+
+
+        private void RenamePage()
         {
-            CurrentValues = Pages.Find(p => p.ContentId == page.ContentId);
-            CheckValues(page, CurrentValues);
-            await Grid.EndEdit();
+            //TODO:  Implement Rename Page
         }
 
-        /// <summary>
-        /// Method to compare properties between to objects
-        /// </summary>
-        /// <param name="page">Object with possible changed values</param>
-        /// <param name="currentValues">Object with values before possible change</param>
-        /// <returns>True if a value was changed</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private bool CheckValues(Content page, Content values)
-        {
-            if(page.Title != values.Title)
-            {
-                ChangeTitle(values.Name, page.Title);
-            }
-            //TODO:  Tech Debt - Need to add logic to check for changes in media
-            //if (page.HeaderMediaId != values.HeaderMediaId)
-            //{
-            //    ChangeMediaId(values.Name, values.HeaderMediaId, page.HeaderMediaId);
-            //}
-            //if (page.FooterMediaId != values.FooterMediaId)
-            //{
-            //    ChangeMediaId(values.Name, values.FooterMediaId, page.FooterMediaId);
-            //}
-            //if (page.LeftMediaId != values.LeftMediaId)
-            //{
-            //    ChangeMediaId(values.Name, values.LeftMediaId, page.LeftMediaId);
-            //}
-            //if (page.MiddleMediaId != values.MiddleMediaId)
-            //{
-            //    ChangeMediaId(values.Name, values.MiddleMediaId, page.MiddleMediaId);
-            //}
-            //if (page.RightMediaId != values.RightMediaId)
-            //{
-            //    ChangeMediaId(values.Name, values.RightMediaId, page.RightMediaId);
-            //}
-            // This if must be the last
-            if (page.Name != values.Name)
-            {
-                RenamePage(page.Name, values.Name, values.LocationId);
-            }
-            return true;
-        }
 
-        private void ChangeMediaId(string? headerMediaId1, string name, string? headerMediaId2)
-        {
-            return;
-        }
-
-        private void ChangeTitle(string name, string title)
-        {
-            return;
-        }
-
-        private void RenamePage(string? newName, string? oldName, int LocationId)
-        {
-            var locationRoute = Locations.Find(l => l.LocationId == LocationId).Route;
-            var oldPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{oldName}";
-            var newPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{newName}"; 
-            Directory.Move(oldPath, newPath);
-            Log.Information($"Renamed Page Folder at {oldPath} to {newPath}");
-        }
-
-        protected async Task EditPage(Content page)
-        {
-            await Grid.EndEditAsync();
-            saveUrl = $"api/image/save/{page.LocationId}/{page.Name}";
-            _navigationManager.NavigateTo($"/administration/edit/editcontent/{saveUrl}");
-        }
-
-        protected async Task Cancel()
-        {
-            await Grid.CloseEdit();
-        }
 
         protected void DataBound()
         {

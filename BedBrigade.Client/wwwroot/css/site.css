@@ -37,12 +37,11 @@ a, .btn-link {
 }
 
 .btn-secondary {
-    background-color: #171717;
-    color: #ffce0a;
+    background-color: #505050;
+    color: #fff;
+    border-color: #505050;
     font-size: 15px;
     font-weight: bold;
-    
-    border-color: #ffce0a;
     font-family: "Comfortaa";
     border-radius: 100px;
     padding: 9px 40px;
@@ -50,10 +49,10 @@ a, .btn-link {
     transition: 0.7s ease;
 }
 
-.btn-secondary:hover {
-    background-color: #ffce0a;
-    color: #171717;
-}
+    .btn-secondary:hover {
+        background-color: #d3d3d3;
+        color: #000000;
+    }
     
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
