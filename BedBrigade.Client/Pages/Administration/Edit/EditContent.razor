@@ -1,6 +1,6 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/edit/editcontent/{LocationId}/{ContentName}"
-@attribute [Authorize]
+@attribute [Authorize(Roles = RoleNames.CanManagePages)]
 
 <style>
     .center-align td {

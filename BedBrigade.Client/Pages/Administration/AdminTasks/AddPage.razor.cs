@@ -30,7 +30,7 @@ public partial class AddPage : ComponentBase
         string pageTitle = e.Value.ToString();
         string pageName = pageTitle.Replace(' ', '-');
         pageName = StringUtil.FilterAlphanumericAndDash(pageName);
-        Model.PageName = pageName.ToLower();
+        Model.PageName = pageName;
     }
 
     private void FilterPageName(ChangeEventArgs e)
@@ -64,7 +64,8 @@ public partial class AddPage : ComponentBase
             Name = Model.PageName,
             LocationId = Model.CurrentLocationId,
             ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-            ContentType = Common.Common.ContentType.Body
+            ContentType = Common.Common.ContentType.Body,
+            Title = Model.PageTitle
         };
 
         var createResponse = await _svcContentDataService.CreateAsync(content);

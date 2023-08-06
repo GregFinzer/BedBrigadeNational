@@ -1,9 +1,8 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
-@page "/administration/admintasks/addpage"
-@using Syncfusion.Blazor.DropDowns
-@attribute [Authorize(Roles = RoleNames.CanCreatePages)]
+@page "/administration/admintasks/renamePage/{LocationId}/{ContentName}"
+@attribute [Authorize(Roles = RoleNames.CanManagePages)]
 
-@if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
+@if (Model == null || Model.PageName == null || Model.PageTitle == null)
 {
     <span class="spinner-border text-success m-5"></span>
 
@@ -12,18 +11,9 @@
 else
 {
     <div class="container my-5 ">
-        <h1>Add Page</h1>
+        <h1>Renaming Page @_originalContent.Name</h1>
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator/>
-            @if (Model.IsNationalAdmin)
-            {
-                <div class="form-group mb-3">
-                    <label for="locationDropdown">Location</label>
-                    <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Model.Locations" @bind-Value="Model.CurrentLocationId">
-                        <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
-                    </SfDropDownList>
-                </div>
-            }
             <div class="form-group mb-3">
                 <label for="pageTitle">Page Title</label>
                 <InputText id="pageTitle" class="form-control" @bind-Value="Model.PageTitle" @oninput="UpdatePageName"/>
