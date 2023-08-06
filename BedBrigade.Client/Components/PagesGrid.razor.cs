@@ -165,7 +165,7 @@ namespace BedBrigade.Client.Components
 
             if (args.Item.Text == "Rename")
             { 
-                RenamePage();
+                await RenamePage();
                 return;
             }
         }
@@ -237,12 +237,7 @@ namespace BedBrigade.Client.Components
 
         private async Task Add(ActionEventArgs<Content> args)
         {
-            //content = new Content();
-            //AddContentVisible = true;
-            //var user = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            //saveUrl = $"api/image/save/temp-work/{user}/Page-to-Add";
             _navigationManager.NavigateTo($"/administration/admintasks/addpage");
-            return;
        }
 
 
@@ -259,9 +254,16 @@ namespace BedBrigade.Client.Components
 
 
 
-        private void RenamePage()
+        private async Task RenamePage()
         {
-            //TODO:  Implement Rename Page
+            await Grid.EndEditAsync();
+            List<Content>? records = await Grid.GetSelectedRecordsAsync();
+
+            if (records != null && records.Count > 0)
+            {
+                var content = records[0];
+                _navigationManager.NavigateTo($"/administration/admintasks/renamepage/{content.LocationId}/{content.Name}");
+            }
         }
 
 

@@ -161,5 +161,38 @@ namespace BedBrigade.Common
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Replaces the tag value.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <param name="beginTag">The begin tag.</param>
+        /// <param name="endTag">The end tag.</param>
+        /// <param name="replaceText">The replace text.</param>
+        /// <returns>System.String.</returns>
+        public static string ReplaceTagValue(string text,
+            string beginTag,
+            string endTag,
+            string replaceText)
+        {
+            int beginTagPos = text.IndexOf(beginTag);
+
+            if (beginTagPos < 0)
+                return text;
+
+            string leftText = string.Empty;
+            int endTagPos = text.IndexOf(endTag, beginTagPos + beginTag.Length);
+
+            if (endTagPos <= 0)
+                return text;
+
+            string rightText = string.Empty;
+
+            leftText = text.Substring(0, beginTagPos + beginTag.Length);
+
+            rightText = text.Substring(endTagPos);
+
+            return string.Format("{0}{1}{2}", leftText, replaceText, rightText);
+        }
     }
 }

@@ -173,6 +173,8 @@ public class ContentDataService : IContentDataService
 
             if (entity != null)
             {
+                entity.Name = content.Name;
+                entity.Title = content.Title;
                 entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
                 entity.UpdateDate = DateTime.Now;
                 entity.UpdateUser = content.UpdateUser;
