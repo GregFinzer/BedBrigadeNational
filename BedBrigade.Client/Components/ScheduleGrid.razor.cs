@@ -83,7 +83,10 @@ namespace BedBrigade.Client.Components
 
         private async Task SetInitialFilter()
         {
-           
+            if (lstSchedules != null && lstSchedules.Count > 0 && Grid != null)
+            {
+                Grid.SelectedRowIndex = 0;
+            }
 
             await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal", DateTime.Today); // default grid filter: future events
         }
@@ -180,7 +183,7 @@ namespace BedBrigade.Client.Components
                         ErrorMessage = "No Schedule Data Found";
                     } // no rows in Media
 
-                  
+                    
                 } // the first success
             }
             catch (Exception ex)
