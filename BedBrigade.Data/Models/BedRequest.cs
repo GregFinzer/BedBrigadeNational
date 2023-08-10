@@ -24,6 +24,7 @@ public class BedRequest : BaseEntity
 
 	[Required]
 	[MaxLength(255)]
+	[EmailInputValidation]
 	public String? Email { get; set; } = string.Empty;
 
 	[Required]
@@ -38,12 +39,12 @@ public class BedRequest : BaseEntity
     [MaxLength(20)] 
     public String? City { get; set; } = string.Empty;
 
-    [Required]
+    //[Required]
     [MaxLength(30)]
     public String? State { get; set; } = string.Empty;
 
     [Required]
-	[MaxLength(10)]
+	[MaxLength(5)]	
 	public String? PostalCode { get; set; } = string.Empty;
 
 	[Required]

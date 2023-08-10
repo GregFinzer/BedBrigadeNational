@@ -1,0 +1,240 @@
+﻿@using System.Text.RegularExpressions;
+@using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
+@using BedBrigade.Data.Services;
+@using BedBrigade.Common;
+@using Syncfusion.Blazor.Inputs;
+
+<div class="card text-center" style="display: @SearchDisplay">
+    <div class="card-header">
+        <h2>@Title</h2>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Please enter a valid Zip code where you live</h5>
+        <p class="card-text"><i>(5 characters containing only digits 0-9)</i></p>
+        <p>
+            <SfMaskedTextBox
+             @ref="maskObj"
+             Mask="00000"
+             Value="@PostalCode"
+             Created="OnCreateInput"
+             Placeholder="Zip Code"
+             OnInput="ZipCodeInputChange"
+             @onkeyup="@HandleKeyDown"
+             Width="200px">             
+            </SfMaskedTextBox>
+        </p>
+        
+        <div class="widget-body">
+            <button id="search" type="button" class="btn btn-primary" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled" >Search Bed Brigade Locations</button>
+        </div>
+    </div> 
+</div>
+<div class="card text-center">
+    <div >
+        <div class="@strAlertType" role="alert" style="display: @strAlertDisplay">
+            @PostalCodeResult
+        </div>
+    </div>
+    <div class="card-body">
+        @if (PostalCodeSuccess)
+        { <div class="row">
+           <div class="col-md-4"></div>
+           <div class="col-md-4">
+               @switch(ResultType){
+                    case "DropDownList":
+                            <label for="LocationSelector" >Select Location to request A Bed</label>
+                            <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
+                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
+                                <DropDownListTemplates TItem="LocationDistance">
+                                    <ItemTemplate>
+                                        <span style="font-weight: bold">
+                                            <span>@((context as LocationDistance).Name)</span>
+                                            <span class='country'>@(" (" + (context as LocationDistance).Distance.ToString("0.00") + " miles away)")</span>
+                                        </span>
+                                    </ItemTemplate>
+                                </DropDownListTemplates>
+                            </SfDropDownList>
+
+
+                            break;
+                        default:
+                       <table>
+                            @foreach (var location in Locations)
+                            {
+                                    <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.Distance.ToString("#.##") miles away</td></tr>
+                            }
+                         </table>
+                         break;
+               }  
+            </div>
+            <div class="col-md-4"></div>
+          </div>
+        }
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public string? ResultType { get; set; } // default is HyperlinkList, other found list of locations
+    [Parameter] 
+    public EventCallback<string> ParentMethod { get; set; }   
+
+    [Inject] private ILocationDataService? _svcLocation { get; set; }
+    private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
+
+    SfMaskedTextBox maskObj;
+
+    public int ddlValue { get; set; } = 0;
+
+    public string InputID = "input-id";
+
+    private string? PostalCode { get; set; } = string.Empty;
+    private string PostalCodeResult { get; set; } = string.Empty;
+    private const string DisplayNone = "none";
+    private string strAlertDisplay = DisplayNone;
+    private const string AlertDanger = "alert alert-danger";
+    private string strAlertType = "alert alert-danger";
+    private bool PostalCodeSuccess = false;
+    private string SearchDisplay = "";
+    private bool SubmitDisabled = true;
+
+
+    protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
+        {
+           { "font-weight", "bold" },
+        };
+
+
+    public async Task OnCreateInput()
+    {
+        await SetZipBoxFocus();
+    }
+
+
+    public async Task SetZipBoxFocus()
+    {
+        await maskObj.FocusAsync();
+        SubmitDisabled = true;
+    }
+
+    async Task CallParentMethod()
+    {
+        await ParentMethod.InvokeAsync(PostalCode);
+    }
+
+    private bool ValidatePostalCode()
+    {
+
+        if (string.IsNullOrEmpty(PostalCode))
+        {
+            strAlertType = "alert alert-warning";
+            PostalCodeResult = "Warning! Please enter a zip code"; // warning
+            return false;
+        }
+        if (!Regex.IsMatch(PostalCode, @"\d{5}$"))
+        {
+            strAlertType = "alert alert-danger";
+            PostalCodeResult = "Error! Zip code must be numeric and have a length of 5.";
+            return false;
+        }
+
+        PostalCodeResult = null;
+        return true;
+    }
+
+    private void ZipCodeInputChange(ChangeEventArgs e)
+    {
+        PostalCode = String.Empty;
+        SubmitDisabled = true;
+        if (e.Value != null && e.Value.ToString().Length==5)
+        {
+            var isNumber = e.Value.ToString().All(c => Char.IsNumber(c));
+            if (isNumber)
+            {
+                PostalCode = e.Value.ToString();
+                SubmitDisabled = false;
+            }           
+        }
+    }
+   
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            StateHasChanged();
+            await HandleSearchClick();
+        }
+    } // HandleKeyDown
+
+    private async Task HandleSearchClick()
+    {
+        strAlertDisplay = "";
+
+        if (!ValidatePostalCode())
+            return;
+
+        var Result = await _svcLocation.GetBedBrigadeNearMe(PostalCode);
+
+        if (!Result.Success || Result.Data == null)
+        {
+            strAlertType = AlertDanger;
+            PostalCodeResult = "Error! " + Result.Message;
+            Locations = new List<LocationDistance>(); // empty location list
+            await SetZipBoxFocus();
+            return;
+        } // some error
+
+
+        if (Result.Message != null && Result.Message.Length > 0)
+        {
+            await GetSearchResult(Result.Message, Result);
+        }
+        else
+        {
+            strAlertType = AlertDanger;
+            PostalCodeResult = "Unknown Error!";
+            Locations = new List<LocationDistance>(); // empty location list
+            await SetZipBoxFocus();
+        }
+
+
+    } // HandleSearchClick()
+
+    private async Task GetSearchResult(string ResultMessage, ServiceResponse<List<LocationDistance>> Result)
+    {
+        if (!ResultMessage.Contains("No locations found"))
+        {
+
+            strAlertType = "alert alert-success";
+            PostalCodeResult = "Success! " + ResultMessage;
+            Locations = Result.Data;
+            PostalCodeSuccess = true;
+            if (ResultType == "DropDownList")
+            {
+                if (Locations != null && Locations.Count > 0)
+                {
+                    ddlValue = Locations.FirstOrDefault().LocationId;
+                    SearchDisplay = DisplayNone;
+                    await CallParentMethod(); // call parent method
+                                              // open parent edit form
+                }
+            }
+        } // Locations Found
+        else
+        { // Locations not found
+            strAlertType = "alert alert-warning";
+            PostalCodeResult = ResultMessage;
+            Locations = new List<LocationDistance>(); // empty location list
+            await SetZipBoxFocus();
+        }
+    } // Search Result
+   
+
+}
+
+
+
