@@ -1,4 +1,5 @@
 ﻿using KellermanSoftware.NetEmailValidation;
+using System.Linq.Expressions;
 
 namespace BedBrigade.Common
 {
@@ -18,8 +19,16 @@ namespace BedBrigade.Common
 
         public static string GetCityForZipCode(string zipCode)
         {
+            
             var addressParser = LibraryFactory.CreateAddressParser();
-            return addressParser.GetInfoForZipCode(zipCode).PrimaryCity;
+            try
+            {
+                return addressParser.GetInfoForZipCode(zipCode).PrimaryCity;
+            }
+            catch(Exception ex)
+            {
+                return ("Error: " + ex.Message); // VS 8/11/2023
+            }
         }
     }
 }
