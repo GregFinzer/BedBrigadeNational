@@ -36,7 +36,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Logout :heavy_check_mark:
     * Administration Dashboard :heavy_check_mark:
     * Edit Configuration :heavy_check_mark:
-    * Edit Home Page
+    * Edit Home Page :heavy_check_mark:
     * Edit Header :heavy_check_mark:
     * Edit Footer :heavy_check_mark:
     
@@ -50,10 +50,10 @@ One thing you will notice about the following project plan is the lack of due da
     
 * Manage Web Pages
     * List Pages :heavy_check_mark:
-    * Add Page
-    * Edit Page
-    * Delete Page
-    * Rename Page
+    * Add Page :heavy_check_mark:
+    * Edit Page :heavy_check_mark:
+    * Delete Page :heavy_check_mark:
+    * Rename Page :heavy_check_mark:
     
 * National Pages
     * National About Us Page :heavy_check_mark:
@@ -85,7 +85,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Volunteer Page
     * Manage Volunteers :heavy_check_mark:
     * Bulk Email Volunteers
-    * Manage Build and Delivery Schedule
+    * Manage Build and Delivery Schedule :heavy_check_mark:
     
 * Location Contact Us
     * Contact Us Page
