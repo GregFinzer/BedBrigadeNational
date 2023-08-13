@@ -20,15 +20,27 @@ namespace BedBrigade.Data.Models
         public void SetCreateUser(String userName)
         {
             CreateUser = userName;
-            CreateDate = DateTime.Now;
+            CreateDate = DateTime.UtcNow;
             MachineName = Environment.MachineName;
         }
 
         public void SetUpdateUser(String userName)
         {
             UpdateUser = userName;
-            UpdateDate = DateTime.Now;
+            UpdateDate = DateTime.UtcNow;
             MachineName = Environment.MachineName;
+        }
+
+        //TODO:  Remove this when all services derive from Repository
+        public bool WasUpdatedInTheLastSecond()
+        {
+            if (UpdateDate == null)
+            {
+                return false;
+            }
+
+            TimeSpan timeSinceLastUpdate = DateTime.UtcNow - UpdateDate.Value;
+            return timeSinceLastUpdate.TotalSeconds <= 1;
         }
     }
 }
