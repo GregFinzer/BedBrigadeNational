@@ -195,7 +195,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
                 if (distance < maxMiles)
                 {
                     LocationDistance locationDistance = new LocationDistance();
-                    locationDistance.TheLocationId = loc.LocationId;
+                    locationDistance.LocationId = loc.LocationId;
                     locationDistance.Name = loc.Name;
                     locationDistance.Route = loc.Route;
                     locationDistance.Distance = distance;

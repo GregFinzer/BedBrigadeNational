@@ -60,62 +60,53 @@ namespace BedBrigade.Data
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(o => o.VolunteeringForId);
         }
-
+        //TODO:  Remove this when all services derive from Repository
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var provider = this.GetService<AuthenticationStateProvider>();
-            //var authState = await provider.GetAuthenticationStateAsync();
-            //var name = authState.User.Identity.Name;
-
             SetAudit("Seed");
             return await base.SaveChangesAsync(cancellationToken);
         }
+
+        //TODO:  Remove this when all services derive from Repository
         /// <summary>
         /// Populate the audit part of the db records
         /// </summary>
         /// <returns></returns>
         public override int SaveChanges()
         {
-            var provider = this.GetService<AuthenticationStateProvider>();
-            //var authState = Task.Run(provider.GetAuthenticationStateAsync());
-           // var name = authState.User.Identity.Name;
-
             SetAudit("Seed");
             return base.SaveChanges();
         }
 
+        //TODO:  Remove this when all services derive from Repository
         private void SetAudit(string userId)
         {
             var tracker = ChangeTracker;
             foreach (var entry in tracker.Entries())
             {
                 System.Diagnostics.Debug.WriteLine($"{entry.Entity} has state {entry.State} ");
-                if (entry.Entity is BaseEntity)
+                if (entry.Entity is BaseEntity baseEntity)
                 {
-                    var referenceEntity = entry.Entity as BaseEntity;
                     switch (entry.State)
                     {
                         case EntityState.Added:
-                            referenceEntity.CreateDate = DateTime.UtcNow;
-                            referenceEntity.CreateUser = userId;
-                            referenceEntity.UpdateDate = DateTime.UtcNow;
-                            referenceEntity.UpdateUser = userId;
-                            referenceEntity.MachineName = Environment.MachineName;
+                            if (String.IsNullOrEmpty(baseEntity.CreateUser))
+                            {
+                                baseEntity.CreateDate = DateTime.UtcNow;
+                                baseEntity.CreateUser = userId;
+                                baseEntity.UpdateDate = DateTime.UtcNow;
+                                baseEntity.UpdateUser = userId;
+                                baseEntity.MachineName = Environment.MachineName;
+                            }
                             break;
-
-                        case EntityState.Deleted:
-                            referenceEntity.UpdateDate = DateTime.UtcNow;
-                            referenceEntity.UpdateUser = userId;
-                            referenceEntity.MachineName = Environment.MachineName; 
-                            break;
-
                         case EntityState.Modified:
-                            referenceEntity.UpdateDate = DateTime.UtcNow;
-                            referenceEntity.UpdateUser = userId;
-                            referenceEntity.MachineName = Environment.MachineName; 
-                            break;
-
-                        default:
+                            
+                            if (!baseEntity.WasUpdatedInTheLastSecond())
+                            {
+                                baseEntity.UpdateDate = DateTime.UtcNow;
+                                baseEntity.UpdateUser = userId;
+                                baseEntity.MachineName = Environment.MachineName;
+                            }
                             break;
                     }
                 }

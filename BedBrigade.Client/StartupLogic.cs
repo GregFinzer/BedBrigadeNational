@@ -57,6 +57,9 @@ namespace BedBrigade.Client
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             builder.Services.AddSingleton(emailConfig);
 
+            builder.Services.AddTransient<ReCaptchaApi>(); // VS 7/31/2023
+            builder.Services.AddHttpClient(); // VS 7/31/2023
+
             ClientServices(builder);
 
             DataServices(builder);
