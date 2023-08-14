@@ -228,6 +228,18 @@ public class Seed
                     ConfigurationValue = "30",
                     Section = ConfigSection.System
                 },
+                 new()
+                {
+                    ConfigurationKey = ConfigNames.ReCaptchaSecret,
+                    ConfigurationValue = "6Lfwa-sSAAAAAFQ1IkOh96IR3C-6zF_MbaTjJ8Lj",
+                    Section = ConfigSection.System
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
+                    ConfigurationValue = "6Lfwa-sSAAAAAJ5DXVnVsm7bf3iN-PlCEcjsEU8d",
+                    Section = ConfigSection.System
+                },
             };
 
             await context.Configurations.AddRangeAsync(configurations);

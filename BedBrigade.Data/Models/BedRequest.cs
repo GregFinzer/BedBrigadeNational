@@ -14,24 +14,24 @@ public class BedRequest : BaseEntity
 	[ForeignKey("LocationId"), Required]
 	public Int32 LocationId { get; set; } 
 
-	[Required]
-	[MaxLength(20)]
+	[Required(ErrorMessage = "First Name is required.")]
+    [MaxLength(20)]
 	public String? FirstName { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "Last Name is required.")]
 	[MaxLength(25)]
 	public String LastName { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "Email Address is required.")]
 	[MaxLength(255)]
 	[EmailInputValidation]
 	public String? Email { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "Phone Number is required.")]
 	[MaxLength(14)]
 	public String? Phone { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "Street Address is required.")]
 	[MaxLength(40)]
 	public String? Street { get; set; } = string.Empty;
 
@@ -43,14 +43,14 @@ public class BedRequest : BaseEntity
     [MaxLength(30)]
     public String? State { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Postal Code (Zip Code) is required.")]
 	[MaxLength(5)]	
 	public String? PostalCode { get; set; } = string.Empty;
 
-	[Required]
+	[Required(ErrorMessage = "The number of ordered beds is required and must be >0.")]
 	public Int32 NumberOfBeds { get; set; }
 
-	[Required]
+	[Required(ErrorMessage = "Please indicate the age and gender of children.")]
 	[MaxLength(255)]
 	public String? AgesGender { get; set; } = string.Empty;
 

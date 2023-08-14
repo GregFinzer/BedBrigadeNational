@@ -29,22 +29,21 @@
         </div>
     </div> 
 </div>
-<div class="card text-center">
-    <div >
-        <div class="@strAlertType" role="alert" style="display: @strAlertDisplay">
+<div class="row">
+    <div class="col-md-12" >
+        <div class="@strAlertType" role="alert" style="display: @strAlertDisplay; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center">
             @PostalCodeResult
         </div>
     </div>
-    <div class="card-body">
-        @if (PostalCodeSuccess)
-        { <div class="row">
-           <div class="col-md-4"></div>
-           <div class="col-md-4">
+</div>
+@if (PostalCodeSuccess)
+  { <div class="row pb-2">
+        <div class="col-md-12 d-flex justify-content-center align-items-center" >
                @switch(ResultType){
                     case "DropDownList":
-                            <label for="LocationSelector" >Select Location to request A Bed</label>
+                    <label for="LocationSelector" class="formlabel" >Select Location to request A Bed&nbsp;</label>
                             <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
-                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
+                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>                                
                                 <DropDownListTemplates TItem="LocationDistance">
                                     <ItemTemplate>
                                         <span style="font-weight: bold">
@@ -54,24 +53,22 @@
                                     </ItemTemplate>
                                 </DropDownListTemplates>
                             </SfDropDownList>
-
-
+                           
                             break;
                         default:
-                       <table>
-                            @foreach (var location in Locations)
-                            {
-                                    <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.Distance.ToString("#.##") miles away</td></tr>
-                            }
-                         </table>
+                                 <table>
+                                    @foreach (var location in Locations)
+                                    {
+                                            <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.Distance.ToString("#.##") miles away</td></tr>
+                                    }
+                                 </table>
                          break;
-               }  
-            </div>
-            <div class="col-md-4"></div>
-          </div>
-        }
+                    }
+        </div>
     </div>
-</div>
+  }
+
+
 
 
 @code {
