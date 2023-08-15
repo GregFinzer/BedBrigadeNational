@@ -42,7 +42,7 @@ namespace BedBrigade.Data.Services
             return typeof(TEntity).Name;
         }
 
-        public async Task<ServiceResponse<List<TEntity>>> GetAllAsync()
+        public virtual async Task<ServiceResponse<List<TEntity>>> GetAllAsync()
         {
             string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetAllAsync");
             List<TEntity>? cachedContent = _cachingService.Get<List<TEntity>>(cacheKey);
@@ -52,16 +52,24 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<TEntity>>($"Found {cachedContent.Count()} {GetEntityName()} in cache", true, cachedContent);
             }
 
-            using (var ctx = _contextFactory.CreateDbContext())
+            try
             {
-                var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.ToListAsync();
-                _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<List<TEntity>>($"Found {result.Count()} {GetEntityName()}", true, result);
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<TEntity>();
+                    var result = await dbSet.ToListAsync();
+                    _cachingService.Set(cacheKey, result);
+                    return new ServiceResponse<List<TEntity>>($"Found {result.Count()} {GetEntityName()}", true, result);
+                }
             }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<List<TEntity>>($"Error GetAllAsync for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+            }
+
         }
 
-        public async Task<ServiceResponse<TEntity>> GetByIdAsync(object id)
+        public virtual async Task<ServiceResponse<TEntity>> GetByIdAsync(object id)
         {
             string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), id.ToString());
             TEntity? cachedContent = _cachingService.Get<TEntity>(cacheKey);
@@ -71,22 +79,31 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<TEntity>($"Found {GetEntityName()} with id {id} in cache", true, cachedContent);
             }
 
-            using (var ctx = _contextFactory.CreateDbContext())
+            try
             {
-                var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.FindAsync(id);
-
-                if (result != null)
+                using (var ctx = _contextFactory.CreateDbContext())
                 {
-                    _cachingService.Set(cacheKey, result);
-                    return new ServiceResponse<TEntity>($"Found {GetEntityName()} with id {id}", true, result);
-                }
+                    var dbSet = ctx.Set<TEntity>();
+                    var result = await dbSet.FindAsync(id);
 
-                return new ServiceResponse<TEntity>($"Could not find {GetEntityName()} with id {id}", false);
+                    if (result != null)
+                    {
+                        _cachingService.Set(cacheKey, result);
+                        return new ServiceResponse<TEntity>($"Found {GetEntityName()} with id {id}", true, result);
+                    }
+
+                    return new ServiceResponse<TEntity>($"Could not find {GetEntityName()} with id {id}", false);
+                }
             }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<TEntity>($"Could not GetByIdAsync {GetEntityName()}  with id {id}: {ex.Message} ({ex.ErrorCode})", false);
+            }
+
+
         }
 
-        public async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
+        public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
             if (entity is BaseEntity baseEntity)
             {
@@ -111,7 +128,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
+        public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
             if (entity is BaseEntity baseEntity)
             {
@@ -135,7 +152,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> DeleteAsync(object id)
+        public virtual async Task<ServiceResponse<bool>> DeleteAsync(object id)
         {
             try
             {
