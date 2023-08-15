@@ -1,22 +1,32 @@
 ﻿@layout BedBrigade.Client.Shared.MainLayout
 @inject NavigationManager NavigationManager
-@inject ILocationDataService LocationService
 @page "/request-bed"
 
-<div class="bg-light p-5 rounded-lg m-3">
-    <h1 class="display-4">Bed Request</h1>
-    <p class="lead">This page is under construction. Coming soon...</p>   
-</div>
+<BedRequestForm />
 
-<SearchLocation  Title="Find a Bed Brigade Near Me" />
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
 
-<div class="row" >    
-    <div class="col-md-3" style="text-align: center">
-        <ReCAPTCHA  />
-    </div>
-    <div class="col-md-9">
-    </div>
-</div>
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
 
+    .required::after {
+        content: '*';
+        font-size: medium;
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
 
+    .formlabel {
+        color: #B4886B;
+        font-weight: bold;
+        font-size: small;
+        display: block;
+    }
+</style>
 
