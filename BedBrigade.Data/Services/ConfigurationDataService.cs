@@ -15,6 +15,7 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
+        _auth = authProvider;
     }
 
     /// <summary>
