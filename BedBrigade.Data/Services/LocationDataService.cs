@@ -168,7 +168,7 @@ public class LocationDataService : BaseDataService, ILocationDataService
         }
 
         int maxMiles;
-        var milesResult = await _configurationDataService.GetAsync(ConfigNames.BedBrigadeNearMeMaxMiles);
+        var milesResult = await _configurationDataService.GetByIdAsync(ConfigNames.BedBrigadeNearMeMaxMiles);
         if (milesResult.Success && milesResult.Data != null && milesResult.Data.ConfigurationValue != null)
         {
             maxMiles = int.Parse(milesResult.Data.ConfigurationValue);

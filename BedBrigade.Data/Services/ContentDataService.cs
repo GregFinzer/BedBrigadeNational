@@ -1,10 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
-using System.Security.Claims;
-using BedBrigade.Common;
-using ContentType = BedBrigade.Common.Common.ContentType;
 
 namespace BedBrigade.Data.Services;
 
@@ -21,9 +17,6 @@ public class ContentDataService : Repository<Content>, IContentDataService
         _contextFactory = contextFactory;
         _auth = authProvider;
     }
-
-
-
 
     public Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
     {
