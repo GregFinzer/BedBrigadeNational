@@ -1,0 +1,168 @@
+﻿<div class="container-fluid" style="display: @DisplaySearch">
+    <SearchLocation @ref="SearchLocation" Title="Find a Bed Brigade Near Me" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
+</div>
+
+<div class="container-fluid" style="display: @DisplayForm">
+
+    <EditForm  EditContext="@EC" >
+        <DataAnnotationsValidator />        
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Contact Information</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="firstname" class="formlabel required">First Name</label>
+                            <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName" Blur="@RunValidation" ></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.FirstName)"></ValidationMessage>
+                            </div>
+                            
+                        </div>
+                        <div class="form-group ">
+                            <label for="lastname" class="formlabel required">Last Name</label>
+                            <SfTextBox ID="lastname" @bind-Value="newRequest.LastName" Blur="@RunValidation"></SfTextBox>
+                            <div style="font-size: smaller">
+                                 <ValidationMessage For="@(() => newRequest.LastName)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="formlabel required">Email</label>
+                            <SfTextBox ID="email" @bind-Value="newRequest.Email" Blur="@RunValidation"></SfTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.Email)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="formlabel required">Phone</label>
+                            <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="newRequest.Phone" Blur="@RunValidation" ></SfMaskedTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.Phone)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card">
+                    <div class="card-header">Delivery Address</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="street" class="formlabel required">Street</label>
+                            <SfTextBox ID="street" @bind-Value="newRequest.Street" Blur="@RunValidation" ></SfTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.Street)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="city" class="formlabel required">City</label>
+                            <SfTextBox ID="city" @bind-Value="newRequest.City" ValueChange="@ValidationAddress" Blur="@ValidationAddress"  ></SfTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.City)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="state" class="formlabel required">State</label>
+                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a state" DataSource="@StateList" @bind-Value="newRequest.State" >
+                                <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="string" TItem="UsState" ValueChange="@ValidationAddress" Blur="@ValidationAddress" ></DropDownListEvents>
+                                <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.State)"></ValidationMessage>
+                                </div>
+                            </SfDropDownList>
+                        </div>
+                        <div class="form-group">
+                            <label for="zip" class="formlabel required">Postal Code</label>                           
+                            <SfMaskedTextBox ID="zip" Mask="00000" @bind-Value="@newRequest.PostalCode" ValueChange="@ValidationAddress" Blur="@ValidationAddress"></SfMaskedTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.PostalCode)" ></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: @DisplayAddressMessage">
+                            <div class="alert alert-danger" role="alert" style="padding-top: 2px; padding-bottom: 2px; font-size: small;">
+                                It looks like entered city, state, and ZIP code didn't match your requested location. Check them and try again.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Bed Request Details</div>
+                    <div class="card-body">                     
+                        <div class="form-group">
+                            <label for="numbed" class="formlabel required">Number of Beds</label>
+                            <SfNumericTextBox ID="numbed" TValue="int" Min="1" Max="50" HtmlAttributes="htmlattributeSize" @bind-Value="@NumericValue" OnBlur="@RunValidation"></SfNumericTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.NumberOfBeds)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="ages" class="formlabel required">Ages / Gender</label>
+                            <SfTextBox ID="ages" @bind-Value="newRequest.AgesGender" ValueChange="@RunValidation" Blur="@RunValidation" ></SfTextBox>
+                            <div style="font-size: smaller">
+                            <ValidationMessage For="@(() => newRequest.AgesGender)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inst" class="formlabel">Special Instructions</label>
+                            <SfTextBox ID="inst" @bind-Value="newRequest.SpecialInstructions" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute" ></SfTextBox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">&nbsp;</div>
+        </div>
+        <div class="row">       
+            <div class="col-md-12">
+                <div>
+                    <div class="@AlertType" role="alert" style="display: @AlertDisplay ">
+                        @((MarkupString)SubmitAlertMessage)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" style="text-align: center">
+                <ReCAPTCHA @ref="reCAPTCHAComponent" OnSuccess="OnSuccess" OnExpired="OnExpired" />
+            </div>
+            <div class="col-md-9">
+                <div class="@NotificationStatus" role="alert" style="display: @NotificationDisplay" >
+                    @((MarkupString)NotificationMessage)
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row" >
+                <div class="col-md-3" style="text-align: center">
+                    <SfButton CssClass="btn btn-primary" OnClick="@SaveRequest">Submit Request</SfButton>
+            </div>
+            <div class="col-md-9">
+            </div>
+            </div>
+
+    </EditForm>
+
+</div>
+
+<div class="container-fluid" style="display: @ResultDisplay">
+    <div class="@AlertType" role="alert" >
+         @((MarkupString)ResultMessage)
+    </div>
+</div>
+
+
+
+
+
+

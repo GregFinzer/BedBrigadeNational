@@ -13,6 +13,8 @@
         public const string MaxFileSize = "MaxFileSize";
         public const string MaxVideoSize = "MaxVideoSize";
         public const string IsCachingEnabled = "IsCachingEnabled";
-        public const string BedBrigadeNearMeMaxMiles = "30";
+        public const string BedBrigadeNearMeMaxMiles = "BedBrigadeNearMeMaxMiles";
+        public const string ReCaptchaSecret = "ReCaptchaSecret";
+        public const string ReCaptchaSiteKey = "ReCaptchaSiteKey";
     }
 }

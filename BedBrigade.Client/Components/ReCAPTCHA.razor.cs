@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
+using BedBrigade.Data.Services;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Client.Components
 {
@@ -20,8 +22,11 @@ namespace BedBrigade.Client.Components
 
         [Parameter]
         public EventCallback OnExpired { get; set; }
+        private IHttpClientFactory HttpClientFactory { get; }
 
-        public string SiteKey { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+
+        public string? SiteKey { get; set; }
 
         private string UniqueId = Guid.NewGuid().ToString();
 
@@ -29,11 +34,23 @@ namespace BedBrigade.Client.Components
 
         public string ResultPrint = String.Empty;
 
+        private Dictionary<string, string?> dctConfiguration { get; set; } = new Dictionary<string, string?>();
+
+        protected override async Task OnInitializedAsync()
+        {
+            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System);
+            if (dataConfiguration.Success && dataConfiguration != null)
+            {
+                dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
+            }
+        } // Init
+
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                SiteKey = ReCaptchaApi.GetReCaptchaKey("SiteKey");
+                SiteKey = dctConfiguration[ConfigNames.ReCaptchaSiteKey].ToString();
                 // Debug.WriteLine("Site Key: " + SiteKey);
 
                 await JS.InvokeAsync<object>("My.reCAPTCHA.init");
@@ -48,7 +65,7 @@ namespace BedBrigade.Client.Components
             if (OnSuccess.HasDelegate)
             {
                 OnSuccess.InvokeAsync(response);
-                ResultPrint = response; // for test only
+                //ResultPrint = response;
 
             }
         }
@@ -66,6 +83,28 @@ namespace BedBrigade.Client.Components
         {
             return JS.InvokeAsync<string>("My.reCAPTCHA.getResponse", WidgetId);
         }
+                    
+        public async Task<(bool Success, string[] ErrorCodes)> Post(string reCAPTCHAResponse)
+        {
+
+            var url = "https://www.google.com/recaptcha/api/siteverify";
+            var content = new FormUrlEncodedContent(new Dictionary<string, string?>
+            {                
+                { "secret", dctConfiguration[ConfigNames.ReCaptchaSecret].ToString() },
+                { "response", reCAPTCHAResponse}
+            });
+
+            var httpClient = this.HttpClientFactory.CreateClient();
+            var response = await httpClient.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
+
+            var verificationResponse = await response.Content.ReadAsAsync<reCAPTCHAVerificationResponse>();
+            if (verificationResponse.Success) return (Success: true, ErrorCodes: new string[0]);
+
+            return (
+                Success: false,
+                ErrorCodes: verificationResponse.ErrorCodes.Select(err => err.Replace('-', ' ')).ToArray());
+        } // post
 
     }
 }
