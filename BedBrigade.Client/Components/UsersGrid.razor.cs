@@ -73,7 +73,7 @@ namespace BedBrigade.Client.Components
             {
                 Roles = getRoles.Data;
             }
-            var getUsers = await _svcUser.GetAllAsync();
+            var getUsers = await _svcUser.GetAllForLocationAsync();
             if (getUsers.Success)
             {
                 BBUsers = getUsers.Data;

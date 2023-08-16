@@ -29,27 +29,32 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<BedRequest>>("No Claim of type Role found");
         string roleName = roleClaim.Value;
 
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllAsync with role ({roleName})");
+        Claim? locationClaim = authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId");
+
+        if (locationClaim == null)
+            return new ServiceResponse<List<BedRequest>>("No Claim of type LocationId found");
+
+        int.TryParse(locationClaim.Value ?? "0", out int locationId);
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllForLocationAsync with LocationId ({locationId})");
         var cachedContent = _cachingService.Get<List<BedRequest>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} BedRequests records in cache", true, cachedContent); ;
-        
+            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
             {
-                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0",
-                    out int locationId);
                 var result = await dbSet.Where(b => b.LocationId == locationId).ToListAsync();
                 _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<List<BedRequest>>($"Found {result.Count()} BedRequests", true, result);
+                return new ServiceResponse<List<BedRequest>>($"Found {result.Count()} {GetEntityName()} records", true, result);
             }
 
             var nationalAdminResponse = await dbSet.ToListAsync();
             _cachingService.Set(cacheKey, nationalAdminResponse);
-            return new ServiceResponse<List<BedRequest>>($"Found {nationalAdminResponse.Count()} BedRequests", true, nationalAdminResponse);
+            return new ServiceResponse<List<BedRequest>>($"Found {nationalAdminResponse.Count()} {GetEntityName()} records", true, nationalAdminResponse);
         }
     }
 }
