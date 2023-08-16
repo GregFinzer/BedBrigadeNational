@@ -2,14 +2,9 @@
 
 namespace BedBrigade.Data.Services
 {
-    public interface ILocationDataService
+    public interface ILocationDataService : IRepository<Location>
     {
-        Task<ServiceResponse<Location>> CreateAsync(Location location);
-        Task<ServiceResponse<bool>> DeleteAsync(int locationId);
-        Task<ServiceResponse<List<Location>>> GetAllAsync();
-        Task<ServiceResponse<Location>> GetAsync(int locationId);
         Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName);
-        Task<ServiceResponse<Location>> UpdateAsync(Location location);
         Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string zipCode);
     }
 }

@@ -133,7 +133,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
 
         private async Task SetLocationName(int locationId)
         {
-            var locationResult = await _svcLocation.GetAsync(locationId);
+            var locationResult = await _svcLocation.GetByIdAsync(locationId);
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
