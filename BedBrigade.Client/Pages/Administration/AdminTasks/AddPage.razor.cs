@@ -51,7 +51,7 @@ public partial class AddPage : ComponentBase
             return;
         }
 
-        var pageTemplate = await _svcTemplateDataService.GetAsync(Constants.DefaultPageTemplate);
+        var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Constants.DefaultPageTemplate);
 
         if (!pageTemplate.Success)
         {
