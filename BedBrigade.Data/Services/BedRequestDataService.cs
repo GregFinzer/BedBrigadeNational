@@ -19,7 +19,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _auth = authProvider;
     }
 
-    public override async Task<ServiceResponse<List<BedRequest>>> GetAllAsync()
+    public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync()
     {
         AuthenticationState authState = await _auth.GetAuthenticationStateAsync();
 

@@ -2,12 +2,8 @@
 
 namespace BedBrigade.Data.Services
 {
-    public interface IDonationDataService
+    public interface IDonationDataService : IRepository<Donation>
     {
-        Task<ServiceResponse<Donation>> CreateAsync(Donation donation);
-        Task<ServiceResponse<bool>> DeleteAsync(int donationId);
-        Task<ServiceResponse<List<Donation>>> GetAllAsync();
-        Task<ServiceResponse<Donation>> GetAsync(int donationId);
-        Task<ServiceResponse<Donation>> UpdateAsync(Donation donation);
+        Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync();
     }
 }
