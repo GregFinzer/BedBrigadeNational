@@ -311,7 +311,7 @@ namespace BedBrigade.Client.Components
 
         private async Task<Location> GetUserLocation(User user)
         {
-            var locationResult = await _svcLocation.GetAsync(user.LocationId);
+            var locationResult = await _svcLocation.GetByIdAsync(user.LocationId);
             if (locationResult.Success)
             {
                return locationResult.Data;

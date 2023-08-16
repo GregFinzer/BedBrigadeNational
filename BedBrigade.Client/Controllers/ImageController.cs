@@ -31,7 +31,7 @@ namespace ImageUpload.Controllers
             string locationName = string.Empty;
             try
             {
-                var result = await _svcLocation.GetAsync(Id);
+                var result = await _svcLocation.GetByIdAsync(Id);
                 if(result.Success)
                 {
                     locationName = result.Data.Route;

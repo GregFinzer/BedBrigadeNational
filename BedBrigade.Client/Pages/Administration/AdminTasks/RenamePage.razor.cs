@@ -34,7 +34,7 @@ public partial class RenamePage : ComponentBase
         }
 
         _originalContent =  (await _svcContentDataService.GetAsync(ContentName, _originalLocationId)).Data;
-        _locationRoute = (await _svcLocationDataService.GetAsync(_originalLocationId)).Data.Route;
+        _locationRoute = (await _svcLocationDataService.GetByIdAsync(_originalLocationId)).Data.Route;
         Model.PageTitle = _originalContent.Title;
         Model.PageName = _originalContent.Name;
     }
