@@ -87,7 +87,7 @@ namespace BedBrigade.Client.Components
             
 
 
-            var result = await _svcDonation.GetAllAsync();
+            var result = await _svcDonation.GetAllForLocationAsync();
             if (result.Success)
             {
                 Donations = result.Data.ToList();

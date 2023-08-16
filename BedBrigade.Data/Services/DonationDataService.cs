@@ -9,119 +9,55 @@ using BedBrigade.Common;
 
 namespace BedBrigade.Data.Services;
 
-public class DonationDataService : IDonationDataService
+public class DonationDataService : Repository<Donation>, IDonationDataService
 {
 
+    private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly AuthenticationStateProvider _auth;
 
-    protected ClaimsPrincipal _identity;
-
-    public DonationDataService(IDbContextFactory<DataContext> dbContextFactory, AuthenticationStateProvider authProvider)
+    public DonationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
     {
-        _contextFactory = dbContextFactory;
+        _contextFactory = contextFactory;
+        _cachingService = cachingService;
         _auth = authProvider;
     }
 
-    public async Task<ServiceResponse<Donation>> GetAsync(int donationId)
+    public async Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync()
     {
-        using (var context = _contextFactory.CreateDbContext())
+        AuthenticationState authState = await _auth.GetAuthenticationStateAsync();
+
+        Claim? roleClaim = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+        if (roleClaim == null)
+            return new ServiceResponse<List<Donation>>("No Claim of type Role found");
+        string roleName = roleClaim.Value;
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllAsync with role ({roleName})");
+        var cachedContent = _cachingService.Get<List<Donation>>(cacheKey);
+
+        if (cachedContent != null)
+            return new ServiceResponse<List<Donation>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+
+        using (var ctx = _contextFactory.CreateDbContext())
         {
-            var result = await context.Donations.FindAsync(donationId);
-            if (result != null)
+            var dbSet = ctx.Set<Donation>();
+            if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
             {
-                return new ServiceResponse<Donation>("Found Record", true, result);
+                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0",
+                    out int locationId);
+                var result = await dbSet.Where(b => b.LocationId == locationId).ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<Donation>>($"Found {result.Count()} {GetEntityName()} records", true, result);
             }
 
-            return new ServiceResponse<Donation>("Not Found");
+            var nationalAdminResponse = await dbSet.ToListAsync();
+            _cachingService.Set(cacheKey, nationalAdminResponse);
+            return new ServiceResponse<List<Donation>>($"Found {nationalAdminResponse.Count()} {GetEntityName()} records", true, nationalAdminResponse);
         }
     }
 
-    public async Task<ServiceResponse<List<Donation>>> GetAllAsync()
-    {
-        var authState = await _auth.GetAuthenticationStateAsync();
 
-        var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-
-        using (var context = _contextFactory.CreateDbContext())
-        {
-
-            List<Donation> result;
-            if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
-            {
-                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
-                result = context.Donations.Where(u => u.LocationId == locationId).ToList();
-            }
-            else
-            {
-                result = await context.Donations.ToListAsync();
-            }
-
-            if (result != null)
-            {
-                return new ServiceResponse<List<Donation>>($"Found {result.Count} records.", true, result);
-            }
-        }
-        return new ServiceResponse<List<Donation>>("None found.");
-    }
-
-    public async Task<ServiceResponse<bool>> DeleteAsync(int donationId)
-    {
-        using (var context = _contextFactory.CreateDbContext())
-        {
-            var user = await context.Users.FindAsync(donationId);
-            if (user == null)
-            {
-                return new ServiceResponse<bool>($"Donation record with key {donationId} not found");
-            }
-            try
-            {
-                context.Users.Remove(user);
-                await context.SaveChangesAsync();
-                return new ServiceResponse<bool>($"Removed record with key {donationId}.", true);
-            }
-            catch (DbException ex)
-            {
-                return new ServiceResponse<bool>($"DB error on delete of user record with key {donationId} - {ex.Message} ({ex.ErrorCode})");
-            }
-        }
-    }
-
-    public async Task<ServiceResponse<Donation>> UpdateAsync(Donation donation)
-    {
-        using (var context = _contextFactory.CreateDbContext())
-        {
-            var entity = await context.Users.FindAsync(donation.DonationId);
-
-            if (entity != null)
-            {
-                context.Entry(entity).CurrentValues.SetValues(donation);
-                context.Entry(entity).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-            }
-            return new ServiceResponse<Donation>($"Donation record was updated.", true, donation);
-        }
-        return new ServiceResponse<Donation>($"Donation with key {donation.DonationId} was not updated.");
-    }
-
-    public async Task<ServiceResponse<Donation>> CreateAsync(Donation donation)
-    {
-        using (var context = _contextFactory.CreateDbContext())
-        {
-
-            try
-            {
-                await context.Donations.AddAsync(donation);
-                await context.SaveChangesAsync();
-                return new ServiceResponse<Donation>($"Added location with key {donation.DonationId}", true);
-            }
-            catch (DbException ex)
-            {
-                return new ServiceResponse<Donation>($"DB error on delete of user record with key {donation.DonationId} - {ex.Message} ({ex.ErrorCode})");
-            }
-        }
-
-    }
 
 
 }

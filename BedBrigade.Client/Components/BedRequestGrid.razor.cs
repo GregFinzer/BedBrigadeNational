@@ -76,7 +76,7 @@ namespace BedBrigade.Client.Components
                 OnlyRead = true;
             }
 
-            var bedRequestResult = await _svcBedRequest.GetAllAsync();
+            var bedRequestResult = await _svcBedRequest.GetAllForLocationAsync();
             if (bedRequestResult.Success)
             {
                 BedRequests = bedRequestResult.Data.ToList();
