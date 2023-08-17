@@ -263,7 +263,7 @@ namespace BedBrigade.Client.Components
                 await AddNewUser(user);
                 //args.Cancel = true;
             }
-            var userResult = await _svcUser.GetAllAsync();
+            var userResult = await _svcUser.GetAllForLocationAsync();
             if (userResult.Success)
             {
                 BBUsers = userResult.Data;  
@@ -351,7 +351,7 @@ namespace BedBrigade.Client.Components
                 }
 
             }
-            var result = await _svcUser.GetAllAsync();
+            var result = await _svcUser.GetAllForLocationAsync();
             if (result.Success)
             {
                 BBUsers = result.Data;

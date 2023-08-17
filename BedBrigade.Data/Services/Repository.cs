@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using BedBrigade.Data.Models;
@@ -25,11 +27,12 @@ namespace BedBrigade.Data.Services
             _authProvider = authProvider;
         }
 
-        public async Task<string> GetUserName()
+        //This is the email address stored in the User.Identity.Name
+        public async Task<string> GetUserEmail()
         {
             AuthenticationState? state = await _authProvider.GetAuthenticationStateAsync();
 
-            if (state != null && state.User != null && state.User.Identity != null && state.User.Identity.IsAuthenticated && !String.IsNullOrEmpty(state.User.Identity.Name))
+            if (state.User.Identity != null && state.User.Identity.IsAuthenticated && !String.IsNullOrEmpty(state.User.Identity.Name))
             {
                 return state.User.Identity.Name;
             }
@@ -37,6 +40,21 @@ namespace BedBrigade.Data.Services
             return "Anonymous";
         }
 
+        //This is the user name stored in the nameidentifier
+        public async Task<string> GetUserName()
+        {
+            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
+
+            Claim? nameIdentifier = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
+
+            if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
+            {
+                return nameIdentifier.Value;
+            }
+
+            return "Anonymous";
+        }
+        
         public string GetEntityName()
         {
             return typeof(TEntity).Name;
