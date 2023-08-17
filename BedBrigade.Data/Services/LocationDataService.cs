@@ -27,14 +27,6 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         _contextFactory = contextFactory;
     }
 
-
-
-
-
-
-
-
-
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),  $"GetLocationByRouteAsync for ({routeName})");

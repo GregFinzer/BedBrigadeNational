@@ -2,11 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
-using System.Data.Entity;
-using System.Security.Claims;
-using BedBrigade.Common;
 using static BedBrigade.Common.Common;
-
 
 namespace BedBrigade.Data.Services
 {
