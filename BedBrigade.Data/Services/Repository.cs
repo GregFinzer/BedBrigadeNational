@@ -54,7 +54,36 @@ namespace BedBrigade.Data.Services
 
             return "Anonymous";
         }
-        
+
+        public async Task<string?> GetUserRole()
+        {
+            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
+
+            Claim? roleClaim = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Role);
+
+            if (roleClaim != null && !String.IsNullOrEmpty(roleClaim.Value))
+            {
+                return roleClaim.Value;
+            }
+
+            return null;
+        }
+
+        public async Task<int> GetUserLocationId()
+        {
+            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
+
+            Claim? locationClaim = state.User.Claims.FirstOrDefault(t => t.Type == "LocationId");
+
+            if (locationClaim != null && !String.IsNullOrEmpty(locationClaim.Value))
+            {
+                int.TryParse(locationClaim.Value ?? "0", out int locationId);
+                return locationId;
+            }
+
+            return 0;
+        }
+
         public string GetEntityName()
         {
             return typeof(TEntity).Name;

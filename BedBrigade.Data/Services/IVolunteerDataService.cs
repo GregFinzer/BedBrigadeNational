@@ -2,12 +2,8 @@
 
 namespace BedBrigade.Data.Services
 {
-    public interface IVolunteerDataService
+    public interface IVolunteerDataService : IRepository<Volunteer>
     {
-        Task<ServiceResponse<Volunteer>> CreateAsync(Volunteer volunteer);
-        Task<ServiceResponse<bool>> DeleteAsync(int volunteerId);
-        Task<ServiceResponse<List<Volunteer>>> GetAllAsync();
-        Task<ServiceResponse<Volunteer>> GetAsync(int volunteerId);
-        Task<ServiceResponse<Volunteer>> UpdateAsync(Volunteer volunteer);
+        Task<ServiceResponse<List<Volunteer>>> GetAllForLocationAsync();
     }
 }
