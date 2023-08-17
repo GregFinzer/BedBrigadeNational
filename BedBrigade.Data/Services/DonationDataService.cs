@@ -19,10 +19,6 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
     {
         return await _commonService.GetAllForLocationAsync(this);
     }
-
-
-
-
 }
 
 

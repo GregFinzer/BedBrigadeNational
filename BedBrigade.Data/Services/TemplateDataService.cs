@@ -9,17 +9,12 @@ public class TemplateDataService : Repository<Template>, ITemplateDataService
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly AuthenticationStateProvider _auth;
 
     public TemplateDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
-        _auth = authProvider;
     }
-
-
-
 
     public async Task<ServiceResponse<Template>> GetByNameAsync(string name)
     {
@@ -42,10 +37,6 @@ public class TemplateDataService : Repository<Template>, ITemplateDataService
             return new ServiceResponse<Template>("None found.");
         }
     }
-
-
-
-
 
     public async Task<ServiceResponse<List<Template>>> GetByContentTypeAsync(ContentType type)
     {
