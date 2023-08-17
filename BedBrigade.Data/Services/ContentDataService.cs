@@ -8,14 +8,15 @@ public class ContentDataService : Repository<Content>, IContentDataService
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly AuthenticationStateProvider _auth;
+    private readonly ICommonService _commonService;
 
-
-    public ContentDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+    public ContentDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
+        AuthenticationStateProvider authProvider,
+        ICommonService commonService) : base(contextFactory, cachingService, authProvider)
     {
         _cachingService = cachingService;
         _contextFactory = contextFactory;
-        _auth = authProvider;
+        _commonService = commonService;
     }
 
     public Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
@@ -41,6 +42,11 @@ public class ContentDataService : Repository<Content>, IContentDataService
             _cachingService.Set(cacheKey, result);
             return Task.FromResult(new ServiceResponse<Content>($"Found {GetEntityName()} with locationId of {locationId} and a name of {name}", true, result));
         }
+    }
+
+    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync()
+    {
+        return await _commonService.GetAllForLocationAsync(this);
     }
 }
 

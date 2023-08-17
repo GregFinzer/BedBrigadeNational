@@ -15,13 +15,16 @@ namespace BedBrigade.Data.Services
         private readonly ICachingService _cachingService;
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly AuthenticationStateProvider _auth;
+        private readonly ICommonService _commonService;
 
         public UserDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-            AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+            AuthenticationStateProvider authProvider,
+            ICommonService commonService) : base(contextFactory, cachingService, authProvider)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
             _auth = authProvider;
+            _commonService = commonService;
         }
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
@@ -31,45 +34,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync()
         {
-            AuthenticationState authState = await _auth.GetAuthenticationStateAsync();
-
-            Claim? roleClaim = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-
-            if (roleClaim == null)
-                return new ServiceResponse<List<User>>("No Claim of type Role found");
-            string roleName = roleClaim.Value;
-
-            Claim? locationClaim = authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId");
-
-            if (locationClaim == null)
-                return new ServiceResponse<List<User>>("No Claim of type LocationId found");
-
-            int.TryParse(locationClaim.Value ?? "0", out int locationId);
-
-            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),
-                $"GetAllForLocationAsync with LocationId ({locationId})");
-            var cachedContent = _cachingService.Get<List<User>>(cacheKey);
-
-            if (cachedContent != null)
-                return new ServiceResponse<List<User>>(
-                    $"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
-            ;
-
-            using (var ctx = _contextFactory.CreateDbContext())
-            {
-                if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
-                {
-                    var result = ctx.Users.Where(b => b.LocationId == locationId).ToList();
-                    _cachingService.Set(cacheKey, result);
-                    return new ServiceResponse<List<User>>($"Found {result.Count()} {GetEntityName()} records", true,
-                        result);
-                }
-
-                var nationalAdminResponse = ctx.Users.ToList();
-                _cachingService.Set(cacheKey, nationalAdminResponse);
-                return new ServiceResponse<List<User>>(
-                    $"Found {nationalAdminResponse.Count()} {GetEntityName()} records", true, nationalAdminResponse);
-            }
+            return await _commonService.GetAllForLocationAsync(this);
         }
 
         //TODO:  This should be broken out into a separate Role service

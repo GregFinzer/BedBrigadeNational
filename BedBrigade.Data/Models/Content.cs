@@ -5,7 +5,7 @@ using static BedBrigade.Common.Common;
 namespace BedBrigade.Data.Models
 {
 	[Table("Content")]
-    public class Content : BaseEntity
+    public class Content : BaseEntity, ILocationId
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BedBrigade.Data.Models
 {
 	[Table("Volunteers")]
-	public class Volunteer : BaseEntity
+	public class Volunteer : BaseEntity, ILocationId
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

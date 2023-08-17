@@ -86,6 +86,7 @@ namespace BedBrigade.Client
 
         private static void DataServices(WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<ICommonService, CommonService>();
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();

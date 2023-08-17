@@ -114,7 +114,7 @@ namespace BedBrigade.Client.Components
                 OnlyRead = true;
             }
 
-            var result = await _svcVolunteer.GetAllAsync();
+            var result = await _svcVolunteer.GetAllForLocationAsync();
             if (result.Success)
             {
                 Volunteers = result.Data.ToList();

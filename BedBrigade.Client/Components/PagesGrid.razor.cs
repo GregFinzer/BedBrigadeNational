@@ -77,7 +77,7 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             content = new Content();
-            var result = await _svcContent.GetAllAsync();
+            var result = await _svcContent.GetAllForLocationAsync();
             if (result.Success)
             {
                 Pages = result.Data.ToList();
