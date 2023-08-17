@@ -31,7 +31,14 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
             return new ServiceResponse<List<Donation>>("No Claim of type Role found");
         string roleName = roleClaim.Value;
 
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllAsync with role ({roleName})");
+        Claim? locationClaim = authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId");
+
+        if (locationClaim == null)
+            return new ServiceResponse<List<Donation>>("No Claim of type LocationId found");
+
+        int.TryParse(locationClaim.Value ?? "0", out int locationId);
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllForLocationAsync with LocationId ({locationId})");
         var cachedContent = _cachingService.Get<List<Donation>>(cacheKey);
 
         if (cachedContent != null)
@@ -42,8 +49,6 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
             var dbSet = ctx.Set<Donation>();
             if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
             {
-                int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0",
-                    out int locationId);
                 var result = await dbSet.Where(b => b.LocationId == locationId).ToListAsync();
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<Donation>>($"Found {result.Count()} {GetEntityName()} records", true, result);

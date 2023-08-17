@@ -1,331 +1,235 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Security.Claims;
 using BedBrigade.Common;
 using static BedBrigade.Common.Common;
-using EntityState = Microsoft.EntityFrameworkCore.EntityState;
+
 
 namespace BedBrigade.Data.Services
 {
-    public class UserDataService : IUserDataService
+    public class UserDataService : Repository<User>, IUserDataService
     {
+        private readonly ICachingService _cachingService;
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly AuthenticationStateProvider _auth;
-        private ClaimsPrincipal? _identity;
 
-        public UserDataService(IDbContextFactory<DataContext> dbContextFactory, AuthenticationStateProvider authProvider)
+        public UserDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
+            AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
         {
-            _contextFactory = dbContextFactory;
+            _contextFactory = contextFactory;
+            _cachingService = cachingService;
             _auth = authProvider;
-            Task.Run(() => GetUserClaims(authProvider));
-        }
-
-        private async Task GetUserClaims(AuthenticationStateProvider provider)
-        {
-            var state = await provider.GetAuthenticationStateAsync();
-            _identity = state.User;
         }
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
         {
-            if (_identity == null)
-                return new ServiceResponse<User>("Identity is null");
-
-            Claim nameIdentifier = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
-
-            if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
-            {
-                return await GetAsync(nameIdentifier.Value);
-            }
-
-            return new ServiceResponse<User>("NameIdentifier is null or empty");
-        }
-        
-        public async Task<ServiceResponse<User>> GetAsync(string userName)
-        {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-
-                var result = await context.Users.FindAsync(userName);
-                if (result != null)
-                {
-                    return new ServiceResponse<User>("Found Record", true, result);
-                }
-                return new ServiceResponse<User>("Not Found");
-            }
+            return await GetByIdAsync(await GetUserName());
         }
 
-        public async Task<ServiceResponse<List<User>>> GetAllAsync()
+        public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync()
         {
-            using (var context = _contextFactory.CreateDbContext())
-            {
+            AuthenticationState authState = await _auth.GetAuthenticationStateAsync();
 
-                var authState = await _auth.GetAuthenticationStateAsync();
+            Claim? roleClaim = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-                var role = authState.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                List<User> result;
-                if (role.ToLower() != RoleNames.NationalAdmin.ToLower())
-                {
-                    int.TryParse(authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId").Value ?? "0", out int locationId);
-                    result = context.Users.Where(u => u.LocationId == locationId).ToList();
-                }
-                else
-                {
-                    result = context.Users.ToList();
-                }
+            if (roleClaim == null)
+                return new ServiceResponse<List<User>>("No Claim of type Role found");
+            string roleName = roleClaim.Value;
 
-                if (result != null)
-                {
-                    return new ServiceResponse<List<User>>($"Found {result.Count} records.", true, result);
-                }
-                return new ServiceResponse<List<User>>("None found.");
-            }
-        }
+            Claim? locationClaim = authState.User.Claims.FirstOrDefault(c => c.Type == "LocationId");
 
-        public async Task<ServiceResponse<bool>> DeleteAsync(string UserName)
-        {
-            using (var context = _contextFactory.CreateDbContext())
-            {
+            if (locationClaim == null)
+                return new ServiceResponse<List<User>>("No Claim of type LocationId found");
 
-                var user = await context.Users.FindAsync(UserName);
-                if (user == null)
-                {
-                    return new ServiceResponse<bool>($"User record with key {UserName} not found");
-                }
-                try
-                {
-                    context.Users.Remove(user);
-                    await context.SaveChangesAsync();
-                    return new ServiceResponse<bool>($"Removed record with key {UserName}.", true);
-                }
-                catch (DbException ex)
-                {
-                    return new ServiceResponse<bool>($"DB error on delete of user record with key {UserName} - {ex.Message} ({ex.ErrorCode})");
-                }
-            }
-        }
+            int.TryParse(locationClaim.Value ?? "0", out int locationId);
 
-        public async Task<ServiceResponse<User>> UpdateAsync(User user)
-        {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var entity = await context.Users.FindAsync(user.UserName);
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),
+                $"GetAllForLocationAsync with LocationId ({locationId})");
+            var cachedContent = _cachingService.Get<List<User>>(cacheKey);
 
-                if (entity != null)
-                {
-                    context.Entry(entity).CurrentValues.SetValues(user);
-                    context.Entry(entity).State = EntityState.Modified;
-                    await context.SaveChangesAsync();
-                }
-                return new ServiceResponse<User>($"User record was updated.",true,user);
-            }
-            return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
-        }
+            if (cachedContent != null)
+                return new ServiceResponse<List<User>>(
+                    $"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+            ;
 
-        private async Task<ServiceResponse<User>> RecordUpdate(User oldRec, User user)
-        {
             using (var ctx = _contextFactory.CreateDbContext())
             {
-                try
+                if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
                 {
-                    var result = await Task.Run(() => ctx.Users.Update(user));
-                    if (result != null)
-                    {
-                        return new ServiceResponse<User>($"Updated user with key {user.UserName}", true);
-                    }
+                    var result = ctx.Users.Where(b => b.LocationId == locationId).ToList();
+                    _cachingService.Set(cacheKey, result);
+                    return new ServiceResponse<List<User>>($"Found {result.Count()} {GetEntityName()} records", true,
+                        result);
+                }
 
-                }
-                catch (DbException ex)
-                {
-                    Log.Logger.Error("Unable to save updated Volunteer record, {0}", ex);
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Error("Error while updating Volunteer record, {0}", ex.Message);
-                }
+                var nationalAdminResponse = ctx.Users.ToList();
+                _cachingService.Set(cacheKey, nationalAdminResponse);
+                return new ServiceResponse<List<User>>(
+                    $"Found {nationalAdminResponse.Count()} {GetEntityName()} records", true, nationalAdminResponse);
             }
-            return new ServiceResponse<User>($"User with key {user.UserName} was not updated.");
         }
 
-        public async Task<ServiceResponse<User>> CreateAsync(User user)
-            {
-                using (var context = _contextFactory.CreateDbContext())
-                {
+        //TODO:  This should be broken out into a separate Role service
+        public async Task<ServiceResponse<List<Role>>> GetRolesAsync()
+        {
+            string cacheKey = _cachingService.BuildCacheKey("Role", $"GetRolesAsync");
+            var cachedContent = _cachingService.Get<List<Role>>(cacheKey);
 
-                    try
-                    {
-                        await context.Users.AddAsync(user);
-                        await context.SaveChangesAsync();
-                        return new ServiceResponse<User>($"Added user with key {user.UserName}.", true);
-                    }
-                    catch (DbException ex)
-                    {
-                        return new ServiceResponse<User>($"DB error on delete of user record with key {user.UserName} - {ex.Message} ({ex.ErrorCode})");
-                    }
-                }
+            if (cachedContent != null)
+                return new ServiceResponse<List<Role>>($"Found {cachedContent.Count} Role records in cache", true,
+                    cachedContent);
+            ;
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var result = context.Roles.ToList();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<Role>>($"Found {result.Count} Roles", true, result);
             }
+        }
 
-            public async Task<ServiceResponse<bool>> UserExistsAsync(string email)
+        //TODO:  This should be broken out into a separate Role service
+        public async Task<ServiceResponse<Role>> GetRoleAsync(int roleId)
+        {
+            string cacheKey = _cachingService.BuildCacheKey("Role", $"GetRoleAsync({roleId})");
+
+            using (var context = _contextFactory.CreateDbContext())
             {
-                using (var context = _contextFactory.CreateDbContext())
+                var result = await context.Roles.FindAsync(roleId);
+                if (result != null)
                 {
-
-                    var result = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
-                    if (result != null)
-                    {
-                        return new ServiceResponse<bool>($"User does exist.", true, true);
-                    }
-                    return new ServiceResponse<bool>($"User does not exist.", false, false);
+                    _cachingService.Set(cacheKey, result);
+                    return new ServiceResponse<Role>($"Found Role", true, result);
                 }
+
+                return new ServiceResponse<Role>("No Role found.");
             }
+        }
 
-
-            public async Task<ServiceResponse<List<Role>>> GetRolesAsync()
+        public async Task<ServiceResponse<bool>> SaveGridPersistance(Persist persist)
+        {
+            using (var context = _contextFactory.CreateDbContext())
             {
-                using (var context = _contextFactory.CreateDbContext())
-                {
+                var currentUser = await GetCurrentLoggedInUser();
 
-                    var result = context.Roles.ToList();
-                    if (result != null)
-                    {
-                        return new ServiceResponse<List<Role>>($"Found {result.Count} Roles", true, result);
-                    }
-                    return new ServiceResponse<List<Role>>("No Roles found.");
+                if (currentUser.Success && currentUser.Data != null)
+                {
+                    StorePerstanceData(persist, currentUser.Data);
+                    return await SavePersistanceData(context, await GetUserName(), currentUser.Data);
                 }
+
+                return new ServiceResponse<bool>($"Unable to find user {GetUserName()}");
             }
+        }
 
-            public async Task<ServiceResponse<Role>> GetRoleAsync(int roleId)
+        private async Task<ServiceResponse<bool>> SavePersistanceData(DataContext context, string userName, User user)
+        {
+            try
             {
-                using (var context = _contextFactory.CreateDbContext())
-                {
-
-                    var result = await context.Roles.FindAsync(roleId);
-                    if (result != null)
-                    {
-                        return new ServiceResponse<Role>($"Found Role", true, result);
-                    }
-                    return new ServiceResponse<Role>("No Role found.");
-                }
+                var result = context.Users.Update(user);
+                await context.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<bool>($"Grid Persistance Saved for  {userName}");
             }
-
-            public async Task<ServiceResponse<bool>> SaveGridPersistance(Persist persist)
+            catch (DbException ex)
             {
-                using (var context = _contextFactory.CreateDbContext())
+                return new ServiceResponse<bool>(
+                    $"DB error on persist grid record with key {userName} - {ex.Message} ({ex.ErrorCode})");
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<bool>($"Error on persist grid record with key {userName} - {ex.Message} ");
+            }
+        }
+
+        private void StorePerstanceData(Persist persist, User? user)
+        {
+            switch ((PersistGrid)persist.GridId)
+            {
+                case PersistGrid.Configuration:
+                    user.PersistConfig = persist.UserState;
+                    break;
+                case PersistGrid.User:
+                    user.PersistUser = persist.UserState;
+                    break;
+                case PersistGrid.Location:
+                    user.PersistLocation = persist.UserState;
+                    break;
+                case PersistGrid.Volunteer:
+                    user.PersistVolunteers = persist.UserState;
+                    break;
+                case PersistGrid.Donation:
+                    user.PersistDonation = persist.UserState;
+                    break;
+                case PersistGrid.Content:
+                    //                            user.PersistContent = persist.UserState;
+                    break;
+                case PersistGrid.BedRequest:
+                    user.PersistBedRequest = persist.UserState;
+                    break;
+                case PersistGrid.Media:
+                    user.PersistMedia = persist.UserState;
+                    break;
+            }
+        }
+
+        public async Task<ServiceResponse<string>> GetGridPersistance(Persist persist)
+        {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetGridPersistance({persist.GridId}) for user {GetUserName()}");
+            var cachedContent = _cachingService.Get<string>(cacheKey);
+
+            if (cachedContent != null)
+                return new ServiceResponse<string>($"Found Grid for id {persist.GridId} in cache", true, cachedContent);
+
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                string userName = await GetUserName();
+                if (userName != null)
                 {
-                    var userName = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier).Value;
-                    if (userName != null)
+                    var user = await context.Users.FindAsync(userName);
+                    if (user != null)
                     {
-                        var user = await context.Users.FindAsync(userName);
-                        if (user != null)
+                        var response = new ServiceResponse<string>($"Grid peristance found for user {userName}", true,
+                            string.Empty);
+                        // 1 = Recipient, 2 = Facility, 3 = Need 4 = Status, 5 = User
+                        switch ((PersistGrid)persist.GridId)
                         {
-                            StorePerstanceData(persist, user);
-                            return await SavePersistanceData(context, userName, user);
+                            case PersistGrid.Configuration:
+                                response.Data = user.PersistConfig;
+                                break;
+                            case PersistGrid.User:
+                                response.Data = user.PersistUser;
+                                break;
+                            case PersistGrid.Location:
+                                response.Data = response.Data = user.PersistLocation;
+                                break;
+                            case PersistGrid.Volunteer:
+                                response.Data = user.PersistVolunteers;
+                                break;
+                            case PersistGrid.Donation:
+                                response.Data = user.PersistDonation;
+                                break;
+                            case PersistGrid.Content:
+                                //                            user.PersistContent = persist.UserState;
+                                break;
+                            case PersistGrid.BedRequest:
+                                response.Data = user.PersistBedRequest;
+                                break;
+                            case PersistGrid.Media:
+                                response.Data = user.PersistMedia;
+                                break;
                         }
+
+                        _cachingService.Set(cacheKey, response.Data);
+                        return response;
                     }
-
-                    return new ServiceResponse<bool>($"Unable to find user {userName}");
                 }
+
+                return new ServiceResponse<string>($"Unable to find user {userName}");
             }
-
-            private static async Task<ServiceResponse<bool>> SavePersistanceData(DataContext context, string? userName, User? user)
-            {
-                try
-                {
-                    var result = context.Users.Update(user);
-                    await context.SaveChangesAsync();
-                    return new ServiceResponse<bool>($"Grid Persistance Saved for  {userName}");
-                }
-                catch (DbException ex)
-                {
-                    return new ServiceResponse<bool>($"DB error on persist grid record with key {userName} - {ex.Message} ({ex.ErrorCode})");
-                }
-                catch (Exception ex)
-                {
-                    return new ServiceResponse<bool>($"Error on persist grid record with key {userName} - {ex.Message} ");
-                }
-            }
-
-            private static void StorePerstanceData(Persist persist, User? user)
-            {
-                switch ((PersistGrid)persist.GridId)
-                {
-                    case PersistGrid.Configuration:
-                        user.PersistConfig = persist.UserState;
-                        break;
-                    case PersistGrid.User:
-                        user.PersistUser = persist.UserState;
-                        break;
-                    case PersistGrid.Location:
-                        user.PersistLocation = persist.UserState;
-                        break;
-                    case PersistGrid.Volunteer:
-                        user.PersistVolunteers = persist.UserState;
-                        break;
-                    case PersistGrid.Donation:
-                        user.PersistDonation = persist.UserState;
-                        break;
-                    case PersistGrid.Content:
-                        //                            user.PersistContent = persist.UserState;
-                        break;
-                    case PersistGrid.BedRequest:
-                        user.PersistBedRequest = persist.UserState;
-                        break;
-                    case PersistGrid.Media:
-                        user.PersistMedia = persist.UserState;
-                        break;
-                }
-            }
-
-            public async Task<ServiceResponse<string>> GetGridPersistance(Persist persist)
-            {
-                using (var context = _contextFactory.CreateDbContext())
-                {
-                    var userName = _identity.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier).Value;
-                    if (userName != null)
-                    {
-                        var user = await context.Users.FindAsync(userName);
-                        if (user != null)
-                        {
-                            var response = new ServiceResponse<string>($"Grid peristance found for user {userName}", true, string.Empty);
-                            // 1 = Recipient, 2 = Facility, 3 = Need 4 = Status, 5 = User
-                            switch ((PersistGrid)persist.GridId)
-                            {
-                                case PersistGrid.Configuration:
-                                    response.Data = user.PersistConfig;
-                                    break;
-                                case PersistGrid.User:
-                                    response.Data = user.PersistUser;
-                                    break;
-                                case PersistGrid.Location:
-                                    response.Data = response.Data = user.PersistLocation;
-                                    break;
-                                case PersistGrid.Volunteer:
-                                    response.Data = user.PersistVolunteers;
-                                    break;
-                                case PersistGrid.Donation:
-                                    response.Data = user.PersistDonation;
-                                    break;
-                                case PersistGrid.Content:
-                                    //                            user.PersistContent = persist.UserState;
-                                    break;
-                                case PersistGrid.BedRequest:
-                                    response.Data = user.PersistBedRequest;
-                                    break;
-                                case PersistGrid.Media:
-                                    response.Data = user.PersistMedia;
-                                    break;
-                            }
-                            return response;
-                        }
-                    }
-                    return new ServiceResponse<string>($"Unable to find user {userName}");
-                }
-            }
-
-            
         }
     }
+}

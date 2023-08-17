@@ -2,18 +2,13 @@
 
 namespace BedBrigade.Data.Services
 {
-    public interface IUserDataService
+    public interface IUserDataService : IRepository<User>
     {
-        Task<ServiceResponse<User>> CreateAsync(User user);
-        Task<ServiceResponse<bool>> DeleteAsync(string UserName);
-        Task<ServiceResponse<List<User>>> GetAllAsync();
-        Task<ServiceResponse<User>> GetAsync(string userName);
-        Task<ServiceResponse<User>> UpdateAsync(User user);
-        Task<ServiceResponse<bool>> UserExistsAsync(string email);
+        Task<ServiceResponse<User>> GetCurrentLoggedInUser();
+        Task<ServiceResponse<bool>> SaveGridPersistance(Persist persist);
+        Task<ServiceResponse<string>> GetGridPersistance(Persist persist);
         Task<ServiceResponse<List<Role>>> GetRolesAsync();
         Task<ServiceResponse<Role>> GetRoleAsync(int roleId);
-        Task<ServiceResponse<string>> GetGridPersistance(Persist grid);
-        Task<ServiceResponse<bool>> SaveGridPersistance(Persist grid);
-        Task<ServiceResponse<User>> GetCurrentLoggedInUser();
+        Task<ServiceResponse<List<User>>> GetAllForLocationAsync();
     }
 }
