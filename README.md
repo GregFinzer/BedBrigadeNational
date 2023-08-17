@@ -8,7 +8,7 @@ See the this page for more information about Bed Brigade: https://www.bedbrigade
 This is the current website that runs in Orchard Core:
 https://www.bedbrigadecolumbus.org/
 
-The national web site will be built in Blazor Web Assembly for the front end and a .NET Core API for the back end.  .NET Core 7 will be used.
+The national web site is being built in Blazor Server.  NET Core 7 is being used.
 
 **Overall Direction**
 * The Bed Brigade national website will follow the Goodwill model where users will search a bed brigade near me by entering in a zip code
