@@ -1152,6 +1152,9 @@ a.back-btn:hover {
   .main-img-rotate .Container section.flow .slider-angle .carousel-inner {
     transform: inherit;
   }
+  .body-content {
+    padding-top: 40px;
+  }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
   body #mainNav .navbar-nav .nav-item {

@@ -355,3 +355,5 @@ MigrationBackup/
 /BedBrigade/Server/appsettings.json
 /BedBrigade/Server/appsettings.Production.json
 /BedBrigade.Client/wwwroot/Media
+/Documentation/*.bak
+/*.bak
