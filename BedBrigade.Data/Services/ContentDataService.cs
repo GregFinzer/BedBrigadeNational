@@ -1,4 +1,5 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common;
+using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +49,46 @@ public class ContentDataService : Repository<Content>, IContentDataService
     {
         return await _commonService.GetAllForLocationAsync(this);
     }
+
+    public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
+    {
+        entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
+        return base.CreateAsync(entity);
+    }
+
+    public override async Task<ServiceResponse<Content>> UpdateAsync(Content content)
+    {
+        using (var context = _contextFactory.CreateDbContext())
+        {
+            var entity = await context.Content.FindAsync(content.ContentId);
+
+            if (entity != null)
+            {
+                entity.Name = content.Name;
+                entity.Title = content.Title;
+                entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
+                entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
+                entity.UpdateDate = DateTime.Now;
+                entity.UpdateUser = content.UpdateUser;
+                context.Entry(entity).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<Content>($"Content record was updated.", true, content);
+            }
+            return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
+        }
+    }
+
+    private string RemoveSyncFusionClasses(string? input)
+    {
+        if (input == null)
+        {
+            return string.Empty;
+        }
+
+        return input.Replace("e-rte-image", "").Replace("e-imginline", "");
+    }
+    
 }
 
 
