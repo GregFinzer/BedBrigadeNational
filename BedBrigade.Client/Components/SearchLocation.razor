@@ -41,7 +41,7 @@
         <div class="col-md-12 d-flex justify-content-center align-items-center" >
                @switch(ResultType){
                     case "DropDownList":
-                    <label for="LocationSelector" class="formlabel" >Select Location to request A Bed&nbsp;</label>
+                    <label for="LocationSelector" class="formlabel" >Select a Location&nbsp;</label>
                             <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
                                 <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>                                
                                 <DropDownListTemplates TItem="LocationDistance">

@@ -152,10 +152,11 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
+            string userName = await GetUserName();
             if (entity is BaseEntity baseEntity)
             {
-                baseEntity.SetCreateUser(await GetUserName());
-                baseEntity.SetUpdateUser(await GetUserName());
+                baseEntity.SetCreateUser(userName);
+                baseEntity.SetUpdateUser(userName);
             }
 
             try
@@ -177,9 +178,10 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
+            string userName = await GetUserName();
             if (entity is BaseEntity baseEntity)
             {
-                baseEntity.SetUpdateUser(await GetUserName());
+                baseEntity.SetUpdateUser(userName);
             }
 
             try
