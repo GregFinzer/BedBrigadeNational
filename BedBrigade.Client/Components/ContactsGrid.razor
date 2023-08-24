@@ -57,12 +57,12 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as ContactUs)) IsPrimary="true">@ButtonTitle</SfButton>
-                                <SfButton OnClick="Cancel">Cancel</SfButton>
+                                <SfButton CssClass="btn btn-secondary" OnClick="Cancel">Cancel</SfButton>
                             </FooterTemplate>
                             <Template>
                                 @{
                                     ContactUs contactUs = (context as ContactUs)!;
-                                    if(contactUs.LocationId == (int) LocationNumber.National)
+                                    if(contactUs.LocationId == 0)
                                     {
                                         contactUs.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 
@@ -98,7 +98,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfTextBox @bind-Value=@contactUs.Message Enabled="true" Placeholder="Message" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Placeholder="Message" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                 }
@@ -199,6 +199,15 @@ else
     .e-dialog .e-dlg-header {
         font-size: 1.75rem;
         font-weight: 700;
+    }
+
+    .e-dialog {
+        max-height: 800px !important;
+        min-height: 100px !important;
+    }
+
+    .custom-textbox-height {
+        height: 100px;
     }
 
 </style>
