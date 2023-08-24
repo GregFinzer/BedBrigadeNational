@@ -3,6 +3,16 @@ using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Common;
 
+
+
+public class ContactUsStatusEnumItem
+{
+    public ContactUsStatus Value { get; set; }
+    public string? Name { get; set; }
+}
+
+
+
 public class ContentTypeEnumItem
 {
     public ContentType Value { get; set; }
@@ -86,7 +96,8 @@ public static class Common
         BedRequest = 7,
         Media = 8,
         Pages = 9, 
-        Schedule = 10  // added by VS 7/1/2023
+        Schedule = 10,
+        ContactUs = 11
     }
 
     public enum BedRequestStatus

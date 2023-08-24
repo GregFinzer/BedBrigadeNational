@@ -12,7 +12,7 @@ The national web site is being built in Blazor Server.  NET Core 7 is being used
 
 **Overall Direction**
 * The Bed Brigade national website will follow the Goodwill model where users will search a bed brigade near me by entering in a zip code
-* Each location of Bed Brigade will manage their home page, bed requests, volunteers, stories, and assembly instructions
+* Each location of Bed Brigade will manage their home page, bed requests, volunteers, stories, news, users, and assembly instructions
 * The styling of the header and footer will be minimal so that each Bed Brigade location can have their own colors.
 
 **Business Pain**
