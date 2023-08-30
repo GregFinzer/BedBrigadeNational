@@ -75,7 +75,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Deactivate/Activate Location
     
 * Location Request Bed
-    * Request Bed Page
+    * Request Bed Page :heavy_check_mark:
     * Manage Bed Requests :heavy_check_mark:
     * Schedule Deliveries
     * Delivery Checklist
@@ -88,8 +88,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Manage Build and Delivery Schedule :heavy_check_mark:
     
 * Location Contact Us
-    * Contact Us Page
-    * Manage Contacts
+    * Contact Us Page :heavy_check_mark:
+    * Manage Contacts :heavy_check_mark:
     
 * Location Donations
     * Grove City Donate
