@@ -1,9 +1,11 @@
-﻿<div class="container-fluid" style="display: @DisplaySearch">
+﻿<h1 style="display: @DisplayForm">Contact Us</h1>
+
+<div class="container-fluid" style="display: @DisplaySearch">
     <SearchLocation @ref="SearchLocation" Title="Find a Bed Brigade Near Me" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
 </div>
 
 <div class="container-fluid" style="display: @DisplayForm">
-
+    
     <EditForm  EditContext="@EC" >
         <DataAnnotationsValidator />        
 
