@@ -42,4 +42,9 @@ public interface ILoadImagesService
     void EnsureDirectoriesExist(string path, string html);
 
     string SetImgSourceForImageRotators(string path, string html);
+
+    List<string> GetImagesForLocationWithDefault(string path, string area);
+
+    string GetRotatedImage(List<string> images);
+    string GetDirectoryForPathAndArea(string path, string area);
 }

@@ -7,7 +7,7 @@ namespace BedBrigade.Client.Services
     public class LoadImagesService : ILoadImagesService
     {
         private const string imageRotatorTag = "ImageRotator";
-        const string mediaDirectory = "wwwroot/media";
+        private const string mediaDirectory = "wwwroot/media";
         private readonly ICachingService _cachingService;
 
         public string SetImgSourceForImageRotators(string path, string html)
@@ -106,6 +106,12 @@ namespace BedBrigade.Client.Services
             return rotatorLogic.ComputeImageToDisplay(images);
         }
 
+        public string GetRotatedImage(List<string> images)
+        {
+            ImageRotatorLogic rotatorLogic = new ImageRotatorLogic();
+            return rotatorLogic.ComputeImageToDisplay(images);
+        }
+
         /// <summary>
         /// Sets the rotated images for the html
         /// </summary>
@@ -149,8 +155,7 @@ namespace BedBrigade.Client.Services
         /// </example>
         public List<string> GetImagesForArea(string path, string area)
         {
-            string directory = $"{mediaDirectory}/{path}/{area}";
-            directory = directory.Replace("//", "/");
+            string directory = GetDirectoryForPathAndArea(path, area);
             string cacheKey = _cachingService.BuildCacheKey("Directory.GetFiles", directory);
             List<string>? cachedFiles = _cachingService.Get<List<string>?>(cacheKey);
             if (cachedFiles != null)
@@ -167,6 +172,25 @@ namespace BedBrigade.Client.Services
 
             _cachingService.Set(cacheKey, new List<string>());
             return new List<string>();
+        }
+
+        public List<string> GetImagesForLocationWithDefault(string path, string area)
+        {
+            List<string> locationImages = GetImagesForArea(path, area);
+
+            if (locationImages.Count > 0)
+            {
+                return locationImages;
+            }
+
+            return GetImagesForArea(Constants.NationalRoute, area);
+        }
+
+        public string GetDirectoryForPathAndArea(string path, string area)
+        {
+            string directory = $"{mediaDirectory}/{path}/{area}";
+            directory = directory.Replace("//", "/");
+            return directory;
         }
     }
 }
