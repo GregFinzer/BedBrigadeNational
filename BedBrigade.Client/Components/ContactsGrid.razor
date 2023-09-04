@@ -56,8 +56,8 @@ else
                                   }
                             </HeaderTemplate>
                             <FooterTemplate>
-                                <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as ContactUs)) IsPrimary="true">@ButtonTitle</SfButton>
-                                <SfButton CssClass="btn btn-secondary" OnClick="Cancel">Cancel</SfButton>
+                                <button class="btn btn-primary" @onclick=@(() => Save(context as ContactUs)) IsPrimary="true">@ButtonTitle</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
                             </FooterTemplate>
                             <Template>
                                 @{

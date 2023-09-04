@@ -72,8 +72,8 @@
                                     <span style="vertical-align:top; color: red; font-weight: bold">*</span><label>Required fields</label>
                                 </div>
                                 <div class="col-md-6" style="text-align: right">
-                                    <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</SfButton>
-                                    <SfButton CssClass="btn btn-danger" OnClick="Cancel">Cancel</SfButton>
+                                    <button class="btn btn-primary" @onclick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</button>
+                                    <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
                                 </div>
                             </div>
                         </FooterTemplate>
