@@ -87,7 +87,7 @@ namespace BedBrigade.Client.Components
         public bool NoPaging { get; private set; }
         public bool OnlyRead { get; private set; } = false;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "200px" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "80%" };
 
         /// <summary>
         /// Setup the configuration Grid component

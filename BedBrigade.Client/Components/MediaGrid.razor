@@ -89,12 +89,12 @@ else
                             <FooterTemplate>
                                 @if (editHeaderTitle.Contains("Upload"))
                                 {
-                                    <SfButton OnClick="Cancel">Close</SfButton>
+                                    <button class="btn btn-secondary" @onclick="Cancel">Close</button>
                                 }
                                 else
                                 {
-                                    <SfButton CssClass="btn btn-primary" OnClick=@(() => Save(context as Media)) IsPrimary="true" >@ButtonTitle</SfButton>                               
-                                    <SfButton OnClick="Cancel" >Cancel</SfButton>
+                                    <button class="btn btn-primary" @onclick=@(() => Save(context as Media)) IsPrimary="true" >@ButtonTitle</button>
+                                    <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
                                 }
                             </FooterTemplate>
                             <Template>

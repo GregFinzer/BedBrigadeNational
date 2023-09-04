@@ -67,7 +67,7 @@ namespace BedBrigade.Client.Components
         public bool OnlyRead { get; private set; } = false;
         public int selectedScheduleId = 0;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "700px", MinHeight="200px", EnableResize=true };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight="200px", EnableResize=true };
 
 
         protected override async Task OnInitializedAsync()
