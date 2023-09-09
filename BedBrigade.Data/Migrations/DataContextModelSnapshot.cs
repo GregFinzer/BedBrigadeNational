@@ -613,11 +613,17 @@ namespace BedBrigade.Server.Migrations
                     b.Property<int>("VehiclesDeliveryMax")
                         .HasColumnType("int");
 
+                    b.Property<int>("VehiclesDeliveryRegistered")
+                      .HasColumnType("int");
+
                     b.Property<int>("VehiclesNormalMax")
                         .HasColumnType("int");
 
                     b.Property<int>("VolunteersMax")
                         .HasColumnType("int");
+
+                    b.Property<int>("VolunteersRegistered")
+                   .HasColumnType("int");
 
                     b.HasKey("ScheduleId");
 
@@ -803,6 +809,9 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("VehicleType")
+                     .HasColumnType("int");
+
                     b.Property<bool>("IHaveAMinivan")
                         .HasColumnType("bit");
 
@@ -879,6 +888,37 @@ namespace BedBrigade.Server.Migrations
 
                     b.ToTable("VolunteersFor");
                 });
+
+            modelBuilder.Entity("BedBrigade.Data.Models.VolunteerEvent", b =>
+            {
+                b.Property<int>("RegistrationId")
+                  .ValueGeneratedOnAdd()
+                  .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegistrationId"));
+
+                b.Property<int>("LocationId")                   
+                    .HasColumnType("int");
+
+                b.Property<int>("VolunteerId")
+                    .HasColumnType("int");               
+
+                b.Property<string>("VolunteerEventNote")                                       
+                    .HasColumnType("nvarchar(4000)");
+
+                b.HasKey("RegistrationId");
+
+                b.ToTable("VolunteerEvents");
+            });
+
+            modelBuilder.Entity("BedBrigade.Data.Models.VolunteerEvent", b =>
+            {
+                b.HasOne("BedBrigade.Data.Models.Location", null)
+                    .WithMany("VolunteerEvents")
+                    .HasForeignKey("LocationId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
 
             modelBuilder.Entity("BedBrigade.Data.Models.BedRequest", b =>
                 {

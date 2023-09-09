@@ -3,7 +3,7 @@ using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Common;
 
-
+// ENUM & other classes
 
 public class ContactUsStatusEnumItem
 {
@@ -60,6 +60,16 @@ public class EventStatusEnumItem // added by VS 7/1/2023
 
 }
 
+public class VehicleTypeEnumItem // added by VS 9/1/2023
+{
+    public VehicleType Value { get; set; }
+    public string? Name { get; set; }
+
+}
+
+
+//=======================================================================
+
 public static class Common
 {
     public enum ContentType 
@@ -105,6 +115,20 @@ public static class Common
        Requested = 1,
        Scheduled = 2,
        Delivered = 3,
+    }
+
+    public enum VehicleType // added by VS 9/1/2023
+    {
+        [Description("I do not have a delivery vehicle")]
+        NoCar = 0,
+        [Description("I have a minivan")]
+        Minivan = 1,
+        [Description("I have a large SUV")]
+        SUV = 2,
+        [Description("I have a pickup truck with cap")]
+        Truck = 3,
+        [Description("I have other type of vehicle")]
+        Other = 8,
     }
 
     /// <summary>

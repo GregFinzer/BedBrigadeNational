@@ -1,5 +1,7 @@
+using BedBrigade.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static BedBrigade.Common.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -12,30 +14,25 @@ namespace BedBrigade.Data.Models
 
 		[ForeignKey("LocationId")]
 		public Int32 LocationId { get; set; }
-
-		[ForeignKey("VolunteeringForId")]
-        public Int32 VolunteeringForId { get; set; }
-
-		[Required]
-		public DateTime VolunteeringForDate { get; set; }
-
-		[Required]
+		       	
 		public Boolean IHaveVolunteeredBefore { get; set; }
 
-		[Required]
-		[MaxLength(20)]
-		public String FirstName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "First Name is required.")]
+        [MaxLength(20)]        
+        public String FirstName { get; set; } = string.Empty;
 
-        [Required]
-		[MaxLength(25)]
+        [Required(ErrorMessage = "Last Name is required.")]
+        [MaxLength(25)]
 		public String LastName { get; set; } = string.Empty;
 
-        [Required]
-		[MaxLength(255)]
+        [Required(ErrorMessage = "Email Address is required.")]
+        [Index(IsUnique = true)]
+        [EmailInputValidation]
+        [MaxLength(255)]
 		public String Email { get; set; } = string.Empty;
 
-        [Required]
-		[MaxLength(14)]
+        [Required(ErrorMessage = "Phone Number is required.")]
+        [MaxLength(14)]
 		public String Phone { get; set; } = string.Empty;
 
         [MaxLength(80)]
@@ -44,16 +41,18 @@ namespace BedBrigade.Data.Models
         [MaxLength(4000)]
 		public String? Message { get; set; } = string.Empty;
 
-        [Required]
-		public Boolean IHaveAMinivan { get; set; }
+        public VehicleType VehicleType { get; set; } = VehicleType.NoCar; // default value
 
-		[Required]
-		public Boolean IHaveAnSUV { get; set; }
+        public Boolean IHaveAMinivan { get; set; } = false; // delete
 
-		[Required]
-		public Boolean IHaveAPickupTruck { get; set; }
+		public Boolean IHaveAnSUV { get; set; } = false; // delete
+		
+		public Boolean IHaveAPickupTruck { get; set; } = false; // delete
 
-		public string FullName {
+		public int VolunteeringForId { get; set; } = 0; // for compatibility only - should be deleted
+		public DateTime VolunteeringForDate { get; set; }// for compatibility only - should be deleted
+
+        public string FullName {
 			get
 			{
 				return $"{FirstName} {LastName}";
