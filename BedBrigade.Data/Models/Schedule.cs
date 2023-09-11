@@ -5,9 +5,9 @@ using static BedBrigade.Common.Common;
 namespace BedBrigade.Data.Models
 {
     [Table("Schedules")]
-    public class Schedule : BaseEntity
+    public class Schedule : BaseEntity, ILocationId
     {
-        // identification ans relationships (2)
+        // identification and relationships (2)
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]                
         public Int32 ScheduleId { get; set; }
@@ -28,10 +28,21 @@ namespace BedBrigade.Data.Models
         [Required]
         public DateTime EventDateScheduled { get; set; }
 
-        // Event Resources  (3)          
+        // Event Resources  (3)
+       
         public int VehiclesDeliveryMax { get; set; } = 0;
+        public int VehiclesDeliveryRegistered { get; set; } = 0;
         public int VehiclesNormalMax { get; set; } = 0;
-        public int VolunteersMax { get; set; } = 0;
+        public int VolunteersMax { get; set; } = 0; 
+        public int VolunteersRegistered { get; set; } = 0;
+       
+        public string EventSelect
+        {
+            get
+            {
+                return $"{EventName}: {EventDateScheduled.ToShortDateString()}, {EventDateScheduled.ToShortTimeString()}";
+            }
+        }
     }
 }
 

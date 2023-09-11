@@ -1,0 +1,41 @@
+﻿<div class="request-img-rotate border-bottom-green widget widget-align-justify widget-size-100">
+    <div class="Container " style="background-color:#ffffff;">
+        <section class="flow">
+            <div class="slider-angle slider-angle-1 widget widget-align-justify widget-size-33">
+                <div class="Container carousel-inner" style="background-color:#ffffff;">
+                    <section class="flow">
+                        <ImageRotator myId="leftImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                    </section>
+                </div>
+            </div>
+            <div class="slider-angle slider-angle-2 widget widget-align-justify widget-size-33">
+                <div class="Container carousel-inner" style="background-color:#ffffff;">
+                    <section class="flow">
+                        <ImageRotator myId="middleImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                    </section>
+                </div>
+            </div>
+            <div class="slider-angle slider-angle-3 widget widget-align-justify widget-size-33">
+                <div class="Container carousel-inner" style="background-color:#ffffff;">
+                    <section class="flow">
+                        <ImageRotator myId="rightImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                    </section>
+                </div>
+            </div>
+            <div class="widget widget-h-t-m-l-block widget-align-justify widget-size-100 widget-h-t-m-l-block">
+                <div class="widget-body">
+                    <h2>@RotatorTitle</h2>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? RotatorTitle { get; set; }
+    [Parameter]
+    public int LocationId { get; set; }
+    [Parameter]
+    public string? ImagePath { get; set; }
+}

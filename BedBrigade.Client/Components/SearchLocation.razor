@@ -3,6 +3,7 @@
 @using BedBrigade.Data.Services;
 @using BedBrigade.Common;
 @using Syncfusion.Blazor.Inputs;
+@using System.Diagnostics;
 
 <div class="card text-center" style="display: @SearchDisplay">
     <div class="card-header">
@@ -41,9 +42,10 @@
         <div class="col-md-12 d-flex justify-content-center align-items-center" >
                @switch(ResultType){
                     case "DropDownList":
-                    <label for="LocationSelector" class="formlabel" >Select a Location&nbsp;</label>
-                            <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
-                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>                                
+                    <label for="LocationSelector" class="formlabel" >Select a Location&nbsp;&nbsp;</label>
+                            <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue"  Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
+                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="LocationDistance" ValueChange="ChangeLocation"></DropDownListEvents>
                                 <DropDownListTemplates TItem="LocationDistance">
                                     <ItemTemplate>
                                         <span style="font-weight: bold">
@@ -78,7 +80,9 @@
     [Parameter]
     public string? ResultType { get; set; } // default is HyperlinkList, other found list of locations
     [Parameter] 
-    public EventCallback<string> ParentMethod { get; set; }   
+    public EventCallback<string> ParentMethod { get; set; }
+    [Parameter] 
+    public EventCallback<string> LocationChanged { get; set; }
 
     [Inject] private ILocationDataService? _svcLocation { get; set; }
     private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
@@ -86,6 +90,7 @@
     SfMaskedTextBox maskObj;
 
     public int ddlValue { get; set; } = 0;
+    public string selectedLocationName { get; set; } = string.Empty;
 
     public string InputID = "input-id";
 
@@ -105,6 +110,13 @@
            { "font-weight", "bold" },
         };
 
+    public async Task ChangeLocation(ChangeEventArgs<int, LocationDistance> args)
+    {
+        //Debug.WriteLine("ValueChange event has been triggered !!");
+        //selectedLocationName = args.ItemData.;
+        await CallLocationChanged();
+    }
+
 
     public async Task OnCreateInput()
     {
@@ -118,9 +130,28 @@
         SubmitDisabled = true;
     }
 
+    async Task CallLocationChanged()
+    {
+        try
+        {
+            await LocationChanged.InvokeAsync(ddlValue.ToString());
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
     async Task CallParentMethod()
     {
-        await ParentMethod.InvokeAsync(PostalCode);
+        try
+        {
+            await ParentMethod.InvokeAsync(PostalCode);
+        }
+        catch(Exception ex)
+        {
+            
+        }
     }
 
     private bool ValidatePostalCode()

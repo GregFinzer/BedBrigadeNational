@@ -26,7 +26,8 @@ namespace BedBrigade.Data
         public virtual DbSet<Volunteer> Volunteers { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<EmailQueue> EmailQueues { get; set; }
-        public virtual DbSet<VolunteerFor> VolunteersFor { get; set; } 
+        public virtual DbSet<VolunteerFor> VolunteersFor { get; set; }
+        public virtual DbSet<VolunteerEvent> VolunteerEvents { get; set; }
 
         public virtual DbSet<Template> Templates { get; set; }
         
