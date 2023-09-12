@@ -243,9 +243,14 @@ namespace BedBrigade.Client.Components
 
         protected async Task SendTax()
         {
-            foreach(var recipient in LB_Send.GetDataList() )
+            foreach (var recipient in LB_Send.GetDataList())
             {
-                await _messageService.SendEmailAsync(recipient.Email, "national@bedbrigade.org", "Bed Brigade Charitable Donation", "TaxDonation", new { FullName = recipient.Name, Amount = recipient.Amount, Email = recipient.Email });
+                string body = $"Dear {recipient.Name},\n\n" +
+                              $"Thank you for your generous donation of {recipient.Amount.ToString("C")} to the Bed Brigade";
+                await _messageService.SendEmailAsync(recipient.Email, 
+                    "national@bedbrigade.org", 
+                    "Bed Brigade Charitable Donation", 
+                    body);
             }
             await CloseTaxDialog();
         }

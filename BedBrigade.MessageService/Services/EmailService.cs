@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.IO;
-using BedBrigade.Common;
+using System.Text;
 
 namespace BedBrigade.MessageService.Services;
 
@@ -24,11 +24,20 @@ public class EmailService : IEmailService
         _emailConfig = emailConfig;
     }
 
-    public async Task<ServiceResponse<SendResponse>> SendEmailAsync(string To, string From, string Subject, string Template, object Model)
+    public async Task<ServiceResponse<SendResponse>> SendEmailAsync(string toEmail, string fromEmail, string subject, string body)
+    {
+        if (_emailConfig.UseFileMock)
+        {
+            return await SendEmailFileMockAsync(toEmail, fromEmail, subject, body);
+        }
+
+        return await SendLiveEmail(toEmail, fromEmail, subject, body);
+    }
+
+    private async Task<ServiceResponse<SendResponse>> SendLiveEmail(string toEmail, string fromEmail, string subject, string body)
     {
         try
-        { 
-            string template = File.ReadAllText(Template.ToApplicationPath("Templates"));
+        {
             SendResponse email = new SendResponse();
 
             var sender = new SmtpSender(() => new SmtpClient(_emailConfig.SmtpServer)
@@ -41,57 +50,54 @@ public class EmailService : IEmailService
             Email.DefaultSender = sender;
             Email.DefaultRenderer = new RazorRenderer();
 
-            email = await Email               
+            email = await Email
                 .From(_emailConfig.From)
-                .To(To)
-                .Subject(Subject)
-                .UsingTemplate(template, Model)
+                .To(toEmail)
+                .Subject(subject)
+                .Body(body, false)
                 .SendAsync();
-            var result = await AuditEmailAsync(To, From, Subject, Template, Model, email);
-            if (result.Success)
+            
+            if (email.Successful)
             {
-                return new ServiceResponse<SendResponse>($"Email sent from {From}, to {To}.", true, email);
+                return new ServiceResponse<SendResponse>($"Live Email sent from {fromEmail}, to {toEmail}.", true,
+                    email);
             }
-            return new ServiceResponse<SendResponse>("Email failed to send.", false, email);
 
+            return new ServiceResponse<SendResponse>("Live Email failed to send.", false, email);
         }
         catch (Exception ex)
         {
             Debug.Print(ex.Message);
-            return new ServiceResponse<SendResponse>($"Caught Exception {ex.Message}", false);
+            return new ServiceResponse<SendResponse>($"Live Email Caught Exception {ex.Message}", false);
         }
-
-
     }
 
-    private async Task<ServiceResponse<SendResponse>> AuditEmailAsync(string to, string from, string subject, string template, object model, SendResponse result)
+    private async Task<ServiceResponse<SendResponse>> SendEmailFileMockAsync(string toEmail, string fromEmail,
+        string subject, string body)
     {
-        EmailQueue emailqueue = new()
-        {
-            FromDisplayName = from,
-            FromAddress = from,
-            ToAddress = to,
-            Subject = subject,
-            HtmlBody = template,
-            QueueDate = DateTime.UtcNow,
-            SentDate = DateTime.UtcNow,
-            UpdateDate = DateTime.UtcNow,
-            Priority = 0,
-            Status = result.Successful.ToString(),
-            FailureMessage = result.ErrorMessages.Count > 0 ? string.Join(", ", result.ErrorMessages) : string.Empty,
-            FirstName = from
-        };
         try
         {
-            await _context.EmailQueues.AddAsync(emailqueue);
-            await _context.SaveChangesAsync();
-            return new ServiceResponse<SendResponse>("Email Audited", true, result);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Sent:    {DateTime.Now}");
+            sb.AppendLine($"To:      {toEmail}");
+            sb.AppendLine($"From:    {fromEmail}");
+            sb.AppendLine($"Subject: {subject}");
+            sb.AppendLine("Body:");
+            sb.AppendLine(body);
+            sb.AppendLine("=".PadRight(80, '='));
+            sb.AppendLine();
+            string filePath = $"..\\Logs\\{_emailConfig.FileMockName}";
+            await File.AppendAllTextAsync(filePath, sb.ToString());
+
+            return new ServiceResponse<SendResponse>($"Mock Email sent from {fromEmail}, to {toEmail}.", true);
         }
         catch (Exception ex)
         {
-            return new ServiceResponse<SendResponse>($"Write email audit {ex.Message}", false, result);
+            return new ServiceResponse<SendResponse>($"Mock Email Caught Exception {ex.Message}", false);
         }
     }
+
+
 }
 
 

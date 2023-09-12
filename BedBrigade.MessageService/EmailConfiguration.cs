@@ -11,5 +11,7 @@ namespace BedBrigade.MessageService
         public string Password { get; set; } = string.Empty;
         public bool EnableSsl { get; set; } = true;
         public SmtpDeliveryMethod DeliveryMethod { get; set; } = SmtpDeliveryMethod.Network;
+        public bool UseFileMock { get; set; } = true;
+        public string FileMockName { get; set; } = "EmailFileMock.txt";
     }
 }

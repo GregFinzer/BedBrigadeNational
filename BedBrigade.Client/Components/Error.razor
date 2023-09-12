@@ -15,13 +15,11 @@
 
     public async Task ProcessError(Exception ex)
     {
-        StringBuilder template = new StringBuilder();
-        template.AppendLine("@Model.FirstName");
-        template.AppendLine("<p>@Model.Body</p>");
-        template.AppendLine("Bed Brigade");
-
+        //Log to file
         Logger.LogError("Error:ProcessError - Type: {0} Message: {1}", ex.GetType(), ex.Message);
-        string errorBody = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
-        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", template.ToString(), new { FirstName = RoleNames.NationalAdmin, Body = errorBody});
+
+        //Email the error
+        string body = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
+        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", body);
     }
 }
