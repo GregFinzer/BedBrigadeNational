@@ -22,11 +22,10 @@ namespace BedBrigade.Client.Controllers
     public class FileManagerController : Controller
     {
         private const string rootFolderHeaderName = "rootFolder";
-        private const string DoubleBackSlash = "\\";
         private const string Slash = "/";
         public PhysicalFileProvider? operation;
         public string? basePath;
-        string root = "wwwroot\\Media"; // new
+        string root = Path.Combine("wwwroot", "Media"); // new
         string mainFolder = "media";
 
         [Obsolete]
@@ -34,7 +33,8 @@ namespace BedBrigade.Client.Controllers
         {
             this.basePath = hostingEnvironment.ContentRootPath;
             this.operation = new PhysicalFileProvider();
-            this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root);
+            string newRootPath = Path.Combine(basePath, root);
+            this.operation.RootFolder(newRootPath);
         }
 
         // Processing the File Manager operations
@@ -93,7 +93,8 @@ namespace BedBrigade.Client.Controllers
             try
             {
                 string newroot = HttpContext.Request.Headers[rootFolderHeaderName].ToString().Split(',')[0];
-                operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
+                string rootFolder = Path.Combine(basePath, root, newroot);
+                operation.RootFolder(rootFolder);
                 fullPath = fullPath + Path.AltDirectorySeparatorChar + newroot;
             }
             catch { }
@@ -122,16 +123,12 @@ namespace BedBrigade.Client.Controllers
                 {  // fix bug in Syncfusion Path
                     args.Path = args.Path.Replace(newroot, "");
                 }
-                this.operation.RootFolder(this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot);
+
+                string rootFolder = Path.Combine(basePath, root, newroot);
+                this.operation.RootFolder(rootFolder);
             }
             return operation.GetImage(args.Path, args.Id, false, null, null);
         }
-        public IActionResult Index()
-        {
-
-            return View();
-        }
-
 
 
         private void SetUserRoot()
@@ -145,7 +142,7 @@ namespace BedBrigade.Client.Controllers
 
                 if (!String.IsNullOrEmpty(newroot))
                 {
-                    var newFullRoot = this.basePath + DoubleBackSlash + this.root + DoubleBackSlash + newroot;
+                    var newFullRoot = Path.Combine(basePath, root, newroot);
                     //Debug.WriteLine(newFullRoot);
                     operation.RootFolder(newFullRoot); // new
                 }

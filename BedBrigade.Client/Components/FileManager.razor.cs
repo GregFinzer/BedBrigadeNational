@@ -29,12 +29,9 @@ namespace BedBrigade.Client.Components
         public SfFileManager<FileManagerDirectoryContent>? fileManager;
 
         private const string PathDivider = "/";
-        private const string DoubleBackSlash = "\\";
         private const string SubfolderKey = ConfigNames.MainMediaSubFolder;
         private const string SiteRoot = "wwwroot/";
         private string? MainAdminFolder { get; set; } = String.Empty;
-        private string @ErrorMessage = String.Empty;
-        private string MediaRoot = "wwwroot/media";      
       
         private Dictionary<string, string?> dctConfiguration { get; set; } = new Dictionary<string, string?>();
         private string AllowedExtensions  = String.Empty;
@@ -90,7 +87,6 @@ namespace BedBrigade.Client.Components
                 dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
                 AllowedExtensions = dctConfiguration[ConfigNames.AllowedFileExtensions].ToString() + "," + dctConfiguration[ConfigNames.AllowedVideoExtensions].ToString();
                 MaxFileSize = Convert.ToDouble(dctConfiguration[ConfigNames.MaxVideoSize]);
-                MediaRoot = SiteRoot + dctConfiguration[ConfigNames.MediaFolder];
                 MainAdminFolder = dctConfiguration[SubfolderKey];
 
                 if (userLocationId == (int)LocationNumber.National)
@@ -263,8 +259,8 @@ namespace BedBrigade.Client.Components
                     args.DownloadData.Path = PathDivider + userRoute + PathDivider;
                     foreach (var myFile in args.DownloadData.DownloadFileDetails)
                     {
-                        myFile.Path = DoubleBackSlash + userRoute + DoubleBackSlash;
-                        myFile.FilterPath = DoubleBackSlash + userRoute + DoubleBackSlash;
+                        myFile.Path = Path.DirectorySeparatorChar + userRoute + Path.DirectorySeparatorChar;
+                        myFile.FilterPath = Path.DirectorySeparatorChar + userRoute + Path.DirectorySeparatorChar;
                     }
                 }
                 else

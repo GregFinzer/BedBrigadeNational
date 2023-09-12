@@ -23,17 +23,17 @@
             Console.WriteLine($"Start {Start} End {End} Header {Header} Message {Msg}");
         }
 
-        private void GetValues(string FilePath)
+        private void GetValues(string filePath)
         {
             XElement root;
             try
             {
-                var path = Environment.CurrentDirectory + "\\wwwroot\\data\\" + ($"{FilePath}");
+                var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "data", filePath);
                 root = XElement.Load(path);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unable to access XML maintenace note. Path = {ex.Message}");
+                Console.WriteLine($"Unable to access XML maintenance note. Path = {ex.Message}");
                 // We don't want to end the program - display nothing and continue.
                 return;
             }

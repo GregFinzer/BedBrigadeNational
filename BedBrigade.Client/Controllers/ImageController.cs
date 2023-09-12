@@ -27,18 +27,23 @@ namespace ImageUpload.Controllers
         [HttpPost]
         public async Task Save( IList<IFormFile> UploadFiles, int Id, string contentType, string contentName)
         {
-            
-            string locationName = string.Empty;
+            string locationRoute = string.Empty;
             try
             {
                 var result = await _svcLocation.GetByIdAsync(Id);
                 if(result.Success)
                 {
-                    locationName = result.Data.Route;
+                    locationRoute = result.Data.Route.TrimStart('/');
                 }
                 foreach (var file in UploadFiles)
                 {
-                    string targetLocation = hostingEnv.ContentRootPath + $"\\wwwroot\\media{locationName}\\{contentType}\\{contentName}";
+                    string targetLocation = Path.Combine(hostingEnv.ContentRootPath,
+                        "wwwroot",
+                        "media",
+                        locationRoute,
+                        contentType,
+                        contentName);
+                    
                     if (!Directory.Exists(targetLocation))
                     {
                         Directory.CreateDirectory(targetLocation);
@@ -58,9 +63,8 @@ namespace ImageUpload.Controllers
 
         private string CreateFile(IFormFile file, string targetLocation, string filename)
         {
-
             // Name which is used to save the image
-            filename = targetLocation +  $@"\{filename}";
+            filename = Path.Combine(targetLocation, filename);
 
             if (!System.IO.File.Exists(filename))
             {

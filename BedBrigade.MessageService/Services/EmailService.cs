@@ -86,8 +86,8 @@ public class EmailService : IEmailService
             sb.AppendLine(body);
             sb.AppendLine("=".PadRight(80, '='));
             sb.AppendLine();
-            string filePath = $"..\\Logs\\{_emailConfig.FileMockName}";
-            await File.AppendAllTextAsync(filePath, sb.ToString());
+            
+            await File.AppendAllTextAsync(_emailConfig.FileMockPath, sb.ToString());
 
             return new ServiceResponse<SendResponse>($"Mock Email sent from {fromEmail}, to {toEmail}.", true);
         }

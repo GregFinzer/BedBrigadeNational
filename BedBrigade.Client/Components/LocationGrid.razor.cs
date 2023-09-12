@@ -249,7 +249,7 @@ namespace BedBrigade.Client.Components
                 if (!Location.Route.DirectoryExists())
                 {
                     Location.Route.CreateDirectory();
-                    var locationRoute = GetAppRoot(location.Route);
+                    var locationRoute = GetMediaDirectory(location.Route);
                     if (!Directory.Exists(locationRoute + "/pages"))
                     {
                         locationRoute = locationRoute + "/pages";
@@ -341,11 +341,6 @@ namespace BedBrigade.Client.Components
         protected async Task Save(Location location)
         {
             location.Route.ToLower();
-            if(!location.Route.StartsWith('\\'))
-            {
-
-            };
-
             await Grid.EndEdit();
         }
 
