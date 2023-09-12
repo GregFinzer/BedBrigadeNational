@@ -34,7 +34,7 @@ namespace BedBrigade.Data.Data.Seeding
         {
             Log.Logger.Information("SeedImages Started");
 
-            string mediaPath = GetAppRoot(string.Empty);
+            string mediaPath = GetMediaDirectory(string.Empty);
             if (!Directory.Exists(mediaPath))
             {
                 Directory.CreateDirectory(mediaPath);

@@ -159,7 +159,7 @@ public class Seed
     public static void SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
     {
         Log.Logger.Information("Seed Schedules Started");
-        string? sqlConnectionString = string.Empty; //"server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False"; //connection string
+        string? sqlConnectionString = string.Empty; 
         string script = String.Empty;
 
         using (var context = contextFactory.CreateDbContext())
@@ -172,7 +172,7 @@ public class Seed
         }
         else // load data to table
         {
-            var path = Environment.CurrentDirectory + "\\wwwroot\\data\\" + ($"CreateSchedules.sql");
+            var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "data", "CreateSchedules.sql");
             FileInfo file = new FileInfo(path);
             Log.Logger.Information("Schedules will be created");
             Log.Logger.Information("Schedules SQL script file: " + file.FullName);

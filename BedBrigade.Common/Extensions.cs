@@ -78,32 +78,32 @@ namespace BedBrigade.Common
         /// <returns>A string containing where the file was found</returns>
         public static string ToApplicationPath(this string fileName, string folderName = "")
         {
-            string appRoot = GetAppRoot(folderName);
+            string appRoot = GetMediaDirectory(folderName);
             return Path.Combine(appRoot , fileName);
         }
 
 
         public static bool DirectoryExists(this string directoryName)
         {
-            var appRoot = GetAppRoot(directoryName);
+            var appRoot = GetMediaDirectory(directoryName);
             return Directory.Exists(appRoot);
         }
 
         public static DirectoryInfo CreateDirectory(this string directoryName)
         {
-            var appRoot = GetAppRoot(directoryName);
+            var appRoot = GetMediaDirectory(directoryName);
             return Directory.CreateDirectory(appRoot);
         }
 
         public static void DeleteDirectory(this string directoryName, bool recursiveDelete)
         {
-            var appRoot = GetAppRoot(directoryName);
+            var appRoot = GetMediaDirectory(directoryName);
             Directory.Delete(appRoot, recursiveDelete);
         }
 
         public static void DeleteFiles(this string directoryName)
         {
-            var appRoot = GetAppRoot(directoryName);
+            var appRoot = GetMediaDirectory(directoryName);
             string[] files = Directory.GetFiles(appRoot);
             foreach ( string file in files )
             {
@@ -111,16 +111,31 @@ namespace BedBrigade.Common
             }
         }
 
-        public static string GetAppRoot(string directoryName)
+        public static string GetMediaDirectory(string directoryName)
         {
-            var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-            Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
-            var appRoot = appPathMatcher.Match(exePath).Value;
-            var result = $"{appRoot}\\wwwroot\\Media\\{directoryName}";
-            result = result.Replace("\\/", "\\");
+            directoryName = directoryName.TrimStart('/').TrimStart('\\');
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            baseDirectory = GetPathBeforeBin(baseDirectory);
+            string result = Path.Combine(baseDirectory, "wwwroot", "Media", directoryName);
             return result;
         }
 
+        private static string GetPathBeforeBin(string filePath)
+        {
+            string searchText = Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar;
+
+            int index = filePath.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
+
+            if (index != -1)
+            {
+                return filePath.Substring(0, index);
+            }
+            else
+            {
+                // Return the entire path if "/bin/" is not found or some other default action
+                return filePath;
+            }
+        }
 
 
     }
