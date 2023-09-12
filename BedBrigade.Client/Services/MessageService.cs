@@ -26,8 +26,8 @@ public class MessageService : IMessageService
     /// <param name="template"></param>
     /// <param name="model"></param>
     /// <returns>ServiceResponse<SendResponse></SendResponse></returns>
-    public async Task<ServiceResponse<SendResponse>> SendEmailAsync(string to, string from, string subject, string template, object model)
+    public async Task<ServiceResponse<SendResponse>> SendEmailAsync(string to, string from, string subject, string body)
     {
-        return await _emailService.SendEmailAsync(to, from, subject, template, model);
+        return await _emailService.SendEmailAsync(to, from, subject, body);
     }
 }

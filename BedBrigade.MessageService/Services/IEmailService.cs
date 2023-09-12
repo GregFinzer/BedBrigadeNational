@@ -6,6 +6,6 @@ namespace BedBrigade.MessageService.Services
 {
     public interface IEmailService
     {
-        Task<ServiceResponse<SendResponse>> SendEmailAsync(string To, string From, string Subject, string Template, object Model);
+        Task<ServiceResponse<SendResponse>> SendEmailAsync(string toEmail, string fromEmail, string subject, string body);
     }
 }
