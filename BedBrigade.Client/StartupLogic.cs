@@ -103,6 +103,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ITemplateDataService, TemplateDataService>();
             builder.Services.AddScoped<IContactUsDataService, ContactUsDataService>();
             builder.Services.AddScoped<IVolunteerEventsDataService, VolunteerEventsDataService>();
+            builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
         }
 
         private static void ClientServices(WebApplicationBuilder builder)

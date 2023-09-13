@@ -10,6 +10,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
+using Serilog;
 
 namespace BedBrigade.MessageService.Services;
 
@@ -87,7 +88,7 @@ public class EmailService : IEmailService
             sb.AppendLine("=".PadRight(80, '='));
             sb.AppendLine();
             
-            await File.AppendAllTextAsync(_emailConfig.FileMockPath, sb.ToString());
+            Log.Logger.Information(sb.ToString());
 
             return new ServiceResponse<SendResponse>($"Mock Email sent from {fromEmail}, to {toEmail}.", true);
         }

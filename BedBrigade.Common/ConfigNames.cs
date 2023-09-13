@@ -2,9 +2,20 @@
 {
     public static class ConfigNames
     {
+        //Email Section
         public const string FromEmailAddress = "FromEmailAddress";
         public const string HostName = "HostName";
         public const string Port = "Port";
+        public const string EmailBeginHour = "EmailBeginHour";
+        public const string EmailEndHour = "EmailEndHour";
+        public const string EmailBeginDayOfWeek = "EmailBeginDayOfWeek";
+        public const string EmailEndDayOfWeek = "EmailEndDayOfWeek";
+        public const string EmailMaxSendPerHour = "EmailMaxSendPerHour";
+        public const string EmailMaxSendPerDay = "EmailMaxSendPerDay";
+        public const string EmailLockWaitMinutes = "EmailLockWaitMinutes";
+        public const string EmailKeepDays = "EmailKeepDays";
+        public const string EmailMaxPerChunk = "EmailMaxPerChunk";
+
         public const string TokenExpiration = "TokenExpiration";
         public const string AllowedFileExtensions = "AllowedFileExtensions";
         public const string AllowedVideoExtensions = "AllowedVideoExtensions";

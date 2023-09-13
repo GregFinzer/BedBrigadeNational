@@ -297,6 +297,60 @@ public class Seed
                     ConfigurationValue = "6Lfwa-sSAAAAAJ5DXVnVsm7bf3iN-PlCEcjsEU8d",
                     Section = ConfigSection.System
                 },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailBeginHour,
+                    ConfigurationValue = "8",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailEndHour,
+                    ConfigurationValue = "17",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailBeginDayOfWeek,
+                    ConfigurationValue = "1",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailEndDayOfWeek,
+                    ConfigurationValue = "5",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailMaxSendPerHour,
+                    ConfigurationValue = "180",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailMaxSendPerDay,
+                    ConfigurationValue = "1260",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailLockWaitMinutes,
+                    ConfigurationValue = "10",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailKeepDays,
+                    ConfigurationValue = "30",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailMaxPerChunk,
+                    ConfigurationValue = "90",
+                    Section = ConfigSection.Email
+                },
             };
 
             await context.Configurations.AddRangeAsync(configurations);
