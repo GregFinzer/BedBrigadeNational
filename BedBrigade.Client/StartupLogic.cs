@@ -13,6 +13,7 @@ using BedBrigade.MessageService.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace BedBrigade.Client
 {
     public static class StartupLogic
@@ -40,6 +41,19 @@ namespace BedBrigade.Client
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
+            Log.Logger.Information("No Compression added to services");
+            ////Do not use compression for hot reload of local development
+            //if (!Common.Common.IsDevelopment())
+            //{
+            //    Log.Logger.Information("Configure Compression");
+            //    builder.Services.Configure<GzipCompressionProviderOptions>
+            //        (options => options.Level = CompressionLevel.Fastest);
+            //    builder.Services.AddResponseCompression(options =>
+            //    {
+            //        options.Providers.Add<GzipCompressionProvider>();
+            //    });
+            //}
+
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
@@ -47,11 +61,14 @@ namespace BedBrigade.Client
             builder.Services.AddAuthorizationCore();
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlBuilder =>
+                {
+                    sqlBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                });
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.UseApplicationServiceProvider(_svcProvider);
             });
-
+            
             // Add Email Messageing Service config
             // Email Messaging Service
             EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
@@ -121,12 +138,15 @@ namespace BedBrigade.Client
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                // Do not compress when using Hot Reload
-                app.UseResponseCompression();
+                Log.Logger.Information("No Compression added to the app");
+                //Log.Logger.Information("Use Compression");
+                //// Do not compress when using Hot Reload
+                //app.UseResponseCompression();
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -139,6 +159,7 @@ namespace BedBrigade.Client
                 endpoints.MapRazorPages();
 
             });
+            
             Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
             
                         return app;
@@ -157,11 +178,11 @@ namespace BedBrigade.Client
                 var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
                 using (var context = dbContextFactory.CreateDbContext())
                 {
-                    if (app.Environment.IsDevelopment())
-                    {
+                    //if (app.Environment.IsDevelopment())
+                    //{
                         Log.Logger.Information("Performing Migration");
                         await context.Database.MigrateAsync();
-                    }
+                    //}
                 }
                 Log.Logger.Information("Seeding Data");
                 await Seed.SeedData(dbContextFactory);

@@ -32,17 +32,24 @@ namespace BedBrigade.Data.Data.Seeding
 
         private static async Task SeedImages(DataContext context)
         {
-            Log.Logger.Information("SeedImages Started");
-
-            string mediaPath = GetMediaDirectory(string.Empty);
-            if (!Directory.Exists(mediaPath))
+            if (!Common.Common.IsDevelopment())
             {
-                Directory.CreateDirectory(mediaPath);
+                Log.Logger.Information("SeedImages Skipped because we are not in Development environment");
             }
-
-            if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
+            else
             {
-                CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", mediaPath);
+                Log.Logger.Information("SeedImages Started");
+
+                string mediaPath = GetMediaDirectory(string.Empty);
+                if (!Directory.Exists(mediaPath))
+                {
+                    Directory.CreateDirectory(mediaPath);
+                }
+
+                if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
+                {
+                    CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages", mediaPath);
+                }
             }
         }
 

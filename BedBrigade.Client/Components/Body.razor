@@ -4,6 +4,7 @@
 @using System.Security.Claims;
 @using BedBrigade.Common;
 @using HtmlAgilityPack;
+@using Serilog
 @inject IJSRuntime JS
 
 @((MarkupString)BodyContent)
@@ -37,33 +38,45 @@
 
     public async Task LoadBody()
     {
-        var url = _navigationManager.Uri;
-        var PageName = string.Empty;
-        var Location = string.Empty;
-        var routePath = url.Split('/');
-        if (string.IsNullOrEmpty(routePath[3]))
+        try
         {
-            Location = "National";
-            PageName = "Home";
+            var url = _navigationManager.Uri;
+            var PageName = string.Empty;
+            var Location = string.Empty;
+            var routePath = url.Split('/');
+            if (string.IsNullOrEmpty(routePath[3]))
+            {
+                Location = "National";
+                PageName = "Home";
+            }
+            else if (routePath.Length < 5)
+            {
+                _navigationManager.NavigateTo("/National/Sorry", true);
+                return;
+            }
+            else
+            {
+                Location = routePath[3];
+                PageName = routePath[4];
+            }
+            Path = $"/{Location}/pages/{PageName}";
+            await LoadLocationPage(Location, PageName);
         }
-        else if (routePath.Length < 5)
+        catch (Exception ex)
         {
-            _navigationManager.NavigateTo("/National/Sorry", true);
-            return;
+            Log.Logger.Error(ex.Message);
         }
-        else
+    }
+
+    private async Task LoadLocationPage(string location, string pageName)
+    {
+        var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+
+        if (locationResponse.Success && locationResponse.Data != null)
         {
-            Location = routePath[3];
-            PageName = routePath[4];
-        }
-        Path = $"/{Location}/pages/{PageName}";
-        var result = await _svcLocation.GetLocationByRouteAsync($"/{Location}");
-        
-        if (result.Success && result.Data != null)
-        {
-            Console.WriteLine($"Location passed {Location} Location {result.Data.LocationId} ");
-            var contentResult = await _svcContent.GetAsync(PageName, result.Data.LocationId);
-            Console.WriteLine($"Page: {PageName} Location: {result.Data.LocationId}");
+            Console.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
+            var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
+            Console.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
             if (contentResult.Success)
             {
                 content = contentResult.Data;
@@ -75,7 +88,7 @@
                 if (string.IsNullOrEmpty(Menu))
                 {
                     Menu = "home";
-                };
+                }
             }
             else
             {
