@@ -209,8 +209,10 @@ public class Seed
 
         using (var context = contextFactory.CreateDbContext())
         {
+            Log.Logger.Information("Created DBContext");
             if (await context.Configurations.AnyAsync()) return;
 
+            Log.Logger.Information("No configurations found, adding");
             var configurations = new List<Configuration>
             {
                 new()
@@ -300,7 +302,9 @@ public class Seed
             };
 
             await context.Configurations.AddRangeAsync(configurations);
+            Log.Logger.Information("After AddRangeAsync");
             await context.SaveChangesAsync();
+            Log.Logger.Information("After SaveChanges");
         }
     }
 

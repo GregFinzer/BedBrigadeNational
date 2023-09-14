@@ -20,8 +20,6 @@
     <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
     <Content Remove="wwwroot\Data\CreateSchedules.sql" />
     <Content Remove="wwwroot\Media\national\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
-    <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
-    <Content Remove="wwwroot\scripts\DisplayToggle.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +34,9 @@
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
-    <None Include="wwwroot\Data\CreateSchedules.sql" />
+    <None Include="wwwroot\Data\CreateSchedules.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="wwwroot\Media\Arlington\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\canton\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\Circleville\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
@@ -46,10 +46,10 @@
     <None Include="wwwroot\Media\newark\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\rock\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\Media\templates\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
+    <None Include="wwwroot\scripts\AddRemoveClass.js" />
     <None Include="wwwroot\scripts\DisplayToggle.js" />
     <None Include="wwwroot\scripts\cookie.js" />
     <None Include="wwwroot\scripts\scriptLoader.js" />
-    <None Include="wwwroot\scripts\AddRemoveClass.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
   </ItemGroup>
 
