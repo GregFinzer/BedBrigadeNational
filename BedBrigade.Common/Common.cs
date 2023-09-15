@@ -301,10 +301,24 @@ public static class Common
         }
     }
 
+    public static bool IsDevelopment()
+    {
+        string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        return environment == "Development";
+    }
+
     public static string GetHtml(string fileName)
     {
-        var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
-        return html;
+        if (IsDevelopment())
+        {
+            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
+            return html;
+        }
+        else
+        {
+            var html = File.ReadAllText($"../wwwroot/Data/Seeding/SeedHtml/{fileName}");
+            return html;
+        }
     }
 
     public static List<UsState> GetStateList()

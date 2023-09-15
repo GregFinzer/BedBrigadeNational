@@ -41,7 +41,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-    steps:
+    steps:       
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'bedbrigadedev'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_599C0265E3AF42A78A8F66BD93A0E9D3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6F6BDFCE943F46E19A78403FD6BF04FC }}
           package: .
