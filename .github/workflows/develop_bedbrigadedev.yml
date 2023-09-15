@@ -42,6 +42,12 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - name: Create MediaBackup directory if it doesn't exist
+        run: |
+          if [ ! -d "../MediaBackup" ]; then
+            mkdir -p ../MediaBackup
+          fi
+        
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
