@@ -60,7 +60,7 @@
 
   <ItemGroup>
     <None Include="compilerconfig.json" />
-    <None Include="Pages\Administration\AdminTasks\Email.razor" />
+    <None Include="Pages\Administration\Admin\Email.razor" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
@@ -96,7 +96,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
     <ProjectReference Include="..\BedBrigade.Data\BedBrigade.Data.csproj" />
-    <ProjectReference Include="..\BedBrigade.MessageService\BedBrigade.MessageService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

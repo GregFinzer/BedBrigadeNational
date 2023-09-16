@@ -16,8 +16,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Data", "BedBriga
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Common", "BedBrigade.Common\BedBrigade.Common.csproj", "{0C03AB4D-0341-41EA-B473-A1F7C28519EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.MessageService", "BedBrigade.MessageService\BedBrigade.MessageService.csproj", "{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,12 +47,6 @@ Global
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Stage|Any CPU.Build.0 = Release|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Stage|Any CPU.ActiveCfg = Stage|Any CPU
-		{ADC1A3FD-4062-4DB7-A933-02F34B4121F9}.Stage|Any CPU.Build.0 = Stage|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

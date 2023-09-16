@@ -2,8 +2,8 @@
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Org.BouncyCastle.Asn1.Cms;
-using Org.BouncyCastle.Asn1.X509;
+//using Org.BouncyCastle.Asn1.Cms;
+//using Org.BouncyCastle.Asn1.X509;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -23,7 +23,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-        [Inject] private IMessageService? _messageService { get; set; }
+        [Inject] private IEmailQueueLogic? _emailQueueLogic { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -247,10 +247,10 @@ namespace BedBrigade.Client.Components
             {
                 string body = $"Dear {recipient.Name},\n\n" +
                               $"Thank you for your generous donation of {recipient.Amount.ToString("C")} to the Bed Brigade";
-                await _messageService.SendEmailAsync(recipient.Email, 
-                    "national@bedbrigade.org", 
-                    "Bed Brigade Charitable Donation", 
-                    body);
+                //await _messageService.SendEmailAsync(recipient.Email, 
+                //    "national@bedbrigade.org", 
+                //    "Bed Brigade Charitable Donation", 
+                //    body);
             }
             await CloseTaxDialog();
         }

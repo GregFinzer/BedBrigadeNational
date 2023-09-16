@@ -4,7 +4,6 @@
 @using BedBrigade.Common
 
 @inject ILogger<Error> Logger
-@inject IMessageService _svcMessageService
 
 <CascadingValue Value="this">
     @ChildContent
@@ -19,7 +18,8 @@
         Logger.LogError("Error:ProcessError - Type: {0} Message: {1}", ex.GetType(), ex.Message);
 
         //Email the error
-        string body = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
-        await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", body);
+        //TODO:  Implement
+        //string body = $"Error: processError - Type {ex.GetType()}, {ex.Message}";
+        //await _svcMessageService.SendEmailAsync("National.Admin@bedbrigade.org","Error.Notice@bedbrigade.org","**** Error ****", body);
     }
 }

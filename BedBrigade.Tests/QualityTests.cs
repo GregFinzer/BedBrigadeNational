@@ -80,24 +80,6 @@ namespace BedBrigade.Tests
         }
 
 
-        [Test]
-        public void QualityCheckBedBrigadeMessageService()
-        {
-            const string project = "BedBrigade.MessageService";
-            string projectPath = Path.Combine(_solutionPath, project);
-            QualityResult result = _qualityLogic.GetQualityViolationsForDirectory(projectPath);
-
-            if (result.QualityViolations.Any())
-            {
-                ReportViolations(result);
-                Assert.Fail($"Failed Quality Check for {project}");
-            }
-            else
-            {
-                Console.WriteLine($"Passed Quality Check for {project}");
-            }
-        }
-
 
         private void ReportViolations(QualityResult result)
         {
