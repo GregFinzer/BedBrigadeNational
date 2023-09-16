@@ -1,15 +1,14 @@
 ﻿using BedBrigade.Client.Components;
+using BedBrigade.Client.Pages.Administration.Admin;
 using BedBrigade.Client.Services;
 using BedBrigade.Data.Services;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
-using BedBrigade.MessageService;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using Serilog;
-using BedBrigade.MessageService.Services;
 using BedBrigade.Common;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,11 +68,6 @@ namespace BedBrigade.Client
                 options.UseApplicationServiceProvider(_svcProvider);
             });
             
-            // Add Email Messageing Service config
-            // Email Messaging Service
-            EmailConfiguration emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-            builder.Services.AddSingleton(emailConfig);
-
            
             builder.Services.AddHttpClient(); // VS 7/31/2023
 
@@ -81,8 +75,7 @@ namespace BedBrigade.Client
 
             DataServices(builder);
 
-            builder.Services.AddScoped<IMessageService, Services.MessageService>();
-            builder.Services.AddScoped<IEmailService, EmailService>();
+
             builder.Services.AddScoped<ToastService, ToastService>();
             builder.Services.AddSignalR(e =>
             {
@@ -121,6 +114,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContactUsDataService, ContactUsDataService>();
             builder.Services.AddScoped<IVolunteerEventsDataService, VolunteerEventsDataService>();
             builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
+            builder.Services.AddScoped<IEmailQueueLogic, EmailQueueLogic>();
         }
 
         private static void ClientServices(WebApplicationBuilder builder)

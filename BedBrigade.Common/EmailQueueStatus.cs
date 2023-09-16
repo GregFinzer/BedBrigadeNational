@@ -4,6 +4,7 @@
     {
         Queued,
         Locked,
-        Sent
+        Sent,
+        Failed
     }
 }

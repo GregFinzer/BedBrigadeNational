@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BedBrigade.Data.Models
 {
     [Table("EmailQueue")]
-    public class EmailQueue
+    public class EmailQueue : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -33,7 +33,6 @@ namespace BedBrigade.Data.Models
 
         public DateTime? LockDate { get; set; }
         public DateTime? SentDate { get; set; }
-        public DateTime? UpdateDate { get; set; }
 
         [Required]
         public int Priority { get; set; }

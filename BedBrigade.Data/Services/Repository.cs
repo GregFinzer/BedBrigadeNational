@@ -30,11 +30,18 @@ namespace BedBrigade.Data.Services
         //This is the email address stored in the User.Identity.Name
         public async Task<string> GetUserEmail()
         {
-            AuthenticationState? state = await _authProvider.GetAuthenticationStateAsync();
-
-            if (state.User.Identity != null && state.User.Identity.IsAuthenticated && !String.IsNullOrEmpty(state.User.Identity.Name))
+            try
             {
-                return state.User.Identity.Name;
+                AuthenticationState? state = await _authProvider.GetAuthenticationStateAsync();
+
+                if (state.User.Identity != null && state.User.Identity.IsAuthenticated && !String.IsNullOrEmpty(state.User.Identity.Name))
+                {
+                    return state.User.Identity.Name;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Anonymous";
             }
 
             return "Anonymous";
@@ -43,13 +50,20 @@ namespace BedBrigade.Data.Services
         //This is the user name stored in the nameidentifier
         public async Task<string> GetUserName()
         {
-            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
-
-            Claim? nameIdentifier = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
-
-            if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
+            try
             {
-                return nameIdentifier.Value;
+                AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
+
+                Claim? nameIdentifier = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
+
+                if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
+                {
+                    return nameIdentifier.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Anonymous";
             }
 
             return "Anonymous";
@@ -57,13 +71,20 @@ namespace BedBrigade.Data.Services
 
         public async Task<string?> GetUserRole()
         {
-            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
-
-            Claim? roleClaim = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Role);
-
-            if (roleClaim != null && !String.IsNullOrEmpty(roleClaim.Value))
+            try
             {
-                return roleClaim.Value;
+                AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
+
+                Claim? roleClaim = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Role);
+
+                if (roleClaim != null && !String.IsNullOrEmpty(roleClaim.Value))
+                {
+                    return roleClaim.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
 
             return null;

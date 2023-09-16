@@ -218,19 +218,7 @@ public class Seed
                 new()
                 {
                     ConfigurationKey = ConfigNames.FromEmailAddress,
-                    ConfigurationValue = "webmaster@bedbrigade.org",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.HostName,
-                    ConfigurationValue = "mail.bedbrigade.org",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.Port,
-                    ConfigurationValue = "8889",
+                    ConfigurationValue = "DoNotReply@89a27aba-71cb-4968-863a-b1e5203187d5.azurecomm.net",
                     Section = ConfigSection.Email
                 },
                 new()
@@ -325,14 +313,20 @@ public class Seed
                 },
                 new()
                 {
+                    ConfigurationKey = ConfigNames.EmailMaxSendPerMinute,
+                    ConfigurationValue = "30",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
                     ConfigurationKey = ConfigNames.EmailMaxSendPerHour,
-                    ConfigurationValue = "180",
+                    ConfigurationValue = "60",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailMaxSendPerDay,
-                    ConfigurationValue = "1260",
+                    ConfigurationValue = "1440",
                     Section = ConfigSection.Email
                 },
                 new()
@@ -350,7 +344,19 @@ public class Seed
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailMaxPerChunk,
-                    ConfigurationValue = "90",
+                    ConfigurationValue = "30",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailUseFileMock,
+                    ConfigurationValue = "true",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.FromEmailDisplayName,
+                    ConfigurationValue = "Bed Brigade NoReply",
                     Section = ConfigSection.Email
                 },
             };
