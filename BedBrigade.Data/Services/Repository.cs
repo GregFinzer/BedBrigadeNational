@@ -15,6 +15,7 @@ namespace BedBrigade.Data.Services
     public abstract class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
+        private const string _defaultUserNameAndEmail = "Anonymous";
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ICachingService _cachingService;
         private readonly AuthenticationStateProvider _authProvider;
@@ -41,10 +42,10 @@ namespace BedBrigade.Data.Services
             }
             catch (Exception e)
             {
-                return "Anonymous";
+                return _defaultUserNameAndEmail;
             }
 
-            return "Anonymous";
+            return _defaultUserNameAndEmail;
         }
 
         //This is the user name stored in the nameidentifier
@@ -63,10 +64,10 @@ namespace BedBrigade.Data.Services
             }
             catch (Exception e)
             {
-                return "Anonymous";
+                return _defaultUserNameAndEmail;
             }
 
-            return "Anonymous";
+            return _defaultUserNameAndEmail;
         }
 
         public async Task<string?> GetUserRole()
