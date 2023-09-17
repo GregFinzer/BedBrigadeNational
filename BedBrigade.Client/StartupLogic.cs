@@ -75,7 +75,6 @@ namespace BedBrigade.Client
 
             DataServices(builder);
 
-
             builder.Services.AddScoped<ToastService, ToastService>();
             builder.Services.AddSignalR(e =>
             {
@@ -93,6 +92,7 @@ namespace BedBrigade.Client
 
             _svcProvider = builder.Services.BuildServiceProvider();
         }
+
 
         private static void DataServices(WebApplicationBuilder builder)
         {
@@ -114,7 +114,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContactUsDataService, ContactUsDataService>();
             builder.Services.AddScoped<IVolunteerEventsDataService, VolunteerEventsDataService>();
             builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
-            builder.Services.AddScoped<IEmailQueueLogic, EmailQueueLogic>();
+            
         }
 
         private static void ClientServices(WebApplicationBuilder builder)
@@ -218,6 +218,16 @@ namespace BedBrigade.Client
                     }
                 }
             }
+        }
+
+        public static void SetupEmailQueueProcessing(WebApplication app)
+        {
+            Log.Logger.Information("Setup Email Queue Processing");
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var configurationDataService = services.GetRequiredService<IConfigurationDataService>();
+            var emailQueueDataService = services.GetRequiredService<IEmailQueueDataService>();
+            EmailQueueLogic.Start(emailQueueDataService, configurationDataService);
         }
     }
 }

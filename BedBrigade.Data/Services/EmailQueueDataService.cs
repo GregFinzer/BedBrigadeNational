@@ -21,19 +21,39 @@ namespace BedBrigade.Data.Services
 
         public async Task<List<EmailQueue>> GetLockedEmails()
         {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetLockedEmails()");
+            List<EmailQueue>? cachedContent = _cachingService.Get<List<EmailQueue>>(cacheKey);
+
+            if (cachedContent != null)
+            {
+                return cachedContent;
+            }
+
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                return await dbSet.Where(o => o.Status == EmailQueueStatus.Locked.ToString()).ToListAsync();
+                var result = await dbSet.Where(o => o.Status == EmailQueueStatus.Locked.ToString()).ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return result;
             }
         }
 
         public async Task<List<EmailQueue>> GetEmailsSentToday()
         {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetEmailsSentToday()");
+            List<EmailQueue>? cachedContent = _cachingService.Get<List<EmailQueue>>(cacheKey);
+
+            if (cachedContent != null)
+            {
+                return cachedContent;
+            }
+
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                return await dbSet.Where(o => o.SentDate.HasValue && o.SentDate.Value.Date == DateTime.Now.Date).ToListAsync();
+                var result = await dbSet.Where(o => o.SentDate.HasValue && o.SentDate.Value.Date == DateTime.Now.Date).ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return result;
             }
         }
 
@@ -58,14 +78,24 @@ namespace BedBrigade.Data.Services
 
         public async Task<List<EmailQueue>> GetEmailsToProcess(int maxPerChunk)
         {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetEmailsToProcess({maxPerChunk})");
+            List<EmailQueue>? cachedContent = _cachingService.Get<List<EmailQueue>>(cacheKey);
+
+            if (cachedContent != null)
+            {
+                return cachedContent;
+            }
+
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                return await dbSet.Where(o => o.Status == EmailQueueStatus.Queued.ToString())
+                var result = await dbSet.Where(o => o.Status == EmailQueueStatus.Queued.ToString())
                     .OrderByDescending(o => o.Priority)
                     .ThenBy(o => o.QueueDate)
                     .Take(maxPerChunk)
                     .ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return result;
             }
         }
 
