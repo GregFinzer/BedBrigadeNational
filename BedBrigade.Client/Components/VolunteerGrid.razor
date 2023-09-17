@@ -15,12 +15,25 @@
 }
 else
 {
-    <fieldset class="m-4">
-        <legend>Volunteers</legend>
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper">
-                <div class="row">
-                    <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers
+    <div class="row"><div class="col">&nbsp;</div></div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Volunteers</h2>
+        </div>          
+        <div class="col-md-6" style="text-align:right; font-size: small">
+            <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
+            @if (isLocationAdmin)
+            {
+                <span>[Location: @userLocationName]</span>
+            }
+            <br />@userName
+        </div>
+    </div>
+
+    <div class="row">
+            <div class="content-wrapper col-md-12" >               
+                <div style="width: 100%">
+                    <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers Width="100%"
                             ContextMenuItems=@ContextMenu
                             EnablePersistence="true"
                             ShowColumnChooser="true"
@@ -34,11 +47,11 @@ else
                             AllowResizing="true"
                             AllowSelection="true"
                             AllowPdfExport="true"
-                            AllowTextWrap="true"
+                            AllowTextWrap="true"                            
                             AllowGrouping="true">
-                        <GridTextWrapSettings WrapMode="WrapMode.Header" />
+                        <GridTextWrapSettings WrapMode="WrapMode.Content" />
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
-                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
                                 <span>@RecordText</span>
@@ -57,17 +70,7 @@ else
                             <Template>
                                 @{
                                     Volunteer volunteer = (context as Volunteer)!;
-                                    if (volunteer.LocationId == (int)LocationNumber.National)
-                                    {
-                                        volunteer.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
-                                    }
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfDropDownList TItem="VolunteerFor" TValue="Int32" DataSource="VolunteersFor" @bind-Value=@volunteer.VolunteeringForId Enabled="true" Placeholder="Volunteers For" FloatLabelType="FloatLabelType.Auto">
-                                                <DropDownListFieldSettings Text="Name" Value="VolunteerForId" />
-                                            </SfDropDownList>
-                                        </div>
-                                    </div>
+                                                                 
                                     <div class="row">
                                         <div class="col-md-4">
                                             <SfTextBox ID="name" @bind-Value=@volunteer.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
@@ -96,29 +99,37 @@ else
 
                                     </div>
                                     <div class="row my-4">
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <SfCheckBox @bind-Checked=@volunteer.IHaveVolunteeredBefore Label="Previous Volunteer" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
                                         </div>
-                                        <div class="col-md-3 text-center">
-                                            <SfCheckBox Name="MiniVan" @bind-Checked=@volunteer.IHaveAMinivan Label="Mini Van" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                        <div class="col-md-8 text-center">
+                                           <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.NoCar)" Name="RadioBtn" Value="@Common.VehicleType.NoCar.ToString()" @bind-checked="volunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>                                   
+                                     </div>
+                                     <div class="row">
+                                         <div class="col-md-4 text-center">
+                                           <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Minivan)" Name="RadioBtn" Value="@Common.VehicleType.Minivan.ToString()" @bind-checked="volunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                                    @BootstrapHelper.GetBootstrapMessage("info", "Minivan with seats removed or folded into the floor (Honda Odyseey, Toyota Sienna, Chrysler Pacifica, Kia Carnival, etc.)","", false, "compact")
+                                         </div>
+                                        <div class="col-md-4 text-center">
+                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.SUV)" Name="RadioBtn" Value="@Common.VehicleType.SUV.ToString()" @bind-checked="volunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                                @BootstrapHelper.GetBootstrapMessage("info", "Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.","", false, "compact")
                                         </div>
-                                        <div class="col-md-3 text-center">
-                                            <SfCheckBox Name="SUV" @bind-Checked=@volunteer.IHaveAnSUV Label="SUV" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
-                                        </div>
-                                        <div class="col-md-3 text-center">
-                                            <SfCheckBox @bind-Checked=@volunteer.IHaveAPickupTruck Label="Pickup" LabelPosition="Syncfusion.Blazor.Buttons.LabelPosition.After" />
+                                        <div class="col-md-4 text-center">
+                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Truck)" Value="@Common.VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="volunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                                @BootstrapHelper.GetBootstrapMessage("info", "A pickup truck with a camper shell or with a canopy.","", false, "compact")
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div>Notes</div>
                                         <div class="col-md-12">
-                                            <SfRichTextEditor ID="note" @ref=@RteObject @bind-Value=@volunteer.Message EnableResize="true" Enabled="true" Height="300px">
-                                                <RichTextEditorToolbarSettings Items=@Tools />
-                                                <RichTextEditorEvents Created=@CreatedRte />
-                                            </SfRichTextEditor>
+                                            <fieldset class="border rounded-3 p-1">
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Note / Comment / Message</b></legend>
+                                                <div class="control-wrapper">
+                                                    <SfTextBox ID="EventNote" @bind-Value=@volunteer.Message Enabled="true" Placeholder="Volunteer Message" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
+                                                </div>
+                                            </fieldset>
                                         </div>
                                     </div>
-
                                 }
                             </Template>
                         </GridEditSettings>
@@ -128,13 +139,13 @@ else
                                 <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true" />
+                        <GridGroupSettings ShowDropArea="true" EnableLazyLoading="true" />
                         <GridColumns>
-                            <GridColumn Field=@nameof(Volunteer.VolunteerId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridForeignColumn Field=@nameof(Volunteer.VolunteeringForId) ForeignDataSource=@VolunteersFor ForeignKeyField="VolunteerForId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers For" Type="ColumnType.String"AllowEditing="false" AllowFiltering="false" Width="110" />
-                            <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                            <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false"/>
-                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false">
+                        <GridColumn Field=@nameof(Volunteer.VolunteerId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="200px"    />
+                            <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false"  AllowFiltering="false" Width="250px"   />
+                            <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="150px"  >
                                 <Template>
                                     @{
                                         var request = (context as Volunteer);
@@ -142,36 +153,21 @@ else
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false"/>
-                            <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Volunteers At" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
-                            <GridColumn HeaderText="Vehicle" HeaderTextAlign="TextAlign.Center" >
-                                <GridColumns>                            
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAMinivan) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Mini Van" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAnSUV) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="SUV" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
-                                    <GridColumn Field=@nameof(Volunteer.IHaveAPickupTruck) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Pickup" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" />
-                                </GridColumns>
-                            </GridColumn>
-                            <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125" />
-                            <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" AllowEditing="false" Width="100">
-                                <Template>
-                                    @{
-                                        var volunteer = (context as Volunteer);
-                                        @volunteer.Message.StripHTML();
-                                    }
-                                </Template>
-                            </GridColumn>
-
-                        </GridColumns>
+                            <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="300px" />                                                  
+                            <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="false" AllowFiltering="false" Width="200px"  />                        
+                            <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125px" />
+                            <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="false" Width="800px" />
+                         </GridColumns>
                     </SfGrid>
-
+                 </div>
                 </div>
-            </div>
-        </div>
-    </fieldset>
+            </div>     
 }
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
     <ToastPosition X="Center" Y="Top" ></ToastPosition>
 </SfToast>
+
+@ErrorMessage
 
 @if (NoPaging)
 {

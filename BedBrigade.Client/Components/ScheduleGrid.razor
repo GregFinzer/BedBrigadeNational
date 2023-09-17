@@ -199,12 +199,13 @@
                                 <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
                                 <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="350" AllowFiltering="false" ></GridColumn>                               
                      
-                                <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
+                                <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
+                            <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers (Registered)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
                                 <GridColumn Field=@nameof(Schedule.VehiclesDeliveryMax) HeaderText="Vehicles (Delivery)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
-                                <GridColumn Field=@nameof(Schedule.VehiclesNormalMax) HeaderText="Vehicles (Normal)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>                               
-                            
-         
-                </GridColumns>
+                                <GridColumn Field=@nameof(Schedule.VehiclesNormalMax) HeaderText="Vehicles (Normal)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VehiclesDeliveryRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
+
+                    </GridColumns>
             </SfGrid>
             </div>
         </div>

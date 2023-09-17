@@ -165,6 +165,19 @@ public static class Common
                         .ToList();
     }
 
+    public static List<VehicleTypeEnumItem> GetVehicleTypeItems() 
+    {
+        var type = typeof(VehicleType);
+        return Enum.GetValues(type).OfType<VehicleType>().ToList()
+                        .Select(x => new VehicleTypeEnumItem
+                        {
+                            Value = (VehicleType)x,
+                            Name = Enum.GetName(type, x)
+                        })
+                        .ToList();
+    }
+
+
     public static List<EventStatusEnumItem> GetEventStatusItems() // added by VS 7/1/2023
     {
         var type = typeof(EventStatus);

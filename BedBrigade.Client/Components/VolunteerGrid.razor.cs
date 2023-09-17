@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Common;
+using BedBrigade.Data.Migrations;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -11,15 +12,15 @@ using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using static BedBrigade.Common.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
+using System.Diagnostics;
 
 namespace BedBrigade.Client.Components
 {
     public partial class VolunteerGrid : ComponentBase
     {
         [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
-        [Inject] private IVolunteerForDataService? _svcVolunteerFor { get; set; }
-        [Inject] private IUserDataService? _svcUser { get; set; }
-        [Inject] private ILocationDataService _svcLocation { get; set; }
+       [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -29,14 +30,21 @@ namespace BedBrigade.Client.Components
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
-        protected List<Volunteer>? Volunteers { get; set; }
+        protected List<Volunteer>? Volunteers { get; set; }      
         protected Volunteer Volunteer { get; set; } = new Volunteer();
-        protected List<VolunteerFor> VolunteersFor { get; private set; }
-        protected List<Location> Locations { get; private set; }
-        protected string[] groupColumns = new string[] { "LocationId" };
+        public List<VehicleTypeEnumItem>? lstVehicleTypes { get; private set; }
+        protected List<Location>? Locations { get; private set; }    
         protected SfGrid<Volunteer>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
+
+
+        private string userRole = String.Empty;
+        private string userName = String.Empty;
+        private string userLocationName = String.Empty;
+        private int userLocationId = 0;
+        public bool isLocationAdmin = false;
+        private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
@@ -46,59 +54,32 @@ namespace BedBrigade.Client.Components
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
-        protected SfRichTextEditor RteObject { get; set; }
-        protected List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
-        {
-            new ToolbarItemModel() { Command = ToolbarCommand.Bold },
-            new ToolbarItemModel() { Command = ToolbarCommand.Italic },
-            new ToolbarItemModel() { Command = ToolbarCommand.Underline },
-            new ToolbarItemModel() { Command = ToolbarCommand.StrikeThrough },
-            new ToolbarItemModel() { Command = ToolbarCommand.FontName },
-            new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
-            new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
-            new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
-            new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
-            new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
-            new ToolbarItemModel() { Command = ToolbarCommand.SuperScript },
-            new ToolbarItemModel() { Command = ToolbarCommand.SubScript },
-            new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-            new ToolbarItemModel() { Command = ToolbarCommand.Formats },
-            new ToolbarItemModel() { Command = ToolbarCommand.Alignments },
-            new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
-            new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
-            new ToolbarItemModel() { Command = ToolbarCommand.Outdent },
-            new ToolbarItemModel() { Command = ToolbarCommand.Indent },
-            new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-            new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
-            new ToolbarItemModel() { Command = ToolbarCommand.Image },
-            new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
-            new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-            new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat },
-            new ToolbarItemModel() { Command = ToolbarCommand.Print },
-            new ToolbarItemModel() { Command = ToolbarCommand.SourceCode },
-            new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-            new ToolbarItemModel() { Command = ToolbarCommand.Undo },
-            new ToolbarItemModel() { Command = ToolbarCommand.Redo }
-        };
-
-
+               
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public bool OnlyRead { get; private set; } = false;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "80%" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "70%" };
 
-        /// <summary>
-        /// Setup the configuration Grid component
-        /// Establish the Claims Principal
-        /// </summary>
-        /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            var authState = await _authState.GetAuthenticationStateAsync();
+            await LoadUserData();
+            await LoadLocations();
+            await LoadVolunteerData();
+            lstVehicleTypes = GetVehicleTypeItems();
+          
+        } // Async Init
+
+
+        private async Task LoadUserData()
+        {
+            var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
+            userName = Identity.Identity.Name;
+            userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+
+            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) )
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -109,68 +90,86 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-            if (Identity.IsInRole(RoleNames.LocationAdmin) )
+
+            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
             {
-                OnlyRead = true;
+                userRole = RoleNames.NationalAdmin;
+                isLocationAdmin = false;
             }
-
-            var result = await _svcVolunteer.GetAllForLocationAsync();
-            if (result.Success)
+            else // Location User
             {
-                Volunteers = result.Data.ToList();
-            }
-
-            var volunteerForRresult = await _svcVolunteerFor.GetAllAsync();
-            if (volunteerForRresult.Success)
-            {
-                VolunteersFor = volunteerForRresult.Data.ToList();
-            }
-            var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
-            {
-                Locations = locationResult.Data.ToList();
-            }
-        }
-
-        protected void CreatedRte()
-        {
-            RteObject.RefreshUI();
-        }
-
-
-        protected override Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (!firstRender)
-            {
-                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
+                if (Identity.IsInRole(RoleNames.LocationAdmin))
                 {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
-                    Grid.EditSettings.AllowDeleting = true;
-                    Grid.EditSettings.AllowAdding = true;
-                    Grid.EditSettings.AllowEditing = true;
-                    StateHasChanged();
+                    userRole = RoleNames.LocationAdmin;
+                    isLocationAdmin = true;
                 }
-            }
-            return base.OnAfterRenderAsync(firstRender);
-        }
 
-        /// <summary>
-        /// On loading of the Grid get the user grid persited data
-        /// </summary>
-        /// <returns></returns>
-        protected async Task OnLoad()
+                if (Identity.IsInRole(RoleNames.LocationAuthor))
+                {
+                    userRole = RoleNames.LocationAuthor;
+                    isLocationAdmin = true;
+                }
+               
+
+
+            } // Get User Data
+        } // User Data
+
+
+        private async Task LoadLocations()
         {
-            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = await Grid.GetPersistData() });
-            if (result.Success)
+            var dataLocations = await _svcLocation!.GetAllAsync();
+
+            if (dataLocations.Success) // 
             {
-                await Grid.SetPersistData(result.Data);
+                Locations = dataLocations.Data;
+                if (Locations != null && Locations.Count > 0)
+                { // select User Location Name 
+                    userLocationName = Locations.Find(e => e.LocationId == userLocationId).Name;
+                } // Locations found             
+
             }
-            if (!Identity.IsInRole(RoleNames.NationalAdmin))
+        } // Load Locations
+
+        private async Task LoadVolunteerData()
+        {
+            try // get Schedule List ===========================================================================================
             {
-                await Grid.ExpandAllGroupAsync();
+                var dataVolunteer = await _svcVolunteer.GetAllAsync(); // get Schedules
+                Volunteers = new List<Volunteer>();
+
+                if (dataVolunteer.Success && dataVolunteer != null)
+                {
+                   
+                    if (dataVolunteer.Data.Count > 0)
+                    {
+                        Volunteers = dataVolunteer.Data.ToList(); // retrieve existing media records to temp list
+
+                        // Location Filter
+                        if (isLocationAdmin)
+                        {
+                           Volunteers = Volunteers.FindAll(e => e.LocationId == userLocationId); // Location Filter
+                        }
+
+                    }
+                    else
+                    {
+                        ErrorMessage = "No Volunteers Data Found";
+                    } // no rows in Media
+
+
+                } // the first success
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "No DB Files. " + ex.Message;
             }
 
-        }
+        } // OnInit
+
+       
+
+    
 
         /// <summary>
         /// On destoring of the grid save its current state
@@ -178,7 +177,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnDestroyed()
         {
-            _state = await Grid.GetPersistData();
+            _state = await Grid.GetPersistDataAsync();
             var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
             if (!result.Success)
             {
@@ -192,8 +191,8 @@ namespace BedBrigade.Client.Components
         {
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
-                _state = await Grid.GetPersistData();
+                await Grid.ResetPersistDataAsync();
+                _state = await Grid.GetPersistDataAsync();
                 await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Volunteer, UserState = _state });
                 return;
             }
@@ -294,7 +293,7 @@ namespace BedBrigade.Client.Components
             {
                 // new Volunteer
                 var result = await _svcVolunteer.CreateAsync(Volunteer);
-                if (result.Success)
+                if (result.Success && result.Data != null)
                 {
                     Volunteer location = result.Data;
                 }
@@ -321,12 +320,12 @@ namespace BedBrigade.Client.Components
 
         protected async Task Save(Volunteer location)
         {
-            await Grid.EndEdit();
+            await Grid.EndEditAsync();
         }
 
         protected async Task Cancel()
         {
-            await Grid.CloseEdit();
+            await Grid.CloseEditAsync();
         }
 
         protected void DataBound()
@@ -348,7 +347,7 @@ namespace BedBrigade.Client.Components
                 FileName = "Volunteer" + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
-            await Grid.PdfExport(ExportProperties);
+            await Grid.ExportToPdfAsync(ExportProperties);
         }
         protected async Task ExcelExport()
         {
@@ -358,7 +357,7 @@ namespace BedBrigade.Client.Components
 
             };
 
-            await Grid.ExcelExport();
+            await Grid.ExportToPdfAsync();
         }
         protected async Task CsvExportAsync()
         {
@@ -368,8 +367,14 @@ namespace BedBrigade.Client.Components
 
             };
 
-            await Grid.CsvExport(ExportProperties);
+            await Grid.ExportToCsvAsync(ExportProperties);
         }
+
+        private string cssClass { get; set; } = "e-outline";
+        protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
+        {
+            { "rows", "5" },
+        };
 
 
     }

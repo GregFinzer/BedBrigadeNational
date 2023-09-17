@@ -3,14 +3,33 @@
 @inject ILocationDataService LocationService
 @page "/volunteer"
 
-<div class="bg-light p-5 rounded-lg m-3">
-    <h1 class="display-4">Volunteer Registration</h1>
-    <p class="lead">Bed Brigade new Volunteers will be able to register on this page to selected location.</p>
-    <hr class="my-4">
-    <p>New Volunteer will register for some location events, enter contact information and available vehicle type</p>
-</div>
+<VolunteerForm />
 
-<SearchLocation  Title="Find a Bed Brigade Near Me" />
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .required::after {
+        content: '*';
+        font-size: medium;
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
+
+    .formlabel {
+        color: #B4886B;
+        font-weight: bold;
+        font-size: small;
+        display: block;
+    }
+</style>
 
 
 
