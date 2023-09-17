@@ -1,6 +1,5 @@
 ﻿@layout BedBrigade.Client.Shared.AdminLayout
 @page "/administration/admin/email"
-@inject IEmailQueueLogic EmailQueueLogic; 
 @attribute [Authorize(Roles = RoleNames.CanSendBulkEmail)]
 
 <h3>Send Email</h3>
@@ -20,26 +19,61 @@
         <label for="body">Body:</label>
         <InputTextArea id="body" class="form-control" @bind-Value="email.Body"></InputTextArea>
     </div>
-
     <button type="submit" class="btn btn-primary">Submit</button>
-    <button type="button" class="btn btn-secondary" @onclick="ProcessQueue">Process Queue</button>
 </EditForm>
 
+<p>&nbsp;</p>
 
+@if (isSuccess)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @message
+    </div>
+}
+else if (isFailure)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @message
+    </div>
+}
 
 
 @code {
+    private bool isSuccess;
+    private bool isFailure;
+    private string message;
     private EmailQueue email = new EmailQueue();
+    
+    public void ShowSuccess(string successMessage)
+    {
+        isSuccess = true;
+        isFailure = false;
+        message = successMessage;
+    }
 
+    public void ShowFailure(string failureMessage)
+    {
+        isFailure = true;
+        isSuccess = false;
+        message = failureMessage;
+    }
+
+
+    
     private async Task HandleSubmit()
     {
-        await EmailQueueLogic.QueueEmail(email);
-        // // Logic to send email. For simplicity, we'll just print to console for now.
-        // Console.WriteLine($"Sending email to: {email.To}, Subject: {email.Subject}, Body: {email.Body}");
+        email.EmailQueueId = 0;
+        var result = await EmailQueueLogic.QueueEmail(email);
+
+        if (result.Success)
+        {
+            ShowSuccess("Email successfully queued.");
+        }
+        else
+        {
+            ShowFailure("Email failed to queue. " + result.Message);
+        }
     }
 
-    private async Task ProcessQueue()
-    {
-        EmailQueueLogic.ProcessQueue(email);
-    }
+
 }

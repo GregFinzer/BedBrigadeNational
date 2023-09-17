@@ -1,41 +1,69 @@
-﻿using System.Text;
+﻿#region Includes
+
+using System.Drawing;
+using System.Text;
 using Azure;
 using Azure.Communication.Email;
 using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using Serilog;
+#endregion
 
 namespace BedBrigade.Data.Services
 {
-    public  class EmailQueueLogic :IEmailQueueLogic
+    public static class EmailQueueLogic 
     {
-        private readonly IEmailQueueDataService _emailQueueDataService;
-        private readonly IConfigurationDataService _configurationDataService;
-        private readonly Timer _timer;
-        private bool _processing = false;
-        private int _emailBeginHour;
-        private int _emailEndHour;
-        private int _emailBeginDayOfWeek;
-        private int _emailEndDayOfWeek;
-        private int _emailMaxSendPerMinute;
-        private int _emailMaxSendPerHour;
-        private int _emailMaxSendPerDay;
-        private int _emailLockWaitMinutes;
-        private int _emailKeepDays;
-        private int _emailMaxPerChunk;
-        private bool _emailUseFileMock;
-        private string _fromEmailAddress;
-        private string _fromEmailDisplayName;
+        #region Class Variables
 
-        public EmailQueueLogic(IEmailQueueDataService emailQueueDataService, IConfigurationDataService configurationDataService)
+        private static IEmailQueueDataService _emailQueueDataService;
+        private static IConfigurationDataService _configurationDataService;
+        private static Timer _timer;
+        private static bool _processing = false;
+        private static int _emailBeginHour;
+        private static int _emailEndHour;
+        private static int _emailBeginDayOfWeek;
+        private static int _emailEndDayOfWeek;
+        private static int _emailMaxSendPerMinute;
+        private static int _emailMaxSendPerHour;
+        private static int _emailMaxSendPerDay;
+        private static int _emailLockWaitMinutes;
+        private static int _emailKeepDays;
+        private static int _emailMaxPerChunk;
+        private static bool _emailUseFileMock;
+        private static string _fromEmailAddress;
+        private static string _fromEmailDisplayName;
+        #endregion
+
+
+
+        #region Public Methods
+
+        public static void Start(IEmailQueueDataService emailQueueDataService, IConfigurationDataService configurationDataService)
         {
             _emailQueueDataService = emailQueueDataService;
             _configurationDataService = configurationDataService;
             const int oneMinute = 1000 * 60;
-            //_timer = new Timer(ProcessQueue, null, oneMinute, oneMinute);
+            _timer = new Timer(ProcessQueue, null, oneMinute, oneMinute);
         }
 
-        public async void ProcessQueue(object? state)
+        public static async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
+        {
+            try
+            {
+                email.Status = EmailQueueStatus.Queued.ToString();
+                email.QueueDate = DateTime.Now;
+                email.FailureMessage = string.Empty;
+                await _emailQueueDataService.CreateAsync(email);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>(ex.Message, false);
+            }
+
+            return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
+        }
+
+        private static async void ProcessQueue(object? state)
         {
             if (_processing)
                 return;
@@ -67,11 +95,16 @@ namespace BedBrigade.Data.Services
             await _emailQueueDataService.DeleteOldEmailQueue(_emailKeepDays);
             _processing = false;
         }
+        #endregion
 
-        private async Task SendQueuedEmails()
+        #region Private Methods
+        private static async Task SendQueuedEmails()
         {
             List<EmailQueue> emailsToProcess = await _emailQueueDataService.GetEmailsToProcess(_emailMaxPerChunk);
             Log.Debug("EmailQueueLogic:  Emails to send now: " + emailsToProcess.Count);
+
+            if (emailsToProcess.Count == 0)
+                return;
 
             Log.Debug("EmailQueueLogic:  Locking Emails");
             await _emailQueueDataService.LockEmailsToProcess(emailsToProcess);
@@ -99,7 +132,7 @@ namespace BedBrigade.Data.Services
             Log.Debug(msg);
         }
 
-        private async Task LogEmail(EmailQueue email)
+        private static async Task LogEmail(EmailQueue email)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Send Email");
@@ -116,7 +149,7 @@ namespace BedBrigade.Data.Services
             await _emailQueueDataService.UpdateAsync(email);
         }
 
-        private async Task SendLiveEmail(EmailQueue email)
+        private static async Task SendLiveEmail(EmailQueue email)
         {
             // This code retrieves your connection string from an environment variable.
             string connectionString = Environment.GetEnvironmentVariable("COMMUNICATION_SERVICES_CONNECTION_STRING");
@@ -172,7 +205,7 @@ namespace BedBrigade.Data.Services
             await _emailQueueDataService.UpdateAsync(email);
         }
 
-        private async Task<bool> WaitForLock()
+        private static async Task<bool> WaitForLock()
         {
             Log.Debug("EmailQueueLogic:  GetLockedEmails");
             List<EmailQueue> lockedEmails = await _emailQueueDataService.GetLockedEmails();
@@ -196,7 +229,7 @@ namespace BedBrigade.Data.Services
             return false;
         }
 
-        private async Task<bool> MaxSent()
+        private static async Task<bool> MaxSent()
         {
             Log.Debug("EmailQueueLogic:  GetEmailsSentToday");
             List<EmailQueue> emailsSentToday = await _emailQueueDataService.GetEmailsSentToday();
@@ -222,7 +255,7 @@ namespace BedBrigade.Data.Services
             return false;
         }
 
-        private bool TimeToSendEmail()
+        private static bool TimeToSendEmail()
         {
             DateTime currentDate = DateTime.Now;
             bool validTime = currentDate.Hour >= _emailBeginHour && currentDate.Hour <= _emailEndHour;
@@ -246,42 +279,27 @@ namespace BedBrigade.Data.Services
             return validDay && validTime;
         }
 
-        public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
-        {
-            try
-            {
-                email.Status = EmailQueueStatus.Queued.ToString();
-                email.QueueDate = DateTime.Now;
-                email.FailureMessage = string.Empty;
-                await _emailQueueDataService.CreateAsync(email);
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse<string>(ex.Message, false);
-            }
-            
-            return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
-        }
 
-        private async Task LoadConfiguration()
+
+        private static async Task LoadConfiguration()
         {
             Log.Debug("EmailQueueLogic: LoadConfiguration");
-            _emailBeginHour = await LoadEmailConfigValue(ConfigNames.EmailBeginHour);
-            _emailEndHour = await LoadEmailConfigValue(ConfigNames.EmailEndHour);
-            _emailBeginDayOfWeek = await LoadEmailConfigValue(ConfigNames.EmailBeginDayOfWeek);
-            _emailEndDayOfWeek = await LoadEmailConfigValue(ConfigNames.EmailEndDayOfWeek);
-            _emailMaxSendPerMinute = await LoadEmailConfigValue(ConfigNames.EmailMaxSendPerMinute);
-            _emailMaxSendPerHour = await LoadEmailConfigValue(ConfigNames.EmailMaxSendPerHour);
-            _emailMaxSendPerDay = await LoadEmailConfigValue(ConfigNames.EmailMaxSendPerDay);
-            _emailLockWaitMinutes = await LoadEmailConfigValue(ConfigNames.EmailLockWaitMinutes);
-            _emailKeepDays = await LoadEmailConfigValue(ConfigNames.EmailKeepDays);
-            _emailMaxPerChunk = await LoadEmailConfigValue(ConfigNames.EmailMaxPerChunk);
-            _emailUseFileMock = await LoadEmailConfigValue(ConfigNames.EmailUseFileMock) == 1;
-            _fromEmailAddress = await LoadEmailConfigString(ConfigNames.FromEmailAddress);
-            _fromEmailDisplayName = await LoadEmailConfigString(ConfigNames.FromEmailDisplayName);
+            _emailBeginHour = await LoadEmailConfigValue( ConfigNames.EmailBeginHour);
+            _emailEndHour = await LoadEmailConfigValue( ConfigNames.EmailEndHour);
+            _emailBeginDayOfWeek = await LoadEmailConfigValue( ConfigNames.EmailBeginDayOfWeek);
+            _emailEndDayOfWeek = await LoadEmailConfigValue( ConfigNames.EmailEndDayOfWeek);
+            _emailMaxSendPerMinute = await LoadEmailConfigValue( ConfigNames.EmailMaxSendPerMinute);
+            _emailMaxSendPerHour = await LoadEmailConfigValue( ConfigNames.EmailMaxSendPerHour);
+            _emailMaxSendPerDay = await LoadEmailConfigValue( ConfigNames.EmailMaxSendPerDay);
+            _emailLockWaitMinutes = await LoadEmailConfigValue( ConfigNames.EmailLockWaitMinutes);
+            _emailKeepDays = await LoadEmailConfigValue( ConfigNames.EmailKeepDays);
+            _emailMaxPerChunk = await LoadEmailConfigValue( ConfigNames.EmailMaxPerChunk);
+            _emailUseFileMock = await LoadEmailConfigValue( ConfigNames.EmailUseFileMock) == 1;
+            _fromEmailAddress = await LoadEmailConfigString( ConfigNames.FromEmailAddress);
+            _fromEmailDisplayName = await LoadEmailConfigString( ConfigNames.FromEmailDisplayName);
         }
 
-        private async Task<string> LoadEmailConfigString(string id)
+        private static async Task<string> LoadEmailConfigString(string id)
         {
             var configResult = await _configurationDataService.GetByIdAsync(id);
 
@@ -293,7 +311,7 @@ namespace BedBrigade.Data.Services
             return configResult.Data.ConfigurationValue ?? string.Empty;
         }
 
-        private async Task<int> LoadEmailConfigValue(string id)
+        private static async Task<int> LoadEmailConfigValue(string id)
         {
             var configResult = await _configurationDataService.GetByIdAsync(id);
 
@@ -318,5 +336,6 @@ namespace BedBrigade.Data.Services
             throw new ArgumentException(
                 $"Expected Config setting {id} to be an integer: {configResult.Data.ConfigurationValue}");
         }
+        #endregion
     }
 }
