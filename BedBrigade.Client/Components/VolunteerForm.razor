@@ -113,11 +113,7 @@
                                 <div class="row">                                  
                                     <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Truck)" Value="@Common.VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     @BootstrapHelper.GetBootstrapMessage("info", "A pickup truck with a camper shell or with a canopy.","", false, "compact")
-                                </div>
-                                <hr />
-                                <div class="row">
-                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Other)" Value="@Common.VehicleType.Other.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
-                                </div>
+                                </div>           
                             </div>
                         </div>
                 </div>
