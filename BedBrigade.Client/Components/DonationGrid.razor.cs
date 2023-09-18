@@ -23,7 +23,6 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-        [Inject] private IEmailQueueLogic? _emailQueueLogic { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
