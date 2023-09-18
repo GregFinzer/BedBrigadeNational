@@ -13,6 +13,8 @@ using System.Security.Claims;
 using static BedBrigade.Common.Common;
 using Action = Syncfusion.Blazor.Grids.Action;
 using System.Diagnostics;
+using Syncfusion.Blazor;
+using System.Threading;
 
 namespace BedBrigade.Client.Components
 {
@@ -59,8 +61,11 @@ namespace BedBrigade.Client.Components
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public bool OnlyRead { get; private set; } = false;
+        private string DisplayEmailMessage = "none";
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "70%" };
+
+        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // = OperationWithTimeout(cancellationTokenSource.Token);
 
         protected override async Task OnInitializedAsync()
         {
@@ -133,11 +138,11 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadVolunteerData()
         {
-            try // get Schedule List ===========================================================================================
+            try // get Volunteer List ===========================================================================================
             {
                 var dataVolunteer = await _svcVolunteer.GetAllAsync(); // get Schedules
                 Volunteers = new List<Volunteer>();
-
+                
                 if (dataVolunteer.Success && dataVolunteer != null)
                 {
                    
@@ -266,13 +271,20 @@ namespace BedBrigade.Client.Components
         private void Add()
         {
             HeaderTitle = "Add Volunteer";
-            ButtonTitle = "Add Volunteer";
-            Volunteer.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+            ButtonTitle = "Add Volunteer";           
         }
+
+        private void ValidateNewEmail()
+        {
+            DisplayEmailMessage = "";
+        }
+
 
         private async Task Save(ActionEventArgs<Volunteer> args)
         {
+            DisplayEmailMessage = "none";
             Volunteer Volunteer = args.Data;
+           
             Volunteer.Phone = Volunteer.Phone.FormatPhoneNumber();
             if (Volunteer.VolunteerId != 0)
             {
@@ -310,6 +322,7 @@ namespace BedBrigade.Client.Components
             }
 
             await Grid.Refresh();
+          
         }
 
         private void BeginEdit()
