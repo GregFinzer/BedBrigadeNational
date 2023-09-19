@@ -10,5 +10,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<Role>>> GetRolesAsync();
         Task<ServiceResponse<Role>> GetRoleAsync(int roleId);
         Task<ServiceResponse<List<User>>> GetAllForLocationAsync();
+        Task<ServiceResponse<List<string>>> GetDistinctEmail();
+        Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
     }
 }

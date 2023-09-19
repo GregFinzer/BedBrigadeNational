@@ -11,13 +11,25 @@ namespace BedBrigade.Data.Services
         
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ICachingService _cachingService;
-        
+        private readonly IVolunteerDataService _volunteerDataService;
+        private readonly IBedRequestDataService _bedRequestDataService;
+        private readonly IContactUsDataService _contactUsDataService;
+        private readonly IUserDataService _userDataService;
+
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService, 
-            AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+            AuthenticationStateProvider authProvider,
+            IVolunteerDataService volunteerDataService,
+            IBedRequestDataService bedRequestDataService,
+            IContactUsDataService contactUsDataService,
+            IUserDataService userDataService) : base(contextFactory, cachingService, authProvider)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
+            _volunteerDataService = volunteerDataService;
+            _bedRequestDataService = bedRequestDataService;
+            _contactUsDataService = contactUsDataService;
+            _userDataService = userDataService;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -174,6 +186,48 @@ namespace BedBrigade.Data.Services
             catch (DbException ex)
             {
                 return new ServiceResponse<EmailQueue>($"Could not update {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
+            }
+        }
+
+        public async Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    bool isNational = locationId == Constants.NationalLocationId;
+                    int queueCount = await dbSet.CountAsync(o => o.Status == EmailQueueStatus.Queued.ToString());
+
+                }
+            }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<string>($"Could not GetSendPlanMessage {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
+            }
+        }
+
+        private async int GetEmailCount(int locationId, EmailRecipientOption option, int scheduleId)
+        {
+            int emailCount;
+            bool isNational = locationId == Constants.NationalLocationId;
+
+            switch (option)
+            {
+                case EmailRecipientOption.AllVolunteers:
+                    return (await _volunteerDataService.GetDistinctEmailByLocation(locationId)).Data.Count;
+                case EmailRecipientOption.AllBedRequestors:
+                    return (await _bedRequestDataService.GetDistinctEmailByLocation(locationId)).Data.Count;
+                case EmailRecipientOption.AllContactUs:
+                    return (await _contactUsDataService.GetDistinctEmailByLocation(locationId)).Data.Count;
+                case EmailRecipientOption.AllBedBrigadeLeadersNationwide:
+                    return (await _userDataService.GetDistinctEmail()).Data.Count;
+                case EmailRecipientOption.AllBedBrigadeLeadersForMyLocation:
+                    return (await _userDataService.GetDistinctEmailByLocation(locationId)).Data.Count;
+                case EmailRecipientOption.VolunteersWithDeliveryVehicles:
+                    return (await _volunteerDataService.GetVolunteerEmailsWithDeliveryVehicles(locationId)).Data.Count;
+                case EmailRecipientOption.VolunteersForAnEvent:
+                    return (await _volunteerDataService.GetVolunteerEmailsForASchedule(scheduleId)).Data.Count;
             }
         }
     }

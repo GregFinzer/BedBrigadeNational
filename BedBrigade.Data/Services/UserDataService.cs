@@ -192,5 +192,15 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>($"Unable to find user {userName}");
             }
         }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
+        {
+            return await _commonService.GetDistinctEmail(this);
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId)
+        {
+            return await _commonService.GetDistinctEmailByLocation(this, locationId);
+        }
     }
 }

@@ -19,7 +19,8 @@ namespace BedBrigade.Data.Models
        
 		[ForeignKey("VolunteerId")]
         public Int32 VolunteerId { get; set; }
-		
+        public Volunteer Volunteer { get; set; }
+
         [MaxLength(4000)]
 		public String? VolunteerEventNote { get; set; } = string.Empty;
 
