@@ -120,7 +120,7 @@ else
                                             <SfTextBox @bind-Value=@volunteer.OrganizationOrGroup Enabled="true" Placeholder="Organization" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@volunteer.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@volunteer.LocationId Readonly=@OnlyRead Enabled="@enabledLocationSelector" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                             <div style="font-size: smaller">
