@@ -78,11 +78,21 @@
                             </div>
                         </FooterTemplate>
                           <Template >                             
-                                @{
-                                    Schedule schedule = (context as Schedule)!; 
-                                                                     
+                            @{
+                                Schedule schedule = (context as Schedule)!; 
+                                if(schedule.ScheduleId == 0) // new event
+                                {
+                                    DateTime myDate = DateTime.Today;
+                                    //myDate = myDate.AddDays(1);
+                                    string strDate = myDate.ToShortDateString();
+                                    string strTime = "9:00 AM";
+                                    myDate = DateTime.Parse(strDate + " " + strTime);
+                                    schedule.EventDateScheduled = myDate;
+                                }
+
+
                                    <div class="row" >
-                                        <div class="col-md-6">
+                                        <div class="col-md-7">
                                             <fieldset class="border rounded-3 p-1">
                                                 <legend class="float-none w-auto p-1" style="font-size: small"><b>Event Details</b></legend>
                                                 <div class="row">
@@ -113,7 +123,7 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label required"><b>Event Date</b></label>
-                                                            <SfDatePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="Choose a Date" ShowClearButton="true" Enabled="true"></SfDatePicker>
+                                                            <SfDateTimePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="Choose a Date & Time" ShowClearButton="true" Enabled="true"></SfDateTimePicker>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -135,7 +145,7 @@
                                                 </div>
                                             </fieldset>
                                         </div>
-                                         <div class="col-md-3">
+                                         <div class="col-md-2">
                                             <fieldset class="border rounded-3 p-1">
                                                 <legend class="float-none w-auto p-1" style="font-size: small"><b>Resources</b></legend>
                                                 <div class="row">
@@ -149,7 +159,7 @@
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label"><b>Vehicles (Delivery)</b></label>
+                                                            <label class="example-label">Vehicles (Delivery)</label>
                                                             <SfNumericTextBox ID="VehiclesDeliveryMax" TValue="Int32" @bind-Value="@schedule.VehiclesDeliveryMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
                                                         </div>
                                                     </div>
@@ -157,7 +167,7 @@
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label"><b>Vehicles (Normal)</b></label>
+                                                            <label class="example-label">Vehicles (Normal)</label>
                                                             <SfNumericTextBox ID="VehiclesNormalMax" TValue="Int32" @bind-Value="@schedule.VehiclesNormalMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
                                                         </div>
                                                     </div>
@@ -184,7 +194,7 @@
                             <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@userLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
                             <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="false" AllowAdding="true" AllowEditing="true" ></GridColumn>
                                 <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                
-                                <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DatePickerEdit" Width="150px" AllowFiltering="true">
+                                <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="d" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
                                    <FilterTemplate>  
                                        @{
                                             <SfDateRangePicker Placeholder="Choose a Range" Width="500" ShowClearButton="true"
@@ -194,6 +204,14 @@
                                             </SfDateRangePicker>
                                         } 
                                         </FilterTemplate>
+                                        <Template>
+                                @{
+                                    Schedule mySchedule = (context as Schedule)!;
+                                    @mySchedule.EventDateScheduled.ToShortDateString()
+                                    <span>&nbsp;</span>
+                                    @mySchedule.EventDateScheduled.ToShortTimeString()
+                                }
+                                        </Template>
                                 </GridColumn>                                
                                 <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
                                 <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>

@@ -13,6 +13,7 @@ using BedBrigade.Data.Services;
 using System.Diagnostics;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Schedule;
+using BedBrigade.Client.Pages.Administration.Manage;
 
 
 namespace BedBrigade.Client.Components
@@ -313,8 +314,8 @@ namespace BedBrigade.Client.Components
             else
             {
                 enabledLocationSelector = true;
-            }
-           
+            }   
+
         }
 
         private async Task Save(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)

@@ -37,7 +37,7 @@ else
                             ContextMenuItems=@ContextMenu
                             EnablePersistence="true"
                             ShowColumnChooser="true"
-                            Toolbar=@ToolBar
+                            Toolbar=@ToolBar                           
                             AllowPaging="true"
                             AllowSorting="true"
                             AllowExcelExport="true"
@@ -57,42 +57,75 @@ else
                                 <span>@RecordText</span>
                             </EmptyRecordTemplate>
                         </GridTemplates>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                        <GridEditSettings 
+                            AllowAdding="true"
+                            AllowEditing="true"
+                            AllowDeleting="true"
+                            Dialog=@DialogParams 
+                            ShowDeleteConfirmDialog="true" 
+                            Mode="@EditMode.Dialog">
                             <HeaderTemplate>
                                 @{
                                     @HeaderTitle
                                   }
                             </HeaderTemplate>
                             <FooterTemplate>
-                                <button class="btn btn-primary" @onclick=@(() => Save(context as Volunteer)) IsPrimary="true">@ButtonTitle</button>
+                                <button class="btn btn-primary"  @onclick=@(() => Save(context as Volunteer)) IsPrimary="true">@ButtonTitle</button>
                                 <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
                             </FooterTemplate>
-                            <Template>
-                                @{
-                                    Volunteer volunteer = (context as Volunteer)!;
-                                                                 
+                            <Validator>
+                                     <DataAnnotationsValidator></DataAnnotationsValidator>
+                            </Validator>
+                            <Template>                               
+                            @{
+                                Volunteer volunteer = (context as Volunteer)!;
+                                if (volunteer.LocationId == 0)
+                                {
+                                    volunteer.LocationId = userLocationId;
+                                }
+
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <SfTextBox ID="name" @bind-Value=@volunteer.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                        <div class="form-group">
+                                            <SfTextBox @bind-Value=@volunteer.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => volunteer.FirstName)"></ValidationMessage>
+                                            </div>
+                                        </div>                                          
                                         </div>
                                         <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@volunteer.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox @bind-Value=@volunteer.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => volunteer.FirstName)"></ValidationMessage>
+                                            </div>
                                         </div>
                                         <div class="form-group col-md-4">
                                             <SfTextBox @bind-Value=@volunteer.Email Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => volunteer.Email)"></ValidationMessage>
+                                            <div style="display: @DisplayEmailMessage">
+                                                    @BootstrapHelper.GetBootstrapMessage("warning", "This email is already registered.", "", false,"compact");
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-4">
                                             <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@volunteer.Phone Enabled="true" Placeholder="Phone" FloatLabelType="FloatLabelType.Auto" />
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => volunteer.Phone)"></ValidationMessage>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <SfTextBox @bind-Value=@volunteer.OrganizationOrGroup Enabled="true" Placeholder="Organization" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@volunteer.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@volunteer.LocationId Readonly=@OnlyRead Enabled="@enabledLocationSelector" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => volunteer.LocationId)"></ValidationMessage>                                            
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -129,8 +162,8 @@ else
                                                 </div>
                                             </fieldset>
                                         </div>
-                                    </div>
-                                }
+                                    </div>                                   
+                                }                               
                             </Template>
                         </GridEditSettings>
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
