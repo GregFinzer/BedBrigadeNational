@@ -175,7 +175,7 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
-            string? userName = await GetUserName();
+            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
             entity.SetCreateAndUpdateUser(userName);
             
             try
@@ -186,7 +186,7 @@ namespace BedBrigade.Data.Services
                     await dbSet.AddAsync(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    Log.Debug($"Created {GetEntityName()}{Environment.NewLine}{ObjectUtil.ObjectToString(entity)}");
+                    Log.Debug($"{userName} Created {GetEntityName()}{Environment.NewLine}{ObjectUtil.ObjectToString(entity)}");
                     return new ServiceResponse<TEntity>($"Created {GetEntityName()} with id {entity}", true, entity);
                 }
             }
@@ -199,7 +199,7 @@ namespace BedBrigade.Data.Services
         public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
 
-            string? userName = await GetUserName();
+            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
             entity.SetUpdateUser(userName);
 
             try
@@ -213,7 +213,7 @@ namespace BedBrigade.Data.Services
                     dbSet.Update(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    Log.Debug($"Updated {GetEntityName()}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
+                    Log.Debug($"{userName} Updated {GetEntityName()}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
                     return new ServiceResponse<TEntity>($"Updated {GetEntityName()} with id {entity}", true, entity);
                 }
             }
