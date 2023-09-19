@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Common;
 using BedBrigade.Data.Models;
+using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using static BedBrigade.Common.Common;
@@ -69,6 +70,7 @@ namespace BedBrigade.Data.Data.Seeding
                     ContentHtml = seedHtml,
                 };
 
+                SeedRoutines.SetMaintFields(content);
                 context.Content.Add(content);
 
                 try
@@ -90,13 +92,15 @@ namespace BedBrigade.Data.Data.Seeding
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var seedHtml = GetHtml($"Footer.html");
-                context.Content.Add(new Content
+                var content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
                     ContentType = ContentType.Footer,
                     Name = name,
                     ContentHtml = seedHtml
-                });
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content);
 
                 try
                 {
@@ -135,14 +139,18 @@ namespace BedBrigade.Data.Data.Seeding
                             break;
                     }
 
-                    context.Content.Add(new Content
+                    var content = new Content
                     {
                         LocationId = location.LocationId!,
                         ContentType = ContentType.Home,
                         Name = name,
                         ContentHtml = seedHtml,
                         Title = name
-                    });
+                    };
+
+                    SeedRoutines.SetMaintFields(content);
+                    context.Content.Add(content);
+
 
                     try
                     {
@@ -165,14 +173,18 @@ namespace BedBrigade.Data.Data.Seeding
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var seedHtml = GetHtml("History.html");
-                context.Content.Add(new Content
+
+                var content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
                     ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     Title = "History of Bed Brigade"
-                });
+                };
+
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content);
                 try
                 {
                     await context.SaveChangesAsync();
@@ -192,14 +204,17 @@ namespace BedBrigade.Data.Data.Seeding
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
                 var seedHtml = GetHtml("Locations.html");
-                context.Content.Add(new Content
+                var content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
                     ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     Title = "Locations"
-                });
+                };
+
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content);
 
                 try
                 {
@@ -223,14 +238,17 @@ namespace BedBrigade.Data.Data.Seeding
             {
 
                 var seedHtml = GetHtml("Partners.html");
-                context.Content.Add(new Content
+                var content = new Content
                 {
                     LocationId = (int)LocationNumber.GroveCity,
                     ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
                     Title = "Partners"
-                });
+                };
+
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content);
 
                 try
                 {
@@ -259,14 +277,18 @@ namespace BedBrigade.Data.Data.Seeding
                     }
 
                     var seedHtml = GetHtml("Assembly.html");
-                    context.Content.Add(new Content
+
+                    var content = new Content
                     {
                         LocationId = location.LocationId!,
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
                         Title = "Assembly Instructions"
-                    });
+                    };
+                    SeedRoutines.SetMaintFields(content);
+
+                    context.Content.Add(content);
                 }
 
                 try
@@ -290,14 +312,17 @@ namespace BedBrigade.Data.Data.Seeding
                 var seedHtml = GetHtml("Aboutus.html");
                 foreach (var location in context.Locations)
                 {
-                    context.Content.Add(new Content
+                    var content = new Content
                     {
                         LocationId = location.LocationId!,
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
                         Title = "About Us"
-                    });
+                    };
+
+                    SeedRoutines.SetMaintFields(content);
+                    context.Content.Add(content);
                 }
 
                 try
@@ -325,14 +350,17 @@ namespace BedBrigade.Data.Data.Seeding
                         continue;
 
                     var seedHtml = GetHtml("Donate.html");
-                    context.Content.Add(new Content
+
+                    var content = new Content
                     {
                         LocationId = location.LocationId!,
                         ContentType = ContentType.Body,
                         Name = name,
                         ContentHtml = seedHtml,
                         Title = "Donate To Beed Brigade"
-                    });
+                    };
+                    SeedRoutines.SetMaintFields(content);
+                    context.Content.Add(content);
                 }
 
                 try
@@ -354,12 +382,15 @@ namespace BedBrigade.Data.Data.Seeding
             if (!await context.Templates.AnyAsync(c => c.Name == name))
             {
                 var seedHtml = GetHtml("ThreeRotatorPageTemplate.html");
-                context.Templates.Add(new Template
+
+                var content = new Template
                 {
                     ContentType = ContentType.Body,
                     Name = name,
                     ContentHtml = seedHtml,
-                });
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Templates.Add(content);
 
                 try
                 {

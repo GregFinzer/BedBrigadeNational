@@ -61,58 +61,6 @@ namespace BedBrigade.Data
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(o => o.VolunteeringForId);
         }
-        //TODO:  Remove this when all services derive from Repository
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            SetAudit("Seed");
-            return await base.SaveChangesAsync(cancellationToken);
-        }
-
-        //TODO:  Remove this when all services derive from Repository
-        /// <summary>
-        /// Populate the audit part of the db records
-        /// </summary>
-        /// <returns></returns>
-        public override int SaveChanges()
-        {
-            SetAudit("Seed");
-            return base.SaveChanges();
-        }
-
-        //TODO:  Remove this when all services derive from Repository
-        private void SetAudit(string userId)
-        {
-            var tracker = ChangeTracker;
-            foreach (var entry in tracker.Entries())
-            {
-                System.Diagnostics.Debug.WriteLine($"{entry.Entity} has state {entry.State} ");
-                if (entry.Entity is BaseEntity baseEntity)
-                {
-                    switch (entry.State)
-                    {
-                        case EntityState.Added:
-                            if (String.IsNullOrEmpty(baseEntity.CreateUser))
-                            {
-                                baseEntity.CreateDate = DateTime.UtcNow;
-                                baseEntity.CreateUser = userId;
-                                baseEntity.UpdateDate = DateTime.UtcNow;
-                                baseEntity.UpdateUser = userId;
-                                baseEntity.MachineName = Environment.MachineName;
-                            }
-                            break;
-                        case EntityState.Modified:
-                            
-                            if (!baseEntity.WasUpdatedInTheLastSecond())
-                            {
-                                baseEntity.UpdateDate = DateTime.UtcNow;
-                                baseEntity.UpdateUser = userId;
-                                baseEntity.MachineName = Environment.MachineName;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
     }
 }
 

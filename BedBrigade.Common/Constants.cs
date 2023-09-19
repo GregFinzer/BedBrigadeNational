@@ -8,5 +8,6 @@
         public const int NationalLocationId = 1;
         public const string NationalRoute = "/national";
         public const string DefaultPageTemplate = "ThreeRotatorPageTemplate";
+        public const string DefaultUserNameAndEmail = "Anonymous";
     }
 }

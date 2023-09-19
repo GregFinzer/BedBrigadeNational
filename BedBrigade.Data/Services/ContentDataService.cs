@@ -68,7 +68,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                 entity.Title = content.Title;
                 entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
                 entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
-                entity.UpdateDate = DateTime.Now;
+                entity.UpdateDate = DateTime.UtcNow;
                 entity.UpdateUser = content.UpdateUser;
                 context.Entry(entity).State = EntityState.Modified;
                 await context.SaveChangesAsync();

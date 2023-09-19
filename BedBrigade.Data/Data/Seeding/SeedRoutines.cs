@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using BedBrigade.Data.Data.Seeding;
+using BedBrigade.Data.Models;
+using System.Security.Cryptography;
 
 namespace BedBrigade.Data.Seeding
 {
@@ -20,5 +22,21 @@ namespace BedBrigade.Data.Seeding
             }
         }
 
+        public static void SetMaintFields<T>(List<T> entities) where T : BaseEntity
+        {
+            foreach (var entity in entities)
+            {
+                SetMaintFields(entity);
+            }
+        }
+
+        public static void SetMaintFields<T>(T entity) where T : BaseEntity
+        {
+            entity.CreateUser = SeedConstants.SeedUserName;
+            entity.CreateDate = DateTime.UtcNow;
+            entity.UpdateUser = SeedConstants.SeedUserName;
+            entity.UpdateDate = DateTime.UtcNow;
+            entity.MachineName = Environment.MachineName;
+        }
     }
 }

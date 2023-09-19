@@ -7,6 +7,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
+using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Common;
 
@@ -60,6 +61,10 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
+
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            Log.Information($"{userName} went to the Manage Contact Page");
+
             if (Identity.HasRole(RoleNames.CanManageContacts))
             {
                 ToolBar = new List<string>

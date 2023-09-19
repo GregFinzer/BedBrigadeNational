@@ -15,6 +15,7 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using System.Diagnostics;
 using Syncfusion.Blazor;
 using System.Threading;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -81,8 +82,11 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            userName = Identity.Identity.Name;
+            
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            Log.Information($"{userName} went to the Manage Volunteers Page");
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) )
             {

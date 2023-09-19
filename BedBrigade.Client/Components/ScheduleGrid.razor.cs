@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Schedule;
 using BedBrigade.Client.Pages.Administration.Manage;
+using Serilog;
 
 
 namespace BedBrigade.Client.Components
@@ -97,7 +98,9 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            userName = Identity.Identity.Name;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            Log.Information($"{userName} went to the Manage Schedules Page");
+
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))

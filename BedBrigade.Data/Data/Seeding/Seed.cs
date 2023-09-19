@@ -49,7 +49,6 @@ public class Seed
         },
 
         // fiction locations - San Francisco - for testing time only
-
         new Location
         {
             Name = "San Francisco Holy Spirit", 
@@ -290,25 +289,25 @@ public class Seed
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailBeginHour,
-                    ConfigurationValue = "8",
+                    ConfigurationValue = "0",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailEndHour,
-                    ConfigurationValue = "17",
+                    ConfigurationValue = "23",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailBeginDayOfWeek,
-                    ConfigurationValue = "1",
+                    ConfigurationValue = "0",
                     Section = ConfigSection.Email
                 },
                 new()
                 {
                     ConfigurationKey = ConfigNames.EmailEndDayOfWeek,
-                    ConfigurationValue = "5",
+                    ConfigurationValue = "6",
                     Section = ConfigSection.Email
                 },
                 new()
@@ -361,6 +360,7 @@ public class Seed
                 },
             };
 
+            SeedRoutines.SetMaintFields(configurations);
             await context.Configurations.AddRangeAsync(configurations);
             Log.Logger.Information("After AddRangeAsync");
             await context.SaveChangesAsync();
@@ -383,6 +383,8 @@ public class Seed
 
             try
             {
+                SeedRoutines.SetMaintFields(_locations);
+
                 foreach (var location in _locations)
                 {
                     var loc = location.Route + "/pages";
@@ -421,8 +423,8 @@ public class Seed
                         AltText = "Bed Brigade National Logo",
                         FileStatus = "seed",
                         FileUse = FileUse.Unknown,
-                        CreateDate = DateTime.Now,
-                        UpdateDate = DateTime.Now,
+                        CreateDate = DateTime.UtcNow,
+                        UpdateDate = DateTime.UtcNow,
                         CreateUser = SeedConstants.SeedUserName,
                         UpdateUser = SeedConstants.SeedUserName,
                         MachineName = Environment.MachineName
@@ -461,6 +463,7 @@ public class Seed
     private static async Task SeedUser(IDbContextFactory<DataContext> _contextFactory)
     {
         Log.Logger.Information("SeedUser Started");
+        SeedRoutines.SetMaintFields(_users);
 
         using (var context = _contextFactory.CreateDbContext())
         {
@@ -531,7 +534,7 @@ public class Seed
         using (var context = contextFactory.CreateDbContext())
         {
             if (await context.VolunteersFor.AnyAsync()) return;
-            List<VolunteerFor> VolunteeringFor = new List<VolunteerFor>
+            List<VolunteerFor> volunteeringForList = new List<VolunteerFor>
             {
                 new VolunteerFor{Name = "Bed Building" },
                 new VolunteerFor{Name = "Bed Delivery" },
@@ -539,9 +542,12 @@ public class Seed
                 new VolunteerFor { Name = "New Option" },
                 new VolunteerFor { Name = "Other" }
             };
+
+            SeedRoutines.SetMaintFields(volunteeringForList);
+
             try
             {
-                await context.VolunteersFor.AddRangeAsync(VolunteeringFor);
+                await context.VolunteersFor.AddRangeAsync(volunteeringForList);
                 await context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -584,7 +590,7 @@ public class Seed
                 {
                     LocationId = location.LocationId,
                     VolunteeringForId = volunteeringFor.VolunteerForId,
-                    VolunteeringForDate = DateTime.Now.AddDays(new Random().Next(60)),
+                    VolunteeringForDate = DateTime.UtcNow.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
                     FirstName = firstName,
                     LastName = lastName,
@@ -597,6 +603,7 @@ public class Seed
                 };
                 try
                 {
+                    SeedRoutines.SetMaintFields(volunteer);
                     await context.AddAsync(volunteer);
                     await context.SaveChangesAsync();
                 }
@@ -646,6 +653,7 @@ public class Seed
                         TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)]
                     };
 
+                    SeedRoutines.SetMaintFields(donation);
                     await context.Donations.AddAsync(donation);
                 }
                 await context.SaveChangesAsync();
@@ -703,10 +711,11 @@ public class Seed
                         NumberOfBeds = new Random().Next(1, 4),
                         Status = (BedRequestStatus) new Random().Next(1,4),
                         TeamNumber = new Random().Next(1, 5),
-                        DeliveryDate = DateTime.Now.AddDays(new Random().Next(10)),
+                        DeliveryDate = DateTime.UtcNow.AddDays(new Random().Next(10)),
                         Notes = string.Empty
                     };
 
+                    SeedRoutines.SetMaintFields(bedRequest);
                     await context.BedRequests.AddAsync(bedRequest);
                     await context.SaveChangesAsync();
                 }
@@ -730,6 +739,8 @@ public class Seed
         var lastFour = new Random().Next(1000, 9999);
         return $"({firstThree}) {nextThree}-{lastFour}";
     }
+
+
 }
 
 
