@@ -62,7 +62,7 @@ namespace BedBrigade.Client.Components
         public bool NoPaging { get; private set; }
         public bool OnlyRead { get; private set; } = false;
         private string DisplayEmailMessage = "none";
-
+        public bool enabledLocationSelector { get; set; } = true;
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "70%" };
 
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // = OperationWithTimeout(cancellationTokenSource.Token);
@@ -271,7 +271,15 @@ namespace BedBrigade.Client.Components
         private void Add()
         {
             HeaderTitle = "Add Volunteer";
-            ButtonTitle = "Add Volunteer";           
+            ButtonTitle = "Add Volunteer";    
+              if (isLocationAdmin)
+              {
+                  enabledLocationSelector = false;
+              }
+              else
+              {
+                  enabledLocationSelector = true;
+              }
         }
 
         private void ValidateNewEmail()
@@ -329,6 +337,7 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Update Volunteer";
             ButtonTitle = "Update";
+            enabledLocationSelector = false;
         }
 
         protected async Task Save(Volunteer location)
