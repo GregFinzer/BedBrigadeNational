@@ -5,9 +5,9 @@ namespace BedBrigade.Data.Services
     public interface IRepository<TEntity> where TEntity : class
     {
         //Get stuff out of the identity
-        Task<string> GetUserEmail();
+        Task<string?> GetUserEmail();
 
-        Task<string> GetUserName();
+        Task<string?> GetUserName();
 
         string GetEntityName();
 

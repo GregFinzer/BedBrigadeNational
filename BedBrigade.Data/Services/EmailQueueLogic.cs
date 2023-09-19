@@ -1,5 +1,6 @@
 ﻿#region Includes
 
+using System.Data.Common;
 using System.Drawing;
 using System.Text;
 using Azure;
@@ -51,7 +52,7 @@ namespace BedBrigade.Data.Services
             try
             {
                 email.Status = EmailQueueStatus.Queued.ToString();
-                email.QueueDate = DateTime.Now;
+                email.QueueDate = DateTime.UtcNow;
                 email.FailureMessage = string.Empty;
                 await _emailQueueDataService.CreateAsync(email);
             }
@@ -63,6 +64,10 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
         }
 
+
+        #endregion
+
+        #region Private Methods
         private static async void ProcessQueue(object? state)
         {
             if (_processing)
@@ -95,9 +100,7 @@ namespace BedBrigade.Data.Services
             await _emailQueueDataService.DeleteOldEmailQueue(_emailKeepDays);
             _processing = false;
         }
-        #endregion
 
-        #region Private Methods
         private static async Task SendQueuedEmails()
         {
             List<EmailQueue> emailsToProcess = await _emailQueueDataService.GetEmailsToProcess(_emailMaxPerChunk);
@@ -144,7 +147,7 @@ namespace BedBrigade.Data.Services
             sb.AppendLine("=".PadRight(40,'='));
             Log.Information(sb.ToString());
 
-            email.SentDate = DateTime.Now;
+            email.SentDate = DateTime.UtcNow;
             email.Status = EmailQueueStatus.Sent.ToString();
             await _emailQueueDataService.UpdateAsync(email);
         }
@@ -159,7 +162,7 @@ namespace BedBrigade.Data.Services
                 string errorMessage =
                     "EmailQueueLogic:  COMMUNICATION_SERVICES_CONNECTION_STRING is not set as an environment variable";
                 Log.Error(errorMessage);
-                email.SentDate = DateTime.Now;
+                email.SentDate = DateTime.UtcNow;
                 email.FailureMessage = errorMessage;
                 email.Status = EmailQueueStatus.Failed.ToString();
                 await _emailQueueDataService.UpdateAsync(email);
@@ -201,7 +204,7 @@ namespace BedBrigade.Data.Services
                 email.Status = EmailQueueStatus.Failed.ToString();
             }
 
-            email.SentDate = DateTime.Now;
+            email.SentDate = DateTime.UtcNow;
             await _emailQueueDataService.UpdateAsync(email);
         }
 
@@ -216,7 +219,7 @@ namespace BedBrigade.Data.Services
             {
                 //If there are emails locked less than an hour ago, skip
                 if (firstLockedEmail.LockDate.HasValue
-                    && firstLockedEmail.LockDate.Value > DateTime.Now.AddMinutes(_emailLockWaitMinutes))
+                    && firstLockedEmail.LockDate.Value > DateTime.UtcNow.AddMinutes(_emailLockWaitMinutes))
                 {
                     Log.Debug($"EmailQueueLogic:  Emails are currently locked, waiting for {_emailLockWaitMinutes} minutes");
                     return true;
@@ -234,13 +237,13 @@ namespace BedBrigade.Data.Services
             Log.Debug("EmailQueueLogic:  GetEmailsSentToday");
             List<EmailQueue> emailsSentToday = await _emailQueueDataService.GetEmailsSentToday();
 
-            if (emailsSentToday.Count(o => o.SentDate >= DateTime.Now.AddMinutes(-1)) >= _emailMaxSendPerMinute)
+            if (emailsSentToday.Count(o => o.SentDate >= DateTime.UtcNow.AddMinutes(-1)) >= _emailMaxSendPerMinute)
             {
                 Log.Debug("EmailQueueLogic: Sent max per minute of " + _emailMaxSendPerMinute);
                 return true;
             }
 
-            if (emailsSentToday.Count(o => o.SentDate >= DateTime.Now.AddHours(-1)) >= _emailMaxSendPerHour)
+            if (emailsSentToday.Count(o => o.SentDate >= DateTime.UtcNow.AddHours(-1)) >= _emailMaxSendPerHour)
             {
                 Log.Debug("EmailQueueLogic: Sent max per hour of " + _emailMaxSendPerHour);
                 return true;
@@ -257,7 +260,7 @@ namespace BedBrigade.Data.Services
 
         private static bool TimeToSendEmail()
         {
-            DateTime currentDate = DateTime.Now;
+            DateTime currentDate = DateTime.UtcNow;
             bool validTime = currentDate.Hour >= _emailBeginHour && currentDate.Hour <= _emailEndHour;
             bool validDay = currentDate.DayOfWeek >= (DayOfWeek) _emailBeginDayOfWeek && currentDate.DayOfWeek <= (DayOfWeek)_emailEndDayOfWeek;
 

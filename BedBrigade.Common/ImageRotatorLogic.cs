@@ -8,7 +8,7 @@
         {
             if (fileNames.Count > 0)
             {
-                var currentDateTime = OverrideDateTime ?? DateTime.Now;
+                var currentDateTime = OverrideDateTime ?? DateTime.UtcNow;
                 var unit = currentDateTime.Hour * 2 + (currentDateTime.Minute > 30 ? 1 : 0);
                 var imageIndex = unit % fileNames.Count;
                 return fileNames[imageIndex].Replace("wwwroot/", "");

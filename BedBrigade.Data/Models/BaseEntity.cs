@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BedBrigade.Common;
 
 namespace BedBrigade.Data.Models
 {
@@ -17,30 +18,20 @@ namespace BedBrigade.Data.Models
         [MaxLength(100)]
         public String? MachineName { get; set; } = string.Empty;
 
-        public void SetCreateUser(String userName)
+        public void SetCreateAndUpdateUser(String? userName)
         {
-            CreateUser = userName;
+            CreateUser = userName ?? Constants.DefaultUserNameAndEmail;
             CreateDate = DateTime.UtcNow;
+            UpdateUser = CreateUser;
+            UpdateDate = CreateDate;
             MachineName = Environment.MachineName;
         }
 
-        public void SetUpdateUser(String userName)
+        public void SetUpdateUser(String? userName)
         {
-            UpdateUser = userName;
+            UpdateUser = userName ?? Constants.DefaultUserNameAndEmail;
             UpdateDate = DateTime.UtcNow;
             MachineName = Environment.MachineName;
-        }
-
-        //TODO:  Remove this when all services derive from Repository
-        public bool WasUpdatedInTheLastSecond()
-        {
-            if (UpdateDate == null)
-            {
-                return false;
-            }
-
-            TimeSpan timeSinceLastUpdate = DateTime.UtcNow - UpdateDate.Value;
-            return timeSinceLastUpdate.TotalSeconds <= 1;
         }
     }
 }

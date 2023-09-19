@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Microsoft.JSInterop;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -57,7 +58,8 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            userName = Identity.Identity.Name;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            Log.Information($"{userName} went to the Manage Media Page");
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
             userRoute = Identity.Claims.FirstOrDefault(c => c.Type == "UserRoute").Value;
             userRoute = userRoute.Replace(PathDivider, "");

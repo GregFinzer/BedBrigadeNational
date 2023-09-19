@@ -6,16 +6,17 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BedBrigade.Data.Services
 {
     public abstract class Repository<TEntity> : IRepository<TEntity>
-        where TEntity : class
+        where TEntity : BaseEntity
     {
-        private const string _defaultUserNameAndEmail = "Anonymous";
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ICachingService _cachingService;
         private readonly AuthenticationStateProvider _authProvider;
@@ -29,7 +30,7 @@ namespace BedBrigade.Data.Services
         }
 
         //This is the email address stored in the User.Identity.Name
-        public async Task<string> GetUserEmail()
+        public async Task<string?> GetUserEmail()
         {
             try
             {
@@ -40,16 +41,16 @@ namespace BedBrigade.Data.Services
                     return state.User.Identity.Name;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return _defaultUserNameAndEmail;
+                return null;
             }
 
-            return _defaultUserNameAndEmail;
+            return Constants.DefaultUserNameAndEmail;
         }
 
         //This is the user name stored in the nameidentifier
-        public async Task<string> GetUserName()
+        public async Task<string?> GetUserName()
         {
             try
             {
@@ -62,12 +63,12 @@ namespace BedBrigade.Data.Services
                     return nameIdentifier.Value;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return _defaultUserNameAndEmail;
+                return null;
             }
 
-            return _defaultUserNameAndEmail;
+            return Constants.DefaultUserNameAndEmail;
         }
 
         public async Task<string?> GetUserRole()
@@ -83,7 +84,7 @@ namespace BedBrigade.Data.Services
                     return roleClaim.Value;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -174,13 +175,9 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
-            string userName = await GetUserName();
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.SetCreateUser(userName);
-                baseEntity.SetUpdateUser(userName);
-            }
-
+            string? userName = await GetUserName();
+            entity.SetCreateAndUpdateUser(userName);
+            
             try
             {
                 using (var ctx = _contextFactory.CreateDbContext())
@@ -189,6 +186,7 @@ namespace BedBrigade.Data.Services
                     await dbSet.AddAsync(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
+                    Log.Debug($"Created {GetEntityName()}{Environment.NewLine}{ObjectUtil.ObjectToString(entity)}");
                     return new ServiceResponse<TEntity>($"Created {GetEntityName()} with id {entity}", true, entity);
                 }
             }
@@ -200,20 +198,22 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
-            string userName = await GetUserName();
-            if (entity is BaseEntity baseEntity)
-            {
-                baseEntity.SetUpdateUser(userName);
-            }
+
+            string? userName = await GetUserName();
+            entity.SetUpdateUser(userName);
 
             try
             {
+                
                 using (var ctx = _contextFactory.CreateDbContext())
                 {
                     var dbSet = ctx.Set<TEntity>();
+                    var primaryKeyValue = GetPrimaryKeyValue(ctx, entity);
+                    var originalEntity = await ctx.FindAsync<TEntity>(primaryKeyValue);
                     dbSet.Update(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
+                    Log.Debug($"Updated {GetEntityName()}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
                     return new ServiceResponse<TEntity>($"Updated {GetEntityName()} with id {entity}", true, entity);
                 }
             }
@@ -225,6 +225,8 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<bool>> DeleteAsync(object id)
         {
+            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
+
             try
             {
                 using (var ctx = _contextFactory.CreateDbContext())
@@ -240,6 +242,7 @@ namespace BedBrigade.Data.Services
                     dbSet.Remove(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
+                    Log.Debug($"{userName} Deleted {GetEntityName()}{Environment.NewLine}{ObjectUtil.ObjectToString(entity)}");
                     return new ServiceResponse<bool>($"Deleted {GetEntityName()} with id {id}", true);
                 }
             }
@@ -247,6 +250,22 @@ namespace BedBrigade.Data.Services
             {
                 return new ServiceResponse<bool>($"Could not delete {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
             }
+        }
+
+        private object GetPrimaryKeyValue<TEntity>(DbContext context, TEntity entity) where TEntity : class
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            // Get the entity type of TEntity from the DbContext
+            var entityType = context.Model.FindEntityType(typeof(TEntity));
+
+            // Get the primary key for the entity
+            var primaryKey = entityType.FindPrimaryKey();
+
+            // Return the value of the property used as the primary key
+            var keyProperty = primaryKey?.Properties.FirstOrDefault();
+            return keyProperty?.GetGetter().GetClrValue(entity);
         }
     }
 }

@@ -100,7 +100,7 @@ namespace BedBrigade.Client.Pages.Administration.Edit
             {
                 Body = await ProcessHtml(contentResult.Data.ContentHtml, locationId);
                 Content = contentResult.Data;
-                Content.UpdateDate = DateTime.Now;
+                Content.UpdateDate = DateTime.UtcNow;
                 Content.UpdateUser =  Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 ImageButtonList = GetImageButtonList(Body);
             }
