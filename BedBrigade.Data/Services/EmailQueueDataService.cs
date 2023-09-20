@@ -272,30 +272,31 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId)
         {
+            const string message = "Built Email List";
             switch (option)
             {
                 case EmailRecipientOption.Everyone:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await GetEveryone()));
+                    return new ServiceResponse<List<string>>(message, true, (await GetEveryone()));
                 case EmailRecipientOption.VolunteersForLocation:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _volunteerDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetDistinctEmailByLocation(locationId)).Data);
                 case EmailRecipientOption.BedRequestorsForLocation:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _bedRequestDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.GetDistinctEmailByLocation(locationId)).Data);
                 case EmailRecipientOption.ContactUsForLocation:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _contactUsDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _contactUsDataService.GetDistinctEmailByLocation(locationId)).Data);
                 case EmailRecipientOption.BedBrigadeLeadersNationwide:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _userDataService.GetDistinctEmail()).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _userDataService.GetDistinctEmail()).Data);
                 case EmailRecipientOption.BedBrigadeLeadersForLocation:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _userDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _userDataService.GetDistinctEmailByLocation(locationId)).Data);
                 case EmailRecipientOption.VolunteersWithDeliveryVehicles:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _volunteerDataService.GetVolunteerEmailsWithDeliveryVehicles(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsWithDeliveryVehicles(locationId)).Data);
                 case EmailRecipientOption.VolunteersForAnEvent:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _volunteerDataService.GetVolunteerEmailsForASchedule(scheduleId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsForASchedule(scheduleId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveNotRecievedABed:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _bedRequestDataService.EmailsForNotReceivedABed(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForNotReceivedABed(locationId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveRecievedABed:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _bedRequestDataService.EmailsForReceivedABed(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForReceivedABed(locationId)).Data);
                 case EmailRecipientOption.BedRequestorsForAnEvent:
-                    return new ServiceResponse<List<string>>("Built Email List", true, (await _bedRequestDataService.EmailsForSchedule(scheduleId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(scheduleId)).Data);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(option), option, $"Unsupported Option: {option}");
             }
