@@ -5,16 +5,19 @@ using static BedBrigade.Common.Common;
 namespace BedBrigade.Data.Models;
 
 [Table("BedRequests")]
-public class BedRequest : BaseEntity, ILocationId
+public class BedRequest : BaseEntity, ILocationId, IEmail
 {
 	[Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Int32 BedRequestId { get; set; }
 
 	[ForeignKey("LocationId"), Required]
-	public Int32 LocationId { get; set; } 
+	public Int32 LocationId { get; set; }
 
-	[Required(ErrorMessage = "First Name is required.")]
+    [ForeignKey("ScheduleId")]
+    public Int32? ScheduleId { get; set; }
+
+    [Required(ErrorMessage = "First Name is required.")]
     [MaxLength(20)]
 	public String? FirstName { get; set; } = string.Empty;
 

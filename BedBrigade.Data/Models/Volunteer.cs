@@ -6,7 +6,7 @@ using static BedBrigade.Common.Common;
 namespace BedBrigade.Data.Models
 {
 	[Table("Volunteers")]
-	public class Volunteer : BaseEntity, ILocationId
+	public class Volunteer : BaseEntity, ILocationId, IEmail
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

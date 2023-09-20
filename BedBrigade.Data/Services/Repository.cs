@@ -213,7 +213,7 @@ namespace BedBrigade.Data.Services
                     dbSet.Update(entity);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    Log.Debug($"{userName} Updated {GetEntityName()}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
+                    Log.Debug($"{userName} Updated {GetEntityName()} with ID: {primaryKeyValue}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
                     return new ServiceResponse<TEntity>($"Updated {GetEntityName()} with id {entity}", true, entity);
                 }
             }

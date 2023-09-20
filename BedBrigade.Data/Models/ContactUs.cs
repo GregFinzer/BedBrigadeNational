@@ -5,7 +5,7 @@ using BedBrigade.Common;
 namespace BedBrigade.Data.Models
 {
 	[Table("ContactUs")]
-	public class ContactUs : BaseEntity, ILocationId
+	public class ContactUs : BaseEntity, ILocationId, IEmail
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -45,6 +45,41 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<TEntity>>($"Found {nationalAdminResponse.Count()} {repository.GetEntityName()} records", true, nationalAdminResponse);
             }
         }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctEmail<TEntity>(IRepository<TEntity> repository)
+            where TEntity : class, IEmail
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetDistinctEmail");
+            var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+            if (cachedContent != null)
+                return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {repository.GetEntityName()} records in cache", true, cachedContent); ;
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.Select(b => b.Email).Distinct().ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records", true, result);
+            }
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation<TEntity>(IRepository<TEntity> repository, int locationId) where TEntity : class, IEmail, ILocationId
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetDistinctEmailByLocation({locationId}");
+            var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+            if (cachedContent != null)
+                return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {repository.GetEntityName()} records in cache", true, cachedContent); ;
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.Where(o => o.LocationId == locationId).Select(b => b.Email).Distinct().ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records", true, result);
+            }
+        }
     }
 
 

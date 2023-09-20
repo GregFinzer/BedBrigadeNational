@@ -1,4 +1,5 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common;
+using BedBrigade.Data.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -10,5 +11,7 @@ namespace BedBrigade.Data.Services
         Task<List<EmailQueue>> GetEmailsToProcess(int maxPerChunk);
         Task DeleteOldEmailQueue(int daysOld);
         Task LockEmailsToProcess(List<EmailQueue> emailsToProcess);
+        Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId);
+        Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId);
     }
 }
