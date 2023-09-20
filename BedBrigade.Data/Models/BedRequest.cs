@@ -12,9 +12,12 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
     public Int32 BedRequestId { get; set; }
 
 	[ForeignKey("LocationId"), Required]
-	public Int32 LocationId { get; set; } 
+	public Int32 LocationId { get; set; }
 
-	[Required(ErrorMessage = "First Name is required.")]
+    [ForeignKey("ScheduleId")]
+    public Int32? ScheduleId { get; set; }
+
+    [Required(ErrorMessage = "First Name is required.")]
     [MaxLength(20)]
 	public String? FirstName { get; set; } = string.Empty;
 

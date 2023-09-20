@@ -12,5 +12,6 @@ namespace BedBrigade.Data.Services
         Task DeleteOldEmailQueue(int daysOld);
         Task LockEmailsToProcess(List<EmailQueue> emailsToProcess);
         Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId);
+        Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId);
     }
 }

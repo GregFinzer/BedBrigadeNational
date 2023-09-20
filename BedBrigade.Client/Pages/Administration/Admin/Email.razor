@@ -14,7 +14,16 @@ else
         <h1>Send Email</h1>
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator/>
-            @if (Model.IsNationalAdmin)
+            
+            <div class="form-group mb-3">
+                <label for="emailRecipientOptionDropdown">To</label>
+                <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
+                    <DropDownListFieldSettings Text="Name" Value="Value" />
+                    <DropDownListEvents TValue="EmailRecipientOption" TItem="EnumNameValue<EmailRecipientOption>" ValueChange="EmailRecipientChangeEvent"></DropDownListEvents>
+                </SfDropDownList>
+            </div>
+
+            @if (Model.ShowLocationDropdown)
             {
                 <div class="form-group mb-3">
                     <label for="locationDropdown">Location</label>
@@ -24,13 +33,6 @@ else
                     </SfDropDownList>
                 </div>
             }
-
-            <div class="form-group mb-3">
-                <label for="emailRecipientOptionDropdown">To</label>
-                <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
-                    <DropDownListFieldSettings Text="Name" Value="Value" />
-                </SfDropDownList>
-            </div>
             
             @if (Model.ShowEventDropdown)
             {
@@ -38,20 +40,50 @@ else
                     <label for="events" class="formlabel">Location Available Events&nbsp;(@Model.Schedules.Count)</label>
                     <SfDropDownList ID="events" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@Model.Schedules">
                         <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ScheduleChangeEvent"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
             }
 
             <div class="form-group mb-3">
                 <label for="subject">Subject:</label>
-                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" />
+                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"  />
+                <div style="font-size: smaller">
+                    <ValidationMessage For="@(() => Model.Subject)"></ValidationMessage>
+                </div>  
             </div>
 
             <div class="form-group mb-3">
                 <label for="body">Body:</label>
-                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body"></InputTextArea>
+                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="4000"></InputTextArea>
+                <div style="font-size: smaller">
+                    <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
+                </div> 
             </div>
+
+            @if (showPlan)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @message
+                </div>
+            }
+
             <button type="submit" class="btn btn-primary">Submit</button>
         </EditForm>
+        
+        <p>&nbsp;</p>
+
+        @if (isSuccess)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
+        else if (isFailure)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
     </div>
 }

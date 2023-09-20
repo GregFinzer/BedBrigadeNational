@@ -12,5 +12,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<User>>> GetAllForLocationAsync();
         Task<ServiceResponse<List<string>>> GetDistinctEmail();
         Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
+        Task<ServiceResponse<string>> GetEmailSignature(string userName);
     }
 }

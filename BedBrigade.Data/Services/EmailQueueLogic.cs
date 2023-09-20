@@ -47,6 +47,36 @@ namespace BedBrigade.Data.Services
             _timer = new Timer(ProcessQueue, null, oneMinute, oneMinute);
         }
 
+        public static async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emaiList, string subject,
+            string body)
+        {
+            if (emaiList.Count == 0)
+                return new ServiceResponse<string>("No emails to send", false);
+
+            try
+            {
+                foreach (string email in emaiList)
+                {
+                    EmailQueue emailQueue = new EmailQueue
+                    {
+                        ToAddress = email,
+                        Subject = subject,
+                        Body = body,
+                        Status = EmailQueueStatus.Queued.ToString(),
+                        QueueDate = DateTime.UtcNow,
+                        FailureMessage = string.Empty
+                    };
+                    await _emailQueueDataService.CreateAsync(emailQueue);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>(ex.Message, false);
+            }
+
+            return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
+        }
+        
         public static async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
             try

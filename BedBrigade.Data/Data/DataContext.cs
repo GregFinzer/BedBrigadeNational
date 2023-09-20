@@ -34,11 +34,6 @@ namespace BedBrigade.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             CreateIndexes(modelBuilder);
-            SetSeedForLocation(modelBuilder);
-        }
-
-        private void SetSeedForLocation(ModelBuilder modelBuilder)
-        {
         }
 
         /// <summary>
@@ -60,6 +55,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(o => o.VolunteeringForId);
+
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.ScheduleId);
         }
     }
 }
