@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Pages.Administration
 {
     public partial class Dashboard : ComponentBase
     {
+        [Inject] private IJSRuntime _js { get; set; }
+
         public int TotalVolunteers { get; private set; }
         public int TotalBedRequests { get; private set; }
         public int TotalScheduledDeliveries { get; private set; }
@@ -38,6 +41,12 @@ namespace BedBrigade.Client.Pages.Administration
 
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            //Collapse the mobile menu
+            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+        }
+        
         //        private async Task<List<GraphData>> GetUserRolesAsync()
         //        {
         //            List<GraphData> RoleSource = new();

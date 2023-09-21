@@ -2,7 +2,6 @@
 using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
-using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -14,6 +13,7 @@ namespace BedBrigade.Client.Pages
 {
     public partial class LoginBase : ComponentBase
     {
+        [Inject] private IJSRuntime _js { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
         [Inject] private ICustomSessionService _sessionService { get; set; }
@@ -48,6 +48,13 @@ namespace BedBrigade.Client.Pages
             }
 
         }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            //Collapse the mobile menu
+            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+        }
+
 
         protected void HandlePassword()
         {
