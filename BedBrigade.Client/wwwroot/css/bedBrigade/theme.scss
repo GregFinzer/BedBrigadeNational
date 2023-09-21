@@ -1471,3 +1471,23 @@ a.back-btn:hover {
         height: 430px;
     }
 }
+
+/* By default, no scrollbar for larger screens */
+.admin-dropdown {
+    max-height: 100%;
+    overflow-y: visible;
+}
+
+/* Mobile screens with a max-width of 768px (you can adjust this breakpoint as needed) */
+@media only screen and (max-width: 768px) {
+    .admin-dropdown {
+        max-height: 400px; 
+        overflow-y: auto;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    main {
+        padding-top: 40px;
+    }
+}

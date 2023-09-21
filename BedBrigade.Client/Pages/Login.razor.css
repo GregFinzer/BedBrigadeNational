@@ -1,24 +1,34 @@
-﻿ .e-card-image {
+﻿.e-card-image {
 }
 
- .card {
+.card {
     border-radius: 25px;
     border: 1px solid rgb(0,0,255,.8);
-    width: 40%;
-    margin-left: 30%;
-    margin-bottom: 25px;
-    margin-top: 50px;
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%
 }
 
- .e-card .e-card-content {
+@media (min-width: 768px) {
+    .card {
+        border-radius: 25px;
+        border: 1px solid rgb(0,0,255,.8);
+        width: 40%;
+        margin-left: 30%;
+        margin-bottom: 25px;
+        margin-top: 50px;
+    }
 }
 
- .e-card.e-card-horizontal img {
+.e-card .e-card-content {
+}
+
+.e-card.e-card-horizontal img {
     margin: 0px;
     width: 50%
 }
 
- .login-error {
+.login-error {
     color: red;
     margin: 10px;
 }

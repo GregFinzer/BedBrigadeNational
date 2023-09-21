@@ -139,8 +139,11 @@ namespace BedBrigade.Data.Services
 
         }
 
-        public virtual async Task<ServiceResponse<TEntity>> GetByIdAsync(object id)
+        public virtual async Task<ServiceResponse<TEntity>> GetByIdAsync(object? id)
         {
+            if (id == null)
+                return new ServiceResponse<TEntity>($"Could not GetByIdAsync {GetEntityName()} with null id", false);
+
             string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), id.ToString());
             TEntity? cachedContent = _cachingService.Get<TEntity>(cacheKey);
 
