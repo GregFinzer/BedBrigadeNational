@@ -23,3 +23,16 @@
         ele.style.display = value;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    let navbarToggler = document.querySelector(".navbar-toggler");
+
+    document.querySelectorAll(".click-collapse").forEach(item => {
+        item.addEventListener("click", function () {
+            if (getComputedStyle(navbarToggler).display !== 'none') {
+                navbarToggler.click();
+                console.debug("navbarToggler clicked");
+            }
+        });
+    });
+});
