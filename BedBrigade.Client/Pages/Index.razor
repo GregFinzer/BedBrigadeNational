@@ -6,6 +6,7 @@
 
 @code {
     Body myBody;
+    [Inject] private IJSRuntime _js { get; set; }
     [Parameter] public string mylocation { get; set; }
     [Parameter] public string mypageName { get; set; }
     public string location { get; set; } 
@@ -29,6 +30,8 @@
             await myBody.LoadBody();
             myBody.RefreshState();
         }
+        //Collapse the mobile menu
+        await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
 
     protected override void OnInitialized()

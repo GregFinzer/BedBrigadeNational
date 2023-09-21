@@ -2,12 +2,14 @@
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Syncfusion.Blazor.DropDowns;
 
 namespace BedBrigade.Client.Pages.Administration.Admin
 {
     public partial class Email : ComponentBase
     {
+        [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IUserDataService _svcUserDataService { get; set; }
         [Inject] private ILocationDataService _svcLocationDataService { get; set; }
         [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
@@ -43,7 +45,13 @@ namespace BedBrigade.Client.Pages.Administration.Admin
             Model.ShowEventDropdown = false;
             await BuildPlan();
         }
-        
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            //Collapse the mobile menu
+            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+        }
+
         private async Task HandleValidSubmit()
         {
             var emails = await _svcEmailQueueDataService.GetEmailsToSend(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId);
