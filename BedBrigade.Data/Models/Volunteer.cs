@@ -43,20 +43,55 @@ namespace BedBrigade.Data.Models
 
         public VehicleType VehicleType { get; set; } = VehicleType.NoCar; // default value
 
-        public Boolean IHaveAMinivan { get; set; } = false; // delete
+        public Boolean IHaveAMinivan { get; set; } = false; // unused
 
-		public Boolean IHaveAnSUV { get; set; } = false; // delete
+		public Boolean IHaveAnSUV { get; set; } = false; // unused
 		
-		public Boolean IHaveAPickupTruck { get; set; } = false; // delete
+		public Boolean IHaveAPickupTruck { get; set; } = false; // unused
 
-		public int VolunteeringForId { get; set; } = 0; // for compatibility only - should be deleted
-		public DateTime VolunteeringForDate { get; set; }// for compatibility only - should be deleted
+		public int VolunteeringForId { get; set; } = 0; // unused
+		public DateTime VolunteeringForDate { get; set; }// unused
 
+		[NotMapped]
         public string FullName {
 			get
 			{
 				return $"{FirstName} {LastName}";
 			}
 		}
-	}
+        [NotMapped]
+        public string SearchName
+        {
+            get
+            {
+                return $"{LastName}, {FirstName}";
+            }
+        }
+
+        // additional Schedule/Event fields for EvolGrid
+        [NotMapped]
+        public Int32 RegistrationId { get; set; } = 0;
+        [NotMapped]
+		public Int32 EventId { get; set; } = 0;
+		[NotMapped]
+		public Int32 EventLocationId { get; set; } = 0;
+        [NotMapped]
+        public String? EventLocationName { get; set; } = string.Empty;
+        [NotMapped]
+        public String? EventName { get; set; } = string.Empty;
+		[NotMapped]
+		public DateTime? EventDate { get; set;}
+		[NotMapped]
+        public EventType EventType { get; set; } = EventType.Delivery;
+
+        [NotMapped]
+        public string EvolId
+        {
+            get
+            {
+                return Guid.NewGuid().ToString();
+            }
+        }
+
+    }
 }

@@ -194,5 +194,21 @@ namespace BedBrigade.Common
 
             return string.Format("{0}{1}{2}", leftText, replaceText, rightText);
         }
-    }
-}
+
+        public static string IsNull(string expression, string replacement)
+        {
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                return replacement;
+            }
+            else
+            {
+                return expression;
+            }
+        } // Is Null
+
+
+    } // class
+
+
+} // name space

@@ -38,6 +38,35 @@ namespace BedBrigade.Common
             result = result.Replace(" 1 seconds", " 1 second");
 
             return result;
-        }
-    }
-}
+        } // Timelaps
+
+        public static string GetFormattedDateTime(DateTime? myDate)
+        {            
+            string strReturnDate = string.Empty;
+            string strFormattedDate = String.Empty;
+            string strFormattedTime = string.Empty;
+
+            if (myDate != null)
+            {
+                DateTime regularDate = myDate.HasValue ? myDate.Value : default(DateTime);
+
+
+                try
+                {
+                    strFormattedDate = regularDate.ToShortDateString();
+                    strFormattedTime = regularDate.ToShortTimeString();
+
+                    strReturnDate = strFormattedDate + ", " + strFormattedTime;
+
+                }
+                catch(Exception ex) { }
+
+            }
+
+            return (strReturnDate);
+
+        } // Format Date
+       
+
+    } // class
+} // namespace
