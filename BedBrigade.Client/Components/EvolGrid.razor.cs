@@ -101,29 +101,17 @@ namespace BedBrigade.Client.Components
      
         protected override async Task OnInitializedAsync()
         {
-            await LoadUserData();
-            await LoadConfigurations();
+            await LoadUserData();           
             await LoadLocations();
-            await LoadVolunteerData();
-            //await LoadScheduleData();
-            Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
-            //await LoadVolunteerEvents();
-            VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);        
+            await LoadVolunteerData();           
+            Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId);           
+            VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);
+            displayId = await EvolHelper.GetIdColumnsConfigurations(_svcConfiguration);
             lstVehicleTypes = GetVehicleTypeItems();
             DisableToolBar();
             PrepareGridData();
 
-        } // Async Init
-
-        private async Task LoadConfigurations()
-        {
-            displayId = await EvolHelper.GetIdColumnsConfigurations(_svcConfiguration);                        
-            if(!displayId)
-            {
-                ErrorMessage = "Cannot Load Configuration Data";
-            }
-        } // Load Configuration
-            
+        } // Async Init           
 
         private void DisableToolBar()
         {
