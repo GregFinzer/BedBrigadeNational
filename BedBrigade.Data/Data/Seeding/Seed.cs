@@ -157,7 +157,7 @@ public class Seed
 
     public static void SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
     {
-        return;
+       
         Log.Logger.Information("Seed Schedules Started");
         string? sqlConnectionString = string.Empty; 
         string script = String.Empty;
