@@ -223,38 +223,8 @@ namespace BedBrigade.Client.Components
                 {
                     ErrorMessage = "Volunteer Data: No DB Files. " + ex.Message;
                 }
-        } // Load Grid Data
-              
-
-        private async Task LoadScheduleData()
-        {
-            try // get Schedule List ===========================================================================================
-            {
-                var dataSchedule = await _svcSchedule.GetAllAsync(); // get Schedules
-                Schedules = new List<Schedule>();
-                if (dataSchedule.Success)                {
-                    if (dataSchedule!.Data.Count > 0)
-                    {
-                        Schedules = dataSchedule!.Data; // retrieve existing media records to temp list
-                        Schedules = Schedules.FindAll(e => e.EventStatus == EventStatus.Scheduled && e.EventDateScheduled >= DateTime.Today); // only scheduled events to the future
-                        // Location Filter
-                        if (isLocationAdmin)
-                        {
-                            Schedules = Schedules.FindAll(e => e.LocationId == userLocationId);
-                        }
-                    }
-                    else
-                    {
-                        ErrorMessage = "No Schedule Data Found";
-                    } // no rows in Media
-                } // the first success
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = "Schedule Data: No DB Files. " + ex.Message;
-            }
-        } // Load Schedule Data           
-
+        } // Load Volunteer Data            
+        
         private void PrepareGridData()
         {
             EventVolunteers = EvolHelper.GetGridDataSource(VolunteerEvents, Schedules, Volunteers, Locations);
