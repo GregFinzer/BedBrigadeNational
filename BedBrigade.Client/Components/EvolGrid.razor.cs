@@ -51,12 +51,14 @@ namespace BedBrigade.Client.Components
         private string userName = String.Empty;
         private string userLocationName = String.Empty;
         private int userLocationId = 0;      
-        public bool isLocationAdmin = false;    
+        public bool isLocationAdmin = false; 
+        
 
         // variables
 
         private ClaimsPrincipal? Identity { get; set; }
-        protected string? RecordText { get; set; } = "Loading Volunteers ...";
+        protected string? RecordText { get; set; } = "Loading Schedules ...";
+        public bool DataStatus = true;
 
         // Grid regerences
 
@@ -81,6 +83,7 @@ namespace BedBrigade.Client.Components
         private string DisplayDataPanel = DisplayNone;
         private string DisplaySearchPanel = DisplayNone;
         private MarkupString DeleteMessage;
+        private string GridDisplay = String.Empty;
            
         private MarkupString DialogMessage;
         private MarkupString AvailabilityMessage; // Volunteer Availability
@@ -97,34 +100,43 @@ namespace BedBrigade.Client.Components
 
         public string strJson = string.Empty;
         public string strHtml = string.Empty;
-        private string testString = string.Empty;   
+        private string testString = string.Empty;        
+        private List<string> lstEmptyTables = new List<string>();
      
         protected override async Task OnInitializedAsync()
         {
-            await LoadUserData();
-            await LoadConfigurations();
-            await LoadLocations();
-            await LoadVolunteerData();
-            //await LoadScheduleData();
-            Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
-            //await LoadVolunteerEvents();
-            VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);        
-            lstVehicleTypes = GetVehicleTypeItems();
-            DisableToolBar();
-            PrepareGridData();
+            lstEmptyTables = await EvolHelper.GetEvolDataStatusAsync(_svcSchedule, _svcVolunteer);
+            if (lstEmptyTables.Count > 0)            
+            {
+                DataStatus = false;
+                GridDisplay = DisplayNone;
+                _ = Task.CompletedTask;
+                return;
+            }
+
+            if (DataStatus)
+            {
+               await LoadGridData();
+            }
 
         } // Async Init
 
-        private async Task LoadConfigurations()
-        {
-            displayId = await EvolHelper.GetIdColumnsConfigurations(_svcConfiguration);                        
-            if(!displayId)
-            {
-                ErrorMessage = "Cannot Load Configuration Data";
-            }
-        } // Load Configuration
-            
 
+        private async Task LoadGridData()
+        {
+            await LoadUserData();
+            await LoadLocations();
+            await LoadVolunteerData();
+            displayId = await EvolHelper.GetIdColumnsConfigurations(_svcConfiguration);
+            //await LoadScheduleData();
+            Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
+            //await LoadVolunteerEvents();
+            VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);
+            lstVehicleTypes = GetVehicleTypeItems();
+            DisableToolBar();
+            PrepareGridData();
+        }
+               
         private void DisableToolBar()
         {
             foreach (ItemModel tbItem in Toolbaritems)
