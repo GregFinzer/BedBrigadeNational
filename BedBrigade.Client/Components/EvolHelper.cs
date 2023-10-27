@@ -1,12 +1,22 @@
 ﻿using BedBrigade.Client.Pages.Administration.Manage;
 using BedBrigade.Common;
 using BedBrigade.Data.Models;
+using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Primitives;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
+using Syncfusion.Blazor;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Lists.Internal;
 using System.Data.Entity;
+using System.Diagnostics;
+using System.Text;
 using static BedBrigade.Common.Common;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BedBrigade.Client.Components
 {
@@ -89,55 +99,120 @@ namespace BedBrigade.Client.Components
 
                 return null;
         } // Load Volunteer Events
-        
-        public static List<Volunteer> GetGridDataSource(List<VolunteerEvent> VolunteerEvents, List<Schedule> Schedules, List<Volunteer> Volunteers, List<Location> Locations)
+
+
+        public static async Task<List<string>> GetEvolDataStatusAsync(IScheduleDataService? _svcSchedule, IVolunteerDataService? _svcVolunteer)
         {
-            // step 1 - load all registered volunteers (for future events)  to combined class
+            var bTableStatus = false;
+            var lstEmptyTables = new List<string>();
+            // Schedules
+            var dataTable = await _svcSchedule.GetAllAsync();            
+            if (dataTable.Success && dataTable.Data.ToList().Count > 0)  
+            {
+                bTableStatus = true;
+            }
+            if(!bTableStatus)
+            {
+                lstEmptyTables.Add("Schedules");
+            }
+            // Volunteers            
+            bTableStatus = false;
+            var dataTableV = await _svcVolunteer.GetAllAsync();
+            if (dataTableV.Success && dataTableV.Data.ToList().Count > 0)
+            {
+                bTableStatus = true;
+            }
+            if (!bTableStatus)
+            {
+                lstEmptyTables.Add("Volunteers");
+            }
+
+            return (lstEmptyTables);
+        } // GetEvolDataStatus
+
+        public static MarkupString GetEvolDataStatusMessage(List<string> lstEmptyTables)
+        {
+            var strHtml = String.Empty;
+            var sbHtml = new StringBuilder();
+            var AlertStyle = "danger";
+
+            sbHtml.Append("<div class='alert alert-" + AlertStyle + "' >");
+            sbHtml.Append("<h2>Page 'Events Volunteers' is not available right now</h2>");
+            sbHtml.Append("We noticed that some of the database tables, required for Events Volunteers management, are currently empty:<br />");
+            if (lstEmptyTables.Count > 0)
+            {
+                sbHtml.Append("<ul>");
+                foreach (var item in lstEmptyTables)
+                {
+                    sbHtml.Append("<li>"+item+"</li>");
+                }
+                sbHtml.Append("</ul>");
+            }
+            sbHtml.Append("Please make sure to populate these tables with the necessary data.<br />");
+            sbHtml.Append("If you have any questions or need assistance with this process, feel free to reach out to our support team.");
+            sbHtml.Append("</div");
+
+            strHtml=sbHtml.ToString();
+            return (MarkupString)strHtml;
+
+        } // Get Evol Data Sttaus
+
+        public static List<Volunteer> GetGridDataSource(List<VolunteerEvent>? VolunteerEvents = null, List<Schedule>? Schedules = null, List<Volunteer>? Volunteers = null, List<Location>? Locations = null)
+        {
             var EventVolunteers = new List<Volunteer>();
-            EventVolunteers = (from ve in VolunteerEvents
-                               join e in Schedules on ve.ScheduleId equals e.ScheduleId
-                               join v in Volunteers on ve.VolunteerId equals v.VolunteerId
-                               join l in Locations on e.LocationId equals l.LocationId
-                               select new Volunteer
-                               {
-                                   RegistrationId = ve.RegistrationId,
-                                   VolunteerId = ve.VolunteerId,
-                                   EventId = e.ScheduleId,
-                                   // Event Fields
-                                   EventLocationId = ve.LocationId,
-                                   EventLocationName = l.Name,
-                                   EventName = e.EventName,
-                                   EventDate = e.EventDateScheduled,
-                                   EventType = e.EventType,
-                                   // Volunteer Fields
-                                   IHaveVolunteeredBefore = v.IHaveVolunteeredBefore,
-                                   FirstName = v.FirstName,
-                                   LastName = v.LastName,
-                                   Phone = v.Phone,
-                                   Email = v.Email,
-                                   OrganizationOrGroup = v.OrganizationOrGroup,
-                                   Message = v.Message,
-                                   VehicleType = v.VehicleType,
-                                   CreateDate = ve.CreateDate
-                               }
-                        ).ToList();
-            // step 2 - add futrure events without volunteers to combined class
-            EventVolunteers.AddRange(
-                (from e in Schedules
-                 where !(from ev in EventVolunteers
-                         select ev.EventId).Contains(e.ScheduleId)
-                 join l in Locations on e.LocationId equals l.LocationId
-                 select new Volunteer
-                 {
-                     EventId = e.ScheduleId,
-                     EventLocationId = e.LocationId,
-                     EventLocationName = l.Name,
-                     EventName = e.EventName,
-                     EventDate = e.EventDateScheduled,
-                     EventType = e.EventType
-                 }
-                    ).ToList()
-                );
+            // step 1 - load all registered volunteers (for future events)  to combined class
+            if (VolunteerEvents != null && Volunteers != null && VolunteerEvents.Count > 0)
+            {
+
+                EventVolunteers = (from ve in VolunteerEvents
+                                   join e in Schedules on ve.ScheduleId equals e.ScheduleId
+                                   join v in Volunteers on ve.VolunteerId equals v.VolunteerId
+                                   join l in Locations on e.LocationId equals l.LocationId
+                                   select new Volunteer
+                                   {
+                                       RegistrationId = ve.RegistrationId,
+                                       VolunteerId = ve.VolunteerId,
+                                       EventId = e.ScheduleId,
+                                       // Event Fields
+                                       EventLocationId = ve.LocationId,
+                                       EventLocationName = l.Name,
+                                       EventName = e.EventName,
+                                       EventDate = e.EventDateScheduled,
+                                       EventType = e.EventType,
+                                       // Volunteer Fields
+                                       IHaveVolunteeredBefore = v.IHaveVolunteeredBefore,
+                                       FirstName = v.FirstName,
+                                       LastName = v.LastName,
+                                       Phone = v.Phone,
+                                       Email = v.Email,
+                                       OrganizationOrGroup = v.OrganizationOrGroup,
+                                       Message = v.Message,
+                                       VehicleType = v.VehicleType,
+                                       CreateDate = ve.CreateDate
+                                   }
+                            ).ToList();
+            }
+
+            // step 2 - add future events without volunteers to combined class
+            if (Schedules != null && Schedules.Count > 0)
+            {
+                EventVolunteers.AddRange(
+                    (from e in Schedules
+                     where !(from ev in EventVolunteers
+                             select ev.EventId).Contains(e.ScheduleId)
+                     join l in Locations on e.LocationId equals l.LocationId
+                     select new Volunteer
+                     {
+                         EventId = e.ScheduleId,
+                         EventLocationId = e.LocationId,
+                         EventLocationName = l.Name,
+                         EventName = e.EventName,
+                         EventDate = e.EventDateScheduled,
+                         EventType = e.EventType
+                     }
+                        ).ToList()
+                    );
+            }
             //  strJson = JsonConvert.SerializeObject(EventVolunteers, Formatting.Indented);
             //  strHtml = "<pre>" + strJson + "</pre>";
 
@@ -164,28 +239,49 @@ namespace BedBrigade.Client.Components
 
         } // delete dialog
 
-        public static List<Volunteer> GetLocationVolunteersSelector(Volunteer selectedGridObject, List<Volunteer> lstVolunteerSelector, List<VolunteerEvent> VolunteerEvents)
+        public static List<Volunteer> GetLocationVolunteersSelector(Volunteer selectedGridObject, List<Volunteer>? lstVolunteerSelector, List<VolunteerEvent>? VolunteerEvents)
         {
+            var lstLocationVolunteers = new List<Volunteer>();
             var lstLocVolunteers = lstVolunteerSelector.FindAll(vs => vs.LocationId == selectedGridObject.EventLocationId);
             // Event Linked Volunteers
-            var lstEventLinkedVolunteers = VolunteerEvents.FindAll(ve => ve.ScheduleId == selectedGridObject.EventId);
-            // Available Volunteers, not linked to current Event
-            var lstLocationVolunteers = (
-                     (from v in lstLocVolunteers // location volunteers                                                                                                 
-                      where !(from lv in lstEventLinkedVolunteers
-                              select lv.VolunteerId).Contains(v.VolunteerId)
-                      select new Volunteer
-                      {
-                          VolunteerId = v.VolunteerId,
-                          FirstName = v.FirstName,
-                          LastName = v.LastName,
-                          Email = v.Email,
-                          Phone = v.Phone,
-                          IHaveVolunteeredBefore = v.IHaveVolunteeredBefore,
-                          VehicleType = v.VehicleType
-                      }
-                      ).OrderBy(loc => loc.SearchName).ToList()
-                     );
+            if (VolunteerEvents != null && VolunteerEvents.Count() > 0)
+            {
+                var lstEventLinkedVolunteers = VolunteerEvents.FindAll(ve => ve.ScheduleId == selectedGridObject.EventId);
+                // Available Volunteers, not linked to current Event
+                lstLocationVolunteers = (
+                         (from v in lstLocVolunteers // location volunteers                                                                                                 
+                          where !(from lv in lstEventLinkedVolunteers
+                                  select lv.VolunteerId).Contains(v.VolunteerId)
+                          select new Volunteer
+                          {
+                              VolunteerId = v.VolunteerId,
+                              FirstName = v.FirstName,
+                              LastName = v.LastName,
+                              Email = v.Email,
+                              Phone = v.Phone,
+                              IHaveVolunteeredBefore = v.IHaveVolunteeredBefore,
+                              VehicleType = v.VehicleType
+                          }
+                          ).OrderBy(loc => loc.SearchName).ToList()
+                         );
+            }
+            else
+            {
+                lstLocationVolunteers = (
+                        (from v in lstLocVolunteers // location volunteers                                                                                                                         
+                         select new Volunteer
+                         {
+                             VolunteerId = v.VolunteerId,
+                             FirstName = v.FirstName,
+                             LastName = v.LastName,
+                             Email = v.Email,
+                             Phone = v.Phone,
+                             IHaveVolunteeredBefore = v.IHaveVolunteeredBefore,
+                             VehicleType = v.VehicleType
+                         }
+                         ).OrderBy(loc => loc.SearchName).ToList()
+                        );
+            }
 
             return (lstLocationVolunteers);
 

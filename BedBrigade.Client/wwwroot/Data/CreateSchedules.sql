@@ -1,10 +1,10 @@
 SET NOCOUNT ON;
 
-IF (SELECT count(*) FROM [dbo].[Schedules]) > 500
-RETURN
+IF (OBJECT_ID('Schedules') IS NOT NULL )
+BEGIN
 
-TRUNCATE TABLE [dbo].[Schedules];
-
+IF (SELECT count(*) FROM [dbo].[Schedules]) = 0
+BEGIN
 
 SET IDENTITY_INSERT [dbo].[Schedules] ON 
 INSERT [dbo].[Schedules] ([ScheduleId], [LocationId], [EventName], [EventNote], [GroupName], [EventType], [EventStatus], [EventDateScheduled], [EventDateCompleted], [VehiclesDeliveryMax], [VehiclesNormalMax], [VolunteersMax], [CreateDate], [CreateUser], [UpdateDate], [UpdateUser], [MachineName]) VALUES (3, 3, N'matrices', N'edited note elementum pellentesque quisque porta volutpat', N'bifurcated', 4, 3, CAST(N'2023-03-25T00:00:00.0000000' AS DateTime2), CAST(N'2023-05-25T00:00:00.0000000' AS DateTime2), 5, 6, 15, CAST(N'2023-03-01T00:00:00.0000000' AS DateTime2), N'smckerlie2@artisteer.com', CAST(N'2023-07-09T21:52:57.3022513' AS DateTime2), N'Seed', N'DELLXPS-8930')
@@ -425,5 +425,9 @@ SET IDENTITY_INSERT [dbo].[Schedules] OFF
   FROM [bedbrigade].[dbo].[Schedules]
   where LocationId=3
 
-  update dbo.Schedules SET EventDateScheduled=DATEADD(month, 4, EventDateScheduled)
+  update dbo.Schedules SET EventDateScheduled=DATEADD(month, 5, EventDateScheduled)
+
+  END
+
+END
  
