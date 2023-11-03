@@ -1,0 +1,189 @@
+﻿
+
+<div class="Container" >
+<div class="row">
+    <div class="col-lg-12 control-section">
+        <div class="content-wrapper">    
+                @{
+                    if (SelectedEvent != null)
+                    {
+                        <div class="row" style="display: @DisplayParentHeader">
+                            <div class="col" style="font-size: small">Event #: <label style="font-weight: bold">@SelectedEvent.ScheduleId.ToString()</label></div>
+                            @{
+                                strName = StringUtil.IsNull(SelectedEvent.EventName, "Unknown");
+                            }
+                            <div class="col" style="font-size: small">Name: <label style="font-weight: bold">@strName</label></div>                  
+                            @{
+                                strName = EnumHelper.GetEnumDescription(SelectedEvent.EventType);
+                            }
+                            <div class="col" style="font-size: small">Type: <label style="font-weight: bold">@strName</label></div>
+                            @{
+                                strName = DateUtil.GetFormattedDateTime(SelectedEvent.EventDateScheduled);
+                            }
+                            <div class="col" style="font-size: small; white-space: nowrap">Date: <label style="font-weight: bold">@strName</label></div>                 
+                        </div>
+                    }
+                  }
+            <div class="row">
+                <div class="col-md-11 control-section">
+                <SfGrid @ref="Grid"  
+                    Toolbar="Toolbaritems"
+                    Width="80%"                                       
+                    DataSource="@EventVolunteers"                         
+                    RowHeight="@GridRowHeight" 
+                    ShowColumnMenu="true"
+                    AllowSelection="true"
+                    AllowFiltering="false"
+                    AllowSorting="true"  >                       
+                    <GridEvents OnToolbarClick="ToolbarClickHandler" TValue="Volunteer" RowSelected="GetSelectedVolunteer" ></GridEvents>   
+                    <GridColumns>
+                        <GridColumn Field=@nameof(Volunteer.RegistrationId) HeaderText="Reg ID" TextAlign="TextAlign.Right" Visible="@displayId" ></GridColumn>                        
+                        <GridColumn Field=@nameof(Volunteer.VolunteerId) HeaderText="Vol Id"  TextAlign="TextAlign.Right" Visible="@displayId" ></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore)  Type="ColumnType.Boolean" HeaderText="Prev.Vol." AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
+                        <GridColumn Field=@nameof(Volunteer.FullName) HeaderText="Name" TextAlign="TextAlign.Left" ></GridColumn>   
+                        <GridColumn Field=@nameof(Volunteer.Email) HeaderText="Email" TextAlign="TextAlign.Left" ></GridColumn>  
+                        <GridColumn Field=@nameof(Volunteer.Phone) HeaderText="Phone" TextAlign="TextAlign.Left" >
+                             <Template>
+                                    @{
+                                        var request = (context as Volunteer);
+                                        @request.Phone.FormatPhoneNumber();
+                                    }
+                                </Template>
+                        </GridColumn>  
+                        <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="false" AllowFiltering="true"></GridForeignColumn>
+                        <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Message / Note" TextAlign="TextAlign.Left" ></GridColumn>        
+                    </GridColumns>
+                </SfGrid>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@if (ShowEditDialog)
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display: @(ShowEditDialog ? "block" : "none")">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@DialogTitle</h5>                    
+                </div>
+                @AvailabilityMessage
+                 <div class="modal-body"  style="display: @DisplaySearchPanel">               
+                   <SfTab>
+                    <TabItems>
+                        <TabItem>
+                            <ChildContent>
+                                <TabHeader Text="Choose"></TabHeader>
+                            </ChildContent>                           
+                           <ContentTemplate>
+                                    <SfDropDownList TValue="string" TItem="Volunteer" Placeholder="Select a Volunteer" DataSource="@lstVolunteerSelector" >
+                                        <DropDownListFieldSettings Value="VolunteerId" Text="SearchName"></DropDownListFieldSettings>
+                                        <DropDownListEvents TItem="Volunteer" TValue="string"  ValueChange="OnVolunteerSelect" ></DropDownListEvents>
+                                    </SfDropDownList>
+                            </ContentTemplate>
+                        </TabItem>
+                        <TabItem>
+                            <ChildContent>
+                                <TabHeader Text="Search"></TabHeader>
+                            </ChildContent>
+                            <ContentTemplate>
+                                 <SfAutoComplete TValue="string" TItem="Volunteer" Placeholder="Seach a Volunteer by Name" DataSource="@lstVolunteerSelector" >                      
+                                        <AutoCompleteFieldSettings Value="SearchName" ></AutoCompleteFieldSettings>          
+                                        <AutoCompleteEvents TValue="string" TItem="Volunteer" ValueChange="OnVolunteerSelect" ></AutoCompleteEvents> 
+                                </SfAutoComplete>      
+                            </ContentTemplate>
+                        </TabItem>
+                    </TabItems>
+                    </SfTab>
+                </div>
+                <div class="modal-body"  style="display: @DisplayDataPanel">
+                    <div class="row">
+                        <div class="col" >
+                            <div class="card" >
+                                <div class="card-title" style="text-align: center;  background-color: #DEDEDE"><b>Event</b></div>
+                                 <div class="card-body">
+                                     <table class="table table-striped table-sm">
+                                       <tr style="display: @displayId">
+                                            <td style="vertical-align: top" >EventID:</td>
+                                            <th style="vertical-align: top" >@SelectedEvent.ScheduleId</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: top" >Location:</td>
+                                            <th style="vertical-align: top" >@EventLocationName</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: top" >Name:</td>
+                                            <th style="vertical-align: top" >@SelectedEvent.EventName</th>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: top" >Date:</td>
+                                            <th style="vertical-align: top" >@DateUtil.GetFormattedDateTime(SelectedEvent.EventDateScheduled)</th>
+                                        </tr>
+                                     </table>
+                                 </div>
+                            </div>
+                        </div>
+                         <div class="col" >
+                            <div class="card" >
+                                <div class="card-title" style="text-align: center; background-color: #DEDEDE"><b>Volunteer</b></div>
+                                 <div class="card-body">
+                                    @if (newVolunteer != null)
+                                    {
+                                        <table class="table table-striped table-sm" style="display: @displayVolunteerData">
+
+                                            @if(newVolunteer.RegistrationId > 0)
+                                            {
+                                                <tr style="display: @displayId">
+                                                    <td style="vertical-align: top" >RegistrationID:</td>
+                                                    <th style="vertical-align: top" >@newVolunteer.RegistrationId</th>
+                                                </tr>
+                                            }
+                                            <tr style="display: @displayId">
+                                                <td style="vertical-align: top" >VolunteerID:</td>
+                                                <th style="vertical-align: top" >@newVolunteer.VolunteerId</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align: top" >Name:</td>
+                                                <th style="vertical-align: top" >@newVolunteer.FullName</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align: top" >Phone:</td>
+                                                <th style="vertical-align: top; white-space: nowrap" >@newVolunteer.Phone.FormatPhoneNumber()</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align: top" >Email:</td>
+                                                <th style="vertical-align: top" >@newVolunteer.Email</th>
+                                            </tr>                                         
+                                            <tr>
+                                                <td style="vertical-align: top; white-space: nowrap" >Vehicle Type:</td>      
+                                                <th style="vertical-align: top" >@EnumHelper.GetEnumDescription(newVolunteer.VehicleType)</th>
+                                            </tr>                                      
+                                        </table>
+                                    }
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+                <div class="modal-body">
+                    @DialogMessage
+                </div>
+                <div class="modal-footer">
+                    <button type="button"  style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(()=> onConfirmAdd())">OK</button>&nbsp;     
+                     <button type="button"  style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(()=> onConfirmDelete())">OK</button>&nbsp;     
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(()=> this.ShowEditDialog=false)">@CloseButtonCaption</button>                 
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+    @testString
+    @ErrorMessage
+    @((MarkupString)strHtml)
+
+
+
+
