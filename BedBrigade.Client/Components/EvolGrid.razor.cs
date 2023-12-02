@@ -124,10 +124,10 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadGridData()
         {
+            await LoadConfiguration();
             await LoadUserData();
             await LoadLocations();
-            await LoadVolunteerData();
-            displayId = await EvolHelper.GetIdColumnsConfigurations(_svcConfiguration);
+            await LoadVolunteerData();            
             //await LoadScheduleData();
             Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
             //await LoadVolunteerEvents();
@@ -136,7 +136,32 @@ namespace BedBrigade.Client.Components
             DisableToolBar();
             PrepareGridData();
         }
-               
+
+        private async Task LoadConfiguration()
+        {
+                        Dictionary<string, string?> dctConfiguration = new Dictionary<string, string?>();
+            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System); // Configuration ============================
+            if (dataConfiguration.Success && dataConfiguration != null)
+            {
+                dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
+                if (dctConfiguration != null)
+                {
+                    var DisplayIdFields = dctConfiguration["DisplayIdFields"].ToString();
+                    if (DisplayIdFields == "Yes")
+                    {
+                        displayId = true;
+                    }
+                    var EmptyGridText= dctConfiguration["EmptyGridText"].ToString();
+                    if(EmptyGridText!=null && EmptyGridText.Length > 0)
+                    {
+                        RecordText = EmptyGridText;
+                    }
+
+                }
+            }
+        } // Load Configuration
+
+
         private void DisableToolBar()
         {
             foreach (ItemModel tbItem in Toolbaritems)

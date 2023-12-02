@@ -30,5 +30,6 @@
         public const string ReCaptchaSecret = "ReCaptchaSecret";
         public const string ReCaptchaSiteKey = "ReCaptchaSiteKey";
         public const string DisplayIdFields = "DisplayIdFields";
+        public const string EmptyGridText = "EmptyGridText";
     }
 }
