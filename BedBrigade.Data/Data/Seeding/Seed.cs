@@ -358,10 +358,16 @@ public class Seed
                     ConfigurationValue = "Bed Brigade NoReply",
                     Section = ConfigSection.Email
                 },
-                   new()
+                new()
                 {
                     ConfigurationKey = ConfigNames.DisplayIdFields,
                     ConfigurationValue = "No",
+                    Section = ConfigSection.System
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmptyGridText,
+                    ConfigurationValue = "No matching records found",
                     Section = ConfigSection.System
                 },
 
