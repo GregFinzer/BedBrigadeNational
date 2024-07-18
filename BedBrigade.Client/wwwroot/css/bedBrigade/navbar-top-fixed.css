@@ -1,8 +1,0 @@
-/* Show it is fixed to the top */
-body {
-    padding-top: 74px;
-}
-
-#page-content {
-    min-height: 60vh;
-}

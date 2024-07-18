@@ -1,9 +1,0 @@
-#edit, #admin, #manage {
-    cursor: pointer;
-    font-size: 15px;
-}
-
-    #edit::after, #admin::after, #manage::after {
-        content: "  &#9660;";
-    }
-
