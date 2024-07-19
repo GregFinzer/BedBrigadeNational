@@ -1,10 +1,15 @@
+using BedBrigade.Client;
 using BedBrigade.Client.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+StartupLogic.ConfigureLogger(builder);
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Add services to the container
+StartupLogic.AddServicesToTheContainer(builder);
 
 var app = builder.Build();
 
