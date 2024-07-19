@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components.Pages
 {
-    public partial class ContactUs :ComponentBase
+    public partial class BedBrigadeNearMe :ComponentBase
     {
         [Inject] private IJSRuntime _js { get; set; }
 
