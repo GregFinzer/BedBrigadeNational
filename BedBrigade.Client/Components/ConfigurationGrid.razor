@@ -1,0 +1,162 @@
+﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Data.Models
+@using BedBrigade.Common
+@using static BedBrigade.Common.Common;
+
+@if (ConfigRecs == null)
+{
+    <span class="spinner-border text-success m-5"></span>
+    <span>Loading ....</span>
+}
+else
+{
+    <fieldset class="m-4">
+        <legend>Configuration</legend>
+        <div class="col-md-12 control-sec">
+            <div class="content-wrapper">
+                <div class="row">
+                    <SfGrid @ref="Grid" TValue="Configuration" DataSource=@ConfigRecs
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true">
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Configuration" />
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
+                                }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <button class="btn btn-primary" @onclick=@(() => Save(context as Configuration)) IsPrimary="true">@ButtonTitle</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    Configuration configRec = (context as Configuration)!;
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="Configuration Section" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                                            </SfDropDownList>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="Section" Direction="SortDirection.Descending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false" />
+                            <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                            <GridColumn Field=@nameof(Configuration.Section) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" >
+                                <Template>
+                                    @{
+                                        var request = (context as Configuration);
+                                        var sectionConfig = Enum.GetName(typeof(Common.ConfigSection), request.Section);
+                                        @sectionConfig
+                                    }
+                                </Template>
+                            </GridColumn>
+                                
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+}
+<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
+    <ToastPosition X="Center" Y="Top" ></ToastPosition>
+</SfToast>
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+
+<style>
+    /***************************************** VolunteerGrid.razor.css ********************************************/
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+    .e-toast-container {
+        margin-top: 450px;
+    }
+
+        .e-toast-container .e-toast {
+            border: 1px solid black;
+            border-radius: 25px;
+        }
+            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-title {
+                color: deepskyblue;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+            }
+            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
+            .e-toast-container .e-toast .e-toast-message .e-toast-content {
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+                background-color: lightskyblue;
+                padding: 5px;
+                width: 100%;
+                height: 50px;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+</style>

@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop;
+@using BedBrigade.Client.Services;
+
+@((MarkupString)footerContent)
+
+@code {
+    // Client
+    private string footerContent = string.Empty;
+    [Inject] private IContentDataService _svcContent { get; set; }
+    [Inject] private ILocationDataService _svcLocation { get; set; }
+    [Inject] NavigationManager _nm { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var contentResult = await _svcContent.GetAsync("Footer", (int)LocationNumber.National);
+        if (contentResult.Success)
+        {
+            footerContent = contentResult.Data.ContentHtml;
+        }
+    }
+}

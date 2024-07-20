@@ -1,0 +1,38 @@
+﻿@using Syncfusion.Blazor.Notifications; 
+  
+<SfToast @ref="ToastOptions.ToastObj" ShowProgressBar="true" ShowCloseButton="true"  
+         CssClass="@ToastOptions.CssClass" Icon="@ToastOptions.Icon"> 
+    <ToastTemplates> 
+        <Title> 
+            @ToastOptions.Title 
+        </Title> 
+        <Content> 
+            @ToastOptions.Content 
+        </Content> 
+    </ToastTemplates> 
+</SfToast> 
+  
+@code {  
+    [Inject] 
+    public ToastService ToastService { get; set; } 
+  
+    // Parameter 
+    private ToastOptions ToastOptions = new ToastOptions();  
+    protected override async Task OnInitializedAsync() 
+    { 
+    // Update the parameter in local variable and render the toast 
+        ToastService.ToastInstance += (ToastOptions options) => 
+        { 
+            InvokeAsync(async () => 
+            { 
+                this.ToastOptions.Title = options.Title; 
+                this.ToastOptions.Content = options.Content; 
+                this.ToastOptions.CssClass = options.CssClass; 
+                this.ToastOptions.Icon = options.Icon;          
+                this.StateHasChanged(); 
+                await Task.Delay(500); 
+                await this.ToastOptions.ToastObj.ShowAsync(); 
+            }); 
+        }; 
+    } 
+}

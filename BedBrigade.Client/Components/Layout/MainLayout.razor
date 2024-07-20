@@ -1,23 +1,41 @@
 ﻿@inherits LayoutComponentBase
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@using Microsoft.AspNetCore.Components.Web
+@inject IWebHostEnvironment HostEnvironment
+<div class="">
+    <Header />
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
 
         <article class="content px-4">
-            @Body
+            @if(HostEnvironment.IsDevelopment())
+            {
+                @Body
+            }
+            else
+            {
+                <ErrorBoundary @ref=@errorBoundary >
+                    <ChildContent>
+                        @Body
+                    </ChildContent>
+                    <ErrorContent>
+                        <h2 class="w-100 text-center my-4">An Error has occured</h2>
+                    </ErrorContent>
+                </ErrorBoundary>
+            }
         </article>
     </main>
+    <Footer></Footer>
 </div>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+@code {
+    [Inject] Microsoft.Extensions.Hosting.IHostingEnvironment _env { get; set; }
+
+    private ErrorBoundary errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+        base.OnParametersSet();
+    }
+
+}
