@@ -148,32 +148,44 @@ namespace BedBrigade.Data.Services
 
         private async Task<string> CreateToken(User user)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            try
             {
-                var location = await context.Locations.FindAsync(user.LocationId);
-                List<Claim> claims = new List<Claim>
+
+
+                using (var context = _contextFactory.CreateDbContext())
                 {
-                new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim("LocationId", user.LocationId.ToString()),
-                new Claim("UserRoute", location.Route)
-                };
+                    var location = await context.Locations.FindAsync(user.LocationId);
+                    List<Claim> claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                        new Claim(ClaimTypes.Name, user.Email),
+                        new Claim(ClaimTypes.Role, user.Role),
+                        new Claim("LocationId", user.LocationId.ToString()),
+                        new Claim("UserRoute", location.Route)
+                    };
 
-                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                    .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+                    var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
+                        .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var tokenExpiresIn = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigurationKey == ConfigNames.TokenExpiration);
-                int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
-                var token = new JwtSecurityToken(
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+                    var tokenExpiresIn =
+                        await context.Configurations.FirstOrDefaultAsync(c =>
+                            c.ConfigurationKey == ConfigNames.TokenExpiration);
+                    int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
+                    var token = new JwtSecurityToken(
                         claims: claims,
                         expires: DateTime.Now.AddHours(tokenHours),
                         signingCredentials: creds);
 
-                var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+                    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-                return jwt;
+                    return jwt;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error("Error creating token, {0}", ex.Message);
+                throw;
             }
         }
 
