@@ -32,16 +32,14 @@
         await LoadBody();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Console.WriteLine($"Set active on {Menu}");
-            await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         Console.WriteLine($"Set active on {Menu}");
+    //         await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
+    //     }
+    // }
 
     public void RefreshState()
     {
