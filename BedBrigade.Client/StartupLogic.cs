@@ -6,6 +6,7 @@ using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -49,7 +50,7 @@ namespace BedBrigade.Client
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredSessionStorage();
-            //builder.Services.AddAuthorizationCore();
+           
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -84,23 +85,26 @@ namespace BedBrigade.Client
 
         private static void SetupAuth(WebApplicationBuilder builder)
         {
-            builder.Services.AddAuthorization(config =>
-            {
-                foreach (var userPolicy in RoleNames.GetPolicies())
-                    config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true"));
-            });
+            //builder.Services.AddAuthorization(config =>
+            //{
+            //    foreach (var userPolicy in RoleNames.GetPolicies())
+            //        config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true"));
+            //});
 
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = "auth_token";
-                    options.LoginPath = "/login";
-                    options.Cookie.MaxAge = TimeSpan.FromDays(2);
-                    options.AccessDeniedPath = "/acessDenied";
-                });
+            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            //    .AddCookie(options =>
+            //    {
+            //        options.Cookie.Name = "auth_token";
+            //        options.LoginPath = "/login";
+            //        options.Cookie.MaxAge = TimeSpan.FromDays(2);
+            //        options.AccessDeniedPath = "/acessDenied";
+            //    });
 
-            builder.Services.AddCascadingAuthenticationState();
-            builder.Services.AddScoped<IAuthServiceV8, AuthServiceV8>();
+            //builder.Services.AddAuthorizationCore();
+            //builder.Services.AddCascadingAuthenticationState();
+            //builder.Services.AddScoped<AuthServiceV8>();
+            //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProviderV8>();
+            
         }
 
         private static void ClientServices(WebApplicationBuilder builder)

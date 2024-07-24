@@ -19,7 +19,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthDataService _authDataService { get; set; }
-        [Inject] private IAuthServiceV8 AuthServiceV8 { get; set; }
+        [Inject] private AuthServiceV8 AuthServiceV8 { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
@@ -89,7 +89,7 @@ namespace BedBrigade.Client.Components.Pages
             }
             else
             {
-                await AuthServiceV8.LoginAsync(result.Data);
+                AuthServiceV8.CurrentUser = result.Data;
                 NavigationManager.NavigateTo("/Administration/Dashboard");
             }
         }

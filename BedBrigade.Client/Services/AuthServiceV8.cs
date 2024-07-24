@@ -1,26 +1,24 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BedBrigade.Client.Services
 {
-    public class AuthServiceV8 : IAuthServiceV8
+    public class AuthServiceV8
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        public event Action<ClaimsPrincipal>? UserChanged;
+        private ClaimsPrincipal? currentUser;
 
-        public AuthServiceV8(IHttpContextAccessor httpContextAccessor)
+        public ClaimsPrincipal CurrentUser
         {
-            _httpContextAccessor = httpContextAccessor;
-        }
+            get { return currentUser ?? new(); }
+            set
+            {
+                currentUser = value;
 
-        public async Task LoginAsync(ClaimsPrincipal claimsPrincipal)
-        {
-            await _httpContextAccessor.HttpContext.SignInAsync(claimsPrincipal);
-        }
-
-        public async Task LogoutAsync()
-        {
-            //await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                if (UserChanged is not null)
+                {
+                    UserChanged(currentUser);
+                }
+            }
         }
     }
 }

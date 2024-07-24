@@ -2,6 +2,7 @@
 @using Microsoft.JSInterop;
 @using BedBrigade.Client.Services;
 @using System.Security.Claims;
+@using System.Text.RegularExpressions
 @using BedBrigade.Common;
 @using HtmlAgilityPack;
 @using Serilog
@@ -31,6 +32,17 @@
         await LoadBody();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine($"Set active on {Menu}");
+            await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     public void RefreshState()
     {
         StateHasChanged();
@@ -41,6 +53,11 @@
         try
         {
             var url = _navigationManager.Uri;
+            if (String.IsNullOrEmpty(url) || EndsWithPeriodAndExtension(url))
+            {
+                return;
+            }
+
             var PageName = string.Empty;
             var Location = string.Empty;
             var routePath = url.Split('/');
@@ -68,6 +85,20 @@
         }
     }
 
+    public static bool EndsWithPeriodAndExtension(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return false;
+        }
+
+        // Regular expression to check if the URL ends with a period followed by an extension
+        string pattern = @"\.\w+$";
+        Regex regex = new Regex(pattern);
+
+        return regex.IsMatch(url);
+    }
+
     private async Task LoadLocationPage(string location, string pageName)
     {
         var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
@@ -82,8 +113,7 @@
                 content = contentResult.Data;
                 string html = _loadImagesService.SetImagesForHtml(Path, contentResult.Data.ContentHtml);
                 BodyContent = html;
-                Console.WriteLine($"Set active on {Menu}");
-                await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
+
                 Menu = FindMenu();
                 if (string.IsNullOrEmpty(Menu))
                 {

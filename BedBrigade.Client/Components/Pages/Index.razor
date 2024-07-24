@@ -2,10 +2,10 @@
 @page "/{mylocation}"
 @page "/{mylocation}/{mypageName}"
 
-<Body @ref="myBody"/>
+<MyBody @ref="myBody"/>
 
 @code {
-    Body myBody;
+    MyBody myBody;
     [Inject] private IJSRuntime _js { get; set; }
     [Parameter] public string mylocation { get; set; }
     [Parameter] public string mypageName { get; set; }
@@ -25,6 +25,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        Console.WriteLine($"Calling {mypageName} for location {mylocation}");
+
         if (!firstRender)
         {
             await myBody.LoadBody();
@@ -33,10 +35,4 @@
         //Collapse the mobile menu
         await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
-
-    protected override void OnInitialized()
-    {
-       Console.WriteLine($"Calling {mypageName} for location {mylocation}");
-    }
-
 }
