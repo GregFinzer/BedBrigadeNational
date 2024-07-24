@@ -5,7 +5,7 @@ using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -49,7 +49,7 @@ namespace BedBrigade.Client
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredSessionStorage();
-            builder.Services.AddAuthorizationCore();
+            //builder.Services.AddAuthorizationCore();
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -63,6 +63,7 @@ namespace BedBrigade.Client
 
             builder.Services.AddHttpClient();
 
+            SetupAuth(builder);
             ClientServices(builder);
             DataServices(builder);
 
@@ -81,12 +82,33 @@ namespace BedBrigade.Client
             _svcProvider = builder.Services.BuildServiceProvider();
         }
 
+        private static void SetupAuth(WebApplicationBuilder builder)
+        {
+            builder.Services.AddAuthorization(config =>
+            {
+                foreach (var userPolicy in RoleNames.GetPolicies())
+                    config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true"));
+            });
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "auth_token";
+                    options.LoginPath = "/login";
+                    options.Cookie.MaxAge = TimeSpan.FromDays(2);
+                    options.AccessDeniedPath = "/acessDenied";
+                });
+
+            builder.Services.AddCascadingAuthenticationState();
+            builder.Services.AddScoped<IAuthServiceV8, AuthServiceV8>();
+        }
+
         private static void ClientServices(WebApplicationBuilder builder)
         {
             Log.Logger.Information("ClientServices");
             builder.Services.AddSingleton<ICachingService, CachingService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
+            //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            //builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 
@@ -131,7 +153,8 @@ namespace BedBrigade.Client
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAntiforgery();
-            app.UseAuthorization();
+            //TODO:  Delete Later
+            //app.UseAuthorization();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();

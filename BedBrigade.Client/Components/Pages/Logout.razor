@@ -1,15 +1,21 @@
 ﻿@page "/logout"
-@using Constants = BedBrigade.Common.Constants
+@using Microsoft.AspNetCore.Authentication
 
 @code {
-    [Inject] private IJSRuntime _js { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private ICustomSessionService _sessionService { get; set; }
-    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    [Inject] private NavigationManager? NavigationManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {  
-        await _sessionService.RemoveItemAsync(Constants.AuthToken);
-        NavigationManager.NavigateTo("/", true);
+        if (HttpContext != null 
+            && HttpContext.User.Identity != null 
+            && HttpContext.User.Identity.IsAuthenticated)
+        {
+            await HttpContext.SignOutAsync();
+        }
+
+        NavigationManager?.NavigateTo("/", true);
     }
 }

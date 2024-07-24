@@ -2,6 +2,7 @@
 using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -11,13 +12,14 @@ using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components.Pages
 {
-    public partial class LoginBase : ComponentBase
+    public partial class Login : ComponentBase
     {
+        [CascadingParameter]
+        private Task<AuthenticationState>? _authenticationState { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
-        [Inject] private IAuthService AuthService { get; set; }
-        [Inject] private ICustomSessionService _sessionService { get; set; }
-        [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+        [Inject] private IAuthDataService _authDataService { get; set; }
+        [Inject] private IAuthServiceV8 AuthServiceV8 { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
@@ -72,31 +74,23 @@ namespace BedBrigade.Client.Components.Pages
 
         protected async Task HandleLogin()
         {
-            var result = await AuthService.Login(loginModel);
-            if (result.Success)
-            {
+            var result = await _authDataService.Login(loginModel.Email, loginModel.Password);
 
-                await _sessionService.SetItemAsStringAsync(Constants.AuthToken, result.Data);
-                await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/Administration/Dashboard");
+            if (!result.Success)
+            {
+                Error = result.Message;
+                DisplayError = "block;";
+                loginModel.Email = string.Empty;
+                loginModel.Password = string.Empty;
+                if (inputTextFocus.Element != null)
+                {
+                    await inputTextFocus.Element.Value.FocusAsync();
+                }
             }
             else
             {
-                try
-                {
-                    errorMessage = result.Message;
-                    DisplayError = "block;";
-                    loginModel.Email = string.Empty;
-                    loginModel.Password = string.Empty;
-                    if (inputTextFocus.Element != null)
-                    {
-                        await inputTextFocus.Element.Value.FocusAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                await AuthServiceV8.LoginAsync(result.Data);
+                NavigationManager.NavigateTo("/Administration/Dashboard");
             }
         }
     }
