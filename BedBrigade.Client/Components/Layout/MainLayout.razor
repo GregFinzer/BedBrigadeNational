@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.Web
+@using BedBrigade.Client.Services
 @inject IWebHostEnvironment HostEnvironment
 <div class="">
     <Header />
@@ -29,6 +29,8 @@
 
 @code {
     [Inject] Microsoft.Extensions.Hosting.IHostingEnvironment _env { get; set; }
+    [Inject] private IAuthService AuthService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
 
     private ErrorBoundary errorBoundary;
 
@@ -36,6 +38,26 @@
     {
         errorBoundary?.Recover();
         base.OnParametersSet();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // A hard refresh or the user just navigated to the application for the first time
+        if (firstRender && !AuthService.IsLoggedIn)
+        {
+            var url = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString();
+            if (url.Contains("/login"))
+            {
+                return;
+            }
+
+            var restoredFromState = await AuthService.GetStateFromTokenAsync();
+            //The user lost their server side session, but still has a valid JWT
+            if (restoredFromState)
+            {
+                NavigationManager.Refresh();
+            }
+        }
     }
 
 }

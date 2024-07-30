@@ -1,15 +1,15 @@
-﻿using System.Security.Claims;
-using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 
-namespace BedBrigade.Client
+namespace BedBrigade.Client.Services
 {
-    public class CustomAuthStateProviderV8 : AuthenticationStateProvider
+    /// <summary>
+    /// Updates the Blazor backend authentication state when the user changes.
+    /// </summary>
+    public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private AuthenticationState authenticationState;
 
-        public CustomAuthStateProviderV8(AuthServiceV8 service)
+        public CustomAuthStateProvider(IAuthService service)
         {
             authenticationState = new AuthenticationState(service.CurrentUser);
 

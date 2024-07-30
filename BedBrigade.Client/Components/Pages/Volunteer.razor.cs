@@ -5,12 +5,12 @@ namespace BedBrigade.Client.Components.Pages
 {
     public partial class Volunteer : ComponentBase
     {
-        [Inject] private IJSRuntime _js { get; set; }
+        //[Inject] private IJSRuntime _js { get; set; }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //Collapse the mobile menu
-            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
-        }
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    //Collapse the mobile menu
+        //    await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+        //}
     }
 }

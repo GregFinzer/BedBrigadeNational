@@ -19,14 +19,13 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthDataService _authDataService { get; set; }
-        [Inject] private AuthServiceV8 AuthServiceV8 { get; set; }
+        [Inject] private IAuthService AuthService { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
 
         protected UserLogin loginModel = new();
         protected string DisplayError { get; set; } = "none;";
-        protected string Error = "";
         protected StringValues returnUrl;
 
         protected string? errorMessage;
@@ -40,21 +39,37 @@ namespace BedBrigade.Client.Components.Pages
         {
             loginModel.Email = User;
             loginModel.Password = Password;
-            Console.WriteLine("In Login Razor Initialize");
             passwordType = "password";
-
-            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
-            {
-                returnUrl = url;
-            }
-
+            showPassword = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            //Collapse the mobile menu
-            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+            //Parse the query string for the return URL, so we can go there after login
+            if (String.IsNullOrEmpty(returnUrl))
+            {
+                var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
+                {
+                    returnUrl = url;
+                }
+            }
+
+            //A hard reset was performed or the session was lost, try to restore the state and redirect back to the returnUrl
+            if (firstRender && !AuthService.IsLoggedIn)
+            {
+                var restoredFromState = await AuthService.GetStateFromTokenAsync();
+                if (restoredFromState)
+                {
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        NavigationManager.NavigateTo(returnUrl);
+                        returnUrl = string.Empty;
+                    }
+                }
+            }
+
+
         }
 
 
@@ -74,11 +89,11 @@ namespace BedBrigade.Client.Components.Pages
 
         protected async Task HandleLogin()
         {
-            var result = await _authDataService.Login(loginModel.Email, loginModel.Password);
+            var loginResult = await _authDataService.Login(loginModel.Email, loginModel.Password);
 
-            if (!result.Success)
+            if (!loginResult.Success)
             {
-                Error = result.Message;
+                errorMessage = loginResult.Message;
                 DisplayError = "block;";
                 loginModel.Email = string.Empty;
                 loginModel.Password = string.Empty;
@@ -89,8 +104,17 @@ namespace BedBrigade.Client.Components.Pages
             }
             else
             {
-                AuthServiceV8.CurrentUser = result.Data;
-                NavigationManager.NavigateTo("/Administration/Dashboard");
+                await AuthService.Login(loginResult.Data);
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    NavigationManager.NavigateTo(returnUrl);
+                    returnUrl = string.Empty;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/Administration/Dashboard");
+                }
             }
         }
     }

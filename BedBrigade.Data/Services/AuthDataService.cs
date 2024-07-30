@@ -78,6 +78,7 @@ namespace BedBrigade.Data.Services
 
             return principal;
         }
+
         public async Task<ServiceResponse<bool>> Update(UserRegister request)
         {
             using (var context = _contextFactory.CreateDbContext())

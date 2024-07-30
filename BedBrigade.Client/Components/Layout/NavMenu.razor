@@ -136,6 +136,7 @@
 </div>
 
 @code {
+    [Inject] private IJSRuntime _js { get; set; }
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -143,5 +144,11 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //Collapse the mobile menu
+        await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
 }

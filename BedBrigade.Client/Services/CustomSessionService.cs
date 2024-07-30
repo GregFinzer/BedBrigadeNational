@@ -1,7 +1,10 @@
 ﻿using Blazored.SessionStorage;
 
-namespace BedBrigade.Data.Services
+namespace BedBrigade.Client.Services
 {
+    /// <summary>
+    /// A service to manage the browser session storage using Blazored.SessionStorage
+    /// </summary>
     public class CustomSessionService : ICustomSessionService
     {
         private readonly ISessionStorageService _sessionService;
