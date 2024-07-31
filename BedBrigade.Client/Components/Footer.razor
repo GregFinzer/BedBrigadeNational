@@ -1,7 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components
-@using Microsoft.JSInterop;
-@using BedBrigade.Client.Services;
-
+﻿@using Serilog
 @((MarkupString)footerContent)
 
 @code {
@@ -10,12 +7,26 @@
     [Inject] private IContentDataService _svcContent { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] NavigationManager _nm { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+
         var contentResult = await _svcContent.GetAsync("Footer", (int)LocationNumber.National);
         if (contentResult.Success)
         {
             footerContent = contentResult.Data.ContentHtml;
+        }
+        else
+        {
+            Log.Logger.Error($"Error getting footer content: {contentResult.Message}");
+        }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"Footer.OnInitializedAsync : {ex.Message}");
+            throw;
         }
     }
 }

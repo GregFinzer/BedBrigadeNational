@@ -8,6 +8,7 @@ using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Syncfusion.Blazor;
@@ -152,9 +153,8 @@ namespace BedBrigade.Client
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseAntiforgery();
-            //TODO:  Delete Later
-            //app.UseAuthorization();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();

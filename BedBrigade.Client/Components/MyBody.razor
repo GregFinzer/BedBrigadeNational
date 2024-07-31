@@ -12,7 +12,7 @@
 
 @code {
     // Client
-    
+
     [Inject] private IContentDataService _svcContent { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] private NavigationManager _navigationManager { get; set; }
@@ -41,6 +41,7 @@
     {
         try
         {
+            Log.Logger.Debug("MyBody.LoadBody");
             var url = _navigationManager.Uri;
             if (String.IsNullOrEmpty(url) || EndsWithPeriodAndExtension(url))
             {
@@ -65,65 +66,102 @@
                 Location = routePath[3];
                 PageName = routePath[4];
             }
+
             Path = $"/{Location}/pages/{PageName}";
             await LoadLocationPage(Location, PageName);
         }
         catch (Exception ex)
         {
-            Log.Logger.Error(ex.Message);
+            Log.Logger.Error(ex, $"LoadBody: {ex.Message}");
+            throw;
         }
     }
 
-    public static bool EndsWithPeriodAndExtension(string url)
+    public bool EndsWithPeriodAndExtension(string url)
     {
-        if (string.IsNullOrWhiteSpace(url))
+        Log.Logger.Debug("MyBody.EndsWithPeriodAndExtension");
+        try
         {
-            return false;
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return false;
+            }
+
+            // Regular expression to check if the URL ends with a period followed by an extension
+            string pattern = @"\.\w+$";
+            Regex regex = new Regex(pattern);
+
+            return regex.IsMatch(url);
         }
-
-        // Regular expression to check if the URL ends with a period followed by an extension
-        string pattern = @"\.\w+$";
-        Regex regex = new Regex(pattern);
-
-        return regex.IsMatch(url);
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"EndsWithPeriodAndExtension: {ex.Message}");
+            throw;
+        }
     }
 
     private async Task LoadLocationPage(string location, string pageName)
     {
-        var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+        Log.Logger.Debug("MyBody.LoadLocationPage");
 
-        if (locationResponse.Success && locationResponse.Data != null)
+        try
         {
-            Console.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
-            var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
-            Console.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
-            if (contentResult.Success)
-            {
-                content = contentResult.Data;
-                string html = _loadImagesService.SetImagesForHtml(Path, contentResult.Data.ContentHtml);
-                BodyContent = html;
 
-                Menu = FindMenu();
-                if (string.IsNullOrEmpty(Menu))
+
+            var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+
+            if (locationResponse.Success && locationResponse.Data != null)
+            {
+                Console.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
+                var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
+                Console.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
+                if (contentResult.Success)
                 {
-                    Menu = "home";
+                    content = contentResult.Data;
+                    string html = _loadImagesService.SetImagesForHtml(Path, contentResult.Data.ContentHtml);
+                    BodyContent = html;
+
+                    Menu = FindMenu();
+                    if (string.IsNullOrEmpty(Menu))
+                    {
+                        Menu = "home";
+                    }
+                }
+                else
+                {
+                    _navigationManager.NavigateTo("/National/Sorry", true);
                 }
             }
-            else
-            {
-                _navigationManager.NavigateTo("/National/Sorry", true);
-            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"LoadLocationPage: {ex.Message}");
+            throw;
         }
     }
 
 
     protected string FindMenu()
     {
-        var location = _navigationManager.Uri.Split('/');
-        if(location.Length <= 4)
+        Log.Logger.Debug("MyBody.FindMenu");
+
+        try
         {
-            return "home";
+
+
+            var location = _navigationManager.Uri.Split('/');
+            if (location.Length <= 4)
+            {
+                return "home";
+            }
+
+            return location[location.Length - 1].ToLower();
         }
-        return location[location.Length - 1].ToLower();
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"FindMenu: {ex.Message}");
+            throw;
+        }
     }
+
 }

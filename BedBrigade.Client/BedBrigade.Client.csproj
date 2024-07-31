@@ -7,6 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
+    <Content Remove="wwwroot\scripts\cookie.js" />
+    <Content Remove="wwwroot\scripts\DisplayToggle.js" />
+    <Content Remove="wwwroot\scripts\script.js" />
+    <Content Remove="wwwroot\scripts\script.ts" />
+    <Content Remove="wwwroot\scripts\scriptLoader.js" />
+    <Content Remove="wwwroot\scripts\SetGetValue.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\scripts\AddRemoveClass.js" />
+    <None Include="wwwroot\scripts\cookie.js" />
+    <None Include="wwwroot\scripts\DisplayToggle.js" />
+    <None Include="wwwroot\scripts\script.js" />
+    <None Include="wwwroot\scripts\script.ts" />
+    <None Include="wwwroot\scripts\scriptLoader.js" />
+    <None Include="wwwroot\scripts\SetGetValue.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.7" />

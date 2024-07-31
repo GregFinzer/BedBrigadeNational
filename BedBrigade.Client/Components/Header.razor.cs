@@ -1,9 +1,7 @@
-using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop;
 using Serilog;
 
@@ -37,6 +35,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            Log.Debug("Header.OnInitializedAsync");
             try
             {
                 var contentResult = await _svcContent.GetAsync("Header", (int)LocationNumber.National);
@@ -58,13 +57,26 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            Log.Debug("Header.OnAfterRenderAsync");
+
             if (firstRender)
             {
                 await HandleFirstRender();
             }
             else if (authState != null)
             {
-                if (authState.User.HasRole($"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}, {RoleNames.LocationAuthor}, {RoleNames.LocationScheduler}"))
+                await HandleOtherRenders();
+            }
+        }
+
+        private async Task HandleOtherRenders()
+        {
+            Log.Debug("Header.HandleOtherRenders");
+
+            try
+            {
+                if (authState.User.HasRole(
+                        $"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}, {RoleNames.LocationAuthor}, {RoleNames.LocationScheduler}"))
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
@@ -81,29 +93,54 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", AdminElement, "dropdown-toggle");
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.HandleOtherRenders: {ex.Message}");
+                throw;
+            }
         }
 
         private async Task HandleFirstRender()
         {
-            authState = await _authState.GetAuthenticationStateAsync();
-            if (authState != null)
-            {
-                IsNationalAdmin = authState.User.HasRole(RoleNames.NationalAdmin);
-                IsNationalEditor = authState.User.HasRole(RoleNames.NationalEditor);
+            Log.Debug("Header.HandleFirstRender");
 
-                IsLocationAdmin = authState.User.HasRole(RoleNames.LocationAdmin);
-                IsLocationAuthor = authState.User.HasRole(RoleNames.LocationAuthor);
-                IsLocationScheduler = authState.User.HasRole(RoleNames.LocationScheduler);
-                IsLocationTreasurer = authState.User.HasRole(RoleNames.LocationTreasurer);
-                IsLocationEditor = authState.User.HasRole(RoleNames.LocationEditor);
+            try
+            {
+                authState = await _authState.GetAuthenticationStateAsync();
+                if (authState != null)
+                {
+                    IsNationalAdmin = authState.User.HasRole(RoleNames.NationalAdmin);
+                    IsNationalEditor = authState.User.HasRole(RoleNames.NationalEditor);
+
+                    IsLocationAdmin = authState.User.HasRole(RoleNames.LocationAdmin);
+                    IsLocationAuthor = authState.User.HasRole(RoleNames.LocationAuthor);
+                    IsLocationScheduler = authState.User.HasRole(RoleNames.LocationScheduler);
+                    IsLocationTreasurer = authState.User.HasRole(RoleNames.LocationTreasurer);
+                    IsLocationEditor = authState.User.HasRole(RoleNames.LocationEditor);
+                }
+
+                Menu = FindMenu();
             }
-            Menu = FindMenu();
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.HandleFirstRender: {ex.Message}");
+                throw;
+            }
         }
 
         protected string FindMenu()
         {
-            var location = _nm.Uri.Split('/');
-            return location[location.Length - 1];
+            try
+            {
+                Log.Debug("Header.FindMenu");
+                var location = _nm.Uri.Split('/');
+                return location[location.Length - 1];
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.FindMenu: {ex.Message}");
+                throw;
+            }
         }
     }
 }
