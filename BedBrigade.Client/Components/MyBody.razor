@@ -12,7 +12,7 @@
 
 @code {
     // Client
-    [Inject] private IJSRuntime _js { get; set; }
+    
     [Inject] private IContentDataService _svcContent { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] private NavigationManager _navigationManager { get; set; }
@@ -31,15 +31,6 @@
     {
         await LoadBody();
     }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         Console.WriteLine($"Set active on {Menu}");
-    //         await _js.InvokeVoidAsync("AddRemoveClass.SetClass", Menu, "active");
-    //     }
-    // }
 
     public void RefreshState()
     {

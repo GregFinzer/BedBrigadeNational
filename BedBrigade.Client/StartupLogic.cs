@@ -44,10 +44,6 @@ namespace BedBrigade.Client
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            // Syncfusion Blazor Licensing
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
-            builder.Services.AddSyncfusionBlazor();
-
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
@@ -78,11 +74,17 @@ namespace BedBrigade.Client
                 builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
             }));
 
+            // Syncfusion Blazor Licensing
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
+            builder.Services.AddSyncfusionBlazor();
+
             _svcProvider = builder.Services.BuildServiceProvider();
         }
 
         private static void SetupAuth(WebApplicationBuilder builder)
         {
+            Log.Logger.Information("SetupAuth");
+
             //Authentication
             builder.Services.AddAuthorization();
 
@@ -108,8 +110,6 @@ namespace BedBrigade.Client
         {
             Log.Logger.Information("ClientServices");
             builder.Services.AddSingleton<ICachingService, CachingService>();
-            //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            //builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 

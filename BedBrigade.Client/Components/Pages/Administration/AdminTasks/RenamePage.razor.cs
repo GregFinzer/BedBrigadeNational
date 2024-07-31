@@ -105,7 +105,103 @@ public partial class RenamePage : ComponentBase
         if (updateResponse.Success)
         {
             _toastService.Success("Content Saved",
-                $"Page updated for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
+                $"Page updated " +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"" +
+                $"for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
             _navigationManager.NavigateTo("/administration/manage/pages");
         }
         else
