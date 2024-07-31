@@ -49,8 +49,6 @@ namespace BedBrigade.Client
             builder.Services.AddSyncfusionBlazor();
 
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddBlazoredSessionStorage();
-           
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -85,26 +83,25 @@ namespace BedBrigade.Client
 
         private static void SetupAuth(WebApplicationBuilder builder)
         {
-            //builder.Services.AddAuthorization(config =>
-            //{
-            //    foreach (var userPolicy in RoleNames.GetPolicies())
-            //        config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true"));
-            //});
+            //Authentication
+            builder.Services.AddAuthorization();
 
-            //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //    .AddCookie(options =>
-            //    {
-            //        options.Cookie.Name = "auth_token";
-            //        options.LoginPath = "/login";
-            //        options.Cookie.MaxAge = TimeSpan.FromDays(2);
-            //        options.AccessDeniedPath = "/acessDenied";
-            //    });
+            //The cookie authentication is never used, but it is required to prevent a runtime error
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "auth_cookie";
+                    options.Cookie.MaxAge = TimeSpan.FromHours(24);
+                });
 
-            //builder.Services.AddAuthorizationCore();
-            //builder.Services.AddCascadingAuthenticationState();
-            //builder.Services.AddScoped<AuthServiceV8>();
-            //builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProviderV8>();
-            
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddCascadingAuthenticationState();
+
+            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+            builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
+
         }
 
         private static void ClientServices(WebApplicationBuilder builder)
@@ -120,7 +117,6 @@ namespace BedBrigade.Client
         {
             Log.Logger.Information("DataServices");
             builder.Services.AddScoped<ICommonService, CommonService>();
-            builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
             builder.Services.AddScoped<IDonationDataService, DonationDataService>();

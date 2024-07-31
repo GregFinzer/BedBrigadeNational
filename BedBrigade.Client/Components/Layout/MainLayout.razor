@@ -31,6 +31,7 @@
     [Inject] Microsoft.Extensions.Hosting.IHostingEnvironment _env { get; set; }
     [Inject] private IAuthService AuthService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IJSRuntime _js { get; set; }
 
     private ErrorBoundary errorBoundary;
 
@@ -58,6 +59,10 @@
                 NavigationManager.Refresh();
             }
         }
+
+        
+        //Collapse the mobile menu
+        await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
 
 }
