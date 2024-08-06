@@ -1,6 +1,6 @@
 ﻿@page "/"
-@page "/{mylocation}"
-@page "/{mylocation}/{mypageName}"
+@page "/{mylocation:nonfile}"
+@page "/{mylocation}/{mypageName:nonfile}"
 @using Serilog
 
 <MyBody @ref="myBody"/>
@@ -37,7 +37,5 @@
             Log.Logger.Debug("RefreshState");
             myBody.RefreshState();
         }
-        //Collapse the mobile menu
-        //await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
 }

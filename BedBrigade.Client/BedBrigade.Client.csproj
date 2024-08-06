@@ -7,41 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\scripts\AddRemoveClass.js" />
-    <Content Remove="wwwroot\scripts\cookie.js" />
-    <Content Remove="wwwroot\scripts\DisplayToggle.js" />
-    <Content Remove="wwwroot\scripts\script.js" />
-    <Content Remove="wwwroot\scripts\script.ts" />
-    <Content Remove="wwwroot\scripts\scriptLoader.js" />
-    <Content Remove="wwwroot\scripts\SetGetValue.js" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+    <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\README.md" />
+    <None Include="wwwroot\Data\CreateSchedules.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="wwwroot\scripts\AddRemoveClass.js" />
     <None Include="wwwroot\scripts\cookie.js" />
     <None Include="wwwroot\scripts\DisplayToggle.js" />
-    <None Include="wwwroot\scripts\script.js" />
-    <None Include="wwwroot\scripts\script.ts" />
+	<None Include="wwwroot\scripts\script.js" />
     <None Include="wwwroot\scripts\scriptLoader.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.5.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.1" />
-    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
+    <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Syncfusion.Blazor" Version="26.1.35" />
     <PackageReference Include="Syncfusion.Blazor.FileManager.PhysicalFileProvider" Version="26.1.35" />
-    <PackageReference Include="Syncfusion.Licensing" Version="26.1.35" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />

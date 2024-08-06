@@ -2,7 +2,7 @@
 @using BedBrigade.Client.Services
 @inject IWebHostEnvironment HostEnvironment
 <div class="">
-    <Header />
+    <Header></Header>
 
     <main>
 
@@ -43,7 +43,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // A hard refresh or the user just navigated to the application for the first time
+        //A hard refresh or the user just navigated to the application for the first time
         if (firstRender && !AuthService.IsLoggedIn)
         {
             var url = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString();
@@ -62,7 +62,7 @@
 
         
         //Collapse the mobile menu
-        //await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+        await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
     }
 
 }

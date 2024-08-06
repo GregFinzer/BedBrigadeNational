@@ -13,7 +13,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider _authState { get; set; }
+        [Inject] private AuthenticationStateProvider _authenticationStateProvider { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
 
         const string LoginElement = "loginElement";
@@ -24,18 +24,12 @@ namespace BedBrigade.Client.Components
         protected string Login = "login";
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
-        private AuthenticationState authState { get; set; }
-        public bool IsNationalAdmin { get; private set; } = false;
-        public bool IsNationalEditor { get; private set; } = false;
-        public bool IsLocationAdmin { get; private set; } = false;
-        public bool IsLocationAuthor { get; private set; } = false;
-        public bool IsLocationScheduler { get; private set; } = false;
-        public bool IsLocationTreasurer { get; private set; } = false;
-        public bool IsLocationEditor { get; private set; } = false;
+        private AuthenticationState _authState { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             Log.Debug("Header.OnInitializedAsync");
+            _authenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
             try
             {
                 var contentResult = await _svcContent.GetAsync("Header", (int)LocationNumber.National);
@@ -55,42 +49,45 @@ namespace BedBrigade.Client.Components
             }
         }
 
+        private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+        {
+            _authState = await task;
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            _authenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("Header.OnAfterRenderAsync");
-
-            if (firstRender)
-            {
-                await HandleFirstRender();
-            }
-            else if (authState != null)
-            {
-                await HandleOtherRenders();
-            }
+            await HandleRender();
         }
 
-        private async Task HandleOtherRenders()
+        private async Task HandleRender()
         {
-            Log.Debug("Header.HandleOtherRenders");
+            Log.Debug("Header.HandleRender");
 
             try
             {
-                if (authState.User.HasRole(
-                        $"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}, {RoleNames.LocationAuthor}, {RoleNames.LocationScheduler}"))
+                _authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                if (_authState != null 
+                    && _authState.User != null 
+                    && _authState.User.Identity != null 
+                    && _authState.User.Identity.IsAuthenticated)
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
-                    await _js.InvokeVoidAsync("DisplayToggle.Toggle", "administration");
-                    if (Menu.ToLower() == "dashboard")
-                    {
-                        await _js.InvokeVoidAsync("AddRemoveClass.SetClass", AdminElement, "active");
-                    }
+                    await _js.InvokeVoidAsync("DisplayToggle.Show", "administration");
+                    await ShowMenuItems();
                 }
                 else
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Login");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/login");
-                    await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", AdminElement, "dropdown-toggle");
+                    await _js.InvokeVoidAsync("DisplayToggle.HideByClass", "nadmin");
                 }
             }
             catch (Exception ex)
@@ -100,47 +97,49 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task HandleFirstRender()
+        private async Task ShowMenuItems()
         {
-            Log.Debug("Header.HandleFirstRender");
-
+            Log.Debug("Header.SetMenuItems");
             try
             {
-                authState = await _authState.GetAuthenticationStateAsync();
-                if (authState != null)
+                if (_authState.User.HasRole(RoleNames.NationalAdmin))
                 {
-                    IsNationalAdmin = authState.User.HasRole(RoleNames.NationalAdmin);
-                    IsNationalEditor = authState.User.HasRole(RoleNames.NationalEditor);
-
-                    IsLocationAdmin = authState.User.HasRole(RoleNames.LocationAdmin);
-                    IsLocationAuthor = authState.User.HasRole(RoleNames.LocationAuthor);
-                    IsLocationScheduler = authState.User.HasRole(RoleNames.LocationScheduler);
-                    IsLocationTreasurer = authState.User.HasRole(RoleNames.LocationTreasurer);
-                    IsLocationEditor = authState.User.HasRole(RoleNames.LocationEditor);
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "nadmin");
                 }
-
-                Menu = FindMenu();
+                else if (_authState.User.HasRole(RoleNames.NationalEditor))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "neditor");
+                }
+                else if (_authState.User.HasRole(RoleNames.LocationAdmin))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "ladmin");
+                }
+                else if (_authState.User.HasRole(RoleNames.LocationEditor))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "leditor");
+                }
+                else if (_authState.User.HasRole(RoleNames.LocationAuthor))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "lauthor");
+                }
+                else if (_authState.User.HasRole(RoleNames.LocationScheduler))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "lscheduler");
+                }
+                else if (_authState.User.HasRole(RoleNames.LocationTreasurer))
+                {
+                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "ltreasurer");
+                }
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, $"Header.HandleFirstRender: {ex.Message}");
-                throw;
+                Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
             }
+        
         }
 
-        protected string FindMenu()
-        {
-            try
-            {
-                Log.Debug("Header.FindMenu");
-                var location = _nm.Uri.Split('/');
-                return location[location.Length - 1];
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, $"Header.FindMenu: {ex.Message}");
-                throw;
-            }
-        }
+
+
+
     }
 }

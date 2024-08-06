@@ -1,10 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components
-@using Microsoft.JSInterop;
-@using BedBrigade.Client.Services;
-@using System.Security.Claims;
-@using System.Text.RegularExpressions
-@using BedBrigade.Common;
-@using HtmlAgilityPack;
+﻿@using BedBrigade.Client.Services;
 @using Serilog
 @inject IJSRuntime JS
 
@@ -43,7 +37,7 @@
         {
             Log.Logger.Debug("MyBody.LoadBody");
             var url = _navigationManager.Uri;
-            if (String.IsNullOrEmpty(url) || EndsWithPeriodAndExtension(url))
+            if (String.IsNullOrEmpty(url))
             {
                 return;
             }
@@ -56,15 +50,20 @@
                 Location = "National";
                 PageName = "Home";
             }
-            else if (routePath.Length < 5)
+            else if (routePath.Length == 4)
             {
-                _navigationManager.NavigateTo("/National/Sorry", true);
-                return;
+                Location = routePath[3];
+                PageName = "Home";
             }
-            else
+            else if (routePath.Length == 5)
             {
                 Location = routePath[3];
                 PageName = routePath[4];
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/Sorry", true);
+                return;
             }
 
             Path = $"/{Location}/pages/{PageName}";
@@ -77,28 +76,7 @@
         }
     }
 
-    public bool EndsWithPeriodAndExtension(string url)
-    {
-        Log.Logger.Debug("MyBody.EndsWithPeriodAndExtension");
-        try
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return false;
-            }
 
-            // Regular expression to check if the URL ends with a period followed by an extension
-            string pattern = @"\.\w+$";
-            Regex regex = new Regex(pattern);
-
-            return regex.IsMatch(url);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, $"EndsWithPeriodAndExtension: {ex.Message}");
-            throw;
-        }
-    }
 
     private async Task LoadLocationPage(string location, string pageName)
     {
@@ -129,7 +107,7 @@
                 }
                 else
                 {
-                    _navigationManager.NavigateTo("/National/Sorry", true);
+                    _navigationManager.NavigateTo("/Sorry", true);
                 }
             }
         }

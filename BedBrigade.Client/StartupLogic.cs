@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Syncfusion.Blazor;
 
@@ -95,6 +96,7 @@ namespace BedBrigade.Client
                 {
                     options.Cookie.Name = "auth_cookie";
                     options.Cookie.MaxAge = TimeSpan.FromHours(24);
+                    options.LoginPath = "/login";
                 });
 
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -141,6 +143,7 @@ namespace BedBrigade.Client
         {
             Log.Logger.Information("Create and configure application");
             var app = builder.Build();
+
             app.UsePathBase("/National");
 
             // Configure the HTTP request pipeline.
@@ -151,10 +154,18 @@ namespace BedBrigade.Client
                 app.UseHsts();
             }
 
+            app.UseDefaultFiles();
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthorization(); // This must appear after the UseRouting middleware and before UseEndpoints
             app.UseAntiforgery();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
