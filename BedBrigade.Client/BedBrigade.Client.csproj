@@ -1,66 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Pages\Location\**" />
-    <Compile Remove="wwwroot\Media\Arlington\**" />
-    <Compile Remove="wwwroot\Media\canton\**" />
-    <Compile Remove="wwwroot\Media\Circleville\**" />
-    <Compile Remove="wwwroot\Media\lancaster\**" />
-    <Compile Remove="wwwroot\Media\linden\**" />
-    <Compile Remove="wwwroot\Media\newark\**" />
-    <Compile Remove="wwwroot\Media\rock\**" />
-    <Compile Remove="wwwroot\Media\templates\**" />
-    <Content Remove="Pages\Location\**" />
-    <Content Remove="wwwroot\Media\Arlington\**" />
-    <Content Remove="wwwroot\Media\canton\**" />
-    <Content Remove="wwwroot\Media\Circleville\**" />
-    <Content Remove="wwwroot\Media\lancaster\**" />
-    <Content Remove="wwwroot\Media\linden\**" />
-    <Content Remove="wwwroot\Media\newark\**" />
-    <Content Remove="wwwroot\Media\rock\**" />
-    <Content Remove="wwwroot\Media\templates\**" />
-    <EmbeddedResource Remove="Pages\Location\**" />
-    <EmbeddedResource Remove="wwwroot\Media\Arlington\**" />
-    <EmbeddedResource Remove="wwwroot\Media\canton\**" />
-    <EmbeddedResource Remove="wwwroot\Media\Circleville\**" />
-    <EmbeddedResource Remove="wwwroot\Media\lancaster\**" />
-    <EmbeddedResource Remove="wwwroot\Media\linden\**" />
-    <EmbeddedResource Remove="wwwroot\Media\newark\**" />
-    <EmbeddedResource Remove="wwwroot\Media\rock\**" />
-    <EmbeddedResource Remove="wwwroot\Media\templates\**" />
-    <None Remove="Pages\Location\**" />
-    <None Remove="wwwroot\Media\Arlington\**" />
-    <None Remove="wwwroot\Media\canton\**" />
-    <None Remove="wwwroot\Media\Circleville\**" />
-    <None Remove="wwwroot\Media\lancaster\**" />
-    <None Remove="wwwroot\Media\linden\**" />
-    <None Remove="wwwroot\Media\newark\**" />
-    <None Remove="wwwroot\Media\rock\**" />
-    <None Remove="wwwroot\Media\templates\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="compilerconfig.json" />
-    <Content Remove="Components\EditPage.razor" />
-    <Content Remove="Pages\Administration\AdminTasks\Email.razor" />
-    <Content Remove="wwwroot\Data\CreateSchedules.sql" />
-    <Content Remove="wwwroot\Media\national\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Components\AngleImageView.razor.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="compilerconfig.json" />
-    <None Include="Pages\Administration\Admin\Email.razor" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
@@ -68,101 +14,28 @@
     <None Include="wwwroot\Data\CreateSchedules.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="wwwroot\Media\national\pages\Assembly\BB Bed Assembly Instructions Dec 2021.pdf" />
     <None Include="wwwroot\scripts\AddRemoveClass.js" />
-    <None Include="wwwroot\scripts\DisplayToggle.js" />
     <None Include="wwwroot\scripts\cookie.js" />
+    <None Include="wwwroot\scripts\DisplayToggle.js" />
+	<None Include="wwwroot\scripts\script.js" />
     <None Include="wwwroot\scripts\scriptLoader.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
-    <PackageReference Include="Serilog" Version="2.12.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Include="Syncfusion.Blazor" Version="20.4.0.54" />
-    <PackageReference Include="Syncfusion.Blazor.FileManager.PhysicalFileProvider" Version="21.2.9" />
-    <PackageReference Include="Syncfusion.Licensing" Version="21.2.9" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
+    <PackageReference Include="Serilog" Version="4.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Syncfusion.Blazor" Version="26.1.35" />
+    <PackageReference Include="Syncfusion.Blazor.FileManager.PhysicalFileProvider" Version="26.1.35" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
     <ProjectReference Include="..\BedBrigade.Data\BedBrigade.Data.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\AboutUs\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\AboutUs\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\AboutUs\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Assembly\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Assembly\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Assembly\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Contact\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Contact\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Contact\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Donate\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Donate\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Donate\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Footer\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Header\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\History\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\History\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\History\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\News\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\News\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\News\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Partners\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Partners\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Partners\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\RequestBed\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\RequestBed\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\RequestBed\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Stories\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Stories\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Stories\Right\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Volunteer\Left\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Volunteer\Middle\" />
-    <Folder Include="wwwroot\Media\national\pages\Templates\pages\Volunteer\Right\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\Media\national\pages\Assembly\BottomLeft-min.png">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\BottomRight-min.png">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\leftImageRotator\OSB-min.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\middleImageRotator\DoorHinge-min.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\rightImageRotator\1x4-min.jpg">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\TopLeft-min.png">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\Media\national\pages\Assembly\TopRight-min.png">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
 
 </Project>

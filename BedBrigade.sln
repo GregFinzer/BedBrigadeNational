@@ -5,8 +5,6 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Tests", "BedBrigade.Tests\BedBrigade.Tests.csproj", "{2D5A513F-9F65-4B8D-A15B-5201657EE178}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Client", "BedBrigade.Client\BedBrigade.Client.csproj", "{8E373AB8-3429-4DAD-964B-DAF2B377594F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D70B2F43-3010-4A84-AF0C-84D94BA2B5D2}"
 	ProjectSection(SolutionItems) = preProject
 		BlazorServer.md = BlazorServer.md
@@ -15,6 +13,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Data", "BedBrigade.Data\BedBrigade.Data.csproj", "{630936C5-DAE4-46C3-A14D-E33648D128A3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Common", "BedBrigade.Common\BedBrigade.Common.csproj", "{0C03AB4D-0341-41EA-B473-A1F7C28519EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.Client", "BedBrigade.Client\BedBrigade.Client.csproj", "{0633E96E-E43D-4B83-81DE-4A0EB58DD783}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +29,6 @@ Global
 		{2D5A513F-9F65-4B8D-A15B-5201657EE178}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2D5A513F-9F65-4B8D-A15B-5201657EE178}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{2D5A513F-9F65-4B8D-A15B-5201657EE178}.Stage|Any CPU.Build.0 = Release|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Stage|Any CPU.ActiveCfg = Release|Any CPU
-		{8E373AB8-3429-4DAD-964B-DAF2B377594F}.Stage|Any CPU.Build.0 = Release|Any CPU
 		{630936C5-DAE4-46C3-A14D-E33648D128A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{630936C5-DAE4-46C3-A14D-E33648D128A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{630936C5-DAE4-46C3-A14D-E33648D128A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,6 +41,12 @@ Global
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{0C03AB4D-0341-41EA-B473-A1F7C28519EE}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Stage|Any CPU.ActiveCfg = Debug|Any CPU
+		{0633E96E-E43D-4B83-81DE-4A0EB58DD783}.Stage|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

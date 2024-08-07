@@ -1,0 +1,9 @@
+﻿@layout Layout.AdminLayout
+@using BedBrigade.Client.Components
+@using BedBrigade.Common
+@page "/administration/manage/mediagrid"
+@attribute [Authorize(Roles = RoleNames.CanManageMedia)]
+
+<MediaGrid />
+
+<FileManager LocationId="0" />

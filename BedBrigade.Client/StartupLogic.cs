@@ -1,17 +1,18 @@
 ﻿using BedBrigade.Client.Components;
-using BedBrigade.Client.Pages.Administration.Admin;
 using BedBrigade.Client.Services;
-using BedBrigade.Data.Services;
+using BedBrigade.Common;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
+using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Syncfusion.Blazor;
-using Serilog;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Serilog;
+using Syncfusion.Blazor;
 
 namespace BedBrigade.Client
 {
@@ -37,27 +38,16 @@ namespace BedBrigade.Client
 
         public static void AddServicesToTheContainer(WebApplicationBuilder builder)
         {
+            Log.Logger.Information("AddServicesToTheContainer");
+
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            Log.Logger.Information("No Compression added to services");
-            ////Do not use compression for hot reload of local development
-            //if (!Common.Common.IsDevelopment())
-            //{
-            //    Log.Logger.Information("Configure Compression");
-            //    builder.Services.Configure<GzipCompressionProviderOptions>
-            //        (options => options.Level = CompressionLevel.Fastest);
-            //    builder.Services.AddResponseCompression(options =>
-            //    {
-            //        options.Providers.Add<GzipCompressionProvider>();
-            //    });
-            //}
+            builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
 
-            builder.Services.AddRazorPages();
-            builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddBlazoredSessionStorage();
-            builder.Services.AddAuthorizationCore();
+
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlBuilder =>
@@ -67,12 +57,11 @@ namespace BedBrigade.Client
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.UseApplicationServiceProvider(_svcProvider);
             });
-            
-           
-            builder.Services.AddHttpClient(); // VS 7/31/2023
 
+            builder.Services.AddHttpClient();
+
+            SetupAuth(builder);
             ClientServices(builder);
-
             DataServices(builder);
 
             builder.Services.AddScoped<ToastService, ToastService>();
@@ -87,17 +76,50 @@ namespace BedBrigade.Client
                 builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
             }));
 
+            // Syncfusion Blazor Licensing
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
             builder.Services.AddSyncfusionBlazor();
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjIyMjE1NUAzMjMxMmUzMDJlMzBTR09FTlpnUWlNS1k5N0pualJ5UHdlYXNEVk1yakxlaTQrUmE0dEhBU1pJPQ==");
 
             _svcProvider = builder.Services.BuildServiceProvider();
         }
 
+        private static void SetupAuth(WebApplicationBuilder builder)
+        {
+            Log.Logger.Information("SetupAuth");
+
+            //Authentication
+            builder.Services.AddAuthorization();
+
+            //The cookie authentication is never used, but it is required to prevent a runtime error
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "auth_cookie";
+                    options.Cookie.MaxAge = TimeSpan.FromHours(24);
+                    options.LoginPath = "/login";
+                });
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+            builder.Services.AddCascadingAuthenticationState();
+
+            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+            builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
+
+        }
+
+        private static void ClientServices(WebApplicationBuilder builder)
+        {
+            Log.Logger.Information("ClientServices");
+            builder.Services.AddSingleton<ICachingService, CachingService>();
+            builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
+        }
 
         private static void DataServices(WebApplicationBuilder builder)
         {
+            Log.Logger.Information("DataServices");
             builder.Services.AddScoped<ICommonService, CommonService>();
-            builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
             builder.Services.AddScoped<IDonationDataService, DonationDataService>();
@@ -114,50 +136,41 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContactUsDataService, ContactUsDataService>();
             builder.Services.AddScoped<IVolunteerEventsDataService, VolunteerEventsDataService>();
             builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
-            
-        }
 
-        private static void ClientServices(WebApplicationBuilder builder)
-        {
-            builder.Services.AddSingleton<ICachingService, CachingService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
         {
             Log.Logger.Information("Create and configure application");
-            WebApplication app = builder.Build();
+            var app = builder.Build();
+
             app.UsePathBase("/National");
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                Log.Logger.Information("No Compression added to the app");
-                //Log.Logger.Information("Use Compression");
-                //// Do not compress when using Hot Reload
-                //app.UseResponseCompression();
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler("/Error", createScopeForErrors: true);
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
+            app.UseDefaultFiles();
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization(); // This must appear after the UseRouting middleware and before UseEndpoints
+            app.UseAntiforgery();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
                 endpoints.MapControllers();
-                endpoints.MapRazorPages();
-
             });
-            
-            Log.Information($"Connect Application Lifetime {app.Environment.ApplicationName}");
-            
-                        return app;
+
+            app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode();
+
+            return app;
         }
 
         public static async Task SetupDatabase(WebApplication app)
@@ -175,8 +188,8 @@ namespace BedBrigade.Client
                 {
                     //if (app.Environment.IsDevelopment())
                     //{
-                        Log.Logger.Information("Performing Migration");
-                        await context.Database.MigrateAsync();
+                    Log.Logger.Information("Performing Migration");
+                    await context.Database.MigrateAsync();
                     //}
                 }
                 Log.Logger.Information("Seeding Data");

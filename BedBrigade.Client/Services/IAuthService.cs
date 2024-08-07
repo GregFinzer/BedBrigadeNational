@@ -1,13 +1,14 @@
-﻿using BedBrigade.Data.Models;
+﻿using System.Security.Claims;
 
 namespace BedBrigade.Client.Services
 {
     public interface IAuthService
     {
-        Task<ServiceResponse<User>> ChangePassword(UserChangePassword request);
-        Task<bool> IsUserAuthenticated();
-        Task<ServiceResponse<string>> Login(UserLogin request);
-        Task<ServiceResponse<bool>> RegisterAsync(UserRegister request);
-        Task<ServiceResponse<bool>> UpdateAsync(UserRegister request);
+        ClaimsPrincipal CurrentUser { get; set; }
+        bool IsLoggedIn { get; }
+        event Action<ClaimsPrincipal> UserChanged;
+        Task<bool> GetStateFromTokenAsync();
+        Task LogoutAsync(); 
+        Task Login(ClaimsPrincipal user);
     }
 }

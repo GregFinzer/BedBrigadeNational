@@ -19,7 +19,7 @@ namespace BedBrigade.Client.Services
 
                 if (images.Count > 0)
                 {
-                    var image =  images.First().Replace("wwwroot/", "");
+                    var image = images.First().Replace("wwwroot/", "");
                     html = ReplaceImageSrc(html, imgId, image);
                 }
             }

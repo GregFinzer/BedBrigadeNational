@@ -1,0 +1,6 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/donations"
+@using BedBrigade.Common
+@attribute [Authorize(Roles = RoleNames.CanManageDonations)]
+
+<DonationGrid />

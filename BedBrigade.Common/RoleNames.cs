@@ -31,6 +31,17 @@
         public const string CanViewPages =
             "National Admin, National Editor, Location Admin, Location Editor, Location Contributor";
         public const string CanViewAdminDashboard = "National Admin, Location Admin, Location Scheduler";
-        
+
+        public static List<string> GetPolicies()
+        {
+            return new List<string>
+            {
+                "CanCreatePages", "CanCreateBlogPost", "CanPublishPages", "CanPublishBlogPosts", "CanManageMedia",
+                "CanManageVolunteers", "CanManageBedRequests", "CanManageContacts", "CanManageSchedule",
+                "CanSendBulkEmail",
+                "CanManageDonations", "CanManageUsers", "CanCreateNationalNewsPost", "CanCreateContentForLocations",
+                "CanManagePages", "CanViewPages", "CanViewAdminDashboard"
+            };
+        }
     }
 }

@@ -1,0 +1,8 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/users"
+@attribute [Authorize(Roles = RoleNames.CanManageUsers)]
+
+@using BedBrigade.Client.Components
+@using BedBrigade.Common
+
+<UsersGrid />

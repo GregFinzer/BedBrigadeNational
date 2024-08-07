@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Pages.Administration.Manage;
+﻿using BedBrigade.Client.Components.Pages.Administration.Manage;
 using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;

@@ -1,0 +1,145 @@
+﻿@using BedBrigade.Client.Services;
+@using Serilog
+@inject IJSRuntime JS
+
+@((MarkupString)BodyContent)
+
+@code {
+    // Client
+
+    [Inject] private IContentDataService _svcContent { get; set; }
+    [Inject] private ILocationDataService _svcLocation { get; set; }
+    [Inject] private NavigationManager _navigationManager { get; set; }
+    [Inject] private ILoadImagesService _loadImagesService { get; set; }
+
+    string FileName { get; set; } = "NoImageFound.jpg";
+
+
+    private Content content { get; set; }
+    private string BodyContent = string.Empty;
+    private string[] routePath;
+    private string Menu { get; set; }
+    private string Path { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBody();
+    }
+
+    public void RefreshState()
+    {
+        StateHasChanged();
+    }
+
+    public async Task LoadBody()
+    {
+        try
+        {
+            Log.Logger.Debug("MyBody.LoadBody");
+            var url = _navigationManager.Uri;
+            if (String.IsNullOrEmpty(url))
+            {
+                return;
+            }
+
+            var PageName = string.Empty;
+            var Location = string.Empty;
+            var routePath = url.Split('/');
+            if (string.IsNullOrEmpty(routePath[3]))
+            {
+                Location = "National";
+                PageName = "Home";
+            }
+            else if (routePath.Length == 4)
+            {
+                Location = routePath[3];
+                PageName = "Home";
+            }
+            else if (routePath.Length == 5)
+            {
+                Location = routePath[3];
+                PageName = routePath[4];
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/Sorry", true);
+                return;
+            }
+
+            Path = $"/{Location}/pages/{PageName}";
+            await LoadLocationPage(Location, PageName);
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"LoadBody: {ex.Message}");
+            throw;
+        }
+    }
+
+
+
+    private async Task LoadLocationPage(string location, string pageName)
+    {
+        Log.Logger.Debug("MyBody.LoadLocationPage");
+
+        try
+        {
+
+
+            var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+
+            if (locationResponse.Success && locationResponse.Data != null)
+            {
+                Console.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
+                var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
+                Console.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
+                if (contentResult.Success)
+                {
+                    content = contentResult.Data;
+                    string html = _loadImagesService.SetImagesForHtml(Path, contentResult.Data.ContentHtml);
+                    BodyContent = html;
+
+                    Menu = FindMenu();
+                    if (string.IsNullOrEmpty(Menu))
+                    {
+                        Menu = "home";
+                    }
+                }
+                else
+                {
+                    _navigationManager.NavigateTo("/Sorry", true);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"LoadLocationPage: {ex.Message}");
+            throw;
+        }
+    }
+
+
+    protected string FindMenu()
+    {
+        Log.Logger.Debug("MyBody.FindMenu");
+
+        try
+        {
+
+
+            var location = _navigationManager.Uri.Split('/');
+            if (location.Length <= 4)
+            {
+                return "home";
+            }
+
+            return location[location.Length - 1].ToLower();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"FindMenu: {ex.Message}");
+            throw;
+        }
+    }
+
+}

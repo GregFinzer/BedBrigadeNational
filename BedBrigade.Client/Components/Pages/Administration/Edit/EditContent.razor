@@ -1,0 +1,70 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/edit/editcontent/{LocationId}/{ContentName}"
+@attribute [Authorize(Roles = RoleNames.CanManagePages)]
+
+<style>
+    .center-align td {
+        vertical-align: middle;
+    }
+</style>
+
+@if (Content == null && ImageButtonList == null)
+{
+    <span class="spinner-border text-success m-5"></span>
+
+    <span>Loading ....</span>
+}
+else
+{
+
+    <div class="container my-3 ">
+        <h3 class="">@WorkTitle </h3>
+        <table>
+            @foreach(var item in ImageButtonList)
+            {
+                <tr class="center-align">
+                    <td>
+                        @(item.Key)
+                    </td>
+                    <td>
+                        <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))"><img src="Media/national/photosIcon16x16.png" /></button>
+                    </td>
+                </tr>
+            }
+        </table>
+        <p>&nbsp;</p>
+        <EditForm Model="Content">
+            <DataAnnotationsValidator />
+            <div class="rte-container">
+                <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
+                    <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
+                    <RichTextEditorEvents/>
+                    <RichTextEditorToolbarSettings Items="@Tools">
+                        <RichTextEditorCustomToolbarItems>
+                        </RichTextEditorCustomToolbarItems>
+                    </RichTextEditorToolbarSettings>
+                </SfRichTextEditor>
+            </div>
+            <div>
+                <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveClick())">Save</button>
+                <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
+            </div>
+        </EditForm>
+    </div>
+
+    <SfDialog @ref="MediaDialog" Width="90%" IsModal="true" ShowCloseIcon="true" Visible="false">
+        <DialogEvents OnOpen="onOpen"></DialogEvents>
+        <DialogTemplates>
+            <Header>Upload Files</Header>
+            <Content>
+
+                <FileManager ShowHeader="false" FolderPath="@FolderPath"/>
+
+            </Content>
+        </DialogTemplates>
+        <DialogButtons>
+            <DialogButton Content="Close" IsPrimary="true" OnClick="@CloseDialog"/>
+        </DialogButtons>
+    </SfDialog>
+}
+

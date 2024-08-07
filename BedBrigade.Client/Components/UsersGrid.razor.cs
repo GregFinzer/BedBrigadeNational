@@ -19,6 +19,7 @@ namespace BedBrigade.Client.Components
     {
         [Inject] private IUserDataService _svcUser { get; set; }
         [Inject] private IAuthService _svcAuth { get; set; }
+        [Inject] private IAuthDataService _svcAuthData { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
@@ -191,7 +192,7 @@ namespace BedBrigade.Client.Components
             if (!string.IsNullOrEmpty(userRegister.Password) && userRegister.Password == userRegister.ConfirmPassword)
             {
                 UserChangePassword changePassword = new UserChangePassword() { UserId = userRegister.user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
-                var result = await _svcAuth.ChangePassword(changePassword);
+                var result = await _svcAuthData.ChangePassword(changePassword.UserId, changePassword.Password);
                 ToastTitle = "Change Password";
                 if (result.Success)
                 {
@@ -281,7 +282,7 @@ namespace BedBrigade.Client.Components
         {
             userRegister.user = user;
             userRegister.ConfirmPassword = userRegister.Password;
-            var registerResult = await _svcAuth.RegisterAsync(userRegister);
+            var registerResult = await _svcAuthData.Register(userRegister.user, userRegister.Password);
             ToastTitle = "Create User";
             if (registerResult.Success)
             {
