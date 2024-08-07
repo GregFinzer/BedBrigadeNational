@@ -1,21 +1,23 @@
 ﻿@page "/logout"
+@using BedBrigade.Client.Services
 @using Microsoft.AspNetCore.Authentication
 
 @code {
-    [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
-
-    [Inject] private NavigationManager? NavigationManager { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IAuthService AuthService { get; set; }
 
     protected override async Task OnInitializedAsync()
-    {  
-        if (HttpContext != null 
-            && HttpContext.User.Identity != null 
-            && HttpContext.User.Identity.IsAuthenticated)
+    {
+        if (AuthService.IsLoggedIn)
         {
-            await HttpContext.SignOutAsync();
+            await AuthService.LogoutAsync();
+            NavigationManager.NavigateTo("/");
         }
-
-        NavigationManager?.NavigateTo("/", true);
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
+
 }
+

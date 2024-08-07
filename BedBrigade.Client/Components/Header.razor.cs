@@ -104,31 +104,31 @@ namespace BedBrigade.Client.Components
             {
                 if (_authState.User.HasRole(RoleNames.NationalAdmin))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "nadmin");
+                    await Show("nadmin");
                 }
                 else if (_authState.User.HasRole(RoleNames.NationalEditor))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "neditor");
+                    await Show( "neditor");
                 }
                 else if (_authState.User.HasRole(RoleNames.LocationAdmin))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "ladmin");
+                    await Show( "ladmin");
                 }
                 else if (_authState.User.HasRole(RoleNames.LocationEditor))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "leditor");
+                    await Show( "leditor");
                 }
                 else if (_authState.User.HasRole(RoleNames.LocationAuthor))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "lauthor");
+                    await Show( "lauthor");
                 }
                 else if (_authState.User.HasRole(RoleNames.LocationScheduler))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "lscheduler");
+                    await Show( "lscheduler");
                 }
                 else if (_authState.User.HasRole(RoleNames.LocationTreasurer))
                 {
-                    await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", "ltreasurer");
+                    await Show( "ltreasurer");
                 }
             }
             catch (Exception ex)
@@ -138,7 +138,10 @@ namespace BedBrigade.Client.Components
         
         }
 
-
+        private async Task Show(string cssClass)
+        {
+            await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+        }
 
 
     }

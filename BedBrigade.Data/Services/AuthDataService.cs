@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
+using System.Security;
 using BedBrigade.Common;
 using Azure;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -61,7 +62,7 @@ namespace BedBrigade.Data.Services
 
             if (!location.Success) 
             {
-                throw new Exception($"Location not found for user.");
+                throw new SecurityException($"LocationId {user.LocationId} not found for user {user.Email}.");
             }
 
             var claims = new List<Claim>
@@ -179,48 +180,6 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        //private async Task<string> CreateToken(User user)
-        //{
-        //    try
-        //    {
-
-
-        //        using (var context = _contextFactory.CreateDbContext())
-        //        {
-        //            var location = await context.Locations.FindAsync(user.LocationId);
-        //            List<Claim> claims = new List<Claim>
-        //            {
-        //                new Claim(ClaimTypes.NameIdentifier, user.UserName),
-        //                new Claim(ClaimTypes.Name, user.Email),
-        //                new Claim(ClaimTypes.Role, user.Role),
-        //                new Claim("LocationId", user.LocationId.ToString()),
-        //                new Claim("UserRoute", location.Route)
-        //            };
-
-        //            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-        //                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
-        //            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        //            var tokenExpiresIn =
-        //                await context.Configurations.FirstOrDefaultAsync(c =>
-        //                    c.ConfigurationKey == ConfigNames.TokenExpiration);
-        //            int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
-        //            var token = new JwtSecurityToken(
-        //                claims: claims,
-        //                expires: DateTime.Now.AddHours(tokenHours),
-        //                signingCredentials: creds);
-
-        //            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-        //            return jwt;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Logger.Error("Error creating token, {0}", ex.Message);
-        //        throw;
-        //    }
-        //}
 
         public async Task<ServiceResponse<User>> ChangePassword(string userId, string newPassword)
         {
