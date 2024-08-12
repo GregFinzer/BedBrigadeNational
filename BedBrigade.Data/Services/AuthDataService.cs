@@ -7,7 +7,10 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
+using System.Security;
 using BedBrigade.Common;
+using Azure;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BedBrigade.Data.Services
 {
@@ -15,35 +18,66 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly IConfiguration _configuration;
-
-        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, IConfiguration config)
+        private readonly ILocationDataService _locationDataService;
+        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, IConfiguration config, ILocationDataService locationDataService)
         {
             _contextFactory = dbContextFactory;
             _configuration = config;
+            _locationDataService = locationDataService;
         }
 
-        public async Task<ServiceResponse<string>> Login(string email, string password)
+        public async Task<ServiceResponse<ClaimsPrincipal>> Login(string email, string password)
         {
+            if (String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(password))
+            {
+                return new ServiceResponse<ClaimsPrincipal>("Please enter your email and password.");
+            }
+
             using (var context = _contextFactory.CreateDbContext())
             {
-                ServiceResponse<string> response = null;
+                ServiceResponse<ClaimsPrincipal> response = null;
                 var user = await context.Users
                     .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
                 if (user == null)
                 {
-                    response = new ServiceResponse<string>("User not found.");
+                    response = new ServiceResponse<ClaimsPrincipal>("User not found.");
                 }
                 else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 {
-                    response = new ServiceResponse<string>("Wrong password.");
+                    response = new ServiceResponse<ClaimsPrincipal>("Wrong password.");
                 }
                 else
                 {
-                    response = new ServiceResponse<string>("User logged in", true, await CreateToken(user));
+                    var claimsPrincipal = await BuildClaimsPrincipalFromUser(user);
+                    response = new ServiceResponse<ClaimsPrincipal>("User logged in", true, claimsPrincipal);
                 }
 
                 return response;
             }
+        }
+
+        private async Task<ClaimsPrincipal> BuildClaimsPrincipalFromUser(User user)
+        {
+            var location = await _locationDataService.GetByIdAsync(user.LocationId);
+
+            if (!location.Success) 
+            {
+                throw new SecurityException($"LocationId {user.LocationId} not found for user {user.Email}.");
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("LocationId", user.LocationId.ToString()),
+                new Claim("UserRoute", location.Data.Route)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            return principal;
         }
 
         public async Task<ServiceResponse<bool>> Update(UserRegister request)
@@ -146,36 +180,6 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        private async Task<string> CreateToken(User user)
-        {
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var location = await context.Locations.FindAsync(user.LocationId);
-                List<Claim> claims = new List<Claim>
-                {
-                new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim("LocationId", user.LocationId.ToString()),
-                new Claim("UserRoute", location.Route)
-                };
-
-                var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                    .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var tokenExpiresIn = await context.Configurations.FirstOrDefaultAsync(c => c.ConfigurationKey == ConfigNames.TokenExpiration);
-                int.TryParse(tokenExpiresIn.ConfigurationValue, out int tokenHours);
-                var token = new JwtSecurityToken(
-                        claims: claims,
-                        expires: DateTime.Now.AddHours(tokenHours),
-                        signingCredentials: creds);
-
-                var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-                return jwt;
-            }
-        }
 
         public async Task<ServiceResponse<User>> ChangePassword(string userId, string newPassword)
         {

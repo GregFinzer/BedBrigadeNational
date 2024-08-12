@@ -1,11 +1,11 @@
 using BedBrigade.Client;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 StartupLogic.ConfigureLogger(builder);
 StartupLogic.AddServicesToTheContainer(builder);
-WebApplication app = StartupLogic.CreateAndConfigureApplication(builder);
+var app = StartupLogic.CreateAndConfigureApplication(builder);
 await StartupLogic.SetupDatabase(app);
 await StartupLogic.SetupCaching(app);
-StartupLogic.SetupEmailQueueProcessing(app);
+//TODO:  Renable later
+//StartupLogic.SetupEmailQueueProcessing(app);
 app.Run();
-

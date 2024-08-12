@@ -13,7 +13,7 @@ using BedBrigade.Data.Data.Seeding;
 using System.Data.Entity;
 using Syncfusion.Blazor.Notifications.Internal;
 using System.Collections.Generic;
-using BedBrigade.Client.Pages.Administration.Manage;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 using System.Linq.Expressions;
 using System.Drawing.Imaging;
 using static BedBrigade.Common.Common;

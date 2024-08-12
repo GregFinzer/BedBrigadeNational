@@ -13,7 +13,7 @@ using BedBrigade.Data.Services;
 using System.Diagnostics;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Schedule;
-using BedBrigade.Client.Pages.Administration.Manage;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Serilog;
 
 
