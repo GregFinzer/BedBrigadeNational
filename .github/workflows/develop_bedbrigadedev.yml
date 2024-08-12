@@ -35,7 +35,7 @@ jobs:
       run: dotnet publish --configuration Release --output ./publish
 
     - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.5.0
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_DEV_HOST }}  # FTP server is now a secret
         username: ${{ secrets.FTP_DEV_USERNAME }}  # Set up this secret in your GitHub repo settings
