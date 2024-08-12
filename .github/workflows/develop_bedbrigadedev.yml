@@ -43,6 +43,6 @@ jobs:
         server: ${{ secrets.FTP_DEV_HOST }}  # FTP server is now a secret
         username: ${{ secrets.FTP_DEV_USERNAME }}  # Set up this secret in your GitHub repo settings
         password: ${{ secrets.FTP_DEV_PASSWORD }}  # Set up this secret in your GitHub repo settings
-        local-dir: ./publish
+        local-dir: ./publish/
         server-dir: /  # Replace with the target directory on your server
         protocol: ftps  # or ftp if you are not using a secure connection
