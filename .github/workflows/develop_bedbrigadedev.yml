@@ -24,7 +24,7 @@ jobs:
 
     - name: Replace Connection String in appsettings.Development.json
       run: |
-        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./appsettings.Development.json
+        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./BedBrigade.Client/appsettings.Development.json
 
     - name: Restore dependencies
       run: dotnet restore
