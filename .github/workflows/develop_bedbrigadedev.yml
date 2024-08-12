@@ -13,6 +13,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: List all directories
+      run: |
+        find . -type d -print
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
