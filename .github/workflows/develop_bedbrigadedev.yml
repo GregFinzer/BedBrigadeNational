@@ -1,57 +1,45 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - bedbrigadedev
+name: Build, Test, and Deploy .NET Project
 
 on:
   push:
     branches:
-      - develop
-  workflow_dispatch:
+      - develop  # Adjust this to your branch name
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '7.x'
-          include-prerelease: true
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' # Adjust the version if needed
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+    - name: Replace Connection String in appsettings.Development.json
+      run: |
+        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./appsettings.Development.json
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+    - name: Restore dependencies
+      run: dotnet restore
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
 
-    steps:       
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: .net-app
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'bedbrigadedev'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6F6BDFCE943F46E19A78403FD6BF04FC }}
-          package: .
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.5.0
+      with:
+        server: ${{ secrets.FTP_DEV_HOST }}  # FTP server is now a secret
+        username: ${{ secrets.FTP_DEV_USERNAME }}  # Set up this secret in your GitHub repo settings
+        password: ${{ secrets.FTP_DEV_PASSWORD }}  # Set up this secret in your GitHub repo settings
+        local-dir: ./publish
+        server-dir: /  # Replace with the target directory on your server
+        protocol: ftps  # or ftp if you are not using a secure connection
