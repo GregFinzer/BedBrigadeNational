@@ -10,12 +10,15 @@ BedBrigadeNational\Documentation\Design
 <hr />
 
 ## Application Infrastructure Diagram
+(This is out of date)
 ![Application Infrastructure Diagram](Design/Application%20Infrastructure%20Diagram.png)
 
 <hr />
 
 ## Application Architecture Diagram
+(This is out of date)
 ![Application Architecture Diagram](Design/Application%20Architecture%20Diagram.png)
 
 ## Entity Relationship Diagram
+(This is out of date)
 ![Entity Relationship Diagram](Design/EntityRelationshipDiagram.png)

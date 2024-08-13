@@ -12,7 +12,7 @@ https://www.syncfusion.com/sales/communitylicense
 * <a href="https://community.chocolatey.org/packages/visualstudio2022community">Visual Studio 2022</a> for the IDE.
 * <a href="https://community.chocolatey.org/packages/sql-server-express" target="_blank">SQL Server Express</a> for local database development.
 * To run the project the <a href="https://community.chocolatey.org/packages/visualstudio2022-workload-netweb">ASP.NET Workload</a> is required. 
-* .NET 7 SDK:  https://dotnet.microsoft.com/
+* .NET 8 SDK:  https://dotnet.microsoft.com/
 * To run the NUnit tests, <a href="https://www.jetbrains.com/resharper/">Resharper</a> or <a href="https://marketplace.visualstudio.com/items?itemName=NUnitDevelopers.NUnit3TestAdapter">NUnit Test Adapter</a> is required
 * Install SyncFusion:  https://www.syncfusion.com/account/downloads
 * Install Web Compiler Visual Studio Extension.  This is required for right clicking on the theme.scss and generating the theme.css and theme.min.css
@@ -33,12 +33,16 @@ git clone https://github.com/GregFinzer/BedBrigadeNational
     ```
 
 ### 5. Set Gold License Key
-In order to run the NUnit Tests and check for Quality Locally, please set a Windows Environment variable of Gold to what is in this document:  Bed Brigade National Website Information.docx
+In order to run the NUnit Tests and check for Quality Locally, please set a Windows Environment variable of GOLD to what is in this document:  Bed Brigade National Website Information.docx
 * Login to the SmarterAsp.NET FTP Site using credentials given.
 * Download the Secrets Folder.
 * Open the file Bed Brigade National Website Information.docx to see the Gold Suite License Key.
 
-### 6. Run the Application
+### 5. Set Syncfusion License Key
+* Set an environment variable of Syncfusion to your community license.
+
+### 7. Run the Application
+* Close and Reopen Visual Studio (this is necessary after setting the environment variables).
 * Right click the BedBrigade.Client
 * Set as startup project
 * Press the play button
