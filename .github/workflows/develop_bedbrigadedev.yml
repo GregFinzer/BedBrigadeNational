@@ -13,6 +13,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set environment variable from secret
+      run: echo "GOLD=${{ secrets.GOLD }}" >> $GITHUB_ENV
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -20,7 +23,7 @@ jobs:
 
     - name: Replace Connection String in appsettings.Development.json
       run: |
-        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./appsettings.Development.json
+        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./BedBrigade.Client/appsettings.Development.json
 
     - name: Restore dependencies
       run: dotnet restore
@@ -29,17 +32,17 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test
 
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish
 
     - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.5.0
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_DEV_HOST }}  # FTP server is now a secret
         username: ${{ secrets.FTP_DEV_USERNAME }}  # Set up this secret in your GitHub repo settings
         password: ${{ secrets.FTP_DEV_PASSWORD }}  # Set up this secret in your GitHub repo settings
-        local-dir: ./publish
+        local-dir: ./publish/
         server-dir: /  # Replace with the target directory on your server
         protocol: ftps  # or ftp if you are not using a secure connection
