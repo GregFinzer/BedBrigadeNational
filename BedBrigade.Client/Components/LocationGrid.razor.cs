@@ -254,7 +254,8 @@ namespace BedBrigade.Client.Components
                     {
                         locationRoute = locationRoute + "/pages";
                         CreateDirectory(locationRoute);
-                        CopyDirectory($"../BedBrigade.Data/Data/Seeding/SeedImages/pages/", locationRoute);
+                        string seedingDirectory = Common.Common.GetSeedingDirectory();
+                        CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
                     }
 
                     await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Body);

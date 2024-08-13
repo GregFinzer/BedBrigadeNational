@@ -322,16 +322,38 @@ public static class Common
 
     public static string GetHtml(string fileName)
     {
-        if (IsDevelopment())
+        string filePath = $"{GetSeedingDirectory()}/SeedHtml/{fileName}";
+
+        if (!File.Exists(filePath))
         {
-            var html = File.ReadAllText($"../BedBrigade.Data/Data/Seeding/SeedHtml/{fileName}");
-            return html;
+            throw new FileNotFoundException($"File not found: {filePath}");
         }
-        else
+
+        var html = File.ReadAllText(filePath);
+        return html;
+    }
+
+    public static string GetSeedingDirectory()
+    {
+        string localFilePath = "../BedBrigade.Data/Data/Seeding";
+
+        if (Directory.Exists(localFilePath))
         {
-            var html = File.ReadAllText($"../wwwroot/Data/Seeding/SeedHtml/{fileName}");
-            return html;
+            return localFilePath;
         }
+
+        Console.WriteLine("Directory does not exist: " + localFilePath);
+
+        string deployedFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeding");
+
+        if (Directory.Exists(deployedFilePath))
+        {
+            return deployedFilePath;
+        }
+
+        Console.WriteLine("Directory does not exist: " + deployedFilePath);
+
+        throw new DirectoryNotFoundException("Seeding directory not found. Current directory is : " + AppDomain.CurrentDomain.BaseDirectory);
     }
 
     public static List<UsState> GetStateList()

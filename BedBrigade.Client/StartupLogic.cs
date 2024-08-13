@@ -13,12 +13,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Syncfusion.Blazor;
+using System.Diagnostics;
 
 namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
         private static ServiceProvider _svcProvider;
+
+        public static void LoadConfiguration(WebApplicationBuilder builder)
+        {
+            if (Debugger.IsAttached)
+            {
+                builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
+            }
+            else if (Common.Common.IsDevelopment())
+            {
+                builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+            }
+            else
+            {
+                builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+            }
+        }
 
         public static void ConfigureLogger(WebApplicationBuilder builder)
         {
@@ -186,11 +203,8 @@ namespace BedBrigade.Client
                 var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
                 using (var context = dbContextFactory.CreateDbContext())
                 {
-                    //if (app.Environment.IsDevelopment())
-                    //{
                     Log.Logger.Information("Performing Migration");
                     await context.Database.MigrateAsync();
-                    //}
                 }
                 Log.Logger.Information("Seeding Data");
                 await Seed.SeedData(dbContextFactory);
