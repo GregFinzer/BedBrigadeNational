@@ -45,4 +45,4 @@ jobs:
         password: ${{ secrets.FTP_DEV_PASSWORD }}  # Set up this secret in your GitHub repo settings
         local-dir: ./publish/
         server-dir: /  # Replace with the target directory on your server
-        protocol: ftps  # or ftp if you are not using a secure connection
+        protocol: ftp  # or ftp if you are not using a secure connection
