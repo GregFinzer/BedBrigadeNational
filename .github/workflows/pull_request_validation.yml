@@ -1,0 +1,34 @@
+name: Build and Test for Pull Requests
+
+on:
+  pull_request:
+    # This will trigger the workflow for pull requests targeting any branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set environment variable from secret
+      run: echo "GOLD=${{ secrets.GOLD }}" >> $GITHUB_ENV
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' # Adjust the version if needed
+
+    - name: Replace Connection String in appsettings.Development.json
+      run: |
+        sed -i 's#"DefaultConnection": ".*"#"DefaultConnection": "${{ secrets.DEV_CONNECTION_STRING }}"#' ./BedBrigade.Client/appsettings.Development.json
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test
