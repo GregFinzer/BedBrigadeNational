@@ -22,13 +22,17 @@ The national web site is being built in Blazor Server.  NET Core 8 is being used
 * There is no scheduling system which results in a out order of delivery schedule.
 * No tax forms are sent for donations.
 * There is currently no bulk email for: emailing all volunteers, emailing just delivery vehicle volunteers, emailing volunteer reminders, emailing bed request contacts, emailing delivery teams, performing followup, and performing announcements.
+<p>&nbsp;</p>
 
-<a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
-  <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">
+<a href="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/pull_request_validation.yml">
+	<img src="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/pull_request_validation.yml/badge.svg" alt="PR Status" height="50">
 </a>
+<p>&nbsp;</p>
+
 <a href="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/develop_bedbrigadedev.yml">
-	<img src="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/develop_bedbrigadedev.yml/badge.svg?branch=develop" alt="Develop Status" height="50">
+	<img src="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/develop_bedbrigadedev.yml/badge.svg?branch=develop&event=push" alt="Develop Status" height="50">
 </a>
+<p>&nbsp;</p>
 
 Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
