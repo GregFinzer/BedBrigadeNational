@@ -26,6 +26,9 @@ The national web site is being built in Blazor Server.  NET Core 8 is being used
 <a href="https://ci.appveyor.com/project/GregFinzer/bedbrigadenational">
   <img src="https://ci.appveyor.com/api/projects/status/9m16d94gudguouv2?svg=true" alt="AppVeyor Status" height="50">
 </a>
+<a href="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/develop_bedbrigadedev.yml">
+	<img src="https://github.com/GregFinzer/BedBrigadeNational/actions/workflows/develop_bedbrigadedev.yml/badge.svg?branch=develop" alt="Develop Status" height="50">
+</a>
 
 Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
