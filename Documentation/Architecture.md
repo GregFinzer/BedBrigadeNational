@@ -10,7 +10,6 @@ BedBrigadeNational\Documentation\Design
 <hr />
 
 ## Application Infrastructure Diagram
-(This is out of date)
 ![Application Infrastructure Diagram](Design/Application%20Infrastructure%20Diagram.png)
 
 <hr />
