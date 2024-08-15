@@ -1,136 +1,16 @@
-﻿using System.ComponentModel;
+﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
-using static BedBrigade.Common.Logic.Common;
 
 namespace BedBrigade.Common.Logic;
 
 // ENUM & other classes
 
-public class ContactUsStatusEnumItem
-{
-    public ContactUsStatus Value { get; set; }
-    public string? Name { get; set; }
-}
-
-
-
-public class ContentTypeEnumItem
-{
-    public ContentType Value { get; set; }
-    public string? Name { get; set; }
-
-}
-
-public class BedRequestEnumItem
-{
-    public BedRequestStatus Value { get; set; }
-    public string? Name { get; set; }
-
-}
-
-public class ConfigSectionEnumItem
-{
-    public ConfigSection Value { get; set; }
-    public string? Name { get; set; }
-
-}
-public class UsState
-{
-    public string? StateCode { get; set; }
-    public string? StateName { get; set; }
-    public int ZipCodeMin { get; set; } = 0;
-    public int ZipCodeMax { get; set; } = 0;
-}
-public class FileUseEnumItem
-{
-    public FileUse Value { get; set; }
-    public string? Name { get; set; }
-
-}
-
-public class EventTypeEnumItem // added by VS 7/1/2023
-{
-    public EventType Value { get; set; }
-    public string? Name { get; set; }
-
-}
-public class EventStatusEnumItem // added by VS 7/1/2023
-{
-    public EventStatus Value { get; set; }
-    public string? Name { get; set; }
-
-}
-
-public class VehicleTypeEnumItem // added by VS 9/1/2023
-{
-    public VehicleType Value { get; set; }
-    public string? Name { get; set; }
-
-}
-
-
 //=======================================================================
-
 public static class Common
 {
-    public enum ContentType
-    {
-        Header = 1,
-        Footer = 2,
-        Body = 3,
-        Home = 4,
-    }
 
-    public enum EventType // added by VS 7/1/2023
-    {
-        Cut = 1,
-        Build = 2,
-        Delivery = 3,
-        Other = 4,
-    }
 
-    public enum EventStatus // added by VS 7/1/2023
-    {
-        Scheduled = 1,
-        Canceled = 2,
-        Completed = 3,
-    }
 
-    public enum PersistGrid
-    {
-        Configuration = 1,
-        User = 2,
-        Location = 3,
-        Volunteer = 4,
-        Donation = 5,
-        Content = 6,
-        BedRequest = 7,
-        Media = 8,
-        Pages = 9,
-        Schedule = 10,
-        ContactUs = 11
-    }
-
-    public enum BedRequestStatus
-    {
-        Requested = 1,
-        Scheduled = 2,
-        Delivered = 3,
-    }
-
-    public enum VehicleType // added by VS 9/1/2023
-    {
-        [Description("I do not have a delivery vehicle")]
-        NoCar = 0,
-        [Description("I have a minivan")]
-        Minivan = 1,
-        [Description("I have a large SUV")]
-        SUV = 2,
-        [Description("I have a pickup truck with cap")]
-        Truck = 3,
-        [Description("I have other type of vehicle")]
-        Other = 8,
-    }
 
     /// <summary>
     /// Get a list of Enum Items suitable for a dropdown list from the EventTypeEnumItems
@@ -208,16 +88,7 @@ public static class Common
                         .ToList();
     }
 
-    public enum FileUse
-    {
-        Unknown = 0,
-        Logo = 1, // an image used as a logo
-        Image = 2, // an image used as an image
-        Download = 3, // a downloadable file (pdf,csv,etc)
-        Text = 4, // a text file
-        Html = 5, // Raw Html
-        Icon = 6
-    }
+
 
     /// <summary>
     /// Get a list of Enum Items suitable for a dropdown list from the ConfigSection enum.
@@ -236,12 +107,7 @@ public static class Common
     }
 
 
-    public enum ConfigSection
-    {
-        System = 1,
-        Media = 2,
-        Email = 3
-    }
+
 
 
     /// <summary>

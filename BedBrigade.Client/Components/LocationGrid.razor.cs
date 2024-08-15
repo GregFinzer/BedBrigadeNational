@@ -8,7 +8,7 @@ using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using static BedBrigade.Common.Logic.Common;
 using static BedBrigade.Common.Logic.Extensions;
-using ContentType = BedBrigade.Common.Logic.Common.ContentType;
+using ContentType = BedBrigade.Common.Enums.ContentType;
 using BedBrigade.Data.Services;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
@@ -134,7 +134,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Location, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Location, UserState = _state });
                 return;
             }
 
@@ -260,7 +260,7 @@ namespace BedBrigade.Client.Components
                         CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
                     }
 
-                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Body);
+                    await CreateContentAsync(location.LocationId, location.Name, PageNames, BedBrigade.Common.Enums.ContentType.Body);
                     PageNames.Clear();
                     PageNames.Add("Header0");
                     await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Header);

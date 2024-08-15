@@ -161,7 +161,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Donation, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Donation, UserState = _state });
                 return;
             }
 

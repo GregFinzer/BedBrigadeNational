@@ -1,10 +1,11 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Data.Models;
 
 namespace BedBrigade.Data.Services
 {
     public interface ITemplateDataService : IRepository<Template>
     {
         Task<ServiceResponse<Template>> GetByNameAsync(string name);
-        Task<ServiceResponse<List<Template>>> GetByContentTypeAsync(Common.Logic.Common.ContentType type);
+        Task<ServiceResponse<List<Template>>> GetByContentTypeAsync(ContentType type);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -49,9 +50,9 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         {
             var dbSet = ctx.Set<Volunteer>();
             var result = await dbSet.Where(o => o.LocationId == locationId
-                && (o.VehicleType == Common.Logic.Common.VehicleType.Minivan
-                    || o.VehicleType == Common.Logic.Common.VehicleType.SUV
-                    || o.VehicleType == Common.Logic.Common.VehicleType.Truck)).Select(b => b.Email).Distinct().ToListAsync();
+                && (o.VehicleType == VehicleType.Minivan
+                    || o.VehicleType == VehicleType.SUV
+                    || o.VehicleType == VehicleType.Truck)).Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }

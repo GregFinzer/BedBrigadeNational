@@ -14,8 +14,8 @@ using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Schedule;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Serilog;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
 
 
 namespace BedBrigade.Client.Components

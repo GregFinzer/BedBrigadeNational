@@ -157,7 +157,7 @@ else
                                 <Template>
                                     @{
                                         var request = (context as BedRequest);
-                                        var status = Enum.GetName(typeof(Common.BedRequestStatus), request.Status);
+                                        var status = Enum.GetName(typeof(BedRequestStatus), request.Status);
                                         @status
                                     }
                                 </Template>

@@ -10,6 +10,8 @@ using static BedBrigade.Common.Logic.Common;
 using Serilog;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 
 namespace BedBrigade.Client.Components
@@ -149,7 +151,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Pages, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Pages, UserState = _state });
                 return;
             }
 

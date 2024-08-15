@@ -14,6 +14,7 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.Forms;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.EnumModels;
 
 namespace BedBrigade.Client.Components
 {

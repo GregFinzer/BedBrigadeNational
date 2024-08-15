@@ -65,7 +65,7 @@ public partial class AddPage : ComponentBase
             Name = Model.PageName,
             LocationId = Model.CurrentLocationId,
             ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-            ContentType = Common.Logic.Common.ContentType.Body,
+            ContentType = BedBrigade.Common.Enums.ContentType.Body,
             Title = Model.PageTitle
         };
 

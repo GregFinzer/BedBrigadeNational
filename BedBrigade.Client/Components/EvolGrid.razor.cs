@@ -18,6 +18,8 @@ using static BedBrigade.Client.Components.MediaHelper;
 using System.Collections.Generic;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {

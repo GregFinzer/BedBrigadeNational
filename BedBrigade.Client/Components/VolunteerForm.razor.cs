@@ -17,6 +17,7 @@ using System.Data.Entity;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Data.Entity.Infrastructure;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
 
 
 namespace BedBrigade.Client.Components

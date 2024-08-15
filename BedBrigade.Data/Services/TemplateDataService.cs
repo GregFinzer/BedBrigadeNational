@@ -1,6 +1,6 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using ContentType = BedBrigade.Common.Logic.Common.ContentType;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Data.Services;

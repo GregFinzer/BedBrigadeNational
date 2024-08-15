@@ -6,6 +6,7 @@ using System.Text.Json;
 using System;
 using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
