@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Components;
 using BedBrigade.Client.Services;
-using BedBrigade.Common;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
@@ -14,6 +14,7 @@ using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Syncfusion.Blazor;
 using System.Diagnostics;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client
 {
@@ -27,7 +28,7 @@ namespace BedBrigade.Client
             {
                 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
             }
-            else if (Common.Common.IsDevelopment())
+            else if (Common.Logic.WebHelper.IsDevelopment())
             {
                 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
             }

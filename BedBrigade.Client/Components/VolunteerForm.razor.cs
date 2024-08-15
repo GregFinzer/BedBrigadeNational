@@ -7,16 +7,17 @@ using System.Text.Json;
 using System.Diagnostics;
 using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Web;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Data.Entity;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Data.Entity.Infrastructure;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
 
 
 namespace BedBrigade.Client.Components

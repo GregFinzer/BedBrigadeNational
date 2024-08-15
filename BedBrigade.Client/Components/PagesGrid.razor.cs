@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Data.Models;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -7,8 +6,12 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Common;
+
 using Serilog;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 
 namespace BedBrigade.Client.Components
@@ -67,7 +70,7 @@ namespace BedBrigade.Client.Components
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Pages Page");
 
             if (Identity.HasRole(RoleNames.CanManagePages))
@@ -92,7 +95,7 @@ namespace BedBrigade.Client.Components
                 Locations = locResult.Data;
             }
 
-            ContentTypes = GetContentTypeItems();
+            ContentTypes = EnumHelper.GetContentTypeItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -148,7 +151,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Pages, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Pages, UserState = _state });
                 return;
             }
 
@@ -216,7 +219,7 @@ namespace BedBrigade.Client.Components
                         ToastContent = "Delete Successful!";
                         var locationRoute = Locations.Find(l => l.LocationId == rec.LocationId).Route;
                         var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{rec.Name}";
-                        DeleteDirectory(folderPath);
+                        FileUtil.DeleteDirectory(folderPath);
                         Log.Information($"Deleted Page Folder at {folderPath}");
                     }
                     else

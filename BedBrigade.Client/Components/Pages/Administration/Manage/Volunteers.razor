@@ -1,6 +1,7 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/volunteers"
-@using BedBrigade.Common
+@using BedBrigade.Common;
+@using BedBrigade.Common.Constants
 @attribute [Authorize(Roles = RoleNames.CanManageVolunteers)]
 
 <VolunteerGrid />

@@ -1,4 +1,5 @@
-﻿using BedBrigade.Data.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,7 +46,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == locationId && o.Status != Common.Common.BedRequestStatus.Delivered).Select(b => b.Email).Distinct().ToListAsync();
+            var result = await dbSet.Where(o => o.LocationId == locationId && o.Status != BedRequestStatus.Delivered).Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }
@@ -62,7 +63,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == locationId && o.Status == Common.Common.BedRequestStatus.Delivered).Select(b => b.Email).Distinct().ToListAsync();
+            var result = await dbSet.Where(o => o.LocationId == locationId && o.Status == BedRequestStatus.Delivered).Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }

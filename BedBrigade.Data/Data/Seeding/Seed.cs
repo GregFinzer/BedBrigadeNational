@@ -1,12 +1,14 @@
 ﻿using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
 using System.Data.SqlClient;
-using BedBrigade.Common;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
-using static BedBrigade.Common.Common;
+
 using System.Diagnostics;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -401,7 +403,7 @@ public class Seed
                 foreach (var location in _locations)
                 {
                     var loc = location.Route + "/pages";
-                    loc.CreateDirectory();
+                    FileUtil.CreateMediaSubDirectory(loc);
                     context.Locations.Add(location);
                     await context.SaveChangesAsync();
                 }

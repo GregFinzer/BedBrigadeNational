@@ -1,10 +1,11 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using static BedBrigade.Common.Common;
-using static BedBrigade.Common.Extensions;
+
+using static BedBrigade.Common.Logic.Extensions;
 
 namespace BedBrigade.Data.Data.Seeding
 {
@@ -35,7 +36,7 @@ namespace BedBrigade.Data.Data.Seeding
         {
             Log.Logger.Information("SeedImages Started");
 
-            string mediaPath = GetMediaDirectory(string.Empty);
+            string mediaPath = FileUtil.GetMediaDirectory(string.Empty);
             if (!Directory.Exists(mediaPath))
             {
                 Directory.CreateDirectory(mediaPath);
@@ -43,8 +44,8 @@ namespace BedBrigade.Data.Data.Seeding
 
             if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
             {
-                string seedDirectory = Common.Common.GetSeedingDirectory();
-                CopyDirectory($"{seedDirectory}/SeedImages", mediaPath);
+                string seedDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
+                FileUtil.CopyDirectory($"{seedDirectory}/SeedImages", mediaPath);
             }
         }
 
@@ -55,7 +56,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Header";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("Header.html");
+                var seedHtml = WebHelper.GetHtml("Header.html");
                 Content content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
@@ -85,7 +86,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Footer";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml($"Footer.html");
+                var seedHtml = WebHelper.GetHtml($"Footer.html");
                 var content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
@@ -118,7 +119,7 @@ namespace BedBrigade.Data.Data.Seeding
 
                 foreach (var location in locations)
                 {
-                    var seedHtml = GetHtml($"Home.html");
+                    var seedHtml = WebHelper.GetHtml($"Home.html");
 
                     switch (location.LocationId)
                     {
@@ -166,7 +167,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "History";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("History.html");
+                var seedHtml = WebHelper.GetHtml("History.html");
 
                 var content = new Content
                 {
@@ -197,7 +198,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "Locations";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("Locations.html");
+                var seedHtml = WebHelper.GetHtml("Locations.html");
                 var content = new Content
                 {
                     LocationId = (int)LocationNumber.National,
@@ -231,7 +232,7 @@ namespace BedBrigade.Data.Data.Seeding
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
 
-                var seedHtml = GetHtml("Partners.html");
+                var seedHtml = WebHelper.GetHtml("Partners.html");
                 var content = new Content
                 {
                     LocationId = (int)LocationNumber.GroveCity,
@@ -270,7 +271,7 @@ namespace BedBrigade.Data.Data.Seeding
                         continue;
                     }
 
-                    var seedHtml = GetHtml("Assembly.html");
+                    var seedHtml = WebHelper.GetHtml("Assembly.html");
 
                     var content = new Content
                     {
@@ -303,7 +304,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "AboutUs";
             if (!await context.Content.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("Aboutus.html");
+                var seedHtml = WebHelper.GetHtml("Aboutus.html");
                 foreach (var location in context.Locations)
                 {
                     var content = new Content
@@ -343,7 +344,7 @@ namespace BedBrigade.Data.Data.Seeding
                     if (location.LocationId == (int)LocationNumber.National)
                         continue;
 
-                    var seedHtml = GetHtml("Donate.html");
+                    var seedHtml = WebHelper.GetHtml("Donate.html");
 
                     var content = new Content
                     {
@@ -375,7 +376,7 @@ namespace BedBrigade.Data.Data.Seeding
             var name = "ThreeRotatorPageTemplate";
             if (!await context.Templates.AnyAsync(c => c.Name == name))
             {
-                var seedHtml = GetHtml("ThreeRotatorPageTemplate.html");
+                var seedHtml = WebHelper.GetHtml("ThreeRotatorPageTemplate.html");
 
                 var content = new Template
                 {

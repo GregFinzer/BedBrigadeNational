@@ -1,22 +1,15 @@
-﻿using BedBrigade.Common;
-using BedBrigade.Data.Models;
+﻿using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Common.Common;
-using Newtonsoft.Json;
-using Serilog;
 using Syncfusion.Blazor.DropDowns;
-using System.Diagnostics;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-using System.Linq;
 using Syncfusion.Blazor.Navigations;
-using Syncfusion.Blazor.RichTextEditor;
-using static BedBrigade.Client.Components.MediaHelper;
-using System.Collections.Generic;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {
@@ -132,7 +125,7 @@ namespace BedBrigade.Client.Components
             Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
             //await LoadVolunteerEvents();
             VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);
-            lstVehicleTypes = GetVehicleTypeItems();
+            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
             DisableToolBar();
             PrepareGridData();
         }
@@ -178,7 +171,7 @@ namespace BedBrigade.Client.Components
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             //Log.Information($"{userName} went to the Manage Event Volunteers Page");
             
             Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel() { Text = CaptionAdd, Id = "add", TooltipText = "Add Volunteer to selected Event", PrefixIcon = "e-add" });

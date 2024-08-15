@@ -1,4 +1,7 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -29,7 +32,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             Model.Body = (await _svcUserDataService.GetEmailSignature(user.UserName)).Data;
             Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId)).Data;
             Model.CurrentLocationId = user.LocationId;
-            isNationalAdmin = user.LocationId == Constants.NationalLocationId;
+            isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
 
             if (isNationalAdmin)
             {

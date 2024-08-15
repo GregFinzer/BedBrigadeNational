@@ -6,7 +6,7 @@
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Data.Models
 @using BedBrigade.Common
-@using static BedBrigade.Common.Common;
+@using BedBrigade.Common.Logic;
 
 @if (ConfigRecs == null)
 {
@@ -86,7 +86,7 @@ else
                                 <Template>
                                     @{
                                         var request = (context as Configuration);
-                                        var sectionConfig = Enum.GetName(typeof(Common.ConfigSection), request.Section);
+                                        var sectionConfig = Enum.GetName(typeof(ConfigSection), request.Section);
                                         @sectionConfig
                                     }
                                 </Template>

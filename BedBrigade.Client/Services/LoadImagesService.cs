@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using HtmlAgilityPack;
 
@@ -183,7 +184,7 @@ namespace BedBrigade.Client.Services
                 return locationImages;
             }
 
-            return GetImagesForArea(Constants.NationalRoute, area);
+            return GetImagesForArea(Defaults.NationalRoute, area);
         }
 
         public string GetDirectoryForPathAndArea(string path, string area)

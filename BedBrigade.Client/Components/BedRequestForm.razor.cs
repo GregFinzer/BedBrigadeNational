@@ -7,13 +7,15 @@ using System.Text.Json;
 using System.Diagnostics;
 using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Web;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Forms;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.EnumModels;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
 namespace BedBrigade.Client.Components
 {
@@ -25,7 +27,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
         private BedBrigade.Data.Models.BedRequest? newRequest;
-        private List<UsState>? StateList = GetStateList();
+        private List<UsState>? StateList = AddressHelper.GetStateList();
        
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
         private LocationDistance? selectedLocation { get; set; }
@@ -95,7 +97,7 @@ namespace BedBrigade.Client.Components
                 DisplayForm = "";
                 // the following changes run address validations!               
                 newRequest.City = Validation.GetCityForZipCode(SearchZipCode);
-                newRequest.State = GetZipState(StateList, Convert.ToInt32(SearchZipCode));
+                newRequest.State = AddressHelper.GetZipState(StateList, Convert.ToInt32(SearchZipCode));
                 newRequest.PostalCode = SearchZipCode;
                            
             }
@@ -133,7 +135,7 @@ namespace BedBrigade.Client.Components
                         isAddressCorrect = false;
                     }
 
-                        string zipState = GetZipState(StateList, Convert.ToInt32(newRequest.PostalCode));
+                        string zipState = AddressHelper.GetZipState(StateList, Convert.ToInt32(newRequest.PostalCode));
                                                          
                                 if (zipState != null && zipCity.ToLower() == newRequest.City.ToLower() && zipState == newRequest.State)
                                 {

@@ -1,10 +1,12 @@
 ﻿using System.Diagnostics;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Forms;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.EnumModels;
 
 namespace BedBrigade.Client.Components
 {
@@ -16,7 +18,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         private BedBrigade.Data.Models.ContactUs? newRequest;
-        private List<UsState>? StateList = GetStateList();
+        private List<UsState>? StateList = AddressHelper.GetStateList();
        
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
         private LocationDistance? selectedLocation { get; set; }

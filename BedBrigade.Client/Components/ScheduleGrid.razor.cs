@@ -1,6 +1,5 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -8,13 +7,16 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Syncfusion.Blazor.DropDowns;
-using static BedBrigade.Common.Common;
+
 using BedBrigade.Data.Services;
 using System.Diagnostics;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.Schedule;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Serilog;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Logic;
 
 
 namespace BedBrigade.Client.Components
@@ -77,8 +79,8 @@ namespace BedBrigade.Client.Components
             await LoadUserData();         
             await LoadLocations();
             await LoadScheduleData();
-            lstEventStatuses = GetEventStatusItems();
-            lstEventTypes = GetEventTypeItems();
+            lstEventStatuses = EnumHelper.GetEventStatusItems();
+            lstEventTypes = EnumHelper.GetEventTypeItems();
             await SetInitialFilter();
 
         } // Async Init
@@ -98,7 +100,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Schedules Page");
 
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);

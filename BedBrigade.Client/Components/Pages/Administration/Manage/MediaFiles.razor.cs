@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -11,7 +11,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected override void OnInitialized()
         {
-            _sessionService.RemoveItemAsync(Constants.MediaDirectory).GetAwaiter().GetResult();
+            _sessionService.RemoveItemAsync(Defaults.MediaDirectory).GetAwaiter().GetResult();
         }
     }
 }

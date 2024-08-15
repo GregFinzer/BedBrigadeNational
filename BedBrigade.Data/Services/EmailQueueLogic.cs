@@ -5,7 +5,8 @@ using System.Drawing;
 using System.Text;
 using Azure;
 using Azure.Communication.Email;
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Data.Models;
 using Serilog;
 #endregion

@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Enums;
 using BedBrigade.Data.Models;
 
 namespace BedBrigade.Data.Services

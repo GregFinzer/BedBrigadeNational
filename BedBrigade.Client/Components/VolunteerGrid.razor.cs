@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Common;
 using BedBrigade.Data.Migrations;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
@@ -10,12 +9,16 @@ using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Notifications.Internal;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
-using static BedBrigade.Common.Common;
+
 using Action = Syncfusion.Blazor.Grids.Action;
 using System.Diagnostics;
 using Syncfusion.Blazor;
 using System.Threading;
 using Serilog;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {
@@ -73,7 +76,7 @@ namespace BedBrigade.Client.Components
             await LoadUserData();
             await LoadLocations();
             await LoadVolunteerData();
-            lstVehicleTypes = GetVehicleTypeItems();
+            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
           
         } // Async Init
 
@@ -85,7 +88,7 @@ namespace BedBrigade.Client.Components
             
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Volunteers Page");
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) )
@@ -202,7 +205,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistDataAsync();
                 _state = await Grid.GetPersistDataAsync();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Volunteer, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Volunteer, UserState = _state });
                 return;
             }
 

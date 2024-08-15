@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Components.Pages.Administration.Manage;
-using BedBrigade.Common;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
@@ -15,7 +14,8 @@ using Syncfusion.Blazor.Lists.Internal;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Text;
-using static BedBrigade.Common.Common;
+using BedBrigade.Common.Enums;
+
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BedBrigade.Client.Components

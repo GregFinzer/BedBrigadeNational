@@ -1,5 +1,5 @@
 using BedBrigade.Client.Components;
-using BedBrigade.Common;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;

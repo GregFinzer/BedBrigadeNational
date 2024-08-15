@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -30,7 +30,7 @@ namespace BedBrigade.Client.Components
                 isLoading = false;
                 return;
             }
-            var nationalImageList = _svcLoadImages.GetImagesForArea($"{Constants.NationalRoute}/{myPath}", myId);
+            var nationalImageList = _svcLoadImages.GetImagesForArea($"{Defaults.NationalRoute}/{myPath}", myId);
 
             if (nationalImageList.Count > 0)
             {
