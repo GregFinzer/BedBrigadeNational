@@ -8,10 +8,11 @@ using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Logic.Common;
+
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components
 {
@@ -76,7 +77,7 @@ namespace BedBrigade.Client.Components
                 ConfigRecs = result.Data.ToList();
             }
 
-            ConfigSectionEnumItems = GetConfigSectionItems();
+            ConfigSectionEnumItems = EnumHelper.GetConfigSectionItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)

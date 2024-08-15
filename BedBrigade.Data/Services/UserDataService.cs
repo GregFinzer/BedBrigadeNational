@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text;
 using BedBrigade.Common.Enums;
-using static BedBrigade.Common.Logic.Common;
+
 
 namespace BedBrigade.Data.Services
 {

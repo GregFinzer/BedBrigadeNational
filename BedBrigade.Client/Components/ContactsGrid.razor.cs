@@ -8,7 +8,7 @@ using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Logic.Common;
+
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;

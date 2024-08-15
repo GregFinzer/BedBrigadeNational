@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
 using BedBrigade.Data.Services;
-using static BedBrigade.Common.Logic.Common;
+
 using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components

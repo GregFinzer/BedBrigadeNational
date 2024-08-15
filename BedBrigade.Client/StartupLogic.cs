@@ -28,7 +28,7 @@ namespace BedBrigade.Client
             {
                 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
             }
-            else if (Common.Logic.Common.IsDevelopment())
+            else if (Common.Logic.WebHelper.IsDevelopment())
             {
                 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
             }

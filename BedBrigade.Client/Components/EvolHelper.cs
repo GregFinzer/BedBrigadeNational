@@ -15,7 +15,7 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Text;
 using BedBrigade.Common.Enums;
-using static BedBrigade.Common.Logic.Common;
+
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BedBrigade.Client.Components

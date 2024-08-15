@@ -3,19 +3,9 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
-using static BedBrigade.Common.Logic.Common;
-using Newtonsoft.Json;
-using Serilog;
 using Syncfusion.Blazor.DropDowns;
-using System.Diagnostics;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-using System.Linq;
 using Syncfusion.Blazor.Navigations;
-using Syncfusion.Blazor.RichTextEditor;
-using static BedBrigade.Client.Components.MediaHelper;
-using System.Collections.Generic;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
@@ -135,7 +125,7 @@ namespace BedBrigade.Client.Components
             Schedules = await EvolHelper.GetSchedules(_svcSchedule, isLocationAdmin, userLocationId); ;
             //await LoadVolunteerEvents();
             VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, isLocationAdmin, userLocationId);
-            lstVehicleTypes = GetVehicleTypeItems();
+            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
             DisableToolBar();
             PrepareGridData();
         }

@@ -6,7 +6,7 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Logic.Common;
+
 using Serilog;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
@@ -95,7 +95,7 @@ namespace BedBrigade.Client.Components
                 Locations = locResult.Data;
             }
 
-            ContentTypes = GetContentTypeItems();
+            ContentTypes = EnumHelper.GetContentTypeItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -219,7 +219,7 @@ namespace BedBrigade.Client.Components
                         ToastContent = "Delete Successful!";
                         var locationRoute = Locations.Find(l => l.LocationId == rec.LocationId).Route;
                         var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{rec.Name}";
-                        DeleteDirectory(folderPath);
+                        FileUtil.DeleteDirectory(folderPath);
                         Log.Information($"Deleted Page Folder at {folderPath}");
                     }
                     else

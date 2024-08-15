@@ -7,7 +7,7 @@ using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Syncfusion.Blazor.DropDowns;
-using static BedBrigade.Common.Logic.Common;
+
 using BedBrigade.Data.Services;
 using System.Diagnostics;
 using Syncfusion.Blazor.Calendars;
@@ -16,6 +16,7 @@ using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Serilog;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Logic;
 
 
 namespace BedBrigade.Client.Components
@@ -78,8 +79,8 @@ namespace BedBrigade.Client.Components
             await LoadUserData();         
             await LoadLocations();
             await LoadScheduleData();
-            lstEventStatuses = GetEventStatusItems();
-            lstEventTypes = GetEventTypeItems();
+            lstEventStatuses = EnumHelper.GetEventStatusItems();
+            lstEventTypes = EnumHelper.GetEventTypeItems();
             await SetInitialFilter();
 
         } // Async Init

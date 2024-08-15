@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
-using static BedBrigade.Common.Logic.Common;
+
 
 namespace BedBrigade.Data.Models
 {

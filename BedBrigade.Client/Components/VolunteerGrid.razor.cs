@@ -9,7 +9,7 @@ using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Notifications.Internal;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
-using static BedBrigade.Common.Logic.Common;
+
 using Action = Syncfusion.Blazor.Grids.Action;
 using System.Diagnostics;
 using Syncfusion.Blazor;
@@ -76,7 +76,7 @@ namespace BedBrigade.Client.Components
             await LoadUserData();
             await LoadLocations();
             await LoadVolunteerData();
-            lstVehicleTypes = GetVehicleTypeItems();
+            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
           
         } // Async Init
 

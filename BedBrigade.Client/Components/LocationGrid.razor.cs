@@ -6,7 +6,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Logic.Common;
+
 using static BedBrigade.Common.Logic.Extensions;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 using BedBrigade.Data.Services;
@@ -194,7 +194,7 @@ namespace BedBrigade.Client.Components
             {
                 try
                 {
-                    rec.Route.DeleteDirectory(true);
+                    FileUtil.DeleteMediaSubDirectory(rec.Route, true);
                     var deleteResult = await _svcLocation.DeleteAsync(rec.LocationId);
                     if (deleteResult.Success)
                     {
@@ -248,16 +248,16 @@ namespace BedBrigade.Client.Components
             if (result.Success)
             {
                 Location location = result.Data;
-                if (!Location.Route.DirectoryExists())
+                if (!FileUtil.MediaSubDirectoryExists(Location.Route))
                 {
-                    Location.Route.CreateDirectory();
-                    var locationRoute = GetMediaDirectory(location.Route);
+                    FileUtil.CreateMediaSubDirectory(Location.Route);
+                    var locationRoute = FileUtil.GetMediaDirectory(location.Route);
                     if (!Directory.Exists(locationRoute + "/pages"))
                     {
                         locationRoute = locationRoute + "/pages";
-                        CreateDirectory(locationRoute);
-                        string seedingDirectory = Common.Logic.Common.GetSeedingDirectory();
-                        CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
+                        FileUtil.CreateDirectory(locationRoute);
+                        string seedingDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
+                        FileUtil.CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
                     }
 
                     await CreateContentAsync(location.LocationId, location.Name, PageNames, BedBrigade.Common.Enums.ContentType.Body);
@@ -303,7 +303,7 @@ namespace BedBrigade.Client.Components
         {
             foreach (var pageName in names)
             {
-                var seedHtml = GetHtml($"{pageName}.html");
+                var seedHtml = WebHelper.GetHtml($"{pageName}.html");
                 var name = string.Empty;
                 switch (type)
                 {

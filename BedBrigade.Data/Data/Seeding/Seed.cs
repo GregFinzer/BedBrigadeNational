@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
-using static BedBrigade.Common.Logic.Common;
+
 using System.Diagnostics;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
@@ -403,7 +403,7 @@ public class Seed
                 foreach (var location in _locations)
                 {
                     var loc = location.Route + "/pages";
-                    loc.CreateDirectory();
+                    FileUtil.CreateMediaSubDirectory(loc);
                     context.Locations.Add(location);
                     await context.SaveChangesAsync();
                 }

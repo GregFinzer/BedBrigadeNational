@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Diagnostics;
 using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Logic.Common;
+
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;

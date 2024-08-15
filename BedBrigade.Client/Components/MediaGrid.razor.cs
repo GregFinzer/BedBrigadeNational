@@ -16,7 +16,7 @@ using BedBrigade.Client.Components.Pages.Administration.Manage;
 using System.Linq.Expressions;
 using System.Drawing.Imaging;
 using BedBrigade.Common.Constants;
-using static BedBrigade.Common.Logic.Common;
+
 using BedBrigade.Data.Services;
 using BedBrigade.Common.Enums;
 

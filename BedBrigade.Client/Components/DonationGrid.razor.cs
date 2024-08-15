@@ -11,7 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
-using static BedBrigade.Common.Logic.Common;
+
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;

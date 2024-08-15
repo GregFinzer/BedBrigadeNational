@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Logic.Common;
+
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
 using Microsoft.JSInterop;
