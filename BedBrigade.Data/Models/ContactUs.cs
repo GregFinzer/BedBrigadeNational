@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BedBrigade.Common;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Data.Models
 {
-	[Table("ContactUs")]
+    [Table("ContactUs")]
 	public class ContactUs : BaseEntity, ILocationId, IEmail
     {
 		[Key]

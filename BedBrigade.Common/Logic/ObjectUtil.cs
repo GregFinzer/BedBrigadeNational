@@ -8,7 +8,7 @@ using KellermanSoftware.CompareNetObjects;
 using KellermanSoftware.CompareNetObjects.Reports;
 using KellermanSoftware.Serialization;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class ObjectUtil
     {
@@ -35,9 +35,9 @@ namespace BedBrigade.Common
 
         private static bool ShouldOutput(Type type)
         {
-            return type.IsPrimitive 
+            return type.IsPrimitive
                    || type == typeof(string)
-                   || type.IsEnum 
+                   || type.IsEnum
                    || type == typeof(DateTime)
                    || type == typeof(DateTime?)
                    || type == typeof(decimal)
@@ -59,7 +59,7 @@ namespace BedBrigade.Common
         public static string Differences<T>(T obj1, T obj2)
         {
             CompareLogic compareLogic = new CompareLogic();
-            compareLogic.Config.MaxDifferences = Int32.MaxValue;
+            compareLogic.Config.MaxDifferences = int.MaxValue;
             ComparisonResult result = compareLogic.Compare(obj1, obj2);
 
             StringBuilder sb = new StringBuilder();

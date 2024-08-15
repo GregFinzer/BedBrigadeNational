@@ -1,6 +1,5 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -9,7 +8,9 @@ using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components
 {
@@ -54,7 +55,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Configurations Page");
 
             if (Identity.IsInRole(RoleNames.NationalAdmin))
@@ -127,7 +128,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Configuration, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Configuration, UserState = _state });
                 return;
             }
 

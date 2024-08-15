@@ -1,4 +1,5 @@
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -22,7 +23,7 @@ public partial class AddPage : ComponentBase
         Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
         var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
         Model.CurrentLocationId = user.LocationId;
-        Model.IsNationalAdmin = Model.CurrentLocationId == Constants.NationalLocationId;
+        Model.IsNationalAdmin = Model.CurrentLocationId == Defaults.NationalLocationId;
     }
 
     private void UpdatePageName(ChangeEventArgs e)
@@ -51,7 +52,7 @@ public partial class AddPage : ComponentBase
             return;
         }
 
-        var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Constants.DefaultPageTemplate);
+        var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
 
         if (!pageTemplate.Success)
         {
@@ -64,7 +65,7 @@ public partial class AddPage : ComponentBase
             Name = Model.PageName,
             LocationId = Model.CurrentLocationId,
             ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-            ContentType = Common.Common.ContentType.Body,
+            ContentType = Common.Logic.Common.ContentType.Body,
             Title = Model.PageTitle
         };
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Models
 {
     public class reCAPTCHAVerificationResponse
     {

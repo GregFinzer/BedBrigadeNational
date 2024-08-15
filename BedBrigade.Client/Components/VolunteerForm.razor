@@ -1,4 +1,5 @@
-﻿@using System.Globalization
+﻿@using BedBrigade.Common.Logic
+@using System.Globalization
 
 <RotatorContainer RotatorTitle="Volunteer Registration" ImagePath="pages/Volunteer" LocationId="1" />
 
@@ -97,21 +98,21 @@
                             <div class="radio-control">
                                 @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?","", false, "compact")
                                 <div class="row">
-                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.NoCar)" Name="RadioBtn" Value="@Common.VehicleType.NoCar.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.NoCar)" Name="RadioBtn" Value="@VehicleType.NoCar.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                 </div>
                                 <hr/>
                                 <div class="row">
-                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Minivan)" Name="RadioBtn" Value="@Common.VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.Minivan)" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     @BootstrapHelper.GetBootstrapMessage("info", "Minivan with seats removed or folded into the floor (Honda Odyseey, Toyota Sienna, Chrysler Pacifica, Kia Carnival, etc.)","", false, "compact")
                                 </div>
                                 <hr />
                                 <div class="row">                                   
-                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.SUV)" Name="RadioBtn" Value="@Common.VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.SUV)" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     @BootstrapHelper.GetBootstrapMessage("info", "Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.","", false, "compact")
                                 </div> 
                                 <hr />
                                 <div class="row">                                  
-                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(Common.VehicleType.Truck)" Value="@Common.VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.Truck)" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     @BootstrapHelper.GetBootstrapMessage("info", "A pickup truck with a camper shell or with a canopy.","", false, "compact")
                                 </div>           
                             </div>

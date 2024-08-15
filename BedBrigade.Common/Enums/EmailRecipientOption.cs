@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Enums
 {
     public enum EmailRecipientOption
     {

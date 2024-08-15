@@ -1,10 +1,10 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Enums;
 using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using static BedBrigade.Common.Common;
-using static BedBrigade.Common.Extensions;
+using static BedBrigade.Common.Logic.Common;
+using static BedBrigade.Common.Logic.Extensions;
 
 namespace BedBrigade.Data.Data.Seeding
 {
@@ -43,7 +43,7 @@ namespace BedBrigade.Data.Data.Seeding
 
             if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
             {
-                string seedDirectory = Common.Common.GetSeedingDirectory();
+                string seedDirectory = Common.Logic.Common.GetSeedingDirectory();
                 CopyDirectory($"{seedDirectory}/SeedImages", mediaPath);
             }
         }

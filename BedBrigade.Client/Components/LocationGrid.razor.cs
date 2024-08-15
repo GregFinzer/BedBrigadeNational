@@ -1,16 +1,18 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
-using static BedBrigade.Common.Common;
-using static BedBrigade.Common.Extensions;
-using ContentType = BedBrigade.Common.Common.ContentType;
+using static BedBrigade.Common.Logic.Common;
+using static BedBrigade.Common.Logic.Extensions;
+using ContentType = BedBrigade.Common.Logic.Common.ContentType;
 using BedBrigade.Data.Services;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components
 {
@@ -132,7 +134,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Location, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Location, UserState = _state });
                 return;
             }
 
@@ -254,7 +256,7 @@ namespace BedBrigade.Client.Components
                     {
                         locationRoute = locationRoute + "/pages";
                         CreateDirectory(locationRoute);
-                        string seedingDirectory = Common.Common.GetSeedingDirectory();
+                        string seedingDirectory = Common.Logic.Common.GetSeedingDirectory();
                         CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
                     }
 

@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
 using Microsoft.JSInterop;
-using BedBrigade.Common;
 using BedBrigade.Data.Services;
 using Serilog;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {
@@ -58,7 +59,7 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Media Page");
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
             userRoute = Identity.Claims.FirstOrDefault(c => c.Type == "UserRoute").Value;

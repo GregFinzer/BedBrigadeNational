@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Data.Models
 {
@@ -20,7 +20,7 @@ namespace BedBrigade.Data.Models
 
         public void SetCreateAndUpdateUser(String? userName)
         {
-            CreateUser = userName ?? Constants.DefaultUserNameAndEmail;
+            CreateUser = userName ?? Defaults.DefaultUserNameAndEmail;
             CreateDate = DateTime.UtcNow;
             UpdateUser = CreateUser;
             UpdateDate = CreateDate;
@@ -29,7 +29,7 @@ namespace BedBrigade.Data.Models
 
         public void SetUpdateUser(String? userName)
         {
-            UpdateUser = userName ?? Constants.DefaultUserNameAndEmail;
+            UpdateUser = userName ?? Defaults.DefaultUserNameAndEmail;
             UpdateDate = DateTime.UtcNow;
             MachineName = Environment.MachineName;
         }

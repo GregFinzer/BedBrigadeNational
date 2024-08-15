@@ -9,12 +9,13 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Linq;
 using System.Security.Claims;
-using BedBrigade.Common;
 using BedBrigade.Data.Services;
 using Serilog;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {
@@ -66,7 +67,7 @@ namespace BedBrigade.Client.Components
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Constants.DefaultUserNameAndEmail;
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Donations Page");
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
@@ -160,7 +161,7 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.ResetPersistData();
                 _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Donation, UserState = _state });
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Logic.Common.PersistGrid.Donation, UserState = _state });
                 return;
             }
 

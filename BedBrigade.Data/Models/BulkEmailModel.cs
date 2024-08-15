@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BedBrigade.Common;
+using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Data.Models
 {

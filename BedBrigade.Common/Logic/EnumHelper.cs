@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
+using BedBrigade.Common.EnumModels;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class EnumHelper
-    {       
+    {
         public static string GetEnumDescription<T>(T value) where T : Enum
         {
             var fi = value.GetType().GetField(value.ToString());

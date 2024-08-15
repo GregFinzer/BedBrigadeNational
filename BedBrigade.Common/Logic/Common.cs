@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
-using static BedBrigade.Common.Common;
+using BedBrigade.Common.Enums;
+using static BedBrigade.Common.Logic.Common;
 
-namespace BedBrigade.Common;
+namespace BedBrigade.Common.Logic;
 
 // ENUM & other classes
 
@@ -37,8 +38,8 @@ public class UsState
 {
     public string? StateCode { get; set; }
     public string? StateName { get; set; }
-    public Int32 ZipCodeMin { get; set; } = 0;
-    public Int32 ZipCodeMax { get; set; } = 0;
+    public int ZipCodeMin { get; set; } = 0;
+    public int ZipCodeMax { get; set; } = 0;
 }
 public class FileUseEnumItem
 {
@@ -72,8 +73,8 @@ public class VehicleTypeEnumItem // added by VS 9/1/2023
 
 public static class Common
 {
-    public enum ContentType 
-    { 
+    public enum ContentType
+    {
         Header = 1,
         Footer = 2,
         Body = 3,
@@ -81,7 +82,7 @@ public static class Common
     }
 
     public enum EventType // added by VS 7/1/2023
-    {      
+    {
         Cut = 1,
         Build = 2,
         Delivery = 3,
@@ -91,8 +92,8 @@ public static class Common
     public enum EventStatus // added by VS 7/1/2023
     {
         Scheduled = 1,
-        Canceled = 2,       
-        Completed = 3,        
+        Canceled = 2,
+        Completed = 3,
     }
 
     public enum PersistGrid
@@ -105,16 +106,16 @@ public static class Common
         Content = 6,
         BedRequest = 7,
         Media = 8,
-        Pages = 9, 
+        Pages = 9,
         Schedule = 10,
         ContactUs = 11
     }
 
     public enum BedRequestStatus
     {
-       Requested = 1,
-       Scheduled = 2,
-       Delivered = 3,
+        Requested = 1,
+        Scheduled = 2,
+        Delivered = 3,
     }
 
     public enum VehicleType // added by VS 9/1/2023
@@ -141,13 +142,13 @@ public static class Common
         return Enum.GetValues(type).OfType<EventType>().ToList()
                         .Select(x => new EventTypeEnumItem
                         {
-                            Value = (EventType)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
     }
 
-   
+
 
     /// <summary>
     /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
@@ -159,19 +160,19 @@ public static class Common
         return Enum.GetValues(type).OfType<ContentType>().ToList()
                         .Select(x => new ContentTypeEnumItem
                         {
-                            Value = (ContentType)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
     }
 
-    public static List<VehicleTypeEnumItem> GetVehicleTypeItems() 
+    public static List<VehicleTypeEnumItem> GetVehicleTypeItems()
     {
         var type = typeof(VehicleType);
         return Enum.GetValues(type).OfType<VehicleType>().ToList()
                         .Select(x => new VehicleTypeEnumItem
                         {
-                            Value = (VehicleType)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
@@ -184,24 +185,24 @@ public static class Common
         return Enum.GetValues(type).OfType<EventStatus>().ToList()
                         .Select(x => new EventStatusEnumItem
                         {
-                            Value = (EventStatus)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
     } // Get Event Status Items
 
 
-        /// <summary>
-        /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
-        /// </summary>
-        /// <returns>List<EnumItem></EnumItem></returns>
-        public static List<BedRequestEnumItem> GetBedRequestStatusItems()
+    /// <summary>
+    /// Get a list of Enum Items suitable for a dropdown list from the BedRequestStatusEnum
+    /// </summary>
+    /// <returns>List<EnumItem></EnumItem></returns>
+    public static List<BedRequestEnumItem> GetBedRequestStatusItems()
     {
         var type = typeof(BedRequestStatus);
         return Enum.GetValues(type).OfType<BedRequestStatus>().ToList()
                         .Select(x => new BedRequestEnumItem
                         {
-                            Value = (BedRequestStatus)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
@@ -228,7 +229,7 @@ public static class Common
         return Enum.GetValues(type).OfType<FileUse>().ToList()
                         .Select(x => new FileUseEnumItem
                         {
-                            Value = (FileUse)x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
@@ -253,7 +254,7 @@ public static class Common
         return Enum.GetValues(type).OfType<ConfigSection>().ToList()
                         .Select(x => new ConfigSectionEnumItem
                         {
-                            Value = (ConfigSection) x,
+                            Value = x,
                             Name = Enum.GetName(type, x)
                         })
                         .ToList();
@@ -413,12 +414,12 @@ public static class Common
             new UsState {StateCode = "WY",StateName = "Wyoming",ZipCodeMin = 82001,ZipCodeMax = 83414}
 
         };
-        return (StateList);
+        return StateList;
     } // Get State List      
 
     public static string GetZipState(List<UsState> StateList, int ZipCode)
     {
-        string? StateCode = String.Empty;
+        string? StateCode = string.Empty;
         // find State by Zip in Range
         if (StateList.Count > 0 && ZipCode > 0)
         {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 
 namespace BedBrigade.Data.Services
 {

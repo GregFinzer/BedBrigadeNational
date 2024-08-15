@@ -4,7 +4,7 @@ using System.Web;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class Extensions
     {
@@ -22,7 +22,7 @@ namespace BedBrigade.Common
                         .Replace(")", string.Empty)
                         .Replace("-", string.Empty)
                         .Replace(".", string.Empty);
-                    formatted = String.Format("{0:(###) ###-####}", Convert.ToInt64(trimmed));
+                    formatted = string.Format("{0:(###) ###-####}", Convert.ToInt64(trimmed));
                 }
                 return formatted;
             }
@@ -57,7 +57,7 @@ namespace BedBrigade.Common
         /// <returns> true or false</returns>
         public static bool HasRole(this ClaimsPrincipal identity, string roles)
         {
-            
+
             var roleArray = roles.Split(',');
             foreach (var role in roleArray)
             {
@@ -79,7 +79,7 @@ namespace BedBrigade.Common
         public static string ToApplicationPath(this string fileName, string folderName = "")
         {
             string appRoot = GetMediaDirectory(folderName);
-            return Path.Combine(appRoot , fileName);
+            return Path.Combine(appRoot, fileName);
         }
 
 
@@ -105,9 +105,9 @@ namespace BedBrigade.Common
         {
             var appRoot = GetMediaDirectory(directoryName);
             string[] files = Directory.GetFiles(appRoot);
-            foreach ( string file in files )
+            foreach (string file in files)
             {
-                File.Delete( file );
+                File.Delete(file);
             }
         }
 

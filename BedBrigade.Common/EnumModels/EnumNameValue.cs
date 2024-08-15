@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Common
+﻿namespace BedBrigade.Common.EnumModels
 {
     public class EnumNameValue<T> where T : Enum
     {

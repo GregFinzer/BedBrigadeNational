@@ -1,6 +1,5 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Models;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -16,8 +15,10 @@ using System.Collections.Generic;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
 using System.Linq.Expressions;
 using System.Drawing.Imaging;
-using static BedBrigade.Common.Common;
+using BedBrigade.Common.Constants;
+using static BedBrigade.Common.Logic.Common;
 using BedBrigade.Data.Services;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {

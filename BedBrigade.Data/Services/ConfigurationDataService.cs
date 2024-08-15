@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Data.Services;

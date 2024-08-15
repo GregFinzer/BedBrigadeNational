@@ -1,8 +1,8 @@
-﻿using BedBrigade.Common;
-using KellermanSoftware.NetCachingLibrary;
+﻿using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using System.Text.RegularExpressions;
 using System.Text;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Data.Services
 {

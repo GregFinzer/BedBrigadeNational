@@ -1,7 +1,7 @@
 ﻿using KellermanSoftware.NetEmailValidation;
 using System.Linq.Expressions;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class Validation
     {
@@ -19,15 +19,15 @@ namespace BedBrigade.Common
 
         public static string GetCityForZipCode(string zipCode)
         {
-            
+
             var addressParser = LibraryFactory.CreateAddressParser();
             try
             {
                 return addressParser.GetInfoForZipCode(zipCode).PrimaryCity;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return ("Error: " + ex.Message); // VS 8/11/2023
+                return "Error: " + ex.Message; // VS 8/11/2023
             }
         }
     }

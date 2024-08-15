@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 
 namespace BedBrigade.Data.Models
 {
-	[Table("Content")]
+    [Table("Content")]
     public class Content : BaseEntity, ILocationId
     {
 		[Key]

@@ -11,7 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class BootstrapHelper
     {
@@ -28,7 +28,7 @@ namespace BedBrigade.Common
 
         }
 
-        public static MarkupString GetBootstrapMessage(string strAlertType, string strMainMessage="", string strAdditionalMessage ="", bool bShowTitle = true, string strFontSize = "medium", bool bCloseable = false)
+        public static MarkupString GetBootstrapMessage(string strAlertType, string strMainMessage = "", string strAdditionalMessage = "", bool bShowTitle = true, string strFontSize = "medium", bool bCloseable = false)
         {
             // strAlertType: note, info, success, error, warning
             // Creates a TextInfo based on the "en-US" culture.
@@ -42,14 +42,14 @@ namespace BedBrigade.Common
             myMessage.ShowTitle = bShowTitle;
             myMessage.Closeable = bCloseable;
 
-            var strFontIcon = String.Empty;
+            var strFontIcon = string.Empty;
             if (strAlertType == "error")
             {
                 strAlertType = "danger";
             }
 
             var strAlertStyle = strAlertType;
-           
+
             // type of message
 
             switch (strAlertType)
@@ -71,11 +71,11 @@ namespace BedBrigade.Common
                 case "error":
                 case "danger":
                     strFontIcon = "<i class='fa fa-exclamation-circle'></i>&nbsp;";
-                    break;               
+                    break;
                 case "success":
                     strFontIcon = "<i class='fa fa-check-circle'></i>&nbsp;";
                     break;
-          
+
             }
 
 
@@ -92,8 +92,8 @@ namespace BedBrigade.Common
 
         public static string GetBootstrapMessageHtml(BootstrapMessage myMessage)
         {
-            
-            var strHtml = String.Empty;
+
+            var strHtml = string.Empty;
             var sbHtml = new StringBuilder();
 
             sbHtml.Append("<div class='alert alert-" + myMessage.AlertStyle + "'");
@@ -140,18 +140,18 @@ namespace BedBrigade.Common
             sbHtml.Append("</div>");
 
             strHtml = sbHtml.ToString();
-            return (strHtml);
+            return strHtml;
 
         } //GetBootstrapMessageHtml
 
         public static MarkupString GetBootstrapJumbotron(string strMainTitle = "", string strSubTitle = "", string strMessage = "")
         {
-            var strHtml = String.Empty;
+            var strHtml = string.Empty;
             var sbHtml = new StringBuilder();
             int partCount = 0;
 
             sbHtml.Append("<div class='bg-light p-5 rounded-lg m-3'>");
-            
+
             if (strMainTitle.Trim().Length > 0)
             {
                 sbHtml.Append("<h1 class='display-4'>");
@@ -167,9 +167,9 @@ namespace BedBrigade.Common
                 partCount++;
             }
 
-            if (partCount>0)
+            if (partCount > 0)
             {
-                 sbHtml.Append("<hr class='my-4'>");
+                sbHtml.Append("<hr class='my-4'>");
             }
 
             if (strMessage.Trim().Length > 0)
@@ -179,14 +179,14 @@ namespace BedBrigade.Common
                 sbHtml.Append("</p>");
             }
 
-            sbHtml.Append("</div>");            
-            
+            sbHtml.Append("</div>");
+
             strHtml = sbHtml.ToString();
 
             return (MarkupString)strHtml;
         } // Jumbotron Message
 
-       
+
 
 
     } // class

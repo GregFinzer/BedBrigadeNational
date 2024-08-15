@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class DateUtil
     {
-        public static String MillisecondsToTimeLapse(long milliseconds)
+        public static string MillisecondsToTimeLapse(long milliseconds)
         {
             TimeSpan ts = TimeSpan.FromMilliseconds(milliseconds);
 
@@ -41,14 +41,14 @@ namespace BedBrigade.Common
         } // Timelaps
 
         public static string GetFormattedDateTime(DateTime? myDate)
-        {            
+        {
             string strReturnDate = string.Empty;
-            string strFormattedDate = String.Empty;
+            string strFormattedDate = string.Empty;
             string strFormattedTime = string.Empty;
 
             if (myDate != null)
             {
-                DateTime regularDate = myDate.HasValue ? myDate.Value : default(DateTime);
+                DateTime regularDate = myDate.HasValue ? myDate.Value : default;
 
 
                 try
@@ -59,14 +59,14 @@ namespace BedBrigade.Common
                     strReturnDate = strFormattedDate + ", " + strFormattedTime;
 
                 }
-                catch(Exception ex) { }
+                catch (Exception ex) { }
 
             }
 
-            return (strReturnDate);
+            return strReturnDate;
 
         } // Format Date
-       
+
 
     } // class
 } // namespace

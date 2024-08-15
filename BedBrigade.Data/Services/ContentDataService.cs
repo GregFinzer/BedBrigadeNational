@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;

@@ -4,7 +4,7 @@ using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using KellermanSoftware.NetEmailValidation;
 using KellermanSoftware.StaticCodeAnalysis;
 
-namespace BedBrigade.Common
+namespace BedBrigade.Common.Logic
 {
     public static class LibraryFactory
     {

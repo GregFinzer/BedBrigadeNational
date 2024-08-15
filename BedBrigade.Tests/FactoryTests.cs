@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BedBrigade.Common;
+using BedBrigade.Common.Logic;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 
 namespace BedBrigade.Tests

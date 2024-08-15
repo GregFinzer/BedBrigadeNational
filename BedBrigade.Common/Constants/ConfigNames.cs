@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Common
+﻿namespace BedBrigade.Common.Constants
 {
     public static class ConfigNames
     {

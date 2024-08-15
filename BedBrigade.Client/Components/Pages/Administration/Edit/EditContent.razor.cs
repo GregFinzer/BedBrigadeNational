@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using BedBrigade.Client.Components;
-using BedBrigade.Common;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Mvc;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {

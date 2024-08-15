@@ -6,7 +6,8 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using BedBrigade.Common;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace BedBrigade.Data.Services
                 return null;
             }
 
-            return Constants.DefaultUserNameAndEmail;
+            return Defaults.DefaultUserNameAndEmail;
         }
 
         //This is the user name stored in the nameidentifier
@@ -68,7 +69,7 @@ namespace BedBrigade.Data.Services
                 return null;
             }
 
-            return Constants.DefaultUserNameAndEmail;
+            return Defaults.DefaultUserNameAndEmail;
         }
 
         public async Task<string?> GetUserRole()
@@ -178,7 +179,7 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
-            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
+            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
             entity.SetCreateAndUpdateUser(userName);
             
             try
@@ -202,7 +203,7 @@ namespace BedBrigade.Data.Services
         public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
 
-            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
+            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
             entity.SetUpdateUser(userName);
 
             try
@@ -228,7 +229,7 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<bool>> DeleteAsync(object id)
         {
-            string userName = await GetUserName() ?? Constants.DefaultUserNameAndEmail;
+            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
 
             try
             {

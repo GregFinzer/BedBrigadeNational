@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Components;
 using System.Drawing.Drawing2D;
 using System.Security.Claims;
-using BedBrigade.Common;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components
 {

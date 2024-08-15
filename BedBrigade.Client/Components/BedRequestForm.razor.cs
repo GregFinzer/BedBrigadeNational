@@ -7,13 +7,13 @@ using System.Text.Json;
 using System.Diagnostics;
 using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Web;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Forms;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components
 {

@@ -1,12 +1,14 @@
 ﻿using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Models;
 using System.Data.SqlClient;
-using BedBrigade.Common;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using System.Diagnostics;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Data.Seeding;
 

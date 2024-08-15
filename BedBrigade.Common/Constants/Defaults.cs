@@ -1,6 +1,6 @@
-﻿namespace BedBrigade.Common
+﻿namespace BedBrigade.Common.Constants
 {
-    public static class Constants
+    public static class Defaults
     {
         public const string ErrorImagePath = "media/national/pages/Error/leftImageRotator/NoImageFound.jpg";
         public const string AuthToken = "AuthToken";

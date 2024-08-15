@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using BedBrigade.Data.Models;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
-using BedBrigade.Common;
 using Microsoft.AspNetCore.Components.Forms;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Client.Components
 {

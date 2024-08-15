@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel;
-using BedBrigade.Common;
 using System.Diagnostics;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 using System;
 using System.Threading.Tasks;
+using BedBrigade.Common.Constants;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http.HttpResults;
 using BedBrigade.Data.Services;
-using static BedBrigade.Common.Common;
+using static BedBrigade.Common.Logic.Common;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

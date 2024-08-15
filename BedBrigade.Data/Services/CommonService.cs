@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Data.Models;
 using Microsoft.EntityFrameworkCore;
 

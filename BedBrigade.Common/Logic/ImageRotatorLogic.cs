@@ -1,4 +1,6 @@
-﻿namespace BedBrigade.Common
+﻿using BedBrigade.Common.Constants;
+
+namespace BedBrigade.Common.Logic
 {
     public class ImageRotatorLogic
     {
@@ -13,7 +15,7 @@
                 var imageIndex = unit % fileNames.Count;
                 return fileNames[imageIndex].Replace("wwwroot/", "");
             }
-            return Constants.ErrorImagePath;
+            return Defaults.ErrorImagePath;
         }
     }
 }

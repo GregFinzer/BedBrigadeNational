@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Tests
 {
