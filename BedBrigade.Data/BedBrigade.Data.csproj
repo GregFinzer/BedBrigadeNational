@@ -49,7 +49,6 @@
   
   
     <ItemGroup>
-    <PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
     <PackageReference Include="BetterAddressParser" Version="1.18.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="EntityFramework" Version="6.5.1" />

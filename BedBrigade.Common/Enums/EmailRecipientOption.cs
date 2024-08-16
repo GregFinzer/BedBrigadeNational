@@ -9,6 +9,8 @@ namespace BedBrigade.Common.Enums
 {
     public enum EmailRecipientOption
     {
+        [Description("Myself (used for testing)")]
+        Myself,
         [Description("Bed Brigade Leaders Nationwide")]
         BedBrigadeLeadersNationwide,
         [Description("Bed Brigade Leaders for Location")]

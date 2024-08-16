@@ -16,8 +16,14 @@ namespace BedBrigade.Data.Models
         [Required, MaxLength(100)]
         public string FromAddress { get; set; } = string.Empty;
 
+        [MaxLength(100)]
+        public string? ReplyToAddress { get; set; }
+
         [Required, MaxLength(100)]
         public string ToAddress { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string? ToDisplayName { get; set; }
 
         [Required, MaxLength(100)]
         public string Subject { get; set; } = string.Empty;
