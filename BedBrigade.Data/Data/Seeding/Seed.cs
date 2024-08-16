@@ -218,12 +218,6 @@ public class Seed
             {
                 new()
                 {
-                    ConfigurationKey = ConfigNames.FromEmailAddress,
-                    ConfigurationValue = "DoNotReply@89a27aba-71cb-4968-863a-b1e5203187d5.azurecomm.net",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
                     ConfigurationKey = ConfigNames.TokenExpiration,
                     ConfigurationValue = "24",
                     Section = ConfigSection.System
@@ -287,6 +281,12 @@ public class Seed
                     ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
                     ConfigurationValue = "6LedaRIdAAAAACLvJRk3_zhzPL56te_aMIZwl7rZ",
                     Section = ConfigSection.System
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.FromEmailAddress,
+                    ConfigurationValue = "devtest@bedbrigadecolumbus.org",
+                    Section = ConfigSection.Email
                 },
                 new()
                 {
@@ -358,6 +358,30 @@ public class Seed
                 {
                     ConfigurationKey = ConfigNames.FromEmailDisplayName,
                     ConfigurationValue = "Bed Brigade NoReply",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailHost,
+                    ConfigurationValue = "mail5019.site4now.net",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailPort,
+                    ConfigurationValue = "8889",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailUserName,
+                    ConfigurationValue = "devtest@bedbrigadecolumbus.org",
+                    Section = ConfigSection.Email
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailPassword,
+                    ConfigurationValue = "AskGregForPassword",
                     Section = ConfigSection.Email
                 },
                 new()

@@ -1,10 +1,7 @@
 ﻿#region Includes
-
-using System.Data.Common;
-using System.Drawing;
+using System.Net.Mail;
 using System.Text;
 using Azure;
-using Azure.Communication.Email;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Data.Models;
@@ -34,9 +31,11 @@ namespace BedBrigade.Data.Services
         private static bool _emailUseFileMock;
         private static string _fromEmailAddress;
         private static string _fromEmailDisplayName;
+        private static string _host;
+        private static int _port;
+        private static string _userName;
+        private static string _password;
         #endregion
-
-
 
         #region Public Methods
 
@@ -140,13 +139,26 @@ namespace BedBrigade.Data.Services
             if (emailsToProcess.Count == 0)
                 return;
 
+            if (!_emailUseFileMock)
+            {
+                Log.Debug("EmailQueueLogic:  Sending LIVE emails");
+            }
+
             Log.Debug("EmailQueueLogic:  Locking Emails");
             await _emailQueueDataService.LockEmailsToProcess(emailsToProcess);
 
             foreach (var emailQueue in emailsToProcess)
             {
-                emailQueue.FromAddress = _fromEmailAddress;
-                emailQueue.FromDisplayName = _fromEmailDisplayName;
+                if (string.IsNullOrEmpty(emailQueue.FromAddress))
+                {
+                    emailQueue.FromAddress = _fromEmailAddress;
+                }
+
+                if (string.IsNullOrEmpty(emailQueue.FromDisplayName))
+                {
+                    emailQueue.FromDisplayName = _fromEmailDisplayName;
+                }
+
 
                 if (_emailUseFileMock)
                 {
@@ -169,7 +181,7 @@ namespace BedBrigade.Data.Services
         private static async Task LogEmail(EmailQueue email)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Send Email");
+            sb.AppendLine("Send Email (nothing actually sent see Configuration.EmailUseFileMock");
             sb.AppendLine($"From:  {email.FromAddress}");
             sb.AppendLine($"From Display Name:  {email.FromDisplayName}");
             sb.AppendLine($"To:  {email.ToAddress}");
@@ -178,6 +190,7 @@ namespace BedBrigade.Data.Services
             sb.AppendLine("=".PadRight(40,'='));
             Log.Information(sb.ToString());
 
+            email.LockDate = null;
             email.SentDate = DateTime.UtcNow;
             email.Status = EmailQueueStatus.Sent.ToString();
             await _emailQueueDataService.UpdateAsync(email);
@@ -185,48 +198,51 @@ namespace BedBrigade.Data.Services
 
         private static async Task SendLiveEmail(EmailQueue email)
         {
-            // This code retrieves your connection string from an environment variable.
-            string connectionString = Environment.GetEnvironmentVariable("COMMUNICATION_SERVICES_CONNECTION_STRING");
+            // Create the email message
+            MailMessage mailMessage = new MailMessage();
 
-            if (String.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty(email.FromDisplayName))
             {
-                string errorMessage =
-                    "EmailQueueLogic:  COMMUNICATION_SERVICES_CONNECTION_STRING is not set as an environment variable";
-                Log.Error(errorMessage);
-                email.SentDate = DateTime.UtcNow;
-                email.FailureMessage = errorMessage;
-                email.Status = EmailQueueStatus.Failed.ToString();
-                await _emailQueueDataService.UpdateAsync(email);
-                return;
+                mailMessage.From = new MailAddress(email.FromAddress, email.FromDisplayName);
+            }
+            else
+            {
+                mailMessage.From = new MailAddress(email.FromAddress);
             }
 
-            var emailClient = new EmailClient(connectionString);
-
-            EmailContent emailContent = new EmailContent(email.Subject);
-            emailContent.PlainText = email.Body;
-            EmailMessage emailMessage = new EmailMessage(email.FromAddress, email.ToAddress, emailContent);
-            EmailAddress sender = new EmailAddress(email.FromAddress,email.FromDisplayName ?? email.FromAddress);
-            emailMessage.ReplyTo.Add(sender);
-
-            try
+            if (!string.IsNullOrEmpty(email.ReplyToAddress))
             {
-                EmailSendOperation emailSendOperation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
-
-
-                if (!emailSendOperation.HasValue)
+                if (!string.IsNullOrEmpty(email.FromDisplayName))
                 {
-                    return;
-                }
-
-                if (emailSendOperation.Value.Status == EmailSendStatus.Succeeded)
-                {
-                    email.Status = EmailQueueStatus.Sent.ToString();
+                    mailMessage.ReplyToList.Add(new MailAddress(email.ReplyToAddress, email.FromDisplayName));
                 }
                 else
                 {
-                    email.FailureMessage = emailSendOperation.GetRawResponse().ToString();
-                    email.Status = EmailQueueStatus.Failed.ToString();
+                    mailMessage.ReplyToList.Add(new MailAddress(email.ReplyToAddress));
                 }
+            }
+
+            if (!string.IsNullOrEmpty(email.ToDisplayName))
+            {
+                mailMessage.To.Add(new MailAddress(email.ToAddress, email.ToDisplayName));
+            }
+            else
+            {
+                mailMessage.To.Add(new MailAddress(email.ToAddress));
+            }
+
+            mailMessage.Subject = email.Subject;
+            mailMessage.Body = email.Body;
+
+            // Send the email
+            SmtpClient smtpClient = new SmtpClient(_host, _port);
+
+
+            try
+            {
+                smtpClient.Credentials = new System.Net.NetworkCredential(_userName, _password);
+                smtpClient.Send(mailMessage);
+                email.Status = EmailQueueStatus.Sent.ToString();
             }
             catch (RequestFailedException ex)
             {
@@ -235,6 +251,7 @@ namespace BedBrigade.Data.Services
                 email.Status = EmailQueueStatus.Failed.ToString();
             }
 
+            email.LockDate = null;
             email.SentDate = DateTime.UtcNow;
             await _emailQueueDataService.UpdateAsync(email);
         }
@@ -328,9 +345,15 @@ namespace BedBrigade.Data.Services
             _emailLockWaitMinutes = await LoadEmailConfigValue( ConfigNames.EmailLockWaitMinutes);
             _emailKeepDays = await LoadEmailConfigValue( ConfigNames.EmailKeepDays);
             _emailMaxPerChunk = await LoadEmailConfigValue( ConfigNames.EmailMaxPerChunk);
-            _emailUseFileMock = await LoadEmailConfigValue( ConfigNames.EmailUseFileMock) == 1;
+            _emailUseFileMock =
+                await _configurationDataService.GetConfigValueAsBoolAsync(ConfigSection.Email,
+                    ConfigNames.EmailUseFileMock);
             _fromEmailAddress = await LoadEmailConfigString( ConfigNames.FromEmailAddress);
             _fromEmailDisplayName = await LoadEmailConfigString( ConfigNames.FromEmailDisplayName);
+            _host = await LoadEmailConfigString(ConfigNames.EmailHost);
+            _port = await LoadEmailConfigValue(ConfigNames.EmailPort);
+            _userName = await LoadEmailConfigString(ConfigNames.EmailUserName);
+            _password = await LoadEmailConfigString(ConfigNames.EmailPassword);
         }
 
         private static async Task<string> LoadEmailConfigString(string id)

@@ -277,6 +277,8 @@ namespace BedBrigade.Data.Services
             const string message = "Built Email List";
             switch (option)
             {
+                case EmailRecipientOption.Myself:
+                    return new ServiceResponse<List<string>>(message, true, (await GetMyself()));
                 case EmailRecipientOption.Everyone:
                     return new ServiceResponse<List<string>>(message, true, (await GetEveryone()));
                 case EmailRecipientOption.VolunteersForLocation:
@@ -325,7 +327,11 @@ namespace BedBrigade.Data.Services
             return DateUtil.MillisecondsToTimeLapse(milliseconds);
         }
 
-
+        private async Task<List<string>> GetMyself()
+        {
+            var user = await GetUserEmail();
+            return new List<string> { user };
+        }
 
         private async Task<List<string>> GetEveryone()
         {

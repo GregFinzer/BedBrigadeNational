@@ -40,6 +40,90 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
             return new ServiceResponse<List<Configuration>>(result.Count + " records found", true, result);
         }
     }
+
+    public override async Task<ServiceResponse<Configuration>> GetByIdAsync(object? id)
+    {
+        if (id == null)
+        {
+            return new ServiceResponse<Configuration>("Configuration.GetByIdAsync id is null", false);
+        }
+        var response = await base.GetAllAsync();
+
+        if (!response.Success || response.Data == null)
+            return new ServiceResponse<Configuration>(response.Message, false);
+
+        Configuration result = response.Data.FirstOrDefault(o => o.ConfigurationKey == id.ToString());
+
+        if (result == null)
+        {
+            return new ServiceResponse<Configuration>("Configuration.GetByIdAsync not found: " + id);
+        }
+
+        return new ServiceResponse<Configuration>("Configuration.GetByIdAsyncFound: " + id, true, result);
+    }
+
+    public async Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+
+        if (config == null)
+            ThrowKeyNotFound(section, key);
+
+        if (!int.TryParse(config.ConfigurationValue, out int result))
+        {
+            throw new FormatException($"Configuration value is not an integer for {section} - {key}");
+        }
+
+        return result;
+    }
+
+    public void ThrowKeyNotFound(ConfigSection section, string key)
+    {
+        throw new KeyNotFoundException($"Configuration not found for {section} - {key}");
+    }
+
+    public async Task<string> GetConfigValueAsync(ConfigSection section, string key)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+
+        if (config == null)
+            ThrowKeyNotFound(section, key);
+
+        return config.ConfigurationValue;
+    }
+
+    public async Task<decimal> GetConfigValueAsDecimalAsync(ConfigSection section, string key)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+
+        if (config == null)
+            ThrowKeyNotFound(section, key);
+
+        if (!decimal.TryParse(config.ConfigurationValue, out decimal result))
+        {
+            throw new FormatException($"Configuration value is not an decimal for {section} - {key}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> GetConfigValueAsBoolAsync(ConfigSection section, string key)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+
+        if (config == null)
+            ThrowKeyNotFound(section, key);
+
+        return config.ConfigurationValue.ToLower() == "true";
+    }
 }
 
 

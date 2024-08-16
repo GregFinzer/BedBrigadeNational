@@ -43,8 +43,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                 Model.EmailRecipientOptions = EnumHelper.GetEnumNameValues<EmailRecipientOption>().Where(x => x.Value != EmailRecipientOption.Everyone).ToList();
             }
             
-            Model.CurrentEmailRecipientOption = EmailRecipientOption.BedBrigadeLeadersForLocation;
-            Model.ShowLocationDropdown = isNationalAdmin;
+            Model.CurrentEmailRecipientOption = EmailRecipientOption.Myself;
+            Model.ShowLocationDropdown = false;
             Model.ShowEventDropdown = false;
             await BuildPlan();
         }
