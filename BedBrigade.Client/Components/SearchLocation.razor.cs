@@ -52,7 +52,29 @@ namespace BedBrigade.Client.Components
             await CallLocationChanged();
         }
 
-
+        public async Task ForceLocationByName(string locationName)
+        {
+            string route = $"/{locationName}";
+            var result = await _svcLocation.GetLocationByRouteAsync(route);
+            if (result.Success && result.Data != null)
+            {
+                Locations = new List<LocationDistance>
+                {
+                    new LocationDistance()
+                    {
+                        Distance = 0,
+                        LocationId = result.Data.LocationId,
+                        Name = result.Data.Name,
+                        Route = result.Data.Route
+                    }
+                };
+                ddlValue = result.Data.LocationId;
+                SearchDisplay = DisplayNone;
+                ResultType = "DropDownList";
+                StateHasChanged();
+            }
+        }
+        
         public async Task OnCreateInput()
         {
             await SetZipBoxFocus();

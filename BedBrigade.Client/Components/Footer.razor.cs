@@ -12,7 +12,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] NavigationManager _nm { get; set; }
-        [Inject] private IFooterLocationState _locationState { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
         private string PreviousLocation { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -28,7 +28,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? "national";
+            string locationName = _locationState.Location ?? "National";
             var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
             if (!locationResult.Success)
@@ -51,7 +51,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async void OnLocationChanged()
+        private async Task OnLocationChanged()
         {
             await LoadContent();
             StateHasChanged();

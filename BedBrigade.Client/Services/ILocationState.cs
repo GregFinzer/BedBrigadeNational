@@ -1,8 +1,8 @@
 ﻿namespace BedBrigade.Client.Services
 {
-    public interface IHeaderLocationState
+    public interface ILocationState
     {
         string Location { get; set; }
-        event Action OnChange;
+        event Func<Task> OnChange;
     }
 }

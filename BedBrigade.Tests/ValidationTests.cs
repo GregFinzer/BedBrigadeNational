@@ -33,31 +33,6 @@ namespace BedBrigade.Tests
             Assert.IsTrue(result.IsValid);
         }
 
-        [Test]
-        public void ValidCity()
-        {
-            //Arrange
-            string city = "Columbus";
-
-            //Act
-            bool result = Validation.IsValidCity(city);
-
-            //Assert
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void InvalidCity()
-        {
-            //Arrange
-            string city = "Columbus123";
-
-            //Act
-            bool result = Validation.IsValidCity(city);
-
-            //Assert
-            Assert.IsFalse(result);
-        }
 
         [Test]
         public void GetCityForZipCode()

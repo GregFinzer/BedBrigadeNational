@@ -132,8 +132,7 @@ namespace BedBrigade.Client
             Log.Logger.Information("ClientServices");
             builder.Services.AddSingleton<ICachingService, CachingService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
-            builder.Services.AddScoped<IHeaderLocationState, HeaderLocationState>();
-            builder.Services.AddScoped<IFooterLocationState, FooterLocationState>();
+            builder.Services.AddScoped<ILocationState, LocationState>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)
