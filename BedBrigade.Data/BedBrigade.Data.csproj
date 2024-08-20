@@ -18,12 +18,17 @@
   <ItemGroup>
     <None Remove="Data\Seeding\SeedHtml\Aboutus.html" />
     <None Remove="Data\Seeding\SeedHtml\History.html" />
+    <None Remove="Data\Seeding\SeedHtml\LocationAboutUs.html" />
     <None Remove="Data\Seeding\SeedHtml\Locations.html" />
     <None Remove="Data\Seeding\SeedHtml\News.html" />
     <None Remove="Data\Seeding\SeedHtml\Partners.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Data\Seeding\SeedHtml\LocationAboutUs.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Include="Data\Seeding\SeedHtml\Aboutus.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -81,13 +86,22 @@
   
   
     <ItemGroup>
-      <None Update="Data\Seeding\SeedHtml\Assembly.html">
+      <None Update="Data\Seeding\SeedHtml\LocationHome.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Data\Seeding\SeedHtml\Donate.html">
+      <None Update="Data\Seeding\SeedHtml\LocationAssembly.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\LocationDonate.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\LocationFooter.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Data\Seeding\SeedHtml\Footer.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\LocationHeader.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Data\Seeding\SeedHtml\Header.html">

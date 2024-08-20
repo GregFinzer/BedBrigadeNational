@@ -1,5 +1,5 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -9,7 +9,7 @@ using Serilog;
 
 namespace BedBrigade.Client.Components
 {
-    public partial class Header
+    public partial class Header : ComponentBase, IDisposable
     {
         // Client
         [Inject] private IJSRuntime _js { get; set; }
@@ -17,6 +17,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authenticationStateProvider { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
+        [Inject] private IHeaderLocationState _locationState { get; set; }
 
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
@@ -27,29 +28,16 @@ namespace BedBrigade.Client.Components
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
         private AuthenticationState _authState { get; set; }
+        private string PreviousLocation { get; set; } 
 
         protected override async Task OnInitializedAsync()
         {
             Log.Debug("Header.OnInitializedAsync");
+            await LoadContent();
             _authenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
-            try
-            {
-                var contentResult = await _svcContent.GetAsync("Header", (int)LocationNumber.National);
-                if (contentResult.Success)
-                {
-                    await Console.Out.WriteLineAsync($"Loaded Header");
-                    headerContent = contentResult.Data.ContentHtml;
-                }
-                else
-                {
-                    Log.Logger.Error($"Error loading Header: {contentResult.Message}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, $"Error loading header: {ex.Message}");
-            }
+            _locationState.OnChange += OnLocationChanged;
         }
+
 
         private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
         {
@@ -57,9 +45,46 @@ namespace BedBrigade.Client.Components
             StateHasChanged();
         }
 
+        private async void OnLocationChanged()
+        {
+            if (_locationState.Location == PreviousLocation)
+            {
+                return;
+            }
+
+            await LoadContent();
+            StateHasChanged();
+        }
+
+        private async Task LoadContent()
+        {
+            string locationName = _locationState.Location ?? "national";
+            var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
+
+            if (!locationResult.Success)
+            {
+                Log.Logger.Error($"Error loading location: {locationResult.Message}");
+            }
+            else
+            {
+                var contentResult = await _svcContent.GetAsync("Header", locationResult.Data.LocationId);
+
+                if (contentResult.Success)
+                {
+                    headerContent = contentResult.Data.ContentHtml;
+                    PreviousLocation = locationName;
+                }
+                else
+                {
+                    Log.Logger.Error($"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
+                }
+            }
+        }
+
         public void Dispose()
         {
             _authenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+            _locationState.OnChange -= OnLocationChanged; // Unsubscribe from the event
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
