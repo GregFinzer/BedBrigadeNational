@@ -69,21 +69,21 @@ namespace BedBrigade.Common.Logic
             return StateList;
         } // Get State List      
 
-        public static string GetZipState(List<UsState> StateList, int ZipCode)
-        {
-            string? StateCode = string.Empty;
-            // find State by Zip in Range
-            if (StateList.Count > 0 && ZipCode > 0)
-            {
+        //public static string GetZipState(List<UsState> StateList, int ZipCode)
+        //{
+        //    string? StateCode = string.Empty;
+        //    // find State by Zip in Range
+        //    if (StateList.Count > 0 && ZipCode > 0)
+        //    {
 
-                var lstItem = StateList.Find(x => ZipCode >= x.ZipCodeMin && ZipCode <= x.ZipCodeMax);
-                if (lstItem != null)
-                {
-                    StateCode = lstItem.StateCode;
-                }
-            }
+        //        var lstItem = StateList.Find(x => ZipCode >= x.ZipCodeMin && ZipCode <= x.ZipCodeMax);
+        //        if (lstItem != null)
+        //        {
+        //            StateCode = lstItem.StateCode;
+        //        }
+        //    }
 
-            return StateCode;
-        } // GetZipState
+        //    return StateCode;
+        //} // GetZipState
     }
 }

@@ -17,7 +17,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider _authenticationStateProvider { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
-        [Inject] private IHeaderLocationState _locationState { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
 
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
@@ -45,20 +45,15 @@ namespace BedBrigade.Client.Components
             StateHasChanged();
         }
 
-        private async void OnLocationChanged()
+        private async Task OnLocationChanged()
         {
-            if (_locationState.Location == PreviousLocation)
-            {
-                return;
-            }
-
             await LoadContent();
             StateHasChanged();
         }
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? "national";
+            string locationName = _locationState.Location ?? "National";
             var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
             if (!locationResult.Success)
