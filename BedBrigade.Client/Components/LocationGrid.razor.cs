@@ -245,43 +245,19 @@ namespace BedBrigade.Client.Components
 
             // new Location
             var result = await _svcLocation.CreateAsync(Location);
+
+            ToastTitle = "Create Location";
+
             if (result.Success)
             {
-                Location location = result.Data;
-                if (!FileUtil.MediaSubDirectoryExists(Location.Route))
-                {
-                    FileUtil.CreateMediaSubDirectory(Location.Route);
-                    var locationRoute = FileUtil.GetMediaDirectory(location.Route);
-                    if (!Directory.Exists(locationRoute + "/pages"))
-                    {
-                        locationRoute = locationRoute + "/pages";
-                        FileUtil.CreateDirectory(locationRoute);
-                        string seedingDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
-                        FileUtil.CopyDirectory($"{seedingDirectory}/SeedImages/pages/", locationRoute);
-                    }
-
-                    await CreateContentAsync(location.LocationId, location.Name, PageNames, BedBrigade.Common.Enums.ContentType.Body);
-                    PageNames.Clear();
-                    PageNames.Add("Header0");
-                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Header);
-                    PageNames.Clear();
-                    PageNames.Add("Footer0");
-                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Footer);
-                    PageNames.Clear();
-                    PageNames.Add($"Home0");
-                    await CreateContentAsync(location.LocationId, location.Name, PageNames, ContentType.Home);
-                }
-            }
-            ToastTitle = "Create Location";
-            if (Location.LocationId != 0)
-            {
                 ToastContent = "Location Created Successfully!";
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
-                ToastContent = "Unable to save Location!";
+                ToastContent = result.Message ;
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
-            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
         private async Task UpdateLocationAsync(Location Location)
@@ -299,41 +275,7 @@ namespace BedBrigade.Client.Components
             await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
-        private async Task CreateContentAsync(int locationId, string LocationName, List<string> names, ContentType type)
-        {
-            foreach (var pageName in names)
-            {
-                var seedHtml = WebHelper.GetHtml($"{pageName}.html");
-                var name = string.Empty;
-                switch (type)
-                {
-                    case ContentType.Home:
-                        name = "Home";
-                        break;
-                    case ContentType.Header:
-                        name = "Header";
-                        seedHtml = seedHtml.Replace("Template", LocationName);
-                        break;
-                    case ContentType.Footer:
-                        name = "Footer";
-                        seedHtml = seedHtml.Replace("Template", LocationName);
-                        break;
-                    default:
-                        name = pageName;
-                        break;
 
-                }
-                Content content = new Content
-                {
-                    LocationId = locationId,
-                    ContentType = type,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                };
-
-                var result = await _svcContent.CreateAsync(content);
-            }
-        }
 
         private void BeginEdit()
         {

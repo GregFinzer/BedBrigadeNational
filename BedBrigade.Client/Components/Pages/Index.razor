@@ -1,6 +1,7 @@
 ﻿@page "/"
 @page "/{mylocation:nonfile}"
 @page "/{mylocation}/{mypageName:nonfile}"
+@using BedBrigade.Client.Services
 @using Serilog
 
 <MyBody @ref="myBody"/>
@@ -8,6 +9,13 @@
 @code {
     MyBody myBody;
     [Inject] private IJSRuntime _js { get; set; }
+
+    [Inject]
+    private IHeaderLocationState _headerLocationState  {  get; set; }
+
+    [Inject]
+    private IFooterLocationState _footerLocationState { get; set; }
+
     [Parameter] public string? mylocation { get; set; }
     [Parameter] public string? mypageName { get; set; }
     public string location { get; set; } 
@@ -19,7 +27,8 @@
     {
         location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
         pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
-        
+        _headerLocationState.Location = location; // Update the state
+        _footerLocationState.Location = location + string.Empty; // Update the state
         mylocation = null;
         mypageName = null;
     }

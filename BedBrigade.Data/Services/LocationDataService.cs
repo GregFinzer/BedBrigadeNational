@@ -5,6 +5,7 @@ using Serilog;
 using System.Data.Common;
 using System.Runtime.InteropServices;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 
@@ -16,17 +17,68 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly AuthenticationStateProvider _auth;
     private readonly IConfigurationDataService _configurationDataService;
+    private readonly IContentDataService _contentDataService;
 
-
-    public LocationDataService(IDbContextFactory<DataContext> contextFactory, 
-        ICachingService cachingService, 
+    public LocationDataService(IDbContextFactory<DataContext> contextFactory,
+        ICachingService cachingService,
         AuthenticationStateProvider authProvider,
-        IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authProvider)
+        IConfigurationDataService configurationDataService,
+        IContentDataService contentDataService) : base(contextFactory, cachingService, authProvider)
     {
         _cachingService = cachingService;
         _configurationDataService = configurationDataService;
+        _contentDataService = contentDataService;
         _contextFactory = contextFactory;
     }
+
+    public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
+    {
+        var existingLocation = await GetLocationByRouteAsync(entity.Route);
+
+        if (existingLocation.Success)
+        {
+            return new ServiceResponse<Location>($"Location with route {entity.Route} already exists");
+        }
+
+        var result = await base.CreateAsync(entity);
+
+        if (!result.Success)
+            return result;
+
+        var location = result.Data;
+
+        CreateLocationMedia(location);
+        await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
+        await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
+        await CreateContent(location, ContentType.Body, "Home.html", "Home");
+        await CreateContent(location, ContentType.Body, "LocationDonate.html", "Donate");
+        await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
+        await CreateContent(location, ContentType.Body, "LocationAssembly.html", "Assembly");
+        return result;
+    }
+
+    public async Task CreateContent(Location location, ContentType contentType, string templateName, string name)
+    {
+        var content = new Content();
+        content.LocationId = location.LocationId;
+        content.ContentType = contentType;
+        content.Name = name;
+        content.ContentHtml = WebHelper.GetHtml(templateName);
+        content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+        content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
+        content.Title = StringUtil.InsertSpaces(content.Name);
+        await _contentDataService.CreateAsync(content);
+    }
+
+    private void CreateLocationMedia(Location location)
+    {
+        if (!FileUtil.MediaSubDirectoryExists(location.Route))
+        {
+            FileUtil.CreateMediaSubDirectory(location.Route);
+        }
+    }
+
+
 
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
