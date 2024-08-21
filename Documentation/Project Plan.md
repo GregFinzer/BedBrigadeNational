@@ -56,17 +56,23 @@ One thing you will notice about the following project plan is the lack of due da
     * Rename Page :heavy_check_mark:
     
 * National Pages
-    * National About Us Page :heavy_check_mark:
-    * National History of Bed Brigade Page :heavy_check_mark:
+    * Design National Home Page
+    * National Home Page
+    * National About Us Page 
+    * National History of Bed Brigade Page 
     
 * Locations
     * Location List :heavy_check_mark:
-    * Grove City Location Home Page
-    * Polaris Location Home Page
     * Bed Brigade Near Me :heavy_check_mark:
-    * Grove City Assembly Instructions
-    * Polaris Assembly Instructions
-    * Grove City Partners    
+    * Grove City Location Home Page :heavy_check_mark:
+    * Grove City Location About Us Page :heavy_check_mark:
+    * Grove City History  :heavy_check_mark:
+    * Grove City Partners  :heavy_check_mark:
+    * Grove City Assembly Instructions  :heavy_check_mark:
+    * Polaris Location Home Page
+    * Polaris About Us Page
+    * Polaris Assembly Instructions Page
+
     
 * Manage Locations
     * Manage Locations Page :heavy_check_mark:
@@ -78,13 +84,13 @@ One thing you will notice about the following project plan is the lack of due da
     * Request Bed Page :heavy_check_mark:
     * Manage Bed Requests :heavy_check_mark:
     * Schedule Deliveries
-    * Delivery Checklist
     * Bulk Email Scheduled Deliveries
+    * Manage Delivery Checklist
     
 * Location Volunteer    
     * Volunteer Page :heavy_check_mark:
     * Manage Volunteers :heavy_check_mark:
-    * Bulk Email Volunteers
+    * Bulk Email Volunteers  :heavy_check_mark:
     * Manage Build and Delivery Schedule :heavy_check_mark:
     
 * Location Contact Us
@@ -92,6 +98,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Manage Contacts :heavy_check_mark:
     
 * Location Donations
+    * Setup PayPal IPN
     * Grove City Donate
     * Polaris Donate
     * Manage Donations :heavy_check_mark:
@@ -103,15 +110,6 @@ One thing you will notice about the following project plan is the lack of due da
     * Edit User :heavy_check_mark: 
     * Delete User :heavy_check_mark:
     
-* News
-    * National News Sample Story 
-    * List of News
-    * News Detail
-    * Manage News
-    * Add News
-    * Edit News
-    * Delete News
-    
 * Stories
     * Grove City Sample Story
     * Polaris Sample Story
@@ -121,6 +119,51 @@ One thing you will notice about the following project plan is the lack of due da
     * Add Story
     * Edit Story
     * Delete Story
+    
+* News
+    * National News Sample Story 
+    * List of News
+    * News Detail
+    * Manage News
+    * Add News
+    * Edit News
+    * Delete News
+    
+    
+* Tech Debt
+    * Upgrade to Blazor 8 :heavy_check_mark:
+    * Refactor Common.cs :heavy_check_mark:
+    * Refactor into Files :heavy_check_mark:
+    * Move Entities :heavy_check_mark:
+    * Move Syncfusion Licensing :heavy_check_mark:
+    * Regression Testing :heavy_check_mark:
+    * Change from Azure Email to SmarterASP.NET Email :heavy_check_mark:
+    * Update Diagrams :heavy_check_mark:
+    * GitHub Actions for Pull Requests :heavy_check_mark:
+    * Deploy to SmarterASP.NET Development :heavy_check_mark:
+    * Use location query parm Bed Request :heavy_check_mark:
+    * Use Location Query Parm Contact
+    * Use Location Query Parm Volunteer
+    * Design Shared Bed Requests
+    * Admin Dashboard Content
+    * Unique Volunteer Email Add Dialog
+    * Update NuGet Packages and Change NUnit Assertions
+    * Cache get files
+    * Remove Unused Components and Pages
+    * Add three image rotators to Bed Brigade Near Me
+    * Location Latitude & Longitude
+    * FM Dependent Functionality
+    * Verify security for all pages
+    * Global Error Handler
+    * Refresh Header and Footer
+    * Minify CSS and JS
+    * Add Page Titles
+    * Custom Icons in Grid Toolbar
+    * Review All Code
+    
+    
+    
+    
 
 * For Version 2
     * Search
@@ -134,5 +177,6 @@ One thing you will notice about the following project plan is the lack of due da
         * Page Versioning
         * Page History
         * Restore Version
+
     
 
