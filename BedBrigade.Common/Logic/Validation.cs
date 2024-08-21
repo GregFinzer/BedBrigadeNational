@@ -11,6 +11,11 @@ namespace BedBrigade.Common.Logic
             return emailValidation.ValidEmail(email, emailValidation.NoConnectOptions);
         }
 
+        public static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            return PhoneNumberValidator.IsValidPhoneNumber(phoneNumber);
+        }
+
         public static bool IsValidZipCode(string zipCode)
         {
             var addressParser = LibraryFactory.CreateAddressParser();

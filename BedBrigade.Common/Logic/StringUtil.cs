@@ -208,6 +208,13 @@ namespace BedBrigade.Common.Logic
         } // Is Null
 
 
+        public static string ExtractDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return new string(input.Where(char.IsDigit).ToArray());
+        }
     } // class
 
 

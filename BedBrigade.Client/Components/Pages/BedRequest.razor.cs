@@ -31,7 +31,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private string DisplayForm = DisplayNone;
         private string DisplayAddressMessage = DisplayNone;
-        private string DisplaySearch = "";
+        private string DisplaySearch = DisplayNone;
         public int NumericValue { get; set; } = 1;
 
         private string SuccessClass = "alert alert-success";
@@ -95,6 +95,12 @@ namespace BedBrigade.Client.Components.Pages
                 {
                     await SearchLocation.ForceLocationByName(_locationQueryParm);
                     DisplayForm = "";
+                    StateHasChanged();
+                }
+                else
+                {
+                    DisplaySearch = "";
+                    StateHasChanged();
                 }
             }
         }
@@ -128,6 +134,21 @@ namespace BedBrigade.Client.Components.Pages
             if (!formIsValid)
             {
                 ShowValidationMessage(FormNotCompleted);
+                return false;
+            }
+
+            bool isPhoneValid = Validation.IsValidPhoneNumber(newRequest.Phone);
+
+            if (!isPhoneValid)
+            {
+                ShowValidationMessage("Please enter a valid phone number.");
+                return false;
+            }
+
+            var emailResult = Validation.IsValidEmail(newRequest.Email);
+            if (!emailResult.IsValid)
+            {
+                ShowValidationMessage(emailResult.UserMessage);
                 return false;
             }
 
