@@ -18,20 +18,19 @@ using Syncfusion.Blazor.RichTextEditor;
 using System.Data.Entity.Infrastructure;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
+using Microsoft.AspNetCore.WebUtilities;
 
-
-namespace BedBrigade.Client.Components
+namespace BedBrigade.Client.Components.Pages
 {
-    public partial class VolunteerForm : ComponentBase
+    public partial class VolunteerSignUp : ComponentBase
     {
-
         #region Declaration
 
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject] private IVolunteerEventsDataService? _svcVolunteerEvents { get; set; }
-
+        [Inject] private NavigationManager? _nav { get; set; }
 
         private BedBrigade.Data.Models.Volunteer? newVolunteer;
 
@@ -43,7 +42,7 @@ namespace BedBrigade.Client.Components
 
         private List<VolunteerEvent> VolunteerRegister { get; set; } = new List<VolunteerEvent>(); // Volunteer/Events Registration
 
-        private SearchLocation? SearchLocation;             
+        private SearchLocation? SearchLocation;
 
         private const string DisplayNone = "none";
         private const string AlertDanger = "alert alert-danger";
@@ -54,26 +53,26 @@ namespace BedBrigade.Client.Components
         private const string AlertWarning = "warning";
 
         private string DisplayForm = DisplayNone;
-        private string DisplayAddressMessage = DisplayNone;      
-        private string DisplaySearch = "";
-        private string DisplayExId = DisplayNone; 
+        private string DisplayAddressMessage = DisplayNone;
+        private string DisplaySearch = DisplayNone;
+        private string DisplayExId = DisplayNone;
         private string DisplayEventDetail = DisplayNone;
         private string DisplayLocationEvents = DisplayNone;
         private string DisplayLocationStatusMessage = DisplayNone;
         private string DisplayExistingMessage = DisplayNone;
         private string DisplayEmailMessage = DisplayNone;
-        private MarkupString ExistingMessage = BootstrapHelper.GetBootstrapMessage("info", "Please enter your email address and we will check your data in our Database.", "", false,"compact");
+        private MarkupString ExistingMessage = BootstrapHelper.GetBootstrapMessage("info", "Please enter your email address and we will check your data in our Database.", "", false, "compact");
         private MarkupString LocationEventsAlert = BootstrapHelper.GetBootstrapMessage("warning", "Sorry, no available volunteer events in selected Location.<br/>Please select other location or try again later.", "", false);
         public int NumericValue { get; set; } = 1;
 
         private MarkupString FinalMessage;
-        private MarkupString NotificationMessage = BootstrapHelper.GetBootstrapMessage("info", FormMessage,"",false);       
+        private MarkupString NotificationMessage = BootstrapHelper.GetBootstrapMessage("info", FormMessage, "", false);
         private string SubmitAlertMessage = string.Empty;
         private string AlertDisplay = DisplayNone;
         private string ResultDisplay = DisplayNone;
         private string NotificationDisplay = string.Empty;
         private string AlertType = AlertDanger;
-    
+
         private ReCAPTCHA? reCAPTCHAComponent;
         private bool ValidReCAPTCHA = false;
         private bool ServerVerificatiing = false;
@@ -85,10 +84,11 @@ namespace BedBrigade.Client.Components
         private string VolunteerEventNote = string.Empty;
         private int exVolunteerId = 0;
         private bool isRegisterNow = false;
-       
+
         private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
         private EditContext? EC { get; set; }
-       
+
+        private string? _locationQueryParm;
 
         private string cssClass { get; set; } = "e-outline";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
@@ -109,12 +109,21 @@ namespace BedBrigade.Client.Components
         #endregion
         #region Initialization
 
+        protected override void OnInitialized()
+        {
+            var uri = _nav.ToAbsoluteUri(_nav.Uri);
+
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+            {
+                _locationQueryParm = locationQueryParm;
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            newVolunteer = new BedBrigade.Data.Models.Volunteer();            
+            newVolunteer = new BedBrigade.Data.Models.Volunteer();
             EC = new EditContext(newVolunteer);
             //messageStore = new ValidationMessageStore(EC);
-            base.OnInitialized();
             
             var dataEvents = await _svcSchedule.GetAllAsync();
             if (dataEvents.Success && dataEvents != null)
@@ -123,7 +132,7 @@ namespace BedBrigade.Client.Components
             }
 
             var dataRegister = await _svcVolunteerEvents.GetAllAsync();
-            if(dataRegister.Success && dataRegister != null)
+            if (dataRegister.Success && dataRegister != null)
             {
                 VolunteerRegister = dataRegister.Data;
             }
@@ -134,13 +143,31 @@ namespace BedBrigade.Client.Components
                 Volunteers = dataVolunteers.Data.ToList();
             }
 
-            var dataLocations  = await _svcLocation.GetAllAsync();
+            var dataLocations = await _svcLocation.GetAllAsync();
             if (dataLocations != null)
             {
                 Locations = dataLocations.Data.ToList();
             }
 
         } // Init
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                if (!string.IsNullOrEmpty(_locationQueryParm))
+                {
+                    await SearchLocation.ForceLocationByName(_locationQueryParm);
+                    DisplayForm = "";
+                    StateHasChanged();
+                }
+                else
+                {
+                    DisplaySearch = "";
+                    StateHasChanged();
+                }
+            }
+        }
 
         private void CheckChildData(string SearchZipCode)  // from Search Location Component
         { // usually data is zip code
@@ -159,12 +186,12 @@ namespace BedBrigade.Client.Components
 
         #region Validation & Events
 
-        
+
         private void HandleSelectedValueChanged(string strLocationId)
         {
             //Select Location in drop-down list
             selectedLocation = Convert.ToInt32(strLocationId);
-            selectedLocationName = Locations.SingleOrDefault(item => item.LocationId == selectedLocation).Name;         
+            selectedLocationName = Locations.SingleOrDefault(item => item.LocationId == selectedLocation).Name;
             GetLocationEvents();
 
         }
@@ -182,7 +209,7 @@ namespace BedBrigade.Client.Components
         {
             if (isRegisterNow)
             {
-               // GetLocationEvents();
+                // GetLocationEvents();
             }
             else
             {
@@ -195,14 +222,14 @@ namespace BedBrigade.Client.Components
         { // Filter Events to selected Location & Events with available dates & registered Volunteers < VolunteersMax
             try
             {
-                             
+
 
                 DisplayLocationEvents = DisplayNone;
                 DisplayLocationStatusMessage = DisplayNone;
                 // Date Filtration
                 LocationEvents = Events
                     .Where(item => item.LocationId == selectedLocation) // Location
-                    .Where(item=>item.EventStatus == EventStatus.Scheduled) // Scheduled Events
+                    .Where(item => item.EventStatus == EventStatus.Scheduled) // Scheduled Events
                     .Where(item => item.EventDateScheduled > DateTime.Today.AddDays(EventCutOffTimeDays)) // CutOffDays
                     .ToList();
 
@@ -238,11 +265,11 @@ namespace BedBrigade.Client.Components
                     DisplayLocationStatusMessage = "";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-            
+
         }//GetLocationEvents
 
         private void ChangeEvent(ChangeEventArgs<int, Schedule> args)
@@ -252,23 +279,23 @@ namespace BedBrigade.Client.Components
             selectedEventName = SelectedEvent.EventName;
             DisplayEventDetail = "";
         }
-     
+
         private void RunValidation()
         {
-      
+
             NotificationMessage = (MarkupString)"&nbsp;";
             DisplayAddressMessage = DisplayNone;
             NotificationDisplay = "";
-            EditFormStatus =  EC.Validate(); // manually trigger the validation here
-            
-            FormValidation();               
+            EditFormStatus = EC.Validate(); // manually trigger the validation here
+
+            FormValidation();
         } // Run Validation
 
         private bool CheckEmailAddress(string eMail)
         {
             DisplayExId = DisplayNone;
             var bEmailFound = false;
-            
+
             // return true if found email address
             var exVolunteer = Volunteers.Where(item => item.Email == eMail).FirstOrDefault();
             if (exVolunteer != null)
@@ -276,10 +303,10 @@ namespace BedBrigade.Client.Components
                 bEmailFound = true;
                 if (newVolunteer.IHaveVolunteeredBefore) // Volunteer found by eMail
                 {
-                    exVolunteerId = exVolunteer.VolunteerId; 
+                    exVolunteerId = exVolunteer.VolunteerId;
                     newVolunteer.VolunteerId = exVolunteer.VolunteerId;
                     newVolunteer.CreateDate = exVolunteer?.CreateDate;
-                    newVolunteer.CreateUser= exVolunteer?.CreateUser;
+                    newVolunteer.CreateUser = exVolunteer?.CreateUser;
                     newVolunteer.UpdateDate = exVolunteer?.UpdateDate;
                     newVolunteer.LocationId = exVolunteer.LocationId;
                     DisplayExId = "";
@@ -306,13 +333,13 @@ namespace BedBrigade.Client.Components
         } // check email address
 
         private bool EmailAddressValid()
-        {          
+        {
             DisplayEmailMessage = DisplayNone;
             if (newVolunteer.Email.Length > 0) // Email entered
             {
                 var bEmailFound = CheckEmailAddress(newVolunteer.Email);
 
-               // Debug.WriteLine(newVolunteer.Email + ": " + bEmailFound.ToString());
+                // Debug.WriteLine(newVolunteer.Email + ": " + bEmailFound.ToString());
 
 
                 if (newVolunteer.IHaveVolunteeredBefore) // existing Account
@@ -337,7 +364,8 @@ namespace BedBrigade.Client.Components
                     }
                 }
             } // email special validation
-            else {
+            else
+            {
                 return false;
             } // No email entered
 
@@ -355,7 +383,7 @@ namespace BedBrigade.Client.Components
                 return;
             };
 
-            EditFormStatus = EC.Validate();         
+            EditFormStatus = EC.Validate();
 
             if (EditFormStatus)
             {
@@ -406,7 +434,7 @@ namespace BedBrigade.Client.Components
 
         #endregion
         #region SaveVolunteer
-               
+
 
         private async Task SaveVolunteer()
         {
@@ -421,8 +449,8 @@ namespace BedBrigade.Client.Components
                 {
                     newVolunteer.LocationId = selectedLocation; // get value from child component
                 }
-               
-                await UpdateDatabase();             
+
+                await UpdateDatabase();
 
             } // Edit Form Status
             else // not valid data or/and reCaptcha
@@ -444,21 +472,21 @@ namespace BedBrigade.Client.Components
                 {
                     FormStatusMessage = FormNotCompleted;
                     AlertType = AlertWarning;
-                } 
-                                
+                }
+
                 NotificationMessage = BootstrapHelper.GetBootstrapMessage(AlertType, FormStatusMessage, ReCaptchaStatusMessage);
                 NotificationDisplay = "";
-            }                                  
-               
-            
+            }
+
+
         } // Save Request
-          
+
         private async Task UpdateDatabase()
         {
             var intNewVolunteerId = 0;
             var intNewRegistrationId = 0;
             var newRegister = new VolunteerEvent();
-            
+
             ServiceResponse<Volunteer> addResult;
             string ResultTitle = "Volunteer Registration";
             string ResultSubTitle = string.Empty;
@@ -467,7 +495,7 @@ namespace BedBrigade.Client.Components
 
             // Step 1 - save Volunteer Data
             try
-            { 
+            {
                 if (newVolunteer.VolunteerId > 0) // update Volunteer Data
                 {
                     addResult = await _svcVolunteer.UpdateAsync(newVolunteer);
@@ -485,7 +513,7 @@ namespace BedBrigade.Client.Components
 
                 if (newVolunteer != null && newVolunteer.VolunteerId > 0)
                 {
-                    await ReviewVolunteerData(newVolunteer);                    
+                    await ReviewVolunteerData(newVolunteer);
                 }
                 else
                 {
@@ -507,7 +535,7 @@ namespace BedBrigade.Client.Components
             var intNewVolunteerId = 0;
             var intNewRegistrationId = 0;
             var newRegister = new VolunteerEvent();
-                       
+
             string ResultTitle = "Volunteer Registration";
             string ResultSubTitle = string.Empty;
             string ResultMessage = string.Empty;
@@ -540,7 +568,7 @@ namespace BedBrigade.Client.Components
                 }
             } // register now
 
-            CreateFinalMessage(newVolunteer, newRegister, intNewRegistrationId);          
+            CreateFinalMessage(newVolunteer, newRegister, intNewRegistrationId);
 
         } // Review Volunteer Data
 
@@ -584,8 +612,8 @@ namespace BedBrigade.Client.Components
             FinalMessage = BootstrapHelper.GetBootstrapJumbotron(ResultTitle, ResultSubTitle, ResultMessage);
         } // Create Final Message
 
-        private async Task UpdateScheduleVolunteerCount(int intScheduleId, int intAddCar=0)
-        {           
+        private async Task UpdateScheduleVolunteerCount(int intScheduleId, int intAddCar = 0)
+        {
             // update Registered volunteer count for registered Schedule
             var dataRegister = await _svcVolunteerEvents.GetAllAsync(); // all registered events
             if (dataRegister.Success && dataRegister != null)
@@ -593,22 +621,21 @@ namespace BedBrigade.Client.Components
                 VolunteerRegister = dataRegister.Data;
             }
             var registerEvent = new Schedule();
-            
-           var dataEvents = await _svcSchedule.GetByIdAsync(intScheduleId); // Get selected Schedule data
+
+            var dataEvents = await _svcSchedule.GetByIdAsync(intScheduleId); // Get selected Schedule data
             if (dataEvents.Success && dataEvents != null)
             {
                 registerEvent = dataEvents.Data; // dataEvents.Data.ToList().FirstOrDefault(item => item.ScheduleId == intScheduleId);
                 // update registered Volunteers by re-count of all Volunteers already registered for selected event
                 registerEvent.VolunteersRegistered = VolunteerRegister.Where(reg => reg.ScheduleId == intScheduleId).ToList().Count();
                 // update Registered car for event
-                registerEvent.VehiclesDeliveryRegistered = registerEvent.VehiclesDeliveryRegistered + intAddCar;                   
-                
+                registerEvent.VehiclesDeliveryRegistered = registerEvent.VehiclesDeliveryRegistered + intAddCar;
+
                 var addRegCount = await _svcSchedule.UpdateAsync(registerEvent);
             }
         } // Update Volunteer Count
 
         #endregion
 
-
-    } // page class
-} // namespace
+    }
+}
