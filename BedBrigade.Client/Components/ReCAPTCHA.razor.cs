@@ -1,15 +1,8 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
-using System.Text.Json;
-using System;
-using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http.HttpResults;
 using BedBrigade.Data.Services;
 
 using BedBrigade.Common.Models;
@@ -36,28 +29,15 @@ namespace BedBrigade.Client.Components
 
         public string ResultPrint = String.Empty;
 
-        private Dictionary<string, string?> dctConfiguration { get; set; } = new Dictionary<string, string?>();
-
-        protected override async Task OnInitializedAsync()
-        {
-            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System);
-            if (dataConfiguration.Success && dataConfiguration != null)
-            {
-                dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
-            }
-        } // Init
 
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                SiteKey = dctConfiguration[ConfigNames.ReCaptchaSiteKey].ToString();
-                // Debug.WriteLine("Site Key: " + SiteKey);
-
+                SiteKey = await _svcConfiguration.GetConfigValueAsync(ConfigSection.System, ConfigNames.ReCaptchaSiteKey);
                 await JS.InvokeAsync<object>("My.reCAPTCHA.init");
                 this.WidgetId = await JS.InvokeAsync<int>("My.reCAPTCHA.render", DotNetObjectReference.Create(this), UniqueId, SiteKey);
-                //ResultPrint = "SiteKey OK";
             }
         }
 
@@ -92,7 +72,7 @@ namespace BedBrigade.Client.Components
             var url = "https://www.google.com/recaptcha/api/siteverify";
             var content = new FormUrlEncodedContent(new Dictionary<string, string?>
             {                
-                { "secret", dctConfiguration[ConfigNames.ReCaptchaSecret].ToString() },
+                { "secret", SiteKey },
                 { "response", reCAPTCHAResponse}
             });
 

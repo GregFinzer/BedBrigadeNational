@@ -28,14 +28,14 @@ namespace BedBrigade.Data.Models
         [Required]
         public DateTime EventDateScheduled { get; set; }
 
+        public int EventDurationHours { get; set; } = 0;
+
         // Event Resources  (3)
-       
-        public int VehiclesDeliveryMax { get; set; } = 0;
-        public int VehiclesDeliveryRegistered { get; set; } = 0;
-        public int VehiclesNormalMax { get; set; } = 0;
+        
         public int VolunteersMax { get; set; } = 0; 
         public int VolunteersRegistered { get; set; } = 0;
-       
+        public int DeliveryVehiclesRegistered { get; set; } = 0;
+
         public string EventSelect
         {
             get

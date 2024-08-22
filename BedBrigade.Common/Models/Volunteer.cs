@@ -43,14 +43,6 @@ namespace BedBrigade.Data.Models
 
         public VehicleType VehicleType { get; set; } = VehicleType.NoCar; // default value
 
-        public Boolean IHaveAMinivan { get; set; } = false; // unused
-
-		public Boolean IHaveAnSUV { get; set; } = false; // unused
-		
-		public Boolean IHaveAPickupTruck { get; set; } = false; // unused
-
-		public int VolunteeringForId { get; set; } = 0; // unused
-		public DateTime VolunteeringForDate { get; set; }// unused
 
 		[NotMapped]
         public string FullName {

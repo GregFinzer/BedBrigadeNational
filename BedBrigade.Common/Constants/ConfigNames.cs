@@ -10,6 +10,7 @@
         public const string BedBrigadeNearMeMaxMiles = "BedBrigadeNearMeMaxMiles";
         public const string DisplayIdFields = "DisplayIdFields";
         public const string EmptyGridText = "EmptyGridText";
+        public const string EventCutOffTimeDays = "EventCutOffTimeDays";
 
         //Media
         public const string AllowedFileExtensions = "AllowedFileExtensions";

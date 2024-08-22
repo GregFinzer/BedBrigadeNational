@@ -11,9 +11,6 @@
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
-    <None Include="wwwroot\Data\CreateSchedules.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="wwwroot\scripts\AddRemoveClass.js" />
     <None Include="wwwroot\scripts\cookie.js" />
     <None Include="wwwroot\scripts\DisplayToggle.js" />
