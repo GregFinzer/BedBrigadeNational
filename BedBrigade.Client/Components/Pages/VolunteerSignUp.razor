@@ -1,0 +1,247 @@
+﻿@page "/volunteer"
+
+<RotatorContainer RotatorTitle="Volunteer Registration" ImagePath="pages/Volunteer" LocationId="1" />
+
+
+<div class="container-fluid" style="display: @DisplaySearch">
+
+    <div class="row">
+        <div class="col-md-12" style="text-align: center">
+            <br />
+            <p>If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form</p>
+        </div>
+    </div>
+
+    <SearchLocation @ref="SearchLocation"
+                    Title="Find a Bed Brigade Locations Near Me"
+                    ResultType="DropDownList"
+                    ParentMethod="(childData)=>CheckChildData(childData)"
+                    LocationChanged="(ddlValue)=>HandleSelectedValueChanged(ddlValue)" />
+</div>
+
+<div class="container-fluid" style="display: @DisplayForm">
+
+    <EditForm EditContext="@EC">
+        <DataAnnotationsValidator />
+
+        <div class="row">
+            
+            <div class="@(AvailableVolunteerEvents ? "col-md-3" : "col-md-12")">
+                <div class="card">
+                    <div class="card-header" style="text-align: center">
+                        Bed Brigade Location Events
+                    </div>
+
+                    <div class="card-body" style="display: @DisplayLocationEvents">
+                        <div class="form-group">
+                            <label for="events" class="formlabel">Location Available Events&nbsp;(@LocationEvents.Count)</label>
+                            <SfDropDownList @ref="ddlVolunteerEvents" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@LocationEvents">
+                                <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ChangeEvent"></DropDownListEvents>
+                            </SfDropDownList>
+                            <div style="font-size: smaller">
+                            </div>
+                        </div>
+                        @if (SelectedEvent != null)
+                        {
+                            <div style="display: @DisplayEventDetail">
+                                <label class="formlabel">Selected Event Details</label>
+                                <div class="form-group">
+                                    <label class="formlabel">Name</label>
+                                    <label>@SelectedEvent.EventName</label>
+                                </div>
+                                @if (SelectedEvent.EventType.ToString() != SelectedEvent.EventName)
+                                {
+                                    <div class="form-group">
+                                        <label class="formlabel">Event Type</label>
+                                        <label>@SelectedEvent.EventType</label>
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(SelectedEvent.GroupName))
+                                {
+                                    <div class="form-group">
+                                        <label class="formlabel">Event Group</label>
+                                        <label>@SelectedEvent.GroupName</label>
+                                    </div>
+                                }
+                                <div class="form-group">
+                                    <label class="formlabel">Event Date & Time</label>
+                                    <label>@SelectedEvent.EventDateScheduled.ToString("dddd, MM/dd/yyyy h:mm tt") to @SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString()</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="formlabel">Volunteers registered/needed</label>
+                                    <label>@SelectedEvent.VolunteersRegistered/@SelectedEvent.VolunteersMax</label>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(SelectedEvent.EventNote))
+                                {
+                                    <div class="form-group">
+                                        <label class="formlabel">Event Note</label>
+                                        <label>@SelectedEvent.EventNote</label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body" style="display: @DisplayLocationStatusMessage">
+                        @LocationEventsAlert
+                    </div>
+                </div>
+            </div>
+            @if (AvailableVolunteerEvents)
+            {
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center">Volunteer Information</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <SfCheckBox Label="Have you volunteered for Bed Brigade before?" @bind-Checked="newVolunteer.IHaveVolunteeredBefore" @onchange="onPreviousVolunteer"></SfCheckBox>
+                            </div>
+                            <div class="form-group" style="display: @DisplayExistingMessage">
+                                @ExistingMessage
+                            </div>
+                            <div class="form-group">
+                                <label for="firstname" class="formlabel required">First Name</label>
+                                <SfTextBox ID="firstname" @bind-Value="newVolunteer.FirstName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => newVolunteer.FirstName)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="lastname" class="formlabel required">Last Name</label>
+                                <SfTextBox ID="lastname" @bind-Value="newVolunteer.LastName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => newVolunteer.LastName)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="formlabel required">Email</label>
+                                <SfTextBox ID="email" @bind-Value="newVolunteer.Email"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => newVolunteer.Email)"></ValidationMessage>
+                                    <div style="display: @DisplayEmailMessage">
+                                        @BootstrapHelper.GetBootstrapMessage("warning", "This email is already registered.", "", false, "compact");
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="formlabel required">Phone</label>
+                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="newVolunteer.Phone"></SfMaskedTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => newVolunteer.Phone)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="formlabel">Organization or Group</label>
+                                <SfTextBox ID="email" @bind-Value="newVolunteer.OrganizationOrGroup"></SfTextBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inst" class="formlabel">Message</label>
+                                <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
+                            </div>
+                        </div>
+                        <div class="card-footer  text-muted" style="text-align: center; font-size:small; color: GrayText; display: @DisplayExId">
+                            <span>Volunteer Id: @newVolunteer.VolunteerId</span>&nbsp;|&nbsp;
+                            <span>
+                                Last Visit: @(newVolunteer.UpdateDate.HasValue ? Convert.ToDateTime(newVolunteer.UpdateDate, System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat) : "")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (SelectedEvent != null && SelectedEvent.EventType == EventType.Delivery)
+                {
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header" style="text-align: center">
+                                Delivery Vehicle
+                            </div>
+                            <div class="card-body">
+                                <div class="control-section">
+                                    <div class="radio-control">
+                                        @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?", "", false, "compact")
+                                        <div class="row">
+                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.NoCar)" Name="RadioBtn" Value="@VehicleType.NoCar.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr/>
+                                        <div class="row">
+                                            <SfRadioButton Label="I have a Minvan with seats removed or folded into the floor" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr/>
+                                        <div class="row">
+                                            <SfRadioButton Label="I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr/>
+                                        <div class="row">
+                                            <SfRadioButton Label="I have a full size pickup truck with tie down straps or a cap" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        
+        @if (AvailableVolunteerEvents)
+        {
+            <div class="row">
+                <div class="col-md-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3" style="text-align: center">
+                    <ReCAPTCHA @ref="reCAPTCHAComponent" OnSuccess="OnSuccess" OnExpired="OnExpired"/>
+                </div>
+                <div class="col-md-9">
+                    <div class="alert alert-danger" role="alert" style="display: @MyMessageDisplay">
+                        @MyMessage
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-3" style="text-align: center">
+                    <SfButton CssClass="btn btn-primary" OnClick="@SaveVolunteer">Submit Volunteer Registration</SfButton>
+                </div>
+                <div class="col-md-9">
+                </div>
+            </div>
+        }
+    </EditForm>
+
+</div>
+
+<div class="container-fluid" style="display: @ResultDisplay">@FinalMessage</div>
+
+
+
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .required::after {
+        content: '*';
+        font-size: medium;
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
+
+    .formlabel {
+        color: #B4886B;
+        font-weight: bold;
+        font-size: small;
+        display: block;
+    }
+</style>
+
+
+

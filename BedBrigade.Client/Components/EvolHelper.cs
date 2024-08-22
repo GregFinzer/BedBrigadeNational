@@ -300,7 +300,7 @@ namespace BedBrigade.Client.Components
                         mySchedule.VolunteersRegistered++;
                         if (CarType != VehicleType.NoCar)
                         {
-                            mySchedule.VehiclesDeliveryRegistered++;
+                            mySchedule.DeliveryVehiclesRegistered++;
                         }
                     }
                     break;
@@ -311,9 +311,9 @@ namespace BedBrigade.Client.Components
                         {
                             mySchedule.VolunteersRegistered--;
                         }
-                        if (CarType != VehicleType.NoCar && mySchedule.VehiclesDeliveryRegistered > 0)
+                        if (CarType != VehicleType.NoCar && mySchedule.DeliveryVehiclesRegistered > 0)
                         {
-                            mySchedule.VehiclesDeliveryRegistered--;
+                            mySchedule.DeliveryVehiclesRegistered--;
                         }
                     }
                     break;

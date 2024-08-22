@@ -25,7 +25,6 @@ namespace BedBrigade.Client.Components
         SfMaskedTextBox maskObj;
 
         public int ddlValue { get; set; } = 0;
-        public string selectedLocationName { get; set; } = string.Empty;
 
         public string InputID = "input-id";
 
@@ -47,8 +46,6 @@ namespace BedBrigade.Client.Components
 
         public async Task ChangeLocation(ChangeEventArgs<int, LocationDistance> args)
         {
-            //Debug.WriteLine("ValueChange event has been triggered !!");
-            //selectedLocationName = args.ItemData.;
             await CallLocationChanged();
         }
 

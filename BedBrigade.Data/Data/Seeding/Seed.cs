@@ -153,52 +153,34 @@ public class Seed
         await SeedVolunteers(contextFactory);
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
-        SeedSchedules(contextFactory);
+        await SeedSchedules(contextFactory);
     }
 
 
-    public static void SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
+    public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
     {
        Log.Logger.Information("Seed Schedules Started");
-        string? sqlConnectionString = string.Empty; 
         string script = String.Empty;
 
         using (var context = contextFactory.CreateDbContext())
         {
-            sqlConnectionString = context.Database.GetConnectionString();
-        if (bTruncateData) // clear table
-        {
-            script = "truncate table dbo.Schedules";
-            Log.Logger.Information("Schedules will be truncated");
-        }
-        else // load data to table
-        {
-            var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "data", "CreateSchedules.sql");
-            FileInfo file = new FileInfo(path);
-            Log.Logger.Information("Schedules will be created");
-            Log.Logger.Information("Schedules SQL script file: " + file.FullName);
-            script = file.OpenText().ReadToEnd();
-        }
-            if (script.Length > 0)
-            {
-                SqlConnection tmpConn;
-                tmpConn = new SqlConnection();
-                tmpConn.ConnectionString = sqlConnectionString;
+            if (await context.Schedules.AnyAsync()) return;
 
-                SqlCommand myCommand = new SqlCommand(script, tmpConn);
-                try
-                {
-                    tmpConn.Open();
-                    var result = myCommand.ExecuteNonQuery();
-                    Log.Logger.Information("Schedules records affected: "+result.ToString());
-
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Information(ex.Message);
-                }
-            } //context
-
+            Schedule schedule = new Schedule();
+            schedule.LocationId = (int)LocationNumber.GroveCity;
+            schedule.EventName = "Delivery";
+            schedule.EventNote =
+                "Come deliver beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.";
+            schedule.EventStatus = EventStatus.Scheduled;
+            schedule.EventType = EventType.Delivery;
+            schedule.EventDateScheduled = DateTime.Today.AddDays(7).AddHours(9);
+            schedule.EventDurationHours = 3;
+            schedule.VolunteersMax = 20;
+            schedule.VolunteersRegistered = 0;
+            schedule.DeliveryVehiclesRegistered = 0;
+            SeedRoutines.SetMaintFields(schedule);
+            await context.Schedules.AddAsync(schedule);
+            await context.SaveChangesAsync();
         }
     } // Seed Schedules
 
@@ -396,7 +378,12 @@ public class Seed
                     ConfigurationValue = "No matching records found",
                     Section = ConfigSection.System
                 },
-
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EventCutOffTimeDays,
+                    ConfigurationValue = "4",
+                    Section = ConfigSection.System
+                },
             };
 
             SeedRoutines.SetMaintFields(configurations);
@@ -628,17 +615,12 @@ public class Seed
                 Volunteer volunteer = new()
                 {
                     LocationId = location.LocationId,
-                    VolunteeringForId = volunteeringFor.VolunteerForId,
-                    VolunteeringForDate = DateTime.UtcNow.AddDays(new Random().Next(60)),
                     IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
                     FirstName = firstName,
                     LastName = lastName,
                     Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
                     Phone = phoneNumber,
                     VehicleType = (VehicleType)new Random().Next(0, 3),
-                    IHaveAMinivan = YesOrNo[new Random().Next(YesOrNo.Count)],
-                    IHaveAnSUV = YesOrNo[new Random().Next(YesOrNo.Count)],
-                    IHaveAPickupTruck = YesOrNo[new Random().Next(YesOrNo.Count)]
                 };
                 try
                 {

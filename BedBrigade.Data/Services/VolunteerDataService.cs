@@ -3,6 +3,7 @@ using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Data.Common;
 
 namespace BedBrigade.Data.Services;
 
@@ -60,21 +61,68 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
 
     public async Task<ServiceResponse<List<string>>> GetVolunteerEmailsForASchedule(int scheduleId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetVolunteerEmailsForASchedule({scheduleId})");
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetVolunteerEmailsForASchedule({scheduleId})");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
-
-        using (var ctx = _contextFactory.CreateDbContext())
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache",
+                true, cachedContent);
+        ;
+        try
         {
-            var result = await ctx.VolunteerEvents
-                .Where(o => o.ScheduleId == scheduleId)
-                .Select(b => b.Volunteer.Email)
-                .Distinct().ToListAsync();
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.VolunteerEvents
+                    .Where(o => o.ScheduleId == scheduleId)
+                    .Select(b => b.Volunteer.Email)
+                    .Distinct().ToListAsync();
 
-            _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true,
+                    result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<string>>(
+                $"Could not GetVolunteerEmailsForASchedule {GetEntityName()}  with scheduleId {scheduleId}: {ex.Message} ({ex.ErrorCode})",
+                false);
+        }
+    }
+
+    public async Task<ServiceResponse<Volunteer>> GetByEmail(string email)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetByEmail({email})");
+        var cachedContent = _cachingService.Get<Volunteer>(cacheKey);
+
+        if (cachedContent != null)
+            return new ServiceResponse<Volunteer>($"Found GetByEmail({email}) in cache", true, cachedContent);
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Volunteer>();
+                var result = await dbSet.FirstOrDefaultAsync(o => o.Email == email);
+
+                if (result != null)
+                {
+                    _cachingService.Set(cacheKey, result);
+
+                    return new ServiceResponse<Volunteer>($"Found GetByEmail({email})", true, result);
+                }
+                else
+                {
+                    return new ServiceResponse<Volunteer>($"GetByEmail({email}) not found", false);
+                }
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<Volunteer>(
+                $"Could not GetByEmail for Volunteer {email}: {ex.Message} ({ex.ErrorCode})",
+                false);
         }
     }
 }

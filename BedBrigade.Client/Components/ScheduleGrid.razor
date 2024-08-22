@@ -8,91 +8,91 @@
     using BedBrigade.Common.Logic;
 
 
-<div class="col-lg-12 control-sec">
-    <div class="row"><div class="col">&nbsp;</div></div>
-    <div class="row">
-        <div class="col">
-            <h2>Event Scheduler</h2>
-        </div>
-        <div class="col" style="text-align: right">
-            <h5>Show Schedules&nbsp;</h5>
-        </div>
-        <div class="col">
-            <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="Select a grid filter" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
-                <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
-                <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
-            </SfDropDownList>
-        </div>
-        <div class="col" style="text-align:right; font-size: small">
-            <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-            @if (isLocationAdmin)
-            {
-                <span>[Location: @userLocationName]</span>
-            }
-            <br />@userName
-        </div>
-    </div>
-    <div class="content-wrapper">
+    <div class="col-lg-12 control-sec">
+        <div class="row"><div class="col">&nbsp;</div></div>
         <div class="row">
-            <div style="width: 100%">
-                <SfGrid @ref="Grid" TValue="Schedule"  DataSource="@lstSchedules" 
-                        ShowColumnChooser="true"                        
-                        AllowPaging="true"
-                        AllowSorting="true"
-                        AllowExcelExport="true"
-                        ShowColumnMenu="true"
-                        AllowFiltering="true"
-                        AllowReordering="true"
-                        AllowResizing="true"
-                        AllowSelection="true"
-                        AllowPdfExport="true"
-                        AllowTextWrap="true"
-                        AllowGrouping="true"
-                        Toolbar=@ToolBar >
-                    <GridTextWrapSettings WrapMode="WrapMode.Header" /> 
-                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
-                     </GridFilterSettings>
-                    <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
-                    <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
-                    <GridEditSettings 
-                        AllowAdding="true" 
-                        AllowEditing="true" 
-                        AllowDeleting="true"
-                        Dialog=@DialogParams                        
-                        Mode="EditMode.Dialog"
-                        ShowConfirmDialog="true"
-                        ShowDeleteConfirmDialog="true">
-                        <HeaderTemplate>
-                            @{
-                                @HeaderTitle
-                            }
-                        </HeaderTemplate>                  
-                        <FooterTemplate>
-                            <div class="row">
-                                <div class="col-md-6" style="text-align: left">
-                                    <span style="vertical-align:top; color: red; font-weight: bold">*</span><label>Required fields</label>
-                                </div>
-                                <div class="col-md-6" style="text-align: right">
-                                    <button class="btn btn-primary" @onclick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</button>
-                                    <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                                </div>
-                            </div>
-                        </FooterTemplate>
-                          <Template >                             
-                            @{
-                                Schedule schedule = (context as Schedule)!; 
-                                if(schedule.ScheduleId == 0) // new event
-                                {
-                                    DateTime myDate = DateTime.Today;
-                                    //myDate = myDate.AddDays(1);
-                                    string strDate = myDate.ToShortDateString();
-                                    string strTime = "9:00 AM";
-                                    myDate = DateTime.Parse(strDate + " " + strTime);
-                                    schedule.EventDateScheduled = myDate;
+            <div class="col">
+                <h2>Event Scheduler</h2>
+            </div>
+            <div class="col" style="text-align: right">
+                <h5>Show Schedules&nbsp;</h5>
+            </div>
+            <div class="col">
+                <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="Select a grid filter" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
+                    <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
+                    <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col" style="text-align:right; font-size: small">
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
+                @if (isLocationAdmin)
+                {
+                    <span>[Location: @userLocationName]</span>
+                }
+                <br />@userName
+            </div>
+        </div>
+        <div class="content-wrapper">
+            <div class="row">
+                <div style="width: 100%">
+                    <SfGrid @ref="Grid" TValue="Schedule"  DataSource="@lstSchedules" 
+                            ShowColumnChooser="true"                        
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true"
+                            AllowGrouping="true"
+                            Toolbar=@ToolBar >
+                        <GridTextWrapSettings WrapMode="WrapMode.Header" /> 
+                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
+                        </GridFilterSettings>
+                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
+                        <GridEditSettings 
+                            AllowAdding="true" 
+                            AllowEditing="true" 
+                            AllowDeleting="true"
+                            Dialog=@DialogParams                        
+                            Mode="EditMode.Dialog"
+                            ShowConfirmDialog="true"
+                            ShowDeleteConfirmDialog="true">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
                                 }
+                            </HeaderTemplate>                  
+                            <FooterTemplate>
+                                <div class="row">
+                                    <div class="col-md-6" style="text-align: left">
+                                        <span style="vertical-align:top; color: red; font-weight: bold">*</span><label>Required fields</label>
+                                    </div>
+                                    <div class="col-md-6" style="text-align: right">
+                                        <button class="btn btn-primary" @onclick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</button>
+                                        <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                    </div>
+                                </div>
+                            </FooterTemplate>
+                            <Template >                             
+                                @{
+                                    Schedule schedule = (context as Schedule)!; 
+                                    if(schedule.ScheduleId == 0) // new event
+                                    {
+                                        DateTime myDate = DateTime.Today;
+                                        //myDate = myDate.AddDays(1);
+                                        string strDate = myDate.ToShortDateString();
+                                        string strTime = "9:00 AM";
+                                        myDate = DateTime.Parse(strDate + " " + strTime);
+                                        schedule.EventDateScheduled = myDate;
+                                    }
 
 
-                                   <div class="row" >
+                                    <div class="row" >
                                         <div class="col-md-7">
                                             <fieldset class="border rounded-3 p-1">
                                                 <legend class="float-none w-auto p-1" style="font-size: small"><b>Event Details</b></legend>
@@ -146,7 +146,7 @@
                                                 </div>
                                             </fieldset>
                                         </div>
-                                         <div class="col-md-2">
+                                        <div class="col-md-2">
                                             <fieldset class="border rounded-3 p-1">
                                                 <legend class="float-none w-auto p-1" style="font-size: small"><b>Resources</b></legend>
                                                 <div class="row">
@@ -157,22 +157,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="control-wrapper">
-                                                            <label class="example-label">Vehicles (Delivery)</label>
-                                                            <SfNumericTextBox ID="VehiclesDeliveryMax" TValue="Int32" @bind-Value="@schedule.VehiclesDeliveryMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="control-wrapper">
-                                                            <label class="example-label">Vehicles (Normal)</label>
-                                                            <SfNumericTextBox ID="VehiclesNormalMax" TValue="Int32" @bind-Value="@schedule.VehiclesNormalMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
-                                                        </div>
-                                                    </div>
-                                                </div>                                                
                                             </fieldset>
                                         </div>
                                         <div class="col-md-3">
@@ -183,53 +167,50 @@
                                                 </div>
                                             </fieldset>
                                         </div>
-                                   </div>                                                                                                                                                                                                    
+                                    </div>                                                                                                                                                                                                    
                                  
                                 }                           
-                           </Template>
+                            </Template>
 
-                    </GridEditSettings>                                                                                              
+                        </GridEditSettings>                                                                                              
           
-                    <GridColumns>
-                             <GridColumn Field=@nameof(Schedule.ScheduleId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Schedule.ScheduleId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
                             <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@userLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
                             <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="false" AllowAdding="true" AllowEditing="true" ></GridColumn>
-                                <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                
-                                <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="d" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
-                                   <FilterTemplate>  
-                                       @{
-                                            <SfDateRangePicker Placeholder="Choose a Range" Width="500" ShowClearButton="true"
-                                                               @bind-StartDate="ScheduleStartDate" @bind-EndDate="ScheduleEndDate" TValue="DateTime">
-                                                <DateRangePickerEvents TValue="DateTime" ValueChange="ValueChangeHandler">
-                                                </DateRangePickerEvents>
-                                            </SfDateRangePicker>
-                                        } 
-                                        </FilterTemplate>
-                                        <Template>
-                                @{
-                                    Schedule mySchedule = (context as Schedule)!;
-                                    @mySchedule.EventDateScheduled.ToShortDateString()
-                                    <span>&nbsp;</span>
-                                    @mySchedule.EventDateScheduled.ToShortTimeString()
-                                }
-                                        </Template>
-                                </GridColumn>                                
-                                <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
-                                <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
-                                <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="350" AllowFiltering="false" ></GridColumn>                               
-                     
-                                <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
+                            <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                
+                            <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="d" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
+                                <FilterTemplate>  
+                                    @{
+                                        <SfDateRangePicker Placeholder="Choose a Range" Width="500" ShowClearButton="true"
+                                                           @bind-StartDate="ScheduleStartDate" @bind-EndDate="ScheduleEndDate" TValue="DateTime">
+                                            <DateRangePickerEvents TValue="DateTime" ValueChange="ValueChangeHandler">
+                                            </DateRangePickerEvents>
+                                        </SfDateRangePicker>
+                                    } 
+                                </FilterTemplate>
+                                <Template>
+                                    @{
+                                        Schedule mySchedule = (context as Schedule)!;
+                                        @mySchedule.EventDateScheduled.ToShortDateString()
+                                        <span>&nbsp;</span>
+                                        @mySchedule.EventDateScheduled.ToShortTimeString()
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true"></GridColumn>
+                            <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
+                            <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
+                            <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="350" AllowFiltering="false" ></GridColumn>                               
+                            <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
                             <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers (Registered)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
-                                <GridColumn Field=@nameof(Schedule.VehiclesDeliveryMax) HeaderText="Vehicles (Delivery)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
-                                <GridColumn Field=@nameof(Schedule.VehiclesNormalMax) HeaderText="Vehicles (Normal)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.VehiclesDeliveryRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
-
-                    </GridColumns>
-            </SfGrid>
+                            <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </div>
             </div>
         </div>
     </div>
-</div>
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast">
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
