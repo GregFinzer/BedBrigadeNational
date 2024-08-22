@@ -359,7 +359,7 @@ namespace BedBrigade.Client.Components.Pages
                 {
                     var existingVolunteer = existingVolunteerResult.Data;
                     existingVolunteer.LocationId = newVolunteer.LocationId;
-                    existingVolunteer.IHaveVolunteeredBefore = newVolunteer.IHaveVolunteeredBefore;
+                    existingVolunteer.IHaveVolunteeredBefore = true;
                     existingVolunteer.FirstName = newVolunteer.FirstName;
                     existingVolunteer.LastName = newVolunteer.LastName;
                     existingVolunteer.Email = newVolunteer.Email;
