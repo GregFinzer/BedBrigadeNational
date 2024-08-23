@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Common.Models
 {
     public class UserChangePassword
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BedBrigade.Common.Constants;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Common.Models
 {
     public abstract class BaseEntity
     {

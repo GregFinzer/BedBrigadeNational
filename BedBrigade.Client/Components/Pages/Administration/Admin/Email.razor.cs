@@ -2,7 +2,7 @@
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -84,7 +84,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             showPlan = true;
         }
 
-        private async void ScheduleChangeEvent(ChangeEventArgs<int, Data.Models.Schedule> args)
+        private async void ScheduleChangeEvent(ChangeEventArgs<int, Common.Models.Schedule> args)
         {
             Model.CurrentScheduleId = args.Value;
             await BuildPlan();

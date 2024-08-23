@@ -2,6 +2,7 @@
 @page "/administration/admin/email"
 @using BedBrigade.Common.EnumModels
 @using BedBrigade.Common.Enums
+@using BedBrigade.Common.Models
 @attribute [Authorize(Roles = RoleNames.CanSendBulkEmail)]
 
 @if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)

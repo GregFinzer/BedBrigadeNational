@@ -1,5 +1,5 @@
-﻿using BedBrigade.Data.Models;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {

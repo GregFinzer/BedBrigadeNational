@@ -1,13 +1,13 @@
 ﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using System.Diagnostics;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -19,7 +19,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
 
-        private BedBrigade.Data.Models.ContactUs? newRequest;
+        private Common.Models.ContactUs? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
 
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
@@ -77,7 +77,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
-            newRequest = new BedBrigade.Data.Models.ContactUs();
+            newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
             //messageStore = new ValidationMessageStore(EC);
 

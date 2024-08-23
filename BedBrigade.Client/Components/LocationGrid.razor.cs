@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
@@ -13,6 +12,7 @@ using BedBrigade.Data.Services;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

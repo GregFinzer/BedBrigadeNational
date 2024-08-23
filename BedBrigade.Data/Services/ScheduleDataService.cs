@@ -1,9 +1,10 @@
-﻿using BedBrigade.Data.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BedBrigade.Data.Services;
 
@@ -21,6 +22,27 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _configurationDataService = configurationDataService;
+    }
+
+    public override async Task<ServiceResponse<Schedule>> CreateAsync(Schedule entity)
+    {
+        var result = await base.CreateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<Schedule>> UpdateAsync(Schedule entity)
+    {
+        var result = await base.UpdateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
+    {
+        var result = await base.DeleteAsync(id);
+        _cachingService.ClearScheduleRelated();
+        return result;
     }
 
     public async Task<ServiceResponse<List<Schedule>>> GetAvailableSchedulesByLocationId(int locationId)

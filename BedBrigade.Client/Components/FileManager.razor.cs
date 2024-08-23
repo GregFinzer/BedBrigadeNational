@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using BedBrigade.Data.Models;
-
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
 using Microsoft.JSInterop;
@@ -10,6 +8,7 @@ using BedBrigade.Data.Services;
 using Serilog;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

@@ -1,10 +1,10 @@
-﻿using BedBrigade.Data.Models;
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

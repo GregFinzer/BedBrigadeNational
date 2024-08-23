@@ -1,8 +1,7 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Common.Models
 {
 	[Table("Donations")]
 	public class Donation : BaseEntity, ILocationId

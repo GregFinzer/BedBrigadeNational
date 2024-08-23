@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 //using Org.BouncyCastle.Asn1.Cms;
@@ -16,6 +15,7 @@ using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

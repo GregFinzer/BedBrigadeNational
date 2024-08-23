@@ -1,9 +1,8 @@
 ﻿using BedBrigade.Common.Enums;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System.Data.Common;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services;
 
@@ -12,16 +11,34 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICachingService _cachingService;
     private readonly ICommonService _commonService;
-    private readonly IVolunteerEventsDataService _volunteerEventsDataService;
 
     public VolunteerDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        AuthenticationStateProvider authProvider, ICommonService commonService,
-        IVolunteerEventsDataService volunteerEventsDataService) : base(contextFactory, cachingService, authProvider)
+        AuthenticationStateProvider authProvider, ICommonService commonService) : base(contextFactory, cachingService, authProvider)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
-        _volunteerEventsDataService = volunteerEventsDataService;
+    }
+
+    public override async Task<ServiceResponse<Volunteer>> CreateAsync(Volunteer entity)
+    {
+        var result = await base.CreateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<Volunteer>> UpdateAsync(Volunteer entity)
+    {
+        var result = await base.UpdateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
+    {
+        var result = await base.DeleteAsync(id);
+        _cachingService.ClearScheduleRelated();
+        return result;
     }
 
     public async Task<ServiceResponse<List<Volunteer>>> GetAllForLocationAsync()

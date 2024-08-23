@@ -1,6 +1,6 @@
-﻿using BedBrigade.Data.Models;
-using BedBrigade.Client.Services;
+﻿using BedBrigade.Client.Services;
 using BedBrigade.Common;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components;

@@ -13,5 +13,6 @@
         void ClearByEntityName(string entityName);
         void Set<T>(string cacheKey, T value);
         T? Get<T>(string cacheKey);
+        void ClearScheduleRelated();
     }
 }

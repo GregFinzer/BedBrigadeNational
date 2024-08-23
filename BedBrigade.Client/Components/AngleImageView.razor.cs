@@ -1,5 +1,4 @@
 using BedBrigade.Client.Components.Pages.Administration.Manage;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.IO;

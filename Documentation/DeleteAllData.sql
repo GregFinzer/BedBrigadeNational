@@ -1,6 +1,7 @@
-delete from dbo.BedRequests
+--This deletes all data except for the locations
+delete from BedRequests
 go
-delete from dbo.Configurations
+delete from Configurations
 go
 delete from ContactUs
 go
@@ -20,10 +21,9 @@ delete from templates
 go
 delete from Users
 go
-delete from dbo.VolunteersFor
+delete from VolunteersFor
 go
-delete from dbo.VolunteerEvents
+delete from VolunteerEvents
 go
 delete from Volunteers
 go
-delete from Locations

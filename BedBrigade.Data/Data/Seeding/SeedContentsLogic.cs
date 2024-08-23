@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

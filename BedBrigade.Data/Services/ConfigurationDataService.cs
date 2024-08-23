@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Common.Enums;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 using Microsoft.AspNetCore.Components.Authorization;

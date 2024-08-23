@@ -1,5 +1,4 @@
-﻿using BedBrigade.Data.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
@@ -8,6 +7,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services;
 
