@@ -310,16 +310,16 @@ public class Seed
                     ConfigurationValue = "30",
                     Section = ConfigSection.System
                 },
-                 new()
+                new()
                 {
-                    ConfigurationKey = ConfigNames.ReCaptchaSecret,
-                    ConfigurationValue = "6LedaRIdAAAAANBtScRJVeWtwW25zJKLYnxzs4mz",
+                    ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
+                    ConfigurationValue = "6LeDtS0qAAAAANLi2IY68WW555JXAWIelpoZQIWO",
                     Section = ConfigSection.System
                 },
                 new()
                 {
-                    ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
-                    ConfigurationValue = "6LedaRIdAAAAACLvJRk3_zhzPL56te_aMIZwl7rZ",
+                    ConfigurationKey = ConfigNames.ReCaptchaSecret,
+                    ConfigurationValue = "6LeDtS0qAAAAANGrgPxMV2vTcgVG1e01KaRGjuqL",
                     Section = ConfigSection.System
                 },
                 new()
