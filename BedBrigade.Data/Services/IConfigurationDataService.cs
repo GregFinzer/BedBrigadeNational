@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Common.Enums;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 
 
 namespace BedBrigade.Data.Services

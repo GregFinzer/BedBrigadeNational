@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.RichTextEditor;
@@ -9,6 +8,7 @@ using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Mvc;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {

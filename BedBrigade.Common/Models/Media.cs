@@ -2,8 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
 
-
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Common.Models
 {
     [Table("Media")]
     public class Media : BaseEntity

@@ -4,7 +4,7 @@ using System.Text;
 using Azure;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using Serilog;
 #endregion
 

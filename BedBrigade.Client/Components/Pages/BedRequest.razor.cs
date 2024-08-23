@@ -1,6 +1,5 @@
 ﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -19,7 +18,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
 
-        private BedBrigade.Data.Models.BedRequest? newRequest;
+        private Common.Models.BedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
 
         private SearchLocation? SearchLocation;
@@ -73,7 +72,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
-            newRequest = new BedBrigade.Data.Models.BedRequest();
+            newRequest = new Common.Models.BedRequest();
             EC = new EditContext(newRequest);
             //messageStore = new ValidationMessageStore(EC);
 

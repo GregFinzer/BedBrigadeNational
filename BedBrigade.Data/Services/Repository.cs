@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

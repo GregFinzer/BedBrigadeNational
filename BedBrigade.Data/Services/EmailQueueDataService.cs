@@ -1,10 +1,10 @@
 ﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {

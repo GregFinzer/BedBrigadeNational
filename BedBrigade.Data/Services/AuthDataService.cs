@@ -1,5 +1,4 @@
-﻿using BedBrigade.Data.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,6 +9,7 @@ using System.Data.Common;
 using System.Security;
 using BedBrigade.Common;
 using Azure;
+using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BedBrigade.Data.Services

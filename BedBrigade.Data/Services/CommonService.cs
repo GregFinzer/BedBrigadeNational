@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Common.Constants;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services

@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Data.Data.Seeding;
-using BedBrigade.Data.Models;
 using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -9,6 +8,7 @@ using System.Diagnostics;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -142,7 +142,6 @@ public class Seed
 
     public static async Task SeedData(IDbContextFactory<DataContext> contextFactory)
     {
-
         await SeedConfigurations(contextFactory);
         await SeedLocations(contextFactory);
         await SeedContentsLogic.SeedContents(contextFactory);
@@ -156,33 +155,92 @@ public class Seed
         await SeedSchedules(contextFactory);
     }
 
-
-    public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory, bool bTruncateData = false)
+    public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory)
     {
-       Log.Logger.Information("Seed Schedules Started");
-        string script = String.Empty;
-
-        using (var context = contextFactory.CreateDbContext())
+        using (DataContext context = contextFactory.CreateDbContext())
         {
             if (await context.Schedules.AnyAsync()) return;
 
-            Schedule schedule = new Schedule();
-            schedule.LocationId = (int)LocationNumber.GroveCity;
-            schedule.EventName = "Delivery";
-            schedule.EventNote =
-                "Come deliver beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.";
-            schedule.EventStatus = EventStatus.Scheduled;
-            schedule.EventType = EventType.Delivery;
-            schedule.EventDateScheduled = DateTime.Today.AddDays(7).AddHours(9);
-            schedule.EventDurationHours = 3;
-            schedule.VolunteersMax = 20;
-            schedule.VolunteersRegistered = 0;
-            schedule.DeliveryVehiclesRegistered = 0;
-            SeedRoutines.SetMaintFields(schedule);
-            await context.Schedules.AddAsync(schedule);
+            await SeedBuildSchedule(context);
+            await SeedDeliverySchedule(context);
             await context.SaveChangesAsync();
         }
-    } // Seed Schedules
+    }
+
+    public static async Task SeedBuildSchedule(DataContext context)
+    {
+        Log.Logger.Information("SeedBuildSchedule Started");
+
+        DateTime currentDate = DateTime.Today;
+
+        for (int i = 0; i < 12; i++)
+        {
+            // Get the first day of the current month
+            DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+
+            // Calculate the first Saturday of the month
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)firstDayOfMonth.DayOfWeek + 7) % 7;
+
+            DateTime firstSaturday = firstDayOfMonth.AddDays(daysUntilSaturday);
+
+            Schedule schedule = new Schedule
+            {
+                LocationId = (int)LocationNumber.GroveCity,
+                EventName = "Build",
+                EventNote =
+                    "Come build beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.",
+                EventStatus = EventStatus.Scheduled,
+                EventType = EventType.Build,
+                EventDateScheduled = firstSaturday.AddHours(9),
+                EventDurationHours = 3,
+                VolunteersMax = 20,
+                VolunteersRegistered = 0,
+                DeliveryVehiclesRegistered = 0
+            };
+
+            SeedRoutines.SetMaintFields(schedule);
+            await context.Schedules.AddAsync(schedule);
+
+            // Move to the next month
+            currentDate = currentDate.AddMonths(1);
+        }
+    }
+
+
+    public static async Task SeedDeliverySchedule(DataContext context)
+    {
+        Log.Logger.Information("SeedDeliverySchedule Started");
+
+        // Calculate the first Saturday
+        int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
+        if (daysUntilSaturday == 0)
+        {
+            daysUntilSaturday = 7; // If today is Saturday, schedule for the next Saturday
+        }
+
+        DateTime nextSaturday = DateTime.Today.AddDays(daysUntilSaturday);
+
+        for (int i = 0; i < 52; i++)
+        {
+            Schedule schedule = new Schedule
+            {
+                LocationId = (int)LocationNumber.GroveCity,
+                EventName = "Delivery",
+                EventNote =
+                    "Come deliver beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.",
+                EventStatus = EventStatus.Scheduled,
+                EventType = EventType.Delivery,
+                EventDateScheduled = nextSaturday.AddDays(i * 7).AddHours(9),
+                EventDurationHours = 3,
+                VolunteersMax = 20,
+                VolunteersRegistered = 0,
+                DeliveryVehiclesRegistered = 0
+            };
+
+            SeedRoutines.SetMaintFields(schedule);
+            await context.Schedules.AddAsync(schedule);
+        }
+    }
 
 
 

@@ -1,5 +1,4 @@
 ﻿using BedBrigade.Client.Components.Pages.Administration.Manage;
-using BedBrigade.Data.Models;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +14,7 @@ using System.Data.Entity;
 using System.Diagnostics;
 using System.Text;
 using BedBrigade.Common.Enums;
-
+using BedBrigade.Common.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BedBrigade.Client.Components

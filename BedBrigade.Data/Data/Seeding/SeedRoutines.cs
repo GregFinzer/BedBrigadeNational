@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Data.Data.Seeding;
-using BedBrigade.Data.Models;
 using System.Security.Cryptography;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Seeding
 {

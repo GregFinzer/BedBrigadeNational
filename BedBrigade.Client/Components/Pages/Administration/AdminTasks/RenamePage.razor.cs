@@ -1,6 +1,6 @@
 using BedBrigade.Client.Components;
 using BedBrigade.Common.Logic;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 

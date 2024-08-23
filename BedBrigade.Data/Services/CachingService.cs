@@ -3,6 +3,7 @@ using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using System.Text.RegularExpressions;
 using System.Text;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -86,7 +87,19 @@ namespace BedBrigade.Data.Services
             return _cache.Get<T>(cacheKey);
         }
 
-        //TODO:  Correct this in all Kellerman Software libraries
+        public void ClearScheduleRelated()
+        {
+            if (!IsCachingEnabled)
+            {
+                return;
+            }
+
+            ClearByEntityName(nameof(Volunteer));
+            ClearByEntityName(nameof(Schedule));
+            ClearByEntityName(nameof(VolunteerEvent));
+            ClearByEntityName(nameof(BedRequest));
+        }
+
         private static Regex WildcardToRegex(string wildcard)
         {
             StringBuilder sb = new StringBuilder(wildcard.Length + 8);

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BedBrigade.Data.Models
+namespace BedBrigade.Common.Models
 {
 	[Table("VolunteerEvents")]
 	public class VolunteerEvent : BaseEntity, ILocationId

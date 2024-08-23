@@ -1,6 +1,5 @@
 ﻿using Syncfusion.Blazor.DropDowns;
 using System.Diagnostics;
-using BedBrigade.Data.Models;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components.Forms;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
 using Microsoft.AspNetCore.Mvc;
 using Azure;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -23,7 +23,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IVolunteerEventsDataService? _svcVolunteerEvents { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
 
-        private BedBrigade.Data.Models.Volunteer? newVolunteer;
+        private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
 
@@ -101,7 +101,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            newVolunteer = new BedBrigade.Data.Models.Volunteer();
+            newVolunteer = new Volunteer();
             EC = new EditContext(newVolunteer);
         } 
 

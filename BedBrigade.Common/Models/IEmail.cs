@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Data.Models
+﻿namespace BedBrigade.Common.Models
 {
     public interface IEmail
     {

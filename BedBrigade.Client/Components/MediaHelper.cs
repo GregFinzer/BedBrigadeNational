@@ -1,9 +1,9 @@
-﻿using BedBrigade.Data.Models;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System.Drawing.Drawing2D;
 using System.Security.Claims;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {

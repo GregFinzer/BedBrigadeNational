@@ -1,5 +1,5 @@
 ﻿using BedBrigade.Common.Enums;
-using BedBrigade.Data.Models;
+using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +18,27 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
+    }
+
+    public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
+    {
+        var result = await base.CreateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest entity)
+    {
+        var result = await base.UpdateAsync(entity);
+        _cachingService.ClearScheduleRelated();
+        return result;
+    }
+
+    public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
+    {
+        var result = await base.DeleteAsync(id);
+        _cachingService.ClearScheduleRelated();
+        return result;
     }
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync()

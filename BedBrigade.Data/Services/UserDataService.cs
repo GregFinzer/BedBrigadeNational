@@ -1,9 +1,9 @@
-﻿using BedBrigade.Data.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Text;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 
 namespace BedBrigade.Data.Services
