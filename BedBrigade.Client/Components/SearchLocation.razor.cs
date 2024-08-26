@@ -37,7 +37,7 @@ namespace BedBrigade.Client.Components
         private bool PostalCodeSuccess = false;
         private string SearchDisplay = "";
         private bool SubmitDisabled = true;
-
+        private bool IsSearching = false;
 
         protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
         {
@@ -146,7 +146,10 @@ namespace BedBrigade.Client.Components
             if (!ValidatePostalCode())
                 return;
 
+            IsSearching = true;
             var Result = await _svcLocation.GetBedBrigadeNearMe(PostalCode);
+            StateHasChanged();
+            IsSearching = false;
 
             if (!Result.Success || Result.Data == null)
             {

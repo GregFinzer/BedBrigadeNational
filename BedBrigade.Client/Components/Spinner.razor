@@ -1,0 +1,10 @@
+﻿@using Syncfusion.Blazor.Spinner
+
+<div id="spinner-container">
+    <SfSpinner @bind-Visible="@IsVisible" Label="Loading....">
+    </SfSpinner>
+</div>
+
+@code {
+    public bool IsVisible { get; set; } = true;
+}
