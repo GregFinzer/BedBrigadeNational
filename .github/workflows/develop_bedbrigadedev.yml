@@ -34,15 +34,43 @@ jobs:
     - name: Run tests
       run: dotnet test
 
+    - name: Create TmpFolder
+      run: mkdir TmpFolder
+
+    - name: Create app_offline.htm
+      run: echo "<html><body><h1>The application is offline for maintenance</h1></body></html>" > ./TmpFolder/app_offline.htm
+
+    - name: FTP Upload app_offline.htm
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_DEV_HOST }}  
+        username: ${{ secrets.FTP_DEV_USERNAME }}  
+        password: ${{ secrets.FTP_DEV_PASSWORD }}  
+        local-dir: ./TmpFolder/
+        server-dir: /  
+        protocol: ftp        
+
+    - name: Wait for 5 seconds
+      run: sleep 5
+      
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish
 
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: ${{ secrets.FTP_DEV_HOST }}  # FTP server is now a secret
-        username: ${{ secrets.FTP_DEV_USERNAME }}  # Set up this secret in your GitHub repo settings
-        password: ${{ secrets.FTP_DEV_PASSWORD }}  # Set up this secret in your GitHub repo settings
+        server: ${{ secrets.FTP_DEV_HOST }}  
+        username: ${{ secrets.FTP_DEV_USERNAME }}  
+        password: ${{ secrets.FTP_DEV_PASSWORD }}  
         local-dir: ./publish/
-        server-dir: /  # Replace with the target directory on your server
-        protocol: ftp  # or ftp if you are not using a secure connection
+        server-dir: /  
+        protocol: ftp  
+
+    - name: Remove app_offline.htm from server after deploy
+      run: |
+        echo "open ${{ secrets.FTP_DEV_HOST }}" > ftp_commands.txt
+        echo "user ${{ secrets.FTP_DEV_USERNAME }} ${{ secrets.FTP_DEV_PASSWORD }}" >> ftp_commands.txt
+        echo "cd /" >> ftp_commands.txt  # Adjust to the directory where app_offline.htm is located
+        echo "delete app_offline.htm" >> ftp_commands.txt
+        echo "bye" >> ftp_commands.txt
+        ftp -inv < ftp_commands.txt        
