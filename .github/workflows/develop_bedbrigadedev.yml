@@ -40,15 +40,14 @@ jobs:
     - name: Create app_offline.htm
       run: echo "<html><body><h1>The application is offline for maintenance</h1></body></html>" > ./TmpFolder/app_offline.htm
 
-    - name: FTP Upload app_offline.htm
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: Upload file app_offline.htm
+      uses: tomasbkk/action-ftp-upload@v1.0
       with:
-        server: ${{ secrets.FTP_DEV_HOST }}  
-        username: ${{ secrets.FTP_DEV_USERNAME }}  
-        password: ${{ secrets.FTP_DEV_PASSWORD }}  
-        local-dir: ./TmpFolder/
-        server-dir: /  
-        protocol: ftp        
+        user: ${{ secrets.FTP_DEV_USERNAME }}
+        password: ${{ secrets.FTP_DEV_PASSWORD }}
+        host: ${{ secrets.FTP_DEV_HOST }}
+        src: ./TmpFolder/app_offline.htm
+        dest: app_offline.htm
 
     - name: Wait for 5 seconds
       run: sleep 5
@@ -65,12 +64,4 @@ jobs:
         local-dir: ./publish/
         server-dir: /  
         protocol: ftp  
-
-    - name: Remove app_offline.htm from server after deploy
-      run: |
-        echo "open ${{ secrets.FTP_DEV_HOST }}" > ftp_commands.txt
-        echo "user ${{ secrets.FTP_DEV_USERNAME }} ${{ secrets.FTP_DEV_PASSWORD }}" >> ftp_commands.txt
-        echo "cd /" >> ftp_commands.txt  # Adjust to the directory where app_offline.htm is located
-        echo "delete app_offline.htm" >> ftp_commands.txt
-        echo "bye" >> ftp_commands.txt
-        ftp -inv < ftp_commands.txt        
+    
