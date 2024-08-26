@@ -142,8 +142,8 @@ One thing you will notice about the following project plan is the lack of due da
     * GitHub Actions for Pull Requests :heavy_check_mark:
     * Deploy to SmarterASP.NET Development :heavy_check_mark:
     * Use location query parm Bed Request :heavy_check_mark:
-    * Use Location Query Parm Contact
-    * Use Location Query Parm Volunteer
+    * Use Location Query Parm Contact :heavy_check_mark:
+    * Use Location Query Parm Volunteer :heavy_check_mark:
     * Design Shared Bed Requests
     * Admin Dashboard Content
     * Unique Volunteer Email Add Dialog
@@ -160,6 +160,12 @@ One thing you will notice about the following project plan is the lack of due da
     * Add Page Titles
     * Custom Icons in Grid Toolbar
     * Review All Code
+    * AppOffline for Development
+    * Syncfusion Spinner
+    * Re-add complierconfig.json
+    * Rework Seeding
+    * Upgrade to Blazor 9
+    * Blazor 9 Change Render Mode
     
     
     
