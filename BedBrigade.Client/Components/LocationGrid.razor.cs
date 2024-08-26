@@ -236,6 +236,10 @@ namespace BedBrigade.Client.Components
             {
                 await AddNewLocationAsync(Location);
             }
+
+            // validate location folders
+            var bLocationFolderStatus = FileUtil.CreateOrValidateLocationFolders(Location.Route); // VS 8/25/2023
+
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
         }

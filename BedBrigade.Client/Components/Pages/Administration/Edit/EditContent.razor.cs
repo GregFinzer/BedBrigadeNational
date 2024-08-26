@@ -33,6 +33,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         SfDialog MediaDialog;
         public string FolderPath { get; set; }
         private string LocationName { get; set; } = "";
+        private string LocationRoute { get; set; } = "";
         private string saveUrl { get; set; }
         private string imagePath { get; set; }
         private List<string> AllowedTypes = new()
@@ -137,14 +138,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
-                imagePath = $"media/{LocationName}/pages/{ContentName}/";
+                LocationRoute = locationResult.Data.Route;
+                imagePath = $"media/{LocationRoute}/pages/{ContentName}/"; // VS 8/25/2024
                 saveUrl = $"api/image/save/{locationId}/pages/{ContentName}";
             }
         }
 
         private async Task<string?> ProcessHtml(string? html, int locationId)
         {
-            string path = $"{LocationName}/pages/{ContentName}";
+            string path = $"{LocationRoute}/pages/{ContentName}"; // VS 8/25/2024
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
@@ -161,13 +163,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             if (updateResult.Success)
             {
                 _toastService.Success("Content Saved", 
-                    $"Content saved for location {LocationName} with name of {ContentName}");
+                    $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024
                 _navigationManager.NavigateTo("/administration/manage/pages");
             }
             else
             {
                 _toastService.Error("Error",
-                    $"Could not save Content for location {LocationName} with name of {ContentName}");
+                    $"Could not save Content for location {LocationRoute} with name of {ContentName}");
             }
             
         }
@@ -179,7 +181,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = $"{LocationName}/pages/{ContentName}/{itemValue}";
+            FolderPath = $"{LocationRoute}/pages/{ContentName}/{itemValue}"; // VS 8/25/2024
             await OpenDialog();
         }
 

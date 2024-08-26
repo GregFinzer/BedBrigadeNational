@@ -134,6 +134,21 @@ else
                                     }
                                 </Template>
                             </GridColumn>
+                            <GridColumn Field=@nameof(ContactUs.CreateDate) ShowColumnMenu="false" HeaderText="Date Created" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="15">
+                                <Template>
+                                    @{
+                                        var request = (context as ContactUs);
+                                        if (request.CreateDate.HasValue)
+                                        {
+                                            @request.CreateDate.Value.ToShortDateString();
+                                        }
+                                        else
+                                        {
+                                            @string.Empty;
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
                         </GridColumns>
                     </SfGrid>
 

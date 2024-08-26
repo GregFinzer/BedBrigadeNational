@@ -1,5 +1,8 @@
-﻿using System;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +50,146 @@ namespace BedBrigade.Common.Logic
         }
 
 
+
+        public static bool CreateOrValidateLocationFolders(string locationRoute)
+        {
+
+           // LocationRoute = LocationRoute.Replace("/", String.Empty);                        
+            
+            string templateLocationRoot = Path.Combine(GetMediaDirectory("grove-city"),"pages"); // temporary - should be replaced by configuration variable
+            // default pages List
+            string[] defaultPageFolders = Directory.GetDirectories(templateLocationRoot);
+            // Clear page List - remove path
+
+
+            try
+            {
+                // Step 1 - Location Root Folder & pages folder
+                string locationRoot = GetMediaDirectory(locationRoute);
+                string locationPagesPath = Path.Combine(locationRoot, "pages"); // location top default sub-folder
+                CreateFolderIfNotExists(locationRoot); // check location folder
+                CreateFolderIfNotExists(locationPagesPath); // check "pages" sub-folder                           
+
+                // step 2 - loop in default pages list
+                //foreach (string pageFolderName in defaultPageFolders)
+                Parallel.ForEach(defaultPageFolders, pageFolderName =>                
+                {   // create location page folder
+                    string pageName = Path.GetFileName(pageFolderName);
+                    string pageFolderPath = Path.Combine(locationPagesPath, pageName);
+                    CreateFolderIfNotExists(pageFolderPath);
+                    if (pageName == "Home") // special structure
+                    {
+                        string homeRotatorPath = Path.Combine(pageFolderPath, "headerImageRotator");
+                        CreateFolderIfNotExists(homeRotatorPath);
+                        if (Directory.GetFiles(homeRotatorPath).Length == 0)
+                        {
+                            CopyRotatorImages(homeRotatorPath, true);
+                        }
+                    }
+                    else
+                    {
+                        // Rotator Images Folder
+                        CreatePageRotatorFolders(pageFolderPath);                      
+
+                    } // Loop in default pages
+
+                } // end page loop
+                ); // end Parallel process
+
+               return (true);
+
+            }
+            catch (Exception ex) 
+            {
+                   // Debug.WriteLine(ex.Message);
+                    return(false);
+            }            
+
+        } // Validate Location Folders
+
+
+        private static void CreatePageRotatorFolders(string pageFolderPath)
+        {
+            string[] RotatorFolders = ["leftImageRotator", "middleImageRotator", "rightImageRotator"];
+            // Rotator Images Folder
+            foreach (var rotatorFolderName in RotatorFolders)
+            {
+                string rotatorFolderPath = Path.Combine(pageFolderPath, rotatorFolderName);
+                CreateFolderIfNotExists(rotatorFolderPath);
+                if (Directory.GetFiles(rotatorFolderPath).Length == 0)
+                {
+                    CopyRotatorImages(rotatorFolderPath);
+                }
+            } // loop in rotator folders
+        } // Create Page Rotator Folders
+
+        private static void CreateFolderIfNotExists(string folderPath)
+        {
+            try
+            {
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                    //Debug.WriteLine($"Created folder: {folderPath}");
+                }
+                else
+                {
+                    //Debug.WriteLine($"Folder already exists: {folderPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine($"Failed to create folder: {folderPath}. Error: {ex.Message}");
+            }
+        } // Create Folder if Not Exists
+
+        private static void CopyRotatorImages(string targetFolderPath, bool bHomePage = false)
+        {            
+            string imagesFolderPath = Path.Combine(GetSeedingDirectory(), "SeedImages"); // seeding path
+            List<string> imagesToCopy = new List<string> { "middleHomeImage.jpg", "rightHomeImage.jpg" }; // for home paqe
+           
+            if (!bHomePage) // Rotator Single Image in Folder
+            {
+                imagesToCopy.Clear();
+                imagesToCopy = new List<string> { "Default.jpg" };
+            }                      
+
+            foreach (string imageName in imagesToCopy)
+                {
+
+                var imageFileName = imageName;
+
+                if (imagesToCopy.Count == 1)
+                {
+                    string rotatorFolderName = Path.GetFileName(targetFolderPath); // image rotator name without path
+                    imageFileName = rotatorFolderName + imageFileName; // default rotator image
+                }
+
+                    string sourceImagePath = Path.Combine(imagesFolderPath, imageFileName);
+                    string destinationImagePath = Path.Combine(targetFolderPath, imageFileName);
+
+                    try
+                    {
+                        if (File.Exists(sourceImagePath) && !File.Exists(destinationImagePath))
+                        {
+                            File.Copy(sourceImagePath, destinationImagePath);
+                            //Debug.WriteLine($"Copied image: {imageFileName} to {targetFolderPath}");
+                        }
+                        else
+                        {
+                            //Debug.WriteLine($"Cannot copy image: {imageFileName} to {targetFolderPath}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //Debug.WriteLine($"Failed to copy image: {imageFileName} to {targetFolderPath}. Error: {ex.Message}");
+                    }
+                }
+            
+        }//CopyRotatorImages
+
+
+
         public static bool MediaSubDirectoryExists(string directoryName)
         {
             var appRoot = GetMediaDirectory(directoryName);
@@ -62,8 +205,10 @@ namespace BedBrigade.Common.Logic
         public static void DeleteMediaSubDirectory(string directoryName, bool recursiveDelete)
         {
             var appRoot = GetMediaDirectory(directoryName);
-            Directory.Delete(appRoot, recursiveDelete);
-        }
+            if (Directory.Exists(appRoot)) {                        
+                Directory.Delete(appRoot, recursiveDelete);
+            }
+        } // Delete Media SubDirectory
 
         public static void DeleteMediaFiles(string directoryName)
         {
@@ -116,7 +261,7 @@ namespace BedBrigade.Common.Logic
             // Copy each file into the new directory.
             foreach (FileInfo fi in source.GetFiles())
             {
-                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                //Debug.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
                 fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
             }
 
@@ -138,7 +283,7 @@ namespace BedBrigade.Common.Logic
                 return localFilePath;
             }
 
-            Console.WriteLine("Directory does not exist: " + localFilePath);
+           // Debug.WriteLine("Directory does not exist: " + localFilePath);
 
             string deployedFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeding");
 
