@@ -12,7 +12,7 @@ namespace BedBrigade.Client.Components
         [Parameter] public string myPath { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ILoadImagesService _svcLoadImages { get; set; }
-        private bool isLoading = false;
+        private bool isLoading = true;
         private bool imagesFound = false;
         private string nationalPath = string.Empty;
         private string locationPath = string.Empty;
