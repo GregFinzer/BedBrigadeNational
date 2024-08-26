@@ -3,12 +3,12 @@
     //https://www.syncfusion.com/forums/173239/how-to-keep-toast-visible-when-navigating-to-another-page
     public class ToastService
     {
-        public event Action<ToastOptions> ToastInstance;
+        public event Action<ToastOptions>? ToastInstance;
 
         public void Open(ToastOptions options)
         {
             // Invoke ToastComponent to update and show the toast with options 
-            this.ToastInstance.Invoke(options);
+            ToastInstance?.Invoke(options);
         }
 
         public void Success(string title, string content)
