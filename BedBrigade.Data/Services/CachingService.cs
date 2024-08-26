@@ -79,6 +79,9 @@ namespace BedBrigade.Data.Services
 
         public T? Get<T>(string cacheKey)
         {
+            //Used to test the spinner
+            //System.Threading.Thread.Sleep(1000);
+
             if (!IsCachingEnabled)
             {
                 return default(T);

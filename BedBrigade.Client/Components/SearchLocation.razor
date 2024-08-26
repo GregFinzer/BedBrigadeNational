@@ -1,4 +1,8 @@
 ﻿@using BedBrigade.Common.Models
+@if (IsSearching)
+{
+    <Spinner />
+}
 <div class="card text-center" style="display: @SearchDisplay">
     <div class="card-header">
         <h2>@Title</h2>
