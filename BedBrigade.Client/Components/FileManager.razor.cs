@@ -9,6 +9,7 @@ using Serilog;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Data.Seeding;
 
 namespace BedBrigade.Client.Components
 {
@@ -302,7 +303,7 @@ namespace BedBrigade.Client.Components
             if (slashCount == 2)
             { // take text between /xxxxx/
                 var arLocation = folderPath.Split(PathDivider);
-                if (arLocation[1].ToLower() != "national") // special validation, because route "/" is national
+                if (arLocation[1].ToLower() != SeedConstants.SeedNationalName.ToLower()) // special validation, because route "/" is national
                 {
                     selectedLocation += arLocation[1];
                 }

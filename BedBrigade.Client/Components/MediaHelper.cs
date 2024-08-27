@@ -4,6 +4,7 @@ using System.Security.Claims;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Data.Seeding;
 
 namespace BedBrigade.Client.Components
 {
@@ -178,10 +179,10 @@ namespace BedBrigade.Client.Components
 
             if (MediaUser.FolderList.Count > 1)
             {
-                if (MediaUser.Role.Contains("National"))
+                if (MediaUser.Role.Contains(SeedConstants.SeedNationalName))
                 {
                     // set National pre-selecterd
-                    var nationalFolder = MediaUser.FolderList.Where(f => f.ToLower().Contains("national")).ToList();
+                    var nationalFolder = MediaUser.FolderList.Where(f => f.ToLower().Contains(SeedConstants.SeedNationalName.ToLower())).ToList();
                     MediaUser.DropFileFolder = nationalFolder[0];
                 }
                 else

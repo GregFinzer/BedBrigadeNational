@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
+using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -29,6 +31,7 @@ namespace BedBrigade.Client.Components
         private string Menu { get; set; }
         private AuthenticationState _authState { get; set; }
         private string PreviousLocation { get; set; } 
+        private ClaimsPrincipal User { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,7 +45,16 @@ namespace BedBrigade.Client.Components
         private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
         {
             _authState = await task;
-            StateHasChanged();
+            
+            //We don't need to refresh if this is the first time to load the component
+            if (User == null)
+            {
+                User = _authState.User;
+            }
+            else 
+            {
+                StateHasChanged();
+            }
         }
 
         private async Task OnLocationChanged()
@@ -53,7 +65,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? "National";
+            string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
             var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
             if (!locationResult.Success)
