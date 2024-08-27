@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Logic;
+using NUnit.Framework.Legacy;
 
 namespace BedBrigade.Tests
 {
@@ -14,8 +15,8 @@ namespace BedBrigade.Tests
             string updatedPath = Path.Combine(Environment.CurrentDirectory, "TestFiles", "UpdatedHeader.html");
             string updatedHeader = File.ReadAllText(updatedPath);
 
-            updatedHeader = StringUtil.RestoreHrefWithJavaScript(originalHeader, updatedHeader); 
-            Assert.AreEqual(originalHeader, updatedHeader);
+            updatedHeader = StringUtil.RestoreHrefWithJavaScript(originalHeader, updatedHeader);
+            ClassicAssert.AreEqual(originalHeader, updatedHeader);
         }
     }
 }

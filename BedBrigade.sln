@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Tests", "BedBrigade.Tests\BedBrigade.Tests.csproj", "{2D5A513F-9F65-4B8D-A15B-5201657EE178}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D70B2F43-3010-4A84-AF0C-84D94BA2B5D2}"
-	ProjectSection(SolutionItems) = preProject
-		BlazorServer.md = BlazorServer.md
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Data", "BedBrigade.Data\BedBrigade.Data.csproj", "{630936C5-DAE4-46C3-A14D-E33648D128A3}"
 EndProject
