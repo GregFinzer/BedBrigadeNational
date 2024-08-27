@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Logic;
+using NUnit.Framework.Legacy;
 
 namespace BedBrigade.Tests
 {
@@ -16,7 +17,7 @@ namespace BedBrigade.Tests
 
             //Assert
             Console.WriteLine(result.UserMessage);
-            Assert.IsFalse(result.IsValid);
+            ClassicAssert.IsFalse(result.IsValid);
         }
 
         [Test]
@@ -30,7 +31,7 @@ namespace BedBrigade.Tests
 
             //Assert
             Console.WriteLine(result.UserMessage);
-            Assert.IsTrue(result.IsValid);
+            ClassicAssert.IsTrue(result.IsValid);
         }
 
 
@@ -44,7 +45,7 @@ namespace BedBrigade.Tests
             string result = Validation.GetCityForZipCode(zipCode);
 
             //Assert
-            Assert.AreEqual("Columbus", result);
+            ClassicAssert.AreEqual("Columbus", result);
         }
 
         [Test]
@@ -57,7 +58,7 @@ namespace BedBrigade.Tests
             bool result = Validation.IsValidPhoneNumber(phoneNumber);
 
             //Assert
-            Assert.IsFalse(result);
+            ClassicAssert.IsFalse(result);
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace BedBrigade.Tests
             bool result = Validation.IsValidPhoneNumber(phoneNumber);
 
             //Assert
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         [Test]
@@ -83,7 +84,7 @@ namespace BedBrigade.Tests
             string result = Validation.GetStateForZipCode(zipCode);
 
             //Assert
-            Assert.AreEqual("OH", result);
+            ClassicAssert.AreEqual("OH", result);
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace BedBrigade.Tests
             bool result = Validation.IsValidZipCode(zipCode);
 
             //Assert
-            Assert.IsTrue(result);
+            ClassicAssert.IsTrue(result);
         }
 
         [Test]
@@ -109,7 +110,7 @@ namespace BedBrigade.Tests
             bool result = Validation.IsValidZipCode(zipCode);
 
             //Assert
-            Assert.IsFalse(result);
+            ClassicAssert.IsFalse(result);
         }
     }
 }

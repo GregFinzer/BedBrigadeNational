@@ -1,5 +1,5 @@
-﻿using BedBrigade.Common;
-using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Logic;
+using NUnit.Framework.Legacy;
 
 namespace BedBrigade.Tests
 {
@@ -18,7 +18,7 @@ namespace BedBrigade.Tests
             var actual = imageRotatorLogic.ComputeImageToDisplay(fileNames);
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -34,7 +34,7 @@ namespace BedBrigade.Tests
             var actual = imageRotatorLogic.ComputeImageToDisplay(fileNames);
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace BedBrigade.Tests
             var actual = imageRotatorLogic.ComputeImageToDisplay(fileNames);
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace BedBrigade.Tests
             var actual = imageRotatorLogic.ComputeImageToDisplay(fileNames);
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace BedBrigade.Tests
             var actual = imageRotatorLogic.ComputeImageToDisplay(fileNames);
 
             //Assert
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
     }
 }

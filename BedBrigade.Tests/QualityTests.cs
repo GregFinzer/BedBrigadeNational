@@ -75,7 +75,7 @@ namespace BedBrigade.Tests
             }
             else
             {
-                Console.WriteLine($"Failed Quality Check for  {project}");
+                Console.WriteLine($"Passed Quality Check for  {project}");
             }
         }
 
