@@ -1,15 +1,17 @@
 ﻿
+using BedBrigade.Data.Data.Seeding;
+
 namespace BedBrigade.Client.Services
 {
     public class LocationState : ILocationState
     {
-        private string _location;
+        private string _location = SeedConstants.SeedNationalName;
         public string Location
         {
             get => _location;
             set
             {
-                if (_location != value)
+                if (_location.ToLower() != value.ToLower())
                 {
                     _location = value;
                     NotifyStateChangedAsync();

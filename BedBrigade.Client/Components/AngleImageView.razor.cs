@@ -2,6 +2,7 @@ using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.IO;
+using BedBrigade.Data.Data.Seeding;
 
 namespace BedBrigade.Client.Components
 {
@@ -9,7 +10,7 @@ namespace BedBrigade.Client.Components
     {
 
         [Parameter] public string Caption { get; set; } = "Bed Brigade";
-        [Parameter] public string Path { get; set; } = "National";
+        [Parameter] public string Path { get; set; } = SeedConstants.SeedNationalName;
 
         string FileName { get; set; } = "NoImageFound.jpg";
         string LeftFileName { get; set; }

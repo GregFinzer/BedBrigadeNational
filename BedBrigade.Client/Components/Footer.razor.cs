@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Client.Services;
+using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
@@ -28,7 +29,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? "National";
+            string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
             var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
             if (!locationResult.Success)
