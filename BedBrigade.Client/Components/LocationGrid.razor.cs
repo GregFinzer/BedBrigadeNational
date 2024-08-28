@@ -246,6 +246,7 @@ namespace BedBrigade.Client.Components
 
         private async Task AddNewLocationAsync(Location Location)
         {
+            Location.Route = Location.Route.StartsWith("/") ? Location.Route : "/" + Location.Route; // VS 8/26/2024
 
             // new Location
             var result = await _svcLocation.CreateAsync(Location);
