@@ -120,7 +120,7 @@ namespace BedBrigade.Client.Components
             if (!Regex.IsMatch(PostalCode, @"\d{5}$"))
             {
                 strAlertType = "alert alert-danger";
-                PostalCodeResult = "Error! Zip code must be numeric and have a length of 5.";
+                PostalCodeResult = "Zip code must be numeric and have a length of 5.";
                 return false;
             }
 
@@ -154,7 +154,7 @@ namespace BedBrigade.Client.Components
             if (!Result.Success || Result.Data == null)
             {
                 strAlertType = AlertDanger;
-                PostalCodeResult = "Error! " + Result.Message;
+                PostalCodeResult = Result.Message;
                 Locations = new List<LocationDistance>(); // empty location list
                 await SetZipBoxFocus();
                 return;
