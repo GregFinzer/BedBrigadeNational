@@ -123,7 +123,7 @@ namespace BedBrigade.Client.Components.Pages
         private void ShowValidationMessage(string message)
         {
             MyValidationMessage = message;
-            MyValidationDisplay = "block";
+            MyValidationDisplay = "";
         }
         private async Task<bool> IsValid()
         {
@@ -133,21 +133,6 @@ namespace BedBrigade.Client.Components.Pages
             if (!formIsValid)
             {
                 ShowValidationMessage(FormNotCompleted);
-                return false;
-            }
-
-            bool isPhoneValid = Validation.IsValidPhoneNumber(newRequest.Phone);
-
-            if (!isPhoneValid)
-            {
-                ShowValidationMessage("Please enter a valid phone number.");
-                return false;
-            }
-
-            var emailResult = Validation.IsValidEmail(newRequest.Email);
-            if (!emailResult.IsValid)
-            {
-                ShowValidationMessage(emailResult.UserMessage);
                 return false;
             }
 

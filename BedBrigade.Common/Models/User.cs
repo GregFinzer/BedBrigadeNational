@@ -1,3 +1,4 @@
+using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,6 +25,7 @@ public class User : BaseEntity, ILocationId, IEmail
 
     [Required(ErrorMessage = "An email address is required")]
     [MaxLength(255)]
+    [CustomEmailValidation]
     public String Email { get; set; } = string.Empty;
     
     [MaxLength(255)]
@@ -34,6 +36,7 @@ public class User : BaseEntity, ILocationId, IEmail
 
     [MaxLength(14)]
     [Required(ErrorMessage = "Please enter a phone number")]
+    [CustomPhoneValidation]
     public String? Phone { get; set; } = string.Empty;
 
     public String? Role { get; set; } = string.Empty;

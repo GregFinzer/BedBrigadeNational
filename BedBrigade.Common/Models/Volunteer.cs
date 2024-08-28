@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models
 {
@@ -25,14 +26,14 @@ namespace BedBrigade.Common.Models
 		public String LastName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email Address is required.")]
-        [Index(IsUnique = true)]
-        [EmailInputValidation]
+        [CustomEmailValidation]
         [MaxLength(255)]
 		public String Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone Number is required.")]
         [MaxLength(14)]
-		public String Phone { get; set; } = string.Empty;
+        [CustomPhoneValidation]
+        public String Phone { get; set; } = string.Empty;
 
         [MaxLength(80)]
 		public String? OrganizationOrGroup { get; set; } = string.Empty;

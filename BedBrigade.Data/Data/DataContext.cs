@@ -1,8 +1,5 @@
 ﻿using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BedBrigade.Data
 {
@@ -53,9 +50,12 @@ namespace BedBrigade.Data
             modelBuilder.Entity<Schedule>()
                 .HasIndex(o => o.EventType);
 
-
             modelBuilder.Entity<BedRequest>()
                 .HasIndex(o => o.ScheduleId);
+
+            modelBuilder.Entity<Volunteer>()
+                .HasIndex(e => e.Email)
+                .IsUnique();
         }
     }
 }

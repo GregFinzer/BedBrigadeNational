@@ -1,3 +1,4 @@
+using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,7 +16,8 @@ namespace BedBrigade.Common.Models
 
         [Required]
 		[MaxLength(255)]
-		public String Email { get; set; } = string.Empty;
+        [CustomEmailValidation]
+        public String Email { get; set; } = string.Empty;
 
         [Required]
         [Column(TypeName = "decimal(18,4)")]

@@ -214,7 +214,7 @@ namespace BedBrigade.Client.Components.Pages
         private void ShowMessage(string message)
         {
             MyMessage = message;
-            MyMessageDisplay = "block";
+            MyMessageDisplay = "";
         }
 
         private bool IsValid()
@@ -226,21 +226,6 @@ namespace BedBrigade.Client.Components.Pages
             if (!formIsValid)
             {
                 ShowMessage(FormNotCompleted);
-                return false;
-            }
-
-            bool isPhoneValid = Validation.IsValidPhoneNumber(newVolunteer.Phone);
-
-            if (!isPhoneValid)
-            {
-                ShowMessage("Please enter a valid phone number.");
-                return false;
-            }
-
-            var emailResult = Validation.IsValidEmail(newVolunteer.Email);
-            if (!emailResult.IsValid)
-            {
-                ShowMessage(emailResult.UserMessage);
                 return false;
             }
 
