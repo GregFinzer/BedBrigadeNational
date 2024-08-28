@@ -50,7 +50,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         CreateLocationMedia(location);
         await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
         await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
-        await CreateContent(location, ContentType.Body, "Home.html", "Home");
+        await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); // VS 8/28/2024 Home.html replaced by LocationHome.html
         await CreateContent(location, ContentType.Body, "LocationDonate.html", "Donate");
         await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
         await CreateContent(location, ContentType.Body, "LocationAssembly.html", "Assembly");
