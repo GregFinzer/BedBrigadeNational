@@ -40,17 +40,22 @@ namespace BedBrigade.Client.Components.Pages
         {
             string location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
             string pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
-            _locationState.Location = location;
+            
 
             if (previousLocation.ToLower() != location.ToLower() || previousPageName.ToLower() != pageName.ToLower())
             {
                 previousLocation = location;
                 previousPageName = pageName;
-                await LoadLocationPage(location, pageName);
+                bool loaded=  await LoadLocationPage(location, pageName);
+
+                if (loaded)
+                {
+                    _locationState.Location = location;
+                }
             }
         }
 
-        private async Task LoadLocationPage(string location, string pageName)
+        private async Task<bool> LoadLocationPage(string location, string pageName)
         {
             Log.Logger.Debug("Index.LoadLocationPage");
 
@@ -73,11 +78,13 @@ namespace BedBrigade.Client.Components.Pages
                     else
                     {
                         _navigationManager.NavigateTo("/Sorry", true);
+                        return false;
                     }
                 }
                 else
                 {
                     _navigationManager.NavigateTo("/Sorry", true);
+                    return false;
                 }
             }
             catch (Exception ex)
@@ -85,6 +92,8 @@ namespace BedBrigade.Client.Components.Pages
                 Log.Logger.Error(ex, $"LoadLocationPage: {ex.Message}");
                 throw;
             }
+
+            return true;
         }
     }
 }
