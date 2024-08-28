@@ -136,6 +136,21 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            bool isPhoneValid = Validation.IsValidPhoneNumber(newRequest.Phone);
+
+            if (!isPhoneValid)
+            {
+                ShowValidationMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
+                return false;
+            }
+
+            var emailResult = Validation.IsValidEmail(newRequest.Email);
+            if (!emailResult.IsValid)
+            {
+                ShowValidationMessage(emailResult.UserMessage);
+                return false;
+            }
+
             string addressMessage = ValidateAddress();
 
             if (!string.IsNullOrEmpty(addressMessage))

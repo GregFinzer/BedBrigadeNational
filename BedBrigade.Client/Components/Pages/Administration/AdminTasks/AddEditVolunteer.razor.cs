@@ -7,6 +7,8 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Serilog;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Net;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -30,6 +32,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             { "rows", "5" },
         };
+        
 
         protected override async Task OnInitializedAsync()
         {
@@ -71,7 +74,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success)
                 {
                     Model = result.Data;
-                    Model.Phone = StringUtil.ExtractDigits(Model.Phone);
                 }
                 else
                 {
@@ -87,16 +89,35 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task HandleValidSubmit()
         {
-            if (await SaveVolunteer())
+            if (IsValid() && await SaveVolunteer())
             {
                 _navigationManager.NavigateTo("/administration/manage/volunteers");
             }
         }
 
-        private async Task<bool> SaveVolunteer()
+        private bool IsValid()
         {
             ErrorMessage = string.Empty;
+            bool isPhoneValid = Validation.IsValidPhoneNumber(Model.Phone);
 
+            if (!isPhoneValid)
+            {
+                ErrorMessage = "Phone numbers must be 10 digits with a valid area code and prefix.";
+                return false;
+            }
+
+            var emailResult = Validation.IsValidEmail(Model.Email);
+            if (!emailResult.IsValid)
+            {
+                ErrorMessage = emailResult.UserMessage;
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> SaveVolunteer()
+        {
             if (VolunteerId != null)
             {
                 var updateResult = await _volunteerDataService.UpdateAsync(Model!);

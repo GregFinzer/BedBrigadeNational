@@ -43,24 +43,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
-        protected string? HeaderTitle { get; set; }
-        protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
 
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
-        protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
-        public bool OnlyRead { get; private set; } = false;
         private bool ShouldDisplayEmailMessage = false;
-        public bool enabledLocationSelector { get; set; } = true;
-        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "70%" };
-
-        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // = OperationWithTimeout(cancellationTokenSource.Token);
 
         protected override async Task OnInitializedAsync()
         {
@@ -196,8 +186,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             {
                 await Grid.ResetPersistDataAsync();
                 _state = await Grid.GetPersistDataAsync();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Volunteer, UserState = _state }); }
-
+                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Volunteer, UserState = _state });
+            }
             else if (args.Item.Text == "Pdf Export")
             {
                 await PdfExport();
@@ -275,61 +265,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
 
 
-        private async Task Save(ActionEventArgs<Volunteer> args)
-        {
-            ShouldDisplayEmailMessage = false;
-            Volunteer Volunteer = args.Data;
 
-            Volunteer.Phone = Volunteer.Phone.FormatPhoneNumber();
-            if (Volunteer.VolunteerId != 0)
-            {
-                //Update Volunteer Record
-                var updateResult = await _svcVolunteer.UpdateAsync(Volunteer);
-                ToastTitle = "Update Volunteer";
-                if (updateResult.Success)
-                {
-                    ToastContent = "Volunteer Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update Volunteer!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-            else
-            {
-                //See if the email already exists
-                var existingVolunteerResult = await _svcVolunteer.GetByEmail(Volunteer.Email);
-
-                if (existingVolunteerResult.Success && existingVolunteerResult.Data != null)
-                {
-                    ShouldDisplayEmailMessage =true;
-                    args.Cancel = true;
-                    StateHasChanged();
-                    return;
-                }
-
-                // new Volunteer
-                var result = await _svcVolunteer.CreateAsync(Volunteer);
-                if (result.Success && result.Data != null)
-                {
-                    Volunteer location = result.Data;
-                }
-                ToastTitle = "Create Volunteer";
-                if (Volunteer.VolunteerId != 0)
-                {
-                    ToastContent = "Volunteer Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save Volunteer!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-
-            await Grid.Refresh();
-
-        }
 
 
 
@@ -375,11 +311,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             await Grid.ExportToCsvAsync(ExportProperties);
         }
 
-        private string cssClass { get; set; } = "e-outline";
-        protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
-        {
-            { "rows", "5" },
-        };
+
 
     }
 }

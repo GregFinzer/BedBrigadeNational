@@ -25,12 +25,10 @@ namespace BedBrigade.Common.Models
 
         [Required(ErrorMessage = "Email is required")]
 		[MaxLength(255)]
-        [CustomEmailValidation]
         public String Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone is required")]
 		[MaxLength(14)]
-        [CustomPhoneValidation]
         public String Phone { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Message is required")]

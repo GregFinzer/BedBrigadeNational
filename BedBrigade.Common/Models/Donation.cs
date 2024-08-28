@@ -16,7 +16,6 @@ namespace BedBrigade.Common.Models
 
         [Required]
 		[MaxLength(255)]
-        [CustomEmailValidation]
         public String Email { get; set; } = string.Empty;
 
         [Required]

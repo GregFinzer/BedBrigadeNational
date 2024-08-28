@@ -136,6 +136,21 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            bool isPhoneValid = Validation.IsValidPhoneNumber(newRequest.Phone);
+
+            if (!isPhoneValid)
+            {
+                ShowValidationMessage("Please enter a valid phone number.");
+                return false;
+            }
+
+            var emailResult = Validation.IsValidEmail(newRequest.Email);
+            if (!emailResult.IsValid)
+            {
+                ShowValidationMessage(emailResult.UserMessage);
+                return false;
+            }
+
             if (!ValidReCAPTCHA)
             {
                 ShowValidationMessage("Please check reCAPTCHA");

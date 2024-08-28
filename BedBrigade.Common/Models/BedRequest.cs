@@ -28,12 +28,10 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
 
 	[Required(ErrorMessage = "Email Address is required.")]
 	[MaxLength(255)]
-	[CustomEmailValidation]
 	public String? Email { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Phone Number is required.")]
 	[MaxLength(14)]
-	[CustomPhoneValidation]
 	public String? Phone { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Street Address is required.")]

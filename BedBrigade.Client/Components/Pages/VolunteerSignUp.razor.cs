@@ -10,6 +10,7 @@ using Serilog;
 using Microsoft.AspNetCore.Mvc;
 using Azure;
 using BedBrigade.Common.Models;
+using System.Net;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -226,6 +227,21 @@ namespace BedBrigade.Client.Components.Pages
             if (!formIsValid)
             {
                 ShowMessage(FormNotCompleted);
+                return false;
+            }
+
+            bool isPhoneValid = Validation.IsValidPhoneNumber(newVolunteer.Phone);
+
+            if (!isPhoneValid)
+            {
+                ShowMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
+                return false;
+            }
+
+            var emailResult = Validation.IsValidEmail(newVolunteer.Email);
+            if (!emailResult.IsValid)
+            {
+                ShowMessage(emailResult.UserMessage);
                 return false;
             }
 

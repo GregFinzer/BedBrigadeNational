@@ -26,13 +26,11 @@ namespace BedBrigade.Common.Models
 		public String LastName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email Address is required.")]
-        [CustomEmailValidation]
         [MaxLength(255)]
 		public String Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone Number is required.")]
         [MaxLength(14)]
-        [CustomPhoneValidation]
         public String Phone { get; set; } = string.Empty;
 
         [MaxLength(80)]
