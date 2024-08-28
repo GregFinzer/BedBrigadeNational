@@ -9,6 +9,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
+using Bogus;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -650,8 +651,6 @@ public class Seed
         {
             if (await context.Volunteers.AnyAsync()) return;
 
-            List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
-            List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
             List<bool> YesOrNo = new List<bool> { true, false };
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
@@ -661,15 +660,14 @@ public class Seed
             {
                 locations.Remove(item);
             }
-
+            
             for (var i = 0; i <= 100; i++)
             {
-                var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
-                var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
-                int firstThree, nextThree, lastFour;
+                var faker = new Faker();
+                var firstName = faker.Name.FirstName();
+                var lastName = faker.Name.LastName();
                 var phoneNumber = GeneratePhoneNumber();
                 var location = locations[new Random().Next(locations.Count - 1)];
-                var volunteeringFor = volunteersFor[new Random().Next(volunteersFor.Count - 1)];
                 Volunteer volunteer = new()
                 {
                     LocationId = location.LocationId,
@@ -705,8 +703,6 @@ public class Seed
             {
                 if (await context.Donations.AnyAsync()) return;
 
-                List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
-                List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
                 List<bool> YesOrNo = new List<bool> { true, false };
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
@@ -719,8 +715,9 @@ public class Seed
                 for (var i = 0; i < 100; i++)
                 {
                     var location = locations[new Random().Next(locations.Count - 1)];
-                    var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
-                    var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+                    var faker = new Faker();
+                    var firstName = faker.Name.FirstName();
+                    var lastName = faker.Name.LastName();
                     Donation donation = new()
                     {
                         LocationId = location.LocationId,
@@ -758,9 +755,6 @@ public class Seed
             {
                 if (await context.BedRequests.AnyAsync()) return;
 
-                List<string> FirstNames = new List<string> { "Mike", "Sam", "John", "Luke", "Betty", "Joan", "Sandra", "Elizabeth", "Greg", "Genava" };
-                List<string> LastNames = new List<string> { "Smith", "Willams", "Henry", "Cobb", "McAlvy", "Jackson", "Tomkin", "Corey", "Whipple", "Forbrzo" };
-                List<bool> YesOrNo = new List<bool> { true, false };
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<string> City = new List<string> { "Columbus", "Cleveland", "Cincinnati", "Canton", "Youngston", "Springfield", "Middletown", "Beavercreek" };
                 List<string> StreetName = new List<string> { "E. Bella Ln", "W. Chandler Blvd", "25 St.", "4th Ave.", "G Ave.", "Indian Wells CT.", "N. Arizona" };
@@ -774,8 +768,9 @@ public class Seed
                 for (var i = 0; i < 30; i++)
                 {
                     var location = locations[new Random().Next(locations.Count - 1)];
-                    var firstName = FirstNames[new Random().Next(FirstNames.Count - 1)];
-                    var lastName = LastNames[new Random().Next(LastNames.Count - 1)];
+                    var faker = new Faker();
+                    var firstName = faker.Name.FirstName();
+                    var lastName = faker.Name.LastName();
                     BedRequest bedRequest = new()
                     {
                         LocationId = location.LocationId,

@@ -17,7 +17,7 @@
             {
                 Title = title,
                 Content = content,
-                CssClass = "e-toast-success",
+                CssClass = "e-toast-success custom-toast",
                 Icon = "e-success toast-icons"
             });
         }
@@ -28,7 +28,7 @@
             {
                 Title = title,
                 Content = content,
-                CssClass = "e-toast-danger",
+                CssClass = "e-toast-danger custom-toast",
                 Icon = "e-error toast-icons"
             });
         }

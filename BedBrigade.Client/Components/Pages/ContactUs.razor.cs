@@ -122,7 +122,7 @@ namespace BedBrigade.Client.Components.Pages
         private void ShowValidationMessage(string message)
         {
             MyValidationMessage = message;
-            MyValidationDisplay = "block";
+            MyValidationDisplay = "";
         }
 
         private bool IsValid()

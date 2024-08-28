@@ -10,6 +10,7 @@ using Serilog;
 using Microsoft.AspNetCore.Mvc;
 using Azure;
 using BedBrigade.Common.Models;
+using System.Net;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -214,7 +215,7 @@ namespace BedBrigade.Client.Components.Pages
         private void ShowMessage(string message)
         {
             MyMessage = message;
-            MyMessageDisplay = "block";
+            MyMessageDisplay = "";
         }
 
         private bool IsValid()
@@ -233,7 +234,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!isPhoneValid)
             {
-                ShowMessage("Please enter a valid phone number.");
+                ShowMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
                 return false;
             }
 

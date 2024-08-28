@@ -1,0 +1,131 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/admintasks/addeditvolunteer/{LocationId:int}"
+@page "/administration/admintasks/addeditvolunteer/{LocationId:int}/{VolunteerId:int}"
+@using BedBrigade.Common.Models
+@attribute [Authorize(Roles = RoleNames.CanManageVolunteers)]
+
+@if (Model == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="container my-5 ">
+        @if (VolunteerId == null)
+        {
+            <h3>Add Volunteer</h3>
+        }
+        else
+        {
+            <h3>Edit Volunteer</h3>
+        }
+
+        <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator/>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center">
+                            Volunteer Information
+                        </div>
+                        <div class="card-body">
+
+                            <div class="form-group mb-3">
+                                <label for="locationDropDown">Location</label>
+                                <SfDropDownList id="locationDropDown" TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@Model.LocationId Enabled="@CanSetLocation" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                    <DropDownListFieldSettings Text="Name" Value="LocationId"/>
+                                </SfDropDownList>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.LocationId)"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="firstname" class="formlabel required">First Name</label>
+                                <SfTextBox ID="firstname" @bind-Value="Model.FirstName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.FirstName)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="lastName" class="formlabel required">Last Name</label>
+                                <SfTextBox ID="lastName" @bind-Value="Model.LastName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.LastName)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="email" class="formlabel required">Email</label>
+                                <SfTextBox ID="email" @bind-Value="Model.Email"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Email)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="phone">Phone</label>
+                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="Model.Phone"></SfMaskedTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Phone)"></ValidationMessage>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" class="formlabel">Organization or Group</label>
+                                <SfTextBox ID="email" @bind-Value="Model.OrganizationOrGroup"></SfTextBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inst" class="formlabel">Message</label>
+                                <SfTextBox ID="inst" @bind-Value="Model.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center">
+                            Delivery Vehicle
+                        </div>
+                        <div class="card-body">
+                            <div class="control-section">
+                                <div class="radio-control">
+                                    @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?", "", false, "compact")
+                                    <div class="row">
+                                        <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.NoCar)" Name="RadioBtn" Value="@VehicleType.NoCar.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <SfRadioButton Label="I have a Minvan with seats removed or folded into the floor" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <SfRadioButton Label="I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <SfRadioButton Label="I have a full size pickup truck with tie down straps or a cap" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ErrorMessage
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary mt-5">Save</button>
+            <button type="button" class="btn btn-secondary mt-5" @onclick="HandleCancel">Cancel</button> 
+        </EditForm>
+    </div>
+}

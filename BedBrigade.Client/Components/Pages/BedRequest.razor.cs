@@ -123,7 +123,7 @@ namespace BedBrigade.Client.Components.Pages
         private void ShowValidationMessage(string message)
         {
             MyValidationMessage = message;
-            MyValidationDisplay = "block";
+            MyValidationDisplay = "";
         }
         private async Task<bool> IsValid()
         {
@@ -140,7 +140,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!isPhoneValid)
             {
-                ShowValidationMessage("Please enter a valid phone number.");
+                ShowValidationMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
                 return false;
             }
 

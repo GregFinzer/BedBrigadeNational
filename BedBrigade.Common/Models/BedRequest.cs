@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models;
 
@@ -27,7 +28,6 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
 
 	[Required(ErrorMessage = "Email Address is required.")]
 	[MaxLength(255)]
-	[EmailInputValidation]
 	public String? Email { get; set; } = string.Empty;
 
 	[Required(ErrorMessage = "Phone Number is required.")]

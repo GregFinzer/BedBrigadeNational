@@ -5,7 +5,7 @@ namespace BedBrigade.Common.Logic
 {
     public static class Validation
     {
-        public static Result IsValidEmail(string email)
+        public static Result IsValidEmail(string? email)
         {
             var emailValidation = LibraryFactory.CreateEmailValidation();
             return emailValidation.ValidEmail(email, emailValidation.NoConnectOptions);

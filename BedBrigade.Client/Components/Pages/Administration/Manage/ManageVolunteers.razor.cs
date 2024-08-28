@@ -1,18 +1,10 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Migrations;
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
-using Syncfusion.Blazor.Notifications.Internal;
-using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
-
 using Action = Syncfusion.Blazor.Grids.Action;
-using System.Diagnostics;
-using Syncfusion.Blazor;
-using System.Threading;
 using Serilog;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
@@ -20,15 +12,15 @@ using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 
-namespace BedBrigade.Client.Components
+namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
-    public partial class VolunteerGrid : ComponentBase
+    public partial class ManageVolunteers : ComponentBase
     {
         [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
-       [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-
+        [Inject] private NavigationManager? _navigationManager { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -36,10 +28,9 @@ namespace BedBrigade.Client.Components
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
-        protected List<Volunteer>? Volunteers { get; set; }      
-        protected Volunteer Volunteer { get; set; } = new Volunteer();
+        protected List<Volunteer>? Volunteers { get; set; }
         public List<VehicleTypeEnumItem>? lstVehicleTypes { get; private set; }
-        protected List<Location>? Locations { get; private set; }    
+        protected List<Location>? Locations { get; private set; }
         protected SfGrid<Volunteer>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
@@ -52,24 +43,14 @@ namespace BedBrigade.Client.Components
         public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
-        protected string? HeaderTitle { get; set; }
-        protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
-               
-        protected string? RecordText { get; set; } = "Loading Volunteers ...";
-        protected string? Hide { get; private set; } = "true";
-        public bool NoPaging { get; private set; }
-        public bool OnlyRead { get; private set; } = false;
-        private string DisplayEmailMessage = "none";
-        public bool enabledLocationSelector { get; set; } = true;
-        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "70%" };
 
-        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // = OperationWithTimeout(cancellationTokenSource.Token);
+        protected string? RecordText { get; set; } = "Loading Volunteers ...";
+        public bool NoPaging { get; private set; }
+        private bool ShouldDisplayEmailMessage = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -77,7 +58,7 @@ namespace BedBrigade.Client.Components
             await LoadLocations();
             await LoadVolunteerData();
             lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
-          
+
         } // Async Init
 
 
@@ -85,13 +66,13 @@ namespace BedBrigade.Client.Components
         {
             var authState = await _authState!.GetAuthenticationStateAsync();
             Identity = authState.User;
-            
+
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 
             userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Volunteers Page");
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) )
+            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -121,7 +102,7 @@ namespace BedBrigade.Client.Components
                     userRole = RoleNames.LocationAuthor;
                     isLocationAdmin = true;
                 }
-               
+
 
 
             } // Get User Data
@@ -149,10 +130,10 @@ namespace BedBrigade.Client.Components
             {
                 var dataVolunteer = await _svcVolunteer.GetAllAsync(); // get Schedules
                 Volunteers = new List<Volunteer>();
-                
+
                 if (dataVolunteer.Success && dataVolunteer != null)
                 {
-                   
+
                     if (dataVolunteer.Data.Count > 0)
                     {
                         Volunteers = dataVolunteer.Data.ToList(); // retrieve existing media records to temp list
@@ -160,7 +141,7 @@ namespace BedBrigade.Client.Components
                         // Location Filter
                         if (isLocationAdmin)
                         {
-                           Volunteers = Volunteers.FindAll(e => e.LocationId == userLocationId); // Location Filter
+                            Volunteers = Volunteers.FindAll(e => e.LocationId == userLocationId); // Location Filter
                         }
 
                     }
@@ -179,9 +160,9 @@ namespace BedBrigade.Client.Components
 
         } // OnInit
 
-       
 
-    
+
+
 
         /// <summary>
         /// On destoring of the grid save its current state
@@ -206,24 +187,29 @@ namespace BedBrigade.Client.Components
                 await Grid.ResetPersistDataAsync();
                 _state = await Grid.GetPersistDataAsync();
                 await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Volunteer, UserState = _state });
-                return;
             }
-
-            if (args.Item.Text == "Pdf Export")
+            else if (args.Item.Text == "Pdf Export")
             {
                 await PdfExport();
             }
-            if (args.Item.Text == "Excel Export")
+            else if (args.Item.Text == "Excel Export")
             {
                 await ExcelExport();
-                return;
             }
-            if (args.Item.Text == "Csv Export")
+            else if (args.Item.Text == "Csv Export")
             {
                 await CsvExportAsync();
-                return;
             }
+        }
 
+        protected async Task Edit(ActionEventArgs<Volunteer> args)
+        {
+            var volunteer = (await Grid.GetSelectedRecordsAsync()).FirstOrDefault();
+
+            if (volunteer != null)
+            {
+                _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
+            }
         }
 
         public async Task OnActionBegin(ActionEventArgs<Volunteer> args)
@@ -243,11 +229,8 @@ namespace BedBrigade.Client.Components
                     Add();
                     break;
 
-                case Action.Save:
-                    await Save(args);
-                    break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    await Edit(args);
                     break;
             }
 
@@ -270,92 +253,21 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                 }
                 ToastTimeout = 4000;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout});
+                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
             }
         }
 
         private void Add()
         {
-            HeaderTitle = "Add Volunteer";
-            ButtonTitle = "Add Volunteer";    
-              if (isLocationAdmin)
-              {
-                  enabledLocationSelector = false;
-              }
-              else
-              {
-                  enabledLocationSelector = true;
-              }
-        }
-
-        private void ValidateNewEmail()
-        {
-            DisplayEmailMessage = "";
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}");
         }
 
 
-        private async Task Save(ActionEventArgs<Volunteer> args)
-        {
-            DisplayEmailMessage = "none";
-            Volunteer Volunteer = args.Data;
-           
-            Volunteer.Phone = Volunteer.Phone.FormatPhoneNumber();
-            if (Volunteer.VolunteerId != 0)
-            {
-                //Update Volunteer Record
-                var updateResult = await _svcVolunteer.UpdateAsync(Volunteer);
-                ToastTitle = "Update Volunteer";
-                if (updateResult.Success)
-                {
-                    ToastContent = "Volunteer Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update Volunteer!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-            else
-            {
-                // new Volunteer
-                var result = await _svcVolunteer.CreateAsync(Volunteer);
-                if (result.Success && result.Data != null)
-                {
-                    Volunteer location = result.Data;
-                }
-                ToastTitle = "Create Volunteer";
-                if (Volunteer.VolunteerId != 0)
-                {
-                    ToastContent = "Volunteer Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save Volunteer!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
 
-            await Grid.Refresh();
-          
-        }
 
-        private void BeginEdit()
-        {
-            HeaderTitle = "Update Volunteer";
-            ButtonTitle = "Update";
-            enabledLocationSelector = false;
-        }
 
-        protected async Task Save(Volunteer location)
-        {
-            await Grid.EndEditAsync();
-        }
 
-        protected async Task Cancel()
-        {
-            await Grid.CloseEditAsync();
-        }
 
         protected void DataBound()
         {
@@ -399,13 +311,7 @@ namespace BedBrigade.Client.Components
             await Grid.ExportToCsvAsync(ExportProperties);
         }
 
-        private string cssClass { get; set; } = "e-outline";
-        protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
-        {
-            { "rows", "5" },
-        };
 
 
     }
 }
-
