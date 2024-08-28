@@ -215,7 +215,10 @@
 
 <div class="container-fluid" style="display: @ResultDisplay">@FinalMessage</div>
 
-
+@if (ResultDisplay != DisplayNone)
+{
+    <SfButton CssClass="btn btn-primary ms-4 mt-3" OnClick="@RefreshPage">Volunteer for Another Event</SfButton>
+}
 
 
 <style>

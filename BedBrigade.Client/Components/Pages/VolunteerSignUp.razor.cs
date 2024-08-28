@@ -286,6 +286,11 @@ namespace BedBrigade.Client.Components.Pages
         #endregion
         #region SaveVolunteer
 
+        private Task RefreshPage()
+        {
+            _nav.NavigateTo(_nav.Uri, true);
+            return Task.CompletedTask;
+        }
 
         private async Task SaveVolunteer()
         {
