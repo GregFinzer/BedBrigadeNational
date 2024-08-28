@@ -186,6 +186,10 @@
     </div>
 </div>
 
+@if (SuccessDisplay != DisplayNone)
+{
+    <SfButton CssClass="btn btn-primary ms-3 mt-3" OnClick="@RefreshPage">Request a Bed for Another Person</SfButton>
+}
 
 <style>
     input[type=number]::-webkit-inner-spin-button,

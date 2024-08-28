@@ -253,6 +253,12 @@ namespace BedBrigade.Client.Components.Pages
         #endregion
         #region SaveRequest
 
+        private Task RefreshPage()
+        {
+            _nav.NavigateTo(_nav.Uri, true);
+            return Task.CompletedTask;
+        }
+
         private async Task SaveRequest()
         {
             var FormStatusMessage = "The Request Form is completed.";
@@ -287,7 +293,7 @@ namespace BedBrigade.Client.Components.Pages
                     DisplaySearch = DisplayNone;
                     DisplayForm = DisplayNone;
                     // ResultMessage = "New Bed Request #" + newRequest.BedRequestId.ToString() + " created Successfully!<br />";
-                    SuccessMessage += "We have received your request (registration #" + newRequest.BedRequestId.ToString() + ") and would like to thank you for writing to us.<br />";
+                    SuccessMessage += "We have received your request and would like to thank you for writing to us.<br />";
                     SuccessMessage += "We will look over your request and reply by email as soon as possible.<br />";
                     SuccessMessage += "Talk to you soon, Bed Brigade.";
                     SuccessDisplay = "";
