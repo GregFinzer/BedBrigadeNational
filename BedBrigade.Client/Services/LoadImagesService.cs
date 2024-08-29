@@ -157,7 +157,7 @@ namespace BedBrigade.Client.Services
         public List<string> GetImagesForArea(string path, string area)
         {
             string directory = GetDirectoryForPathAndArea(path, area);
-            string cacheKey = _cachingService.BuildCacheKey("Directory.GetFiles", directory);
+            string cacheKey = _cachingService.BuildCacheKey(Defaults.GetFilesCacheKey, directory);
             List<string>? cachedFiles = _cachingService.Get<List<string>?>(cacheKey);
             if (cachedFiles != null)
             {

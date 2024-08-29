@@ -9,5 +9,6 @@
         public const string NationalRoute = "/national";
         public const string DefaultPageTemplate = "ThreeRotatorPageTemplate";
         public const string DefaultUserNameAndEmail = "Anonymous";
+        public const string GetFilesCacheKey = "Directory.GetFiles";
     }
 }

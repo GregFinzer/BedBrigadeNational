@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Syncfusion.Blazor.FileManager;
 using Syncfusion.Blazor.FileManager.Base;
 using System.Diagnostics;
+using BedBrigade.Common.Constants;
+using BedBrigade.Data.Services;
 using FileManagerDirectoryContent = Syncfusion.Blazor.FileManager.Base.FileManagerDirectoryContent;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
@@ -21,6 +23,7 @@ namespace BedBrigade.Client.Controllers
     [Route("[controller]")]
     public class FileManagerController : Controller
     {
+        private readonly ICachingService _cachingService;
         private const string rootFolderHeaderName = "rootFolder";
         private const string Slash = "/";
         public PhysicalFileProvider? operation;
@@ -29,8 +32,9 @@ namespace BedBrigade.Client.Controllers
         string mainFolder = "media";
 
         [Obsolete]
-        public FileManagerController(IHostingEnvironment hostingEnvironment)
+        public FileManagerController(IHostingEnvironment hostingEnvironment, ICachingService cachingService)
         {
+            _cachingService = cachingService;
             this.basePath = hostingEnvironment.ContentRootPath;
             this.operation = new PhysicalFileProvider();
             string newRootPath = Path.Combine(basePath, root);
@@ -50,18 +54,22 @@ namespace BedBrigade.Client.Controllers
                     // Path - Current path; ShowHiddenItems - Boolean value to show/hide hidden items
                     return operation.ToCamelCase(operation.GetFiles(args.Path, args.ShowHiddenItems));
                 case "delete":
+                    _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
                     // Path - Current path where of the folder to be deleted; Names - Name of the files to be deleted
                     return operation.ToCamelCase(operation.Delete(args.Path, args.Names));
                 case "copy":
+                    _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
                     //  Path - Path from where the file was copied; TargetPath - Path where the file/folder is to be copied; RenameFiles - Files with same name in the copied location that is confirmed for renaming; TargetData - Data of the copied file
                     return operation.ToCamelCase(operation.Copy(args.Path, args.TargetPath, args.Names, args.RenameFiles, args.TargetData));
                 case "move":
+                    _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
                     // Path - Path from where the file was cut; TargetPath - Path where the file/folder is to be moved; RenameFiles - Files with same name in the moved location that is confirmed for renaming; TargetData - Data of the moved file
                     return operation.ToCamelCase(operation.Move(args.Path, args.TargetPath, args.Names, args.RenameFiles, args.TargetData));
                 case "details":
                     // Path - Current path where details of file/folder is requested; Name - Names of the requested folders
                     return operation.ToCamelCase(operation.Details(args.Path, args.Names));
                 case "create":
+                    _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
                     // Path - Current path where the folder is to be created; Name - Name of the new folder / block creation on top level
                     return operation.ToCamelCase(operation.Create(args.Path, args.Name));
                 //return Content("Prohibited");
@@ -69,6 +77,7 @@ namespace BedBrigade.Client.Controllers
                     // Path - Current path where the search is performed; SearchString - String typed in the searchbox; CaseSensitive - Boolean value which specifies whether the search must be casesensitive
                     return operation.ToCamelCase(operation.Search(args.Path, args.SearchString, args.ShowHiddenItems, args.CaseSensitive));
                 case "rename":
+                    _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
                     // Path - Current path of the renamed file; Name - Old file name; NewName - New file name
                     return operation.ToCamelCase(operation.Rename(args.Path, args.Name, args.NewName));
             }
@@ -110,6 +119,7 @@ namespace BedBrigade.Client.Controllers
                 Response.HttpContext.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpResponseFeature>().ReasonPhrase = uploadResponse.Error.Message;
             }
 
+            _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
             return Content("");
         }
 

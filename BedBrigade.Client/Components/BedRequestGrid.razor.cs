@@ -51,6 +51,10 @@ namespace BedBrigade.Client.Components
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
+        public bool IsLocationColumnVisible { get; set; } = false;
+
+        public string ManageBedRequestsMessage { get; set; } = "Manage Bed Requests";
+
         public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
@@ -78,11 +82,6 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-            if(Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
-            {
-                OnlyRead = true;
-            }
-
             var bedRequestResult = await _svcBedRequest.GetAllForLocationAsync();
             if (bedRequestResult.Success)
             {
@@ -99,6 +98,23 @@ namespace BedBrigade.Client.Components
                     Locations.Remove(item);
                 }
             }
+
+            if (Identity.IsInRole(RoleNames.NationalAdmin)
+                || Identity.IsInRole(RoleNames.NationalScheduler)
+                || Identity.IsInRole(RoleNames.LocationAdminPlus))
+            {
+                IsLocationColumnVisible = true;
+            }
+            else
+            {
+                int? locationId = ClaimsPrincipalHelper.GetLocationId(Identity);
+
+                if (locationId != null)
+                {
+                    ManageBedRequestsMessage = $"Manage Bed Requests for {Locations.Single(r => r.LocationId == locationId).Name}";
+                }
+            }
+
             BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
         }
 

@@ -1,10 +1,5 @@
-﻿@using Syncfusion.Blazor.Notifications
-@using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Buttons
-@using FilterType = Syncfusion.Blazor.Grids.FilterType
+﻿@using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
-@using BedBrigade.Common;
 @using BedBrigade.Common.Models
 
 @if (BedRequests == null)
@@ -14,7 +9,7 @@
 else
 {
     <fieldset class="m-4">
-        <legend>BedRequest</legend>
+        <legend>@ManageBedRequestsMessage</legend>
         <div class="col-md-12 control-sec">
             <div class="content-wrapper">
                 <div class="row">
@@ -118,64 +113,33 @@ else
                                             <SfTextBox @bind-Value=@BedRequest.AgesGender Enabled="true" Placeholder="Ages Genders" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
                                 }
                             </Template>
                         </GridEditSettings>
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="FullName" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="FullName" Direction="SortDirection.Ascending"/>
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(BedRequest.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.Street) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
-                                <Template>
-                                    @{
-                                        var request = (context as BedRequest);
-                                        <div>@request.Street</div>
-                                        <div>@request.City, @request.State @request.PostalCode</div>
-                                    }
-
-                                </Template>
-                            </GridColumn>
-                            <GridForeignColumn Field=@nameof(BedRequest.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
-                                <Template>
-                                    @{
-                                        var request = (context as BedRequest);
-                                        @request.Phone.FormatPhoneNumber();
-                                    }
-                                </Template>
-                            </GridColumn>
-                            <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Bed Requests" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(BedRequest.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" >
-                                <Template>
-                                    @{
-                                        var request = (context as BedRequest);
-                                        var status = Enum.GetName(typeof(BedRequestStatus), request.Status);
-                                        @status
-                                    }
-                                </Template>
-                            </GridColumn>
-                            <GridColumn Field=@nameof(BedRequest.DeliveryDate) ShowColumnMenu="false" HeaderText="Date Delivered" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="15" >
-                                <Template>
-                                    @{
-                                        var request = (context as BedRequest);
-                                        if (request.DeliveryDate.HasValue)
-                                        {
-                                            @request.DeliveryDate.Value.ToShortDateString()
-                                            ;
-                                        }
-                                        else
-                                        {
-                                            @string.Empty;
-                                        }
-                                    }
-                                </Template>
-                            </GridColumn>
+                            <GridForeignColumn Field=@nameof(BedRequest.LocationId) Visible=@IsLocationColumnVisible ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.FormattedPhone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.Street) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.PostalCode) ShowColumnMenu="false" HeaderText="Zip" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.StatusString) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.AgesGender) ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.DeliveryDateString) ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 
@@ -242,4 +206,7 @@ else
         font-weight: 700;
     }
 
+    .custom-textbox-height {
+        height: 100px;
+    }
 </style>
