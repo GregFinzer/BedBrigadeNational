@@ -24,6 +24,8 @@ public class Seed
     {
         new Role {Name = RoleNames.NationalAdmin},
         new Role {Name = RoleNames.NationalEditor},
+        new Role {Name = RoleNames.NationalScheduler},
+        new Role {Name = RoleNames.LocationAdminPlus},
         new Role {Name = RoleNames.LocationAdmin},
         new Role {Name = RoleNames.LocationEditor},
         new Role {Name = RoleNames.LocationAuthor},

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using BedBrigade.Common.Constants;
 
 namespace ImageUpload.Controllers
 {
@@ -15,12 +16,14 @@ namespace ImageUpload.Controllers
         private readonly IWebHostEnvironment hostingEnv;
         private readonly AuthenticationStateProvider? _authState;
         private readonly ILocationDataService _svcLocation;
+        private readonly ICachingService _cachingService;
         private ClaimsPrincipal _identity;
 
-        public ImageController(IWebHostEnvironment env, ILocationDataService location)
+        public ImageController(IWebHostEnvironment env, ILocationDataService location, ICachingService cachingService)
         {
             hostingEnv = env;
             _svcLocation = location;
+            _cachingService = cachingService;
         }
         
         [Route("Save/{id:int}/{contentType}/{contentName}")]
@@ -81,6 +84,7 @@ namespace ImageUpload.Controllers
                 Response.StatusCode = 204;
             }
 
+            _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
             return filename;
         }
 

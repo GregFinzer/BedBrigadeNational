@@ -23,8 +23,9 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<TEntity>>("No Role found");
 
             int locationId = await repository.GetUserLocationId();
+            bool isAdmin = roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
 
-            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetAllForLocationAsync with LocationId ({locationId})");
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetAllForLocationAsync with LocationId,isAdmin ({locationId},{isAdmin})");
             var cachedContent = _cachingService.Get<List<TEntity>>(cacheKey);
 
             if (cachedContent != null)
@@ -33,7 +34,7 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<TEntity>();
-                if (roleName.ToLower() != RoleNames.NationalAdmin.ToLower())
+                if (!isAdmin)
                 {
                     var result = await dbSet.Where(b => b.LocationId == locationId).ToListAsync();
                     _cachingService.Set(cacheKey, result);
@@ -45,6 +46,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<TEntity>>($"Found {nationalAdminResponse.Count()} {repository.GetEntityName()} records", true, nationalAdminResponse);
             }
         }
+
 
         public async Task<ServiceResponse<List<string>>> GetDistinctEmail<TEntity>(IRepository<TEntity> repository)
             where TEntity : class, IEmail
