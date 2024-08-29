@@ -1,0 +1,42 @@
+﻿@inherits ErrorBoundary
+@inject IWebHostEnvironment HostEnvironment
+@inject NavigationManager Navigation
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">Unhandled Exception</h4>
+        @if (HostEnvironment.IsDevelopment())
+        {
+            <p>Page:  @Navigation.Uri</p>
+            <p>An error occurred: @CurrentException.Message</p>
+            <pre>@CurrentException.StackTrace</pre>
+        }
+        else
+        {
+            <p>An error has occurred.</p>
+        }
+        <button class="btn btn-primary mt-2" @onclick="ReloadPage">Reload</button>
+    </div>
+}
+
+@code
+{
+    [Inject]
+    private ILogger<CustomErrorBoundary> Logger { get; set; }
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        Logger.LogError(exception, "An unhandled exception occurred on page: " + Navigation.Uri);
+        return base.OnErrorAsync(exception);
+    }
+
+    private void ReloadPage()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
