@@ -38,8 +38,10 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
 * [Architecture](Documentation/Architecture.md)
 * [Getting Started](Documentation/Getting%20Started.md)
-* [Developer Overview](Documentation/Developer%20Overview.md)
+* [Coding Standards](Documentation/Coding%20Standards.md)
+* [Developer Gotchas](Documentation/Developer%20Gotchas.md)
 * [Developer Notes](Documentation/Developer%20Notes.md)
+* [Developer Overview](Documentation/Developer%20Overview.md)
 * [Entity Framework](Documentation/Entity%20Framework.md)
 * <a href="https://github.com/GregFinzer/BedBrigadeNational/raw/main/Documentation/Design/Estimates.xlsx" target="_blank">Estimates</a>
 * [Implementation Plan](Documentation/Implementation%20Plan.md)

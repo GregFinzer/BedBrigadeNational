@@ -2,30 +2,16 @@
 @using BedBrigade.Client.Services
 @inject IWebHostEnvironment HostEnvironment
 
-
-<Header></Header>
-<div class="page">
-
-    <main>
-        <article class="content px-4">
-            @if(HostEnvironment.IsDevelopment())
-            {
+<CustomErrorBoundary @ref=errorBoundary>
+    <Header></Header>
+    <div class="page">
+        <main>
+            <article class="content px-4">
                 @Body
-            }
-            else
-            {
-                <ErrorBoundary @ref=@errorBoundary >
-                    <ChildContent>
-                       @Body
-                    </ChildContent>
-                    <ErrorContent>
-                        <h2 class="w-100 text-center my-4">An Error has occured</h2>
-                    </ErrorContent>
-                </ErrorBoundary>             
-            }        
-        </article>
-    </main>
-</div>
+            </article>
+        </main>
+    </div>
+</CustomErrorBoundary>
 
 @code {
     [Inject] private IAuthService AuthService { get; set; }
