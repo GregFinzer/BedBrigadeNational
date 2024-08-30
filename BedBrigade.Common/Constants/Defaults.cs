@@ -10,5 +10,6 @@
         public const string DefaultPageTemplate = "ThreeRotatorPageTemplate";
         public const string DefaultUserNameAndEmail = "Anonymous";
         public const string GetFilesCacheKey = "Directory.GetFiles";
+        public const int MetroAreaNoneId = 1;
     }
 }

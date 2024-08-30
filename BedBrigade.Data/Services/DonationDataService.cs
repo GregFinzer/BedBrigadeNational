@@ -14,9 +14,9 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
         _commonService = commonService;
     }
 
-    public async Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this);
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 }
 

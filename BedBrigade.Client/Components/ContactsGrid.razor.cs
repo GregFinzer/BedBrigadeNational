@@ -65,9 +65,58 @@ namespace BedBrigade.Client.Components
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
+                           Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Contact Page");
 
+            SetupToolbar();
+
+            await LoadContacts();
+            await LoadLocations();
+
+            ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
+        }
+
+        private async Task LoadLocations()
+        {
+            var locationResult = await _svcLocation.GetAllAsync();
+            if (locationResult.Success)
+            {
+                Locations = locationResult.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
+            }
+        }
+
+        private async Task LoadContacts()
+        {
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+
+            if (isNationalAdmin)
+            {
+                var allResult = await _svcContactUs.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    Contacts = allResult.Data.ToList();
+                }
+            }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcContactUs.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    Contacts = contactUsResult.Data.ToList();
+                }
+            }
+        }
+
+        private void SetupToolbar()
+        {
             if (Identity.HasRole(RoleNames.CanManageContacts))
             {
                 ToolBar = new List<string>
@@ -86,32 +135,8 @@ namespace BedBrigade.Client.Components
                     FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
                 }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
-
-            if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
-            {
-                OnlyRead = true;
-            }
-
-            var contactUsResult = await _svcContactUs.GetAllForLocationAsync();
-            if (contactUsResult.Success)
-            {
-                Contacts = contactUsResult.Data.ToList();
-            }
-
-            var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
-            {
-                Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
-                if (item != null)
-                {
-                    Locations.Remove(item);
-                }
-            }
-
-            ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
         }
-        
+
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)

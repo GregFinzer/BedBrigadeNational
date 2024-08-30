@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -111,6 +106,13 @@ namespace BedBrigade.Data.Services
         public string GetEntityName()
         {
             return typeof(TEntity).Name;
+        }
+
+        public async Task<bool> IsUserNationalAdmin()
+        {
+            string roleName = await GetUserRole() ?? string.Empty;
+
+            return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
         }
 
         public virtual async Task<ServiceResponse<List<TEntity>>> GetAllAsync()
@@ -271,5 +273,7 @@ namespace BedBrigade.Data.Services
             var keyProperty = primaryKey?.Properties.FirstOrDefault();
             return keyProperty?.GetGetter().GetClrValue(entity);
         }
+
+
     }
 }

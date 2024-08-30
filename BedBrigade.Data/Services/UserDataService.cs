@@ -33,9 +33,9 @@ namespace BedBrigade.Data.Services
             return await GetByIdAsync(await GetUserName());
         }
 
-        public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync()
+        public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync(int locationId)
         {
-            return await _commonService.GetAllForLocationAsync(this);
+            return await _commonService.GetAllForLocationAsync(this, locationId);
         }
 
         //TODO:  This should be broken out into a separate Role service

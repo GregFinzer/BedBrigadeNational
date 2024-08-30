@@ -16,6 +16,7 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 
 namespace BedBrigade.Client.Components
 {
@@ -70,33 +71,19 @@ namespace BedBrigade.Client.Components
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Donations Page");
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
-            {
-                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-            }
-            ContextMenu = new List<object> {
-                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
-                FirstPage,
-                NextPage,
-                PrevPage,
-                LastPage,
-                "AutoFit",
-                "AutoFitAll",
-                "SortAscending",
-                "SortDescending"
-            }; 
-            
+            SetupToolbar();
+            await LoadDonations();
+            await LoadLocations();
 
+            var query = from donation in Donations
+                    where donation.TaxFormSent == false
+                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
+            NotSent = query.ToList();
 
-            var result = await _svcDonation.GetAllForLocationAsync();
-            if (result.Success)
-            {
-                Donations = result.Data.ToList();
-            }
+        }
+
+        private async Task LoadLocations()
+        {
             var locationResult = await _svcLocation.GetAllAsync();
             if (locationResult.Success)
             {
@@ -107,11 +94,53 @@ namespace BedBrigade.Client.Components
                     Locations.Remove(item);
                 }
             }
-            var query = from donation in Donations
-                    where donation.TaxFormSent == false
-                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
-            NotSent = query.ToList();
+        }
 
+        private async Task LoadDonations()
+        {
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
+            {
+                var allResult = await _svcDonation.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    Donations = allResult.Data.ToList();
+                }
+            }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    Donations = contactUsResult.Data.ToList();
+                }
+            }
+        }
+
+        private void SetupToolbar()
+        {
+            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
+            {
+                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+            }
+
+            ContextMenu = new List<object> {
+                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
+                FirstPage,
+                NextPage,
+                PrevPage,
+                LastPage,
+                "AutoFit",
+                "AutoFitAll",
+                "SortAscending",
+                "SortDescending"
+            };
         }
 
         /// <summary>

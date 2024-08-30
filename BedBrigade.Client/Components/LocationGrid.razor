@@ -6,7 +6,7 @@
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 
-@if (Locations == null)
+@if (Locations == null || MetroAreas == null)
 {
     <Spinner />
 }
@@ -43,7 +43,7 @@ else
                             <HeaderTemplate>
                                 @{
                                     @HeaderTitle
-                                  }
+                                }
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as Location)) IsPrimary="true">@ButtonTitle</button>
@@ -88,7 +88,13 @@ else
                                             <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Longitude Enabled="true" Placeholder="Longitude" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
-
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="Select Metro Area" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
+                                                <DropDownListFieldSettings Value="MetroAreaId" Text="Name" />
+                                            </SfDropDownList>
+                                        </div>
+                                    </div>
                                 }
                             </Template>
                         </GridEditSettings>
@@ -100,15 +106,16 @@ else
                         </GridSortSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.Address1) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.Address2) ShowColumnMenu="false" HeaderText="Suite/PO Box" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.City) ShowColumnMenu="false" HeaderText="City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.State) ShowColumnMenu="false" HeaderText="State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.PostalCode) ShowColumnMenu="false" HeaderText="Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.Address1) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.Address2) ShowColumnMenu="false" HeaderText="Suite/PO Box" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.City) ShowColumnMenu="false" HeaderText="City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.State) ShowColumnMenu="false" HeaderText="State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.PostalCode) ShowColumnMenu="false" HeaderText="Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.##" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(Location.MetroAreaId) ForeignDataSource=@MetroAreas ForeignKeyField="MetroAreaId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Metro Area" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 
@@ -131,7 +138,7 @@ else
 }
 
 <style>
-    /***************************************** VolunteerGrid.razor.css ********************************************/
+    /***************************************** LocationGrid.razor.css ********************************************/
 
     .e-grid td.e-rowcell.e-focus.e-focused {
         box-shadow: none;

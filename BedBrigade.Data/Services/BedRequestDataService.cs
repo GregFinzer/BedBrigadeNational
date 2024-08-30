@@ -42,40 +42,12 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
-    //We allow the National, Location Admin Plus, and National Scheduler to see all bed requests for all locations because they may move a bed request to a different location
-    public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId)
     {
-        string? roleName = await GetUserRole();
-
-        if (roleName == null)
-            return new ServiceResponse<List<BedRequest>>("No Role found");
-
-        int locationId = await GetUserLocationId();
-        bool isAdmin = roleName.ToLower() == RoleNames.NationalAdmin.ToLower()
-                       || roleName.ToLower() == RoleNames.NationalScheduler.ToLower()
-                       || roleName.ToLower() == RoleNames.LocationAdminPlus.ToLower();
-
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetAllForLocationAsync with LocationId,isAdmin ({locationId},{isAdmin})");
-        var cachedContent = _cachingService.Get<List<BedRequest>>(cacheKey);
-
-        if (cachedContent != null)
-            return new ServiceResponse<List<BedRequest>>($"GetAllForLocationAsync Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
-
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var dbSet = ctx.Set<BedRequest>();
-            if (!isAdmin)
-            {
-                var result = await dbSet.Where(b => b.LocationId == locationId).ToListAsync();
-                _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<List<BedRequest>>($"GetAllForLocationAsync Found {result.Count()} {GetEntityName()} records", true, result);
-            }
-
-            var nationalAdminResponse = await dbSet.ToListAsync();
-            _cachingService.Set(cacheKey, nationalAdminResponse);
-            return new ServiceResponse<List<BedRequest>>($"GetAllForLocationAsync Found {nationalAdminResponse.Count()} {GetEntityName()} records", true, nationalAdminResponse);
-        }
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
+
+
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
     {
@@ -136,6 +108,11 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }
+    }
+
+    public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationList(List<int> locationIds)
+    {
+        return await _commonService.GetAllForLocationList(this, locationIds);
     }
 }
 

@@ -15,9 +15,9 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
         _commonService = commonService;
     }
 
-    public async Task<ServiceResponse<List<ContactUs>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<ContactUs>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this);
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()

@@ -14,7 +14,9 @@ namespace BedBrigade.Data.Services
         Task<int> GetUserLocationId();
 
         Task<string?> GetUserRole();
-        
+
+        Task<bool> IsUserNationalAdmin();
+
         //Entity Framework Wrappers
         Task<ServiceResponse<List<TEntity>>> GetAllAsync();
         Task<ServiceResponse<TEntity>> GetByIdAsync(object id);

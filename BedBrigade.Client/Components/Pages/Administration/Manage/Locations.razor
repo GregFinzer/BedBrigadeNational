@@ -3,6 +3,6 @@
 @using BedBrigade.Common;
 @using BedBrigade.Common.Constants
 @page "/administration/manage/locations"
-@attribute [Authorize(Roles = RoleNames.NationalAdmin)]
+@attribute [Authorize(Roles = RoleNames.CanViewLocations)]
 
 <LocationGrid />

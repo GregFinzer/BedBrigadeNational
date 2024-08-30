@@ -9,7 +9,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<string>> GetGridPersistance(Persist persist);
         Task<ServiceResponse<List<Role>>> GetRolesAsync();
         Task<ServiceResponse<Role>> GetRoleAsync(int roleId);
-        Task<ServiceResponse<List<User>>> GetAllForLocationAsync();
+        Task<ServiceResponse<List<User>>> GetAllForLocationAsync(int locationId);
         Task<ServiceResponse<List<string>>> GetDistinctEmail();
         Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
         Task<ServiceResponse<string>> GetEmailSignature(string userName);
