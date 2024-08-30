@@ -69,31 +69,30 @@ namespace BedBrigade.Client.Components
                            Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Contact Page");
 
-            if (Identity.HasRole(RoleNames.CanManageContacts))
-            {
-                ToolBar = new List<string>
-                    { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string>
-                {
-                    "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
-                    "SortDescending"
-                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string>
-                {
-                    FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
-                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
+            SetupToolbar();
 
-            if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
-            {
-                OnlyRead = true;
-            }
+            await LoadContacts();
+            await LoadLocations();
 
-            //TODO:  Refactor
+            ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
+        }
+
+        private async Task LoadLocations()
+        {
+            var locationResult = await _svcLocation.GetAllAsync();
+            if (locationResult.Success)
+            {
+                Locations = locationResult.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
+            }
+        }
+
+        private async Task LoadContacts()
+        {
             bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
 
             if (isNationalAdmin)
@@ -114,21 +113,30 @@ namespace BedBrigade.Client.Components
                     Contacts = contactUsResult.Data.ToList();
                 }
             }
-
-            var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
-            {
-                Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
-                if (item != null)
-                {
-                    Locations.Remove(item);
-                }
-            }
-
-            ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
         }
-        
+
+        private void SetupToolbar()
+        {
+            if (Identity.HasRole(RoleNames.CanManageContacts))
+            {
+                ToolBar = new List<string>
+                    { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string>
+                {
+                    "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
+                    "SortDescending"
+                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+                ContextMenu = new List<string>
+                {
+                    FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
+                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+            }
+        }
+
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)

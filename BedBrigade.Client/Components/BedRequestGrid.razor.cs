@@ -93,39 +93,39 @@ namespace BedBrigade.Client.Components
                     BedRequests = allResult.Data.ToList();
                     IsLocationColumnVisible = true;
                 }
+                return;
             }
-            else
+
+            var locationId = await _svcUser.GetUserLocationId();
+
+            var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
+
+            if (userLocationResult.Success && userLocationResult.Data != null)
             {
-                var locationId = await _svcUser.GetUserLocationId();
-
-                var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
-
-                if (userLocationResult.Success && userLocationResult.Data != null)
+                //If this is a metro user, get all contacts for the metro area
+                if (userLocationResult.Data.IsMetroLocation())
                 {
-                    //If this is a metro user, get all contacts for the metro area
-                    if (userLocationResult.Data.IsMetroLocation())
-                    {
-                        var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
+                    var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
 
-                        if (metroLocations.Success && metroLocations.Data != null)
-                        {
-                            var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
-                            var metroAreaResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
-                            if (metroAreaResult.Success && metroAreaResult.Data != null)
-                            {
-                                BedRequests = metroAreaResult.Data.ToList();
-                                IsLocationColumnVisible = true;
-                            }
-                        }
-                    }
-                    else
+                    if (metroLocations.Success && metroLocations.Data != null)
                     {
-                        var locationResult = await _svcBedRequest.GetAllForLocationAsync(userLocationResult.Data.LocationId);
-                        if (locationResult.Success)
+                        var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
+                        var metroAreaResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
+                        if (metroAreaResult.Success && metroAreaResult.Data != null)
                         {
-                            BedRequests = locationResult.Data.ToList();
+                            BedRequests = metroAreaResult.Data.ToList();
+                            IsLocationColumnVisible = true;
                         }
                     }
+
+                    return;
+                }
+
+                //Get By Location
+                var locationResult = await _svcBedRequest.GetAllForLocationAsync(userLocationResult.Data.LocationId);
+                if (locationResult.Success)
+                {
+                    BedRequests = locationResult.Data.ToList();
                 }
             }
         }

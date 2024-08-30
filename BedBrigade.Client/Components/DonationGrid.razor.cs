@@ -71,27 +71,33 @@ namespace BedBrigade.Client.Components
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Donations Page");
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
-            {
-                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-            }
-            ContextMenu = new List<object> {
-                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
-                FirstPage,
-                NextPage,
-                PrevPage,
-                LastPage,
-                "AutoFit",
-                "AutoFitAll",
-                "SortAscending",
-                "SortDescending"
-            };
+            SetupToolbar();
+            await LoadDonations();
+            await LoadLocations();
 
-            //TODO:  Refactor
+            var query = from donation in Donations
+                    where donation.TaxFormSent == false
+                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
+            NotSent = query.ToList();
+
+        }
+
+        private async Task LoadLocations()
+        {
+            var locationResult = await _svcLocation.GetAllAsync();
+            if (locationResult.Success)
+            {
+                Locations = locationResult.Data.ToList();
+                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                if (item != null)
+                {
+                    Locations.Remove(item);
+                }
+            }
+        }
+
+        private async Task LoadDonations()
+        {
             bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
@@ -111,23 +117,30 @@ namespace BedBrigade.Client.Components
                     Donations = contactUsResult.Data.ToList();
                 }
             }
+        }
 
-
-            var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
+        private void SetupToolbar()
+        {
+            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
             {
-                Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
-                if (item != null)
-                {
-                    Locations.Remove(item);
-                }
+                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
             }
-            var query = from donation in Donations
-                    where donation.TaxFormSent == false
-                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
-            NotSent = query.ToList();
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+            }
 
+            ContextMenu = new List<object> {
+                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
+                FirstPage,
+                NextPage,
+                PrevPage,
+                LastPage,
+                "AutoFit",
+                "AutoFitAll",
+                "SortAscending",
+                "SortDescending"
+            };
         }
 
         /// <summary>
