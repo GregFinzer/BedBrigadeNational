@@ -12,6 +12,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 
 
 namespace BedBrigade.Client.Components
@@ -84,11 +85,28 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             content = new Content();
-            var result = await _svcContent.GetAllForLocationAsync();
-            if (result.Success)
+
+            //TODO:  Refactor
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
             {
-                Pages = result.Data.ToList();
+                var allResult = await _svcContent.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    Pages = allResult.Data.ToList();
+                }
             }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcContent.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    Pages = contactUsResult.Data.ToList();
+                }
+            }
+
             var locResult = await _svcLocation.GetAllAsync();
             if (locResult.Success)
             {

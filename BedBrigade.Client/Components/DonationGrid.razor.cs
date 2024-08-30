@@ -16,6 +16,7 @@ using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 
 namespace BedBrigade.Client.Components
 {
@@ -88,15 +89,30 @@ namespace BedBrigade.Client.Components
                 "AutoFitAll",
                 "SortAscending",
                 "SortDescending"
-            }; 
-            
+            };
 
-
-            var result = await _svcDonation.GetAllForLocationAsync();
-            if (result.Success)
+            //TODO:  Refactor
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
             {
-                Donations = result.Data.ToList();
+                var allResult = await _svcDonation.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    Donations = allResult.Data.ToList();
+                }
             }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    Donations = contactUsResult.Data.ToList();
+                }
+            }
+
+
             var locationResult = await _svcLocation.GetAllAsync();
             if (locationResult.Success)
             {

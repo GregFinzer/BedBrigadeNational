@@ -65,7 +65,8 @@ namespace BedBrigade.Client.Components
             var authState = await _authState.GetAuthenticationStateAsync();
             Identity = authState.User;
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
+            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
+                           Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Contact Page");
 
             if (Identity.HasRole(RoleNames.CanManageContacts))
@@ -92,10 +93,26 @@ namespace BedBrigade.Client.Components
                 OnlyRead = true;
             }
 
-            var contactUsResult = await _svcContactUs.GetAllForLocationAsync();
-            if (contactUsResult.Success)
+            //TODO:  Refactor
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+
+            if (isNationalAdmin)
             {
-                Contacts = contactUsResult.Data.ToList();
+                var allResult = await _svcContactUs.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    Contacts = allResult.Data.ToList();
+                }
+            }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcContactUs.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    Contacts = contactUsResult.Data.ToList();
+                }
             }
 
             var locationResult = await _svcLocation.GetAllAsync();

@@ -24,8 +24,6 @@ public class Seed
     {
         new Role {Name = RoleNames.NationalAdmin},
         new Role {Name = RoleNames.NationalEditor},
-        new Role {Name = RoleNames.NationalScheduler},
-        new Role {Name = RoleNames.LocationAdminPlus},
         new Role {Name = RoleNames.LocationAdmin},
         new Role {Name = RoleNames.LocationEditor},
         new Role {Name = RoleNames.LocationAuthor},
@@ -56,12 +54,12 @@ public class Seed
         // fiction locations - San Francisco - for testing time only
         new Location
         {
-            Name = "San Francisco Holy Spirit", 
-            Route = "/sfholyspirit", 
-            Address1 = "2400 Noriega Street", 
-            Address2 = "", 
+            Name = "San Francisco Holy Spirit",
+            Route = "/sfholyspirit",
+            Address1 = "2400 Noriega Street",
+            Address2 = "",
             City = "San Francisco",
-            State = "CA", 
+            State = "CA",
             PostalCode = "94122"
         },
         new Location
@@ -96,7 +94,7 @@ public class Seed
             State = "CA",
             PostalCode = "94118"
         },
-        
+
         new Location
         {
             Name = "Daly City Hope",
@@ -141,12 +139,13 @@ public class Seed
         new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
 
-    
+
 
     public static async Task SeedData(IDbContextFactory<DataContext> contextFactory)
     {
         await SeedConfigurations(contextFactory);
         await SeedLocations(contextFactory);
+        await SeedMetroAreas(contextFactory);
         await SeedContentsLogic.SeedContents(contextFactory);
         await SeedMedia(contextFactory);
         await SeedRoles(contextFactory);
@@ -156,6 +155,58 @@ public class Seed
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
         await SeedSchedules(contextFactory);
+    }
+
+    private static async Task SeedMetroAreas(IDbContextFactory<DataContext> contextFactory)
+    {
+        Log.Logger.Information("SeedMetroAreas Started");
+
+        using (var context = contextFactory.CreateDbContext())
+        {
+            if (await context.MetroAreas.AnyAsync()) return;
+
+            try
+            {
+                MetroArea metroArea = new MetroArea
+                {
+                    Name = "None"
+                };
+
+                SeedRoutines.SetMaintFields(metroArea);
+                await context.MetroAreas.AddAsync(metroArea);
+
+                metroArea = new MetroArea
+                {
+                    Name = "Columbus, Ohio"
+                };
+
+                SeedRoutines.SetMaintFields(metroArea);
+                await context.MetroAreas.AddAsync(metroArea);
+
+                await context.SaveChangesAsync();
+
+                var groveCity = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.GroveCity);
+                if (groveCity != null)
+                {
+                    groveCity.MetroAreaId = metroArea.MetroAreaId;
+                    context.Locations.Update(groveCity);
+                    await context.SaveChangesAsync();
+                }
+
+                var rockCity = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.RockCity);
+                if (rockCity != null)
+                {
+                    rockCity.MetroAreaId = metroArea.MetroAreaId;
+                    context.Locations.Update(rockCity);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Information($"MetroArea seed error: {ex.Message}");
+                throw;
+            }
+        }
     }
 
     public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory)
@@ -293,7 +344,7 @@ public class Seed
                 {
                     ConfigurationKey = ConfigNames.MaxFileSize,
                     ConfigurationValue = "104857600",
-                    Section = ConfigSection.Media    
+                    Section = ConfigSection.Media
                 },
                 new() // added by VS 2/19/2023
                 {
@@ -657,12 +708,12 @@ public class Seed
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
-            var item = locations.Single(r => r.LocationId == (int) LocationNumber.National);
+            var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
             if (item != null)
             {
                 locations.Remove(item);
             }
-            
+
             for (var i = 0; i <= 100; i++)
             {
                 var faker = new Faker();
@@ -780,12 +831,12 @@ public class Seed
                         LastName = lastName,
                         Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
                         Phone = GeneratePhoneNumber(),
-                        Street = $"{new Random().Next(99999).ToString()} {StreetName[new Random().Next(StreetName.Count -1)]}",
+                        Street = $"{new Random().Next(99999).ToString()} {StreetName[new Random().Next(StreetName.Count - 1)]}",
                         City = City[new Random().Next(City.Count - 1)],
                         State = "Ohio",
                         PostalCode = new Random().Next(43001, 43086).ToString(),
                         NumberOfBeds = new Random().Next(1, 4),
-                        Status = (BedRequestStatus) new Random().Next(1,4),
+                        Status = (BedRequestStatus)new Random().Next(1, 4),
                         TeamNumber = new Random().Next(1, 5),
                         DeliveryDate = DateTime.UtcNow.AddDays(new Random().Next(10)),
                         Notes = string.Empty

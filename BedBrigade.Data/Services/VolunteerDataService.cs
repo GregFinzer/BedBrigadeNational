@@ -41,9 +41,9 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         return result;
     }
 
-    public async Task<ServiceResponse<List<Volunteer>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<Volunteer>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this);
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()

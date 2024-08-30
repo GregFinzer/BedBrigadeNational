@@ -144,14 +144,6 @@ namespace BedBrigade.Client.Components
                 {
                     await Show( "neditor");
                 }
-                else if (_authState.User.HasRole(RoleNames.NationalScheduler))
-                {
-                    await Show("nscheduler");
-                }
-                else if (_authState.User.HasRole(RoleNames.LocationAdminPlus))
-                {
-                    await Show("ladmin");
-                }
                 else if (_authState.User.HasRole(RoleNames.LocationAdmin))
                 {
                     await Show( "ladmin");

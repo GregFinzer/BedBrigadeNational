@@ -81,11 +81,11 @@ namespace BedBrigade.Client.Components
             {
                 Roles = getRoles.Data;
             }
-            var getUsers = await _svcUser.GetAllForLocationAsync();
-            if (getUsers.Success)
-            {
-                BBUsers = getUsers.Data;
-            }
+
+            //TODO:  Refactor
+            await LoadUsers();
+
+
             var getLocations = await _svcLocation.GetAllAsync();
             if (getLocations.Success)
             {
@@ -94,6 +94,29 @@ namespace BedBrigade.Client.Components
 
             //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
 
+        }
+
+        private async Task LoadUsers()
+        {
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
+            {
+                var allResult = await _svcUser.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    BBUsers = allResult.Data.ToList();
+                }
+            }
+            else
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                var contactUsResult = await _svcUser.GetAllForLocationAsync(userLocationId);
+                if (contactUsResult.Success)
+                {
+                    BBUsers = contactUsResult.Data.ToList();
+                }
+            }
         }
 
         protected async Task OnLoad()
@@ -271,11 +294,10 @@ namespace BedBrigade.Client.Components
                 await AddNewUser(user);
                 //args.Cancel = true;
             }
-            var userResult = await _svcUser.GetAllForLocationAsync();
-            if (userResult.Success)
-            {
-                BBUsers = userResult.Data;  
-            }
+
+            await LoadUsers();
+
+
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
         }
@@ -359,11 +381,9 @@ namespace BedBrigade.Client.Components
                 }
 
             }
-            var result = await _svcUser.GetAllForLocationAsync();
-            if (result.Success)
-            {
-                BBUsers = result.Data;
-            }
+
+            await LoadUsers();
+
             await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
         }

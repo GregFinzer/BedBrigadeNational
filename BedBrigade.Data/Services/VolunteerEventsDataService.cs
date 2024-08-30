@@ -37,9 +37,9 @@ public class VolunteerEventsDataService : Repository<VolunteerEvent>, IVolunteer
         return result;
     }
 
-    public async Task<ServiceResponse<List<VolunteerEvent>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<VolunteerEvent>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this);
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
 }

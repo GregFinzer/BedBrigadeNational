@@ -165,7 +165,33 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         return new ServiceResponse<List<LocationDistance>>($"Found {result.Count} locations within {maxMiles} miles of {postalCode}", true, result);
     }
 
+    public async Task<ServiceResponse<List<Location>>> GetLocationsByMetroAreaId(int metroAreaId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetLocationsByMetroAreaId for ({metroAreaId})");
+        var cachedLocations = _cachingService.Get<List<Location>>(cacheKey);
 
+        if (cachedLocations != null)
+        {
+            return new ServiceResponse<List<Location>>($"Found {cachedLocations.Count} locations for Metro Area ID {metroAreaId} in cache", true, cachedLocations);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var locations = await ctx.Locations
+                    .Where(l => l.MetroAreaId == metroAreaId)
+                    .ToListAsync();
+
+                _cachingService.Set(cacheKey, locations);
+                return new ServiceResponse<List<Location>>($"Found {locations.Count} locations for Metro Area ID {metroAreaId}", true, locations);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<Location>>($"Error retrieving locations for Metro Area ID {metroAreaId}: {ex.Message} ({ex.ErrorCode})", false);
+        }
+    }
 
 
 }

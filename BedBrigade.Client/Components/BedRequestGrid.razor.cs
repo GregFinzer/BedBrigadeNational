@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
+        [Inject] private IHeaderMessageService _headerMessageService { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -71,23 +72,66 @@ namespace BedBrigade.Client.Components
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Bed Requests Page");
 
-            if (Identity.HasRole(RoleNames.CanManageBedRequests))
+            SetupToolbar();
+            await LoadLocations();
+            await LoadBedRequests();
+
+            BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
+        }
+
+        private async Task LoadBedRequests()
+        {
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+
+            //Get all records when an admin
+            if (isNationalAdmin)
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                var allResult = await _svcBedRequest.GetAllAsync();
+
+                if (allResult.Success)
+                {
+                    BedRequests = allResult.Data.ToList();
+                    IsLocationColumnVisible = true;
+                }
             }
             else
             {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
+                var locationId = await _svcUser.GetUserLocationId();
 
-            var bedRequestResult = await _svcBedRequest.GetAllForLocationAsync();
-            if (bedRequestResult.Success)
-            {
-                BedRequests = bedRequestResult.Data.ToList();
-            }
+                var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
 
+                if (userLocationResult.Success && userLocationResult.Data != null)
+                {
+                    //If this is a metro user, get all contacts for the metro area
+                    if (userLocationResult.Data.IsMetroLocation())
+                    {
+                        var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
+
+                        if (metroLocations.Success && metroLocations.Data != null)
+                        {
+                            var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
+                            var metroAreaResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
+                            if (metroAreaResult.Success && metroAreaResult.Data != null)
+                            {
+                                BedRequests = metroAreaResult.Data.ToList();
+                                IsLocationColumnVisible = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var locationResult = await _svcBedRequest.GetAllForLocationAsync(userLocationResult.Data.LocationId);
+                        if (locationResult.Success)
+                        {
+                            BedRequests = locationResult.Data.ToList();
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task LoadLocations()
+        {
             var locationResult = await _svcLocation.GetAllAsync();
             if (locationResult.Success)
             {
@@ -98,24 +142,20 @@ namespace BedBrigade.Client.Components
                     Locations.Remove(item);
                 }
             }
+        }
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin)
-                || Identity.IsInRole(RoleNames.NationalScheduler)
-                || Identity.IsInRole(RoleNames.LocationAdminPlus))
+        private void SetupToolbar()
+        {
+            if (Identity.HasRole(RoleNames.CanManageBedRequests))
             {
-                IsLocationColumnVisible = true;
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
             {
-                int? locationId = ClaimsPrincipalHelper.GetLocationId(Identity);
-
-                if (locationId != null)
-                {
-                    ManageBedRequestsMessage = $"Manage Bed Requests for {Locations.Single(r => r.LocationId == locationId).Name}";
-                }
+                ToolBar = new List<string> { "Search", "Reset" };
+                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
-
-            BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)

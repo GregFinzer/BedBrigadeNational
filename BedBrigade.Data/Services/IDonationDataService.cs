@@ -4,6 +4,6 @@ namespace BedBrigade.Data.Services
 {
     public interface IDonationDataService : IRepository<Donation>
     {
-        Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync();
+        Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync(int locationId);
     }
 }

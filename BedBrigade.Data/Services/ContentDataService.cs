@@ -45,9 +45,9 @@ public class ContentDataService : Repository<Content>, IContentDataService
         }
     }
 
-    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync()
+    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this);
+        return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)

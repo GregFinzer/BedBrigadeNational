@@ -23,6 +23,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
+        [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
+
         [Parameter] public string? Id { get; set; }
 
         List<string> PageNames = new List<string> { "AboutUs", "Assembly", "Contact", "Donate", "History", "Locations", "News", "Partners", "RequestBed", "Stories", "Volunteer" };
@@ -33,6 +35,7 @@ namespace BedBrigade.Client.Components
         private const string FirstPage = "First";
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Location>? Locations { get; set; }
+        protected List<MetroArea>? MetroAreas { get; set; }
         protected SfGrid<Location>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
@@ -82,6 +85,12 @@ namespace BedBrigade.Client.Components
                     Locations.Remove(item);
 
                 }
+            }
+
+            var metroResult = await _svcMetroArea.GetAllAsync();
+            if (metroResult.Success)
+            {
+                MetroAreas = metroResult.Data.ToList();
             }
         }
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -206,7 +215,7 @@ namespace BedBrigade.Client.Components
                     }
 
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     args.Cancel = true;
                     reason = ex.Message;
@@ -260,9 +269,11 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                ToastContent = result.Message ;
+                ToastContent = result.Message;
                 await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
+
+
         }
 
         private async Task UpdateLocationAsync(Location Location)
