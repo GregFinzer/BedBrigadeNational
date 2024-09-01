@@ -16,20 +16,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Data\Seeding\SeedHtml\Aboutus.html" />
+    <None Remove="Data\Seeding\SeedHtml\AboutUs.html" />
+    <None Remove="Data\Seeding\SeedHtml\GroveCityAboutUs.html" />
+    <None Remove="Data\Seeding\SeedHtml\GroveCityPartners.html" />
     <None Remove="Data\Seeding\SeedHtml\History.html" />
     <None Remove="Data\Seeding\SeedHtml\LocationAboutUs.html" />
     <None Remove="Data\Seeding\SeedHtml\Locations.html" />
     <None Remove="Data\Seeding\SeedHtml\News.html" />
-    <None Remove="Data\Seeding\SeedHtml\Partners.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Data\Seeding\SeedHtml\AboutUs.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Include="Data\Seeding\SeedHtml\LocationAboutUs.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Include="Data\Seeding\SeedHtml\Aboutus.html">
+    <Content Include="Data\Seeding\SeedHtml\GroveCityAboutUs.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -45,7 +50,7 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Seeding\SeedHtml\Partners.html">
+    <Content Include="Data\Seeding\SeedHtml\GroveCityPartners.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -87,13 +92,25 @@
   
   
     <ItemGroup>
+      <None Update="Data\Seeding\SeedHtml\LocationDonations.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\GroveCityDonations.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\GroveCityHome.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\GroveCityAssemblyInstructions.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedHtml\GroveCityHeader.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Data\Seeding\SeedHtml\LocationHome.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Data\Seeding\SeedHtml\LocationAssembly.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationDonate.html">
+      <None Update="Data\Seeding\SeedHtml\LocationAssemblyInstructions.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Data\Seeding\SeedHtml\LocationFooter.html">
@@ -118,6 +135,225 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Data\Seeding\SeedHtml\ThreeRotatorPageTemplate.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\BB Bed Assembly Instructions 2023-12-11.pdf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\BB Bed Assembly Instructions 2024-07-23.pdf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\BottomLeft-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\BottomRight-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\leftImageRotator\OSB-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\middleImageRotator\DoorHinge-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\rightImageRotator\1x4-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\TopLeft-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Assembly-Instructions\TopRight-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\leftImageRotator\Bedding.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\leftImageRotator\BrandonWithMattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\leftImageRotator\OSB-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\leftImageRotator\SmileMattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\middleImageRotator\DonationDrive.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\middleImageRotator\Framed-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\middleImageRotator\PuttingOnHinges.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\middleImageRotator\TeensOutsidePaintingHeadboards.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\middleImageRotator\TruckWithFrames.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\rightImageRotator\Bibles.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\rightImageRotator\Mattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\rightImageRotator\OSB-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\rightImageRotator\PressingOn.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Donate\rightImageRotator\RockCity-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\headerImageRotator\banner_img.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\headerImageRotator\FlowerBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\headerImageRotator\TwoBeds.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\headerImageRotator\TwoWildBeds.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\Layer-8.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\ministry-img.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\grove-city\pages\Home\work-img1.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\BB Bed Assembly Instructions 2024-07-23.pdf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\BottomLeft-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\BottomRight-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\leftImageRotator\OSB-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\middleImageRotator\DoorHinge-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\rightImageRotator\1x4-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\TopLeft-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Assembly-Instructions\TopRight-min.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\leftImageRotator\Bedding.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\leftImageRotator\BrandonWithMattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\leftImageRotator\OSB-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\leftImageRotator\SmileMattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\middleImageRotator\DonationDrive.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\middleImageRotator\Framed-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\middleImageRotator\PuttingOnHinges.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\middleImageRotator\TeensOutsidePaintingHeadboards.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\middleImageRotator\TruckWithFrames.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\rightImageRotator\Bibles.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\rightImageRotator\Mattress-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\rightImageRotator\OSB-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\rightImageRotator\PressingOn.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Donations\rightImageRotator\RockCity-min.jfif">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\leftImageRotator\BoyDinoOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\leftImageRotator\BoySpidermanOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\leftImageRotator\GirlBrutusOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\leftImageRotator\HappyGirlOnNewBed-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\middleImageRotator\BoyOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\middleImageRotator\GirlsOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\middleImageRotator\TeenOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\middleImageRotator\TwoHappyTeenBoys-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\rightImageRotator\GirlWithDogOnBed.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\rightImageRotator\RequestABed-TwoBoysAndMickey.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\rightImageRotator\Sisters.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\RequestBed\rightImageRotator\TwoThumbsUp-min.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\leftImageRotator\BrandonWithMattress-min.JPG">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\leftImageRotator\Mattress-min.JPG">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\leftImageRotator\SmileMattress-min.JPG">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\middleImageRotator\Framed-min.JPG">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\middleImageRotator\TeensOutsidePaintingHeadboards.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\middleImageRotator\TruckWithFrames.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\rightImageRotator\OSB-min.JPG">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\rightImageRotator\PressingOn.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Seeding\SeedImages\national\pages\Volunteer\rightImageRotator\RockCity-min.JPG">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

@@ -129,6 +129,12 @@ namespace BedBrigade.Client.Services
             var doc = new HtmlDocument();
             doc.LoadHtml(originalHtml);
             var nodes = doc.DocumentNode.SelectNodes("//img");
+
+            if (nodes == null)
+            {
+                return originalHtml;
+            }
+
             foreach (var node in nodes)
             {
                 if (node.Attributes[Id] != null)
