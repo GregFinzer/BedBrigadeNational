@@ -50,6 +50,7 @@ namespace BedBrigade.Data.Data.Seeding;
             await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
             await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
             await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
+            await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
     }
 
         private static async Task SeedContentItem(DataContext context, 
