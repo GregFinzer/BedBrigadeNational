@@ -84,6 +84,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         content.ContentHtml = WebHelper.GetHtml(templateName);
         content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
         content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
+        content.ContentHtml = content.ContentHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
         content.Title = StringUtil.InsertSpaces(content.Name);
         await _contentDataService.CreateAsync(content);
     }
