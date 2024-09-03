@@ -21,7 +21,7 @@ namespace BedBrigade.Client.Services
 
         public event Func<Task> OnChange;
 
-        private async Task NotifyStateChangedAsync()
+        public async Task NotifyStateChangedAsync()
         {
             if (OnChange != null)
             {

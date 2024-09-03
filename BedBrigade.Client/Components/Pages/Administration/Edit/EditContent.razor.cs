@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using BedBrigade.Client.Components;
+using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ILoadImagesService _loadImagesService { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ICachingService _svcCaching { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
         [Parameter] public string LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
@@ -162,6 +164,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             var updateResult = await _svcContent.UpdateAsync(Content);
             if (updateResult.Success)
             {
+                if (Content.ContentType == ContentType.Header || Content.ContentType == ContentType.Footer)
+                {
+                    await _locationState.NotifyStateChangedAsync();
+                }
+
                 _toastService.Success("Content Saved", 
                     $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024
                 _navigationManager.NavigateTo("/administration/manage/pages");
