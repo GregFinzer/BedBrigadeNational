@@ -48,7 +48,7 @@
                                     <ItemTemplate>
                                         <span style="font-weight: bold">
                                             <span>@((context as LocationDistance).Name)</span>
-                                            <span class='country'>@(" (" + (context as LocationDistance).Distance.ToString("0.00") + " miles away)")</span>
+                                            <span class='country'>@(" (" + (context as LocationDistance).MilesAwayString + ")")</span>
                                         </span>
                                     </ItemTemplate>
                                 </DropDownListTemplates>
@@ -59,7 +59,7 @@
                                  <table>
                                     @foreach (var location in Locations)
                                     {
-                                            <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.Distance.ToString("#.##") miles away</td></tr>
+                                            <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.MilesAwayString</td></tr>
                                     }
                                  </table>
                          break;
