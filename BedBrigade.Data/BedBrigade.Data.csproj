@@ -6,34 +6,45 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\Seeding\SeedImages\pages\**" />
-    <Compile Remove="Shared\**" />
-    <EmbeddedResource Remove="Data\Seeding\SeedImages\pages\**" />
-    <EmbeddedResource Remove="Shared\**" />
-    <None Remove="Data\Seeding\SeedImages\pages\**" />
-    <None Remove="Shared\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Data\Seeding\SeedHtml\AboutUs.html" />
-    <None Remove="Data\Seeding\SeedHtml\GroveCityAboutUs.html" />
-    <None Remove="Data\Seeding\SeedHtml\GroveCityHistory.html" />
-    <None Remove="Data\Seeding\SeedHtml\GroveCityPartners.html" />
-    <None Remove="Data\Seeding\SeedHtml\History.html" />
-    <None Remove="Data\Seeding\SeedHtml\LocationAboutUs.html" />
-    <None Remove="Data\Seeding\SeedHtml\Locations.html" />
-    <None Remove="Data\Seeding\SeedHtml\News.html" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Data\Seeding\SeedHtml\AboutUs.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+    <Content Include="Data\Seeding\SeedHtml\Footer.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityAssemblyInstructions.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityCalendar.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityDonations.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityFooter.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityHeader.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Seeding\SeedHtml\GroveCityHistory.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityHome.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\GroveCityInventory.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\Header.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\Home.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Seeding\SeedHtml\LocationAboutUs.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -47,8 +58,26 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Data\Seeding\SeedHtml\LocationAssemblyInstructions.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\LocationDonations.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\LocationFooter.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\LocationHeader.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\LocationHome.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\Seeding\SeedHtml\Locations.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\NewPage.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Seeding\SeedHtml\News.html">
@@ -57,6 +86,12 @@
     </Content>
     <Content Include="Data\Seeding\SeedHtml\GroveCityPartners.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\Stories.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Seeding\SeedHtml\ThreeRotatorPageTemplate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -97,60 +132,6 @@
   
   
     <ItemGroup>
-      <None Update="Data\Seeding\SeedHtml\GroveCityCalendar.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityFooter.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityInventory.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationDonations.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityDonations.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityHome.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityAssemblyInstructions.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\GroveCityHeader.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationHome.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationAssemblyInstructions.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationFooter.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Footer.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationHeader.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Header.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Home.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\NewPage.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Stories.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\ThreeRotatorPageTemplate.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="Data\Seeding\SeedImages\grove-city\pages\AboutUs\leftImageRotator\BedBrigadeVanBack-min.jpg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
