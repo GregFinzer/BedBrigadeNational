@@ -77,13 +77,13 @@ namespace BedBrigade.Client.Components.Pages
                     }
                     else
                     {
-                        _navigationManager.NavigateTo("/Sorry", true);
+                        _navigationManager.NavigateTo($"/Sorry/{location}/{pageName}", true);
                         return false;
                     }
                 }
                 else
                 {
-                    _navigationManager.NavigateTo("/Sorry", true);
+                    _navigationManager.NavigateTo($"/Sorry/{location}", true);
                     return false;
                 }
             }

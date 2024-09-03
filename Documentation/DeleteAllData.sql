@@ -1,4 +1,4 @@
---This deletes all data except for the locations
+--This deletes all data except for the Locations and MetroAreas
 delete from BedRequests
 go
 delete from Configurations

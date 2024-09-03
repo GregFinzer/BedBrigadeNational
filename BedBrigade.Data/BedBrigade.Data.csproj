@@ -5,53 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Data\Seeding\SeedImages\pages\**" />
-    <Compile Remove="Shared\**" />
-    <EmbeddedResource Remove="Data\Seeding\SeedImages\pages\**" />
-    <EmbeddedResource Remove="Shared\**" />
-    <None Remove="Data\Seeding\SeedImages\pages\**" />
-    <None Remove="Shared\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Data\Seeding\SeedHtml\Aboutus.html" />
-    <None Remove="Data\Seeding\SeedHtml\History.html" />
-    <None Remove="Data\Seeding\SeedHtml\LocationAboutUs.html" />
-    <None Remove="Data\Seeding\SeedHtml\Locations.html" />
-    <None Remove="Data\Seeding\SeedHtml\News.html" />
-    <None Remove="Data\Seeding\SeedHtml\Partners.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Data\Seeding\SeedHtml\LocationAboutUs.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Include="Data\Seeding\SeedHtml\Aboutus.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Seeding\SeedHtml\History.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Seeding\SeedHtml\Locations.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Seeding\SeedHtml\News.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Seeding\SeedHtml\Partners.html">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  
   
     <ItemGroup>
     <PackageReference Include="BetterAddressParser" Version="1.18.0" />
@@ -85,41 +38,6 @@
     </ItemGroup>
 
   
-  
-    <ItemGroup>
-      <None Update="Data\Seeding\SeedHtml\LocationHome.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationAssembly.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationDonate.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationFooter.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Footer.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\LocationHeader.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Header.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Home.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\NewPage.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\Stories.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\Seeding\SeedHtml\ThreeRotatorPageTemplate.html">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
+
 
 </Project>

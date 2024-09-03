@@ -11,5 +11,6 @@
         public const string DefaultUserNameAndEmail = "Anonymous";
         public const string GetFilesCacheKey = "Directory.GetFiles";
         public const int MetroAreaNoneId = 1;
+        public const string PagesDirectory = "pages";
     }
 }

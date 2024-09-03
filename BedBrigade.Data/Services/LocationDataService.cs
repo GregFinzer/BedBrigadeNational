@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
-using System.Runtime.InteropServices;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
@@ -33,28 +32,47 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
     {
-        var existingLocation = await GetLocationByRouteAsync(entity.Route);
-
-        if (existingLocation.Success)
+        try
         {
-            return new ServiceResponse<Location>($"Location with route {entity.Route} already exists");
-        }
+            var groveCityLocation = await GetByIdAsync((int) LocationNumber.GroveCity);
 
-        var result = await base.CreateAsync(entity);
+            if (!groveCityLocation.Success || groveCityLocation.Data == null)
+            {
+                return new ServiceResponse<Location>("Grove City location not found", false);
+            }
 
-        if (!result.Success)
+            var existingLocation = await GetLocationByRouteAsync(entity.Route);
+
+            if (existingLocation.Success)
+            {
+                return new ServiceResponse<Location>($"Location with route {entity.Route} already exists");
+            }
+
+            var result = await base.CreateAsync(entity);
+
+            if (!result.Success)
+                return result;
+
+            var location = result.Data;
+
+            FileUtil.CreateLocationMediaDirectory(location);
+            await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
+            await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
+            await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); 
+            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Home");
+            await CreateContent(location, ContentType.Body, "LocationDonations.html", "Donations");
+            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Donations");
+            await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
+            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
+            await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
+            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
             return result;
-
-        var location = result.Data;
-
-        CreateLocationMedia(location);
-        await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
-        await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
-        await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); // VS 8/28/2024 Home.html replaced by LocationHome.html
-        await CreateContent(location, ContentType.Body, "LocationDonate.html", "Donate");
-        await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
-        await CreateContent(location, ContentType.Body, "LocationAssembly.html", "Assembly");
-        return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
     }
 
     public async Task CreateContent(Location location, ContentType contentType, string templateName, string name)
@@ -70,13 +88,6 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         await _contentDataService.CreateAsync(content);
     }
 
-    private void CreateLocationMedia(Location location)
-    {
-        if (!FileUtil.MediaSubDirectoryExists(location.Route))
-        {
-            FileUtil.CreateMediaSubDirectory(location.Route);
-        }
-    }
 
 
 

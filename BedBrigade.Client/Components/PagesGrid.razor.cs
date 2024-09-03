@@ -309,7 +309,7 @@ namespace BedBrigade.Client.Components
         {
             PdfExportProperties ExportProperties = new PdfExportProperties
             {
-                FileName = "Pages" + DateTime.Now.ToShortDateString() + ".pdf",
+                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
             await Grid.PdfExport(ExportProperties);
@@ -318,7 +318,7 @@ namespace BedBrigade.Client.Components
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Pages " + DateTime.Now.ToShortDateString() + ".xlsx",
+                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".xlsx",
 
             };
 
@@ -328,7 +328,7 @@ namespace BedBrigade.Client.Components
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Pages " + DateTime.Now.ToShortDateString() + ".csv",
+                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".csv",
 
             };
 

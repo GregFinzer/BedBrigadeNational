@@ -135,7 +135,7 @@ namespace BedBrigade.Client.Components
             bool isFile = false;
             if (args.FileDetails != null && args.FileDetails.Name != null) 
             {
-                if (args.FileDetails.Name.ToString().ToLower() == "pages")
+                if (args.FileDetails.Name.ToString().ToLower() == Defaults.PagesDirectory.ToLower())
                 {
                     isPagesFolder = true;
                 }
@@ -155,7 +155,7 @@ namespace BedBrigade.Client.Components
             if (args.FileDetails != null)
             {
                 isFile = args.FileDetails[0].IsFile;
-                if (args.FileDetails[0].Name.ToString() == "pages")
+                if (args.FileDetails[0].Name.ToString().ToLower() == Defaults.PagesDirectory.ToLower())
                 {
                     isPagesFolder = true;
                 }                

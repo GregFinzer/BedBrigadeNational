@@ -5,8 +5,8 @@ using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace BedBrigade.Data.Data.Seeding
-{
+namespace BedBrigade.Data.Data.Seeding;
+
     public static class SeedContentsLogic
     {
         public static async Task SeedContents(IDbContextFactory<DataContext> _contextFactory)
@@ -23,16 +23,75 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedFooter(context, locations);
                 await SeedAboutPage(context, locations);
                 await SeedHomePage(context, locations);
-                await SeedDonatePage(context, locations);
+                await SeedDonationsPage(context, locations);
                 await SeedNationalHistoryPage(context);
                 await SeedNationalLocations(context);
-                await SeedGroveCityPartners(context);
                 await SeedAssemblyInstructions(context, locations);
                 await SeedThreeRotatorPageTemplate(context);
+                await SeedGroveCity(context);
             }
         }
 
-        private static async Task SeedImages(DataContext context)
+        private static async Task SeedGroveCity(DataContext context)
+        {
+            Log.Logger.Information("SeedGroveCity Started");
+            var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == (int)LocationNumber.GroveCity);
+
+            if (location == null)
+            {
+                Console.WriteLine($"Error cannot find location with id: " + LocationNumber.GroveCity);
+                return;
+            }
+
+            await SeedContentItem(context, ContentType.Header, location, "Header", "GroveCityHeader.html");
+            await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
+            await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
+            await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
+            await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
+            await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
+            await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
+            await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
+    }
+
+        private static async Task SeedContentItem(DataContext context, 
+            ContentType contentType, 
+            Location location,
+            string name, string seedHtmlName)
+        {
+            if (await context.Content.AnyAsync(c => c.LocationId == location.LocationId && c.Name == name))
+            {
+                return;
+            }
+
+            string seedHtml = WebHelper.GetHtml(seedHtmlName);
+
+            seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+            seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+
+            var content = new Content
+            {
+                LocationId = location.LocationId,
+                ContentType = contentType,
+                Name = name,
+                ContentHtml = seedHtml,
+                Title = StringUtil.InsertSpaces(name.Replace("-", " "))
+            };
+
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content);
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in content {name} for location {location.Name}: {ex.Message}");
+            }
+        }
+    
+
+    private static async Task SeedImages(DataContext context)
         {
             Log.Logger.Information("SeedImages Started");
 
@@ -57,7 +116,12 @@ namespace BedBrigade.Data.Data.Seeding
 
             foreach (var location in locations)
             {
-                bool alreadyAdded =
+                if (location.LocationId == (int)LocationNumber.GroveCity)
+                {
+                    continue;
+                }
+
+            bool alreadyAdded =
                     await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId);
                 if (alreadyAdded)
                     continue;
@@ -154,6 +218,11 @@ namespace BedBrigade.Data.Data.Seeding
             {
                 foreach (var location in locations)
                 {
+                    if (location.LocationId == (int)LocationNumber.GroveCity)
+                    {
+                        continue;
+                    }
+
                     string seedHtml;
 
                     switch (location.LocationId)
@@ -269,76 +338,23 @@ namespace BedBrigade.Data.Data.Seeding
 
 
 
-        private static async Task SeedGroveCityPartners(DataContext context)
-        {
-            Log.Logger.Information("SeedGroveCityPartners Started");
 
-            var name = "Partners";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
-            {
-
-                var seedHtml = WebHelper.GetHtml("Partners.html");
-                var content = new Content
-                {
-                    LocationId = (int)LocationNumber.GroveCity,
-                    ContentType = ContentType.Body,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                    Title = "Partners"
-                };
-
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content);
-
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
-            }
-        }
 
         private static async Task SeedAssemblyInstructions(DataContext context, List<Location> locations)
         {
             Log.Logger.Information("SeedAssemblyInstructions Started");
 
-            var name = "Assembly";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
+            var name = "Assembly-Instructions";
+
+            foreach (var location in locations)
             {
-                foreach (var location in locations)
+                //Do not seed National.  Grove City has it's own
+                if (location.LocationId == (int)LocationNumber.National 
+                    || location.LocationId == (int) LocationNumber.GroveCity)
                 {
-                    //Assembly instructions are location specific
-                    if (location.LocationId == (int)LocationNumber.National)
-                    {
-                        continue;
-                    }
-
-                    var seedHtml = WebHelper.GetHtml("LocationAssembly.html");
-
-                    var content = new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "Assembly Instructions"
-                    };
-                    SeedRoutines.SetMaintFields(content);
-
-                    context.Content.Add(content);
+                    continue;
                 }
-
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
+                await SeedContentItem(context, ContentType.Body, location, name, "LocationAssemblyInstructions.html");
             }
         }
 
@@ -353,7 +369,12 @@ namespace BedBrigade.Data.Data.Seeding
                     
                 foreach (var location in locations)
                 {
-                    if (location.LocationId == (int)LocationNumber.National)
+                    if (location.LocationId == (int)LocationNumber.GroveCity)
+                    {
+                        continue;
+                    }
+
+                if (location.LocationId == (int)LocationNumber.National)
                     {
                         seedHtml = WebHelper.GetHtml("AboutUs.html");
                     }
@@ -389,45 +410,20 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
 
-        private static async Task SeedDonatePage(DataContext context, List<Location> locations)
+        private static async Task SeedDonationsPage(DataContext context, List<Location> locations)
         {
             Log.Logger.Information("SeedDonatePage Started");
 
             var name = "Donations";
-            if (!await context.Content.AnyAsync(c => c.Name == name))
+
+            foreach (var location in locations)
             {
-                foreach (var location in locations)
-                {
-                    //We don't take donations at the national level
-                    if (location.LocationId == (int)LocationNumber.National)
-                        continue;
+                //We don't take donations at the national level
+                if (location.LocationId == (int)LocationNumber.National
+                    || location.LocationId == (int)LocationNumber.GroveCity)
+                    continue;
 
-                    var seedHtml = WebHelper.GetHtml("LocationDonate.html");
-
-                    var content = new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.Body,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = "Donate To Bed Brigade"
-                    };
-
-                    content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
-                    content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
-
-                    SeedRoutines.SetMaintFields(content);
-                    context.Content.Add(content);
-                }
-
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in content {ex.Message}");
-                }
+                await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");
             }
         }
 
@@ -460,4 +456,4 @@ namespace BedBrigade.Data.Data.Seeding
             }
         }
     }
-}
+
