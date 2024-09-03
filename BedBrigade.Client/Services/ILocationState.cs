@@ -4,5 +4,6 @@
     {
         string Location { get; set; }
         event Func<Task> OnChange;
+        Task NotifyStateChangedAsync();
     }
 }
