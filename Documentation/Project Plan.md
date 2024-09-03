@@ -60,6 +60,7 @@ One thing you will notice about the following project plan is the lack of due da
     * National Home Page
     * National About Us Page 
     * National History of Bed Brigade Page 
+    * National Donations Page
     
 * Locations
     * Location List :heavy_check_mark:
@@ -72,6 +73,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Polaris Location Home Page
     * Polaris About Us Page
     * Polaris Assembly Instructions Page
+    * Polaris Donations Page
 
     
 * Manage Locations
@@ -79,6 +81,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Edit Location :heavy_check_mark:
     * Add Location :heavy_check_mark:
     * Deactivate/Activate Location
+    * Metro Areas :heavy_check_mark:
     
 * Location Request Bed
     * Request Bed Page :heavy_check_mark:
@@ -99,7 +102,7 @@ One thing you will notice about the following project plan is the lack of due da
     
 * Location Donations
     * Setup PayPal IPN
-    * Grove City Donate
+    * Grove City Donate :heavy_check_mark:
     * Polaris Donate
     * Manage Donations :heavy_check_mark:
     * Email Tax Forms
@@ -144,29 +147,37 @@ One thing you will notice about the following project plan is the lack of due da
     * Use location query parm Bed Request :heavy_check_mark:
     * Use Location Query Parm Contact :heavy_check_mark:
     * Use Location Query Parm Volunteer :heavy_check_mark:
-    * Design Shared Bed Requests
-    * Admin Dashboard Content
-    * Unique Volunteer Email Add Dialog
-    * Update NuGet Packages and Change NUnit Assertions
-    * Cache get files
+    * Design Shared Bed Requests :heavy_check_mark:
+    * Admin Dashboard Content :heavy_check_mark:
+    * Unique Volunteer Email Add Dialog :heavy_check_mark:
+    * Update NuGet Packages and Change NUnit Assertions :heavy_check_mark:
+    * Cache get files :heavy_check_mark:
     * Remove Unused Components and Pages
     * Add three image rotators to Bed Brigade Near Me
     * Location Latitude & Longitude
     * FM Dependent Functionality
     * Verify security for all pages
-    * Global Error Handler
+    * Global Error Handler :heavy_check_mark:
     * Refresh Header and Footer
-    * Minify CSS and JS
     * Add Page Titles
     * Custom Icons in Grid Toolbar
     * Review All Code
-    * AppOffline for Development
-    * Syncfusion Spinner
-    * Re-add complierconfig.json
-    * Rework Seeding
+    * AppOffline for Development :heavy_check_mark:
+    * Syncfusion Spinner :heavy_check_mark:
+    * Re-add compilerconfig.json :heavy_check_mark:
+    * Rework Seeding :heavy_check_mark:
     * Upgrade to Blazor 9
     * Blazor 9 Change Render Mode
+    * Add Notification Code to Sorry Page :heavy_check_mark:
+    * Make seeding environment specific
+    * Add Database Indexes
+    * Verify Mobile for all pages
+    * Refactor Grid Persistence
+    * Add try catch and alert
     
+* New Stories
+    * Send confirmation email for Bed Request
+    * Import Bed Requests
     
     
     
