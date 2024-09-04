@@ -175,8 +175,8 @@ else
                         <GridTextWrapSettings WrapMode="Syncfusion.Blazor.Grids.WrapMode.Content"></GridTextWrapSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Media.MediaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" HeaderText="Media Id" />
-                            <GridColumn Field=@nameof(Media.MediaId) ShowColumnMenu="false" HeaderText="Id" ShowInColumnChooser="true" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" Width="15"  />
-                                <GridColumn Field=@nameof(Media.LocationId) ShowColumnMenu="false" ShowInColumnChooser="true" HeaderText="Location Id" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AllowSorting="true" Width="20" >
+                            <GridColumn Field=@nameof(Media.MediaId) ShowColumnMenu="false" HeaderText="Id" ShowInColumnChooser="true" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Media.LocationId) ShowColumnMenu="false" ShowInColumnChooser="true" HeaderText="Location Id" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AllowSorting="true" AutoFit="true">
                                 <Template>
                                         @{
                                             var myFile = (context as Media);
@@ -237,7 +237,7 @@ else
                                         <span title="Editable"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;&nbsp;Alt Text</span>
                                     </HeaderTemplate>
                              </GridColumn>
-                            <GridColumn Field=@nameof(Media.FileSize) ShowColumnMenu="false" HeaderText="Size" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" Width="15" >
+                            <GridColumn Field=@nameof(Media.FileSize) ShowColumnMenu="false" HeaderText="Size" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                                 <Template>
                                         @{
                                             var myFile=(context as Media);

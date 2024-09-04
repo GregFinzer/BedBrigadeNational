@@ -39,7 +39,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(4000)]
 		public String? Message { get; set; } = string.Empty;
 
-        public VehicleType VehicleType { get; set; } = VehicleType.NoCar; // default value
+        public VehicleType VehicleType { get; set; } = VehicleType.None; // default value
 
 
 		[NotMapped]

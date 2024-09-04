@@ -21,14 +21,14 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
-        [Inject] private IVolunteerEventsDataService? _svcVolunteerEvents { get; set; }
+        [Inject] private ISignUpDataService? _svcSignUp { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
 
         private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
 
-        private List<VolunteerEvent> VolunteerRegister { get; set; } = new List<VolunteerEvent>(); // Volunteer/Events Registration
+        private List<SignUp> VolunteerRegister { get; set; } = new List<SignUp>(); // Volunteer/Events Registration
 
         private SearchLocation? SearchLocation;
 
@@ -67,8 +67,8 @@ namespace BedBrigade.Client.Components.Pages
         private string? _locationQueryParm;
         private string MyMessage = string.Empty;
         private string MyMessageDisplay = DisplayNone;
-        private bool AvailableVolunteerEvents = false;
-        private SfDropDownList<int, Schedule> ddlVolunteerEvents;
+        private bool AreSignUpsAvailable = false;
+        private SfDropDownList<int, Schedule> ddlSchedule;
 
         private string cssClass { get; set; } = "e-outline";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
@@ -160,7 +160,7 @@ namespace BedBrigade.Client.Components.Pages
         { 
             try
             {
-                ddlVolunteerEvents.Value = -1;
+                ddlSchedule.Value = -1;
                 DisplayLocationEvents = DisplayNone;
                 DisplayLocationStatusMessage = DisplayNone;
                 SelectedEvent = null;
@@ -181,12 +181,12 @@ namespace BedBrigade.Client.Components.Pages
                 if (LocationEvents.Count > 0)
                 {
                     DisplayLocationEvents = "";
-                    AvailableVolunteerEvents = true;
+                    AreSignUpsAvailable = true;
                 }
                 else
                 {
                     DisplayLocationStatusMessage = "";
-                    AvailableVolunteerEvents = false;
+                    AreSignUpsAvailable = false;
                 }
             }
             catch (Exception ex)
@@ -329,12 +329,12 @@ namespace BedBrigade.Client.Components.Pages
             try
             {
 
-                VolunteerEvent newRegister = new VolunteerEvent();
+                SignUp newRegister = new SignUp();
                 newRegister.ScheduleId = SelectedEvent.ScheduleId;
                 newRegister.VolunteerId = newVolunteer.VolunteerId;
                 newRegister.LocationId = selectedLocation;
-                newRegister.VolunteerEventNote = newVolunteer.Message;
-                var createResult = await _svcVolunteerEvents.CreateAsync(newRegister);
+                newRegister.SignUpNote = newVolunteer.Message;
+                var createResult = await _svcSignUp.CreateAsync(newRegister);
 
                 if (!createResult.Success)
                 {
@@ -463,7 +463,7 @@ namespace BedBrigade.Client.Components.Pages
                 var existingSchedule = existingResult.Data;
                 existingSchedule.VolunteersRegistered += 1;
 
-                if (newVolunteer.VehicleType != VehicleType.NoCar)
+                if (newVolunteer.VehicleType != VehicleType.None)
                 {
                     existingSchedule.DeliveryVehiclesRegistered += 1;
                 }

@@ -80,10 +80,9 @@ else
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
-                            <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                            <GridColumn Field=@nameof(Configuration.SectionDescription) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true">
-                            </GridColumn>
+                            <GridColumn Field=@nameof(Configuration.SectionDescription) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" />
+                            <GridColumn Field=@nameof(Configuration.ConfigurationKey) IsPrimaryKey="true" HeaderText="Key" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false" />
+                            <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Value" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         </GridColumns>
                     </SfGrid>
 

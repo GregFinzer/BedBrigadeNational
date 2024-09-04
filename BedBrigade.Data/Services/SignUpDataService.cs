@@ -4,26 +4,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
 
-public class VolunteerEventsDataService : Repository<VolunteerEvent>, IVolunteerEventsDataService
+public class SignUpDataService : Repository<SignUp>, ISignUpDataService
 {
     private readonly ICachingService _cachingService;
     private readonly ICommonService _commonService;
 
-    public VolunteerEventsDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
+    public SignUpDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         AuthenticationStateProvider authProvider, ICommonService commonService) : base(contextFactory, cachingService, authProvider)
     {
         _cachingService = cachingService;
         _commonService = commonService;
     }
 
-    public override async Task<ServiceResponse<VolunteerEvent>> CreateAsync(VolunteerEvent entity)
+    public override async Task<ServiceResponse<SignUp>> CreateAsync(SignUp entity)
     {
         var result = await base.CreateAsync(entity);
         _cachingService.ClearScheduleRelated();
         return result;
     }
 
-    public override async Task<ServiceResponse<VolunteerEvent>> UpdateAsync(VolunteerEvent entity)
+    public override async Task<ServiceResponse<SignUp>> UpdateAsync(SignUp entity)
     {
         var result = await base.UpdateAsync(entity);
         _cachingService.ClearScheduleRelated();
@@ -37,7 +37,7 @@ public class VolunteerEventsDataService : Repository<VolunteerEvent>, IVolunteer
         return result;
     }
 
-    public async Task<ServiceResponse<List<VolunteerEvent>>> GetAllForLocationAsync(int locationId)
+    public async Task<ServiceResponse<List<SignUp>>> GetAllForLocationAsync(int locationId)
     {
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }

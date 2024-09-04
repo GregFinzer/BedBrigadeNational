@@ -14,7 +14,7 @@ using Serilog;
 
 namespace BedBrigade.Client.Components;
 
-public partial class EvolGrid : ComponentBase
+public partial class SignUpGrid : ComponentBase
 {
     // data services
 
@@ -24,7 +24,7 @@ public partial class EvolGrid : ComponentBase
     [Inject] private ILocationDataService? _svcLocation { get; set; }
     [Inject] private AuthenticationStateProvider? _authState { get; set; }
     [Inject] private IScheduleDataService? _svcSchedule { get; set; }
-    [Inject] private IVolunteerEventsDataService? _svcVolunteerEvents { get; set; }
+    [Inject] private ISignUpDataService? _svcSignUp { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
 
     // object lists
@@ -35,7 +35,7 @@ public partial class EvolGrid : ComponentBase
     protected List<Volunteer>? lstLocationVolunteers { get; set; } = new List<Volunteer>();
     protected List<Location>? Locations { get; set; }
     protected List<Schedule>? Schedules { get; set; }
-    protected List<VolunteerEvent>? VolunteerEvents { get; set; }
+    protected List<SignUp>? SignUps { get; set; }
 
     protected List<Syncfusion.Blazor.Navigations.ItemModel> Toolbaritems =
         new List<Syncfusion.Blazor.Navigations.ItemModel>();
@@ -67,7 +67,7 @@ public partial class EvolGrid : ComponentBase
     private const string CaptionWarning = "warning";
     private const string CaptionAdd = "Add";
     private const string CaptionDelete = "Delete";
-    private const string RegisterColumn = "RegistrationId";
+    private const string RegisterColumn = "SignUpId";
 
     // Action & Dialog variables
 
@@ -101,7 +101,7 @@ public partial class EvolGrid : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        lstEmptyTables = await EvolHelper.GetEvolDataStatusAsync(_svcSchedule, _svcVolunteer);
+        lstEmptyTables = await SignUpHelper.GetSignUpDataStatusAsync(_svcSchedule, _svcVolunteer);
         if (lstEmptyTables.Count > 0)
         {
             DataStatus = false;
@@ -160,8 +160,8 @@ public partial class EvolGrid : ComponentBase
         await LoadUserData();
         await LoadLocations();
         await LoadVolunteerData();
-        Schedules = await EvolHelper.GetSchedules(_svcSchedule, IsLocationAdmin, userLocationId);
-        VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, IsLocationAdmin, userLocationId);
+        Schedules = await SignUpHelper.GetSchedules(_svcSchedule, IsLocationAdmin, userLocationId);
+        SignUps = await SignUpHelper.GetSignUps(_svcSignUp, IsLocationAdmin, userLocationId);
         lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
         DisableToolBar();
         PrepareGridData();
@@ -193,7 +193,7 @@ public partial class EvolGrid : ComponentBase
         userLocationId = await _svcUser.GetUserLocationId();
         userName = await _svcUser.GetUserName();
         userRole = await _svcUser.GetUserRole();
-        //Log.Information($"{userName} went to the Manage Event Volunteers Page");
+        Log.Information($"{userName} went to the Manage Sign Up Page");
 
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         {
@@ -217,6 +217,11 @@ public partial class EvolGrid : ComponentBase
     {
         get
         {
+            if (Identity == null)
+            {
+                return false;
+            }
+
             return Identity.IsInRole(RoleNames.LocationAdmin)
                    || Identity.IsInRole(RoleNames.LocationAuthor)
                    || Identity.IsInRole(RoleNames.LocationScheduler);
@@ -240,7 +245,7 @@ public partial class EvolGrid : ComponentBase
     {
         try // get Volunteer List ===========================================================================================
         {
-            Volunteers = await EvolHelper.GetVolunteers(_svcVolunteer);
+            Volunteers = await SignUpHelper.GetVolunteers(_svcVolunteer);
             if (Volunteers.Count > 0)
             {
                 if (IsLocationAdmin)
@@ -264,7 +269,7 @@ public partial class EvolGrid : ComponentBase
 
     private void PrepareGridData()
     {
-        EventVolunteers = EvolHelper.GetGridDataSource(VolunteerEvents, Schedules, Volunteers, Locations);
+        EventVolunteers = SignUpHelper.GetGridDataSource(SignUps, Schedules, Volunteers, Locations);
         return;
     } // Create Grid Data Source
 
@@ -339,7 +344,7 @@ public partial class EvolGrid : ComponentBase
                 break;
 
             case CaptionDelete:
-                newVolunteer = EvolHelper.PrepareVolunteerDeleteDialog(selectedGridObject, ref strMessageText,
+                newVolunteer = SignUpHelper.PrepareVolunteerDeleteDialog(selectedGridObject, ref strMessageText,
                     ref DialogTitle, ref DisplayDeleteButton, ref CloseButtonCaption);
                 break;
         }
@@ -386,7 +391,7 @@ public partial class EvolGrid : ComponentBase
         // Location Volunteers
 
         lstLocationVolunteers =
-            EvolHelper.GetLocationVolunteersSelector(selectedGridObject, lstVolunteerSelector, VolunteerEvents);
+            SignUpHelper.GetLocationVolunteersSelector(selectedGridObject, lstVolunteerSelector, SignUps);
         //strJson = JsonConvert.SerializeObject(lstLocationVolunteers, Formatting.Indented);
         //strHtml = "<pre>" + strJson + "</pre>";
 
@@ -419,16 +424,16 @@ public partial class EvolGrid : ComponentBase
         var actionStatus = "error";
         if (selectedGridObject != null && newVolunteer.VolunteerId > 0)
         {
-            var newRegistration = new VolunteerEvent();
+            var newRegistration = new SignUp();
             newRegistration.VolunteerId = newVolunteer.VolunteerId;
             newRegistration.ScheduleId = selectedGridObject.EventId;
             newRegistration.LocationId = selectedGridObject.EventLocationId;
-            var addResult = await _svcVolunteerEvents.CreateAsync(newRegistration);
+            var addResult = await _svcSignUp.CreateAsync(newRegistration);
             if (addResult.Success)
             {
                 // add Volunteer to Schedule table
 
-                var bUpdateSchedule = await EvolHelper.UpdateSchedule(_svcSchedule, Schedules, CaptionAdd,
+                var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, CaptionAdd,
                     newRegistration.ScheduleId, newVolunteer.VehicleType);
                 if (bUpdateSchedule)
                 {
@@ -471,11 +476,11 @@ public partial class EvolGrid : ComponentBase
             int RegistrationId = selectedGridObject.RegistrationId;
             if (RegistrationId > 0)
             {
-                var deleteResult = await _svcVolunteerEvents.DeleteAsync(RegistrationId);
+                var deleteResult = await _svcSignUp.DeleteAsync(RegistrationId);
                 if (deleteResult.Success)
                 {
                     // add Volunteer to Schedule table
-                    var bUpdateSchedule = await EvolHelper.UpdateSchedule(_svcSchedule, Schedules, "Del",
+                    var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, "Del",
                         selectedGridObject.EventId, selectedGridObject.VehicleType);
                     if (bUpdateSchedule)
                     {
@@ -511,10 +516,8 @@ public partial class EvolGrid : ComponentBase
 
     public async Task RefreshGrid(string strAction)
     {
-        // update Volunteer Events first        
-        VolunteerEvents = await EvolHelper.GetVolunteerEvents(_svcVolunteerEvents, IsLocationAdmin, userLocationId);
-        //strJson = JsonConvert.SerializeObject(VolunteerEvents, Formatting.Indented);
-        //strHtml = "<pre>" + strJson + "</pre>";
+        // update Sign-Ups first        
+        SignUps = await SignUpHelper.GetSignUps(_svcSignUp, IsLocationAdmin, userLocationId);
         PrepareGridData();
         Grid.CallStateHasChanged();
         Grid.Refresh();

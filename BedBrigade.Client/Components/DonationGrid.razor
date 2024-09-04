@@ -33,7 +33,8 @@ else
                             AllowSelection="true"
                             AllowPdfExport="true"
                             AllowTextWrap="true"
-                            AllowGrouping="true">
+                            AllowGrouping="true"
+                            Width="100%">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50})" PageSize="25" />
                         <GridEvents DataBound=@DataBound 
                             Destroyed=@OnDestroyed 
@@ -72,12 +73,12 @@ else
 
                         <GridColumns>
                             <GridColumn Field=@nameof(Donation.DonationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(Donation.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                            <GridColumn Field=@nameof(Donation.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                            <GridColumn Field=@nameof(Donation.TransactionId) ShowColumnMenu="false" HeaderText="Transaction Id" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                            <GridForeignColumn Field=@nameof(Donation.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="1000" />
-                            <GridColumn Field=@nameof(Donation.TaxFormSent) ShowColumnMenu="false" HeaderText="Tax Form Sent" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" />
-                            <GridColumn Field=@nameof(Donation.Amount) ShowColumnMenu="false" HeaderText="Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Number" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" Width="250" />
+                            <GridColumn Field=@nameof(Donation.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.TransactionId) ShowColumnMenu="false" HeaderText="Transaction Id" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(Donation.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.TaxFormSent) ShowColumnMenu="false" HeaderText="Tax Form Sent" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.Amount) ShowColumnMenu="false" HeaderText="Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Number" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 

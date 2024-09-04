@@ -99,7 +99,7 @@ namespace BedBrigade.Data.Services
 
             ClearByEntityName(nameof(Volunteer));
             ClearByEntityName(nameof(Schedule));
-            ClearByEntityName(nameof(VolunteerEvent));
+            ClearByEntityName(nameof(SignUp));
             ClearByEntityName(nameof(BedRequest));
         }
 

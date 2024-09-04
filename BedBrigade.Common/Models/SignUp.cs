@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Common.Models
 {
-	[Table("VolunteerEvents")]
-	public class VolunteerEvent : BaseEntity, ILocationId
+	[Table("SignUps")]
+	public class SignUp : BaseEntity, ILocationId
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 RegistrationId { get; set; }
+        public Int32 SignUpId { get; set; }
 
         [ForeignKey("LocationId")]
         [Required]
@@ -22,7 +22,7 @@ namespace BedBrigade.Common.Models
         public Volunteer Volunteer { get; set; }
 
         [MaxLength(4000)]
-		public String? VolunteerEventNote { get; set; } = string.Empty;
+		public String? SignUpNote { get; set; } = string.Empty;
 
 	} // class
 } // namespace

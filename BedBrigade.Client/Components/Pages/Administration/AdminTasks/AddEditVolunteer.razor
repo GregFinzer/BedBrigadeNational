@@ -96,7 +96,7 @@ else
                                 <div class="radio-control">
                                     @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?", "", false, "compact")
                                     <div class="row">
-                                        <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.NoCar)" Name="RadioBtn" Value="@VehicleType.NoCar.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.None)" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     </div>
                                     <hr />
                                     <div class="row">
