@@ -27,3 +27,7 @@ delete from VolunteerEvents
 go
 delete from Volunteers
 go
+delete from Locations where LocationId > 8
+go
+delete from UserPersist
+go

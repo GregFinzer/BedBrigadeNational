@@ -176,28 +176,11 @@
                         </GridEditSettings>                                                                                              
           
                         <GridColumns>
-                            <GridColumn Field=@nameof(Schedule.ScheduleId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
+                            <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
                             <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@userLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
                             <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="false" AllowAdding="true" AllowEditing="true" ></GridColumn>
-                            <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                
-                            <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="d" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
-                                <FilterTemplate>  
-                                    @{
-                                        <SfDateRangePicker Placeholder="Choose a Range" Width="500" ShowClearButton="true"
-                                                           @bind-StartDate="ScheduleStartDate" @bind-EndDate="ScheduleEndDate" TValue="DateTime">
-                                            <DateRangePickerEvents TValue="DateTime" ValueChange="ValueChangeHandler">
-                                            </DateRangePickerEvents>
-                                        </SfDateRangePicker>
-                                    } 
-                                </FilterTemplate>
-                                <Template>
-                                    @{
-                                        Schedule mySchedule = (context as Schedule)!;
-                                        @mySchedule.EventDateScheduled.ToShortDateString()
-                                        <span>&nbsp;</span>
-                                        @mySchedule.EventDateScheduled.ToShortTimeString()
-                                    }
-                                </Template>
+                            <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
                             </GridColumn>
                             <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true"></GridColumn>
                             <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                

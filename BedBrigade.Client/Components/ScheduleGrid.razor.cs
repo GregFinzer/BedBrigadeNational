@@ -1,17 +1,11 @@
-﻿using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Syncfusion.Blazor.DropDowns;
-
 using BedBrigade.Data.Services;
-using System.Diagnostics;
-using Syncfusion.Blazor.Calendars;
-using Syncfusion.Blazor.Schedule;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Serilog;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
@@ -29,8 +23,6 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-
-       
 
         protected SfGrid<Schedule>? Grid { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
@@ -166,73 +158,49 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadScheduleData()
         {
-            try // get Schedule List ===========================================================================================
+            try 
             {
-                var dataSchedule = await _svcSchedule.GetAllAsync(); // get Schedules
-                lstSchedules = new List<Schedule>();
-
-                if (dataSchedule.Success)
+                ServiceResponse<List<Schedule>> recordResult;
+                if (Identity.IsInRole(RoleNames.NationalAdmin))
                 {
-                    if (dataSchedule!.Data.Count > 0)
-                    {
-                        lstSchedules = dataSchedule!.Data; // retrieve existing media records to temp list
+                    recordResult = await _svcSchedule.GetAllAsync(); 
+                }
+                else
+                {
+                    recordResult = await _svcSchedule.GetSchedulesByLocationId(userLocationId);
+                }
 
-                        // Location Filter
-                        if (Identity.IsInRole(RoleNames.LocationScheduler) || Identity.IsInRole(RoleNames.LocationAdmin))
-                        {                            
-                            lstSchedules = lstSchedules.FindAll(e => e.LocationId == userLocationId);
-                        }
-
-                        //ScheduleStartDate = lstSchedules.Min(x => x.EventDateScheduled);
-                        // Debug.WriteLine(ScheduleStartDate);
-                        // ScheduleEndDate = lstSchedules.Max(x => x.EventDateScheduled);
-
-                    }
-                    else
-                    {
-                        ErrorMessage = "No Schedule Data Found";
-                    } // no rows in Media
-
-                    
-                } // the first success
+                if (recordResult.Success)
+                {
+                    lstSchedules = recordResult!.Data; 
+                }
+                else
+                {
+                    ErrorMessage = "Could not retrieve schedule. " + recordResult.Message;
+                }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "No DB Files. " + ex.Message;
+                ErrorMessage = "Could not retrieve schedule. " + ex.Message;
             }
 
-        } // Load Schedule Data
+        } 
+
+
         protected async Task OnLoad()
         {
-          //  var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = await Grid.GetPersistDataAsync() });
-          //  if (result.Success)
-          //  {
-          //      await Grid.SetPersistDataAsync(result.Data);
-         //   }
-          //  if (!Identity.IsInRole(RoleNames.NationalAdmin))
-          //  {
-          //      await Grid.ExpandAllGroupAsync();
-          //  }
-
-        }
-
-
-
-        public void ValueChangeHandler(RangePickerEventArgs<DateTime> args)
-        {
-            ScheduleStartDate = args.StartDate;
-            ScheduleEndDate = args.EndDate;
+            //TODO: Load the grid state for this grid
+            //It is currently not possible to load the grid state for this grid 
+            //It has to do with how we are filtering the grid client side
+            //After saving the grid state, when it is loaded there are no records shown.
         }
 
         protected async Task OnDestroyed()
         {
-           // _state = await Grid.GetPersistDataAsync();
-          //  var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
-           // if (!result.Success)
-           // {
-                //Log the results
-           // }
-
+            //TODO: Save the grid state for this grid
+            //It is currently not possible to save the grid state for this grid 
+            //It has to do with how we are filtering the grid client side probably
+            //After saving the grid state, when it is loaded there are no records shown.
         }
 
 
@@ -240,10 +208,9 @@ namespace BedBrigade.Client.Components
         {
             if (args.Item.Text == "Reset")
             {
-               // await Grid.ResetPersistDataAsync();
-               // _state = await Grid.GetPersistDataAsync();
-               // await _svcUser.SaveGridPersistance(new Persist { GridId = (int)Common.Common.PersistGrid.Schedule, UserState = _state });
-                return;
+               await Grid.ResetPersistDataAsync();
+               //It is not possible to save the grid state for this grid for some reason
+               return;
             }
 
             if (args.Item.Text == "Pdf Export")
@@ -391,23 +358,18 @@ namespace BedBrigade.Client.Components
         {
             await Grid.CloseEditAsync();
         }
-
         protected void DataBound()
         {
-            try
+            if (lstSchedules.Count == 0) RecordText = "No Schedule records found";
+            if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
-              ///  if (lstSchedules.Count == 0) RecordText = "No Schedule records found";
-                
-              //  if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
-               // {
-               //     NoPaging = true;
-               // }
-               // else
-               //     NoPaging = false;
+                NoPaging = true;
             }
-            catch(Exception ex) { }
+            else
+                NoPaging = false;
 
         }
+
 
         protected async Task PdfExport()
         {

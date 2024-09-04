@@ -10,6 +10,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -24,6 +25,7 @@ namespace BedBrigade.Client.Components
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject] private IVolunteerEventsDataService? _svcVolunteerEvents { get; set; }
+        [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
 
         // object lists
 
@@ -56,6 +58,7 @@ namespace BedBrigade.Client.Components
         // Grid regerences
 
         protected SfGrid<Volunteer>? Grid { get; set; }
+
 
         // Constants
         private const string DisplayNone = "none";
@@ -114,6 +117,42 @@ namespace BedBrigade.Client.Components
 
         } // Async Init
 
+
+        /// <summary>
+        /// On loading of the Grid get the user grid persisted data
+        /// </summary>
+        /// <returns></returns>
+        protected async Task OnLoad()
+        {
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol };
+            var result = await _svcUserPersist.GetGridPersistence(persist);
+            if (result.Success && result.Data != null)
+            {
+                await Grid.SetPersistDataAsync(result.Data);
+            }
+        }
+
+        /// <summary>
+        /// On destroying of the grid save its current state
+        /// </summary>
+        /// <returns></returns>
+        protected async Task OnDestroyed()
+        {
+            await SaveGridPersistence();
+        }
+
+        private async Task SaveGridPersistence()
+        {
+            string state = await Grid.GetPersistData();
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol, Data = state };
+            var result = await _svcUserPersist.SaveGridPersistence(persist);
+            if (!result.Success)
+            {
+                Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.Evol} : {result.Message}");
+            }
+        }
 
         private async Task LoadGridData()
         {

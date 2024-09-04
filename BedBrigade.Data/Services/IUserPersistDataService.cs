@@ -6,6 +6,6 @@ namespace BedBrigade.Data.Services
     {
         Task<ServiceResponse<bool>> SaveGridPersistence(UserPersist persist);
         Task<ServiceResponse<string>> GetGridPersistence(UserPersist persist);
-
+        Task<ServiceResponse<bool>> DeleteByUserName(string userName);
     }
 }

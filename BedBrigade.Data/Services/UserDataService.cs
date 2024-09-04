@@ -13,17 +13,20 @@ namespace BedBrigade.Data.Services
         private readonly AuthenticationStateProvider _auth;
         private readonly ICommonService _commonService;
         private readonly ILocationDataService _locationDataService;
+        private readonly IUserPersistDataService _userPersistDataService;
 
         public UserDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
             AuthenticationStateProvider authProvider,
             ICommonService commonService,
-            ILocationDataService locationDataService) : base(contextFactory, cachingService, authProvider)
+            ILocationDataService locationDataService,
+            IUserPersistDataService userPersistDataService) : base(contextFactory, cachingService, authProvider)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
             _auth = authProvider;
             _commonService = commonService;
             _locationDataService = locationDataService;
+            _userPersistDataService = userPersistDataService;
         }
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
@@ -104,6 +107,26 @@ namespace BedBrigade.Data.Services
             var result = sb.ToString();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<string>($"Email Signature for {user.Data.FirstName} {user.Data.LastName}", true, result);
+        }
+
+        public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
+        {
+            var existingUser = await GetByIdAsync(id);
+
+            if (!existingUser.Success || existingUser.Data == null)
+                return new ServiceResponse<bool>($"Could not find {GetEntityName()} with id {id}", false); 
+
+            var userDelete = await base.DeleteAsync(id);
+
+            if (!userDelete.Success)
+                return userDelete;
+
+            var userPersistDelete = await _userPersistDataService.DeleteByUserName(existingUser.Data.UserName);
+
+            if (!userPersistDelete.Success)
+                return userPersistDelete;
+
+            return new ServiceResponse<bool>($"Deleted {GetEntityName()} with id {id} for UserName {existingUser.Data.UserName}", true);
         }
     }
 }

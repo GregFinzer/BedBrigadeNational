@@ -60,7 +60,7 @@
                        
                                     <GridTextWrapSettings WrapMode="Syncfusion.Blazor.Grids.WrapMode.Content" />
                                     <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
-                                    <GridEvents OnToolbarClick="ToolbarClickHandler" TValue="Volunteer" RowSelected="GetSelectedRecords" ></GridEvents>   
+                                    <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick="ToolbarClickHandler" TValue="Volunteer" RowSelected="GetSelectedRecords" ></GridEvents>   
                                     <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single" ></GridSelectionSettings>
                                              
                                 <GridTemplates>

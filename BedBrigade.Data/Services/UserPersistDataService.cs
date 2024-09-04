@@ -24,53 +24,93 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> SaveGridPersistence(UserPersist persist)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            //Save to the cache immediately in case the user goes back to the grid
+            string persistKey = GetCacheKey(persist);
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), persistKey);
+            _cachingService.Set(cacheKey, persist);
+
+            try
             {
-                var result = await context.UserPersist.FirstOrDefaultAsync(o => o.UserName == persist.UserName
-                                                                     && o.Grid == persist.Grid);
-
-                if (result == null)
+                using (var context = _contextFactory.CreateDbContext())
                 {
-                    context.UserPersist.Add(persist);
-                }
-                else
-                {
-                    result.Data = persist.Data;
-                    context.UserPersist.Update(result);
-                }
+                    var result = await context.UserPersist.FirstOrDefaultAsync(o => o.UserName == persist.UserName
+                        && o.Grid == persist.Grid);
 
-                await context.SaveChangesAsync();
-                string persistKey = GetCacheKey(persist);
-                string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), persistKey);
-                _cachingService.Set(cacheKey, persist.Data);
-                return new ServiceResponse<bool>("Persist data saved", true, true);
+                    if (result == null)
+                    {
+                        context.UserPersist.Add(persist);
+                    }
+                    else
+                    {
+                        result.Data = persist.Data;
+                        context.UserPersist.Update(result);
+                    }
+
+                    await context.SaveChangesAsync();
+                    return new ServiceResponse<bool>("Persist data saved", true, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<bool>($"Error: {ex.Message}");
             }
         }
 
         public async Task<ServiceResponse<string>> GetGridPersistence(UserPersist persist)
         {
-            string persistKey = GetCacheKey(persist);
-            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), persistKey);
-            var cachedContent = _cachingService.Get<UserPersist>(cacheKey);
-            if (cachedContent != null)
-                return new ServiceResponse<string>($"Found in cache for {persist.UserName} for Grid { persist.Grid}", true,
-                cachedContent.Data);
-
-            using (var context = _contextFactory.CreateDbContext())
+            try
             {
-                var result = await context.UserPersist.FirstOrDefaultAsync(o => o.UserName == persist.UserName
-                                                                     && o.Grid == persist.Grid);
-
-                if (result == null)
+                string persistKey = GetCacheKey(persist);
+                string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), persistKey);
+                var cachedContent = _cachingService.Get<UserPersist>(cacheKey);
+                if (cachedContent != null)
                 {
-                    persist.Data = null;
-                    _cachingService.Set(cacheKey, new UserPersist());
-                    return new ServiceResponse<string>("No persist data found", false, string.Empty);
+                    if (String.IsNullOrEmpty(cachedContent.Data))
+                    {
+                        return new ServiceResponse<string>("No persist data found", false, null);
+                    }
+
+                    return new ServiceResponse<string>($"Found in cache for {persist.UserName} for Grid {persist.Grid}",
+                        true,
+                        cachedContent.Data);
                 }
 
-                _cachingService.Set(cacheKey, result.Data);
-                return new ServiceResponse<string>($"Found persist data for {persist.UserName} for Grid { persist.Grid}", true,
-                    result.Data);
+                using (var context = _contextFactory.CreateDbContext())
+                {
+                    var result = await context.UserPersist.FirstOrDefaultAsync(o => o.UserName == persist.UserName
+                        && o.Grid == persist.Grid);
+
+                    if (result == null)
+                    {
+                        persist.Data = null;
+                        _cachingService.Set(cacheKey, new UserPersist());
+                        return new ServiceResponse<string>("No persist data found", false, null);
+                    }
+
+                    _cachingService.Set(cacheKey, result.Data);
+                    return new ServiceResponse<string>(
+                        $"Found persist data for {persist.UserName} for Grid {persist.Grid}", true,
+                        result.Data);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>($"Error: {ex.Message}");
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteByUserName(string userName)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var result = await context.UserPersist.Where(o => o.UserName == userName).ToListAsync();
+                if (result.Count == 0)
+                    return new ServiceResponse<bool>("Nothing to delete for this user", true, true);
+
+                context.UserPersist.RemoveRange(result);
+                await context.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<bool>("Persist data deleted", true, true);
             }
         }
     }

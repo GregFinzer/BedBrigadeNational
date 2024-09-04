@@ -33,7 +33,7 @@ else
                             AllowPdfExport="true"
                             AllowTextWrap="true">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
-                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="MetroArea" />
+                        <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="MetroArea" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
                                 <span>@RecordText</span>

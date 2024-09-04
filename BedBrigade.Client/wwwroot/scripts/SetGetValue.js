@@ -13,8 +13,10 @@
         },
 
         SetAttribute: function (element, attr, value) {
-            document.getElementById(element).setAttribute(attr, value);
-
+            var el = document.getElementById(element);
+            if (el) {
+                el.setAttribute(attr, value);
+            }
         },
 
         GetInnerHtml: function (element) {
