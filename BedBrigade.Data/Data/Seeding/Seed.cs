@@ -49,61 +49,6 @@ public class Seed
         {
             Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", Address1 = "1250 Gemini Pl", Address2 = "", City = "Columbus",
             State = "Ohio", PostalCode = "43240"
-        },
-
-        // fiction locations - San Francisco - for testing time only
-        new Location
-        {
-            Name = "San Francisco Holy Spirit",
-            Route = "/sfholyspirit",
-            Address1 = "2400 Noriega Street",
-            Address2 = "",
-            City = "San Francisco",
-            State = "CA",
-            PostalCode = "94122"
-        },
-        new Location
-        {
-            Name = "San Francisco Our Savior",
-            Route = "/sfoursavior",
-            Address1 = "1011 Garfield St",
-            Address2 = "",
-            City = "San Francisco",
-            State = "CA",
-            PostalCode = "94132"
-        },
-
-        new Location
-        {
-            Name = "San Francisco Christ Lutheran",
-            Route = "/sfchristlutheran",
-            Address1 = "1090 Quintara",
-            Address2 = "",
-            City = "San Francisco",
-            State = "CA",
-            PostalCode = "94116"
-        },
-
-       new Location
-        {
-            Name = "San Francisco Canaan Lutheran",
-            Route = "/sfcanaan",
-            Address1 = "2130 Anza Street",
-            Address2 = "",
-            City = "San Francisco",
-            State = "CA",
-            PostalCode = "94118"
-        },
-
-        new Location
-        {
-            Name = "Daly City Hope",
-            Route = "/dalycityhope",
-            Address1 = "55 San Fernando Way",
-            Address2 = "",
-            City = "San Francisco",
-            State = "CA",
-            PostalCode = "94015"
         }
 
     };

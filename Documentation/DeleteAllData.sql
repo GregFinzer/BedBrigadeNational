@@ -17,17 +17,15 @@ delete from Roles
 go
 delete from Schedules
 go
-delete from templates
+delete from Templates
 go
 delete from Users
 go
-delete from VolunteersFor
-go
-delete from VolunteerEvents
+delete from SignUps
 go
 delete from Volunteers
 go
-delete from Locations where LocationId > 8
+delete from Locations where LocationId > 3
 go
 delete from UserPersist
 go
