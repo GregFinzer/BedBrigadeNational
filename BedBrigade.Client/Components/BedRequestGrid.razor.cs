@@ -290,8 +290,8 @@ namespace BedBrigade.Client.Components
 
         private void Add()
         {
-            HeaderTitle = "Add BedRequest";
-            ButtonTitle = "Add BedRequest";
+            HeaderTitle = "Add Bed Request";
+            ButtonTitle = "Add Bed Request";
             BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
         }
 
@@ -339,7 +339,7 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Update BedRequest";
+            HeaderTitle = "Update Bed Request";
             ButtonTitle = "Update";
         }
 

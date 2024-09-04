@@ -60,7 +60,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
 
     [MaxLength(4000)] public String? SpecialInstructions { get; set; } = string.Empty;
 
-    [Required] public BedRequestStatus Status { get; set; } = BedRequestStatus.Requested;
+    [Required] public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
 
     [NotMapped]
     public string? StatusString
@@ -71,18 +71,6 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
     public Int32? TeamNumber { get; set; }
 
     public DateTime? DeliveryDate { get; set; }
-
-    [NotMapped]
-    public string? DeliveryDateString     
-    {
-        get
-        {
-            if (DeliveryDate == null)
-                return string.Empty;
-
-            return DeliveryDate.Value.ToShortDateString();
-        }
-    }
 
     [MaxLength(255)] public String? Notes { get; set; } = string.Empty;
 
