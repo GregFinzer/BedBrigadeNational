@@ -122,7 +122,7 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         if (config == null)
             ThrowKeyNotFound(section, key);
 
-        return config.ConfigurationValue.ToLower() == "true";
+        return config.ConfigurationValue.ToLower() == "true" || config.ConfigurationValue.ToLower() == "yes";
     }
 }
 
