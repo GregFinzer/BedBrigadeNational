@@ -107,14 +107,17 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@BedRequest.NumberOfBeds Min="1" Mas="10" Enabled="true" Placeholder="Beds Requested" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfNumericTextBox @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" Placeholder="Beds Requested" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfTextBox @bind-Value=@BedRequest.AgesGender Enabled="true" Placeholder="Ages Genders" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="Team #" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-6">
                                             <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
@@ -124,8 +127,8 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
-                                <GridSortColumn Field="FullName" Direction="SortDirection.Ascending"/>
+                                <GridSortColumn Field="@nameof(BedRequest.LocationId)" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="@nameof(BedRequest.CreateDate)" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridColumns>
@@ -135,10 +138,12 @@ else
                             <GridColumn Field=@nameof(BedRequest.FormattedPhone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Street) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.PostalCode) ShowColumnMenu="false" HeaderText="Zip" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.CreateDate) Format="d" ShowColumnMenu="false" HeaderText="Added to List" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.StatusString) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.AgesGender) ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.DeliveryDateString) ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.DeliveryDate) Format="d" ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.TeamNumber) ShowColumnMenu="false" HeaderText="Team #" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>

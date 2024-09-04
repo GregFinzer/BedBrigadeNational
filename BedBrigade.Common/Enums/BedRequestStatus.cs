@@ -2,7 +2,9 @@
 
 public enum BedRequestStatus
 {
-    Requested = 1,
+    Waiting = 1,
     Scheduled = 2,
     Delivered = 3,
+    Given = 4,
+    Cancelled = 5
 }
