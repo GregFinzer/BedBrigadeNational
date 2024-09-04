@@ -90,7 +90,7 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
-                var result = await ctx.VolunteerEvents
+                var result = await ctx.SignUps
                     .Where(o => o.ScheduleId == scheduleId)
                     .Select(b => b.Volunteer.Email)
                     .Distinct().ToListAsync();

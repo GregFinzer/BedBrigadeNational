@@ -1,7 +1,7 @@
 ﻿@layout Layout.AdminLayout
-@page "/administration/manage/events"
+@page "/administration/manage/sign-ups"
 @using BedBrigade.Common;
 @using BedBrigade.Common.Constants
 @attribute [Authorize(Roles = RoleNames.CanManageSchedule)]
 
-<EvolGrid />
+<SignUpGrid />

@@ -13,7 +13,7 @@
         <div class="row"><div class="col">&nbsp;</div></div>
         <div class="row">
             <div class="col">
-                <h2>Event Scheduler</h2>
+                <h2>Manage Schedule</h2>
             </div>
             <div class="col" style="text-align: right">
                 <h5>Show Schedules&nbsp;</h5>
@@ -49,7 +49,8 @@
                             AllowPdfExport="true"
                             AllowTextWrap="true"
                             AllowGrouping="true"
-                            Toolbar=@ToolBar >
+                            Toolbar=@ToolBar
+                            Width="100%">
                         <GridTextWrapSettings WrapMode="WrapMode.Header" /> 
                         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
                         </GridFilterSettings>
@@ -185,8 +186,8 @@
                             <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true"></GridColumn>
                             <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
                             <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
-                            <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="350" AllowFiltering="false" ></GridColumn>                               
-                            <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="150px" AllowFiltering="false"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
                             <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers (Registered)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
                             <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
                         </GridColumns>

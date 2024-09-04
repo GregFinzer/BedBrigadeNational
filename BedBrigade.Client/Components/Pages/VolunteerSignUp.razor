@@ -27,7 +27,7 @@
 
         <div class="row">
             
-            <div class="@(AvailableVolunteerEvents ? "col-md-3" : "col-md-12")">
+            <div class="@(AreSignUpsAvailable ? "col-md-3" : "col-md-12")">
                 <div class="card">
                     <div class="card-header" style="text-align: center">
                         Bed Brigade Location Events
@@ -36,7 +36,7 @@
                     <div class="card-body" style="display: @DisplayLocationEvents">
                         <div class="form-group">
                             <label for="events" class="formlabel">Location Available Events&nbsp;(@LocationEvents.Count)</label>
-                            <SfDropDownList @ref="ddlVolunteerEvents" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@LocationEvents">
+                            <SfDropDownList @ref="ddlSchedule" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@LocationEvents">
                                 <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ChangeEvent"></DropDownListEvents>
                             </SfDropDownList>
@@ -89,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            @if (AvailableVolunteerEvents)
+            @if (AreSignUpsAvailable)
             {
                 <div class="col-md-3">
                     <div class="card">
@@ -162,7 +162,7 @@
                                     <div class="radio-control">
                                         @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?", "", false, "compact")
                                         <div class="row">
-                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.NoCar)" Name="RadioBtn" Value="@VehicleType.NoCar.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.None)" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr/>
                                         <div class="row">
@@ -185,7 +185,7 @@
             }
         </div>
         
-        @if (AvailableVolunteerEvents)
+        @if (AreSignUpsAvailable)
         {
             <div class="row">
                 <div class="col-md-12">&nbsp;</div>

@@ -153,7 +153,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IScheduleDataService, ScheduleDataService>();
             builder.Services.AddScoped<ITemplateDataService, TemplateDataService>();
             builder.Services.AddScoped<IContactUsDataService, ContactUsDataService>();
-            builder.Services.AddScoped<IVolunteerEventsDataService, VolunteerEventsDataService>();
+            builder.Services.AddScoped<ISignUpDataService, SignUpDataService>();
             builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
             builder.Services.AddScoped<IMetroAreaDataService, MetroAreaDataService>();
             builder.Services.AddScoped<IHeaderMessageService, HeaderMessageService>();

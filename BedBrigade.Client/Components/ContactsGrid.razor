@@ -34,7 +34,8 @@ else
                             AllowSelection="true"
                             AllowPdfExport="true"
                             AllowTextWrap="true"
-                            AllowGrouping="true">
+                            AllowGrouping="true"
+                            Width="100%">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="10" />
                         <GridEvents DataBound=@DataBound
                             Destroyed=@OnDestroyed
@@ -112,11 +113,11 @@ else
                         <GridGroupSettings Columns=@groupColumns ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(ContactUs.ContactUsId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(ContactUs.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(ContactUs.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15">
+                            <GridColumn Field=@nameof(ContactUs.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(ContactUs.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                             </GridColumn>
-                            <GridForeignColumn Field=@nameof(ContactUs.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" />
-                            <GridColumn Field=@nameof(ContactUs.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" >
+                            <GridForeignColumn Field=@nameof(ContactUs.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(ContactUs.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                                 <Template>
                                     @{
                                         var request = (context as ContactUs);
@@ -124,8 +125,8 @@ else
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field=@nameof(ContactUs.Message) ShowColumnMenu="false" HeaderText="Message" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
-                            <GridColumn Field=@nameof(ContactUs.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="15" >
+                            <GridColumn Field=@nameof(ContactUs.Message) ShowColumnMenu="false" HeaderText="Message" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(ContactUs.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
                                 <Template>
                                     @{
                                         var request = (context as ContactUs);
@@ -134,7 +135,7 @@ else
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field=@nameof(ContactUs.CreateDate) ShowColumnMenu="false" HeaderText="Date Created" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="15">
+                            <GridColumn Field=@nameof(ContactUs.CreateDate) ShowColumnMenu="false" HeaderText="Date Created" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                                 <Template>
                                     @{
                                         var request = (context as ContactUs);

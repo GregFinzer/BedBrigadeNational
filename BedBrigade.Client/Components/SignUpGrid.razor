@@ -3,7 +3,7 @@
 {   <div class="row"><div class="col">&nbsp;</div></div>
      <div class="row ustify-content-center" >
          <div class="col">
-           @EvolHelper.GetEvolDataStatusMessage(lstEmptyTables)
+           @SignUpHelper.GetEvolDataStatusMessage(lstEmptyTables)
          </div>
      </div>
 }
@@ -13,7 +13,7 @@
             <div class="row"><div class="col">&nbsp;</div></div>
             <div class="row" style="display: @GridDisplay">
                 <div class="col-md-3" style="white-space: nowrap">
-                    <h3>Manage Event's Volunteers</h3>           
+                    <h3>Manage Sign-Ups</h3>           
                 </div>     
                 <div class="col-md-4 align-items-center" >
                     <div class="form-group">
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    @BootstrapHelper.GetBootstrapMessage("info", "You cannot manage Bed Brigade events on this page. Please use 'Schedules' page in Administration Manage.", "", false,"compact")
+                    @BootstrapHelper.GetBootstrapMessage("info", "To manage the Build and Delivery schedule please use 'Schedules' page on the Administration Menu.", "", false,"compact")
                 </div>
                 <div class="col-md-2" style="text-align:right; font-size: small">
                     <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
@@ -83,21 +83,15 @@
                                 <GridColumn Field=@nameof(Volunteer.EvolId) Visible="@displayId" IsPrimaryKey="true" HeaderText="PRID" TextAlign="TextAlign.Left"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
                                 <GridColumn Field=@nameof(Volunteer.RegistrationId) Visible="@displayId" HeaderText="Reg ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
                                 <GridColumn Field=@nameof(Volunteer.EventLocationId) Visible="@displayId" HeaderText="Loc ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                                <GridColumn Field=@nameof(Volunteer.EventLocationName)  HeaderText="Location Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="200px" AllowSorting="true"    />
+                        <GridColumn Field=@nameof(Volunteer.EventLocationName) HeaderText="Location Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
                                 <GridColumn Field=@nameof(Volunteer.EventId)  Visible="@displayId" HeaderText="Event ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                                <GridColumn Field=@nameof(Volunteer.EventName) HeaderText="Event Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="200px" AllowSorting="true"    />
-                                <GridColumn Field=@nameof(Volunteer.EventDate) HeaderText="Event Date" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" Width="200px"   >
-                                    <Template>
-                                        @{
-                                            var request = (context as Volunteer);
-                                            @DateUtil.GetFormattedDateTime(request.EventDate);
-                                        }
-                                    </Template>
-                                </GridColumn>
-                                <GridColumn Field=@nameof(Volunteer.VolunteerId)  Visible="@displayId" HeaderText="Vol ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>                        
-                                <GridColumn Field=@nameof(Volunteer.FullName)  HeaderText="Volunteer Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="200px"  AllowSorting="true"   />
-                                    <GridColumn Field=@nameof(Volunteer.Email)  HeaderText="Email" Type="ColumnType.String" AllowEditing="false"  AllowFiltering="false" Width="250px"   />
-                                    <GridColumn Field=@nameof(Volunteer.Phone)  HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="150px"  >
+                        <GridColumn Field=@nameof(Volunteer.EventName) HeaderText="Event Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
+                        <GridColumn Field=@nameof(Volunteer.EventDate) HeaderText="Event Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+
+                                <GridColumn Field=@nameof(Volunteer.VolunteerId)  Visible="@displayId" HeaderText="Vol ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.FullName) HeaderText="Volunteer Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" AllowSorting="true" />
+                        <GridColumn Field=@nameof(Volunteer.Email) HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.Phone) HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                                         <Template>
                                             @{
                                                 var request = (context as Volunteer);
@@ -105,10 +99,11 @@
                                             }
                                         </Template>
                                     </GridColumn>
-                                    <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup)  HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="300px" />                                                  
-                                    <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="false" AllowFiltering="false" Width="200px"  />                        
-                                    <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore)  Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125px" />
-                                    <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip"  AllowEditing="false" AllowFiltering="false" Width="800px" />
+                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                        <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="false" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.CreateDate) HeaderText="Registration Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                                    <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip"  AllowEditing="false" AllowFiltering="false" Width="200px" />
                                  </GridColumns>
                             </SfGrid>
                          </div>

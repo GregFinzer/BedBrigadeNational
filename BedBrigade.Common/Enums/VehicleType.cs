@@ -5,7 +5,7 @@ namespace BedBrigade.Common.Enums;
 public enum VehicleType // added by VS 9/1/2023
 {
     [Description("I do not have a delivery vehicle")]
-    NoCar = 0,
+    None = 0,
     [Description("I have a minivan")]
     Minivan = 1,
     [Description("I have a large SUV")]

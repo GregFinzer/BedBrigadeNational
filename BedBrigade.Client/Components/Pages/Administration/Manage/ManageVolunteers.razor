@@ -32,7 +32,7 @@ else
     <div class="row">
         <div class="content-wrapper col-md-12">
             <div style="width: 100%">
-                <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers Width="100%"
+                <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers
                         ContextMenuItems=@ContextMenu
                         EnablePersistence="true"
                         ShowColumnChooser="true"
@@ -47,7 +47,8 @@ else
                         AllowSelection="true"
                         AllowPdfExport="true"
                         AllowTextWrap="true"
-                        AllowGrouping="true">
+                        AllowGrouping="true"
+                        Width="100%">
                     <GridTextWrapSettings WrapMode="WrapMode.Content" />
                     <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
                     <GridEvents DataBound=@DataBound OnLoad="@OnLoad" Destroyed=@OnDestroyed OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
@@ -60,16 +61,17 @@ else
                     <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                     <GridSortSettings>
                         <GridSortColumns>
-                            <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
+                            <GridSortColumn Field="@nameof(Volunteer.LocationId)" Direction="SortDirection.Ascending" />
+                            <GridSortColumn Field="@nameof(Volunteer.FullName)" Direction="SortDirection.Ascending" />
                         </GridSortColumns>
                     </GridSortSettings>
                     <GridGroupSettings ShowDropArea="true" EnableLazyLoading="true" />
                     <GridColumns>
-                        <GridColumn Field=@nameof(Volunteer.VolunteerId) HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.VolunteerId) Visible="false" HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
                         <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="200px" />
-                        <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="250px" />
-                        <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="150px">
+                        <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
                             <Template>
                                 @{
                                     var request = (context as Volunteer);
@@ -78,10 +80,10 @@ else
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="300px" />
-                        <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="false" Width="200px" />
-                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" Width="125px" />
-                        <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="false" Width="800px" />
+                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                        <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="false" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="false" Width="400px" />
                     </GridColumns>
                 </SfGrid>
             </div>

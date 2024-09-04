@@ -31,7 +31,8 @@ else
                             AllowResizing="true"
                             AllowSelection="true"
                             AllowPdfExport="true"
-                            AllowTextWrap="true">
+                            AllowTextWrap="true"
+                            Width="100%">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
                         <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="MetroArea" />
                         <GridTemplates>
@@ -69,7 +70,7 @@ else
                         </GridSortSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(MetroArea.MetroAreaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="15" />
+                            <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 
