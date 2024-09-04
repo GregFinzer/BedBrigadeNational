@@ -44,6 +44,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             ".png",
             ".gif"
         };
+        private string contentRootPath = string.Empty;
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -96,6 +97,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             }
 
             await SetLocationName(locationId);
+            contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
 
             ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, locationId);
 
@@ -188,7 +190,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = $"{LocationRoute}/pages/{ContentName}/{itemValue}"; // VS 8/25/2024
+            //FolderPath = $"{LocationRoute}/pages/{ContentName}/{itemValue}"; // old
+            FolderPath = contentRootPath + $"/pages/{ContentName}/{itemValue}"; // VS 9/3/2024
             await OpenDialog();
         }
 
