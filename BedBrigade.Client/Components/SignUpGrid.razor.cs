@@ -233,13 +233,9 @@ public partial class SignUpGrid : ComponentBase
         if (dataLocations.Success) // 
         {
             Locations = dataLocations.Data;
-            if (Locations != null && Locations.Count > 0)
-            {
-                // select User Location Name 
-                userLocationName = Locations.Find(e => e.LocationId == userLocationId).Name;
-            } // Locations found            
+            userLocationName = Locations.FirstOrDefault(e => e.LocationId == userLocationId)?.Name;
         }
-    } // Load Locations
+    } 
 
     private async Task LoadVolunteerData()
     {
