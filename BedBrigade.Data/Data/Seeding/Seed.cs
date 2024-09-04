@@ -642,15 +642,7 @@ public class Seed
                             Role = user.Role,
                             FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                             PasswordHash = passwordHash,
-                            PasswordSalt = passwordSalt,
-                            PersistBedRequest = String.Empty,
-                            PersistConfig = String.Empty,
-                            PersistDonation = string.Empty,
-                            PersistLocation = string.Empty,
-                            PersistMedia = string.Empty,
-                            PersistPages = string.Empty,
-                            PersistUser = string.Empty,
-                            PersistVolunteers = string.Empty
+                            PasswordSalt = passwordSalt
                         };
                         await context.Users.AddAsync(newUser);
                         await context.SaveChangesAsync();

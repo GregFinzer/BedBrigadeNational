@@ -157,6 +157,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IEmailQueueDataService, EmailQueueDataService>();
             builder.Services.AddScoped<IMetroAreaDataService, MetroAreaDataService>();
             builder.Services.AddScoped<IHeaderMessageService, HeaderMessageService>();
+            builder.Services.AddScoped<IUserPersistDataService, UserPersistDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

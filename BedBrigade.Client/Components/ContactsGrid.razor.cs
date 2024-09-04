@@ -20,6 +20,7 @@ namespace BedBrigade.Client.Components
     {
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
 
@@ -152,32 +153,41 @@ namespace BedBrigade.Client.Components
             }
             return base.OnAfterRenderAsync(firstRender);
         }
+
         /// <summary>
-        /// On loading of the Grid get the user grid persited data
+        /// On loading of the Grid get the user grid persisted data
         /// </summary>
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            var result = await _svcUser.GetGridPersistance(new Persist { GridId = (int) PersistGrid.ContactUs, UserState = await Grid.GetPersistData() });
-            if (result.Success)
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.ContactUs };
+            var result = await _svcUserPersist.GetGridPersistence(persist);
+            if (result.Success && result.Data != null)
             {
                 await Grid.SetPersistDataAsync(result.Data);
             }
         }
 
         /// <summary>
-        /// On destoring of the grid save its current state
+        /// On destroying of the grid save its current state
         /// </summary>
         /// <returns></returns>
         protected async Task OnDestroyed()
         {
-            _state = await Grid.GetPersistData();
-            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.ContactUs, UserState = _state });
-            if(!result.Success)
-            {
-                //Log the results
-            }
+            await SaveGridPersistence();
+        }
 
+        private async Task SaveGridPersistence()
+        {
+            _state = await Grid.GetPersistData();
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.ContactUs, Data = _state };
+            var result = await _svcUserPersist.SaveGridPersistence(persist);
+            if (!result.Success)
+            {
+                Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.ContactUs} : {result.Message}");
+            }
         }
 
 
@@ -186,8 +196,7 @@ namespace BedBrigade.Client.Components
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistData();
-                _state = await Grid.GetPersistData();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.ContactUs, UserState = _state });
+                await SaveGridPersistence();
                 return;
             }
 

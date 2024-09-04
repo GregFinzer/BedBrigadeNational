@@ -20,6 +20,7 @@ namespace BedBrigade.Data
         public virtual DbSet<Media> Media { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserPersist> UserPersist { get; set; }
         public virtual DbSet<Volunteer> Volunteers { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<EmailQueue> EmailQueues { get; set; }
@@ -41,6 +42,9 @@ namespace BedBrigade.Data
         /// <param name="modelBuilder"></param>
         private static void CreateIndexes(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserPersist>()
+                .HasKey(up => new { up.UserName, up.Grid });
+
             modelBuilder.Entity<ContactUs>()
                 .HasIndex(o => o.Status);
 

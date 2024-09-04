@@ -18,6 +18,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
     {
         [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
@@ -161,22 +162,41 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         } // OnInit
 
 
-
+        /// <summary>
+        /// On loading of the Grid get the user grid persisted data
+        /// </summary>
+        /// <returns></returns>
+        protected async Task OnLoad()
+        {
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer };
+            var result = await _svcUserPersist.GetGridPersistence(persist);
+            if (result.Success && result.Data != null)
+            {
+                await Grid.SetPersistDataAsync(result.Data);
+            }
+        }
 
 
         /// <summary>
-        /// On destoring of the grid save its current state
+        /// On destroying of the grid save its current state
         /// </summary>
         /// <returns></returns>
         protected async Task OnDestroyed()
         {
-            _state = await Grid.GetPersistDataAsync();
-            var result = await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.BedRequest, UserState = _state });
+            await SaveGridPersistence();
+        }
+
+        private async Task SaveGridPersistence()
+        {
+            _state = await Grid.GetPersistData();
+            string userName = await _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer, Data = _state };
+            var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
             {
-                //Log the results
+                Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.Volunteer} : {result.Message}");
             }
-
         }
 
 
@@ -185,8 +205,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistDataAsync();
-                _state = await Grid.GetPersistDataAsync();
-                await _svcUser.SaveGridPersistance(new Persist { GridId = (int)PersistGrid.Volunteer, UserState = _state });
+                await SaveGridPersistence();
             }
             else if (args.Item.Text == "Pdf Export")
             {
