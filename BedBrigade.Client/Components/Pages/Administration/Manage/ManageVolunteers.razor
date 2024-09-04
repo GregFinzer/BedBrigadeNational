@@ -50,7 +50,7 @@ else
                         AllowGrouping="true">
                     <GridTextWrapSettings WrapMode="WrapMode.Content" />
                     <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
-                    <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
+                    <GridEvents DataBound=@DataBound OnLoad="@OnLoad" Destroyed=@OnDestroyed OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
                     <GridTemplates>
                         <EmptyRecordTemplate>
                             <span>@RecordText</span>

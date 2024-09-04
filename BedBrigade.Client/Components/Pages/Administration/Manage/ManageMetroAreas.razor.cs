@@ -13,6 +13,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage;
 
@@ -21,6 +22,7 @@ public partial class ManageMetroAreas : ComponentBase
     [Inject] private IMetroAreaDataService? _svcMetroArea { get; set; }
     [Inject] private IUserDataService? _svcUser { get; set; }
     [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
 
     [Parameter] public string? Id { get; set; }
 
@@ -310,6 +312,42 @@ public partial class ManageMetroAreas : ComponentBase
         };
 
         await Grid.CsvExport(ExportProperties);
+    }
+
+    /// <summary>
+    /// On loading of the Grid get the user grid persisted data
+    /// </summary>
+    /// <returns></returns>
+    protected async Task OnLoad()
+    {
+        string userName = await _svcUser.GetUserName();
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas };
+        var result = await _svcUserPersist.GetGridPersistence(persist);
+        if (result.Success && result.Data != null)
+        {
+            await Grid.SetPersistDataAsync(result.Data);
+        }
+    }
+
+    /// <summary>
+    /// On destroying of the grid save its current state
+    /// </summary>
+    /// <returns></returns>
+    protected async Task OnDestroyed()
+    {
+        await SaveGridPersistence();
+    }
+
+    private async Task SaveGridPersistence()
+    {
+        string state = await Grid.GetPersistData();
+        string userName = await _svcUser.GetUserName();
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas, Data = state };
+        var result = await _svcUserPersist.SaveGridPersistence(persist);
+        if (!result.Success)
+        {
+            Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.MetroAreas} : {result.Message}");
+        }
     }
 
 }

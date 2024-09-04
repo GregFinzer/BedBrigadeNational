@@ -1,4 +1,3 @@
-using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,32 +41,6 @@ public class User : BaseEntity, ILocationId, IEmail
     [ForeignKey("Role")]
     [Range(1,int.MaxValue, ErrorMessage = "Please select a role for the user")]
     public int FkRole { get; set; }
-
-    // Persist the state of the grid component 
-
-    [MaxLength(4000)]
-    public string PersistConfig { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistDonation { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistLocation { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistPages { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistUser { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistVolunteers { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistMedia { get; set; } = string.Empty;
-
-    [MaxLength(4000)]
-    public string PersistBedRequest { get; set; } = string.Empty;
 
 
     public string FullName

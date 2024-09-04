@@ -42,7 +42,7 @@ else
                         AllowGrouping="true">
                         <GridTextWrapSettings WrapMode="WrapMode.Header" />
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
-                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad TValue="User" />
+                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad Destroyed="@OnDestroyed" TValue="User" />
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <Validator>

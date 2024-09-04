@@ -12,5 +12,7 @@ public enum PersistGrid
     Media = 8,
     Pages = 9,
     Schedule = 10,
-    ContactUs = 11
+    ContactUs = 11,
+    Evol = 12,
+    MetroAreas =13,
 }
