@@ -50,7 +50,7 @@ else
         </EditForm>
     </div>
 
-    <SfDialog @ref="MediaDialog" Width="90%" IsModal="true" ShowCloseIcon="true" Visible="false">
+    <SfDialog @ref="MediaDialog" Width="90%" IsModal="true" ShowCloseIcon="true" Visible="false" ZIndex="100000" >
         <DialogEvents OnOpen="onOpen"></DialogEvents>
         <DialogTemplates>
             <Header>Upload Files</Header>
