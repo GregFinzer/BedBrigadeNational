@@ -23,6 +23,12 @@ namespace BedBrigade.Client.Services
                     var image = images.First().Replace("wwwroot/", "");
                     html = ReplaceImageSrc(html, imgId, image);
                 }
+
+                else
+                { // image source file not found - get "No Image Found" -  VS 9/4/2024                {                 
+
+                    html = ReplaceImageSrc(html, imgId, Defaults.ErrorImagePath); // Image Not Found URL
+                }
             }
 
             return html;
