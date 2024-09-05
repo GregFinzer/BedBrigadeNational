@@ -2,7 +2,7 @@
 {
     public static class Defaults
     {
-        public const string ErrorImagePath = "media/national/pages/Error/leftImageRotator/NoImageFound.jpg";
+        public const string ErrorImagePath = "media/national/NoImageFound.jpg";
         public const string AuthToken = "AuthToken";
         public const string MediaDirectory = "MediaDirectory";
         public const int NationalLocationId = 1;
