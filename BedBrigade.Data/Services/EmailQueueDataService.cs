@@ -300,7 +300,7 @@ namespace BedBrigade.Data.Services
                 case EmailRecipientOption.BedRequestorsWhoHaveRecievedABed:
                     return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForReceivedABed(locationId)).Data);
                 case EmailRecipientOption.BedRequestorsForAnEvent:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(scheduleId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(locationId)).Data);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(option), option, $"Unsupported Option: {option}");
             }

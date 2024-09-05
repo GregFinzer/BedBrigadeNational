@@ -54,9 +54,6 @@ namespace BedBrigade.Data
             modelBuilder.Entity<Schedule>()
                 .HasIndex(o => o.EventType);
 
-            modelBuilder.Entity<BedRequest>()
-                .HasIndex(o => o.ScheduleId);
-
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(e => e.Email)
                 .IsUnique();

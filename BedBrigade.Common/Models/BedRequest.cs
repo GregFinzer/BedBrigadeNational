@@ -14,8 +14,6 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
 
     [ForeignKey("LocationId"), Required] public Int32 LocationId { get; set; }
 
-    [ForeignKey("ScheduleId")] public Int32? ScheduleId { get; set; }
-
     [Required(ErrorMessage = "First Name is required.")]
     [MaxLength(20)]
     public String? FirstName { get; set; } = string.Empty;
