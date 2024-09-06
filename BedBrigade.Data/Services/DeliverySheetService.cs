@@ -52,6 +52,7 @@ namespace BedBrigade.Data.Services
 
         private void CreateTitle(IWorksheet worksheet, string locationName, List<BedRequest> bedRequests)
         {
+            const string titleCell = "A1";
             string title = "Delivery Sheet for " + locationName;
 
             if (bedRequests.Any(o => o.DeliveryDate.HasValue))
@@ -60,13 +61,13 @@ namespace BedBrigade.Data.Services
             }
 
             worksheet.Range["A1:I1"].Merge();
-            worksheet.Range["A1"].Text = title;
-            worksheet.Range["A1"].CellStyle.Font.FontName = "Arial"; 
-            worksheet.Range["A1"].CellStyle.Font.Bold = true;
-            worksheet.Range["A1"].CellStyle.Font.Size = 14;
-            worksheet.Range["A1"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
-            worksheet.Range["A1"].CellStyle.VerticalAlignment = ExcelVAlign.VAlignCenter;
-            worksheet.Range["A1"].RowHeight = 20;
+            worksheet.Range[titleCell].Text = title;
+            worksheet.Range[titleCell].CellStyle.Font.FontName = "Arial"; 
+            worksheet.Range[titleCell].CellStyle.Font.Bold = true;
+            worksheet.Range[titleCell].CellStyle.Font.Size = 14;
+            worksheet.Range[titleCell].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
+            worksheet.Range[titleCell].CellStyle.VerticalAlignment = ExcelVAlign.VAlignCenter;
+            worksheet.Range[titleCell].RowHeight = 20;
         }
 
         private void OutputBedRequests(IWorksheet worksheet, List<BedRequest> bedRequests)

@@ -66,6 +66,10 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
+        private bool IsDialogVisible { get; set; } = false;
+        private string DialogHeader { get; set; } = string.Empty;
+        private string DialogContent { get; set; } = string.Empty;
+
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -410,25 +414,106 @@ namespace BedBrigade.Client.Components
 
         private async void DownloadDeliverySheet()
         {
-            List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-
-            if (!selectedBedRequests.Any())
-                return;
-
-            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedBedRequests.First().LocationId);
-
-            if (!scheduledBedRequestResult.Success || scheduledBedRequestResult.Data == null)
+            if (!await ValidateScheduled())
             {
                 return;
             }
 
-            var location = Locations.FirstOrDefault(l => l.LocationId == selectedBedRequests.First().LocationId);
+            int selectedLocation;
+            if (IsLocationColumnVisible)
+            {
+                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                selectedLocation = selectedBedRequests.First().LocationId;
+            }
+            else
+            {
+                selectedLocation = await _svcUser.GetUserLocationId();
+            }
+
+            var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
             string fileName = _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
             Stream stream = _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data);
             using var streamRef = new DotNetStreamReference(stream: stream);
 
             await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
 
+        }
+
+        private async Task<bool> ValidateScheduled()
+        {
+            if (!BedRequests.Any(o => o.Status == BedRequestStatus.Scheduled))
+            {
+                DialogHeader = "No Bed Requests";
+                DialogContent = "There are no bed requests with a Scheduled status to create the Delivery Sheet.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            int selectedLocation;
+            if (IsLocationColumnVisible)
+            {
+                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+
+                if (!selectedBedRequests.Any())
+                {
+                    DialogHeader = "Select Row";
+                    DialogContent = "Please select a row in the location you would like to schedule.";
+                    IsDialogVisible = true;
+                    return false;
+                }
+                selectedLocation = selectedBedRequests.First().LocationId;
+            }
+            else
+            {
+                selectedLocation = await _svcUser.GetUserLocationId();
+            }
+
+            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+
+            if (!scheduledBedRequestResult.Success || scheduledBedRequestResult.Data == null)
+            {
+                DialogHeader = "Could Not Load Data";
+                DialogContent = scheduledBedRequestResult.Message;
+                IsDialogVisible = true;
+                return false;
+            }
+
+            return ValidateBedRequestData(scheduledBedRequestResult);
+        }
+
+        private bool ValidateBedRequestData(ServiceResponse<List<BedRequest>> scheduledBedRequestResult)
+        {
+            if (!scheduledBedRequestResult.Data.Any())
+            {
+                DialogHeader = "No Bed Requests";
+                DialogContent = "There are no bed requests with a Scheduled status for the selected location to create the Delivery Sheet.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            if (scheduledBedRequestResult.Data.Any(o => !o.DeliveryDate.HasValue))
+            {
+                DialogHeader = "Set delivery date";
+                DialogContent = "Please set the delivery date for all scheduled rows.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            if (scheduledBedRequestResult.Data.Any(o => !o.TeamNumber.HasValue))
+            {
+                DialogHeader = "Set team number";
+                DialogContent = "Please set the team number for all scheduled rows.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            return true;
+        }
+
+        private void DialogOkClick()
+        {
+            IsDialogVisible = false;
         }
     }
 }

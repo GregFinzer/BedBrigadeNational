@@ -65,7 +65,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForNotReceivedABed", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -82,7 +82,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForReceivedABed", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -99,7 +99,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForSchedule", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -121,7 +121,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<BedRequest>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetScheduledBedRequestsForLocation", true, cachedContent);
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
