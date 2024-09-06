@@ -15,6 +15,12 @@ namespace BedBrigade.Tests
         [Test]
         public void OutputDeliverySheet()
         {
+            //Skip if not running locally
+            if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
+            {
+                Assert.Ignore("Ignore Excel Test When Running in Pipeline");
+            }
+
             //Arrange
             // Calculate the first Saturday
             int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
