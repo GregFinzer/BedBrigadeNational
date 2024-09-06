@@ -1,18 +1,27 @@
 ﻿using Syncfusion.XlsIO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using Syncfusion.XlsIO.Implementation;
+
 
 namespace BedBrigade.Data.Services
 {
-    public class DeliverySheetService
+    public class DeliverySheetService : IDeliverySheetService
     {
-        public void CreateDeliverySheet(Location location, List<BedRequest> bedRequests)
+        public string CreateDeliverySheetFileName(Location location, List<BedRequest> bedRequests)
+        {
+            string locationName = FileUtil.FilterFileName(location.Name, false);
+            string fileName = $"Delivery_Sheet_{locationName}";
+
+            if (bedRequests.Any(o => o.DeliveryDate.HasValue))
+            {
+                fileName += "_" + bedRequests.First(o => o.DeliveryDate.HasValue).DeliveryDate.Value.ToString("yyyy-MM-dd");
+            }
+
+            fileName += ".xlsx";
+            return fileName;
+        }
+
+        public Stream CreateDeliverySheet(Location location, List<BedRequest> bedRequests)
         {
             // Set the Syncfusion license key
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
@@ -29,25 +38,30 @@ namespace BedBrigade.Data.Services
 
                 SetLandscape(worksheet);
                 SetMargins(worksheet);
-                CreateTitle(worksheet, location.Name);
+                CreateTitle(worksheet, location.Name, bedRequests);
                 CreateHeader(worksheet);
                 OutputBedRequests(worksheet, bedRequests);
 
-                // Save the workbook to the current directory
-                FileStream stream = new FileStream("Sample.xlsx", FileMode.Create, FileAccess.ReadWrite);
+                MemoryStream stream = new MemoryStream();
                 
                 workbook.SaveAs(stream);
-                stream.Dispose();
+                stream.Position = 0;
+                return stream;
             }
-
-
         }
 
-        private void CreateTitle(IWorksheet worksheet, string locationName)
+        private void CreateTitle(IWorksheet worksheet, string locationName, List<BedRequest> bedRequests)
         {
             string title = "Delivery Sheet for " + locationName;
+
+            if (bedRequests.Any(o => o.DeliveryDate.HasValue))
+            {
+                title += " - " + bedRequests.First(o => o.DeliveryDate.HasValue).DeliveryDate.Value.ToShortDateString();
+            }
+
             worksheet.Range["A1:I1"].Merge();
             worksheet.Range["A1"].Text = title;
+            worksheet.Range["A1"].CellStyle.Font.FontName = "Arial"; 
             worksheet.Range["A1"].CellStyle.Font.Bold = true;
             worksheet.Range["A1"].CellStyle.Font.Size = 14;
             worksheet.Range["A1"].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignCenter;
@@ -87,10 +101,12 @@ namespace BedBrigade.Data.Services
 
         private static void ApplyBedRequestCellFormatting(IWorksheet worksheet, bool isWhiteBackground, int row)
         {
-            Syncfusion.Drawing.Color backgroundColor = isWhiteBackground ? Syncfusion.Drawing.Color.White : Syncfusion.Drawing.Color.WhiteSmoke;
+            Syncfusion.Drawing.Color backgroundColor = isWhiteBackground ? Syncfusion.Drawing.Color.White : Syncfusion.Drawing.Color.LightGray;
 
             for (int col = 1; col <= 9; col++)
             {
+                worksheet.Range[row, col].CellStyle.Font.FontName = "Arial";
+                worksheet.Range[row, col].CellStyle.Font.Size = 11;
                 worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
                 worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
                 worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
@@ -109,43 +125,31 @@ namespace BedBrigade.Data.Services
 
         private void CreateHeader(IWorksheet worksheet)
         {
-            CreateHeaderCell(worksheet, "Name", 0, 18.14);
-            CreateHeaderCell(worksheet, "Phone", 1, 15);
-            CreateHeaderCell(worksheet, "Address", 2, 20.29);
-            CreateHeaderCell(worksheet, "Zip", 3, 7);
-            CreateHeaderCell(worksheet, "Requested", 4, 11);
-            CreateHeaderCell(worksheet, "Beds", 5, 4.57);
-            CreateHeaderCell(worksheet, "Ages", 6, 4.57);
-            CreateHeaderCell(worksheet, "Team", 7, 5.14);
-            CreateHeaderCell(worksheet, "Notes", 8, 27.80);
+            CreateHeaderCell(worksheet, "Name", 1, 18.14);
+            CreateHeaderCell(worksheet, "Phone", 2, 15.14);
+            CreateHeaderCell(worksheet, "Address", 3, 20.29);
+            CreateHeaderCell(worksheet, "Zip", 4, 6.14);
+            CreateHeaderCell(worksheet, "Requested", 5, 11);
+            CreateHeaderCell(worksheet, "Beds", 6, 4.57);
+            CreateHeaderCell(worksheet, "Ages", 7, 13);
+            CreateHeaderCell(worksheet, "Team", 8, 5.14);
+            CreateHeaderCell(worksheet, "Notes", 9, 42.80);
         }
 
-        private void CreateHeaderCell(IWorksheet worksheet, string text, int column, double width)
+        private void CreateHeaderCell(IWorksheet worksheet, string text, int col, double width)
         {
-            string columnLetter = GetExcelColumnLetter(column);
-            string cellRange = $"{columnLetter}2";
-            worksheet.Range[cellRange].Text = text;
-            worksheet.Range[cellRange].CellStyle.Color = Syncfusion.Drawing.Color.Black;
-            worksheet.Range[cellRange].CellStyle.Font.Color = ExcelKnownColors.White;
-            worksheet.Range[cellRange].ColumnWidth = width;
+            int row = 2; 
+            worksheet.Range[row, col].Text = text;
+            worksheet.Range[row, col].CellStyle.Color = Syncfusion.Drawing.Color.Black;
+            worksheet.Range[row, col].CellStyle.Font.Color = ExcelKnownColors.White;
+            worksheet.Range[row, col].ColumnWidth = width;
+            worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
+            worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
+            worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Thin;
+            worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
         }
 
-        private static string GetExcelColumnLetter(int columnNumber)
-        {
-            columnNumber++;
-            int dividend = columnNumber;
-            string columnName = String.Empty;
-            int modulo;
 
-            while (dividend > 0)
-            {
-                modulo = (dividend - 1) % 26;
-                columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
-                dividend = (int)((dividend - modulo) / 26);
-            }
-
-            return columnName;
-        }
 
         private static void SetMargins(IWorksheet worksheet)
         {

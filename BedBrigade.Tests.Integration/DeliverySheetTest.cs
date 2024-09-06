@@ -13,9 +13,17 @@ namespace BedBrigade.Tests
     public class DeliverySheetTest
     {
         [Test]
-        public void HelloWorldExcel()
+        public void OutputDeliverySheet()
         {
             //Arrange
+            // Calculate the first Saturday
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
+            if (daysUntilSaturday == 0)
+            {
+                daysUntilSaturday = 7; // If today is Saturday, schedule for the next Saturday
+            }
+
+            DateTime nextSaturday = DateTime.Today.AddDays(daysUntilSaturday);
             DeliverySheetService deliverySheetService = new DeliverySheetService();
 
             Location location = new Location
@@ -36,7 +44,8 @@ namespace BedBrigade.Tests
                     NumberOfBeds = 2,
                     AgesGender = "G/5 B/7",
                     TeamNumber = 1,
-                    Notes = "No Bed Bugs. Delivery scheduled for Saturday 8/31/2024 at 10am"
+                    Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
+                    DeliveryDate = nextSaturday
                 },
                 new BedRequest
                 {
@@ -49,7 +58,8 @@ namespace BedBrigade.Tests
                     NumberOfBeds = 3,
                     AgesGender = "Self G/5 B/7",
                     TeamNumber = 1,
-                    Notes = "No Bed Bugs. Delivery scheduled for Saturday 8/31/2024 at 10am"
+                    Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
+                    DeliveryDate = nextSaturday
                 },
                 new BedRequest
                 {
@@ -62,7 +72,8 @@ namespace BedBrigade.Tests
                     NumberOfBeds = 2,
                     AgesGender = "G/5 B/7",
                     TeamNumber = 2,
-                    Notes = "No Bed Bugs. Delivery scheduled for Saturday 8/31/2024 at 10am"
+                    Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
+                    DeliveryDate = nextSaturday
                 },
                 new BedRequest
                 {
@@ -75,12 +86,18 @@ namespace BedBrigade.Tests
                     NumberOfBeds = 3,
                     AgesGender = "Self G/5 B/7",
                     TeamNumber = 2,
-                    Notes = "No Bed Bugs. Delivery scheduled for Saturday 8/31/2024 at 10am"
+                    Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
+                    DeliveryDate = nextSaturday
                 }
             };
                 
             //Act
-            deliverySheetService.CreateDeliverySheet(location, bedRequests);
+            Stream stream = deliverySheetService.CreateDeliverySheet(location, bedRequests);
+            using (FileStream fileStream = File.Create("Sample.xlsx"))
+            {
+                stream.CopyTo(fileStream);
+            }
+            
 
             //Assert
             ClassicAssert.IsTrue(File.Exists("Sample.xlsx"));

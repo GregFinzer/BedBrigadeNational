@@ -158,5 +158,52 @@ namespace BedBrigade.Common.Logic
 
             FileUtil.CopyDirectory(sourceDirectory, destinationDirectory);
         }
+
+        /// <summary>
+        /// Returns a valid filename, ignoring invalid characters
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="allowSpaces">If false, spaces will be turned into underscores</param>
+        /// <returns></returns>
+        public static string FilterFileName(string fileName, bool allowSpaces= true)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return string.Empty;
+
+            StringBuilder sb = new StringBuilder(fileName.Length);
+            string currentChar;
+            string sInvalid = "";
+
+            for (int i = 0; i < System.IO.Path.GetInvalidFileNameChars().GetUpperBound(0); i++)
+                sInvalid += System.IO.Path.GetInvalidFileNameChars()[i].ToString();
+
+            for (int i = 0; i < System.IO.Path.GetInvalidPathChars().GetUpperBound(0); i++)
+                sInvalid += System.IO.Path.GetInvalidPathChars()[i].ToString();
+
+            sInvalid += System.IO.Path.VolumeSeparatorChar.ToString();
+            sInvalid += System.IO.Path.PathSeparator.ToString();
+            sInvalid += System.IO.Path.DirectorySeparatorChar.ToString();
+            sInvalid += System.IO.Path.AltDirectorySeparatorChar.ToString();
+
+            for (int i = 0; i < fileName.Length; i++)
+            {
+                currentChar = fileName.Substring(i, 1);
+
+                if (!allowSpaces && currentChar == " ")
+                    currentChar = "_";
+
+                if (currentChar == "," || currentChar == "'")
+                {
+                    continue;
+                }
+
+                if (sInvalid.IndexOf(currentChar) < 0)
+                {
+                    sb.Append(currentChar);
+                }
+            }
+
+            return sb.ToString();
+        }
     }
 }
