@@ -13,6 +13,8 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Models;
+using Microsoft.JSInterop;
+using System.IO;
 
 namespace BedBrigade.Client.Components
 {
@@ -23,8 +25,11 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-
+        [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
         [Inject] private IHeaderMessageService _headerMessageService { get; set; }
+        [Inject] private IDeliverySheetService _svcDeliverySheet { get; set; }
+        [Inject] private IJSRuntime JS { get; set; }
+
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -61,6 +66,10 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
+        private bool IsDialogVisible { get; set; } = false;
+        private string DialogHeader { get; set; } = string.Empty;
+        private string DialogContent { get; set; } = string.Empty;
+
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -93,6 +102,7 @@ namespace BedBrigade.Client.Components
                 {
                     BedRequests = allResult.Data.ToList();
                     IsLocationColumnVisible = true;
+                    ManageBedRequestsMessage = "Manage Bed Requests Nationally";
                 }
                 return;
             }
@@ -100,21 +110,27 @@ namespace BedBrigade.Client.Components
             var locationId = await _svcUser.GetUserLocationId();
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
-
             if (userLocationResult.Success && userLocationResult.Data != null)
             {
                 //If this is a metro user, get all contacts for the metro area
                 if (userLocationResult.Data.IsMetroLocation())
                 {
+                    var metroAreaResult = await _svcMetroArea.GetByIdAsync(userLocationResult.Data.MetroAreaId.Value);
+
+                    if (metroAreaResult.Success && metroAreaResult.Data != null)
+                    {
+                        ManageBedRequestsMessage = $"Manage Bed Requests for the {metroAreaResult.Data.Name} Metro Area";
+                    }
+
                     var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
 
                     if (metroLocations.Success && metroLocations.Data != null)
                     {
                         var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
-                        var metroAreaResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
-                        if (metroAreaResult.Success && metroAreaResult.Data != null)
+                        var metroAreaBedRequestResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
+                        if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
                         {
-                            BedRequests = metroAreaResult.Data.ToList();
+                            BedRequests = metroAreaBedRequestResult.Data.ToList();
                             IsLocationColumnVisible = true;
                         }
                     }
@@ -127,6 +143,7 @@ namespace BedBrigade.Client.Components
                 if (locationResult.Success)
                 {
                     BedRequests = locationResult.Data.ToList();
+                    ManageBedRequestsMessage = $"Manage Bed Requests for {userLocationResult.Data.Name}";
                 }
             }
         }
@@ -149,7 +166,7 @@ namespace BedBrigade.Client.Components
         {
             if (Identity.HasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
@@ -215,28 +232,25 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
-            if (args.Item.Text == "Reset")
+            switch (args.Item.Text)
             {
-                await Grid.ResetPersistData();
-                await SaveGridPersistence();
-                return;
+                case "Reset":
+                    await Grid.ResetPersistData();
+                    await SaveGridPersistence();
+                    break;
+                case "Pdf Export":
+                    await PdfExport();
+                    break;
+                case "Excel Export":
+                    await ExcelExport();
+                    break;
+                case "Csv Export":
+                    await CsvExportAsync();
+                    break;
+                case "Download Delivery Sheet":
+                    DownloadDeliverySheet();
+                    break;
             }
-
-            if (args.Item.Text == "Pdf Export")
-            {
-                await PdfExport();
-            }
-            if (args.Item.Text == "Excel Export")
-            {
-                await ExcelExport();
-                return;
-            }
-            if (args.Item.Text == "Csv Export")
-            {
-                await CsvExportAsync();
-                return;
-            }
-
         }
 
         public async Task OnActionBegin(ActionEventArgs<BedRequest> args)
@@ -398,6 +412,109 @@ namespace BedBrigade.Client.Components
         }
 
 
+        private async void DownloadDeliverySheet()
+        {
+            if (!await ValidateScheduled())
+            {
+                return;
+            }
+
+            int selectedLocation;
+            if (IsLocationColumnVisible)
+            {
+                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                selectedLocation = selectedBedRequests.First().LocationId;
+            }
+            else
+            {
+                selectedLocation = await _svcUser.GetUserLocationId();
+            }
+
+            var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+            string fileName = _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
+            Stream stream = _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data);
+            using var streamRef = new DotNetStreamReference(stream: stream);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+
+        }
+
+        private async Task<bool> ValidateScheduled()
+        {
+            if (!BedRequests.Any(o => o.Status == BedRequestStatus.Scheduled))
+            {
+                DialogHeader = "No Bed Requests";
+                DialogContent = "There are no bed requests with a Scheduled status to create the Delivery Sheet.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            int selectedLocation;
+            if (IsLocationColumnVisible)
+            {
+                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+
+                if (!selectedBedRequests.Any())
+                {
+                    DialogHeader = "Select Row";
+                    DialogContent = "Please select a row in the location you would like to schedule.";
+                    IsDialogVisible = true;
+                    return false;
+                }
+                selectedLocation = selectedBedRequests.First().LocationId;
+            }
+            else
+            {
+                selectedLocation = await _svcUser.GetUserLocationId();
+            }
+
+            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+
+            if (!scheduledBedRequestResult.Success || scheduledBedRequestResult.Data == null)
+            {
+                DialogHeader = "Could Not Load Data";
+                DialogContent = scheduledBedRequestResult.Message;
+                IsDialogVisible = true;
+                return false;
+            }
+
+            return ValidateBedRequestData(scheduledBedRequestResult);
+        }
+
+        private bool ValidateBedRequestData(ServiceResponse<List<BedRequest>> scheduledBedRequestResult)
+        {
+            if (!scheduledBedRequestResult.Data.Any())
+            {
+                DialogHeader = "No Bed Requests";
+                DialogContent = "There are no bed requests with a Scheduled status for the selected location to create the Delivery Sheet.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            if (scheduledBedRequestResult.Data.Any(o => !o.DeliveryDate.HasValue))
+            {
+                DialogHeader = "Set delivery date";
+                DialogContent = "Please set the delivery date for all scheduled rows.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            if (scheduledBedRequestResult.Data.Any(o => !o.TeamNumber.HasValue))
+            {
+                DialogHeader = "Set team number";
+                DialogContent = "Please set the team number for all scheduled rows.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+            return true;
+        }
+
+        private void DialogOkClick()
+        {
+            IsDialogVisible = false;
+        }
     }
 }
 

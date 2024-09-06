@@ -11,5 +11,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<string>>> EmailsForReceivedABed(int locationId);
         Task<ServiceResponse<List<string>>> EmailsForSchedule(int scheduleId);
         Task<ServiceResponse<List<BedRequest>>> GetAllForLocationList(List<int> locationIds);
+        Task<ServiceResponse<List<BedRequest>>> GetScheduledBedRequestsForLocation(int locationId);
     }
 }

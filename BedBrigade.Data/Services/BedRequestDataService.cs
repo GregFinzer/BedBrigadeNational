@@ -65,7 +65,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForNotReceivedABed", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -82,7 +82,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForReceivedABed", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -93,18 +93,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-    public async Task<ServiceResponse<List<string>>> EmailsForSchedule(int scheduleId)
+    public async Task<ServiceResponse<List<string>>> EmailsForSchedule(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"EmailsForSchedule({scheduleId})");
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"EmailsForSchedule({locationId})");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForSchedule", true, cachedContent); ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.ScheduleId == scheduleId).Select(b => b.Email).Distinct().ToListAsync();
+            var result = await dbSet.Where(o => o.LocationId == locationId && o.Status == BedRequestStatus.Scheduled).Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }
@@ -113,6 +113,24 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationList(List<int> locationIds)
     {
         return await _commonService.GetAllForLocationList(this, locationIds);
+    }
+
+    public async Task<ServiceResponse<List<BedRequest>>> GetScheduledBedRequestsForLocation(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"ScheduledBedRequestsForLocation({locationId})");
+        var cachedContent = _cachingService.Get<List<BedRequest>>(cacheKey);
+
+        if (cachedContent != null)
+            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetScheduledBedRequestsForLocation", true, cachedContent);
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var result = await dbSet.Where(o => o.LocationId == locationId 
+                                                && o.Status == BedRequestStatus.Scheduled).ToListAsync();
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
     }
 }
 

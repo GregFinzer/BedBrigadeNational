@@ -4,43 +4,6 @@ namespace BedBrigade.Tests
 {
     public static class TestHelper
     {
-        public static bool RunningInPipeline
-        {
-            get
-            {
-                string? account = Environment.GetEnvironmentVariable("APPVEYOR_ACCOUNT_NAME");
-
-                return !string.IsNullOrEmpty(account);
-            }
-        }
-        
-        public static string GetSolutionPath()
-        {
-            string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-            int count = 0;
-            const int maxDepth = 1000;
-
-            while (count < maxDepth)
-            {
-                string[] files = Directory.GetFiles(currentPath, "*.sln");
-
-                if (files.Any())
-                {
-                    return currentPath;
-                }
-
-                string? parentPath = Path.GetDirectoryName(currentPath);
-
-                //We are at the root we did not find anything
-                if (parentPath == null || parentPath == currentPath)
-                    throw new Exception("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
-
-                currentPath = parentPath;
-                count++;
-            }
-
-            throw new Exception("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
-        }
 
         /// <summary>
         /// Execute an external program.
@@ -95,21 +58,7 @@ namespace BedBrigade.Tests
             }
         }
 
-        public static void DeleteOldHtmlFiles()
-        {
-            string tempPath = Path.GetTempPath();
-            string[] files = Directory.GetFiles(tempPath, "*.html");
 
-            foreach (string file in files)
-            {
-                DateTime lastWriteTime = File.GetLastWriteTime(file);
-
-                if (lastWriteTime < DateTime.Now.AddDays(-1))
-                {
-                    File.Delete(file);
-                }
-            }
-        }
 
         public static bool IsWindows()
         {
@@ -128,8 +77,5 @@ namespace BedBrigade.Tests
                 return false;
             }
         }
-
-
-
     }
 }

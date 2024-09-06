@@ -2,6 +2,8 @@
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Common.Models
 
+
+
 @if (BedRequests == null)
 {
     <Spinner />
@@ -114,11 +116,14 @@ else
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="Team #" FloatLabelType="FloatLabelType.Auto" />
+                                        <div class="col-md-4">
+                                            <SfDatePicker @bind-Value=@BedRequest.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
+                                        <div class="col-md-4">
+                                            <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="Team #" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Auto"/>
                                         </div>
                                     </div>
                                 }
@@ -156,6 +161,16 @@ else
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
     <ToastPosition X="Center" Y="Top" ></ToastPosition>
 </SfToast>
+
+<SfDialog Width="300px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@IsDialogVisible">
+    <DialogTemplates>
+        <Header>@DialogHeader</Header>
+        <Content>@DialogContent</Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="OK" IsPrimary="true" OnClick="@DialogOkClick" />
+    </DialogButtons>
+</SfDialog>
 
 @if (NoPaging)
 {
