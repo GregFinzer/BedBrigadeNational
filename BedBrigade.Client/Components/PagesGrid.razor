@@ -13,60 +13,60 @@
 }
 else
 {
-    <fieldset class="m-4">
-        <legend>Pages</legend>
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper">
-                <div class="row">
-                    <SfGrid @ref="Grid" TValue="Content" DataSource=@Pages
-                            ContextMenuItems=@ContextMenu
-                            EnablePersistence="true"
-                            ShowColumnChooser="true"
-                            Toolbar=@ToolBar
-                            AllowPaging="true"
-                            AllowSorting="true"
-                            AllowExcelExport="true"
-                            ShowColumnMenu="true"
-                            AllowFiltering="true"
-                            AllowReordering="true"
-                            AllowResizing="true"
-                            AllowSelection="true"
-                            AllowPdfExport="true"
-                            AllowTextWrap="true"
-                            AllowGrouping="true"
-                            Width="100%">
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,30,35,40})" PageSize="40" />
-                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Content" />
-                        <GridTemplates>
-                            <EmptyRecordTemplate>
-                                <span>@RecordText</span>
-                            </EmptyRecordTemplate>
-                        </GridTemplates>
-                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
-                        <GridSortSettings>
-                            <GridSortColumns>
-                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
-                                <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
-                            </GridSortColumns>
-                        </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns EnableLazyLoading="true" ShowDropArea="false" />
-                        <GridColumns>
-                            <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="false" Width="200px" />
-                            <GridColumn Field=@nameof(Content.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="200px" />
-                            <GridColumn Field=@nameof(Content.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" Width="200px" />
-                            <GridForeignColumn Field=@nameof(Content.ContentType) ForeignDataSource=@ContentTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Type" ShowColumnMenu="false" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.CreateUser) ShowColumnMenu="false" HeaderText="Created By" Type="ColumnType.String"  AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.CreateDate) ShowColumnMenu="false" HeaderText="Created On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="200px" />
-                            <GridColumn Field=@nameof(Content.UpdateUser) ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.UpdateDate) ShowColumnMenu="false" HeaderText="Updated On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" Width="200px" />
-                        </GridColumns>
-                    </SfGrid>
-
-                </div>
-            </div>
-        </div>
-    </fieldset>
+   <br/>
+   <h3>Pages</h3>
+   <div class="col-md-12">
+       <div class="content-wrapper">
+           <div class="row">
+               <div style="width: 100%" >
+               <SfGrid @ref="Grid" TValue="Content" DataSource=@Pages                            
+                       ContextMenuItems=@ContextMenu
+                       EnablePersistence="true"
+                       ShowColumnChooser="true"
+                       Toolbar=@ToolBar
+                       AllowPaging="true"
+                       AllowSorting="true"
+                       AllowExcelExport="true"
+                       ShowColumnMenu="true"
+                       AllowFiltering="true"
+                       AllowReordering="true"
+                       AllowResizing="true"
+                       AllowSelection="true"
+                       AllowPdfExport="true"
+                       AllowTextWrap="false"
+                       AllowGrouping="true"
+                       Width="100%">
+                   <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,30,35,40})" PageSize="40" />
+                   <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Content"  />
+                   <GridTemplates>
+                       <EmptyRecordTemplate>
+                           <span>@RecordText</span>
+                       </EmptyRecordTemplate>
+                   </GridTemplates>
+                   <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                   <GridSortSettings>
+                       <GridSortColumns>
+                           <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
+                           <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
+                       </GridSortColumns>
+                   </GridSortSettings>
+                   <GridGroupSettings Columns=@groupColumns EnableLazyLoading="true" ShowDropArea="false" />
+                   <GridColumns>
+                       <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                           <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="200px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="200px" AutoFit="true" />
+                       <GridForeignColumn Field=@nameof(Content.ContentType) ForeignDataSource=@ContentTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Type" ShowColumnMenu="false" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="200px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.CreateUser) ShowColumnMenu="false" HeaderText="Created By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.CreateDate) ShowColumnMenu="false" HeaderText="Created On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.UpdateUser) ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                       <GridColumn Field=@nameof(Content.UpdateDate) ShowColumnMenu="false" HeaderText="Updated On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                   </GridColumns>
+               </SfGrid>
+               </div>
+           </div>
+       </div>
+   </div>
 }
 
 
