@@ -66,6 +66,9 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
             await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
+            // add Delivery Check List - new 9/6/2024
+            await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
+            
             return result;
         }
         catch (Exception ex)

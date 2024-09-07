@@ -4,6 +4,7 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Diagnostics;
 
 namespace BedBrigade.Data.Data.Seeding;
 
@@ -27,6 +28,7 @@ public static class SeedContentsLogic
             await SeedNationalHistoryPage(context);
             await SeedNationalLocations(context);
             await SeedAssemblyInstructions(context, locations);
+            await SeedDeliveryCheckList(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
         }
@@ -47,11 +49,11 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
         await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
         await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
-        await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions",
-            "GroveCityAssemblyInstructions.html");
+        await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
         await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
         await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
         await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
+        await SeedContentItem(context, ContentType.DeliveryCheckList, location, "DeliveryCheckList", "DeliveryCheckList.txt"); // VS 9/6/2024
     }
 
     private static async Task SeedContentItem(DataContext context,
@@ -66,9 +68,13 @@ public static class SeedContentsLogic
 
         string seedHtml = WebHelper.GetHtml(seedHtmlName);
 
-        seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
-        seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
-        seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+        if (contentType != ContentType.DeliveryCheckList)
+        {
+            seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+            seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+            seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+        }
+
         var content = new Content
         {
             LocationId = location.LocationId,
@@ -87,7 +93,7 @@ public static class SeedContentsLogic
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in content {name} for location {location.Name}: {ex.Message}");
+            Log.Logger.Debug($"Error in content {name} for location {location.Name}: {ex.Message}");
         }
     }
 
@@ -158,7 +164,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug        ($"Error in content {ex.Message}");    
             }
         }
 
@@ -207,7 +213,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug($"Error in content {ex.Message}");
             }
         }
     }
@@ -272,7 +278,7 @@ public static class SeedContentsLogic
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error in content {ex.Message}");
+                    Log.Logger.Debug($"Error in content {ex.Message}");
                 }
             }
         }
@@ -305,7 +311,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug($"Error in content {ex.Message}");
             }
         }
     }
@@ -336,7 +342,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug($"Error in content {ex.Message}");
             }
         }
     }
@@ -412,7 +418,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug($"Error in content {ex.Message}");
             }
         }
     }
@@ -433,6 +439,52 @@ public static class SeedContentsLogic
             await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");
         }
     }
+
+    private static async Task SeedDeliveryCheckList(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }                     
+
+        Log.Logger.Information("SeedDeliveryCheckList Started");
+
+        string? name = Enum.GetName(typeof(ContentType), 5);
+        name = StringUtil.IsNull(name, "Unknown");
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+            {
+                string seedHtml;
+
+                foreach (var location in locations)
+                {
+                   
+                    seedHtml = WebHelper.GetHtml("DeliveryCheckList.txt"); // plane text
+
+                    var content = new Content
+                    {
+                        LocationId = location.LocationId!,
+                        ContentType = ContentType.DeliveryCheckList,
+                        Name = name,
+                        ContentHtml = seedHtml,
+                        Title = StringUtil.InsertSpaces(name)
+                    };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+                }
+
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
+                }          
+        }
+    } // Delivery Check List
 
     private static async Task SeedThreeRotatorPageTemplate(DataContext context)
     {
@@ -458,7 +510,7 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in content {ex.Message}");
+                Log.Logger.Debug($"Error in content {ex.Message}");
             }
         }
     }

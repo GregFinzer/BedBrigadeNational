@@ -13,6 +13,8 @@ using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
+using Syncfusion.Blazor.Popups;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace BedBrigade.Client.Components
@@ -26,6 +28,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IWebHostEnvironment _svcEnv { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -61,6 +64,13 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
         private bool AddContentVisible;
+
+        // text editor
+
+        private SfDialog DialogInstance;
+        private string EditableText;
+        private bool ShowDialog = false;
+        private string CurrentLocationName { get; set; }
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -222,12 +232,23 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                     break;
 
-                case Action.BeginEdit:
-                    await BeginEdit(args);
-                    break;
-            }
+                case Action.BeginEdit:  // VS 9/6/2024 - different for DElivery Check List
 
-        }
+                    if (args.Data.ContentType == Common.Enums.ContentType.DeliveryCheckList)
+                    {
+                        CurrentValues = args.Data;
+                        await SetLocationName();
+                        // open special editor
+                        OpenTextDialog();
+                    }
+                    else
+                    { 
+                        await BeginEdit(args);
+                    }
+                    break;
+            } // switch
+
+        } // Action Begin
 
         private async Task Delete(ActionEventArgs<Content> args)
         {
@@ -344,7 +365,57 @@ namespace BedBrigade.Client.Components
             await Grid.CsvExport(ExportProperties);
         }
 
+        // Text EDitor
 
-    }
-}
+        private void OpenTextDialog()        {          
+            
+            EditableText = StringUtil.IsNull(CurrentValues.ContentHtml, "");
+            ShowDialog = true;
+        }
+
+        private async Task SaveText()
+        {
+            // Save the edited text back to the database
+            CurrentValues.ContentHtml = EditableText;
+            await UpdatePageContent(CurrentValues);        
+            ShowDialog = false;
+        }
+        private async Task SetLocationName()
+        {
+            var locationResult = await _svcLocation.GetByIdAsync(CurrentValues.LocationId);
+            if (locationResult.Success && locationResult.Data != null)
+            {
+               CurrentLocationName = locationResult.Data.Name;                
+            }
+        } // Get Location
+
+
+        private void CloseTextDialog()
+        {
+            ShowDialog = false;
+        }
+
+        private async Task UpdatePageContent(Content newContent)
+        {
+           
+           
+            //Update Content  Record
+            var updateResult = await _svcContent.UpdateAsync(newContent);
+            if (updateResult.Success)            {             
+
+                _toastService.Success("Delivery Check List Saved", $"Content saved for location {CurrentLocationName}"); // VS 8/25/2024              
+                StateHasChanged();
+                await Grid.CloseEditAsync();
+                await Grid.SetRowDataAsync(newContent.ContentId, newContent);
+            }
+            else
+            {
+                _toastService.Error("Error", $"Could not save Delivery Check List for location {CurrentLocationName}");
+            }
+
+        }
+
+
+    } // class
+} // Namespace
 

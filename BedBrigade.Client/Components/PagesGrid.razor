@@ -74,6 +74,22 @@ else
     <ToastPosition X="Center" Y="Top"></ToastPosition>
 </SfToast>
 
+<SfDialog Width="400px" IsModal="true" ShowCloseIcon="true" Visible="@ShowDialog" @ref="DialogInstance" MinHeight="500px"
+          OnClose="CloseTextDialog" EnableResize="true">
+    <DialogTemplates>
+        <Header>
+            <h3>@CurrentLocationName</h3>
+            <h2>Edit Delivery Check List</h2>            
+        </Header>
+        <Content>
+            <SfTextArea ResizeMode="Resize.Vertical"  @bind-Value="EditableText" Placeholder="Enter text" RowCount="20" ColumnCount="50" Width="100%" />
+        </Content>
+        <FooterTemplate>
+            <button id="save" type="button" class="btn btn-primary" @onclick="(() => SaveText())">Save</button>
+            <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => CloseTextDialog())">Cancel</button>    
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
 
 
 @if (NoPaging)
