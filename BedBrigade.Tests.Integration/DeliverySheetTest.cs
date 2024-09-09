@@ -19,7 +19,7 @@ namespace BedBrigade.Tests
         [Test]
         public void OutputDeliverySheet()
         {
-            if (TestHelper.IsWindows() && TestHelper.ThisComputerHasExcelInstalled())
+            if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
             {
                 Assert.Ignore("This test will open Excel. It is not supported on this platform.");
             }
