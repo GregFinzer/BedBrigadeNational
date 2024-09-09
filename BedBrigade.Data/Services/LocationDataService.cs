@@ -158,15 +158,18 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         {
             if (!string.IsNullOrEmpty(loc.PostalCode))
             {
-                var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
-                if (distance < maxMiles)
+                if (loc.IsActive)
                 {
-                    LocationDistance locationDistance = new LocationDistance();
-                    locationDistance.LocationId = loc.LocationId;
-                    locationDistance.Name = loc.Name;
-                    locationDistance.Route = loc.Route;
-                    locationDistance.Distance = distance;
-                    result.Add(locationDistance);
+                    var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
+                    if (distance < maxMiles)
+                    {
+                        LocationDistance locationDistance = new LocationDistance();
+                        locationDistance.LocationId = loc.LocationId;
+                        locationDistance.Name = loc.Name;
+                        locationDistance.Route = loc.Route;
+                        locationDistance.Distance = distance;
+                        result.Add(locationDistance);
+                    }
                 }
             }
         }

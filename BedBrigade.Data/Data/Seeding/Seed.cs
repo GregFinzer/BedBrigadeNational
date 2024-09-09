@@ -38,17 +38,17 @@ public class Seed
         new Location
         {
             Name = SeedConstants.SeedNationalName, Route = "/national", Address1 = "", Address2 = "", City = "Columbus",
-            State = "Ohio", PostalCode = ""
+            State = "Ohio", PostalCode = "",  IsActive = true
         },
         new Location
         {
             Name = "Grove City Bed Brigade", Route = "/grove-city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
-            State = "Ohio", PostalCode = "43123"
+            State = "Ohio", PostalCode = "43123", IsActive = true
         },
         new Location
         {
             Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", Address1 = "1250 Gemini Pl", Address2 = "", City = "Columbus",
-            State = "Ohio", PostalCode = "43240"
+            State = "Ohio", PostalCode = "43240", IsActive = true
         }
 
     };
@@ -134,6 +134,7 @@ public class Seed
                 if (groveCity != null)
                 {
                     groveCity.MetroAreaId = metroArea.MetroAreaId;
+                    groveCity.IsActive = true;
                     context.Locations.Update(groveCity);
                     await context.SaveChangesAsync();
                 }
@@ -142,6 +143,7 @@ public class Seed
                 if (rockCity != null)
                 {
                     rockCity.MetroAreaId = metroArea.MetroAreaId;
+                    rockCity.IsActive = true;
                     context.Locations.Update(rockCity);
                     await context.SaveChangesAsync();
                 }
