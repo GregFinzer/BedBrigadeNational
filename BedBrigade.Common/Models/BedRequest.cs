@@ -80,6 +80,10 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
         get { return $"{FirstName} {LastName}"; }
     }
 
-
+    /// <summary>
+    /// This is used for ordering of the Delivery Sheet
+    /// </summary>
+    [NotMapped]
+    public double Distance { get; set; }
 
 }

@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -11,14 +12,17 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICachingService _cachingService;
     private readonly ICommonService _commonService;
+    private readonly ILocationDataService _locationDataService;
 
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         AuthenticationStateProvider authProvider,
-        ICommonService commonService) : base(contextFactory, cachingService, authProvider)
+        ICommonService commonService,
+        ILocationDataService locationDataService) : base(contextFactory, cachingService, authProvider)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
+        _locationDataService = locationDataService;
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -128,10 +132,37 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => o.LocationId == locationId 
                                                 && o.Status == BedRequestStatus.Scheduled).ToListAsync();
+
+            result = await SortScheduledBedRequests(locationId, result);
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
+
+    private async Task<List<BedRequest>> SortScheduledBedRequests(int locationId, List<BedRequest> bedRequests)
+    {
+        var locationResult = await _locationDataService.GetByIdAsync(locationId);
+
+        if (!locationResult.Success || locationResult.Data == null || !Validation.IsValidZipCode(locationResult.Data.PostalCode))
+        {
+            return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.PostalCode).ToList();
+        }
+
+        var location = locationResult.Data;
+        var addressParser = LibraryFactory.CreateAddressParser();
+
+        foreach (var bedRequest in bedRequests)
+        {
+            bedRequest.Distance = 0;
+            if (location.PostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
+            {
+                bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.PostalCode, bedRequest.PostalCode);
+            }
+        }
+
+        return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+    }
+
 }
 
 
