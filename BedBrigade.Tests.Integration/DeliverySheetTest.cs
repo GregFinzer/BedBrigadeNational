@@ -19,8 +19,13 @@ namespace BedBrigade.Tests
         [Test]
         public void OutputDeliverySheet()
         {
+            if (TestHelper.IsWindows() && TestHelper.ThisComputerHasExcelInstalled())
+            {
+                Assert.Ignore("This test will open Excel. It is not supported on this platform.");
+            }
+
             //Arrange
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sample.xlsx");
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sample.xlsx");
 
             // Calculate the first Saturday
             int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
@@ -109,10 +114,7 @@ namespace BedBrigade.Tests
             //Assert
             ClassicAssert.IsTrue(File.Exists(filePath));
 
-            if (TestHelper.IsWindows() && TestHelper.ThisComputerHasExcelInstalled())
-            {
-                TestHelper.Shell(filePath, null, ProcessWindowStyle.Maximized, false);
-            }
+            TestHelper.Shell(filePath, null, ProcessWindowStyle.Maximized, false);
         }
 
         private string GetDeliveryCheckList()
