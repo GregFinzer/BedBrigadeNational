@@ -16,7 +16,7 @@ namespace BedBrigade.Common.Logic
             return PhoneNumberValidator.IsValidPhoneNumber(phoneNumber);
         }
 
-        public static bool IsValidZipCode(string zipCode)
+        public static bool IsValidZipCode(string? zipCode)
         {
             var addressParser = LibraryFactory.CreateAddressParser();
             return addressParser.IsValidZipCode(zipCode);
