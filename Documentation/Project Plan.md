@@ -86,8 +86,7 @@ One thing you will notice about the following project plan is the lack of due da
 * Location Request Bed
     * Request Bed Page :heavy_check_mark:
     * Manage Bed Requests :heavy_check_mark:
-    * Schedule Deliveries
-    * Bulk Email Scheduled Deliveries
+    * Download Delivery Sheet :heavy_check_mark:
     * Manage Delivery Checklist
     
 * Location Volunteer    
@@ -95,6 +94,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Manage Volunteers :heavy_check_mark:
     * Bulk Email Volunteers  :heavy_check_mark:
     * Manage Build and Delivery Schedule :heavy_check_mark:
+    * Manage Sign Ups :heavy_check_mark: 
     
 * Location Contact Us
     * Contact Us Page :heavy_check_mark:
@@ -158,7 +158,7 @@ One thing you will notice about the following project plan is the lack of due da
     * FM Dependent Functionality
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
-    * Refresh Header and Footer
+    * Refresh Header and Footer :heavy_check_mark:
     * Add Page Titles
     * Custom Icons in Grid Toolbar
     * Review All Code
@@ -172,8 +172,13 @@ One thing you will notice about the following project plan is the lack of due da
     * Make seeding environment specific
     * Add Database Indexes
     * Verify Mobile for all pages
-    * Refactor Grid Persistence
+    * Refactor Grid Persistence :heavy_check_mark:
     * Add try catch and alert
+    * Seed Only Grove City and Rock City :heavy_check_mark:
+    * Location Timezone
+    * Redo Manage Bed Request Form
+    * Delivery Sheet Sort By Team Then By Distance
+    * Add Delivery Checklist to the Delivery Sheet
     
 * New Stories
     * Send confirmation email for Bed Request
