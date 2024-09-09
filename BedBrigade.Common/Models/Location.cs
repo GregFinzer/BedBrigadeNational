@@ -41,6 +41,10 @@ public class Location : BaseEntity
     public Decimal? Longitude { get; set; }
 
     public int? MetroAreaId { get; set; }
+
+    [Column(TypeName = "bit")]
+    public bool IsActive { get; set; } = false;
+
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
     public ICollection<Content> Contents { get; set; } = new List<Content>();
