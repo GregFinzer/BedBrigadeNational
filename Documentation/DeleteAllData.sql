@@ -1,31 +1,37 @@
---This deletes all data except for the Locations and MetroAreas
-delete from BedRequests
+--This deletes all tables in the database
+drop table if exists BedRequests
 go
-delete from Configurations
+drop table if exists Configurations
 go
-delete from ContactUs
+drop table if exists ContactUs
 go
-delete from Content
+drop table if exists Content
 go
-delete from Donations
+drop table if exists Donations
 go
-delete from EmailQueue
+drop table if exists EmailQueue
 go
-delete from Media
+drop table if exists Media
 go
-delete from Roles
+drop table if exists Roles
 go
-delete from Schedules
+drop table if exists Schedules
 go
-delete from Templates
+drop table if exists Templates
 go
-delete from Users
+drop table if exists UserPersist
 go
-delete from SignUps
+drop table if exists Users
 go
-delete from Volunteers
+drop table if exists SignUps
 go
-delete from Locations where LocationId > 3
+drop table if exists Volunteers
 go
-delete from UserPersist
+drop table if exists VolunteersFor
+go
+drop table if exists Locations
+go
+drop table if exists MetroAreas
+go
+drop table if exists __EFMigrationsHistory
 go
