@@ -28,6 +28,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
         [Inject] private IHeaderMessageService _headerMessageService { get; set; }
         [Inject] private IDeliverySheetService _svcDeliverySheet { get; set; }
+        [Inject] private IContentDataService _svcContent { get; set; }
+
         [Inject] private IJSRuntime JS { get; set; }
 
         [Parameter] public string? Id { get; set; }
@@ -431,9 +433,18 @@ namespace BedBrigade.Client.Components
             }
 
             var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+            string deliveryChecklist = string.Empty;
+
+            var deliveryChecklistResult = await _svcContent.GetDeliveryChecklistByLocationId(selectedLocation);
+
+            if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
+            {
+                deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+            }
+
             var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
             string fileName = _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
-            Stream stream = _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data);
+            Stream stream = _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data, deliveryChecklist);
             using var streamRef = new DotNetStreamReference(stream: stream);
 
             await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);

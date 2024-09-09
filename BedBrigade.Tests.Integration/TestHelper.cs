@@ -77,5 +77,33 @@ namespace BedBrigade.Tests
                 return false;
             }
         }
+
+        public static string GetSolutionPath()
+        {
+            string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+            int count = 0;
+            const int maxDepth = 1000;
+
+            while (count < maxDepth)
+            {
+                string[] files = Directory.GetFiles(currentPath, "*.sln");
+
+                if (files.Any())
+                {
+                    return currentPath;
+                }
+
+                string? parentPath = Path.GetDirectoryName(currentPath);
+
+                //We are at the root we did not find anything
+                if (parentPath == null || parentPath == currentPath)
+                    throw new Exception("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+
+                currentPath = parentPath;
+                count++;
+            }
+
+            throw new Exception("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+        }
     }
 }

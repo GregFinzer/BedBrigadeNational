@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -87,6 +88,11 @@ public class ContentDataService : Repository<Content>, IContentDataService
         }
 
         return input.Replace("e-rte-image", "").Replace("e-imginline", "");
+    }
+
+    public Task<ServiceResponse<Content>> GetDeliveryChecklistByLocationId(int locationId)
+    {
+        return GetAsync(ContentType.DeliveryCheckList.ToString(), locationId);
     }
     
 }

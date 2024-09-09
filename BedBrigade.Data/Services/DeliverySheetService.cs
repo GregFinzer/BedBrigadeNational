@@ -21,7 +21,7 @@ namespace BedBrigade.Data.Services
             return fileName;
         }
 
-        public Stream CreateDeliverySheet(Location location, List<BedRequest> bedRequests)
+        public Stream CreateDeliverySheet(Location location, List<BedRequest> bedRequests, string? deliveryChecklist= null)
         {
             // Set the Syncfusion license key
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
@@ -41,12 +41,29 @@ namespace BedBrigade.Data.Services
                 CreateTitle(worksheet, location.Name, bedRequests);
                 CreateHeader(worksheet);
                 OutputBedRequests(worksheet, bedRequests);
+                OutputDeliveryChecklist(worksheet, bedRequests.Count, deliveryChecklist);
 
                 MemoryStream stream = new MemoryStream();
                 
                 workbook.SaveAs(stream);
                 stream.Position = 0;
                 return stream;
+            }
+        }
+
+        private void OutputDeliveryChecklist(IWorksheet worksheet, int bedRequestsCount, string? deliveryChecklist)
+        {
+            if (String.IsNullOrWhiteSpace(deliveryChecklist))
+            {
+                return;
+            }
+
+            int row = bedRequestsCount + 4;
+            string[] lines = deliveryChecklist.Split('\n');
+            foreach (string line in lines)
+            {
+                worksheet.Range[row, 1].Text = line;
+                row++;
             }
         }
 
@@ -131,18 +148,21 @@ namespace BedBrigade.Data.Services
             CreateHeaderCell(worksheet, "Address", 3, 20.29);
             CreateHeaderCell(worksheet, "Zip", 4, 6.14);
             CreateHeaderCell(worksheet, "Requested", 5, 11);
-            CreateHeaderCell(worksheet, "Beds", 6, 4.57);
+            CreateHeaderCell(worksheet, "Beds", 6, 5.14);
             CreateHeaderCell(worksheet, "Ages", 7, 13);
             CreateHeaderCell(worksheet, "Team", 8, 5.14);
-            CreateHeaderCell(worksheet, "Notes", 9, 42.80);
+            CreateHeaderCell(worksheet, "Notes", 9, 42.14);
         }
 
         private void CreateHeaderCell(IWorksheet worksheet, string text, int col, double width)
         {
             int row = 2; 
             worksheet.Range[row, col].Text = text;
+            worksheet.Range[row, col].CellStyle.Font.FontName = "Arial";
             worksheet.Range[row, col].CellStyle.Color = Syncfusion.Drawing.Color.Black;
             worksheet.Range[row, col].CellStyle.Font.Color = ExcelKnownColors.White;
+            worksheet.Range[row, col].CellStyle.Font.Size = 11;
+            worksheet.Range[row, col].CellStyle.Font.Bold = true;
             worksheet.Range[row, col].ColumnWidth = width;
             worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
             worksheet.Range[row, col].CellStyle.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;

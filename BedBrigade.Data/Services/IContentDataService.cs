@@ -6,5 +6,6 @@ namespace BedBrigade.Data.Services
     {
         Task<ServiceResponse<Content>> GetAsync(string name, int locationId);
         Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId);
+        Task<ServiceResponse<Content>> GetDeliveryChecklistByLocationId(int locationId);
     }
 }

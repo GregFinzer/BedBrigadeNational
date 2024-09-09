@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using NUnit.Framework.Legacy;
@@ -12,16 +14,19 @@ namespace BedBrigade.Tests
     [TestFixture]
     public class DeliverySheetTest
     {
+
+
         [Test]
         public void OutputDeliverySheet()
         {
-            //Skip if not running locally
             if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
             {
-                Assert.Ignore("Ignore Excel Test When Running in Pipeline");
+                Assert.Ignore("This test will open Excel. It is not supported on this platform.");
             }
 
             //Arrange
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sample.xlsx");
+
             // Calculate the first Saturday
             int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
             if (daysUntilSaturday == 0)
@@ -98,15 +103,26 @@ namespace BedBrigade.Tests
             };
                 
             //Act
-            Stream stream = deliverySheetService.CreateDeliverySheet(location, bedRequests);
-            using (FileStream fileStream = File.Create("Sample.xlsx"))
+            string deliveryChecklist = GetDeliveryCheckList();
+            Stream stream = deliverySheetService.CreateDeliverySheet(location, bedRequests, deliveryChecklist);
+            using (FileStream fileStream = File.Create(filePath))
             {
                 stream.CopyTo(fileStream);
             }
             
 
             //Assert
-            ClassicAssert.IsTrue(File.Exists("Sample.xlsx"));
+            ClassicAssert.IsTrue(File.Exists(filePath));
+
+            TestHelper.Shell(filePath, null, ProcessWindowStyle.Maximized, false);
+        }
+
+        private string GetDeliveryCheckList()
+        {
+            string filePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding",
+                "SeedHtml", "DeliveryCheckList.txt");
+
+            return File.ReadAllText(filePath);
         }
     }
 }
