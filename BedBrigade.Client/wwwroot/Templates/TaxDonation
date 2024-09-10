@@ -1,7 +1,0 @@
-﻿<div>
-    Dear @Model.FullName,
-    <br/>
-    <br/>
-    <p>Thank you for your tax deductiable donation to Bed Bridade of @string.Format("{0:C2}", @Model.Amount).</p>
-    <p class="my-4">The Bed Bridade Team</p>
-</div>

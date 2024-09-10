@@ -19,7 +19,7 @@ namespace BedBrigade.Common.Models
         public String Email { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,2)")]
         public Decimal Amount { get; set; }
 
 		[MaxLength(255)]
@@ -30,6 +30,9 @@ namespace BedBrigade.Common.Models
 
         [MaxLength(25)]
 		public String? LastName { get; set; } = string.Empty;
+
+		[Required]
+		public DateTime DonationDate { get; set; }
 
         [Required]
 		public Boolean TaxFormSent { get; set; }

@@ -38,15 +38,13 @@ namespace BedBrigade.Data.Services
 
                     if (result == null)
                     {
-                        context.UserPersist.Add(persist);
+                        await base.CreateAsync(persist);
                     }
                     else
                     {
-                        result.Data = persist.Data;
-                        context.UserPersist.Update(result);
+                        await base.UpdateAsync(persist);
                     }
 
-                    await context.SaveChangesAsync();
                     return new ServiceResponse<bool>("Persist data saved", true, true);
                 }
             }

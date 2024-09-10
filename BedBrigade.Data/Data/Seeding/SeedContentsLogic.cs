@@ -29,6 +29,7 @@ public static class SeedContentsLogic
             await SeedNationalLocations(context);
             await SeedAssemblyInstructions(context, locations);
             await SeedDeliveryCheckList(context, locations);
+            await SeedTaxForm(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
         }
@@ -53,7 +54,6 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
         await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
         await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
-        await SeedContentItem(context, ContentType.DeliveryCheckList, location, "DeliveryCheckList", "DeliveryCheckList.txt"); // VS 9/6/2024
     }
 
     private static async Task SeedContentItem(DataContext context,
@@ -447,44 +447,88 @@ public static class SeedContentsLogic
         if (National != null)
         {
             locations.Remove(National);
-        }                     
+        }
 
         Log.Logger.Information("SeedDeliveryCheckList Started");
 
-        string? name = Enum.GetName(typeof(ContentType), 5);
-        name = StringUtil.IsNull(name, "Unknown");
+        string name = ContentType.DeliveryCheckList.ToString();
 
         if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedHtml;
+
+            foreach (var location in locations)
             {
-                string seedHtml;
 
-                foreach (var location in locations)
+                seedHtml = WebHelper.GetHtml("DeliveryCheckList.txt"); // plane text
+
+                var content = new Content
                 {
-                   
-                    seedHtml = WebHelper.GetHtml("DeliveryCheckList.txt"); // plane text
-
-                    var content = new Content
-                    {
-                        LocationId = location.LocationId!,
-                        ContentType = ContentType.DeliveryCheckList,
-                        Name = name,
-                        ContentHtml = seedHtml,
-                        Title = StringUtil.InsertSpaces(name)
-                    };
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.DeliveryCheckList,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    Title = StringUtil.InsertSpaces(name)
+                };
                 SeedRoutines.SetMaintFields(content);
                 context.Content.Add(content); // add row to Contents table 
-                }
+            }
 
-                try
-                {
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
-                }          
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
+            }
         }
     } // Delivery Check List
+
+    private static async Task SeedTaxForm(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }
+
+        Log.Logger.Information("SeedTaxForm Started");
+
+        string name = ContentType.TaxForm.ToString();
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedHtml;
+
+            foreach (var location in locations)
+            {
+
+                seedHtml = WebHelper.GetHtml("TaxForm.txt"); 
+
+                var content = new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.TaxForm,
+                    Name = name,
+                    ContentHtml = seedHtml,
+                    Title = StringUtil.InsertSpaces(name)
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in SeedTaxForm content {ex.Message}");
+            }
+        }
+    } 
 
     private static async Task SeedThreeRotatorPageTemplate(DataContext context)
     {

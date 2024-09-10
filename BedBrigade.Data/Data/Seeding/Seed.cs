@@ -1,10 +1,7 @@
 ﻿using BedBrigade.Data.Data.Seeding;
-using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Data.Common;
-
-using System.Diagnostics;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
@@ -591,6 +588,8 @@ public class Seed
                             PasswordHash = passwordHash,
                             PasswordSalt = passwordSalt
                         };
+
+                        SeedRoutines.SetMaintFields(newUser);
                         await context.Users.AddAsync(newUser);
                         await context.SaveChangesAsync();
                     }

@@ -1,0 +1,18 @@
+This is your official tax receipt from %%Location.Name%% for the tax year %%Year%%. Please retain this receipt for your records. 
+
+Itemized Donations:
+%%ItemizedDonations%%
+
+Total Amount of Donation: %%Amount%%
+
+
+Thank you for your support! 
+Sincerely, 
+%%User.FirstName%% %%User.LastName%%, %%User.Role%%
+%%User.Email%% 
+%%User.Phone%%
+
+%%Location.Name%% 
+%%Location.Address%% 
+%%Location.City%%, %%Location.State%% %%Location.Zip%% 
+%%Location.Website%%
