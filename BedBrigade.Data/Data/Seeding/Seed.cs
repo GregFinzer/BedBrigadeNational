@@ -717,7 +717,9 @@ public class Seed
                         TransactionId = new Random().Next(233999, 293737).ToString(),
                         FirstName = firstName,
                         LastName = lastName,
-                        TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)]
+                        TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
+                        DonationDate = DateTime.UtcNow.AddDays((new Random().Next(364)) * -1),
+
                     };
 
                     SeedRoutines.SetMaintFields(donation);
