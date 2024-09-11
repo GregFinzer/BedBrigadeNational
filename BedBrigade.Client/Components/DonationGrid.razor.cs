@@ -155,26 +155,10 @@ namespace BedBrigade.Client.Components
                 };
 
             }
-            else if (Identity.IsInRole(RoleNames.NationalAdmin))
+            else 
             {
-                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ToolBar = new List<string> { "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<object> {
-                    new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
-                    FirstPage,
-                    NextPage,
-                    PrevPage,
-                    LastPage,
-                    "AutoFit",
-                    "AutoFitAll",
-                    "SortAscending",
-                    "SortDescending"
-                };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<object> {
-                    new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
                     FirstPage,
                     NextPage,
                     PrevPage,
