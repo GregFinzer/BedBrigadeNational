@@ -16,10 +16,10 @@ namespace BedBrigade.Common.Models
 
         [Required]
 		[MaxLength(255)]
-        public String Email { get; set; } = string.Empty;
+        public String? Email { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,2)")]
         public Decimal Amount { get; set; }
 
 		[MaxLength(255)]
@@ -31,10 +31,13 @@ namespace BedBrigade.Common.Models
         [MaxLength(25)]
 		public String? LastName { get; set; } = string.Empty;
 
+		[Required]
+		public DateTime? DonationDate { get; set; }
+
         [Required]
 		public Boolean TaxFormSent { get; set; }
 
-		[Required]
+		[NotMapped]
 		public string FullName 
 		{ get
 			{
@@ -42,6 +45,13 @@ namespace BedBrigade.Common.Models
 			}
 		}
 
-
+        [NotMapped]
+        public string NameAndDate
+        {
+			get
+            {
+                return $"{FullName} - {DonationDate?.ToString("yyyy-MM-dd")}";
+            }
+        }
 	}
 }

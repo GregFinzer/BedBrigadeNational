@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -6,6 +7,6 @@ namespace BedBrigade.Data.Services
     {
         Task<ServiceResponse<Content>> GetAsync(string name, int locationId);
         Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId);
-        Task<ServiceResponse<Content>> GetDeliveryChecklistByLocationId(int locationId);
+        Task<ServiceResponse<Content>> GetByLocationAndContentType(int locationId, ContentType contentType);
     }
 }

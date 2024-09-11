@@ -17,6 +17,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components
 {
@@ -27,7 +28,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
-
+        [Inject] private ToastService _toastService { get; set; }
+        [Inject] private NavigationManager? _navManager { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -47,17 +49,13 @@ namespace BedBrigade.Client.Components
         protected string? ButtonTitle { get; private set; }
         protected string? addNeedDisplay { get; private set; }
         protected string? editNeedDisplay { get; private set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; }
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? RecordText { get; set; } = "Loading Donations ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public bool TaxIsVisible { get; private set; }
-
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "400px" };
+        private Donation Donation = new Donation();
 
         /// <summary>
         /// Setup the Donation Grid component
@@ -72,15 +70,33 @@ namespace BedBrigade.Client.Components
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Donations Page");
 
-            SetupToolbar();
+            SetupAccess();
             await LoadDonations();
             await LoadLocations();
+        }
 
-            var query = from donation in Donations
-                    where donation.TaxFormSent == false
-                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
-            NotSent = query.ToList();
+        private void LoadNotSent()
+        {
+            NotSent = Donations.Where(d => !d.TaxFormSent)
+                .OrderBy(o => o.FullName)
+                .ThenBy(o => o.DonationDate).ToList();
+        }
 
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!firstRender)
+            {
+                if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
+                {
+                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    Grid.EditSettings.AllowDeleting = true;
+                    Grid.EditSettings.AllowAdding = true;
+                    Grid.EditSettings.AllowEditing = true;
+                    StateHasChanged();
+                }
+            }
+
+            return base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task LoadLocations()
@@ -120,28 +136,39 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private void SetupToolbar()
+        private void SetupAccess()
         {
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
+            if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
             {
-                ToolBar = new List<string> { SendTaxForm, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-            }
+                ToolBar = new List<string> { SendTaxForm, "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<object> {"Edit", 
+                    "Delete",
+                    new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
+                    FirstPage,
+                    NextPage,
+                    PrevPage,
+                    LastPage,
+                    "AutoFit",
+                    "AutoFitAll",
+                    "SortAscending",
+                    "SortDescending"
+                };
 
-            ContextMenu = new List<object> {
-                new ContextMenuItemModel {Id = "Tax", Text = SendTaxForm, Target = ".e-content" },
-                FirstPage,
-                NextPage,
-                PrevPage,
-                LastPage,
-                "AutoFit",
-                "AutoFitAll",
-                "SortAscending",
-                "SortDescending"
-            };
+            }
+            else 
+            {
+                ToolBar = new List<string> { "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<object> {
+                    FirstPage,
+                    NextPage,
+                    PrevPage,
+                    LastPage,
+                    "AutoFit",
+                    "AutoFitAll",
+                    "SortAscending",
+                    "SortDescending"
+                };
+            }
         }
 
         /// <summary>
@@ -184,6 +211,7 @@ namespace BedBrigade.Client.Components
         {
             if(args.Item.Text == SendTaxForm)
             {
+                LoadNotSent();
                 TaxIsVisible = true;
             }
         }
@@ -192,6 +220,7 @@ namespace BedBrigade.Client.Components
         {
             if(args.Item.Text == SendTaxForm)
             {
+                LoadNotSent();
                 TaxIsVisible = true;
                 return;
             }
@@ -219,7 +248,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        public void OnActionBegin(ActionEventArgs<Donation> args)
+        public async Task OnActionBegin(ActionEventArgs<Donation> args)
         {
             var requestType = args.RequestType;
             switch (requestType)
@@ -227,10 +256,101 @@ namespace BedBrigade.Client.Components
                 case Action.Searching:
                     RecordText = "Searching ... Record Not Found.";
                     break;
+                case Action.Delete:
+                    await Delete(args);
+                    break;
+                case Action.Add:
+                    Add();
+                    break;
+                case Action.Save:
+                    await Save(args);
+                    break;
+                case Action.BeginEdit:
+                    BeginEdit();
+                    break;
             }
-
         }
 
+        private void BeginEdit()
+        {
+            HeaderTitle = "Update Donation";
+            ButtonTitle = "Update";
+        }
+        private void Add()
+        {
+            HeaderTitle = "Add Donation";
+            ButtonTitle = "Add";
+            Donation.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+        }
+
+        protected async Task Cancel()
+        {
+            await Grid.CloseEdit();
+        }
+
+        private async Task Save(ActionEventArgs<Donation> args)
+        {
+            Donation donation = args.Data;
+            if (donation.DonationId != 0)
+            {
+                //Update Record
+                var updateResult = await _svcDonation.UpdateAsync(donation);
+                
+                if (updateResult.Success)
+                {
+                    _toastService.Success("Donation Updated", "Donation Updated Successfully!");
+                }
+                else
+                {
+                    _toastService.Error("Could not update donation", "Unable to update Donation!");
+                }
+            }
+            else
+            {
+                // new 
+                var result = await _svcDonation.CreateAsync(donation);
+                if (result.Success)
+                {
+                    Donation = result.Data;
+                }
+                if (result.Success)
+                {
+                    _toastService.Success("Donation Added", "Donation Added Successfully!");
+                }
+                else
+                {
+                    _toastService.Error("Could not add donation", "Unable to add Donation!");
+                }
+
+            }
+
+            await Grid.Refresh();
+        }
+
+        protected async Task Save(Donation donation)
+        {
+            await Grid.EndEdit();
+        }
+
+        private async Task Delete(ActionEventArgs<Donation> args)
+        {
+            List<Donation> records = await Grid.GetSelectedRecordsAsync();
+            foreach (var rec in records)
+            {
+                var deleteResult = await _svcDonation.DeleteAsync(rec.DonationId);
+                
+                if (deleteResult.Success)
+                {
+                    _toastService.Success("Donation Deleted", "Donation deleted");
+                }
+                else
+                {
+                    _toastService.Error("Unable to Delete Donation", "Donation could not be deleted");
+                    args.Cancel = true;
+                }
+            }
+            await Grid.Refresh();
+        }
 
         protected void DataBound()
         {
@@ -285,15 +405,20 @@ namespace BedBrigade.Client.Components
 
         protected async Task SendTax()
         {
-            foreach (var recipient in LB_Send.GetDataList())
+            var result =  await _svcDonation.EmailTaxForms(LB_Send.GetDataList().ToList());
+
+            if (result.Success)
             {
-                string body = $"Dear {recipient.Name},\n\n" +
-                              $"Thank you for your generous donation of {recipient.Amount.ToString("C")} to the Bed Brigade";
-                //await _messageService.SendEmailAsync(recipient.Email, 
-                //    "national@bedbrigade.org", 
-                //    "Bed Brigade Charitable Donation", 
-                //    body);
+                _toastService.Success("Tax Forms Sent", "Tax Forms Sent Successfully!");
+                await LoadDonations();
+                LoadNotSent();
+                Grid.Refresh();
             }
+            else
+            {
+                _toastService.Error("Could not send tax forms", "Unable to send Tax Forms!");
+            }
+
             await CloseTaxDialog();
         }
 
@@ -308,17 +433,11 @@ namespace BedBrigade.Client.Components
         {
         { "id", "scope2" }
         };
-        public  SfListBox<string[], ListItem> LB_NotSent;
-        public  SfListBox<string[], ListItem> LB_Send;
-        private List<ListItem> NotSent = new List<ListItem>();
-        private List<ListItem> Send = new List<ListItem>();
-        public class ListItem
-        {
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public decimal Amount { get; set; }
+        public  SfListBox<string[], Donation> LB_NotSent;
+        public  SfListBox<string[], Donation> LB_Send;
+        private List<Donation> NotSent = new List<Donation>();
+        private List<Donation> Send = new List<Donation>();
 
-        }
         #endregion
 
     }

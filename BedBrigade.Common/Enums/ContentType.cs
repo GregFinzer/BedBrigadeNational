@@ -6,5 +6,6 @@ public enum ContentType
     Footer = 2,
     Body = 3,
     Home = 4,
-    DeliveryCheckList = 5
+    DeliveryCheckList = 5,
+    EmailTaxForm=6
 }

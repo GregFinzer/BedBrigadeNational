@@ -51,6 +51,8 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
+
+
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
     {
         entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
@@ -90,11 +92,10 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return input.Replace("e-rte-image", "").Replace("e-imginline", "");
     }
 
-    public Task<ServiceResponse<Content>> GetDeliveryChecklistByLocationId(int locationId)
+    public async Task<ServiceResponse<Content>> GetByLocationAndContentType(int locationId, ContentType contentType)
     {
-        return GetAsync(ContentType.DeliveryCheckList.ToString(), locationId);
+        return await GetAsync(contentType.ToString(), locationId);
     }
-    
 }
 
 
