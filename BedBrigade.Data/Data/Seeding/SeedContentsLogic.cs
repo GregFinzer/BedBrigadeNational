@@ -496,7 +496,7 @@ public static class SeedContentsLogic
 
         Log.Logger.Information("SeedTaxForm Started");
 
-        string name = ContentType.TaxForm.ToString();
+        string name = ContentType.EmailTaxForm.ToString();
 
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
@@ -505,12 +505,12 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
 
-                seedHtml = WebHelper.GetHtml("TaxForm.txt"); 
+                seedHtml = WebHelper.GetHtml("EmailTaxForm.txt"); 
 
                 var content = new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = ContentType.TaxForm,
+                    ContentType = ContentType.EmailTaxForm,
                     Name = name,
                     ContentHtml = seedHtml,
                     Title = StringUtil.InsertSpaces(name)

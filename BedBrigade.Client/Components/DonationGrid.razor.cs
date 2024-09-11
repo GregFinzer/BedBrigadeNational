@@ -29,6 +29,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private AuthenticationStateProvider? _authState { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private NavigationManager? _navManager { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -72,12 +73,13 @@ namespace BedBrigade.Client.Components
             SetupAccess();
             await LoadDonations();
             await LoadLocations();
+        }
 
-            var query = from donation in Donations
-                    where donation.TaxFormSent == false
-                    select new ListItem { Email = donation.Email, Name = donation.FullName, Amount= donation.Amount };                      
-            NotSent = query.ToList();
-
+        private void LoadNotSent()
+        {
+            NotSent = Donations.Where(d => !d.TaxFormSent)
+                .OrderBy(o => o.FullName)
+                .ThenBy(o => o.DonationDate).ToList();
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -225,6 +227,7 @@ namespace BedBrigade.Client.Components
         {
             if(args.Item.Text == SendTaxForm)
             {
+                LoadNotSent();
                 TaxIsVisible = true;
             }
         }
@@ -233,6 +236,7 @@ namespace BedBrigade.Client.Components
         {
             if(args.Item.Text == SendTaxForm)
             {
+                LoadNotSent();
                 TaxIsVisible = true;
                 return;
             }
@@ -333,7 +337,9 @@ namespace BedBrigade.Client.Components
                 {
                     _toastService.Error("Could not add donation", "Unable to add Donation!");
                 }
+
             }
+
             await Grid.Refresh();
         }
 
@@ -359,6 +365,7 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                 }
             }
+            await Grid.Refresh();
         }
 
         protected void DataBound()
@@ -414,15 +421,20 @@ namespace BedBrigade.Client.Components
 
         protected async Task SendTax()
         {
-            foreach (var recipient in LB_Send.GetDataList())
+            var result =  await _svcDonation.EmailTaxForms(LB_Send.GetDataList().ToList());
+
+            if (result.Success)
             {
-                string body = $"Dear {recipient.Name},\n\n" +
-                              $"Thank you for your generous donation of {recipient.Amount.ToString("C")} to the Bed Brigade";
-                //await _messageService.SendEmailAsync(recipient.Email, 
-                //    "national@bedbrigade.org", 
-                //    "Bed Brigade Charitable Donation", 
-                //    body);
+                _toastService.Success("Tax Forms Sent", "Tax Forms Sent Successfully!");
+                await LoadDonations();
+                LoadNotSent();
+                Grid.Refresh();
             }
+            else
+            {
+                _toastService.Error("Could not send tax forms", "Unable to send Tax Forms!");
+            }
+
             await CloseTaxDialog();
         }
 
@@ -437,17 +449,11 @@ namespace BedBrigade.Client.Components
         {
         { "id", "scope2" }
         };
-        public  SfListBox<string[], ListItem> LB_NotSent;
-        public  SfListBox<string[], ListItem> LB_Send;
-        private List<ListItem> NotSent = new List<ListItem>();
-        private List<ListItem> Send = new List<ListItem>();
-        public class ListItem
-        {
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public decimal Amount { get; set; }
+        public  SfListBox<string[], Donation> LB_NotSent;
+        public  SfListBox<string[], Donation> LB_Send;
+        private List<Donation> NotSent = new List<Donation>();
+        private List<Donation> Send = new List<Donation>();
 
-        }
         #endregion
 
     }

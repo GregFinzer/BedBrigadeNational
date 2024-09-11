@@ -15,6 +15,7 @@ using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Models;
 using Microsoft.JSInterop;
 using System.IO;
+using ContentType = BedBrigade.Common.Enums.ContentType;
 
 namespace BedBrigade.Client.Components
 {
@@ -435,7 +436,7 @@ namespace BedBrigade.Client.Components
             var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
             string deliveryChecklist = string.Empty;
 
-            var deliveryChecklistResult = await _svcContent.GetDeliveryChecklistByLocationId(selectedLocation);
+            var deliveryChecklistResult = await _svcContent.GetByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
 
             if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
             {

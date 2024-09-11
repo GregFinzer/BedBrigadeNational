@@ -110,7 +110,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDatePicker @bind-Checked=@donation.DonationDate Enabled="true" Placeholder="Donation Date" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfDatePicker @bind-Value=@donation.DonationDate Enabled="true" Placeholder="Donation Date" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="Tax Form Sent" />
@@ -148,10 +148,10 @@ else
                     <div class="dual-list-wrapper">
                         <div class="dual-list-groupa">
                             <h4>Not Sent</h4>
-                            <SfListBox @ref=@LB_NotSent Scope="@scope2" DataSource="@NotSent" TItem="ListItem" Height="330px" TValue="string[]" @attributes="listbox1Attr">
-                                <ListBoxFieldSettings Text="Name" Value="Email"></ListBoxFieldSettings>
+                            <SfListBox @ref=@LB_NotSent Scope="@scope2" DataSource="@NotSent" TItem="Donation" Height="330px" TValue="string[]" @attributes="listbox1Attr">
+                                <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
                                 <ListBoxToolbarSettings Items="@items"></ListBoxToolbarSettings>
-                                <ListBoxTemplates TItem="ListItem">
+                                <ListBoxTemplates TItem="Donation">
                                     <NoRecordsTemplate>
                                         <span>Nothing to send</span>
                                     </NoRecordsTemplate>
@@ -160,9 +160,9 @@ else
                         </div>
                         <div class="dual-list-groupb">
                             <h4>Send</h4>
-                            <SfListBox @ref=@LB_Send Scope="@scope1" DataSource="@Send" Height="330px" TItem="ListItem" TValue="string[]" @attributes="listbox2Attr">
-                                <ListBoxFieldSettings Text="Name" Value="Email"></ListBoxFieldSettings>
-                                <ListBoxTemplates TItem="ListItem">
+                            <SfListBox @ref=@LB_Send Scope="@scope1" DataSource="@Send" Height="330px" TItem="Donation" TValue="string[]" @attributes="listbox2Attr">
+                                <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
+                                <ListBoxTemplates TItem="Donation">
                                     <NoRecordsTemplate>
                                         <span>Nothing to send</span>
                                     </NoRecordsTemplate>
