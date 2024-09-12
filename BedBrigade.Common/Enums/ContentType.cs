@@ -1,4 +1,6 @@
-﻿namespace BedBrigade.Common.Enums;
+﻿using System.ComponentModel;
+
+namespace BedBrigade.Common.Enums;
 
 public enum ContentType
 {
@@ -6,6 +8,8 @@ public enum ContentType
     Footer = 2,
     Body = 3,
     Home = 4,
+    [Description("Delivery Check List")]
     DeliveryCheckList = 5,
-    EmailTaxForm=6
+    [Description("Email Tax Form")]
+    EmailTaxForm =6
 }
