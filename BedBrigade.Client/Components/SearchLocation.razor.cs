@@ -5,6 +5,7 @@ using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 
 namespace BedBrigade.Client.Components
 {
@@ -32,6 +33,7 @@ namespace BedBrigade.Client.Components
         private string PostalCodeResult { get; set; } = string.Empty;
         private const string DisplayNone = "none";
         private string strAlertDisplay = DisplayNone;
+        private string strDisplayNotActive = DisplayNone;
         private const string AlertDanger = "alert alert-danger";
         private string strAlertType = "alert alert-danger";
         private bool PostalCodeSuccess = false;
@@ -178,9 +180,11 @@ namespace BedBrigade.Client.Components
 
         private async Task GetSearchResult(string ResultMessage, ServiceResponse<List<LocationDistance>> Result)
         {
+            strDisplayNotActive = DisplayNone;
+
             if (!ResultMessage.Contains("No locations found"))
             {
-
+                
                 strAlertType = "alert alert-success";
                 PostalCodeResult = "Success! " + ResultMessage;
                 Locations = Result.Data;
@@ -195,6 +199,13 @@ namespace BedBrigade.Client.Components
                                                   // open parent edit form
                     }
                 }
+
+                // display location list - does contain not active?
+                bool containsAsterisk = Locations.Any(location => location.Name.Contains("*"));
+                if (containsAsterisk) {
+                    strDisplayNotActive = "";
+                }
+
             } // Locations Found
             else
             { // Locations not found

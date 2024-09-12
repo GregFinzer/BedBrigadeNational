@@ -7,6 +7,7 @@ using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using System.Diagnostics;
 
 namespace BedBrigade.Data.Services;
 
@@ -28,6 +29,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         _configurationDataService = configurationDataService;
         _contentDataService = contentDataService;
         _contextFactory = contextFactory;
+        _auth = authProvider;
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -115,8 +117,44 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         }
     }
 
+    public async Task<List<Location>> GetAvailableLocationsAsync(List<Location> locations)
+    {
+        bool isAuthenticated = false;
+
+        if (_auth != null)
+        {
+            var user = (await _auth.GetAuthenticationStateAsync()).User;
+            if (user != null && user.Identity !=null)
+            {
+                isAuthenticated = user.Identity.IsAuthenticated;
+            }
+        }
+
+       // Debug.WriteLine("User authenticated -  " + isAuthenticated.ToString());
 
 
+        // Step 1: Filter locations by postal code
+        var filteredLocations = locations.Where(l => !string.IsNullOrEmpty(l.PostalCode)).ToList();
+
+        // Step 2: If user is not authenticated, select only active locations
+        if (!isAuthenticated)
+        {
+            filteredLocations = filteredLocations.Where(l => l.IsActive).ToList();
+        }
+        else
+        {
+            // Step 3: If user is authenticated, mark inactive locations with an asterisk
+            filteredLocations.ForEach(l =>
+            {
+                if (!l.IsActive)
+                {
+                    l.Name = $"*{l.Name}";
+                }
+            });
+        }
+
+        return filteredLocations;
+    } // get available location
 
     public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string postalCode)
     {
@@ -153,12 +191,13 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             return new ServiceResponse<List<LocationDistance>>($"No locations have postal codes");
         }
 
+
+        var AvailableLocations = await GetAvailableLocationsAsync(locationsResult.Data.ToList());
+
         var result = new List<LocationDistance>();
-        foreach (var loc in locationsResult.Data)
+        foreach (var loc in AvailableLocations) // locationsResult.Data
         {
-            if (!(string.IsNullOrEmpty(loc.PostalCode)) && loc.IsActive)
-            {
-                var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
+            var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
                     if (distance < maxMiles)
                     {
                         LocationDistance locationDistance = new LocationDistance();
@@ -167,8 +206,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
                         locationDistance.Route = loc.Route;
                         locationDistance.Distance = distance;
                         result.Add(locationDistance);
-                    }                
-            }
+                    }                           
         }
         result = result.OrderBy(r => r.Distance).ToList();
 

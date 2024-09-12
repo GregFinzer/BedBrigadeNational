@@ -16,7 +16,7 @@
                     return "is in your zip code";
                 }
 
-                return Distance.ToString("0.00") + " miles away";
+                return Math.Round(Distance, 1).ToString("0.0") + " miles away";
             }
         }
     }
