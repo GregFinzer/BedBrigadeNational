@@ -70,7 +70,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
             // add Delivery Check List - new 9/6/2024
             await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
-            
+            await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             return result;
         }
         catch (Exception ex)
@@ -197,9 +197,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         var result = new List<LocationDistance>();
         foreach (var loc in AvailableLocations) // locationsResult.Data
         {
-           // if (!(string.IsNullOrEmpty(loc.PostalCode)) && loc.IsActive)
-            //{
-                var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
+            var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
                     if (distance < maxMiles)
                     {
                         LocationDistance locationDistance = new LocationDistance();
@@ -208,8 +206,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
                         locationDistance.Route = loc.Route;
                         locationDistance.Distance = distance;
                         result.Add(locationDistance);
-                    }                
-            //}
+                    }                           
         }
         result = result.OrderBy(r => r.Distance).ToList();
 
