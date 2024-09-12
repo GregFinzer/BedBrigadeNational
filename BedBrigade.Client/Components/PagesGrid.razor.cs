@@ -15,6 +15,7 @@ using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Http.HttpResults;
+using ContentType = BedBrigade.Common.Enums.ContentType;
 
 
 namespace BedBrigade.Client.Components
@@ -71,6 +72,7 @@ namespace BedBrigade.Client.Components
         private string EditableText;
         private bool ShowDialog = false;
         private string CurrentLocationName { get; set; }
+        private string TextDialogHeading { get; set; }
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -232,23 +234,24 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                     break;
 
-                case Action.BeginEdit:  // VS 9/6/2024 - different for DElivery Check List
-
-                    if (args.Data.ContentType == Common.Enums.ContentType.DeliveryCheckList)
+                case Action.BeginEdit:  
+                    switch (args.Data.ContentType)
                     {
-                        CurrentValues = args.Data;
-                        await SetLocationName();
-                        // open special editor
-                        OpenTextDialog();
+                        case ContentType.DeliveryCheckList:
+                        case ContentType.EmailTaxForm:
+                            CurrentValues = args.Data;
+                            await SetLocationName();
+                            TextDialogHeading = "Edit " + EnumHelper.GetEnumDescription(args.Data.ContentType);
+                            OpenTextDialog();
+                            break;
+                        default:
+                            await BeginEdit(args);
+                            break;
                     }
-                    else
-                    { 
-                        await BeginEdit(args);
-                    }
-                    break;
-            } // switch
 
-        } // Action Begin
+                    break;
+            } 
+        } 
 
         private async Task Delete(ActionEventArgs<Content> args)
         {
@@ -410,7 +413,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                _toastService.Error("Error", $"Could not save Delivery Check List for location {CurrentLocationName}");
+                _toastService.Error("Error", $"Could not save content for location {CurrentLocationName}");
             }
 
         }

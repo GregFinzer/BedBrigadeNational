@@ -16,6 +16,7 @@ https://www.syncfusion.com/sales/communitylicense
 * To run the NUnit tests, <a href="https://www.jetbrains.com/resharper/">Resharper</a> or <a href="https://marketplace.visualstudio.com/items?itemName=NUnitDevelopers.NUnit3TestAdapter">NUnit Test Adapter</a> is required
 * Install SyncFusion:  https://www.syncfusion.com/account/downloads
 * Install Web Compiler Visual Studio Extension.  This is required for right clicking on the theme.scss and generating the theme.css and theme.min.css
+* Install your favorite database editor for SQL Server Express such as <a href="https://community.chocolatey.org/packages/sql-server-management-studio">SQL Server Management Studio</a> or <a href="https://community.chocolatey.org/packages/databasenet">Database .NET</a>
 
 ### 3.  Clone the repository
 On the command line run as administrator in the directory you want to clone it to:
