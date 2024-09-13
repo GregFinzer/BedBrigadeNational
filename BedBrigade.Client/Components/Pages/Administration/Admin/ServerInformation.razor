@@ -121,16 +121,31 @@
 
     public double GetFreeMemory()
     {
-        PerformanceCounter freeMemory = new PerformanceCounter("Memory", "Available MBytes");
-        return Math.Round(Convert.ToDouble(freeMemory.NextValue()) / 1024.0, 2);
+        try
+        {
+            PerformanceCounter freeMemory = new PerformanceCounter("Memory", "Available MBytes");
+            return Math.Round(Convert.ToDouble(freeMemory.NextValue()) / 1024.0, 2);
+        }
+        catch (Exception ex)
+        {
+            return Math.Round(GC.GetGCMemoryInfo().MemoryLoadBytes / (1024.0 * 1024 * 1024), 2);
+        }
     }
 
     private float GetCpuUtilization()
     {
-        PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        // Call NextValue twice to get a valid reading
-        cpuCounter.NextValue();
-        System.Threading.Thread.Sleep(1000);
-        return cpuCounter.NextValue();
+        try
+        {
+            PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            // Call NextValue twice to get a valid reading
+            cpuCounter.NextValue();
+            System.Threading.Thread.Sleep(1000);
+            return cpuCounter.NextValue();
+        }
+        catch (Exception)
+        {
+            return -1;
+        }
+
     }
 }
