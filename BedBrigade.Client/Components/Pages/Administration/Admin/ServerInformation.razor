@@ -5,7 +5,11 @@
 @using System.Runtime.InteropServices;
 @using System.Management;
 
-<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+@if (!WebHelper.IsDevelopment())
+{
+    <CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+}
+
 
 <h3 class="mb-4">Server Information</h3>
 
