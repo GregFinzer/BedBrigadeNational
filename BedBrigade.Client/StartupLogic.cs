@@ -88,6 +88,7 @@ namespace BedBrigade.Client
                 e.MaximumReceiveMessageSize = 1024000;
             });
 
+            builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
