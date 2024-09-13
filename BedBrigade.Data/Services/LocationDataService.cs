@@ -132,18 +132,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         {
             filteredLocations = filteredLocations.Where(l => l.IsActive).ToList();
         }
-        else
-        {
-            // Step 3: If user is authenticated, mark inactive locations with an asterisk
-            filteredLocations.ForEach(l =>
-            {
-                if (!l.IsActive)
-                {
-                    l.Name = $"*{l.Name}";
-                }
-            });
-        }
-
+       
         return filteredLocations;
     } // get available location
 
@@ -193,7 +182,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
                     {
                         LocationDistance locationDistance = new LocationDistance();
                         locationDistance.LocationId = loc.LocationId;
-                        locationDistance.Name = loc.Name;
+                        locationDistance.Name = loc.IsActive ? loc.Name : $"*{loc.Name}";
                         locationDistance.Route = loc.Route;
                         locationDistance.Distance = distance;
                         result.Add(locationDistance);
