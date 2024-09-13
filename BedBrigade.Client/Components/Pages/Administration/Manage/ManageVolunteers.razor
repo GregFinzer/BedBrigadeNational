@@ -1,12 +1,12 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/volunteers"
-@attribute [Authorize(Roles = RoleNames.CanManageVolunteers)]
 
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using WrapMode = Syncfusion.Blazor.Grids.WrapMode
 @using BedBrigade.Common.Models
 
+<CheckAuth Roles=@RoleNames.CanViewVolunteers></CheckAuth>
 
 @if (Volunteers == null)
 {

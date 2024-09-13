@@ -32,19 +32,15 @@
         public const string CanViewAdminDashboard =
             "National Admin, National Editor, Location Admin, Location Editor, Location Author, Location Scheduler, Location Contributor, Location Treasurer, Location Communications";
 
+        public const string CanViewBedRequests = CanViewAdminDashboard;
+        public const string CanViewContacts = CanViewAdminDashboard;
         public const string CanViewLocations = CanViewAdminDashboard;
         public const string CanViewMetroAreas = CanViewAdminDashboard;
+        public const string CanViewSignUps = CanViewAdminDashboard;
+        public const string CanViewVolunteers = CanViewAdminDashboard;
+        public const string CanViewSchedule = CanViewAdminDashboard;
+        public const string CanViewUsers = CanViewAdminDashboard;
 
-        public static List<string> GetPolicies()
-        {
-            return new List<string>
-            {
-                "CanCreatePages", "CanCreateBlogPost", "CanPublishPages", "CanPublishBlogPosts", "CanManageMedia",
-                "CanManageVolunteers", "CanManageBedRequests", "CanManageContacts", "CanManageSchedule",
-                "CanSendBulkEmail",
-                "CanManageDonations", "CanManageUsers", "CanCreateNationalNewsPost", "CanCreateContentForLocations",
-                "CanManagePages", "CanViewPages", "CanViewAdminDashboard"
-            };
-        }
+
     }
 }

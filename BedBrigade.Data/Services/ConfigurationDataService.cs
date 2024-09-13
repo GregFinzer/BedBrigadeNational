@@ -1,8 +1,7 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BedBrigade.Data.Services;
 
@@ -10,13 +9,13 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly AuthenticationStateProvider _auth;
+    private readonly IAuthService _authService;
 
-    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, IAuthService authService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
-        _auth = authProvider;
+        _authService = authService;
     }
 
     /// <summary>

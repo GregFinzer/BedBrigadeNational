@@ -1,10 +1,11 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/MetroAreas"
-@attribute [Authorize(Roles = RoleNames.CanViewMetroAreas)]
 
 @using BedBrigade.Common.Models
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
+
+<CheckAuth Roles=@RoleNames.CanViewMetroAreas></CheckAuth>
 
 @if (MetroAreas == null)
 {

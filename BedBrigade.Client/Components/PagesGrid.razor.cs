@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
@@ -16,6 +16,7 @@ using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Http.HttpResults;
 using ContentType = BedBrigade.Common.Enums.ContentType;
+using BedBrigade.Client.Services;
 
 
 namespace BedBrigade.Client.Components
@@ -27,7 +28,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IWebHostEnvironment _svcEnv { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
         [Inject] private ToastService _toastService { get; set; }
 
@@ -81,8 +82,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            var authState = await _authState.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Pages Page");

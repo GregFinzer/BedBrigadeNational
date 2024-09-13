@@ -1,7 +1,8 @@
 ﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Components.Authorization;
+
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 
@@ -10,7 +11,7 @@ public class TemplateDataService : Repository<Template>, ITemplateDataService
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
 
-    public TemplateDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+    public TemplateDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, IAuthService authService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;

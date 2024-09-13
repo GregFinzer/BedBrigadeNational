@@ -1,7 +1,7 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/admintasks/renamePage/{LocationId}/{ContentName}"
 @using BedBrigade.Common.Constants
-@attribute [Authorize(Roles = RoleNames.CanManagePages)]
+<CheckAuth Roles=@RoleNames.CanManagePages></CheckAuth>
 
 @if (Model == null || Model.PageName == null || Model.PageTitle == null)
 {

@@ -1,8 +1,9 @@
 ﻿using BedBrigade.Common.Enums;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 
@@ -13,7 +14,7 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
     private readonly ICommonService _commonService;
 
     public VolunteerDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        AuthenticationStateProvider authProvider, ICommonService commonService) : base(contextFactory, cachingService, authProvider)
+        IAuthService authService, ICommonService commonService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 
@@ -16,8 +17,8 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
 
     public ScheduleDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
-        AuthenticationStateProvider authProvider,
-        IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authProvider)
+        IAuthService authService,
+        IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;

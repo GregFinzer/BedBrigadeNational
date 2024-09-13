@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
@@ -21,7 +21,7 @@ public partial class ManageMetroAreas : ComponentBase
 {
     [Inject] private IMetroAreaDataService? _svcMetroArea { get; set; }
     [Inject] private IUserDataService? _svcUser { get; set; }
-    [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
 
     [Parameter] public string? Id { get; set; }
@@ -59,8 +59,7 @@ public partial class ManageMetroAreas : ComponentBase
     /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
-        var authState = await _authState.GetAuthenticationStateAsync();
-        Identity = authState.User;
+        Identity = _svcAuth.CurrentUser;
         if (Identity.IsInRole(RoleNames.NationalAdmin))
         {
             ToolBar = new List<string>

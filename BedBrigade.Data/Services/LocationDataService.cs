@@ -8,6 +8,7 @@ using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using System.Diagnostics;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 
@@ -15,21 +16,21 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly AuthenticationStateProvider _auth;
+    private readonly IAuthService _authService;
     private readonly IConfigurationDataService _configurationDataService;
     private readonly IContentDataService _contentDataService;
 
     public LocationDataService(IDbContextFactory<DataContext> contextFactory,
         ICachingService cachingService,
-        AuthenticationStateProvider authProvider,
+        IAuthService authService,
         IConfigurationDataService configurationDataService,
-        IContentDataService contentDataService) : base(contextFactory, cachingService, authProvider)
+        IContentDataService contentDataService) : base(contextFactory, cachingService, authService)
     {
         _cachingService = cachingService;
         _configurationDataService = configurationDataService;
         _contentDataService = contentDataService;
         _contextFactory = contextFactory;
-        _auth = authProvider;
+        _authService = authService;
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -119,19 +120,9 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
     public async Task<List<Location>> GetAvailableLocationsAsync(List<Location> locations)
     {
-        bool isAuthenticated = false;
-
-        if (_auth != null)
-        {
-            var user = (await _auth.GetAuthenticationStateAsync()).User;
-            if (user != null && user.Identity !=null)
-            {
-                isAuthenticated = user.Identity.IsAuthenticated;
-            }
-        }
+        bool isAuthenticated = _authService.IsLoggedIn;
 
        // Debug.WriteLine("User authenticated -  " + isAuthenticated.ToString());
-
 
         // Step 1: Filter locations by postal code
         var filteredLocations = locations.Where(l => !string.IsNullOrEmpty(l.PostalCode)).ToList();

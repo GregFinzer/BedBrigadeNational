@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
@@ -11,6 +11,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
@@ -20,7 +21,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
         [Parameter] public string? Id { get; set; }
 
@@ -65,8 +66,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task LoadUserData()
         {
-            var authState = await _authState!.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
 
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 

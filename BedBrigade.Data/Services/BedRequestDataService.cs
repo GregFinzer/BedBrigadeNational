@@ -1,8 +1,9 @@
-﻿using BedBrigade.Common.Constants;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -15,9 +16,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly ILocationDataService _locationDataService;
 
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        AuthenticationStateProvider authProvider,
+        IAuthService authService,
         ICommonService commonService,
-        ILocationDataService locationDataService) : base(contextFactory, cachingService, authProvider)
+        ILocationDataService locationDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;

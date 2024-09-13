@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.RichTextEditor;
 using System.Security.Claims;
 using BedBrigade.Client.Components;
@@ -15,7 +15,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
     public partial class EditContent : ComponentBase
     {
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ToastService _toastService { get; set; }
@@ -84,7 +84,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         protected override async Task OnInitializedAsync()
         {
             Refreshed = false;
-            Identity = (await _authState.GetAuthenticationStateAsync()).User;
+            Identity = _svcAuth.CurrentUser;
             WorkTitle = $"Editing {ContentName}";
 
             int locationId;

@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -24,7 +24,6 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private IAuthDataService _svcAuthData { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider _authState { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
 
         private ClaimsPrincipal Identity { get; set; }
@@ -61,8 +60,8 @@ namespace BedBrigade.Client.Components
         {
             _logger.LogInformation("Starting User Grid");
             PasswordVisible = false;
-            var authState = await _authState.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            
+            Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Users Page");

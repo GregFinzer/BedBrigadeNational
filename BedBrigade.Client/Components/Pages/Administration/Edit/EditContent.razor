@@ -1,6 +1,6 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/edit/editcontent/{LocationId}/{ContentName}"
-@attribute [Authorize(Roles = RoleNames.CanManagePages)]
+<CheckAuth Roles=@RoleNames.CanManagePages></CheckAuth>
 
 <style>
     .center-align td {

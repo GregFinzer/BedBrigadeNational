@@ -6,7 +6,7 @@ using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -104,27 +104,10 @@ namespace BedBrigade.Client
         private static void SetupAuth(WebApplicationBuilder builder)
         {
             Log.Logger.Information("SetupAuth");
-
-            //Authentication
-            builder.Services.AddAuthorization();
-
-            //The cookie authentication is never used, but it is required to prevent a runtime error
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = "auth_cookie";
-                    options.Cookie.MaxAge = TimeSpan.FromHours(24);
-                    options.LoginPath = "/login";
-                });
-
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            builder.Services.AddCascadingAuthenticationState();
-
-            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
-
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAuthDataService, AuthDataService>();
         }
 
         private static void ClientServices(WebApplicationBuilder builder)

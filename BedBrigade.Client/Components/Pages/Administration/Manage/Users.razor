@@ -1,9 +1,6 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/users"
-@attribute [Authorize(Roles = RoleNames.CanManageUsers)]
+<CheckAuth Roles=@RoleNames.CanViewUsers></CheckAuth>
 
-@using BedBrigade.Client.Components
-@using BedBrigade.Common;
-@using BedBrigade.Common.Constants
 
 <UsersGrid />

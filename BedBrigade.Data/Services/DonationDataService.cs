@@ -1,9 +1,10 @@
 ﻿using System.Text;
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -17,11 +18,11 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
 
     public DonationDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
-        AuthenticationStateProvider authProvider, 
+        IAuthService authService, 
         ICommonService commonService,
         IUserDataService userDataService,
         ILocationDataService locationDataService,
-        IContentDataService contentDataService) : base(contextFactory, cachingService, authProvider)
+        IContentDataService contentDataService) : base(contextFactory, cachingService, authService)
     {
         _commonService = commonService;
         _userDataService = userDataService;

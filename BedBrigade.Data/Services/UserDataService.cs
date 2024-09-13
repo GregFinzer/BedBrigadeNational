@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Services;
 
 
 namespace BedBrigade.Data.Services
@@ -10,20 +11,20 @@ namespace BedBrigade.Data.Services
     {
         private readonly ICachingService _cachingService;
         private readonly IDbContextFactory<DataContext> _contextFactory;
-        private readonly AuthenticationStateProvider _auth;
+        private readonly IAuthService _authService;
         private readonly ICommonService _commonService;
         private readonly ILocationDataService _locationDataService;
         private readonly IUserPersistDataService _userPersistDataService;
 
         public UserDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-            AuthenticationStateProvider authProvider,
+            IAuthService authService,
             ICommonService commonService,
             ILocationDataService locationDataService,
-            IUserPersistDataService userPersistDataService) : base(contextFactory, cachingService, authProvider)
+            IUserPersistDataService userPersistDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
-            _auth = authProvider;
+            _authService = authService;
             _commonService = commonService;
             _locationDataService = locationDataService;
             _userPersistDataService = userPersistDataService;

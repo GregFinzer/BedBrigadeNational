@@ -2,7 +2,7 @@
 @page "/administration/admintasks/addeditvolunteer/{LocationId:int}"
 @page "/administration/admintasks/addeditvolunteer/{LocationId:int}/{VolunteerId:int}"
 @using BedBrigade.Common.Models
-@attribute [Authorize(Roles = RoleNames.CanManageVolunteers)]
+<CheckAuth Roles=@RoleNames.CanManageVolunteers></CheckAuth>
 
 @if (Model == null)
 {

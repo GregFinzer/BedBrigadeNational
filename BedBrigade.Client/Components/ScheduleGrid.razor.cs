@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
@@ -11,6 +11,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Services;
 
 
 namespace BedBrigade.Client.Components
@@ -22,7 +23,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
 
         protected SfGrid<Schedule>? Grid { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
@@ -94,8 +95,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadUserData()
         {
-            var authState = await _authState!.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
             userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Schedules Page");
 

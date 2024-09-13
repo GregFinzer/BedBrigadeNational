@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
@@ -22,7 +22,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -63,8 +63,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            var authState = await _authState.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
                            Defaults.DefaultUserNameAndEmail;

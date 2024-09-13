@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Security.Claims;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
@@ -9,6 +9,7 @@ using BedBrigade.Common.Models;
 using Serilog;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -21,7 +22,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IVolunteerDataService _volunteerDataService { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
@@ -36,8 +37,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected override async Task OnInitializedAsync()
         {
-            var authState = await _authState.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Add/Edit Volunteer Page");
