@@ -35,7 +35,9 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Syncfusion.Blazor" Version="26.2.11" />
     <PackageReference Include="Syncfusion.Blazor.FileManager.PhysicalFileProvider" Version="26.2.11" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
 
 

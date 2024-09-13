@@ -1,0 +1,136 @@
+﻿@page "/administration/admin/serverinfo"
+
+@using System;
+@using System.Diagnostics;
+@using System.Runtime.InteropServices;
+@using System.Management;
+
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+<h3 class="mb-4">Server Information</h3>
+
+<table class="table table-striped table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Information</th>
+        <th scope="col">Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th scope="row">Processor Architecture</th>
+        <td>@ProcessorArchitecture</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Name</th>
+        <td>@ProcessorName</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Count</th>
+        <td>@ProcessorCount</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Speed</th>
+        <td>@ProcessorSpeed MHz</td>
+    </tr>
+    <tr>
+        <th scope="row">CPU Utilization</th>
+        <td>@CpuUtilization %</td>
+    </tr>
+    <tr>
+        <th scope="row">Maximum Memory</th>
+        <td>@MaxMemory GB</td>
+    </tr>
+    <tr>
+        <th scope="row">Free Memory</th>
+        <td>@FreeMemory GB</td>
+    </tr>
+    <tr>
+        <th scope="row">Timezone</th>
+        <td>@Timezone</td>
+    </tr>
+    </tbody>
+</table>
+
+@code {
+    private string ProcessorArchitecture { get; set; }
+    private string ProcessorName { get; set; }
+    private int ProcessorCount { get; set; }
+    private uint ProcessorSpeed { get; set; }
+    private double MaxMemory { get; set; }
+    private double FreeMemory { get; set; }
+    private float CpuUtilization { get; set; }
+    private string Timezone { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ProcessorArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+        ProcessorName = GetProcessorName();
+        ProcessorCount = Environment.ProcessorCount;
+        ProcessorSpeed = GetProcessorSpeed();
+        MaxMemory = GetMaxMemory();
+        FreeMemory = GetFreeMemory();
+        CpuUtilization = GetCpuUtilization();
+        Timezone = TimeZoneInfo.Local.DisplayName;
+    }
+
+    private string GetProcessorName()
+    {
+        try
+        {
+            using (var searcher = new ManagementObjectSearcher("select Name from Win32_Processor"))
+            {
+                foreach (var obj in searcher.Get())
+                {
+                    return obj["Name"].ToString().Trim();
+                }
+            }
+        }
+        catch
+        {
+            // If we can't get the name, we'll return "Unknown"
+        }
+        return "Unknown";
+    }
+
+    private uint GetProcessorSpeed()
+    {
+        uint speed = 0;
+        try
+        {
+            using (var searcher = new ManagementObjectSearcher("select MaxClockSpeed from Win32_Processor"))
+            {
+                foreach (var obj in searcher.Get())
+                {
+                    speed = (uint)obj["MaxClockSpeed"];
+                    break; // We'll just use the first processor's speed
+                }
+            }
+        }
+        catch
+        {
+            // If we can't get the speed, we'll return 0
+        }
+        return speed;
+    }
+
+    private double GetMaxMemory()
+    {
+        return Math.Round(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024), 2);
+    }
+
+    public double GetFreeMemory()
+    {
+        PerformanceCounter freeMemory = new PerformanceCounter("Memory", "Available MBytes");
+        return Math.Round(Convert.ToDouble(freeMemory.NextValue()) / 1024.0, 2);
+    }
+
+    private float GetCpuUtilization()
+    {
+        PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        // Call NextValue twice to get a valid reading
+        cpuCounter.NextValue();
+        System.Threading.Thread.Sleep(1000);
+        return cpuCounter.NextValue();
+    }
+}

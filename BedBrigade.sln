@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Common", "BedBri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Client", "BedBrigade.Client\BedBrigade.Client.csproj", "{0633E96E-E43D-4B83-81DE-4A0EB58DD783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.Tests.Integration", "BedBrigade.Tests.Integration\BedBrigade.Tests.Integration.csproj", "{CFA0AC89-E841-49C2-9C26-FDF5271D590A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Tests.Integration", "BedBrigade.Tests.Integration\BedBrigade.Tests.Integration.csproj", "{CFA0AC89-E841-49C2-9C26-FDF5271D590A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
