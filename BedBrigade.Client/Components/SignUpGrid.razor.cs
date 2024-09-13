@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Syncfusion.Blazor.Grids;
 using System.Security.Claims;
 using Syncfusion.Blazor.DropDowns;
@@ -11,6 +11,7 @@ using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Serilog;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components;
 
@@ -22,7 +23,7 @@ public partial class SignUpGrid : ComponentBase
     [Inject] private IVolunteerDataService? _svcVolunteer { get; set; }
     [Inject] private IUserDataService? _svcUser { get; set; }
     [Inject] private ILocationDataService? _svcLocation { get; set; }
-    [Inject] private AuthenticationStateProvider? _authState { get; set; }
+    [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IScheduleDataService? _svcSchedule { get; set; }
     [Inject] private ISignUpDataService? _svcSignUp { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
@@ -188,8 +189,7 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        var authState = await _authState!.GetAuthenticationStateAsync();
-        Identity = authState.User;
+        Identity = _svcAuth.CurrentUser;
         userLocationId = await _svcUser.GetUserLocationId();
         userName = await _svcUser.GetUserName();
         userRole = await _svcUser.GetUserRole();

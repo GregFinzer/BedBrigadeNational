@@ -1,6 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -14,7 +14,7 @@ namespace ImageUpload.Controllers
     public class ImageController : ControllerBase
     {
         private readonly IWebHostEnvironment hostingEnv;
-        private readonly AuthenticationStateProvider? _authState;
+        private readonly IAuthService _authService;
         private readonly ILocationDataService _svcLocation;
         private readonly ICachingService _cachingService;
         private ClaimsPrincipal _identity;

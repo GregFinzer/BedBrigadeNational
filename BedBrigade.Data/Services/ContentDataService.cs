@@ -1,7 +1,8 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -13,8 +14,8 @@ public class ContentDataService : Repository<Content>, IContentDataService
     private readonly ICommonService _commonService;
 
     public ContentDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        AuthenticationStateProvider authProvider,
-        ICommonService commonService) : base(contextFactory, cachingService, authProvider)
+        IAuthService authService,
+        ICommonService commonService) : base(contextFactory, cachingService, authService)
     {
         _cachingService = cachingService;
         _contextFactory = contextFactory;

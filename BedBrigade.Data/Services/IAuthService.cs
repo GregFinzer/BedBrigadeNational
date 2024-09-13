@@ -6,9 +6,17 @@ namespace BedBrigade.Client.Services
     {
         ClaimsPrincipal CurrentUser { get; set; }
         bool IsLoggedIn { get; }
-        event Action<ClaimsPrincipal> UserChanged;
+        int LocationId { get; }
+        string UserName { get; }
+        string Email { get; }
+        string? UserRole { get; }
+
         Task<bool> GetStateFromTokenAsync();
         Task LogoutAsync(); 
         Task Login(ClaimsPrincipal user);
+
+        event Func<ClaimsPrincipal, Task> AuthChanged;
+        Task NotifyAuthChangedAsync();
+        bool UserHasRole(string roles);
     }
 }

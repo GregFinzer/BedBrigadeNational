@@ -1,6 +1,7 @@
-﻿using BedBrigade.Common.Constants;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services
@@ -8,9 +9,9 @@ namespace BedBrigade.Data.Services
     public class MetroAreaDataService : Repository<MetroArea>, IMetroAreaDataService
     {
         public MetroAreaDataService(IDbContextFactory<DataContext> contextFactory, 
-            ICachingService cachingService, 
-            AuthenticationStateProvider authProvider,
-            ILocationDataService locationDataService) : base(contextFactory, cachingService, authProvider)
+            ICachingService cachingService,
+            IAuthService authService,
+            ILocationDataService locationDataService) : base(contextFactory, cachingService, authService)
         {
         }
     }

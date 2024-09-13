@@ -1,7 +1,5 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/pages"
-@using BedBrigade.Common;
-@using BedBrigade.Common.Constants
-@attribute [Authorize(Roles = RoleNames.CanViewPages)]
+<CheckAuth Roles=@RoleNames.CanViewPages></CheckAuth>
 
 <PagesGrid />

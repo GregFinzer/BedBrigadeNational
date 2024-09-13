@@ -1,10 +1,11 @@
 ﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services
 {
@@ -22,15 +23,15 @@ namespace BedBrigade.Data.Services
         private readonly IScheduleDataService _scheduleDataService;
 
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
-            ICachingService cachingService, 
-            AuthenticationStateProvider authProvider,
+            ICachingService cachingService,
+            IAuthService authService,
             IVolunteerDataService volunteerDataService,
             IBedRequestDataService bedRequestDataService,
             IContactUsDataService contactUsDataService,
             IUserDataService userDataService,
             IConfigurationDataService configurationDataService,
             ILocationDataService locationDataService,
-            IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authProvider)
+            IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;

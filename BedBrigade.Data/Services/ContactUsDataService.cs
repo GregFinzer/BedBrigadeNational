@@ -1,5 +1,6 @@
-﻿using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -9,8 +10,8 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
     private readonly ICommonService _commonService;
 
     public ContactUsDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        AuthenticationStateProvider authProvider,
-        ICommonService commonService) : base(contextFactory, cachingService, authProvider)
+        IAuthService authService,
+        ICommonService commonService) : base(contextFactory, cachingService, authService)
     {
         _commonService = commonService;
     }

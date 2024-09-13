@@ -1,8 +1,5 @@
 ﻿@layout Layout.AdminLayout
-@using BedBrigade.Client.Components
-@using BedBrigade.Common;
-@using BedBrigade.Common.Constants
 @page "/administration/manage/locations"
-@attribute [Authorize(Roles = RoleNames.CanViewLocations)]
+<CheckAuth Roles=@RoleNames.CanViewLocations></CheckAuth>
 
 <LocationGrid />

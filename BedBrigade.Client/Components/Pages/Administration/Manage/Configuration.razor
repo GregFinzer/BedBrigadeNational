@@ -1,12 +1,7 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/Configuration"
-@using BedBrigade.Client.Components
-@using BedBrigade.Common;
-@using BedBrigade.Common.Constants
-@attribute [Authorize(Roles = RoleNames.NationalAdmin)]
+
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
 
 <ConfigurationGrid />
 
-@code {
-
-}

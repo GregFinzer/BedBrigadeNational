@@ -3,7 +3,7 @@
 @using BedBrigade.Common.Constants
 @using BedBrigade.Common.Models
 @using Syncfusion.Blazor.DropDowns
-@attribute [Authorize(Roles = RoleNames.CanCreatePages)]
+<CheckAuth Roles=@RoleNames.CanCreatePages></CheckAuth>
 
 @if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
 {

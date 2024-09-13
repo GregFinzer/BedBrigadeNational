@@ -5,7 +5,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.JSInterop;
 using Serilog;
 
@@ -17,7 +17,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider _authenticationStateProvider { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
 
@@ -29,33 +29,33 @@ namespace BedBrigade.Client.Components
         protected string Login = "login";
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
-        private AuthenticationState _authState { get; set; }
+
         private string PreviousLocation { get; set; } 
-        private ClaimsPrincipal User { get; set; }
+        private ClaimsPrincipal? User { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             Log.Debug("Header.OnInitializedAsync");
             await LoadContent();
-            _authenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+            _svcAuth.AuthChanged += OnAuthChanged;
             _locationState.OnChange += OnLocationChanged;
         }
 
-
-        private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+        private Task OnAuthChanged(ClaimsPrincipal arg)
         {
-            _authState = await task;
-            
             //We don't need to refresh if this is the first time to load the component
             if (User == null)
             {
-                User = _authState.User;
+                User = arg;
             }
-            else 
+            else
             {
                 StateHasChanged();
             }
+
+            return Task.CompletedTask;
         }
+
 
         private async Task OnLocationChanged()
         {
@@ -90,7 +90,7 @@ namespace BedBrigade.Client.Components
 
         public void Dispose()
         {
-            _authenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+            _svcAuth.AuthChanged -= OnAuthChanged;
             _locationState.OnChange -= OnLocationChanged; // Unsubscribe from the event
         }
 
@@ -106,11 +106,7 @@ namespace BedBrigade.Client.Components
 
             try
             {
-                _authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-                if (_authState != null 
-                    && _authState.User != null 
-                    && _authState.User.Identity != null 
-                    && _authState.User.Identity.IsAuthenticated)
+                if (_svcAuth.IsLoggedIn)
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
@@ -136,31 +132,31 @@ namespace BedBrigade.Client.Components
             Log.Debug("Header.SetMenuItems");
             try
             {
-                if (_authState.User.HasRole(RoleNames.NationalAdmin))
+                if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalAdmin))
                 {
                     await Show("nadmin");
                 }
-                else if (_authState.User.HasRole(RoleNames.NationalEditor))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalEditor))
                 {
                     await Show( "neditor");
                 }
-                else if (_authState.User.HasRole(RoleNames.LocationAdmin))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAdmin))
                 {
                     await Show( "ladmin");
                 }
-                else if (_authState.User.HasRole(RoleNames.LocationEditor))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationEditor))
                 {
                     await Show( "leditor");
                 }
-                else if (_authState.User.HasRole(RoleNames.LocationAuthor))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAuthor))
                 {
                     await Show( "lauthor");
                 }
-                else if (_authState.User.HasRole(RoleNames.LocationScheduler))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationScheduler))
                 {
                     await Show( "lscheduler");
                 }
-                else if (_authState.User.HasRole(RoleNames.LocationTreasurer))
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationTreasurer))
                 {
                     await Show( "ltreasurer");
                 }

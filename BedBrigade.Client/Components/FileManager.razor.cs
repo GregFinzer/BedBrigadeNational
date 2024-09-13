@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Security.Claims;
 using Syncfusion.Blazor.FileManager;
 using System.Diagnostics;
@@ -10,6 +10,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components
 {
@@ -18,7 +19,7 @@ namespace BedBrigade.Client.Components
         // Data Services
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
-        [Inject] private AuthenticationStateProvider? _authState { get; set; }
+        [Inject] private IAuthService? _svcAuth { get; set; }
 
         [Parameter]
         public bool ShowHeader { get; set; } = true;
@@ -57,8 +58,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            var authState = await _authState!.GetAuthenticationStateAsync();
-            Identity = authState.User;
+            Identity = _svcAuth.CurrentUser;
             userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Media Page");
             userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);

@@ -1,10 +1,11 @@
 ﻿using System.Data.Common;
 using System.Linq;
 using System.Security.Claims;
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -15,92 +16,36 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ICachingService _cachingService;
-        private readonly AuthenticationStateProvider _authProvider;
+        private readonly IAuthService _authService;
         
 
-        public Repository(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, AuthenticationStateProvider authProvider)
+        public Repository(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, IAuthService authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
-            _authProvider = authProvider;
+            _authService = authService;
         }
 
         //This is the email address stored in the User.Identity.Name
         public async Task<string?> GetUserEmail()
         {
-            try
-            {
-                AuthenticationState? state = await _authProvider.GetAuthenticationStateAsync();
-
-                if (state.User.Identity != null && state.User.Identity.IsAuthenticated && !String.IsNullOrEmpty(state.User.Identity.Name))
-                {
-                    return state.User.Identity.Name;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            return Defaults.DefaultUserNameAndEmail;
+            return _authService.Email;
         }
 
         //This is the user name stored in the nameidentifier
         public async Task<string?> GetUserName()
         {
-            try
-            {
-                AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
-
-                Claim? nameIdentifier = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.NameIdentifier);
-
-                if (nameIdentifier != null && !String.IsNullOrEmpty(nameIdentifier.Value))
-                {
-                    return nameIdentifier.Value;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            return Defaults.DefaultUserNameAndEmail;
+            return _authService.UserName;
         }
 
         public async Task<string?> GetUserRole()
         {
-            try
-            {
-                AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
-
-                Claim? roleClaim = state.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Role);
-
-                if (roleClaim != null && !String.IsNullOrEmpty(roleClaim.Value))
-                {
-                    return roleClaim.Value;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            return null;
+            return _authService.UserRole;
         }
 
         public async Task<int> GetUserLocationId()
         {
-            AuthenticationState state = await _authProvider.GetAuthenticationStateAsync();
-
-            Claim? locationClaim = state.User.Claims.FirstOrDefault(t => t.Type == "LocationId");
-
-            if (locationClaim != null && !String.IsNullOrEmpty(locationClaim.Value))
-            {
-                int.TryParse(locationClaim.Value ?? "0", out int locationId);
-                return locationId;
-            }
-
-            return 0;
+            return _authService.LocationId;
         }
 
         public string GetEntityName()

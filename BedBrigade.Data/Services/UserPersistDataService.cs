@@ -1,5 +1,6 @@
-﻿using BedBrigade.Common.Models;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services
@@ -10,8 +11,8 @@ namespace BedBrigade.Data.Services
         private readonly ICachingService _cachingService;
 
         public UserPersistDataService(IDbContextFactory<DataContext> contextFactory, 
-            ICachingService cachingService, 
-            AuthenticationStateProvider authProvider) : base(contextFactory, cachingService, authProvider)
+            ICachingService cachingService,
+            IAuthService authService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;

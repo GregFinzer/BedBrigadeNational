@@ -1,8 +1,6 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/manage/schedules"
-@using BedBrigade.Common;
-@using BedBrigade.Common.Constants
-@attribute [Authorize(Roles = RoleNames.CanManageSchedule)]
+<CheckAuth Roles=@RoleNames.CanViewSchedule></CheckAuth>
 
 <ScheduleGrid />
 
