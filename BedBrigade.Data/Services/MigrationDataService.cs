@@ -15,7 +15,7 @@ namespace BedBrigade.Data.Services
         public async Task<bool> MigrateAsync()
         {
             Log.Logger.Information("Beginning MigrationDataService.MigrateAsync");
-            using var context = _contextFactory.CreateDbContext();
+            var context = _contextFactory.CreateDbContext();
             await context.Database.MigrateAsync();
             Log.Logger.Information("Finished MigrationDataService.MigrateAsync");
             return true;
