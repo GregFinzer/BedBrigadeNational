@@ -213,9 +213,6 @@ namespace BedBrigade.Client
                 Log.Logger.Information("Setup Database skipped because we are not in local development");
                 return false;
             }
-            string solutionDirectory = FileUtil.GetSolutionPath();
-            string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data");
-
 
             //Setup database if it does not exist locally
             using var scope = app.Services.CreateScope();
@@ -231,7 +228,10 @@ namespace BedBrigade.Client
                 }
             }
 
-            //Do not setup datbase if nothing changed locally today and the database exists
+            string solutionDirectory = FileUtil.GetSolutionPath();
+            string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data", "Migrations");
+
+            //Do not setup datbase if there were no migrations changed locally today and the database exists
             if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory))
             {
                 Log.Logger.Information("Setup Database skipped because no .cs files have been modified today in " + dataDirectory);
