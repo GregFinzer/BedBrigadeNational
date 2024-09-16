@@ -72,6 +72,7 @@ namespace BedBrigade.Client.Components.Pages
            { "maxlength", "2" },
         };
 
+        [Parameter] public string PreloadLocation { get; set; }
         #endregion
         #region Initialization
 
@@ -79,13 +80,19 @@ namespace BedBrigade.Client.Components.Pages
         {
             newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
-            //messageStore = new ValidationMessageStore(EC);
 
-            var uri = _nav.ToAbsoluteUri(_nav.Uri);
-
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+            if (!string.IsNullOrEmpty(PreloadLocation))
             {
-                _locationQueryParm = locationQueryParm;
+                _locationQueryParm = PreloadLocation;
+            }
+            else
+            {
+                var uri = _nav.ToAbsoluteUri(_nav.Uri);
+
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+                {
+                    _locationQueryParm = locationQueryParm;
+                }
             }
 
             base.OnInitialized();
