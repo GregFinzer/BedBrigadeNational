@@ -177,7 +177,7 @@ namespace BedBrigade.Client
 
         public static async Task SetupDatabase(WebApplication app)
         {
-            if (!ShouldSeed())
+            if (!await ShouldSeed(app))
             {
                 return;
             }
@@ -206,7 +206,7 @@ namespace BedBrigade.Client
 
         }
 
-        public static bool ShouldSeed()
+        public static async Task<bool> ShouldSeed(WebApplication app)
         {
             if (!Debugger.IsAttached)
             {
@@ -216,6 +216,22 @@ namespace BedBrigade.Client
             string solutionDirectory = FileUtil.GetSolutionPath();
             string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data");
 
+
+            //Setup database if it does not exist locally
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
+            using (var context = dbContextFactory.CreateDbContext())
+            {
+                bool databaseExists = await context.Database.CanConnectAsync();
+
+                if (!databaseExists)
+                {
+                    return true;
+                }
+            }
+
+            //Do not setup datbase if nothing changed locally today and the database exists
             if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory))
             {
                 Log.Logger.Information("Setup Database skipped because no .cs files have been modified today in " + dataDirectory);
