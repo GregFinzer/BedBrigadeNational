@@ -1,12 +1,5 @@
 ﻿using BedBrigade.Common.Models;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Logic
@@ -204,6 +197,47 @@ namespace BedBrigade.Common.Logic
             }
 
             return sb.ToString();
+        }
+
+        public static string GetSolutionPath()
+        {
+            string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+            int count = 0;
+            const int maxDepth = 1000;
+
+            while (count < maxDepth)
+            {
+                string[] files = Directory.GetFiles(currentPath, "*.sln");
+
+                if (files.Any())
+                {
+                    return currentPath;
+                }
+
+                string? parentPath = Path.GetDirectoryName(currentPath);
+
+                //We are at the root we did not find anything
+                if (parentPath == null || parentPath == currentPath)
+                    throw new DirectoryNotFoundException("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+
+                currentPath = parentPath;
+                count++;
+            }
+
+            throw new DirectoryNotFoundException("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        public static bool AnyCSharpFilesModifiedToday(string directoryPath)
+        {
+            if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"The directory {directoryPath} does not exist.");
+            }
+
+            var today = DateTime.Today;
+            var files = Directory.EnumerateFiles(directoryPath, "*.cs", SearchOption.AllDirectories);
+
+            return files.Any(file => File.GetLastWriteTime(file).Date == today);
         }
     }
 }

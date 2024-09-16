@@ -73,3 +73,35 @@ jobs:
         password: ${{ secrets.FTP_DEV_PASSWORD }}
         remoteFiles: "app_offline.htm"
         ignoreSSL: "1"
+
+    - name: Perform Database Setup
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/api/DatabaseSetup/PerformSetup)
+        if [ $response -ne 200 ]; then
+          echo "Database setup failed with status code: $response"
+          exit 1
+        fi
+      timeout-minutes: 10
+      
+    - name: Navigate to preload page and wait for it to load
+      run: |
+        max_attempts=3
+        attempt=1
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt: Loading preload page..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/administration/preload)
+          if [ $response -eq 200 ]; then
+            echo "Preload page loaded successfully"
+            exit 0
+          else
+            echo "Attempt $attempt: Preload page failed to load with status code: $response"
+            if [ $attempt -lt $max_attempts ]; then
+              echo "Waiting for 2 minutes before retrying..."
+              sleep 120
+            fi
+          fi
+          attempt=$((attempt+1))
+        done
+        echo "Failed to load preload page after $max_attempts attempts"
+        exit 1
+      timeout-minutes: 8      

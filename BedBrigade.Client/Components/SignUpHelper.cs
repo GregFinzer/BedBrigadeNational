@@ -1,21 +1,8 @@
-﻿using BedBrigade.Client.Components.Pages.Administration.Manage;
-using BedBrigade.Data.Seeding;
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-
-using Microsoft.Extensions.Primitives;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
-using Syncfusion.Blazor;
-using Syncfusion.Blazor.DropDowns;
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Lists.Internal;
-using System.Data.Entity;
-using System.Diagnostics;
 using System.Text;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BedBrigade.Client.Components
 {
