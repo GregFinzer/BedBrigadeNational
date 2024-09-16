@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using System.Data.Common;
+﻿using Microsoft.EntityFrameworkCore;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using System.Diagnostics;
 using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
@@ -96,29 +92,37 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     }
 
 
+    public override async Task<ServiceResponse<Location>> GetByIdAsync(object? id)
+    {
+        //There will always be less than 100 locations, so we can cache all of them
+        var allLocations = await GetAllAsync();
 
+        var location = allLocations.Data.FirstOrDefault(l => l.LocationId == (int)id);
+
+        if (location != null)
+        {
+            return new ServiceResponse<Location>($"{location.Name} found", true, location);
+        }
+
+        return new ServiceResponse<Location>("Not Found");
+    }
 
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),  $"GetLocationByRouteAsync for ({routeName})");
-        var cachedLocation = _cachingService.Get<Location>(cacheKey);
+        //There will always be less than 100 locations, so we can cache all of them
+        var allLocations = await GetAllAsync();
 
-        if (cachedLocation != null)
-            return new ServiceResponse<Location>($"{routeName} found in cache", true, cachedLocation);
+        var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower());
 
-        using (var ctx = _contextFactory.CreateDbContext())
+        if (location != null)
         {
-            var loc = await ctx.Locations.FirstOrDefaultAsync(l => l.Route == routeName);
-            if (loc != null)
-            {
-                _cachingService.Set(cacheKey, loc);
-                return new ServiceResponse<Location>($"{routeName} found", true, loc);
-            }
-            return new ServiceResponse<Location>("Not Found");
+            return new ServiceResponse<Location>($"{routeName} found", true, location);
         }
+
+        return new ServiceResponse<Location>("Not Found");
     }
 
-    public async Task<List<Location>> GetAvailableLocationsAsync(List<Location> locations)
+    public List<Location> GetAvailableLocations(List<Location> locations)
     {
         bool isAuthenticated = _authService.IsLoggedIn;
 
@@ -172,10 +176,10 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         }
 
 
-        var AvailableLocations = await GetAvailableLocationsAsync(locationsResult.Data.ToList());
+        var availableLocations = GetAvailableLocations(locationsResult.Data.ToList());
 
         var result = new List<LocationDistance>();
-        foreach (var loc in AvailableLocations) // locationsResult.Data
+        foreach (var loc in availableLocations) // locationsResult.Data
         {
             var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
                     if (distance < maxMiles)
@@ -200,30 +204,18 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
     public async Task<ServiceResponse<List<Location>>> GetLocationsByMetroAreaId(int metroAreaId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetLocationsByMetroAreaId for ({metroAreaId})");
-        var cachedLocations = _cachingService.Get<List<Location>>(cacheKey);
+        //There will always be less than 100 locations, so we can cache all of them
+        var allLocations = await GetAllAsync();
 
-        if (cachedLocations != null)
+        if (!allLocations.Success || allLocations.Data == null)
         {
-            return new ServiceResponse<List<Location>>($"Found {cachedLocations.Count} locations for Metro Area ID {metroAreaId} in cache", true, cachedLocations);
+            return new ServiceResponse<List<Location>>(
+                "Could not get locations by metro area id: " + allLocations.Message);
         }
 
-        try
-        {
-            using (var ctx = _contextFactory.CreateDbContext())
-            {
-                var locations = await ctx.Locations
-                    .Where(l => l.MetroAreaId == metroAreaId)
-                    .ToListAsync();
-
-                _cachingService.Set(cacheKey, locations);
-                return new ServiceResponse<List<Location>>($"Found {locations.Count} locations for Metro Area ID {metroAreaId}", true, locations);
-            }
-        }
-        catch (DbException ex)
-        {
-            return new ServiceResponse<List<Location>>($"Error retrieving locations for Metro Area ID {metroAreaId}: {ex.Message} ({ex.ErrorCode})", false);
-        }
+        var metroLocations = allLocations.Data.Where(l => l.MetroAreaId == metroAreaId).ToList();
+        return new ServiceResponse<List<Location>>(
+            $"Found {metroLocations.Count} locations for Metro Area ID {metroAreaId}", true, metroLocations);
     }
 
 

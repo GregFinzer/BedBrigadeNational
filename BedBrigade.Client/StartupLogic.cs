@@ -5,12 +5,8 @@ using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
 using Blazored.SessionStorage;
-using Microsoft.AspNetCore.Authentication.Cookies;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Syncfusion.Blazor;
 using System.Diagnostics;
@@ -143,6 +139,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IHeaderMessageService, HeaderMessageService>();
             builder.Services.AddScoped<IUserPersistDataService, UserPersistDataService>();
             builder.Services.AddScoped<IDeliverySheetService, DeliverySheetService>();
+            builder.Services.AddScoped<IMigrationDataService, MigrationDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
@@ -165,7 +162,6 @@ namespace BedBrigade.Client
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseAuthorization(); // This must appear after the UseRouting middleware and before UseEndpoints
             app.UseAntiforgery();
 
             app.UseEndpoints(endpoints =>
@@ -181,6 +177,10 @@ namespace BedBrigade.Client
 
         public static async Task SetupDatabase(WebApplication app)
         {
+            if (!ShouldSeed())
+            {
+                return;
+            }
 
             Log.Logger.Information("Setup Database");
 
@@ -204,6 +204,25 @@ namespace BedBrigade.Client
                 Environment.Exit(1);
             }
 
+        }
+
+        public static bool ShouldSeed()
+        {
+            if (!Debugger.IsAttached)
+            {
+                Log.Logger.Information("Setup Database skipped because we are not in local development");
+                return false;
+            }
+            string solutionDirectory = FileUtil.GetSolutionPath();
+            string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data");
+
+            if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory))
+            {
+                Log.Logger.Information("Setup Database skipped because no .cs files have been modified today in " + dataDirectory);
+                return false;
+            }
+
+            return true;
         }
 
         public static async Task SetupCaching(WebApplication app)

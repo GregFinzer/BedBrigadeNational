@@ -10,7 +10,7 @@ using Bogus;
 
 namespace BedBrigade.Data.Seeding;
 
-public class Seed
+public static class Seed
 {
 
     // Table User
