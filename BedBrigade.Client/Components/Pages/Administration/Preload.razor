@@ -3,9 +3,24 @@
 @using BedBrigade.Common.Models
 @using BedBrigade.Data.Data.Seeding
 
-<h2 class="preload-heading">Preload Search Location</h2>
-<SearchLocation Title="Find a Bed Brigade Near Me" />
+<h2 class="preload-heading">Preload Bed Brigade Near Me</h2>
+<BedBrigadeNearMe />
+<hr />
 
+<h2 class="preload-heading">Preload Request A Bed</h2>
+<BedRequest PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Volunteer</h2>
+<VolunteerSignUp PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Contact Us</h2>
+<ContactUs PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Login</h2>
+<Login />
 <hr />
 
 @if (Locations == null && BedBrigadeNearMe == null && BodyContent == null)
@@ -14,7 +29,7 @@
 }
 else
 {
-    <h2 class="preload-heading">Preload Bed Brigade Near Me</h2>
+    <h2 class="preload-heading">Preload Location Distance</h2>
     if (BedBrigadeNearMe != null)
     {
         foreach (var locationDistance in BedBrigadeNearMe)
@@ -45,7 +60,7 @@ else
         </SfGrid>
     }
     <hr />
-    <h2 class="preload-heading">Preload Body Content</h2>
+    <h2 class="preload-heading">Preload Home Page</h2>
     if (BodyContent != null)
     {
         @((MarkupString)BodyContent)

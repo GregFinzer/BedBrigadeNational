@@ -86,17 +86,25 @@ namespace BedBrigade.Client.Components.Pages
            { "maxlength", "2" },
         };
 
+        [Parameter] public string PreloadLocation { get; set; }
         #endregion
         #region Initialization
 
         protected override void OnInitialized()
         {
             //Yes, this has to be here instead of in OnInitializedAsync
-            var uri = _nav.ToAbsoluteUri(_nav.Uri);
-
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+            if (!string.IsNullOrEmpty(PreloadLocation))
             {
-                _locationQueryParm = locationQueryParm;
+                _locationQueryParm = PreloadLocation;
+            }
+            else
+            {
+                var uri = _nav.ToAbsoluteUri(_nav.Uri);
+
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+                {
+                    _locationQueryParm = locationQueryParm;
+                }
             }
         }
 
