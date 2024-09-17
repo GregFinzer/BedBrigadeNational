@@ -54,6 +54,7 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
         await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
         await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
+        await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
 
     private static async Task SeedContentItem(DataContext context,
