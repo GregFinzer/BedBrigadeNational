@@ -15,10 +15,14 @@
     <link href="css/bedBrigade/navbar-top-fixed.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
     
+    @* The head outlet has to be placed before the component styles or it will cause this error if you click a link too fast: *@
+    @* (TypeError: Cannot read properties of null (reading 'insertBefore')) *@
+    @* See:  https://github.com/dotnet/aspnetcore/issues/54842 *@
+    <HeadOutlet @rendermode="RenderMode.InteractiveServer" />
+
     @* This is required for component styles to work *@
     <link rel="stylesheet" href="BedBrigade.Client.styles.css" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <HeadOutlet @rendermode="RenderMode.InteractiveServer" />
 </head>
 
 <body>
