@@ -1,4 +1,5 @@
-﻿using BedBrigade.Client.Components;
+﻿using System.Configuration;
+using BedBrigade.Client.Components;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data;
@@ -28,9 +29,13 @@ namespace BedBrigade.Client
             {
                 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
             }
-            else
+            else if (Common.Logic.WebHelper.IsProduction())
             {
                 builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+            }
+            else
+            {
+                throw new NotSupportedException($"Unknown Environment for Configuration: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
             }
         }
 

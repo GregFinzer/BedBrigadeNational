@@ -50,7 +50,7 @@ public static class Seed
 
     };
 
-    private static readonly List<User> _users = new()
+    private static readonly List<User> _developmentUsers = new()
     {
         //National Users
         new User { FirstName = SeedConstants.SeedNationalName, LastName = "Editor", Role = RoleNames.NationalEditor },
@@ -81,6 +81,16 @@ public static class Seed
         new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
 
+    private static readonly List<User> _productionUsers = new()
+    {
+        new User { FirstName = "Greg", 
+            LastName = "Finzer", 
+            Role = RoleNames.NationalAdmin, 
+            Email="gfinzer@hotmail.com", 
+            LocationId = (int) LocationNumber.National,
+            Phone = string.Empty
+        }
+    };
 
 
     public static async Task SeedData(IDbContextFactory<DataContext> contextFactory)
@@ -155,6 +165,12 @@ public static class Seed
 
     public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory)
     {
+        if (WebHelper.IsProduction())
+        {
+            Log.Logger.Information("Seed Schedules Skipped since we are in Production");
+            return;
+        }
+
         using (DataContext context = contextFactory.CreateDbContext())
         {
             if (await context.Schedules.AnyAsync()) return;
@@ -248,7 +264,6 @@ public static class Seed
 
         using (var context = contextFactory.CreateDbContext())
         {
-            Log.Logger.Information("Created DBContext");
             if (await context.Configurations.AnyAsync()) return;
 
             Log.Logger.Information("No configurations found, adding");
@@ -494,7 +509,7 @@ public static class Seed
                 if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
                 {
                     // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
-                    // add the first reciord in Media table with National Logo
+                    // add the first record in Media table with National Logo
                     context.Media.Add(new Media
                     {
                         LocationId = (int)LocationNumber.National,
@@ -545,11 +560,20 @@ public static class Seed
     private static async Task SeedUser(IDbContextFactory<DataContext> _contextFactory)
     {
         Log.Logger.Information("SeedUser Started");
-        SeedRoutines.SetMaintFields(_users);
+        List<User> users;
+
+        if (WebHelper.IsProduction())
+        {
+            users = _productionUsers;
+        }
+        else
+        {
+            users = _developmentUsers;
+        }
 
         using (var context = _contextFactory.CreateDbContext())
         {
-            foreach (var user in _users)
+            foreach (var user in users)
             {
                 if (!await context.Users.AnyAsync(u => u.UserName == $"{user.FirstName}{user.LastName}"))
                 {
@@ -557,32 +581,20 @@ public static class Seed
                     {
                         SeedRoutines.CreatePasswordHash(_seedUserPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
-                        int locationId;
-
-                        switch (user.FirstName)
+                        if (WebHelper.IsDevelopment())
                         {
-                            case SeedConstants.SeedNationalName:
-                                locationId = (int)LocationNumber.National;
-                                break;
-                            case SeedConstants.SeedGroveCityName:
-                                locationId = (int)LocationNumber.GroveCity;
-                                break;
-                            case SeedConstants.SeedRockCityName:
-                                locationId = (int)LocationNumber.RockCity;
-                                break;
-                            default:
-                                throw new Exception("Invalid location name: " + user.FirstName);
+                            SetDevelopmentUserFields(user);
                         }
 
                         // Create the user
                         var newUser = new User
                         {
                             UserName = $"{user.FirstName}{user.LastName}",
-                            LocationId = locationId,
+                            LocationId = user.LocationId,
                             FirstName = user.FirstName,
                             LastName = user.LastName,
-                            Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower(),
-                            Phone = GeneratePhoneNumber(),
+                            Email = user.Email,
+                            Phone = user.Phone,
                             Role = user.Role,
                             FkRole = context.Roles.FirstOrDefault(r => r.Name == user.Role).RoleId,
                             PasswordHash = passwordHash,
@@ -601,6 +613,28 @@ public static class Seed
                 }
             }
         }
+    }
+
+    private static void SetDevelopmentUserFields(User user)
+    {
+        // Set the location based on the user's first name (location name
+        switch (user.FirstName)
+        {
+            case SeedConstants.SeedNationalName:
+                user.LocationId = (int)LocationNumber.National;
+                break;
+            case SeedConstants.SeedGroveCityName:
+                user.LocationId = (int)LocationNumber.GroveCity;
+                break;
+            case SeedConstants.SeedRockCityName:
+                user.LocationId = (int)LocationNumber.RockCity;
+                break;
+            default:
+                throw new Exception("Invalid location name: " + user.FirstName);
+        }
+
+        user.Email = $"{user.FirstName}.{user.LastName}@bedBrigade.org".ToLower();
+        user.Phone = GeneratePhoneNumber();
     }
 
     private static async Task SeedVolunteersFor(IDbContextFactory<DataContext> contextFactory)
@@ -636,13 +670,18 @@ public static class Seed
     }
     private static async Task SeedVolunteers(IDbContextFactory<DataContext> contextFactory)
     {
+        if (WebHelper.IsProduction())
+        {
+            Log.Logger.Information("Seed Volunteers Skipped since we are in Production");
+            return;
+        }
+
         Log.Logger.Information("SeedVolunteers Started");
 
         using (var context = contextFactory.CreateDbContext())
         {
             if (await context.Volunteers.AnyAsync()) return;
 
-            List<bool> YesOrNo = new List<bool> { true, false };
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
@@ -662,7 +701,7 @@ public static class Seed
                 Volunteer volunteer = new()
                 {
                     LocationId = location.LocationId,
-                    IHaveVolunteeredBefore = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
+                    IHaveVolunteeredBefore = new Random().Next(2) == 0,
                     FirstName = firstName,
                     LastName = lastName,
                     Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
@@ -686,6 +725,12 @@ public static class Seed
 
     private static async Task SeedDonations(IDbContextFactory<DataContext> contextFactory)
     {
+        if (WebHelper.IsProduction())
+        {
+            Log.Logger.Information("Seed Donations Skipped since we are in Production");
+            return;
+        }
+
         try
         {
             Log.Logger.Information("SeedDonations Started");
@@ -694,7 +739,6 @@ public static class Seed
             {
                 if (await context.Donations.AnyAsync()) return;
 
-                List<bool> YesOrNo = new List<bool> { true, false };
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
                 var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
@@ -717,7 +761,7 @@ public static class Seed
                         TransactionId = new Random().Next(233999, 293737).ToString(),
                         FirstName = firstName,
                         LastName = lastName,
-                        TaxFormSent = YesOrNo[new Random().Next(YesOrNo.Count - 1)],
+                        TaxFormSent = new Random().Next(2) == 0,
                         DonationDate = DateTime.UtcNow.AddDays((new Random().Next(364)) * -1),
 
                     };
@@ -740,6 +784,12 @@ public static class Seed
 
     private static async Task SeedBedRequests(IDbContextFactory<DataContext> contextFactory)
     {
+        if (WebHelper.IsProduction())
+        {
+            Log.Logger.Information("Seed BedRequest Skipped since we are in Production");
+            return;
+        }
+
         try
         {
             Log.Logger.Information("Seed BedRequest Started");
