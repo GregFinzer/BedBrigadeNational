@@ -213,18 +213,12 @@ namespace BedBrigade.Client
 
         public static async Task<bool> ShouldSeed(WebApplication app)
         {
-            if (!Debugger.IsAttached)
-            {
-                Log.Logger.Information("Setup Database skipped because we are not in local development");
-                return false;
-            }
-
-            //Setup database if it does not exist locally
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
             var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
             using (var context = dbContextFactory.CreateDbContext())
             {
+                //Setup database if it does not exist
                 bool databaseExists = await context.Database.CanConnectAsync();
 
                 if (!databaseExists)
@@ -232,6 +226,7 @@ namespace BedBrigade.Client
                     return true;
                 }
 
+                //Setup database if the Configurations table does not exist
                 var tableExists = context.Database
                     .ExecuteSqlRaw(
                         @"SELECT CASE WHEN OBJECT_ID(N'dbo.Configurations', N'U') IS NOT NULL THEN 1 ELSE 0 END") == 1;
@@ -242,10 +237,16 @@ namespace BedBrigade.Client
                 }
             }
 
+            if (!Debugger.IsAttached)
+            {
+                Log.Logger.Information("Setup Database skipped because we are not in local development");
+                return false;
+            }
+
             string solutionDirectory = FileUtil.GetSolutionPath();
             string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data", "Migrations");
 
-            //Do not setup datbase if there were no migrations changed locally today and the database exists
+            //Do not setup database if there were no migrations changed locally today and the database exists
             if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory) 
                 && !FileUtil.AnyHtmlFilesModifiedToday(dataDirectory))
             {
