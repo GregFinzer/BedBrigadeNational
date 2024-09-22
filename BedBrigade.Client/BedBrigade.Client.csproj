@@ -7,24 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\scripts\DownloadFile.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\DownloadFile.js" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
-    <None Include="wwwroot\scripts\AddRemoveClass.js" />
-    <None Include="wwwroot\scripts\cookie.js" />
-    <None Include="wwwroot\scripts\DisplayToggle.js" />
-    <None Include="wwwroot\scripts\DownloadFile.js" />
-	<None Include="wwwroot\scripts\script.js" />
-    <None Include="wwwroot\scripts\scriptLoader.js" />
+	<None Include="wwwroot\scripts\Recaptcha.js" />
     <None Include="wwwroot\scripts\SetGetValue.js" />
   </ItemGroup>
 

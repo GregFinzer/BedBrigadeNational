@@ -12,14 +12,9 @@ a, .btn-link {
     color: #0071c1;
 }
 
-/*.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}*/
 
 .btn-primary {
-    background-color: #ffce0a !important; 
+    background-color: #ffce0a !important;
     font-size: 15px;
     font-weight: bold;
     color: #171717 !important;
@@ -31,10 +26,10 @@ a, .btn-link {
     transition: 0.7s ease;
 }
 
-.btn-primary:hover {
-    background-color: #171717 !important;
-    color: #ffce0a !important;
-}
+    .btn-primary:hover {
+        background-color: #171717 !important;
+        color: #ffce0a !important;
+    }
 
 .btn-secondary {
     background-color: #505050 !important;
@@ -53,9 +48,9 @@ a, .btn-link {
         background-color: #d3d3d3 !important;
         color: #000000 !important;
     }
-    
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -103,5 +98,195 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+/* ============ National Home Page ==================== */
 
+#nat-home p, li {
+    font-family: "Comfortaa", cursive;
+    font-size: 20px;
+}
+#nat-home h2 {
+    font-size: 38px;
+    font-weight: bold;
+    font-family: 'Function';
+    line-height: 46px;
+    margin: 30px 0 0;
+}
+
+#nat-hero h1 {
+    font-family: 'Stencil Std';
+    font-size: 72px;
+    color: #fff;
+    margin: 0;
+}
+
+#nat-hero h2 {
+    font-size: 38px;
+    font-weight: bold;
+    font-family: 'Function';
+    line-height: 46px;
+    margin: 30px 0 0;
+    color: #fff;
+}
+
+@media (max-width: 992px) {
+    #nat-hero h1 {
+        font-size: 68px;
+    }
+
+    #nat-hero h2 {
+        font-size: 32px;
+    }
+}
+
+.nat-home-main {
+    position: absolute;
+    z-index: 999;
+    background-size: cover;
+    background-repeat: no-repeat;
+    top: 8%;
+    left: 5%;
+}
+
+.nat-overlay-gradient {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(45deg, rgba(14, 146, 67,.8), rgba(14, 146, 106,.8));
+}
+
+
+
+.rounded-10 {
+    overflow: hidden;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+.ms-30 {
+    margin-left: 30%;
+}
+
+.w-70 {
+    width: 70%;
+}
+
+.spacer-single {
+    width: 100%;
+    height: 30px;
+    display: block;
+    clear: both;
+}
+
+.nat-image-container {
+    width: 100%; /* Full width of the parent container */
+    height: 700px; /* Fixed height of 700px */
+    overflow: hidden; /* Hide anything beyond the 700px height */
+    position: relative;
+    display: block; /* Makes sure the container uses the full width */
+}
+
+    .nat-image-container img {
+        width: auto; /* Full width of the container */
+        height: auto; /* Maintain the aspect ratio */
+        position: absolute;
+        top: 10px;
+        left: 0;
+    }
+
+@media (max-width: 1400px) {
+    .nat-image-container {
+        height: 600px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .nat-image-container {
+        height: 500px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .nat-home-main {
+        left: 1%;
+    }
+}
+
+@media (max-width: 992px) {
+    .nat-image-container {
+        height: 1100px;
+    }
+
+        .nat-image-container img {
+            transform: translateX(-200px);
+        }
+}
+
+@media (max-width: 768px) {
+    .nat-home-main {
+        top: 15%;
+        left: 0%;
+    }
+
+    .nat-image-container {
+        height: 1000px;
+    }
+
+        .nat-image-container img {
+            transform: translateX(-300px);
+        }
+}
+
+@media (max-width: 992px) {
+    .nat-home-main {
+        top: 3%;
+        left: 0%;
+    }
+
+    .nat-image-container {
+        height: 990px;
+    }
+
+        .nat-image-container img {
+            transform: translateX(-400px);
+        }
+}
+
+.vertical-center {
+    display: flex;
+    align-items: center; /* Centers the content vertically */
+}
+
+.rounded-20px {
+    border-radius: 20px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+}
+
+.padding40 {
+    padding: 40px;
+}
+
+
+
+.nat-button-sub-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .nat-button-sub-section {
+        display: none;
+    }
+
+    .nat-image-container {
+        height: 850px;
+    }
+}
 

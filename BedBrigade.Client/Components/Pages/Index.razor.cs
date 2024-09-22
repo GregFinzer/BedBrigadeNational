@@ -55,6 +55,14 @@ namespace BedBrigade.Client.Components.Pages
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!String.IsNullOrEmpty(BodyContent) && BodyContent.Contains("jarallax"))
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.InitializeJarallax");
+            }
+        }
+
         private async Task<bool> LoadLocationPage(string location, string pageName)
         {
             Log.Logger.Debug("Index.LoadLocationPage");

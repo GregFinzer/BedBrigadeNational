@@ -239,5 +239,18 @@ namespace BedBrigade.Common.Logic
 
             return files.Any(file => File.GetLastWriteTime(file).Date == today);
         }
+
+        public static bool AnyHtmlFilesModifiedToday(string directoryPath)
+        {
+            if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"The directory {directoryPath} does not exist.");
+            }
+
+            var today = DateTime.Today;
+            var files = Directory.EnumerateFiles(directoryPath, "*.html", SearchOption.AllDirectories);
+
+            return files.Any(file => File.GetLastWriteTime(file).Date == today);
+        }
     }
 }
