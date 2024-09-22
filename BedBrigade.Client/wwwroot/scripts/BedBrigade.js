@@ -1,0 +1,120 @@
+﻿window.AddRemoveClass = {
+
+    CheckState: function () {
+        return document.readyState;
+    },
+
+    SetClass: function (element, value) {
+        if (element == '') return;
+        const elements = document.getElementsByClassName(value);
+        if (elements.length > 0) {
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].classList.remove(value);
+            }
+            el = document.getElementById(element);
+            if (el == null) return;
+            el.classList.add(value);
+        }
+    },
+
+    RemoveClass: function (element, value) {
+        if (element == '') return;
+        el = document.getElementById(element);
+        if (el == null) return;
+        el.classList.remove(value);
+    }
+}
+
+
+
+window.DisplayToggle = {
+
+    CheckState: function () {
+        return document.readyState;
+    },
+
+    Show: function (element) {
+        if (element == '') return;
+        var ele = document.getElementById(element);
+        if (ele == null) return;
+        ele.style.display = "block";
+    },
+
+    ShowByClass: function (className) {
+        if (className == '') return;
+        var elements = document.getElementsByClassName(className);
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.display = "block";
+        }
+    },
+
+    HideByClass: function (className) {
+        if (className == '') return;
+        var elements = document.getElementsByClassName(className);
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.display = "block";
+        }
+    },
+
+    Hide: function (element) {
+        if (element == '') return;
+        var ele = document.getElementById(element);
+        if (ele == null) return;
+        ele.style.display = "none";
+    }
+}
+
+window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+    const arrayBuffer = await contentStreamReference.arrayBuffer();
+    const blob = new Blob([arrayBuffer]);
+    const url = URL.createObjectURL(blob);
+    const anchorElement = document.createElement('a');
+    anchorElement.href = url;
+    anchorElement.download = fileName ?? '';
+    anchorElement.click();
+    anchorElement.remove();
+    URL.revokeObjectURL(url);
+}
+
+window.SetGetValue = {
+
+    CheckState: function () {
+        return document.readyState;
+    },
+
+    SetInnerHtml: function (element, value) {
+        document.getElementById(element).innerHTML = value;
+    },
+
+    SetOuterHtml: function (element, value) {
+        document.getElementById(element).outerHTML = value;
+    },
+
+    SetAttribute: function (element, attr, value) {
+        var el = document.getElementById(element);
+        if (el) {
+            el.setAttribute(attr, value);
+        }
+    },
+
+    GetInnerHtml: function (element) {
+        return document.getElementById(element).innerHTML;
+    },
+
+    GetOuterHtml: function (element, value) {
+        return document.getElementById(element).outerHTML;
+    },
+
+    GetAttribute: function (element, attr) {
+        return document.getElementById(element).getAttribute(attr);
+    }
+}
+
+window.BedBrigadeUtil = {
+    InitializeJarallax: function (imgPosition = 'top') {
+        jarallax(document.querySelectorAll('.jarallax'), {
+            speed: 0.2,
+            imgPosition: imgPosition
+        });
+    }
+}

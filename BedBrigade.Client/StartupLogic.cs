@@ -231,13 +231,23 @@ namespace BedBrigade.Client
                 {
                     return true;
                 }
+
+                var tableExists = context.Database
+                    .ExecuteSqlRaw(
+                        @"SELECT CASE WHEN OBJECT_ID(N'dbo.Configurations', N'U') IS NOT NULL THEN 1 ELSE 0 END") == 1;
+
+                if (!tableExists)
+                {
+                    return true;
+                }
             }
 
             string solutionDirectory = FileUtil.GetSolutionPath();
             string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data", "Migrations");
 
             //Do not setup datbase if there were no migrations changed locally today and the database exists
-            if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory))
+            if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory) 
+                && !FileUtil.AnyHtmlFilesModifiedToday(dataDirectory))
             {
                 Log.Logger.Information("Setup Database skipped because no .cs files have been modified today in " + dataDirectory);
                 return false;
