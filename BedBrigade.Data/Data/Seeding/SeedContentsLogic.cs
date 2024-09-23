@@ -4,7 +4,6 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.Diagnostics;
 
 namespace BedBrigade.Data.Data.Seeding;
 
@@ -27,11 +26,43 @@ public static class SeedContentsLogic
             await SeedDonationsPage(context, locations);
             await SeedNationalHistoryPage(context);
             await SeedNationalLocations(context);
+            await SeedNationalDonations(context);
             await SeedAssemblyInstructions(context, locations);
             await SeedDeliveryCheckList(context, locations);
             await SeedTaxForm(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
+        }
+    }
+
+    private static async Task SeedNationalDonations(DataContext context)
+    {
+        Log.Logger.Information("SeedNationalDonations Started");
+
+        var name = "Donations";
+        if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == (int) LocationNumber.National))
+        {
+            var seedHtml = WebHelper.GetHtml("Donations.html");
+            var content = new Content
+            {
+                LocationId = (int)LocationNumber.National,
+                ContentType = ContentType.Body,
+                Name = name,
+                ContentHtml = seedHtml,
+                Title = name
+            };
+
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content);
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in content {ex.Message}");
+            }
         }
     }
 

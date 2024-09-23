@@ -244,9 +244,9 @@ namespace BedBrigade.Client
             }
 
             string solutionDirectory = FileUtil.GetSolutionPath();
-            string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data", "Migrations");
+            string dataDirectory = Path.Combine(solutionDirectory, "BedBrigade.Data");
 
-            //Do not setup database if there were no migrations changed locally today and the database exists
+            //Do not set up the database if there were no data changed locally today and the database exists
             if (!FileUtil.AnyCSharpFilesModifiedToday(dataDirectory) 
                 && !FileUtil.AnyHtmlFilesModifiedToday(dataDirectory))
             {
