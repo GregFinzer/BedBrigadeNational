@@ -56,9 +56,9 @@ One thing you will notice about the following project plan is the lack of due da
     * Rename Page :heavy_check_mark:
     
 * National Pages
-    * Design National Home Page
-    * National Home Page
-    * National About Us Page 
+    * Design National Home Page :heavy_check_mark:
+    * National Home Page :heavy_check_mark:
+    * National About Us Page  :heavy_check_mark:
     * National History of Bed Brigade Page 
     * National Donations Page
     
@@ -87,7 +87,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Request Bed Page :heavy_check_mark:
     * Manage Bed Requests :heavy_check_mark:
     * Download Delivery Sheet :heavy_check_mark:
-    * Manage Delivery Checklist
+    * Manage Delivery Checklist :heavy_check_mark:
     
 * Location Volunteer    
     * Volunteer Page :heavy_check_mark:
@@ -101,11 +101,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Manage Contacts :heavy_check_mark:
     
 * Location Donations
-    * Setup PayPal IPN
     * Grove City Donate :heavy_check_mark:
     * Polaris Donate
     * Manage Donations :heavy_check_mark:
-    * Email Tax Forms
+    * Email Tax Forms :heavy_check_mark:
     
 * Manage Users
     * User List :heavy_check_mark:
@@ -169,16 +168,32 @@ One thing you will notice about the following project plan is the lack of due da
     * Upgrade to Blazor 9
     * Blazor 9 Change Render Mode
     * Add Notification Code to Sorry Page :heavy_check_mark:
-    * Make seeding environment specific
+    * Make seeding environment specific :heavy_check_mark:
     * Add Database Indexes
-    * Verify Mobile for all pages
+    * Verify Mobile for all pages :heavy_check_mark:
     * Refactor Grid Persistence :heavy_check_mark:
     * Add try catch and alert
     * Seed Only Grove City and Rock City :heavy_check_mark:
     * Location Timezone
     * Redo Manage Bed Request Form
-    * Delivery Sheet Sort By Team Then By Distance
-    * Add Delivery Checklist to the Delivery Sheet
+    * Delivery Sheet Sort By Team Then By Distance :heavy_check_mark:
+    * Add Delivery Checklist to the Delivery Sheet :heavy_check_mark:
+    * Use Animate.css and Wow.js :heavy_check_mark:
+    * Migration Deployment Setup Database and Preload :heavy_check_mark:
+    * Improve Performance :heavy_check_mark:
+    * Edit EmailTaxForm :heavy_check_mark:
+    * Create Custom Authentication :heavy_check_mark:
+    * Create Server Information Page :heavy_check_mark:
+    * Refresh Header and Footer :heavy_check_mark:
+    * Refactor Grid Persistence :heavy_check_mark:
+    * Seed Only Grove City and Rock City :heavy_check_mark:
+    * Download Delivery Sheet :heavy_check_mark:
+    * Mobile Bed Brigade Near Me
+    * Mobile After Submit Bed Request
+    * Mobile after Contact Us
+    * Mobile after Submit Volunteer
+    * Admin Mobile Margin and Padding
+    * Manage Users Unusable in Mobile
     
 * New Stories
     * Send confirmation email for Bed Request
