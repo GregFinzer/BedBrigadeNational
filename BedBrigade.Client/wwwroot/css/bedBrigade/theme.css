@@ -1337,3 +1337,33 @@ a.back-btn:hover {
     padding-top: 40px;
   }
 }
+@media only screen and (max-width: 768px) {
+  .card-wrapper .card-header h2 {
+    font-size: 18px;
+  }
+  .card-wrapper .card-text {
+    display: none;
+  }
+  .card-wrapper .card-title-desktop {
+    display: none;
+  }
+  .card-wrapper .card-title-mobile {
+    display: block;
+  }
+  .card-wrapper .btn-desktop {
+    display: none;
+  }
+  .card-wrapper .btn-mobile {
+    display: inline-block;
+  }
+  .card-wrapper p {
+    margin-bottom: 0;
+  }
+}
+.card-title-mobile {
+  display: none;
+}
+
+.btn-mobile {
+  display: none;
+}
