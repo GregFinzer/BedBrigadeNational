@@ -1,84 +1,90 @@
 ﻿@using BedBrigade.Common.Models
 @if (IsSearching)
+
 {
     <Spinner />
 }
-<div class="card text-center" style="display: @SearchDisplay">
-    <div class="card-header">
-        <h2>@Title</h2>
-    </div>
-    <div class="card-body">
-        <h5 class="card-title">Please enter a valid Zip code where you live</h5>
-        <p class="card-text"><i>(5 characters containing only digits 0-9)</i></p>
-        <p>
-            <SfMaskedTextBox
-                @ref="maskObj"
-                Mask="00000"
-                Value="@PostalCode"
-                Created="OnCreateInput"
-                Placeholder="Zip Code"
-                OnInput="ZipCodeInputChange"
-                @onkeyup="@HandleKeyDown"
-                Width="200px">             
-            </SfMaskedTextBox>
-        </p>
-        
-        <div class="widget-body">
-            <button id="search" type="button" class="btn btn-primary" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled" >Search Bed Brigade Locations</button>
+<div class="card-wrapper">
+    <div class="card text-center" style="display: @SearchDisplay">
+        <div class="card-header">
+            <h2>@Title</h2>
         </div>
-    </div> 
-</div>
-<div class="row">
-    <div class="col-md-12" >
-        <div class="@strAlertType" role="alert" style="display: @strAlertDisplay; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center">
-            @PostalCodeResult
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="card-title-desktop">Please enter a valid Zip code where you live</span>
+                <span class="card-title-mobile">Enter your Zip code</span>
+            </h5>
+            <p class="card-text"><i>(5 characters containing only digits 0-9)</i></p>
+            <p>
+                <SfMaskedTextBox @ref="maskObj"
+                                 Mask="00000"
+                                 Value="@PostalCode"
+                                 Created="OnCreateInput"
+                                 Placeholder="Zip Code"
+                                 OnInput="ZipCodeInputChange"
+                                 @onkeyup="@HandleKeyDown"
+                                 Width="200px">
+                </SfMaskedTextBox>
+            </p>
+            <div class="widget-body">
+                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">Search Bed Brigade Locations</button>
+                <button id="search" type="button" class="btn btn-primary btn-mobile" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">Search</button>
+            </div>
         </div>
     </div>
-</div>
-@if (PostalCodeSuccess)
-  { <div class="row pb-2">
-        <div class="col-md-12 d-flex justify-content-center align-items-center" >
-               @switch(ResultType){
+    <div class="row">
+        <div class="col-md-12">
+            <div class="@strAlertType" role="alert" style="display: @strAlertDisplay; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center">
+                @PostalCodeResult
+            </div>
+        </div>
+    </div>
+    @if (PostalCodeSuccess)
+
+    {
+        <div class="row pb-2">
+            <div class="col-md-12 d-flex justify-content-center align-items-center">
+                @switch (ResultType)
+                {
+
                     case "DropDownList":
-                    <label for="LocationSelector" class="formlabel" >Select a Location&nbsp;&nbsp;</label>
-                            <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue"  Width="400px" HtmlAttributes="DropDownHtmlAttribute" >
-                                <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
-                        <DropDownListEvents TValue="int" TItem="LocationDistance" ValueChange="ChangeLocation"></DropDownListEvents>
-                                <DropDownListTemplates TItem="LocationDistance">
-                                    <ItemTemplate>
-                                        <span style="font-weight: bold">
-                                            <span>@((context as LocationDistance).Name)</span>
-                                            <span class='country'>@(" (" + (context as LocationDistance).MilesAwayString + ")")</span>
-                                        </span>
-                                    </ItemTemplate>
-                                </DropDownListTemplates>
-                            </SfDropDownList>
-                           
-                            break;
-                        default:
-                                 <table>
-                                    @foreach (var location in Locations)
-                                    {
-                                            <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.MilesAwayString</td></tr>
-                                    }
-                                 </table>
-                         break;
-                    }
+                        <label for="LocationSelector" class="formlabel">Select a Location&nbsp;&nbsp;</label>
+                        <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute">
+                            <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
+                            <DropDownListEvents TValue="int" TItem="LocationDistance" ValueChange="ChangeLocation"></DropDownListEvents>
+                            <DropDownListTemplates TItem="LocationDistance">
+                                <ItemTemplate>
+                                    <span style="font-weight: bold">
+                                        <span>@((context as LocationDistance).Name)</span>
+                                        <span class='country'>@(" (" + (context as LocationDistance).MilesAwayString + ")")</span>
+                                    </span>
+                                </ItemTemplate>
+                            </DropDownListTemplates>
+                        </SfDropDownList>
+
+                        break;
+
+                    default:
+                        <table>
+                            @foreach (var location in Locations)
+
+                            {
+                                <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.MilesAwayString</td></tr>
+                            }
+                        </table>
+                        break;
+
+                }
+            </div>
         </div>
-    </div>
-  }
-<div class="row">
-    <div class="col-md-12">
-        <div class="alert alert-info" role="alert" style="display: @strDisplayNotActive; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center" >
-            Locations marked with an asterisk (*) are currently inactive
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info" role="alert" style="display: @strDisplayNotActive; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center">
+                Locations marked with an asterisk (*) are currently inactive
+            </div>
         </div>
     </div>
 </div>
-
-
-
-
-
-
 
 
