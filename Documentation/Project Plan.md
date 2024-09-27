@@ -194,11 +194,23 @@ One thing you will notice about the following project plan is the lack of due da
     * Mobile after Submit Volunteer
     * Admin Mobile Margin and Padding
     * Manage Users Unusable in Mobile
+    * Design Spanish Translation
+    * Address Autocomplete Design
+    * Design Bulk Email Mailing List
+    * Donations Design
+    * SMS Design
     
 * New Stories
     * Send confirmation email for Bed Request
     * Import Bed Requests
-    
+    * Calendar
+    * Upcoming Events
+    * Add new Schedule Fields
+    * New Manage Volunteer Fields
+    * Volunteer Sign Up New Fields
+    * New Manage Bed Request Fields
+    * New Bed Request Form Fields
+
     
     
 
