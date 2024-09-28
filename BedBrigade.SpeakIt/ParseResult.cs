@@ -12,5 +12,6 @@ namespace BedBrigade.SpeakIt
         public Regex MatchingExpression { get; set; }
         public string FilePath { get; set; }
         public string LocalizableString { get; set; }
+        public string MatchValue { get; set; }
     }
 }
