@@ -17,7 +17,7 @@
                     <div class="card-header">Contact Information</div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="firstname" class="formlabel required">First Name</label>
+                            <label for="firstname" class="formlabel required">@_lc.Keys["First Name"]</label>
                             <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.FirstName)"></ValidationMessage>

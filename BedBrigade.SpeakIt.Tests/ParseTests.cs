@@ -194,10 +194,10 @@ namespace BedBrigade.SpeakIt.Tests
             if (File.Exists(outputFileName))
                 File.Delete(outputFileName);
 
-            StringBuilder sb = new StringBuilder(result.Count*80);
+            StringBuilder sb = new StringBuilder(result.Count * 80);
             foreach (var parseResult in result)
             {
-                sb.AppendLine($"{parseResult.FilePath} - {parseResult.LocalizableString}");
+                sb.AppendLine($"{Path.GetFileName(parseResult.FilePath)} | {parseResult.LocalizableString} ");
             }
 
             File.WriteAllText(outputFileName, sb.ToString());

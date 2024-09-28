@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System.Diagnostics;
+using AKSoftware.Localization.MultiLanguages;
+using AKSoftware.Localization.MultiLanguages.Blazor;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -17,6 +20,8 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
+
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         private Common.Models.BedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -74,6 +79,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
+            _lc.InitLocalizedComponent(this);
             newRequest = new Common.Models.BedRequest();
             EC = new EditContext(newRequest);
 

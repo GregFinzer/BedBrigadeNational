@@ -35,7 +35,7 @@ namespace BedBrigade.SpeakIt.Tests
                     StringBuilder sb = new StringBuilder(result.Count * 80);
                     foreach (var parseResult in result)
                     {
-                        sb.AppendLine($"{parseResult.FilePath} | {parseResult.MatchValue} | {parseResult.LocalizableString}");
+                        sb.AppendLine($"{Path.GetFileName(parseResult.FilePath)} | {parseResult.MatchValue} | {parseResult.LocalizableString}");
                     }
                     File.WriteAllText("RazorFiles.txt", sb.ToString());
                     TestHelper.Shell("RazorFiles.txt",string.Empty,ProcessWindowStyle.Maximized, false);
