@@ -5,6 +5,8 @@ namespace BedBrigade.SpeakIt
 {
     public class SpeakItLogic
     {
+        private const string ReplacementMarker = "~~~";
+
         private static List<Regex> _removePatterns = new List<Regex>()
         {
             // Begin and end tag:  <i class="fa fa-home"></i>
@@ -56,7 +58,7 @@ namespace BedBrigade.SpeakIt
 
             foreach (var file in filesToProcess)
             {
-                if (file.Contains("SearchLocation.razor"))
+                if (Path.GetFileName(file) == "Error.razor")
                     Console.WriteLine("Here");
 
                 string content = File.ReadAllText(file);
@@ -74,34 +76,57 @@ namespace BedBrigade.SpeakIt
 
         public List<ParseResult> GetLocalizableStringsInHtml(string html)
         {
-            const int minStringLength = 2;
             List<ParseResult> result = new List<ParseResult>();
 
-            foreach (var pattern in _contentPatterns)
+            foreach (Regex pattern in _contentPatterns)
             {
                 MatchCollection matches = pattern.Matches(html);
                 foreach (Match match in matches)
                 {
                     string content = match.Groups["content"].Value;
-                    content = RemovePatterns(content).Trim();
-
-                    if (!String.IsNullOrEmpty(content) 
-                        && content.Length >= minStringLength
-                        && !content.StartsWith("@("))
-                    {
-                        result.Add(new ParseResult
-                        {
-                            LocalizableString = content,
-                            MatchingExpression = pattern,
-                            FilePath = string.Empty
-                        });
-                    }
+                    content = RemovePatterns(content);
+                    AddParseResult(pattern, match, result, content);
                 }
 
-                html = pattern.Replace(html, string.Empty);
+                //We use this to split in the AddParseResult method
+                //Example:  Some text <strong>bold text</strong> more text
+                if (matches.Count > 0)
+                {
+                    html = pattern.Replace(html, ReplacementMarker);
+                }
             }
 
             return result;
+        }
+
+        private void AddParseResult(Regex pattern, Match match, List<ParseResult> result, string content)
+        {
+            const int minStringLength = 2;
+            var contentList = content.Split(new[] { ReplacementMarker }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var contentItem in contentList.ToList())
+            {
+                var trimmed = contentItem.Trim();
+
+                if (!String.IsNullOrEmpty(trimmed)
+                    && trimmed.Length >= minStringLength
+                    && !trimmed.StartsWith("@(")
+                    && AtLeastOneAlphabeticCharacter(trimmed))
+                {
+                    result.Add(new ParseResult
+                    {
+                        LocalizableString = trimmed,
+                        MatchingExpression = pattern,
+                        FilePath = string.Empty,
+                        MatchValue = match.Value
+                    });
+                }
+            }
+        }
+
+        private bool AtLeastOneAlphabeticCharacter(string input)
+        {
+            return input.Any(char.IsLetter);
         }
 
         private string RemovePatterns(string html)
