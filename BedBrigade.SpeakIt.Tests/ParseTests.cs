@@ -229,5 +229,65 @@ namespace BedBrigade.SpeakIt.Tests
             File.WriteAllText(outputFileName, sb.ToString());
         }
 
+        [Test]
+        public void VerifyKeysTest()
+        {
+            if (TestHelper.IsRunningUnderGitHubActions())
+            {
+                Assert.Ignore("This test is not supported in GitHub Actions");
+            }
+
+            ParseParms parms = new ParseParms();
+            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
+            parms.WildcardPattern = "*.razor";
+            parms.ExcludeDirectories = new List<string> { "Administration", "Layout" };
+            var result = _logic.GetLocalizableStrings(parms);
+            var failedKeys = VerifyKeys(result);
+            string outputFileName = "FailedKeys.txt";
+            if (File.Exists(outputFileName))
+                File.Delete(outputFileName);
+
+            StringBuilder sb = new StringBuilder(result.Count * 80);
+            foreach (var failedKey in failedKeys)
+            {
+                foreach (var item in failedKey.Value)
+                {
+                    sb.AppendLine($"{failedKey.Key} : {item}");
+                }
+            }
+
+            File.WriteAllText(outputFileName, sb.ToString());
+
+        }
+
+        public Dictionary<string, List<string>> VerifyKeys(List<ParseResult> parseResults)
+        {
+            var conflictingKeys = new Dictionary<string, List<string>>();
+            var keyDict = new Dictionary<string, string>();
+
+            foreach (var result in parseResults)
+            {
+                if (string.IsNullOrEmpty(result.Key))
+                {
+                    continue;
+                }
+
+                if (!keyDict.ContainsKey(result.Key))
+                {
+                    keyDict[result.Key] = result.LocalizableString;
+                }
+                else if (keyDict[result.Key] != result.LocalizableString)
+                {
+                    if (!conflictingKeys.ContainsKey(result.Key))
+                    {
+                        conflictingKeys.Add(result.Key, new List<string>() { keyDict[result.Key]});
+                    }
+                    conflictingKeys[result.Key].Add(result.LocalizableString);
+                }
+            }
+
+            return conflictingKeys;
+        }
+
     }
 }

@@ -109,38 +109,74 @@ namespace BedBrigade.SpeakIt
         {
             ValidateCreateParms(parms);
             List<ParseResult> parseResults = GetLocalizableStrings(parms);
+            ModifyResourceFile(parms, parseResults);
             ModifyRazorFiles(parseResults);
             ModifyCSharpFiles(parms, parseResults);
         }
+
+        private void ModifyResourceFile(CreateParms parms, List<ParseResult> parseResults)
+        {
+            foreach (var parseResult in parseResults)
+            {
+                AddResourceKeyValue(parms.ResourceFilePath, parseResult.Key, parseResult.LocalizableString);
+            }
+        }
+
 
         private void ModifyRazorFiles(List<ParseResult> parseResults)
         {
             foreach (var parseResult in parseResults)
             {
-                string content = File.ReadAllText(parseResult.FilePath);
-                string replacement =
-                    parseResult.MatchValue.Replace(parseResult.LocalizableString, $"@_lc.Keys[\"{parseResult.Key}\"]");
+                string content;
+                using (StreamReader reader = new StreamReader(parseResult.FilePath))
+                {
+                    content = reader.ReadToEnd();
+                }
+
+                string replacement;
+                if (parseResult.MatchValue.Contains("button"))
+                {
+                    replacement = parseResult.MatchValue.Replace($">{parseResult.LocalizableString}<"
+                        , $">@_lc.Keys[\"{parseResult.Key}\"]<");
+                }
+                else
+                {
+                    replacement = parseResult.MatchValue.Replace(parseResult.LocalizableString, $"@_lc.Keys[\"{parseResult.Key}\"]");
+                }
+
                 content = content.Replace(parseResult.MatchValue, replacement);
-                File.WriteAllText(parseResult.FilePath, content);
+
+                using (StreamWriter writer = new StreamWriter(parseResult.FilePath))
+                {
+                    writer.Write(content);
+                }
             }
         }
 
         private void ModifyCSharpFiles(CreateParms parms, List<ParseResult> localizableStrings)
         {
             var filesToModify = localizableStrings.Select(o => o.FilePath).Distinct().ToList();
-
             foreach (var file in filesToModify)
             {
-                string cSharpFile = file.Replace(".razor", ".cs");
+                string cSharpFile = file + ".cs";
                 if (!File.Exists(cSharpFile))
                 {
                     continue;
                 }
 
-                string cSharpContent = File.ReadAllText(cSharpFile);
-                cSharpContent = InjectLanguageContainer(cSharpContent, parms.InjectLanguageContainerCode);
-                cSharpContent = InitLanguageComponent(cSharpContent, parms.InitLanguageContainerCode);
-                File.WriteAllText(cSharpFile, cSharpContent);
+                string original;
+                using (StreamReader reader = new StreamReader(cSharpFile))
+                {
+                    original = reader.ReadToEnd();
+                }
+
+                string modified = InjectLanguageContainer(original, parms.InjectLanguageContainerCode);
+                modified = InitLanguageComponent(modified, parms.InitLanguageContainerCode);
+
+                using (StreamWriter writer = new StreamWriter(cSharpFile))
+                {
+                    writer.Write(modified);
+                }
             }
         }
 
@@ -164,6 +200,7 @@ namespace BedBrigade.SpeakIt
                 if (!String.IsNullOrEmpty(trimmed)
                     && trimmed.Length >= minStringLength
                     && !trimmed.StartsWith("@(")
+                    && !trimmed.StartsWith("@_")
                     && AtLeastOneAlphabeticCharacter(trimmed))
                 {
                     result.Add(new ParseResult
@@ -180,12 +217,18 @@ namespace BedBrigade.SpeakIt
 
         private string BuildKey(string content)
         {
+            const int maxWords = 4;
             string[] words = content.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             StringBuilder sb = new StringBuilder(content.Length);
 
-            foreach (var word in words)
+            for (int i = 0; i < words.Length && i < maxWords; i++)
             {
-                sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(word)));
+                sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(words[i])));
+            }
+
+            if (content.EndsWith(":"))
+            {
+                sb.Append("Colon");
             }
 
             return sb.ToString();
@@ -243,7 +286,7 @@ namespace BedBrigade.SpeakIt
                 // Insert the new line after the last [Inject] line
                 return string.Join(Environment.NewLine,
                     lines.Take(lastInjectIndex + 1)
-                        .Concat(new[] { languageContainer })
+                        .Concat(new[] { "        " + languageContainer })
                         .Concat(lines.Skip(lastInjectIndex + 1)));
             }
 
@@ -255,7 +298,7 @@ namespace BedBrigade.SpeakIt
                 // Insert the new line after the class opening brace
                 return string.Join(Environment.NewLine,
                     lines.Take(classOpeningBraceIndex + 1)
-                        .Concat(new[] { "    " + languageContainer })
+                        .Concat(new[] { "        " + languageContainer })
                         .Concat(lines.Skip(classOpeningBraceIndex + 1)));
             }
 
@@ -284,7 +327,7 @@ namespace BedBrigade.SpeakIt
                     // Insert initLanguage after the opening brace
                     return string.Join(Environment.NewLine,
                         lines.Take(openingBraceIndex + 1)
-                        .Concat(new[] { "        " + initLanguage })
+                        .Concat(new[] { "            " + initLanguage })
                         .Concat(lines.Skip(openingBraceIndex + 1)));
                 }
             }
@@ -300,7 +343,7 @@ namespace BedBrigade.SpeakIt
                     // Insert initLanguage after the opening brace
                     return string.Join(Environment.NewLine,
                         lines.Take(openingBraceIndex + 1)
-                        .Concat(new[] { "        " + initLanguage })
+                        .Concat(new[] { "            " + initLanguage })
                         .Concat(lines.Skip(openingBraceIndex + 1)));
                 }
             }

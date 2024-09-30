@@ -1,1 +1,101 @@
+5CharactersContainingOnly: (5 characters containing only digits 0-9)
+AccessDenied: Access Denied
+Active: Active
+AgesGender: Ages / Gender
+AndRestartingTheApp: and restarting the app.
+AnErrorHasOccurred: An error has occurred.
+AnErrorOccurredColon: 'An error occurred:'
+AnErrorOccurredWhile: An error occurred while processing your request.
+Aspnetcoreenvironment: ASPNETCORE_ENVIRONMENT
+BedBrigadeLocationEvents: Bed Brigade Location Events
+BedBrigadeWeb: Bed Brigade Web
+BedRequestDetails: Bed Request Details
+Cancel: Cancel
+City: City
+ContactInformation: Contact Information
+ContactMessage: Contact Message
+DateColon: 'Date:'
+DeliveryAddress: Delivery Address
+DeliveryVehicle: Delivery Vehicle
+Development: Development
+DevelopmentMode: Development Mode
+Email: Email
+EmailColon: 'Email:'
+EnterYourZipCode: Enter your Zip code
+EnvironmentBySettingThe: environment by setting the
+EnvironmentVariableTo: environment variable to
+EnvironmentWillDisplayMore: environment will display more detailed information about the error that occurred.
+Error: Error.
+EventDateTime: Event Date & Time
+EventGroup: Event Group
+EventidColon: 'EventID:'
+EventNote: Event Note
+EventType: Event Type
+FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FirstName: First Name
+Folder: '[Folder: ]'
+FutureScheduled: Future Scheduled
+IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
+Image: Image
+ItCanResultIn: >-
+  It can result in displaying sensitive information from exceptions to end users.
+
+      For local debugging, enable the
+LastName: Last Name
+Location: '[Location: ]'
+LocationAvailableEvents: Location Available Events()
+LocationColon: 'Location:'
+LocationPathColon: 'Location Path:'
+LocationsMarkedWithAn: Locations marked with an asterisk (*) are currently inactive
+LogIn: Log In
+ManageSchedule: Manage Schedule
+ManageSignups: Manage Sign-Ups
+MediaFileManager: Media File Manager
+Message: Message
+Name: Name
+NameColon: 'Name:'
+NationalPathColon: 'National Path:'
+NoImagesWereFound: No images were found
+NothingToSend: Nothing to send
+NotSent: Not Sent
+NumberOfBeds: Number of Beds
+Ok: OK
+OrganizationOrGroup: Organization or Group
+PageColon: 'Page:'
+Pages: Pages
+Password: Password
+Phone: Phone
+PhoneColon: 'Phone:'
+PleaseEnterAValid: Please enter a valid Zip code where you live
+PleaseEnterYourLogin: Please enter your login details
+PostalCode: Postal Code
+RegistrationidColon: 'RegistrationID:'
+Reload: Reload
+RequestIdColon: 'Request ID:'
+ReturnToHome: Return to Home
+Save: Save
+Search: Search
+SearchBedBrigadeLocations: Search Bed Brigade Locations
+SelectALocation: Select a Location
+SelectedEventDetails: Selected Event Details
+Send: Send
+ShowPassword: Show Password
+ShowSchedules: Show Schedules
+Sorry: Sorry
+SorryThePage: Sorry - the page associated with this link was not found.
+SorryYouAreNot: Sorry, you are not authorized to view this page.
+Spanish: Spanish
+SpecialInstructions: Special Instructions
+State: State
+Street: Street
+SubmitRequest: Submit Request
+SwappingTo: Swapping to
+TheDevelopmentEnvironmentShouldnt: The Development environment shouldn't be enabled for deployed applications.
+UnhandledException: Unhandled Exception
+UserName: User Name
+VehicleTypeColon: 'Vehicle Type:'
+VolunteeridColon: 'VolunteerID:'
+VolunteerIdColon: 'Volunteer Id:'
+VolunteerInformation: Volunteer Information
+VolunteersRegisteredneeded: Volunteers registered/needed
+YouWereTryingTo: 'You were trying to access the page: /'
