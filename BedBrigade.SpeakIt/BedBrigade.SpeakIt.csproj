@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
   </ItemGroup>
 

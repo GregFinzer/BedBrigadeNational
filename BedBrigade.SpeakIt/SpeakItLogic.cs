@@ -2,6 +2,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Logic;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace BedBrigade.SpeakIt
 {
@@ -47,7 +49,7 @@ namespace BedBrigade.SpeakIt
 
         public List<ParseResult> GetLocalizableStrings(ParseParms parms)
         {
-            ValidateParameters(parms);
+            ValidateParseParameters(parms);
 
             string[] files =
                 Directory.GetFiles(parms.TargetDirectory, parms.WildcardPattern, SearchOption.AllDirectories);
@@ -103,6 +105,53 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
+        public void CreateLocalizationStrings(CreateParms parms)
+        {
+            ValidateCreateParms(parms);
+            List<ParseResult> parseResults = GetLocalizableStrings(parms);
+            ModifyRazorFiles(parseResults);
+            ModifyCSharpFiles(parms, parseResults);
+        }
+
+        private void ModifyRazorFiles(List<ParseResult> parseResults)
+        {
+            foreach (var parseResult in parseResults)
+            {
+                string content = File.ReadAllText(parseResult.FilePath);
+                string replacement =
+                    parseResult.MatchValue.Replace(parseResult.LocalizableString, $"@_lc.Keys[\"{parseResult.Key}\"]");
+                content = content.Replace(parseResult.MatchValue, replacement);
+                File.WriteAllText(parseResult.FilePath, content);
+            }
+        }
+
+        private void ModifyCSharpFiles(CreateParms parms, List<ParseResult> localizableStrings)
+        {
+            var filesToModify = localizableStrings.Select(o => o.FilePath).Distinct().ToList();
+
+            foreach (var file in filesToModify)
+            {
+                string cSharpFile = file.Replace(".razor", ".cs");
+                if (!File.Exists(cSharpFile))
+                {
+                    continue;
+                }
+
+                string cSharpContent = File.ReadAllText(cSharpFile);
+                cSharpContent = InjectLanguageContainer(cSharpContent, parms.InjectLanguageContainerCode);
+                cSharpContent = InitLanguageComponent(cSharpContent, parms.InitLanguageContainerCode);
+                File.WriteAllText(cSharpFile, cSharpContent);
+            }
+        }
+
+        private void ValidateCreateParms(CreateParms parms)
+        {
+            if (String.IsNullOrEmpty(parms.ResourceFilePath))
+            {
+                throw new ArgumentException("ResourceFilePath is required");
+            }
+        }
+
         private void AddParseResult(Regex pattern, Match match, List<ParseResult> result, string content)
         {
             const int minStringLength = 2;
@@ -132,26 +181,11 @@ namespace BedBrigade.SpeakIt
         private string BuildKey(string content)
         {
             string[] words = content.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            const int maxWords = 4;
             StringBuilder sb = new StringBuilder(content.Length);
 
-            if (words.Length > maxWords)
+            foreach (var word in words)
             {
-                for (int i = 0; i < maxWords; i++)
-                {
-                    sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(words[i])));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < words.Length; i++)
-                {
-                    sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(words[i])));
-                    if (i < words.Length - 1)
-                    {
-                        sb.Append(" ");
-                    }
-                }
+                sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(word)));
             }
 
             return sb.ToString();
@@ -172,7 +206,7 @@ namespace BedBrigade.SpeakIt
             return html;
         }
 
-        private static void ValidateParameters(ParseParms parms)
+        private static void ValidateParseParameters(ParseParms parms)
         {
             if (String.IsNullOrEmpty(parms.TargetDirectory))
             {
@@ -227,6 +261,117 @@ namespace BedBrigade.SpeakIt
 
             // If no suitable location is found, return the original input
             return input;
+        }
+
+        public static string InitLanguageComponent(string input, string initLanguage)
+        {
+            // Check if the initLanguage already exists in the input
+            if (input.Contains(initLanguage))
+            {
+                return input;
+            }
+
+            var lines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            // Look for "protected override void OnInitialized()"
+            int onInitializedIndex = Array.FindIndex(lines, l => l.Trim().StartsWith("protected override void OnInitialized()"));
+            if (onInitializedIndex != -1)
+            {
+                // Find the opening brace
+                int openingBraceIndex = Array.FindIndex(lines, onInitializedIndex, l => l.Contains("{"));
+                if (openingBraceIndex != -1)
+                {
+                    // Insert initLanguage after the opening brace
+                    return string.Join(Environment.NewLine,
+                        lines.Take(openingBraceIndex + 1)
+                        .Concat(new[] { "        " + initLanguage })
+                        .Concat(lines.Skip(openingBraceIndex + 1)));
+                }
+            }
+
+            // Look for "protected override async Task OnInitializedAsync()"
+            int onInitializedAsyncIndex = Array.FindIndex(lines, l => l.Trim().StartsWith("protected override async Task OnInitializedAsync()"));
+            if (onInitializedAsyncIndex != -1)
+            {
+                // Find the opening brace
+                int openingBraceIndex = Array.FindIndex(lines, onInitializedAsyncIndex, l => l.Contains("{"));
+                if (openingBraceIndex != -1)
+                {
+                    // Insert initLanguage after the opening brace
+                    return string.Join(Environment.NewLine,
+                        lines.Take(openingBraceIndex + 1)
+                        .Concat(new[] { "        " + initLanguage })
+                        .Concat(lines.Skip(openingBraceIndex + 1)));
+                }
+            }
+
+            // If neither method is found, create a new OnInitialized method
+            string newMethod = $@"
+    protected override void OnInitialized()
+    {{
+        {initLanguage}
+    }}";
+
+            // Find the class closing brace
+            int classClosingBraceIndex = Array.FindLastIndex(lines, l => l.Trim() == "}");
+            if (classClosingBraceIndex != -1)
+            {
+                // Insert the new method before the class closing brace
+                return string.Join(Environment.NewLine,
+                    lines.Take(classClosingBraceIndex)
+                    .Concat(new[] { newMethod })
+                    .Concat(lines.Skip(classClosingBraceIndex)));
+            }
+
+            // If no suitable location is found, return the original input
+            return input;
+        }
+
+        public static void AddResourceKeyValue(string filePath, string key, string value)
+        {
+            string directory = Path.GetDirectoryName(filePath);
+
+            // Create the directory if it does not exist
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // Create a new YAML file with the key-value pair
+            if (!File.Exists(filePath))
+            {
+                var newSerializer = new SerializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+                string newContent = newSerializer.Serialize(new Dictionary<string, string> { { key, value } });
+                File.WriteAllText(filePath, newContent);
+                return;
+            }
+
+            // Read the YAML file
+            string yamlContent = File.ReadAllText(filePath);
+
+            // Deserialize YAML to dictionary
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            Dictionary<string, string> yamlObject = deserializer.Deserialize<Dictionary<string, string>>(yamlContent);
+
+            // Add or update the key-value pair
+            yamlObject[key] = value;
+
+            // Sort the dictionary by keys
+            var sortedYamlObject = yamlObject.OrderBy(pair => pair.Key)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            // Serialize the sorted dictionary back to YAML
+            var serializer = new SerializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            string updatedYamlContent = serializer.Serialize(sortedYamlObject);
+
+            // Save the updated YAML content back to the file
+            File.WriteAllText(filePath, updatedYamlContent);
         }
     }
 }
