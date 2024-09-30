@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace BedBrigade.SpeakIt
 {
@@ -13,5 +8,6 @@ namespace BedBrigade.SpeakIt
         public string FilePath { get; set; }
         public string LocalizableString { get; set; }
         public string MatchValue { get; set; }
+        public string Key { get; set; }
     }
 }

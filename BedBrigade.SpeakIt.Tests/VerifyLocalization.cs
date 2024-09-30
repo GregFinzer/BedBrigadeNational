@@ -16,7 +16,7 @@ namespace BedBrigade.SpeakIt.Tests
         [Test, Ignore("Localization Not Implemented Yet")]
         public void VerifyAllRazorFilesAreLocalized()
         {
-            SpeakItParms parms = new SpeakItParms();
+            ParseParms parms = new ParseParms();
             parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
             parms.WildcardPattern = "*.razor";
             parms.ExcludeDirectories = new List<string> { "Administration", "Layout" };

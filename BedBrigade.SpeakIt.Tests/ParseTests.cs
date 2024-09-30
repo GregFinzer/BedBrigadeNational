@@ -184,7 +184,7 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            SpeakItParms parms = new SpeakItParms();
+            ParseParms parms = new ParseParms();
             parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
             parms.WildcardPattern= "*.razor";
             parms.ExcludeDirectories = new List<string> { "Administration", "Layout" };
@@ -211,7 +211,7 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            SpeakItParms parms = new SpeakItParms();
+            ParseParms parms = new ParseParms();
             parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml");
             parms.WildcardPattern = "*.html";
             var result = _logic.GetLocalizableStrings(parms);

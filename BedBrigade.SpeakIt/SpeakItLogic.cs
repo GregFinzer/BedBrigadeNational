@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.SpeakIt
 {
@@ -43,7 +45,7 @@ namespace BedBrigade.SpeakIt
             new Regex(@"<div[^>]*>(?<content>\s*[A-Za-z][\s\S]*?)<\/div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
         };
 
-        public List<ParseResult> GetLocalizableStrings(SpeakItParms parms)
+        public List<ParseResult> GetLocalizableStrings(ParseParms parms)
         {
             ValidateParameters(parms);
 
@@ -120,10 +122,39 @@ namespace BedBrigade.SpeakIt
                         LocalizableString = trimmed,
                         MatchingExpression = pattern,
                         FilePath = string.Empty,
-                        MatchValue = match.Value
+                        MatchValue = match.Value,
+                        Key = BuildKey(trimmed)
                     });
                 }
             }
+        }
+
+        private string BuildKey(string content)
+        {
+            string[] words = content.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            const int maxWords = 4;
+            StringBuilder sb = new StringBuilder(content.Length);
+
+            if (words.Length > maxWords)
+            {
+                for (int i = 0; i < maxWords; i++)
+                {
+                    sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(words[i])));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < words.Length; i++)
+                {
+                    sb.Append(StringUtil.ProperCase(StringUtil.FilterAlphaNumeric(words[i])));
+                    if (i < words.Length - 1)
+                    {
+                        sb.Append(" ");
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         private bool AtLeastOneAlphabeticCharacter(string input)
@@ -141,7 +172,7 @@ namespace BedBrigade.SpeakIt
             return html;
         }
 
-        private static void ValidateParameters(SpeakItParms parms)
+        private static void ValidateParameters(ParseParms parms)
         {
             if (String.IsNullOrEmpty(parms.TargetDirectory))
             {
@@ -157,6 +188,45 @@ namespace BedBrigade.SpeakIt
             {
                 throw new DirectoryNotFoundException($"TargetDirectory does not exist: {parms.TargetDirectory}");
             }
+        }
+
+        public string InjectLanguageContainer(string input, string languageContainer)
+        {
+            // Check if the languageContainer already exists in the input
+            if (input.Contains(languageContainer))
+            {
+                return input;
+            }
+
+            var lines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var injectLines = lines.Where(l => l.TrimStart().StartsWith("[Inject]")).ToList();
+
+            if (injectLines.Any())
+            {
+                // Find the index of the last [Inject] line
+                int lastInjectIndex = Array.LastIndexOf(lines, injectLines.Last());
+
+                // Insert the new line after the last [Inject] line
+                return string.Join(Environment.NewLine,
+                    lines.Take(lastInjectIndex + 1)
+                        .Concat(new[] { languageContainer })
+                        .Concat(lines.Skip(lastInjectIndex + 1)));
+            }
+
+            // Find the index of the line with the opening curly brace of the class
+            int classOpeningBraceIndex = Array.FindIndex(lines, l => l.TrimStart().StartsWith("public") && l.TrimEnd().EndsWith("{"));
+
+            if (classOpeningBraceIndex != -1)
+            {
+                // Insert the new line after the class opening brace
+                return string.Join(Environment.NewLine,
+                    lines.Take(classOpeningBraceIndex + 1)
+                        .Concat(new[] { "    " + languageContainer })
+                        .Concat(lines.Skip(classOpeningBraceIndex + 1)));
+            }
+
+            // If no suitable location is found, return the original input
+            return input;
         }
     }
 }
