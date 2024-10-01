@@ -1,4 +1,12 @@
-<button id="languageButton" @onclick="SetSpanish">@_lc.Keys["Spanish"]</button>
+@if (English)
+{
+    <button id="languageButton" @onclick="SetSpanish">@_lc.Keys["English"]</button>
+}
+else
+{
+    <button id="languageButton" @onclick="SetEnglish">@_lc.Keys["Spanish"]</button>
+}
+
 @((MarkupString)headerContent) 
 
 

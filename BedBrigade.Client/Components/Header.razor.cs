@@ -34,7 +34,7 @@ namespace BedBrigade.Client.Components
 
         private string PreviousLocation { get; set; } 
         private ClaimsPrincipal? User { get; set; }
-
+        private bool English { get; set; } = true;
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
@@ -180,6 +180,13 @@ namespace BedBrigade.Client.Components
         private void SetSpanish()
         {
             _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-MX"));
+            English = false;
+        }
+
+        private void SetEnglish()
+        {
+            _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            English = true;
         }
     }
 }
