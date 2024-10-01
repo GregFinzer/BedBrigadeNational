@@ -12,6 +12,9 @@ using Serilog;
 using Syncfusion.Blazor;
 using System.Diagnostics;
 using BedBrigade.Common.Constants;
+using AKSoftware.Localization.MultiLanguages.Providers;
+using AKSoftware.Localization.MultiLanguages;
+using System.Reflection;
 
 namespace BedBrigade.Client
 {
@@ -118,6 +121,7 @@ namespace BedBrigade.Client
             builder.Services.AddSingleton<ICachingService, CachingService>();
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
             builder.Services.AddScoped<ILocationState, LocationState>();
+            builder.Services.AddLanguageContainerForBlazorServer<EmbeddedResourceKeysProvider>(Assembly.GetExecutingAssembly(), "Resources");
         }
 
         private static void DataServices(WebApplicationBuilder builder)

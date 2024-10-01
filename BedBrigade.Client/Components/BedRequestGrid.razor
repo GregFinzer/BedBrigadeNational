@@ -1,4 +1,4 @@
-﻿@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using BedBrigade.Common.Models
 
@@ -52,7 +52,7 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as BedRequest)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="(Cancel)">Cancel</button>
+                                <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
@@ -64,66 +64,66 @@ else
                                     }
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="name" @bind-Value=@BedRequest.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@BedRequest.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@BedRequest.Phone Enabled="true" Placeholder="Phone" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@BedRequest.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.Email Type="InputType.Email" Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.Street Enabled="true" Placeholder="Street" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.Street Enabled="true" Placeholder="@_lc.Keys["Street"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.City Enabled="true" Placeholder="City" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.City Enabled="true" Placeholder="@_lc.Keys["City"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.State Enabled="true" Placeholder="State" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.State Enabled="true" Placeholder="@_lc.Keys["State"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.PostalCode Enabled="true" Placeholder="Postal Code" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.PostalCode Enabled="true" Placeholder="@_lc.Keys["PostalCode"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@BedRequest.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@BedRequest.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                         </div>
 
                                         <div class="col-md-6" >
-                                            <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@BedRequest.Status Enabled="true" Placeholder="Status" FloatLabelType="FloatLabelType.Auto" >
+                                            <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@BedRequest.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                             </SfDropDownList>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" Placeholder="Beds Requested" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfNumericTextBox @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" Placeholder="@_lc.Keys["BedsRequested"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@BedRequest.AgesGender Enabled="true" Placeholder="Ages Genders" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@BedRequest.AgesGender Enabled="true" Placeholder="@_lc.Keys["AgesGenders"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <SfDatePicker @bind-Value=@BedRequest.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfDatePicker @bind-Value=@BedRequest.DeliveryDate Enabled="true" Placeholder="@_lc.Keys["DeliveryDate"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="Team #" FloatLabelType="FloatLabelType.Auto"/>
+                                            <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="@_lc.Keys["Team"]" FloatLabelType="FloatLabelType.Auto"/>
                                         </div>
                                         <div class="col-md-4">
-                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Auto"/>
+                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="@_lc.Keys["Notes"]" Multiline="true" FloatLabelType="FloatLabelType.Auto"/>
                                         </div>
                                     </div>
                                 }

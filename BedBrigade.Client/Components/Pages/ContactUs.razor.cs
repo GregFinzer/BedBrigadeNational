@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
@@ -18,6 +18,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         private Common.Models.ContactUs? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -78,6 +79,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
+            _lc.InitLocalizedComponent(this);
             newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
 

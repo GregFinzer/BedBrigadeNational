@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 
 using System.Security.Claims;
 using Syncfusion.Blazor.FileManager;
@@ -20,6 +20,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter]
         public bool ShowHeader { get; set; } = true;
@@ -58,6 +59,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Identity = _svcAuth.CurrentUser;
             userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Media Page");

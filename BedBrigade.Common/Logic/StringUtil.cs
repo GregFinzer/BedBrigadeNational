@@ -11,6 +11,27 @@ namespace BedBrigade.Common.Logic
         private const string javaScriptExpression = @"<a.+javascript[^>]+>[^>]+>";
         private static Regex _javaScriptRegex = new Regex(javaScriptExpression, RegexOptions.Compiled);
 
+        public static string ProperCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return char.ToUpper(input[0]) + input.Substring(1).ToLower();
+        }
+
+        public static string FilterAlphaNumeric(string input)
+        {
+            var sb = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
         public static string FilterAlphanumericAndDash(string input)
         {
             var sb = new StringBuilder(input.Length);

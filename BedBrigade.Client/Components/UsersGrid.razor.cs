@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.DropDowns;
@@ -25,6 +25,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthDataService _svcAuthData { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ILogger<User> _logger { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         private ClaimsPrincipal Identity { get; set; }
         protected SfGrid<User>? Grid { get; set; }
@@ -58,6 +59,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             _logger.LogInformation("Starting User Grid");
             PasswordVisible = false;
             

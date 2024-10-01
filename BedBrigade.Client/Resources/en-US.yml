@@ -1,0 +1,124 @@
+5CharactersContainingOnly: (5 characters containing only digits 0-9)
+Active: Active
+Address: Address
+AgesGender: Ages / Gender
+AgesGenders: Ages Genders
+Amount: Amount
+BedBrigadeLocationEvents: Bed Brigade Location Events
+BedBrigadeWeb: Bed Brigade Web
+BedRequestDetails: Bed Request Details
+BedsRequested: Beds Requested
+Cancel: Cancel
+ChooseADate: Choose a Date & Time
+City: City
+ConfigurationKey: Configuration Key
+ConfigurationSection: Configuration Section
+ConfigurationValue: Configuration Value
+ConfirmPassword: Confirm Password
+ContactInformation: Contact Information
+ContactMessage: Contact Message
+DateColon: 'Date:'
+DeliveryAddress: Delivery Address
+DeliveryDate: Delivery Date
+DeliveryVehicle: Delivery Vehicle
+DeliveryVehicleMinivan: I have a Minvan with seats removed or folded into the floor
+DeliveryVehicleNone: I do not have a delivery vehicle
+DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
+DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
+DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
+DonationDate: Donation Date
+Email: Email
+EmailColon: 'Email:'
+English: English
+EnterText: Enter text
+EnterYourZipCode: Enter your Zip code
+EventDateTime: Event Date & Time
+EventGroup: Event Group
+EventidColon: 'EventID:'
+EventName: Event Name
+EventNote: Event Note
+EventStatus: Event Status
+EventType: Event Type
+FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
+FindABedBrigade: Find a Bed Brigade Near Me
+FirstName: First Name
+FolderColon: 'Folder:'
+FutureScheduled: Future Scheduled
+GroupName: Group Name
+HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
+IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
+LastName: Last Name
+Latitude: Latitude
+Loading: Loading....
+Location: Location
+LocationAvailableEvents: Location Available Events
+LocationColon: 'Location:'
+LocationPathColon: 'Location Path:'
+LocationsMarkedWithAn: Locations marked with an asterisk (*) are currently inactive
+LogIn: Log In
+Longitude: Longitude
+ManageSchedule: Manage Schedule
+ManageSignups: Manage Sign-Ups
+MediaFileManager: Media File Manager
+Message: Message
+Name: Name
+NameColon: 'Name:'
+NationalPathColon: 'National Path:'
+NewPassword: New Password
+NoImagesWereFound: No images were found
+Notes: Notes
+NothingToSend: Nothing to send
+NotSent: Not Sent
+NumberOfBeds: Number of Beds
+Ok: OK
+OrganizationOrGroup: Organization or Group
+Pages: Pages
+Password: Password
+Phone: Phone
+PhoneColon: 'Phone:'
+PhoneNumber: Phone Number
+PleaseEnterAValid: Please enter a valid Zip code where you live
+PleaseEnterYourLogin: Please enter your login details
+PostalCode: Postal Code
+RegistrationidColon: 'RegistrationID:'
+RequestABedFor: Request a Bed for Another Person
+ReturnToHome: Return to Home
+Role: Role
+Route: Route
+Save: Save
+SeachAVolunteerBy: Seach a Volunteer by Name
+Search: Search
+SearchBedBrigadeLocations: Search Bed Brigade Locations
+SelectAGridFilter: Select a grid filter
+SelectALocation: Select a Location
+SelectAnEvent: Select an event
+SelectAState: Select a state
+SelectAVolunteer: Select a Volunteer
+SelectedEventDetails: Selected Event Details
+SelectMetroArea: Select Metro Area
+Send: Send
+ShowPassword: Show Password
+ShowSchedules: Show Schedules
+Sorry: Sorry
+SorryThePage: Sorry - the page associated with this link was not found.
+SorryYouAreNot: Sorry, you are not authorized to view this page.
+Spanish: Spanish
+SpecialInstructions: Special Instructions
+State: State
+Status: Status
+Street: Street
+SubmitRequest: Submit Request
+SubmitVolunteerRegistration: Submit Volunteer Registration
+SuitepoBox: Suite/PO Box
+TaxFormSent: Tax Form Sent
+Team: 'Team #'
+TransactionId: Transaction ID
+UserName: User Name
+VehicleTypeColon: 'Vehicle Type:'
+VolunteerForAnotherEvent: Volunteer for Another Event
+VolunteeridColon: 'VolunteerID:'
+VolunteerIdColon: 'Volunteer Id:'
+VolunteerInformation: Volunteer Information
+VolunteersRegisteredneeded: Volunteers registered/needed
+YouWereTryingTo: 'You were trying to access the page: '
+ZipCode: Zip Code

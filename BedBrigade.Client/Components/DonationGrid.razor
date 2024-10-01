@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
@@ -78,7 +78,7 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as Donation)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="(Cancel)">Cancel</button>
+                                <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
@@ -89,31 +89,31 @@ else
                                     }
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="name" @bind-Value=@donation.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@donation.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfTextBox @bind-Value=@donation.Email Type="InputType.Email" Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-6">
-                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="Transaction ID" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.Amount Enabled="true" Placeholder="Amount" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
+                                            <SfNumericTextBox @bind-Value=@donation.Amount Enabled="true" Placeholder="@_lc.Keys["Amount"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDatePicker @bind-Value=@donation.DonationDate Enabled="true" Placeholder="Donation Date" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfDatePicker @bind-Value=@donation.DonationDate Enabled="true" Placeholder="@_lc.Keys["DonationDate"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="Tax Form Sent" />
+                                            <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="@_lc.Keys["TaxFormSent"]" />
                                         </div>
                                     </div>
                                 }
@@ -147,24 +147,24 @@ else
                 <div id="listbox-control">
                     <div class="dual-list-wrapper">
                         <div class="dual-list-groupa">
-                            <h4>Not Sent</h4>
+                            <h4>@_lc.Keys["NotSent"]</h4>
                             <SfListBox @ref=@LB_NotSent Scope="@scope2" DataSource="@NotSent" TItem="Donation" Height="330px" TValue="string[]" @attributes="listbox1Attr">
                                 <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
                                 <ListBoxToolbarSettings Items="@items"></ListBoxToolbarSettings>
                                 <ListBoxTemplates TItem="Donation">
                                     <NoRecordsTemplate>
-                                        <span>Nothing to send</span>
+                                        <span>@_lc.Keys["NothingToSend"]</span>
                                     </NoRecordsTemplate>
                                 </ListBoxTemplates>
                             </SfListBox>
                         </div>
                         <div class="dual-list-groupb">
-                            <h4>Send</h4>
+                            <h4>@_lc.Keys["Send"]</h4>
                             <SfListBox @ref=@LB_Send Scope="@scope1" DataSource="@Send" Height="330px" TItem="Donation" TValue="string[]" @attributes="listbox2Attr">
                                 <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
                                 <ListBoxTemplates TItem="Donation">
                                     <NoRecordsTemplate>
-                                        <span>Nothing to send</span>
+                                        <span>@_lc.Keys["NothingToSend"]</span>
                                     </NoRecordsTemplate>
                                 </ListBoxTemplates>
                             </SfListBox>

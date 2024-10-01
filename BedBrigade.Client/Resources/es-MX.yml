@@ -1,0 +1,124 @@
+5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
+Active: Activo
+Address: Dirección
+AgesGender: Edades / Género
+AgesGenders: Edades Géneros
+Amount: Importe
+BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
+BedBrigadeWeb: Cama Brigade Web
+BedRequestDetails: Detalles de la solicitud de cama
+BedsRequested: Camas solicitadas
+Cancel: Cancelar
+ChooseADate: Elija una fecha y hora
+City: Ciudad
+ConfigurationKey: Clave de configuración
+ConfigurationSection: Sección de configuración
+ConfigurationValue: Valor de configuración
+ConfirmPassword: Confirmar contraseña
+ContactInformation: Información de contacto
+ContactMessage: Mensaje de contacto
+DateColon: 'Fecha:'
+DeliveryAddress: Dirección de entrega
+DeliveryDate: Fecha de entrega
+DeliveryVehicle: Vehículo de reparto
+DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
+DeliveryVehicleNone: No tengo un vehículo de reparto
+DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
+DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
+DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
+DonationDate: Fecha de donación
+Email: Correo electrónico
+EmailColon: 'Correo electrónico:'
+English: Inglés
+EnterText: Introducir texto
+EnterYourZipCode: Ingresa tu código postal
+EventDateTime: Fecha y hora del evento
+EventGroup: Grupo de eventos
+EventidColon: 'ID de evento:'
+EventName: Nombre del evento
+EventNote: Nota del evento
+EventStatus: Estado del evento
+EventType: Tipo de evento
+FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
+FindABedBrigade: Encuentra una brigada de camas cerca de mí
+FirstName: Nombre
+FolderColon: 'Carpeta:'
+FutureScheduled: Futuro programado
+GroupName: Nombre del grupo
+HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
+IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
+LastName: Apellido
+Latitude: Latitud
+Loading: Carga....
+Location: Ubicación
+LocationAvailableEvents: Ubicación Disponible Eventos
+LocationColon: 'Ubicación:'
+LocationPathColon: 'Ruta de ubicación:'
+LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
+LogIn: Inicia sesión
+Longitude: Longitud
+ManageSchedule: Administrar el horario
+ManageSignups: Gestionar las inscripciones
+MediaFileManager: Administrador de archivos multimedia
+Message: Mensaje
+Name: Nombre
+NameColon: 'Nombre:'
+NationalPathColon: 'Camino Nacional:'
+NewPassword: Nueva contraseña
+NoImagesWereFound: No se encontraron imágenes
+Notes: Notas
+NothingToSend: Nada que enviar
+NotSent: No enviado
+NumberOfBeds: Número de camas
+Ok: De acuerdo
+OrganizationOrGroup: Organización o grupo
+Pages: Páginas
+Password: Contraseña
+Phone: Teléfono
+PhoneColon: 'Teléfono:'
+PhoneNumber: Número de teléfono
+PleaseEnterAValid: Ingrese un código postal válido donde vive
+PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
+PostalCode: Código postal
+RegistrationidColon: 'ID de registro:'
+RequestABedFor: Solicitar una cama para otra persona
+ReturnToHome: Volver a casa
+Role: Rol
+Route: Ruta
+Save: Salvar
+SeachAVolunteerBy: Buscar a un voluntario por su nombre
+Search: Buscar
+SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
+SelectAGridFilter: Seleccionar un filtro de cuadrícula
+SelectALocation: Seleccione una ubicación
+SelectAnEvent: Seleccionar un evento
+SelectAState: Seleccionar un estado
+SelectAVolunteer: Seleccione un voluntario
+SelectedEventDetails: Detalles del evento seleccionado
+SelectMetroArea: Seleccione Área Metropolitana
+Send: Enviar
+ShowPassword: Mostrar contraseña
+ShowSchedules: Mostrar horarios
+Sorry: Arrepentido
+SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
+SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
+Spanish: Español
+SpecialInstructions: Instrucciones especiales
+State: Estado
+Status: Estado
+Street: Calle
+SubmitRequest: Enviar solicitud
+SubmitVolunteerRegistration: Enviar Registro de Voluntarios
+SuitepoBox: Suite/Apartado de correos
+TaxFormSent: Formulario de impuestos enviado
+Team: 'Equipo #'
+TransactionId: ID de transacción
+UserName: Nombre de usuario
+VehicleTypeColon: 'Tipo de vehículo:'
+VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
+VolunteeridColon: 'Identificación de voluntario:'
+VolunteerIdColon: 'Identificación del voluntario:'
+VolunteerInformation: Información para voluntarios
+VolunteersRegisteredneeded: Voluntarios registrados/necesarios
+YouWereTryingTo: 'Estabas intentando acceder a la página: '
+ZipCode: Código postal

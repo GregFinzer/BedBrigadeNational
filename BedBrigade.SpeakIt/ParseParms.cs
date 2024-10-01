@@ -1,6 +1,6 @@
 ﻿namespace BedBrigade.SpeakIt
 {
-    public class SpeakItParms
+    public class ParseParms
     {
         public string? TargetDirectory { get; set; }
         public string? WildcardPattern { get; set; }

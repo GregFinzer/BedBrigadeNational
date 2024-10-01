@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
@@ -20,6 +21,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager _nm { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
@@ -32,9 +34,10 @@ namespace BedBrigade.Client.Components
 
         private string PreviousLocation { get; set; } 
         private ClaimsPrincipal? User { get; set; }
-
+        private bool English { get; set; } = true;
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Log.Debug("Header.OnInitializedAsync");
             await LoadContent();
             _svcAuth.AuthChanged += OnAuthChanged;
@@ -174,5 +177,16 @@ namespace BedBrigade.Client.Components
         }
 
 
+        private void SetSpanish()
+        {
+            _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-MX"));
+            English = false;
+        }
+
+        private void SetEnglish()
+        {
+            _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            English = true;
+        }
     }
 }

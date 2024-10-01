@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         protected SfGrid<Schedule>? Grid { get; set; }
         private ClaimsPrincipal? Identity { get; set; }
@@ -69,6 +70,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             await LoadUserData();         
             await LoadLocations();
             await LoadScheduleData();

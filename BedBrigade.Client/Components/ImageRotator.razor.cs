@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +12,7 @@ namespace BedBrigade.Client.Components
         [Parameter] public string myPath { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ILoadImagesService _svcLoadImages { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
         private bool isLoading = true;
         private bool imagesFound = false;
         private string nationalPath = string.Empty;
@@ -20,6 +21,7 @@ namespace BedBrigade.Client.Components
         
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             var location = await _svcLocation.GetByIdAsync(Convert.ToInt32(mylocation));
             var locationImageList = _svcLoadImages.GetImagesForArea($"{location.Data.Route}/{myPath}",myId);
 

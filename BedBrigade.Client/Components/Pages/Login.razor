@@ -1,4 +1,4 @@
-﻿@page "/login"
+@page "/login"
 @page "/login/{user}"
 @page "/login/{user}/{password}"
 
@@ -6,33 +6,33 @@
 @using BedBrigade.Client.Components
 
 <div class="text-center w-100 m-2 text-black-50">
-    <h2>Bed Brigade Web</h2>
+    <h2>@_lc.Keys["BedBrigadeWeb"]</h2>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Please enter your login details</h5>
+        <h5 class="card-title">@_lc.Keys["PleaseEnterYourLogin"]</h5>
         <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="form-group">
-                <label for="email">User Name</label>
+                <label for="email">@_lc.Keys["UserName"]</label>
                 <InputText Id="email" @ref=@inputTextFocus class="form-control" @bind-Value="loginModel.Email"  />
                 <ValidationMessage For="@(() => loginModel.Email)" />
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">@_lc.Keys["Password"]</label>
                 <InputText Id="password" type=@passwordType class="form-control" @bind-Value="loginModel.Password" />
                 <ValidationMessage For="@(() => loginModel.Password)" />
             </div>
             <div class="form-group">
                 <input type="checkbox" checked=@showPassword @oninput=@HandlePassword />
-                <label for="showPassword">Show Password</label>
+                <label for="showPassword">@_lc.Keys["ShowPassword"]</label>
             </div>
             <h6 class="warning login-error text-center" style="display: @DisplayError">@errorMessage</h6>
             <div class="w-100 text-center">
-                <button type="submit" class="btn btn-primary">Log In</button>
+                <button type="submit" class="btn btn-primary">@_lc.Keys["LogIn"]</button>
             </div>
         </EditForm>
     </div>

@@ -1,28 +1,30 @@
-﻿@page "/sorry"
+@page "/sorry"
 @page "/sorry/{mylocation}"
 @page "/sorry/{mylocation}/{mypageName}"
 @using Serilog
-<PageTitle>Sorry</PageTitle>
-<h1 class="text-center mt-5">Sorry - the page associated with this link was not found. </h1>
+<PageTitle>@_lc.Keys["Sorry"]</PageTitle>
+<h1 class="text-center mt-5">@_lc.Keys["SorryThePage"] </h1>
 @if (mylocation != null && mypageName != null)
 {
-    <h2 class="text-center mt-5">You were trying to access the page: /@mylocation/@mypageName</h2>
+    <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]: /@mylocation/@mypageName</h2>
 }
 else if (mylocation != null)
 {
-    <h2 class="text-center mt-5">You were trying to access the page: /@mylocation</h2>
+    <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation</h2>
 }
 
 <div class="text-center">
-    <a href="/" class="btn btn-primary">Return to Home</a>
+    <a href="/" class="btn btn-primary">@_lc.Keys["ReturnToHome"]</a>
 </div>
 
 @code {
+    [Inject] private ILanguageContainerService _lc { get; set; }
     [Parameter] public string? mylocation { get; set; }
     [Parameter] public string? mypageName { get; set; }
 
     protected override void OnInitialized()
     {
+        _lc.InitLocalizedComponent(this);
         if (mylocation != null && mypageName != null)
         {
             Log.Logger.Warning($"404 for Page: /{mylocation}/{mypageName}");

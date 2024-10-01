@@ -184,20 +184,21 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            SpeakItParms parms = new SpeakItParms();
+            ParseParms parms = new ParseParms();
             parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
             parms.WildcardPattern= "*.razor";
-            parms.ExcludeDirectories = new List<string> { "Administration", "Layout" };
+            parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
+            parms.ExcludeFiles = TestHelper.ExcludeFiles;
             var result = _logic.GetLocalizableStrings(parms);
             string outputFileName = "RazorFiles.txt";
 
             if (File.Exists(outputFileName))
                 File.Delete(outputFileName);
 
-            StringBuilder sb = new StringBuilder(result.Count*80);
+            StringBuilder sb = new StringBuilder(result.Count * 80);
             foreach (var parseResult in result)
             {
-                sb.AppendLine($"{parseResult.FilePath} - {parseResult.LocalizableString}");
+                sb.AppendLine($"{Path.GetFileName(parseResult.FilePath)} | {parseResult.LocalizableString} ");
             }
 
             File.WriteAllText(outputFileName, sb.ToString());
@@ -211,7 +212,7 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            SpeakItParms parms = new SpeakItParms();
+            ParseParms parms = new ParseParms();
             parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml");
             parms.WildcardPattern = "*.html";
             var result = _logic.GetLocalizableStrings(parms);
@@ -228,6 +229,8 @@ namespace BedBrigade.SpeakIt.Tests
 
             File.WriteAllText(outputFileName, sb.ToString());
         }
+
+
 
     }
 }

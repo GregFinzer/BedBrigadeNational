@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.Grids;
@@ -32,6 +32,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentDataService _svcContent { get; set; }
 
         [Inject] private IJSRuntime JS { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -80,6 +81,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Identity = _svcAuth.CurrentUser;
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Bed Requests Page");

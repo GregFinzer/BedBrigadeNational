@@ -1,4 +1,4 @@
-﻿@using Syncfusion.Blazor.FileManager
+@using Syncfusion.Blazor.FileManager
 @using Syncfusion.Blazor.Popups
 @using System.Diagnostics
 @using BedBrigade.Client.Components
@@ -10,13 +10,13 @@
     <div class="row"><div class="col">&nbsp;</div></div>
     <div class="row">
             <div class="col">
-               <h3>Media File Manager</h3>
+               <h3>@_lc.Keys["MediaFileManager"]</h3>
              </div>
              <div class="col" style="text-align:right; font-size: small">                          
                   <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
                      @if (isLocationAdmin)
                     {
-                    <span>[Folder: @userRoute]</span>
+                    <span>[@_lc.Keys["FolderColon"] @userRoute]</span>
                     }
                     <br />@userName
               </div>

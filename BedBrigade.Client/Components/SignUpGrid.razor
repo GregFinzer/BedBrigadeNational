@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @if (!DataStatus)
 {   <div class="row"><div class="col">&nbsp;</div></div>
      <div class="row ustify-content-center" >
@@ -13,12 +13,12 @@
             <div class="row"><div class="col">&nbsp;</div></div>
             <div class="row" style="display: @GridDisplay">
                 <div class="col-md-3" style="white-space: nowrap">
-                    <h3>Manage Sign-Ups</h3>           
+                    <h3>@_lc.Keys["ManageSignups"]</h3>           
                 </div>     
                 <div class="col-md-4 align-items-center" >
                     <div class="form-group">
-                    <label for="VolunteerSelector" style="display: inline-block;">Future Scheduled</label>
-                    <SfDropDownList id="VolunteerSelector" CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="Select a grid filter" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="300px"   >
+                    <label for="VolunteerSelector" style="display: inline-block;">@_lc.Keys["FutureScheduled"]</label>
+                    <SfDropDownList id="VolunteerSelector" CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="300px"   >
                         <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
                         <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
                     </SfDropDownList>
@@ -31,7 +31,7 @@
                     <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
                     @if (IsLocationAdmin)
                     {
-                        <span>[Location: @userLocationName]</span>
+                        <span>[@_lc.Keys["LocationColon"]  @userLocationName]</span>
                     }
                     <br />@userName
                 </div>
@@ -128,7 +128,7 @@
                                         <TabHeader Text="Choose"></TabHeader>
                                     </ChildContent>                           
                                    <ContentTemplate>
-                                            <SfDropDownList TValue="string" TItem="Volunteer" Placeholder="Select a Volunteer" DataSource="@lstLocationVolunteers" >
+                                            <SfDropDownList TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SelectAVolunteer"]" DataSource="@lstLocationVolunteers" >
                                                 <DropDownListFieldSettings Value="VolunteerId" Text="SearchName"></DropDownListFieldSettings>
                                                 <DropDownListEvents TItem="Volunteer" TValue="string"  ValueChange="OnVolunteerSelect" ></DropDownListEvents>
                                             </SfDropDownList>
@@ -139,7 +139,7 @@
                                         <TabHeader Text="Search"></TabHeader>
                                     </ChildContent>
                                     <ContentTemplate>
-                                         <SfAutoComplete TValue="string" TItem="Volunteer" Placeholder="Seach a Volunteer by Name" DataSource="@lstLocationVolunteers" >                      
+                                         <SfAutoComplete TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SeachAVolunteerBy"]" DataSource="@lstLocationVolunteers" >                      
                                                 <AutoCompleteFieldSettings Value="SearchName" ></AutoCompleteFieldSettings>          
                                                 <AutoCompleteEvents TValue="string" TItem="Volunteer" ValueChange="OnVolunteerSelect" ></AutoCompleteEvents> 
                                         </SfAutoComplete>      
@@ -156,19 +156,19 @@
                                          <div class="card-body">
                                              <table class="table table-striped table-sm">
                                                <tr style="display: @displayId">
-                                                    <td style="vertical-align: top" >EventID:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["EventidColon"]</td>
                                                     <th style="vertical-align: top" >@selectedGridObject.EventId</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Location:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["LocationColon"]</td>
                                                     <th style="vertical-align: top" >@StringUtil.IsNull(selectedGridObject.EventLocationName,"")</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Name:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["NameColon"]</td>
                                                     <th style="vertical-align: top" >@selectedGridObject.EventName</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Date:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["DateColon"]</td>
                                                     <th style="vertical-align: top" >@DateUtil.GetFormattedDateTime(selectedGridObject.EventDate)</th>
                                                 </tr>
                                              </table>
@@ -182,28 +182,28 @@
                                                <table class="table table-striped table-sm" style="display: @displayVolunteerData">
                                                    @if(newVolunteer.RegistrationId>0){
                                                        <tr style="display: @displayId">
-                                                            <td style="vertical-align: top" >RegistrationID:</td>
+                                                            <td style="vertical-align: top" >@_lc.Keys["RegistrationidColon"]</td>
                                                             <th style="vertical-align: top" >@newVolunteer.RegistrationId</th>
                                                         </tr>
                                                    }
                                                 <tr style="display: @displayId">
-                                                    <td style="vertical-align: top" >VolunteerID:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["VolunteeridColon"]</td>
                                                     <th style="vertical-align: top" >@newVolunteer.VolunteerId</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Name:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["NameColon"]</td>
                                                     <th style="vertical-align: top" >@newVolunteer.FullName</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Phone:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["PhoneColon"]</td>
                                                     <th style="vertical-align: top; white-space: nowrap" >@newVolunteer.Phone.FormatPhoneNumber()</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >Email:</td>
+                                                    <td style="vertical-align: top" >@_lc.Keys["EmailColon"]</td>
                                                     <th style="vertical-align: top" >@newVolunteer.Email</th>
                                                  </tr>                                         
                                                  <tr>
-                                                    <td style="vertical-align: top; white-space: nowrap" >Vehicle Type:</td>      
+                                                    <td style="vertical-align: top; white-space: nowrap" >@_lc.Keys["VehicleTypeColon"]</td>      
                                                     <th style="vertical-align: top" >@EnumHelper.GetEnumDescription(newVolunteer.VehicleType)</th>
                                                 </tr>                                      
                                              </table>
@@ -217,8 +217,8 @@
                             @DialogMessage
                         </div>
                         <div class="modal-footer">
-                            <button type="button"  style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(()=> onConfirmAdd())">OK</button>&nbsp;     
-                             <button type="button"  style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(()=> onConfirmDelete())">OK</button>&nbsp;     
+                            <button type="button"  style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(()=> onConfirmAdd())">@_lc.Keys["Ok"]</button>&nbsp;     
+                             <button type="button"  style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(()=> onConfirmDelete())">@_lc.Keys["Ok"]</button>&nbsp;     
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(()=> this.ShowEditDialog=false)">@CloseButtonCaption</button>                 
                         </div>
                     </div>

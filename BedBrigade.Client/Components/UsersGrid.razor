@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.DropDowns
@@ -55,50 +55,50 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as User)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick=@Cancel>Cancel</button>
+                                <button class="btn btn-secondary" @onclick=@Cancel>@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
                                     var user = (context as User);
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="User Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="@_lc.Keys["UserName"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => user.UserName)" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@userRegister.Password Enabled=@AddUser Placeholder="Password" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@userRegister.Password Enabled=@AddUser Placeholder="@_lc.Keys["Password"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => userRegister.Password)" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="firstname" CssClass="form-control" @bind-Value=@user.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="firstname" CssClass="form-control" @bind-Value=@user.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => user.FirstName)" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="lastname" CssClass="form-control" @bind-Value=@user.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="lastname" CssClass="form-control" @bind-Value=@user.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => user.LastName)" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="Phone Number" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="@_lc.Keys["PhoneNumber"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => user.Phone)" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="email" @bind-Value=@user.Email Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="email" @bind-Value=@user.Email Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
                                             <ValidationMessage For="@(() => user.Email)" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto" >
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                             <ValidationMessage For="@(() => user.LocationId)" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfDropDownList ID="role" TItem="Role" TValue="Int32" DataSource="Roles" @bind-Value=@user.FkRole Enabled="true" Placeholder="Role" FloatLabelType="FloatLabelType.Auto" >
+                                            <SfDropDownList ID="role" TItem="Role" TValue="Int32" DataSource="Roles" @bind-Value=@user.FkRole Enabled="true" Placeholder="@_lc.Keys["Role"]" FloatLabelType="FloatLabelType.Auto" >
                                                 <DropDownListFieldSettings Text="Name" Value="RoleId" />
                                             </SfDropDownList>
                                             <ValidationMessage For="@(() => user.FkRole)" />
@@ -141,11 +141,11 @@ else
                 <DataAnnotationsValidator />
             <div class="col-lg-12 control-section mx-4">
                 <div class="row col-md-10">
-                    <SfTextBox @bind-Value=@userRegister.Password Placeholder="New Password" FloatLabelType="FloatLabelType.Auto" />
+                    <SfTextBox @bind-Value=@userRegister.Password Placeholder="@_lc.Keys["NewPassword"]" FloatLabelType="FloatLabelType.Auto" />
                     <ValidationMessage For="(() => userRegister.Password)" />
                 </div>
                 <div class="row col-md-10">
-                    <SfTextBox @bind-Value=@userRegister.ConfirmPassword Placeholder="Confirm Password" FloatLabelType="FloatLabelType.Auto" />
+                    <SfTextBox @bind-Value=@userRegister.ConfirmPassword Placeholder="@_lc.Keys["ConfirmPassword"]" FloatLabelType="FloatLabelType.Auto" />
                     <ValidationMessage For="(() => userRegister.ConfirmPassword)" />
                 </div>
             </div>

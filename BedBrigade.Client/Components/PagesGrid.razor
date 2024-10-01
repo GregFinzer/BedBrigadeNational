@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
@@ -14,7 +14,7 @@
 else
 {
    <br/>
-   <h3>Pages</h3>
+   <h3>@_lc.Keys["Pages"]</h3>
    <div class="col-md-12">
        <div class="content-wrapper">
            <div class="row">
@@ -82,11 +82,11 @@ else
             <h2>@TextDialogHeading</h2>            
         </Header>
         <Content>
-            <SfTextArea ResizeMode="Resize.Vertical"  @bind-Value="EditableText" Placeholder="Enter text" RowCount="20" ColumnCount="50" Width="100%" />
+            <SfTextArea ResizeMode="Resize.Vertical"  @bind-Value="EditableText" Placeholder="@_lc.Keys["EnterText"]" RowCount="20" ColumnCount="50" Width="100%" />
         </Content>
         <FooterTemplate>
-            <button id="save" type="button" class="btn btn-primary" @onclick="(() => SaveText())">Save</button>
-            <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => CloseTextDialog())">Cancel</button>    
+            <button id="save" type="button" class="btn btn-primary" @onclick="(() => SaveText())">@_lc.Keys["Save"]</button>
+            <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => CloseTextDialog())">@_lc.Keys["Cancel"]</button>    
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>

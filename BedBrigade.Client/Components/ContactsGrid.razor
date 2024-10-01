@@ -1,4 +1,4 @@
-﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Buttons
@@ -57,7 +57,7 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as ContactUs)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
@@ -69,36 +69,36 @@ else
                                     }
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="name" @bind-Value=@contactUs.FirstName Enabled="true" Placeholder="First Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@contactUs.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@contactUs.LastName Enabled="true" Placeholder="Last Name" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="Phone" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@contactUs.Email Type="InputType.Email" Enabled="true" Placeholder="Email" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@contactUs.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@contactUs.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@contactUs.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@contactUs.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                         </div>
 
                                         <div class="col-md-6" >
-                                            <SfDropDownList TItem="EnumNameValue<ContactUsStatus>" TValue="ContactUsStatus" DataSource=@ContactUsStatuses @bind-Value=@contactUs.Status Enabled="true" Placeholder="Status" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="EnumNameValue<ContactUsStatus>" TValue="ContactUsStatus" DataSource=@ContactUsStatuses @bind-Value=@contactUs.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                             </SfDropDownList>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Placeholder="Message" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Placeholder="@_lc.Keys["Message"]" Multiline="true" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                 }
