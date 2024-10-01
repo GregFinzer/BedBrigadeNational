@@ -1,4 +1,4 @@
-﻿<button @onclick="SetSpanish">Spanish</button>
+<button id="languageButton" @onclick="SetSpanish">@_lc.Keys["Spanish"]</button>
 @((MarkupString)headerContent) 
 
 
@@ -15,6 +15,13 @@
 
         #edit::after, #admin::after, #manage::after {
             content: '';
+        }
+
+        #languageButton {
+        z-index: 1500;
+        position: fixed;
+        top: 30px;
+        right: 10px;
         }
 </style>
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -31,6 +31,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -82,6 +83,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;

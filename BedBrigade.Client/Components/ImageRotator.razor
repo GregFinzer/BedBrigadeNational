@@ -1,4 +1,4 @@
-﻿
+
 @if (isLoading)
 {
     <Spinner />
@@ -7,9 +7,9 @@ else
 {
     if (!imagesFound)
     {
-        <p><span>No images were found</span></p>
-        <p><span>Location Path: @locationPath</span></p>
-        <p><span>National Path: @nationalPath</span></p>
+        <p><span>@_lc.Keys["NoImagesWereFound"]</span></p>
+        <p><span>@_lc.Keys["LocationPathColon"] @locationPath</span></p>
+        <p><span>@_lc.Keys["NationalPathColon"] @nationalPath</span></p>
     }
     else
     {

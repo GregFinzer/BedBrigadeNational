@@ -37,6 +37,7 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Log.Debug("Header.OnInitializedAsync");
             await LoadContent();
             _svcAuth.AuthChanged += OnAuthChanged;

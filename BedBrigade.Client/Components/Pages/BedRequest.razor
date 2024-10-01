@@ -1,10 +1,10 @@
-﻿@page "/request-bed"
+@page "/request-bed"
 
 <RotatorContainer RotatorTitle="Request A Bed" ImagePath="pages/RequestBed" LocationId="1" />
 
 
 <div class="container-fluid" style="display: @DisplaySearch">
-    <SearchLocation @ref="SearchLocation" Title="Find a Bed Brigade Near Me" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
+    <SearchLocation @ref="SearchLocation" Title="@_lc.Keys["FindABedBrigade"]" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
 </div>
 
 <div class="container-fluid" style="display: @DisplayForm">
@@ -14,7 +14,7 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="card">
-                    <div class="card-header">Contact Information</div>
+                    <div class="card-header">@_lc.Keys["ContactInformation"]</div>
                     <div class="card-body">
                         <div class="form-group">
                             <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
@@ -25,21 +25,21 @@
 
                         </div>
                         <div class="form-group ">
-                            <label for="lastname" class="formlabel required">Last Name</label>
+                            <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
                             <SfTextBox ID="lastname" @bind-Value="newRequest.LastName"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.LastName)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="email" class="formlabel required">Email</label>
+                            <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
                             <SfTextBox ID="email" @bind-Value="newRequest.Email"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.Email)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="phone" class="formlabel required">Phone</label>
+                            <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
                             <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="newRequest.Phone"></SfMaskedTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.Phone)"></ValidationMessage>
@@ -54,25 +54,25 @@
             <div class="col-md-3">
 
                 <div class="card">
-                    <div class="card-header">Delivery Address</div>
+                    <div class="card-header">@_lc.Keys["DeliveryAddress"]</div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="street" class="formlabel required">Street</label>
+                            <label for="street" class="formlabel required">@_lc.Keys["Street"]</label>
                             <SfTextBox ID="street" @bind-Value="newRequest.Street"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.Street)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group ">
-                            <label for="city" class="formlabel required">City</label>
+                            <label for="city" class="formlabel required">@_lc.Keys["City"]</label>
                             <SfTextBox ID="city" @bind-Value="newRequest.City"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.City)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="state" class="formlabel required">State</label>
-                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a state" DataSource="@StateList" @bind-Value="newRequest.State">
+                            <label for="state" class="formlabel required">@_lc.Keys["State"]</label>
+                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="newRequest.State">
                                 <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
                                 <div style="font-size: smaller">
@@ -81,7 +81,7 @@
                             </SfDropDownList>
                         </div>
                         <div class="form-group">
-                            <label for="zip" class="formlabel required">Postal Code</label>
+                            <label for="zip" class="formlabel required">@_lc.Keys["PostalCode"]</label>
                             <SfMaskedTextBox ID="zip" Mask="00000" @bind-Value="@newRequest.PostalCode"></SfMaskedTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.PostalCode)"></ValidationMessage>
@@ -94,24 +94,24 @@
 
             <div class="col-md-3">
                 <div class="card">
-                    <div class="card-header">Bed Request Details</div>
+                    <div class="card-header">@_lc.Keys["BedRequestDetails"]</div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="numbed" class="formlabel required">Number of Beds</label>
+                            <label for="numbed" class="formlabel required">@_lc.Keys["NumberOfBeds"]</label>
                             <SfNumericTextBox ID="numbed" TValue="int" Min="1" Max="50" HtmlAttributes="htmlattributeSize" @bind-Value="@NumericValue"></SfNumericTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.NumberOfBeds)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group ">
-                            <label for="ages" class="formlabel required">Ages / Gender</label>
+                            <label for="ages" class="formlabel required">@_lc.Keys["AgesGender"]</label>
                             <SfTextBox ID="ages" @bind-Value="newRequest.AgesGender" ></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.AgesGender)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="inst" class="formlabel">Special Instructions</label>
+                            <label for="inst" class="formlabel">@_lc.Keys["SpecialInstructions"]</label>
                             <SfTextBox ID="inst" @bind-Value="newRequest.SpecialInstructions" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                         </div>
                     </div>
@@ -140,7 +140,7 @@
         <br />
         <div class="row">
             <div class="col-md-3" style="text-align: center">
-                <button class="btn btn-primary" @onclick="(SaveRequest)">Submit Request</button>
+                <button class="btn btn-primary" @onclick="(SaveRequest)">@_lc.Keys["SubmitRequest"]</button>
             </div>
             <div class="col-md-9">
             </div>
@@ -158,7 +158,7 @@
 
 @if (SuccessDisplay != DisplayNone)
 {
-    <SfButton CssClass="btn btn-primary ms-3 mt-3" OnClick="@RefreshPage">Request a Bed for Another Person</SfButton>
+    <SfButton CssClass="btn btn-primary ms-3 mt-3" OnClick="@RefreshPage">@_lc.Keys["RequestABedFor"]</SfButton>
 }
 
 <style>

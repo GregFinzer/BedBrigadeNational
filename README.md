@@ -45,6 +45,7 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 * [Entity Framework](Documentation/Entity%20Framework.md)
 * <a href="https://github.com/GregFinzer/BedBrigadeNational/raw/main/Documentation/Design/Estimates.xlsx" target="_blank">Estimates</a>
 * [Implementation Plan](Documentation/Implementation%20Plan.md)
+* [Localization](Documentation/Localization.md)
 * [Project Plan](Documentation/Project%20Plan.md)
 * [References](Documentation/References.md)
 * [Resources for Learning Blazor 8](Documentation/Resources%20for%20Learning%20Blazor%208.md)
@@ -52,5 +53,6 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 * <a href="https://bedbrigade.slack.com" target="_blank">Slack Workspace</a> used for project communication
 * [Story Points](Documentation/Story%20Points.md)
 * <a href="https://trello.com/b/SfXILMoU/bed-brigade" target="_blank">Trello Board</a> used for Kanban
+* [Style Guide](Documentation/Style%20Guide.md)
 
  

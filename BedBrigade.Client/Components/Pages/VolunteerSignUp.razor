@@ -1,4 +1,4 @@
-﻿@page "/volunteer"
+@page "/volunteer"
 @using BedBrigade.Common.Models
 
 <RotatorContainer RotatorTitle="Volunteer Registration" ImagePath="pages/Volunteer" LocationId="1" />
@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12" style="text-align: center">
             <br />
-            <p>If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form</p>
+            <p>@_lc.Keys["IfYouLikeTo"]</p>
         </div>
     </div>
 
@@ -30,13 +30,13 @@
             <div class="@(AreSignUpsAvailable ? "col-md-3" : "col-md-12")">
                 <div class="card">
                     <div class="card-header" style="text-align: center">
-                        Bed Brigade Location Events
+                        @_lc.Keys["BedBrigadeLocationEvents"]
                     </div>
 
                     <div class="card-body" style="display: @DisplayLocationEvents">
                         <div class="form-group">
-                            <label for="events" class="formlabel">Location Available Events&nbsp;(@LocationEvents.Count)</label>
-                            <SfDropDownList @ref="ddlSchedule" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@LocationEvents">
+                            <label for="events" class="formlabel">@_lc.Keys["LocationAvailableEvents"]&nbsp;(@LocationEvents.Count)</label>
+                            <SfDropDownList @ref="ddlSchedule" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAnEvent"]" DataSource="@LocationEvents">
                                 <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ChangeEvent"></DropDownListEvents>
                             </SfDropDownList>
@@ -46,38 +46,38 @@
                         @if (SelectedEvent != null)
                         {
                             <div style="display: @DisplayEventDetail">
-                                <label class="formlabel">Selected Event Details</label>
+                                <label class="formlabel">@_lc.Keys["SelectedEventDetails"]</label>
                                 <div class="form-group">
-                                    <label class="formlabel">Name</label>
+                                    <label class="formlabel">@_lc.Keys["Name"]</label>
                                     <label>@SelectedEvent.EventName</label>
                                 </div>
                                 @if (SelectedEvent.EventType.ToString() != SelectedEvent.EventName)
                                 {
                                     <div class="form-group">
-                                        <label class="formlabel">Event Type</label>
+                                        <label class="formlabel">@_lc.Keys["EventType"]</label>
                                         <label>@SelectedEvent.EventType</label>
                                     </div>
                                 }
                                 @if (!String.IsNullOrEmpty(SelectedEvent.GroupName))
                                 {
                                     <div class="form-group">
-                                        <label class="formlabel">Event Group</label>
+                                        <label class="formlabel">@_lc.Keys["EventGroup"]</label>
                                         <label>@SelectedEvent.GroupName</label>
                                     </div>
                                 }
                                 <div class="form-group">
-                                    <label class="formlabel">Event Date & Time</label>
+                                    <label class="formlabel">@_lc.Keys["EventDateTime"]</label>
                                     <label>@SelectedEvent.EventDateScheduled.ToString("dddd, MM/dd/yyyy h:mm tt") to @SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString()</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class="formlabel">Volunteers registered/needed</label>
+                                    <label class="formlabel">@_lc.Keys["VolunteersRegisteredneeded"]</label>
                                     <label>@SelectedEvent.VolunteersRegistered/@SelectedEvent.VolunteersMax</label>
                                 </div>
 
                                 @if (!string.IsNullOrEmpty(SelectedEvent.EventNote))
                                 {
                                     <div class="form-group">
-                                        <label class="formlabel">Event Note</label>
+                                        <label class="formlabel">@_lc.Keys["EventNote"]</label>
                                         <label>@SelectedEvent.EventNote</label>
                                     </div>
                                 }
@@ -93,30 +93,30 @@
             {
                 <div class="col-md-3">
                     <div class="card">
-                        <div class="card-header" style="text-align: center">Volunteer Information</div>
+                        <div class="card-header" style="text-align: center">@_lc.Keys["VolunteerInformation"]</div>
                         <div class="card-body">
                             <div class="form-group">
-                                <SfCheckBox Label="Have you volunteered for Bed Brigade before?" @bind-Checked="newVolunteer.IHaveVolunteeredBefore" @onchange="onPreviousVolunteer"></SfCheckBox>
+                                <SfCheckBox Label="@_lc.Keys["HaveYouVolunteeredFor"]" @bind-Checked="newVolunteer.IHaveVolunteeredBefore" @onchange="onPreviousVolunteer"></SfCheckBox>
                             </div>
                             <div class="form-group" style="display: @DisplayExistingMessage">
                                 @ExistingMessage
                             </div>
                             <div class="form-group">
-                                <label for="firstname" class="formlabel required">First Name</label>
+                                <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
                                 <SfTextBox ID="firstname" @bind-Value="newVolunteer.FirstName"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.FirstName)"></ValidationMessage>
                                 </div>
                             </div>
                             <div class="form-group ">
-                                <label for="lastname" class="formlabel required">Last Name</label>
+                                <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
                                 <SfTextBox ID="lastname" @bind-Value="newVolunteer.LastName"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.LastName)"></ValidationMessage>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="email" class="formlabel required">Email</label>
+                                <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
                                 <SfTextBox ID="email" @bind-Value="newVolunteer.Email"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.Email)"></ValidationMessage>
@@ -126,23 +126,23 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="phone" class="formlabel required">Phone</label>
+                                <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
                                 <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="newVolunteer.Phone"></SfMaskedTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.Phone)"></ValidationMessage>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="email" class="formlabel">Organization or Group</label>
+                                <label for="email" class="formlabel">@_lc.Keys["OrganizationOrGroup"]</label>
                                 <SfTextBox ID="email" @bind-Value="newVolunteer.OrganizationOrGroup"></SfTextBox>
                             </div>
                             <div class="form-group">
-                                <label for="inst" class="formlabel">Message</label>
+                                <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
                                 <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                             </div>
                         </div>
                         <div class="card-footer  text-muted" style="text-align: center; font-size:small; color: GrayText; display: @DisplayExId">
-                            <span>Volunteer Id: @newVolunteer.VolunteerId</span>&nbsp;|&nbsp;
+                            <span>@_lc.Keys["VolunteerIdColon"] @newVolunteer.VolunteerId</span>&nbsp;|&nbsp;
                             <span>
                                 Last Visit: @(newVolunteer.UpdateDate.HasValue ? Convert.ToDateTime(newVolunteer.UpdateDate, System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat) : "")
                             </span>
@@ -155,26 +155,26 @@
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-header" style="text-align: center">
-                                Delivery Vehicle
+                                @_lc.Keys["DeliveryVehicle"]
                             </div>
                             <div class="card-body">
                                 <div class="control-section">
                                     <div class="radio-control">
-                                        @BootstrapHelper.GetBootstrapMessage("help", "Do you have a vehicle that can carry a bed and mattress?", "", false, "compact")
+                                        @BootstrapHelper.GetBootstrapMessage("help", "@_lc.Keys[\"DeliveryVehicleQuestion\"]", "", false, "compact")
                                         <div class="row">
-                                            <SfRadioButton Label="@EnumHelper.GetEnumDescription(VehicleType.None)" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleNone"]" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr/>
                                         <div class="row">
-                                            <SfRadioButton Label="I have a Minvan with seats removed or folded into the floor" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleMinivan"]" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr/>
                                         <div class="row">
-                                            <SfRadioButton Label="I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleSuv"]" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr/>
                                         <div class="row">
-                                            <SfRadioButton Label="I have a full size pickup truck with tie down straps or a cap" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleTruck"]" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
             <br/>
             <div class="row">
                 <div class="col-md-3" style="text-align: center">
-                    <SfButton CssClass="btn btn-primary" OnClick="@SaveVolunteer">Submit Volunteer Registration</SfButton>
+                    <SfButton CssClass="btn btn-primary" OnClick="@SaveVolunteer">@_lc.Keys["SubmitVolunteerRegistration"]</SfButton>
                 </div>
                 <div class="col-md-9">
                 </div>
@@ -217,7 +217,7 @@
 
 @if (ResultDisplay != DisplayNone)
 {
-    <SfButton CssClass="btn btn-primary ms-4 mt-3" OnClick="@RefreshPage">Volunteer for Another Event</SfButton>
+    <SfButton CssClass="btn btn-primary ms-4 mt-3" OnClick="@RefreshPage">@_lc.Keys["VolunteerForAnotherEvent"]</SfButton>
 }
 
 

@@ -1,4 +1,4 @@
-﻿@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Grids
 @using BedBrigade.Data
 @using BedBrigade.Common
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
@@ -13,13 +13,13 @@
         <div class="row"><div class="col">&nbsp;</div></div>
         <div class="row">
             <div class="col">
-                <h2>Manage Schedule</h2>
+                <h2>@_lc.Keys["ManageSchedule"]</h2>
             </div>
             <div class="col" style="text-align: right">
-                <h5>Show Schedules&nbsp;</h5>
+                <h5>@_lc.Keys["ShowSchedules"]&nbsp;</h5>
             </div>
             <div class="col">
-                <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="Select a grid filter" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
+                <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
                     <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
                     <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
                 </SfDropDownList>
@@ -28,7 +28,7 @@
                 <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
                 @if (isLocationAdmin)
                 {
-                    <span>[Location: @userLocationName]</span>
+                    <span>[@_lc.Keys["LocationColon"] @userLocationName]</span>
                 }
                 <br />@userName
             </div>
@@ -76,7 +76,7 @@
                                     </div>
                                     <div class="col-md-6" style="text-align: right">
                                         <button class="btn btn-primary" @onclick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</button>
-                                        <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                        <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
                                     </div>
                                 </div>
                             </FooterTemplate>
@@ -102,7 +102,7 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label required"><b>Location</b></label>
-                                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="lstLocations" @bind-Value=@schedule.LocationId Enabled="@enabledLocationSelector" Placeholder="Location">
+                                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="lstLocations" @bind-Value=@schedule.LocationId Enabled="@enabledLocationSelector" Placeholder="@_lc.Keys["Location"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                                             </SfDropDownList>
                                                         </div>
@@ -110,7 +110,7 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label required"><b>Event Name</b></label>
-                                                            <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="Event Name" maxlength="50" minlength="5" ValidateOnInput="true" />
+                                                            <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="@_lc.Keys["EventName"]" maxlength="50" minlength="5" ValidateOnInput="true" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -118,7 +118,7 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label required"><b>Event Type</b></label>
-                                                            <SfDropDownList TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="Event Type">
+                                                            <SfDropDownList TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="@_lc.Keys["EventType"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                                             </SfDropDownList>
                                                         </div>
@@ -126,7 +126,7 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label required"><b>Event Date</b></label>
-                                                            <SfDateTimePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="Choose a Date & Time" ShowClearButton="true" Enabled="true"></SfDateTimePicker>
+                                                            <SfDateTimePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="@_lc.Keys["ChooseADate"]" ShowClearButton="true" Enabled="true"></SfDateTimePicker>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -134,13 +134,13 @@
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label"><b>Group Name</b></label>
-                                                            <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="Group Name" maxlength="50" />
+                                                            <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="@_lc.Keys["GroupName"]" maxlength="50" />
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
                                                             <label class="example-label"><b>Event Status</b></label>
-                                                            <SfDropDownList TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="Event Status">
+                                                            <SfDropDownList TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="@_lc.Keys["EventStatus"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                                             </SfDropDownList>
                                                         </div>
@@ -165,7 +165,7 @@
                                             <fieldset class="border rounded-3 p-1">
                                                 <legend class="float-none w-auto p-1" style="font-size: small"><b>Note / Comment</b></legend>
                                                 <div class="control-wrapper">                                                   
-                                                    <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="Event Note" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
+                                                    <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="@_lc.Keys["EventNote"]" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
                                                 </div>
                                             </fieldset>
                                         </div>

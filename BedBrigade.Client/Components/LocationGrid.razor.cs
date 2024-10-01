@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.Grids;
@@ -26,6 +26,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
 
         [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -64,6 +65,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             Identity = _svcAuth.CurrentUser;
             if (Identity.IsInRole(RoleNames.NationalAdmin))
             {

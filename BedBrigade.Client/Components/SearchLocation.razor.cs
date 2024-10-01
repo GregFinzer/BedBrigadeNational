@@ -1,4 +1,4 @@
-﻿using BedBrigade.Data.Services;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Syncfusion.Blazor.DropDowns;
@@ -21,6 +21,7 @@ namespace BedBrigade.Client.Components
         public EventCallback<string> LocationChanged { get; set; }
 
         [Inject] private ILocationDataService? _svcLocation { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
 
         SfMaskedTextBox maskObj;
@@ -45,6 +46,11 @@ namespace BedBrigade.Client.Components
         {
            { "font-weight", "bold" },
         };
+
+        protected override void OnInitialized()
+        {
+            _lc.InitLocalizedComponent(this);
+        }
 
         public async Task ChangeLocation(ChangeEventArgs<int, LocationDistance> args)
         {
@@ -232,4 +238,6 @@ namespace BedBrigade.Client.Components
         }
 
     }
+
+
 }

@@ -1,4 +1,4 @@
-﻿using BedBrigade.Data.Services;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 
 using Syncfusion.Blazor.Grids;
@@ -27,6 +27,7 @@ public partial class SignUpGrid : ComponentBase
     [Inject] private IScheduleDataService? _svcSchedule { get; set; }
     [Inject] private ISignUpDataService? _svcSignUp { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
     // object lists
 
@@ -102,6 +103,7 @@ public partial class SignUpGrid : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+            _lc.InitLocalizedComponent(this);
         lstEmptyTables = await SignUpHelper.GetSignUpDataStatusAsync(_svcSchedule, _svcVolunteer);
         if (lstEmptyTables.Count > 0)
         {

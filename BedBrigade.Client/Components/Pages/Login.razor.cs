@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+using BedBrigade.Client.Services;
 using BedBrigade.Common;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -20,6 +20,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IAuthDataService _authDataService { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
@@ -37,6 +38,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
+            _lc.InitLocalizedComponent(this);
             loginModel.Email = User;
             loginModel.Password = Password;
             passwordType = "password";

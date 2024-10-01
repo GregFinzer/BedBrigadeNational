@@ -1,3 +1,12 @@
 ﻿@page "/bed-brigade-near-me"
 
-<SearchLocation Title="Find a Bed Brigade Near Me" />
+<SearchLocation Title="@_lc.Keys["FindABedBrigade"]" />
+
+@code {
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+}

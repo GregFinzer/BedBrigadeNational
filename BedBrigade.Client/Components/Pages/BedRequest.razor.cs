@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;

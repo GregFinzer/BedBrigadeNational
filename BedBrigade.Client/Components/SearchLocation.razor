@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @if (IsSearching)
 
 {
@@ -11,24 +11,24 @@
         </div>
         <div class="card-body">
             <h5 class="card-title">
-                <span class="card-title-desktop">Please enter a valid Zip code where you live</span>
-                <span class="card-title-mobile">Enter your Zip code</span>
+                <span class="card-title-desktop">@_lc.Keys["PleaseEnterAValid"]</span>
+                <span class="card-title-mobile">@_lc.Keys["EnterYourZipCode"]</span>
             </h5>
-            <p class="card-text"><i>(5 characters containing only digits 0-9)</i></p>
+            <p class="card-text"><i>@_lc.Keys["5CharactersContainingOnly"]</i></p>
             <p>
                 <SfMaskedTextBox @ref="maskObj"
                                  Mask="00000"
                                  Value="@PostalCode"
                                  Created="OnCreateInput"
-                                 Placeholder="Zip Code"
+                                 Placeholder="@_lc.Keys["ZipCode"]"
                                  OnInput="ZipCodeInputChange"
                                  @onkeyup="@HandleKeyDown"
                                  Width="200px">
                 </SfMaskedTextBox>
             </p>
             <div class="widget-body">
-                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">Search Bed Brigade Locations</button>
-                <button id="search" type="button" class="btn btn-primary btn-mobile" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">Search</button>
+                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">@_lc.Keys["SearchBedBrigadeLocations"]</button>
+                <button id="search" type="button" class="btn btn-primary btn-mobile" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">@_lc.Keys["Search"]</button>
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@
                 {
 
                     case "DropDownList":
-                        <label for="LocationSelector" class="formlabel">Select a Location&nbsp;&nbsp;</label>
+                        <label for="LocationSelector" class="formlabel">@_lc.Keys["SelectALocation"]&nbsp;&nbsp;</label>
                         <SfDropDownList id="LocationSelector" TValue="int" TItem="LocationDistance" DataSource="@Locations" @bind-Value="ddlValue" Width="400px" HtmlAttributes="DropDownHtmlAttribute">
                             <DropDownListFieldSettings Value="LocationId" Text="Name"> </DropDownListFieldSettings>
                             <DropDownListEvents TValue="int" TItem="LocationDistance" ValueChange="ChangeLocation"></DropDownListEvents>
@@ -81,7 +81,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="alert alert-info" role="alert" style="display: @strDisplayNotActive; padding-top: 2px; padding-bottom: 2px; width: 100%; text-align: center">
-                Locations marked with an asterisk (*) are currently inactive
+                @_lc.Keys["LocationsMarkedWithAn"]
             </div>
         </div>
     </div>

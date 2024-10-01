@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Constants;
@@ -20,6 +20,7 @@ namespace BedBrigade.Client.Components
         private IHttpClientFactory HttpClientFactory { get; }
 
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         public string? SiteKey { get; set; }
 
@@ -29,7 +30,10 @@ namespace BedBrigade.Client.Components
 
         public string ResultPrint = String.Empty;
 
-
+        protected override void OnInitialized()
+        {
+            _lc.InitLocalizedComponent(this);
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -89,4 +93,6 @@ namespace BedBrigade.Client.Components
         } // post
 
     }
+
+
 }

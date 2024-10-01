@@ -1,4 +1,4 @@
-﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Models
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
@@ -47,7 +47,7 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as Location)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
@@ -55,48 +55,48 @@ else
 
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="@_lc.Keys["Name"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.Route Enabled="true" Placeholder="Route" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.Route Enabled="true" Placeholder="@_lc.Keys["Route"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4" >
                                             <div class="important-box">
-                                                <label for="checked" style="font-weight: bold" >Active</label>
+                                                <label for="checked" style="font-weight: bold" >@_lc.Keys["Active"]</label>
                                                 <SfSwitch @bind-Checked="@location.IsActive"></SfSwitch>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-4">
-                                            <SfTextBox @bind-Value=@location.Address1 Enabled="true" Placeholder="Address" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.Address1 Enabled="true" Placeholder="@_lc.Keys["Address"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <SfTextBox @bind-Value=@location.Address2 Enabled="true" Placeholder="Suite/PO Box" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.Address2 Enabled="true" Placeholder="@_lc.Keys["SuitepoBox"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.City Enabled="true" Placeholder="City" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.City Enabled="true" Placeholder="@_lc.Keys["City"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.State Enabled="true" Placeholder="State" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.State Enabled="true" Placeholder="@_lc.Keys["State"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.PostalCode Enabled="true" Placeholder="Postal Code" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@location.PostalCode Enabled="true" Placeholder="@_lc.Keys["PostalCode"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Latitude Enabled="true" Placeholder="Latitude" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Latitude Enabled="true" Placeholder="@_lc.Keys["Latitude"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-4">
-                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Longitude Enabled="true" Placeholder="Longitude" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfNumericTextBox TValue="decimal?" Min=0.0m Max=360.0m Step=0.01m Format="n2" @bind-Value=@location.Longitude Enabled="true" Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="Select Metro Area" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
+                                            <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="@_lc.Keys["SelectMetroArea"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
                                                 <DropDownListFieldSettings Value="MetroAreaId" Text="Name" />
                                             </SfDropDownList>
                                         </div>

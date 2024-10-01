@@ -5,6 +5,9 @@ namespace BedBrigade.SpeakIt.Tests
     public static class TestHelper
     {
 
+        public static List<string> ExcludeDirectories = new List<string> { "Administration", "Layout" };
+        public static List<string> ExcludeFiles = new List<string> { "Error.razor", "CustomErrorBoundary.razor" };
+
         /// <summary>
         /// Execute an external program.
         /// </summary>

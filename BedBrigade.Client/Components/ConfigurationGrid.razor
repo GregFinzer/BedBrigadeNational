@@ -1,4 +1,4 @@
-﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Buttons
@@ -50,24 +50,24 @@ else
                             </HeaderTemplate>
                             <FooterTemplate>
                                 <button class="btn btn-primary" @onclick=@(() => Save(context as Configuration)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
                             </FooterTemplate>
                             <Template>
                                 @{
                                     Configuration configRec = (context as Configuration)!;
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="Configuration Section" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="@_lc.Keys["ConfigurationSection"]" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                             </SfDropDownList>
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="@_lc.Keys["ConfigurationKey"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="@_lc.Keys["ConfigurationValue"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                 }

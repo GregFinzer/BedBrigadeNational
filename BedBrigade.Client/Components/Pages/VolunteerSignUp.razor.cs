@@ -1,4 +1,4 @@
-﻿using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.DropDowns;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Data.Services;
@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject] private ISignUpDataService? _svcSignUp { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
@@ -92,6 +93,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override void OnInitialized()
         {
+            _lc.InitLocalizedComponent(this);
             //Yes, this has to be here instead of in OnInitializedAsync
             if (!string.IsNullOrEmpty(PreloadLocation))
             {

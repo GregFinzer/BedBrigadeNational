@@ -1,3 +1,12 @@
-﻿@page "/unauthorized"
-<h1>Sorry, you are not authorized to view this page.</h1>
+@page "/unauthorized"
+<h1>@_lc.Keys["SorryYouAreNot"]</h1>
 
+@code
+{
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+}

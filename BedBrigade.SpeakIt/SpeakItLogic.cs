@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity.Core.Common.EntitySql;
 using System.Text;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Logic;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -10,6 +12,7 @@ namespace BedBrigade.SpeakIt
     public class SpeakItLogic
     {
         private const string ReplacementMarker = "~~~";
+        private static Regex KeyReference = new Regex("@_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static List<Regex> _removePatterns = new List<Regex>()
         {
@@ -32,7 +35,10 @@ namespace BedBrigade.SpeakIt
         private static List<Regex> _contentPatterns = new List<Regex>()
         {
             new Regex(@"<a[^>]*>(?<content>.*?)<\/a>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
+            new Regex(@"Placeholder=""(?<content>[^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline),
+            new Regex(@"Label=""(?<content>[^""]+)""", RegexOptions.Compiled | RegexOptions.Multiline),
             new Regex(@"<button[^<]+>(?<content>.*?)</button>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
+            new Regex(@"<SfButton[^<]+>(?<content>.*?)</SfButton>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
             new Regex(@"<label[^<]+>(?<content>\s*[A-Za-z].*?)</label>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
             new Regex(@"<strong>(?<content>.*?)<\/strong>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<i>(?<content>.*?)<\/i>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
@@ -64,9 +70,6 @@ namespace BedBrigade.SpeakIt
 
             foreach (var file in filesToProcess)
             {
-                if (Path.GetFileName(file) == "Error.razor")
-                    Console.WriteLine("Here");
-
                 string content = File.ReadAllText(file);
                 var fileResults = GetLocalizableStringsInHtml(content);
 
@@ -75,6 +78,61 @@ namespace BedBrigade.SpeakIt
                     fileResult.FilePath = file;
                 }
                 result.AddRange(fileResults);
+            }
+
+            return result;
+        }
+
+        public List<ParseResult> GetExistingLocalizedStrings(CreateParms parms)
+        {
+            ValidateParseParameters(parms);
+            var existingKeyValues = ReadYamlFile(parms.ResourceFilePath);
+            string[] files =
+                Directory.GetFiles(parms.TargetDirectory, parms.WildcardPattern, SearchOption.AllDirectories);
+
+            List<string> filesToProcess = files
+                .Where(o => parms.ExcludeFiles.All(a => a != Path.GetFileName(o)))
+                .Where(o => parms.ExcludeDirectories.All(a =>
+                    !o.Contains(Path.DirectorySeparatorChar + a + Path.DirectorySeparatorChar)))
+                .ToList();
+
+            List<ParseResult> result = new List<ParseResult>();
+
+            foreach (var file in filesToProcess)
+            {
+                string content = File.ReadAllText(file);
+                var fileResults = GetExistingLocalizedStringsInHtml(content, existingKeyValues);
+
+                foreach (var fileResult in fileResults)
+                {
+                    fileResult.FilePath = file;
+                }
+                result.AddRange(fileResults);
+            }
+
+            return result;
+        }
+
+        public List<ParseResult> GetExistingLocalizedStringsInHtml(string html,
+            Dictionary<string, string> existingKeyValues)
+        {
+            List<ParseResult> result = new List<ParseResult>();
+
+            MatchCollection matches = KeyReference.Matches(html);
+            foreach (Match match in matches)
+            {
+                string existingKey = match.Groups["content"].Value;
+                string existingValue =
+                    existingKeyValues.ContainsKey(existingKey) ? existingKeyValues[existingKey] : null;
+
+                result.Add(new ParseResult
+                {
+                    LocalizableString = existingValue,
+                    MatchingExpression = KeyReference,
+                    FilePath = string.Empty,
+                    MatchValue = match.Value,
+                    Key = existingKey
+                });
             }
 
             return result;
@@ -125,16 +183,31 @@ namespace BedBrigade.SpeakIt
 
         private void ModifyRazorFiles(List<ParseResult> parseResults)
         {
-            foreach (var parseResult in parseResults)
+            // Order the parseResults by FilePath
+            var orderedResults = parseResults.OrderBy(pr => pr.FilePath).ToList();
+
+            string currentFilePath = null;
+            string content = null;
+
+            foreach (var parseResult in orderedResults)
             {
-                string content;
-                using (StreamReader reader = new StreamReader(parseResult.FilePath))
+                // If the file path has changed, read the new file
+                if (currentFilePath != parseResult.FilePath)
                 {
-                    content = reader.ReadToEnd();
+                    // Write the modified content of the previous file if it exists
+                    if (currentFilePath != null && content != null)
+                    {
+                        File.WriteAllText(currentFilePath, content);
+                    }
+
+                    // Read the new file
+                    currentFilePath = parseResult.FilePath;
+                    content = File.ReadAllText(currentFilePath);
                 }
 
                 string replacement;
-                if (parseResult.MatchValue.Contains("button"))
+                if (parseResult.MatchValue.Contains("button")
+                    || parseResult.MatchValue.Contains("SfButton"))
                 {
                     replacement = parseResult.MatchValue.Replace($">{parseResult.LocalizableString}<"
                         , $">@_lc.Keys[\"{parseResult.Key}\"]<");
@@ -145,11 +218,12 @@ namespace BedBrigade.SpeakIt
                 }
 
                 content = content.Replace(parseResult.MatchValue, replacement);
+            }
 
-                using (StreamWriter writer = new StreamWriter(parseResult.FilePath))
-                {
-                    writer.Write(content);
-                }
+            // Write the last file if it exists
+            if (currentFilePath != null && content != null)
+            {
+                File.WriteAllText(currentFilePath, content);
             }
         }
 
@@ -201,6 +275,7 @@ namespace BedBrigade.SpeakIt
                     && trimmed.Length >= minStringLength
                     && !trimmed.StartsWith("@(")
                     && !trimmed.StartsWith("@_")
+                    && !trimmed.StartsWith("[@_")
                     && AtLeastOneAlphabeticCharacter(trimmed))
                 {
                     result.Add(new ParseResult
@@ -249,7 +324,7 @@ namespace BedBrigade.SpeakIt
             return html;
         }
 
-        private static void ValidateParseParameters(ParseParms parms)
+        private void ValidateParseParameters(ParseParms parms)
         {
             if (String.IsNullOrEmpty(parms.TargetDirectory))
             {
@@ -306,7 +381,7 @@ namespace BedBrigade.SpeakIt
             return input;
         }
 
-        public static string InitLanguageComponent(string input, string initLanguage)
+        public string InitLanguageComponent(string input, string initLanguage)
         {
             // Check if the initLanguage already exists in the input
             if (input.Contains(initLanguage))
@@ -314,25 +389,67 @@ namespace BedBrigade.SpeakIt
                 return input;
             }
 
-            var lines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            string[] lines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
             // Look for "protected override void OnInitialized()"
-            int onInitializedIndex = Array.FindIndex(lines, l => l.Trim().StartsWith("protected override void OnInitialized()"));
-            if (onInitializedIndex != -1)
+            string? insertOnInitializedResult = InsertOnInitialized(lines, initLanguage);
+            if (insertOnInitializedResult != null)
             {
-                // Find the opening brace
-                int openingBraceIndex = Array.FindIndex(lines, onInitializedIndex, l => l.Contains("{"));
-                if (openingBraceIndex != -1)
-                {
-                    // Insert initLanguage after the opening brace
-                    return string.Join(Environment.NewLine,
-                        lines.Take(openingBraceIndex + 1)
-                        .Concat(new[] { "            " + initLanguage })
-                        .Concat(lines.Skip(openingBraceIndex + 1)));
-                }
+                return insertOnInitializedResult;
             }
 
             // Look for "protected override async Task OnInitializedAsync()"
+            string? insertOnInitializedAsyncResult = InsertOnInitializedAsync(lines, initLanguage);
+
+            if (insertOnInitializedAsyncResult != null)
+            {
+                return insertOnInitializedAsyncResult;
+            }
+
+            // If neither method is found, create a new OnInitialized method
+            string? newOnInitializedResult = InsertNewOnInitialized(lines, initLanguage);
+
+            if (newOnInitializedResult != null)
+            {
+                return newOnInitializedResult;
+            }
+
+            // If no suitable location is found, return the original input
+            return input;
+        }
+
+        private string? InsertNewOnInitialized(string[] lines, string initLanguage)
+        {
+            string newMethod = $@"
+    protected override void OnInitialized()
+    {{
+        {initLanguage}
+    }}";
+
+            // Find the last closing brace (namespace)
+            int lastClosingBraceIndex = Array.FindLastIndex(lines, l => l.Trim() == "}");
+
+            if (lastClosingBraceIndex != -1)
+            {
+                // Find the next-to-last closing brace by searching up to the last closing brace index (class)
+                int nextToLastClosingBraceIndex = Array.FindLastIndex(lines, lastClosingBraceIndex - 1, l => l.Trim() == "}");
+
+                if (nextToLastClosingBraceIndex != -1)
+                {
+                    // Insert the new method before the class closing brace
+                    return string.Join(Environment.NewLine,
+                        lines.Take(nextToLastClosingBraceIndex)
+                            .Concat(new[] { newMethod })
+                            .Concat(lines.Skip(nextToLastClosingBraceIndex)));
+                }
+            }
+
+            return null;
+        }
+
+
+        private string? InsertOnInitializedAsync(string[] lines, string initLanguage)
+        {
             int onInitializedAsyncIndex = Array.FindIndex(lines, l => l.Trim().StartsWith("protected override async Task OnInitializedAsync()"));
             if (onInitializedAsyncIndex != -1)
             {
@@ -343,56 +460,61 @@ namespace BedBrigade.SpeakIt
                     // Insert initLanguage after the opening brace
                     return string.Join(Environment.NewLine,
                         lines.Take(openingBraceIndex + 1)
-                        .Concat(new[] { "            " + initLanguage })
-                        .Concat(lines.Skip(openingBraceIndex + 1)));
+                            .Concat(new[] { "            " + initLanguage })
+                            .Concat(lines.Skip(openingBraceIndex + 1)));
                 }
             }
 
-            // If neither method is found, create a new OnInitialized method
-            string newMethod = $@"
-    protected override void OnInitialized()
-    {{
-        {initLanguage}
-    }}";
-
-            // Find the class closing brace
-            int classClosingBraceIndex = Array.FindLastIndex(lines, l => l.Trim() == "}");
-            if (classClosingBraceIndex != -1)
-            {
-                // Insert the new method before the class closing brace
-                return string.Join(Environment.NewLine,
-                    lines.Take(classClosingBraceIndex)
-                    .Concat(new[] { newMethod })
-                    .Concat(lines.Skip(classClosingBraceIndex)));
-            }
-
-            // If no suitable location is found, return the original input
-            return input;
+            return null;
         }
 
-        public static void AddResourceKeyValue(string filePath, string key, string value)
+        private string? InsertOnInitialized(string[] lines, string initLanguage)
+        {
+            int onInitializedIndex = Array.FindIndex(lines, l => l.Trim().StartsWith("protected override void OnInitialized()"));
+            if (onInitializedIndex != -1)
+            {
+                // Find the opening brace
+                int openingBraceIndex = Array.FindIndex(lines, onInitializedIndex, l => l.Contains("{"));
+                if (openingBraceIndex != -1)
+                {
+                    // Insert initLanguage after the opening brace
+                    return string.Join(Environment.NewLine,
+                        lines.Take(openingBraceIndex + 1)
+                            .Concat(new[] { "            " + initLanguage })
+                            .Concat(lines.Skip(openingBraceIndex + 1)));
+                }
+            }
+
+            return null;
+        }
+
+        public void AddResourceKeyValue(string filePath, string key, string value)
         {
             string directory = Path.GetDirectoryName(filePath);
-
             // Create the directory if it does not exist
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            // Create a new YAML file with the key-value pair
+            // Create a new YAML file with the key-value pair if it doesn't exist
             if (!File.Exists(filePath))
             {
-                var newSerializer = new SerializerBuilder()
-                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                    .Build();
-                string newContent = newSerializer.Serialize(new Dictionary<string, string> { { key, value } });
-                File.WriteAllText(filePath, newContent);
+                CreateNewYamlFile(filePath, key, value);
                 return;
             }
 
+            UpdateYamlFile(filePath, key, value);
+        }
+
+        private void UpdateYamlFile(string filePath, string key, string value)
+        {
             // Read the YAML file
-            string yamlContent = File.ReadAllText(filePath);
+            string yamlContent;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                yamlContent = reader.ReadToEnd();
+            }
 
             // Deserialize YAML to dictionary
             var deserializer = new DeserializerBuilder()
@@ -414,7 +536,98 @@ namespace BedBrigade.SpeakIt
             string updatedYamlContent = serializer.Serialize(sortedYamlObject);
 
             // Save the updated YAML content back to the file
-            File.WriteAllText(filePath, updatedYamlContent);
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                writer.Write(updatedYamlContent);
+            }
+        }
+
+        private void CreateNewYamlFile(string filePath, string key, string value)
+        {
+            var newSerializer = new SerializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            string newContent = newSerializer.Serialize(new Dictionary<string, string> { { key, value } });
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                writer.Write(newContent);
+            }
+        }
+
+        public Dictionary<string, List<string>> GetDuplicateValues(ParseParms parms)
+        {
+            var parseResults = GetLocalizableStrings(parms);
+            var conflictingKeys = GetDuplicateValues(parseResults);
+            return conflictingKeys;
+        }
+
+        private Dictionary<string, List<string>> GetDuplicateValues(List<ParseResult> parseResults)
+        {
+            var conflictingKeys = new Dictionary<string, List<string>>();
+            var keyDict = new Dictionary<string, string>();
+
+            foreach (var result in parseResults)
+            {
+                if (string.IsNullOrEmpty(result.Key))
+                {
+                    continue;
+                }
+
+                if (!keyDict.ContainsKey(result.Key))
+                {
+                    keyDict[result.Key] = result.LocalizableString;
+                }
+                else if (keyDict[result.Key] != result.LocalizableString)
+                {
+                    if (!conflictingKeys.ContainsKey(result.Key))
+                    {
+                        conflictingKeys.Add(result.Key, new List<string>() { keyDict[result.Key] });
+                    }
+                    conflictingKeys[result.Key].Add(result.LocalizableString);
+                }
+            }
+
+            return conflictingKeys;
+        }
+
+
+        public List<string> GetUnusedKeys(CreateParms parms)
+        {
+            if (string.IsNullOrEmpty(parms.ResourceFilePath))
+            {
+                throw new ArgumentException("ResourceFilePath is required");
+            }
+
+            // Read existing keys from the YAML file
+            var existingKeys = ReadYamlFile(parms.ResourceFilePath).Keys.ToList();
+
+            // Get localizable strings to find keys in use
+            var parseResults = GetExistingLocalizedStrings(parms);
+            var keysInUse = parseResults.Select(r => r.Key).Distinct().ToList();
+
+            // Find keys that exist in the YAML file but are not in use
+            var unusedKeys = existingKeys.Except(keysInUse).ToList();
+
+            return unusedKeys;
+        }
+
+        private Dictionary<string, string> ReadYamlFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return new Dictionary<string, string>();
+            }
+
+            string yamlContent;
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                yamlContent = reader.ReadToEnd();
+            }
+
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            return deserializer.Deserialize<Dictionary<string, string>>(yamlContent);
         }
     }
 }
