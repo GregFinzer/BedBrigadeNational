@@ -165,8 +165,8 @@ namespace BedBrigade.Client.Components.Pages
             var emailResult = Validation.IsValidEmail(newRequest.Email);
             if (!emailResult.IsValid)
             {
-                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Phone)), _lc.Keys["ValidEmail"]);
-                ShowValidationMessage(emailResult.UserMessage);
+                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Email)), emailResult.UserMessage);
+                ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
                 return false;
             }
 

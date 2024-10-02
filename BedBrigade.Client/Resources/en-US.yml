@@ -7,6 +7,7 @@ Amount: Amount
 BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeWeb: Bed Brigade Web
 BedRequestDetails: Bed Request Details
+BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedsRequested: Beds Requested
 Cancel: Cancel
 ChooseADate: Choose a Date & Time
@@ -61,12 +62,26 @@ LogIn: Log In
 Longitude: Longitude
 ManageSchedule: Manage Schedule
 ManageSignups: Manage Sign-Ups
+MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
+MaxLengthCity50: City has a maximum length of 50 characters
+MaxLengthEmail255: Email Address has a maximum length of 255 characters
+MaxLengthFirstName20: First Name has a maximum length of 20 characters
+MaxLengthLastName25: Last Name has a maximum length of 25 characters
+MaxLengthMessage4000: Message has a maximum length of 4000 characters
+MaxLengthNotes4000: Notes has a maximum length of 4000
+MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
+MaxLengthPhone14: Phone Number has a maximum length of 14 characters
+MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
+MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
+MaxLengthState30: State has a maximum length of 30 characters
+MaxLengthStreet40: Street Address has a maximum length of 40 characters
 MediaFileManager: Media File Manager
 Message: Message
 Name: Name
 NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
+NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 Notes: Notes
 NothingToSend: Nothing to send
@@ -86,16 +101,23 @@ PostalCode: Postal Code
 RegistrationidColon: 'RegistrationID:'
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
+RequiredAgesGender: Please indicate the age and gender of children
+RequiredBody: Body is required.
+RequiredCity: City is required
+RequiredConfirmPassword: Confirm Password is required
+RequiredEmail: Email Address is required
 RequiredFirstName: First Name is required
 RequiredLastName: Last Name is required
-RequiredEmail: Email Address is required
-RequiredPhone: Phone Number is required
 RequiredMessage: Message is required
-MaxLengthFirstName20: First Name has a maximum length of 20 characters
-MaxLengthLastName25: Last Name has a maximum length of 25 characters
-MaxLengthEmail255: Email Address has a maximum length of 255 characters
-MaxLengthPhone14: Phone Number has a maximum length of 14 characters
-MaxLengthMessage4000: Message has a maximum length of 4000 characters
+RequiredName: Name is required
+RequiredPageName: Page Name is required
+RequiredPageTitle: Page Title is required
+RequiredPassword: Password is required
+RequiredPhone: Phone Number is required
+RequiredPostalCode: Postal Code (Zip Code) is required
+RequiredStreet: Street Address is required
+RequiredSubject: Subject is required.
+RequiredUserId: User Id is required
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
@@ -129,13 +151,13 @@ Team: 'Team #'
 TransactionId: Transaction ID
 UserName: User Name
 ValidEmail: Please enter a valid email address
-ValidPhoneNumber: Please enter a valid phone number
+ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
 VehicleTypeColon: 'Vehicle Type:'
 VolunteerForAnotherEvent: Volunteer for Another Event
 VolunteeridColon: 'VolunteerID:'
 VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
-VolunteersRegisteredneeded: Volunteers registered/needed
 VolunteerRegistration: Volunteer Registration
+VolunteersRegisteredneeded: Volunteers registered/needed
 YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code

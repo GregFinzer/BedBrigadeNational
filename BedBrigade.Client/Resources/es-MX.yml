@@ -7,6 +7,7 @@ Amount: Importe
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeWeb: Cama Brigade Web
 BedRequestDetails: Detalles de la solicitud de cama
+BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedsRequested: Camas solicitadas
 Cancel: Cancelar
 ChooseADate: Elija una fecha y hora
@@ -61,12 +62,26 @@ LogIn: Inicia sesión
 Longitude: Longitud
 ManageSchedule: Administrar el horario
 ManageSignups: Gestionar las inscripciones
+MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
+MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
+MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
+MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres
+MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
+MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
+MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
+MaxLengthOrganizationOrGroup80: El grupo tiene una longitud máxima de 20
+MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
+MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
+MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
+MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
+MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MediaFileManager: Administrador de archivos multimedia
 Message: Mensaje
 Name: Nombre
 NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
+NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 Notes: Notas
 NothingToSend: Nada que enviar
@@ -86,17 +101,23 @@ PostalCode: Código postal
 RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
+RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
+RequiredBody: Se requiere cuerpo.
+RequiredCity: Se requiere ciudad
+RequiredConfirmPassword: Confirmar que la contraseña es obligatoria
+RequiredEmail: Se requiere una dirección de correo electrónico
 RequiredFirstName: El nombre de pila es obligatorio
 RequiredLastName: El apellido es obligatorio
-RequiredEmail: Se requiere correo electrónico
-RequiredPhone: Se requiere teléfono
 RequiredMessage: El mensaje es obligatorio
-MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres
-MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
-MaxLengthEmail255: El correo electrónico tiene una longitud máxima de 255 caracteres
-MaxLengthPhone14: El teléfono tiene una longitud máxima de 14 caracteres
-MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
-ValidationPhone: Introduzca un número de teléfono válido
+RequiredName: El nombre es obligatorio
+RequiredPageName: El nombre de la página es obligatorio
+RequiredPageTitle: El título de la página es obligatorio
+RequiredPassword: Se requiere contraseña
+RequiredPhone: Se requiere un número de teléfono
+RequiredPostalCode: Se requiere el código postal
+RequiredStreet: Se requiere la dirección
+RequiredSubject: El sujeto es obligatorio.
+RequiredUserId: Se requiere un ID de usuario
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
@@ -130,13 +151,13 @@ Team: 'Equipo #'
 TransactionId: ID de transacción
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
-ValidPhoneNumber: Introduzca un número de teléfono válido
+ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
 VehicleTypeColon: 'Tipo de vehículo:'
 VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteeridColon: 'Identificación de voluntario:'
 VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
-VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 VolunteerRegistration: Registro de Voluntarios
+VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
 ZipCode: Código postal

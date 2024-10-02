@@ -9,6 +9,7 @@ using AKSoftware.Localization.MultiLanguages;
 using AKSoftware.Localization.MultiLanguages.Blazor;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using BedBrigade.SpeakIt;
 
 
 namespace BedBrigade.Client.Components.Pages
@@ -30,8 +31,6 @@ namespace BedBrigade.Client.Components.Pages
 
         private const string DisplayNone = "none";
         private const string AlertDanger = "alert alert-danger";
-        private const string FormMessage = "Please fill out all the mandatory fields marked with an asterisk (*).";
-        private const string FormNotCompleted = "The Bed Request Form is not completed!";
 
         private string DisplayForm = DisplayNone;
         private string DisplayAddressMessage = DisplayNone;
@@ -73,6 +72,7 @@ namespace BedBrigade.Client.Components.Pages
         };
 
         [Parameter] public string PreloadLocation { get; set; }
+        private ValidationMessageStore _validationMessageStore;
 
         #endregion
         #region Initialization
@@ -82,6 +82,7 @@ namespace BedBrigade.Client.Components.Pages
             _lc.InitLocalizedComponent(this);
             newRequest = new Common.Models.NewBedRequest();
             EC = new EditContext(newRequest);
+            _validationMessageStore = new ValidationMessageStore(EC);
 
             if (!string.IsNullOrEmpty(PreloadLocation))
             {
@@ -142,11 +143,13 @@ namespace BedBrigade.Client.Components.Pages
         private async Task<bool> IsValid()
         {
             ClearValidationMessage();
-            bool formIsValid = EC.Validate();
+            bool formIsValid = true;
+
+            formIsValid = ValidationLocalization.ValidateModel(newRequest, _validationMessageStore, _lc);
 
             if (!formIsValid)
             {
-                ShowValidationMessage(FormNotCompleted);
+                ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
                 return false;
             }
 
@@ -154,14 +157,16 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!isPhoneValid)
             {
-                ShowValidationMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
+                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Phone)), _lc.Keys["ValidPhoneNumber"]);
+                ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
                 return false;
             }
 
             var emailResult = Validation.IsValidEmail(newRequest.Email);
             if (!emailResult.IsValid)
             {
-                ShowValidationMessage(emailResult.UserMessage);
+                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Email)), emailResult.UserMessage);
+                ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
                 return false;
             }
 
@@ -175,7 +180,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!ValidReCAPTCHA)
             {
-                ShowValidationMessage("Please check reCAPTCHA");
+                ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 
@@ -194,6 +199,7 @@ namespace BedBrigade.Client.Components.Pages
         {
             MyValidationMessage = string.Empty;
             MyValidationDisplay = DisplayNone;
+            _validationMessageStore.Clear();
         }
 
         private async Task<string> ValidateZipDistance()
@@ -214,7 +220,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
                 else
                 {
-                    return "No Bed Brigade Near That Zip Code";
+                    return _lc.Keys["NoBedBrigadeNear"];
                 }
             }
             else
