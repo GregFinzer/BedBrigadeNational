@@ -17,6 +17,8 @@ ConfigurationValue: Valor de configuración
 ConfirmPassword: Confirmar contraseña
 ContactInformation: Información de contacto
 ContactMessage: Mensaje de contacto
+ContactUs: Contáctenos
+ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
 DeliveryDate: Fecha de entrega
@@ -77,11 +79,24 @@ Password: Contraseña
 Phone: Teléfono
 PhoneColon: 'Teléfono:'
 PhoneNumber: Número de teléfono
+PleaseCheckRecaptcha: Por favor, marque la casilla de verificación Recaptcha
 PleaseEnterAValid: Ingrese un código postal válido donde vive
 PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
 PostalCode: Código postal
 RegistrationidColon: 'ID de registro:'
+RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
+RequiredFirstName: El nombre de pila es obligatorio
+RequiredLastName: El apellido es obligatorio
+RequiredEmail: Se requiere correo electrónico
+RequiredPhone: Se requiere teléfono
+RequiredMessage: El mensaje es obligatorio
+MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres
+MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
+MaxLengthEmail255: El correo electrónico tiene una longitud máxima de 255 caracteres
+MaxLengthPhone14: El teléfono tiene una longitud máxima de 14 caracteres
+MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
+ValidationPhone: Introduzca un número de teléfono válido
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
@@ -114,11 +129,14 @@ TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
 TransactionId: ID de transacción
 UserName: Nombre de usuario
+ValidEmail: Introduzca una dirección de correo electrónico válida
+ValidPhoneNumber: Introduzca un número de teléfono válido
 VehicleTypeColon: 'Tipo de vehículo:'
 VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteeridColon: 'Identificación de voluntario:'
 VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
+VolunteerRegistration: Registro de Voluntarios
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
 ZipCode: Código postal

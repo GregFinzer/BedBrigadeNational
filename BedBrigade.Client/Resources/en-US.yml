@@ -17,6 +17,8 @@ ConfigurationValue: Configuration Value
 ConfirmPassword: Confirm Password
 ContactInformation: Contact Information
 ContactMessage: Contact Message
+ContactUs: Contact Us
+ContactUsFormNotCompleted: The Contact Us Form is not completed!
 DateColon: 'Date:'
 DeliveryAddress: Delivery Address
 DeliveryDate: Delivery Date
@@ -77,11 +79,24 @@ Password: Password
 Phone: Phone
 PhoneColon: 'Phone:'
 PhoneNumber: Phone Number
+PleaseCheckRecaptcha: Please check the Recaptcha checkbox
 PleaseEnterAValid: Please enter a valid Zip code where you live
 PleaseEnterYourLogin: Please enter your login details
 PostalCode: Postal Code
 RegistrationidColon: 'RegistrationID:'
+RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
+RequiredFirstName: First Name is required
+RequiredLastName: Last Name is required
+RequiredEmail: Email is required
+RequiredPhone: Phone is required
+RequiredMessage: Message is required
+MaxLengthFirstName20: First Name has a maximum length of 20 characters
+MaxLengthLastName25: Last Name has a maximum length of 25 characters
+MaxLengthEmail255: Email has a maximum length of 255 characters
+MaxLengthPhone14: Phone has a maximum length of 14 characters
+MaxLengthMessage4000: Message has a maximum length of 4000 characters
+ValidationPhone: Please enter a valid phone number
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
@@ -114,11 +129,14 @@ TaxFormSent: Tax Form Sent
 Team: 'Team #'
 TransactionId: Transaction ID
 UserName: User Name
+ValidEmail: Please enter a valid email address
+ValidPhoneNumber: Please enter a valid phone number
 VehicleTypeColon: 'Vehicle Type:'
 VolunteerForAnotherEvent: Volunteer for Another Event
 VolunteeridColon: 'VolunteerID:'
 VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
 VolunteersRegisteredneeded: Volunteers registered/needed
+VolunteerRegistration: Volunteer Registration
 YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code
