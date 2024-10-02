@@ -11,7 +11,7 @@ namespace BedBrigade.SpeakIt.Tests
     {
         private CreateLogic _logic = new CreateLogic();
 
-        [Test, Ignore("Unignore to create resource strings")]
+        [Test]
         public void CreateLocalizationStringsTest()
         {
             SpeakItParms parms = new SpeakItParms();

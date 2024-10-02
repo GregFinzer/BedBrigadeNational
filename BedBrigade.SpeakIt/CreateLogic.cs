@@ -22,7 +22,7 @@ namespace BedBrigade.SpeakIt
             List<ParseResult> parseResults = _parseLogic.GetLocalizableStrings(parms);
             ModifyResourceFile(parms, parseResults);
             ModifyRazorFiles(parseResults);
-            ModifyCSharpFiles(parms, parseResults);
+            ModifyRazorCSharpFiles(parms, parseResults);
         }
 
         private void ModifyResourceFile(SpeakItParms parms, List<ParseResult> parseResults)
@@ -33,9 +33,13 @@ namespace BedBrigade.SpeakIt
             }
         }
 
-        private void ModifyCSharpFiles(SpeakItParms parms, List<ParseResult> localizableStrings)
+        private void ModifyRazorCSharpFiles(SpeakItParms parms, List<ParseResult> localizableStrings)
         {
-            var filesToModify = localizableStrings.Select(o => o.FilePath).Distinct().ToList();
+            var filesToModify = localizableStrings
+                .Where(o => Path.GetFileName(o.FilePath).EndsWith(".razor"))
+                .Select(o => o.FilePath)
+                .Distinct().ToList();
+
             foreach (var file in filesToModify)
             {
                 string cSharpFile = file + ".cs";
@@ -63,7 +67,9 @@ namespace BedBrigade.SpeakIt
         private void ModifyRazorFiles(List<ParseResult> parseResults)
         {
             // Order the parseResults by FilePath
-            var orderedResults = parseResults.OrderBy(pr => pr.FilePath).ToList();
+            var orderedResults = parseResults
+                .Where(o => Path.GetFileName(o.FilePath).EndsWith(".razor"))
+                .OrderBy(pr => pr.FilePath).ToList();
 
             string currentFilePath = null;
             string content = null;
