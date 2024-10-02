@@ -23,7 +23,7 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private ILanguageContainerService _lc { get; set; }
 
-        private Common.Models.BedRequest? newRequest;
+        private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
 
         private SearchLocation? SearchLocation;
@@ -80,7 +80,7 @@ namespace BedBrigade.Client.Components.Pages
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
-            newRequest = new Common.Models.BedRequest();
+            newRequest = new Common.Models.NewBedRequest();
             EC = new EditContext(newRequest);
 
             if (!string.IsNullOrEmpty(PreloadLocation))
@@ -295,13 +295,15 @@ namespace BedBrigade.Client.Components.Pages
                 //Set it to the primary city name
                 newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
                 
-                var addResult = await _svcBedRequest.CreateAsync(newRequest);
+                Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
+                ObjectUtil.CopyProperties(newRequest, bedRequest);
+                var addResult = await _svcBedRequest.CreateAsync(bedRequest);
                 if (addResult.Success && addResult.Data != null)
                 {
-                    newRequest = addResult.Data; // added Request
+                    bedRequest = addResult.Data; // added Request
                 }
 
-                if (newRequest != null && newRequest.BedRequestId > 0)
+                if (bedRequest != null && bedRequest.BedRequestId > 0)
                 {
                     //AlertType = "alert alert-success";
                     DisplaySearch = DisplayNone;

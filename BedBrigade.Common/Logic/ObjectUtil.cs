@@ -12,6 +12,7 @@ namespace BedBrigade.Common.Logic
 {
     public static class ObjectUtil
     {
+        private static List<string> _elementsToIgnore;
         public static string ObjectToString<T>(T obj)
         {
             if (obj == null)
@@ -70,6 +71,98 @@ namespace BedBrigade.Common.Logic
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Copy public properties from one object to another of differing types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        public static void CopyProperties<TS, TD>(TS source, TD dest)
+            where TD : class
+            where TS : class
+        {
+            string name = string.Empty;
+
+            if (source == null)
+                throw new ArgumentNullException("source");
+
+            if (dest == null)
+                throw new ArgumentNullException("dest");
+
+            InitElementsToIgnore();
+            Type tsType = typeof(TS);
+            Type tdType = typeof(TD);
+
+            try
+            {
+
+                PropertyInfo[] tsProperties = tsType.GetProperties(); //Default is public instance
+
+                foreach (PropertyInfo tsInfo in tsProperties)
+                {
+                    //If we can't read or write it, skip it
+                    if (!tsInfo.CanRead || !tsInfo.CanWrite)
+                        continue;
+
+                    name = tsInfo.Name;
+
+                    //Skip ignored elements
+                    if (_elementsToIgnore.Contains(name))
+                        continue;
+
+                    Type tsInfoType = tsInfo.PropertyType;
+
+                    if (tsInfoType.IsPrimitive
+                        || tsInfoType.IsEnum
+                        || tsInfoType.IsValueType
+                        || tsInfoType == typeof(DateTime)
+                        || tsInfoType == typeof(decimal)
+                        || tsInfoType == typeof(string)
+                        || tsInfoType == typeof(Guid)
+                        || tsInfoType == typeof(TimeSpan))
+                    {
+                        object value = tsInfo.GetValue(source, null);
+
+                        PropertyInfo[] tdProperties = tdType.GetProperties();
+
+                        foreach (PropertyInfo tdInfo in tdProperties)
+                        {
+                            if (tsInfo.Name == tdInfo.Name)
+                            {
+                                if (value == null)
+                                    tdInfo.SetValue(dest, null, null);
+                                else
+                                    tdInfo.SetValue(dest,
+                                        ConvertUtil.ChangeType(value, tdInfo.PropertyType),
+                                        null);
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format("{0}; Source Type: {1}, Dest Type: {2}, Property: {3}",
+                                           ex.Message, tsType.FullName, tdType.FullName, name);
+                throw new Exception(msg);
+
+            }
+
+        }
+
+        private static void InitElementsToIgnore()
+        {
+            if (_elementsToIgnore == null)
+            {
+                _elementsToIgnore = new List<string>();
+                _elementsToIgnore.Add("IsDirty");
+                _elementsToIgnore.Add("IsNew");
+            }
         }
     }
 }

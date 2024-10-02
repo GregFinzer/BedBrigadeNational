@@ -4,7 +4,7 @@ namespace BedBrigade.SpeakIt.Tests
 {
     public class ParseTests
     {
-        private SpeakItLogic _logic = new SpeakItLogic();
+        private ParseLogic _logic = new ParseLogic();
 
         [Test]
         public void ParseSpan()
@@ -14,7 +14,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "No images were found";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -29,7 +29,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "donate today";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -44,7 +44,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "donate today";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -59,7 +59,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "New Pillows";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -74,7 +74,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "Menu";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -89,7 +89,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "Our Mission";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -104,7 +104,7 @@ namespace BedBrigade.SpeakIt.Tests
                 @"<p style=""text-align: center;""><br></p><p style=""text-align: center;""><a href=""https://www.stjohnsgc.org/""><img src=""/media/grove-city/pages/Partners/StJohnsChurch.png""></a></p>";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(0, result.Count);
@@ -118,7 +118,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -136,7 +136,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "Bedding";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -152,7 +152,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "2024 – Bed Brigade. All rights reserved.";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -169,7 +169,7 @@ namespace BedBrigade.SpeakIt.Tests
             string expected = "Save Donation";
 
             //Act
-            var result = _logic.GetLocalizableStringsInHtml(html);
+            var result = _logic.GetLocalizableStringsInText(html);
 
             //Assert
             Assert.AreEqual(1, result.Count);
@@ -184,9 +184,9 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            ParseParms parms = new ParseParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
-            parms.WildcardPattern= "*.razor";
+            SpeakItParms parms = new SpeakItParms();
+            parms.SourceDirectories = TestHelper.GetSourceDirectories();
+            parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
             var result = _logic.GetLocalizableStrings(parms);
@@ -212,9 +212,10 @@ namespace BedBrigade.SpeakIt.Tests
                 Assert.Ignore("This test is not supported in GitHub Actions");
             }
 
-            ParseParms parms = new ParseParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml");
-            parms.WildcardPattern = "*.html";
+            SpeakItParms parms = new SpeakItParms();
+            string htmlDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml");
+            parms.SourceDirectories = new List<string>() { htmlDirectory };
+            parms.WildcardPatterns = new List<string>() { "*.html" };
             var result = _logic.GetLocalizableStrings(parms);
             string outputFileName = "HtmlFiles.txt";
 

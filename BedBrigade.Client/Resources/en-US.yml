@@ -88,15 +88,14 @@ RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
 RequiredFirstName: First Name is required
 RequiredLastName: Last Name is required
-RequiredEmail: Email is required
-RequiredPhone: Phone is required
+RequiredEmail: Email Address is required
+RequiredPhone: Phone Number is required
 RequiredMessage: Message is required
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
-MaxLengthEmail255: Email has a maximum length of 255 characters
-MaxLengthPhone14: Phone has a maximum length of 14 characters
+MaxLengthEmail255: Email Address has a maximum length of 255 characters
+MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
-ValidationPhone: Please enter a valid phone number
 ReturnToHome: Return to Home
 Role: Role
 Route: Route

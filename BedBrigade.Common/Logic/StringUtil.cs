@@ -236,6 +236,32 @@ namespace BedBrigade.Common.Logic
 
             return new string(input.Where(char.IsDigit).ToArray());
         }
+
+        /// <summary>
+        /// Removes currency characters from a string like $, and spaces using the current culture
+        /// </summary>
+        /// <param name="currency">Currency string to parse</param>
+        /// <returns>Pure currency with no formatting</returns>
+        public static string RemoveCurrency(string currency)
+        {
+            string mask = @"\s|[$]";
+            string symbol = Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencySymbol.ToString();
+
+            //Get the dollar sign for the current culture
+            if (symbol.Length > 0)
+            {
+                mask = mask.Replace("$", symbol);
+            }
+
+            currency = Regex.Replace(currency, mask, "");
+
+            if (currency.StartsWith("(") && currency.EndsWith(")") && currency.Length > 2)
+            {
+                currency = "-" + currency.Substring(1, currency.Length - 2);
+            }
+
+            return currency.Trim();
+        }
     } // class
 
 

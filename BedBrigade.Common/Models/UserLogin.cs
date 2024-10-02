@@ -4,7 +4,7 @@ namespace BedBrigade.Common.Models
 {
     public class UserLogin
     {
-        [Required]
+        [Required(ErrorMessage = "Email Address is required")]
         public string Email { get; set; } = string.Empty;
 
         [Required]
