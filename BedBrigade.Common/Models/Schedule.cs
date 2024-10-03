@@ -36,13 +36,8 @@ namespace BedBrigade.Common.Models
         public int VolunteersRegistered { get; set; } = 0;
         public int DeliveryVehiclesRegistered { get; set; } = 0;
 
-        public string EventSelect
-        {
-            get
-            {
-                return $"{EventName}: {EventDateScheduled.ToShortDateString()}, {EventDateScheduled.ToShortTimeString()}";
-            }
-        }
+        [NotMapped]
+        public string EventSelect { get; set; }
     }
 }
 

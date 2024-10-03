@@ -31,6 +31,42 @@ DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress
 DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationDate: Donation Date
+DynamicBed: Bed
+DynamicBuild: Build
+DynamicCut: Cut
+DynamicDelivery: Delivery
+DynamicOther: Other
+DynamicJanuary: January
+DynamicFebruary: February
+DynamicMarch: March
+DynamicApril: April
+DynamicMay: May
+DynamicJune: June
+DynamicJuly: July
+DynamicAugust: August
+DynamicSeptember: September
+DynamicOctober: October
+DynamicNovember: November
+DynamicDecember: December
+DynamicSunday: Sunday
+DynamicMonday: Monday
+DynamicTuesday: Tuesday
+DynamicWednesday: Wednesday
+DynamicThursday: Thursday
+DynamicFriday: Friday
+DynamicSaturday: Saturday
+DynamicJanuaryBedBuild: January Bed Build
+DynamicFebruaryBedBuild: February Bed Build
+DynamicMarchBedBuild: March Bed Build
+DynamicAprilBedBuild: April Bed Build
+DynamicMayBedBuild: May Bed Build
+DynamicJuneBedBuild: June Bed Build
+DynamicJulyBedBuild: July Bed Build
+DynamicAugustBedBuild: August Bed Build
+DynamicSeptemberBedBuild: September Bed Build
+DynamicOctoberBedBuild: October Bed Build
+DynamicNovemberBedBuild: November Bed Build
+DynamicDecemberBedBuild: December Bed Build
 Email: Email
 EmailColon: 'Email:'
 English: English

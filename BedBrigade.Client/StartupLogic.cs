@@ -15,6 +15,7 @@ using BedBrigade.Common.Constants;
 using AKSoftware.Localization.MultiLanguages.Providers;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
+using BedBrigade.SpeakIt;
 
 namespace BedBrigade.Client
 {
@@ -149,6 +150,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IUserPersistDataService, UserPersistDataService>();
             builder.Services.AddScoped<IDeliverySheetService, DeliverySheetService>();
             builder.Services.AddScoped<IMigrationDataService, MigrationDataService>();
+            builder.Services.AddScoped<ITranslateLogic, TranslateLogic>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

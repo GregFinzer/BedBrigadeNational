@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using BedBrigade.SpeakIt;
+using AKSoftware.Localization.MultiLanguages;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace BedBrigade.Client.Services
+namespace BedBrigade.SpeakIt
 {
     public static class ValidationLocalization
     {

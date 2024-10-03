@@ -122,7 +122,8 @@ namespace BedBrigade.SpeakIt
             foreach (var parseResult in parseResults)
             {
                 if ((parseResult.Key.StartsWith(SpeakItGlobals.RequiredPrefix)
-                    || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix))
+                    || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix)
+                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix))
                     && !existingKeyValues.ContainsKey(parseResult.Key))
                 {
                     result.Add(parseResult);
@@ -356,9 +357,11 @@ namespace BedBrigade.SpeakIt
             // Read existing keys from the YAML file
             var existingKeys = ReadYamlFile(parms.ResourceFilePath).Keys.ToList();
 
-            //Exclude Required and MaxLength because those are used dynamically in ValidationLocalization
+            //Exclude Required, MaxLength, Dynamic because those are used dynamically in ValidationLocalization
             existingKeys = existingKeys.Where(k => !k.StartsWith(SpeakItGlobals.RequiredPrefix)
-                                                   && !k.StartsWith(SpeakItGlobals.MaxLengthPrefix)).ToList();
+                                                   && !k.StartsWith(SpeakItGlobals.MaxLengthPrefix)
+                                                   && !k.StartsWith(SpeakItGlobals.DynamicPrefix)
+                                                   ).ToList();
 
             // Get localizable strings to find keys in use
             var parseResults = GetExistingLocalizedStrings(parms);
