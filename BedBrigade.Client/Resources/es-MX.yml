@@ -31,6 +31,42 @@ DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y u
 DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
 DonationDate: Fecha de donación
+DynamicBed: Cama
+DynamicBuild: Construir
+DynamicCut: Cortar
+DynamicDelivery: Entrega
+DynamicOther: Otro
+DynamicJanuary: Enero
+DynamicFebruary: Febrero
+DynamicMarch: Marzo
+DynamicApril: Abril
+DynamicMay: Mayo
+DynamicJune: Junio
+DynamicJuly: Julio
+DynamicAugust: Agosto
+DynamicSeptember: Septiembre
+DynamicOctober: Octubre
+DynamicNovember: Noviembre
+DynamicDecember: Diciembre
+DynamicSunday: Domingo
+DynamicMonday: Lunes
+DynamicTuesday: Martes
+DynamicWednesday: Miércoles
+DynamicThursday: Jueves
+DynamicFriday: Viernes
+DynamicSaturday: Sábado
+DynamicJanuaryBedBuild: Construcción de camas de enero
+DynamicFebruaryBedBuild: Construcción de camas de febrero
+DynamicMarchBedBuild: Construcción de cama de marzo
+DynamicAprilBedBuild: Construcción de camas de abril
+DynamicMayBedBuild: Construcción de camas de mayo
+DynamicJuneBedBuild: Construcción de cama de junio
+DynamicJulyBedBuild: Construcción de camas de julio
+DynamicAugustBedBuild: Construcción de cama de agosto
+DynamicSeptemberBedBuild: Construcción de camas en septiembre
+DynamicOctoberBedBuild: Construcción de camas de octubre
+DynamicNovemberBedBuild: Construcción de camas de noviembre
+DynamicDecemberBedBuild: Construcción de camas de diciembre
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 English: Inglés

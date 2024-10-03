@@ -207,7 +207,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
                 locationDistance.Name = loc.IsActive ? loc.Name : $"*{loc.Name}";
                 locationDistance.Route = loc.Route;
                 locationDistance.Distance = distance;
-                locationDistance.MilesAwayString = BuildMilesAwayString(locationDistance);
+                FillMilesAway(locationDistance);
                 result.Add(locationDistance);
             }                           
         }
@@ -215,14 +215,23 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         return result;
     }
 
-    private string BuildMilesAwayString(LocationDistance locationDistance)
+    private void FillMilesAway(LocationDistance locationDistance)
     {
         if (locationDistance.Distance == 0)
         {
-            return _lc.Keys["IsInYourZipCode"];
+            locationDistance.MilesAwayString =  _lc.Keys["IsInYourZipCode"];
         }
 
-        return Math.Round(locationDistance.Distance, 1).ToString("0.0") + " " + _lc.Keys["MilesAway"];
+        string translation = _lc.Keys["MilesAway"];
+
+        if (translation != null && translation.ToLower() == "km")
+        {
+            locationDistance.MilesAwayString = Math.Round(locationDistance.Distance * 1.60934, 1).ToString("0.0") + " km";
+        }
+        else
+        {
+            locationDistance.MilesAwayString = Math.Round(locationDistance.Distance, 1).ToString("0.0") + " " + _lc.Keys["MilesAway"];
+        }
     }
 
     public async Task<ServiceResponse<List<Location>>> GetLocationsByMetroAreaId(int metroAreaId)
