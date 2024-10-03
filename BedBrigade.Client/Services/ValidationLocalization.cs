@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using AKSoftware.Localization.MultiLanguages;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace BedBrigade.SpeakIt
+namespace BedBrigade.Client.Services
 {
     public static class ValidationLocalization
     {
-        public static string RequiredPrefix { get; set; } = "Required";
-        public static string MaxLengthPrefix { get; set; } = "MaxLength";
+
 
         public static bool ValidateModel<T>(T model, ValidationMessageStore validationMessageStore, ILanguageContainerService lc)  where T : class, new()
         {
@@ -45,7 +44,7 @@ namespace BedBrigade.SpeakIt
 
             if (property.GetValue(model) != null && property.GetValue(model).ToString().Length > maxLengthAttribute.Length)
             {
-                string languageKey = $"{MaxLengthPrefix}{property.Name}{maxLengthAttribute.Length}";
+                string languageKey = $"{SpeakItGlobals.MaxLengthPrefix}{property.Name}{maxLengthAttribute.Length}";
                 string translation = lc.Keys[languageKey];
 
                 if (!string.IsNullOrEmpty(translation))
@@ -76,7 +75,7 @@ namespace BedBrigade.SpeakIt
             if (property.GetValue(model) == null 
                 ||  string.IsNullOrWhiteSpace(property.GetValue(model).ToString()))
             {
-                string languageKey = $"{RequiredPrefix}{property.Name}";
+                string languageKey = $"{SpeakItGlobals.RequiredPrefix}{property.Name}";
                 string translation = lc.Keys[languageKey];
 
                 if (!string.IsNullOrEmpty(translation))

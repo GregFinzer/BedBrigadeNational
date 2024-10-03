@@ -121,8 +121,8 @@ namespace BedBrigade.SpeakIt
 
             foreach (var parseResult in parseResults)
             {
-                if ((parseResult.Key.StartsWith(ValidationLocalization.RequiredPrefix)
-                    || parseResult.Key.StartsWith(ValidationLocalization.MaxLengthPrefix))
+                if ((parseResult.Key.StartsWith(SpeakItGlobals.RequiredPrefix)
+                    || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix))
                     && !existingKeyValues.ContainsKey(parseResult.Key))
                 {
                     result.Add(parseResult);
@@ -157,7 +157,7 @@ namespace BedBrigade.SpeakIt
                     MatchingExpression = _maxLengthAttributeWithMessageRegex,
                     FilePath = string.Empty,
                     MatchValue = match.Value,
-                    Key = $"{ValidationLocalization.MaxLengthPrefix}{propertyName}{maxLength}"
+                    Key = $"{SpeakItGlobals.MaxLengthPrefix}{propertyName}{maxLength}"
                 });
             }
 
@@ -189,7 +189,7 @@ namespace BedBrigade.SpeakIt
                     MatchingExpression = _maxLengthAttributeRegex,
                     FilePath = string.Empty,
                     MatchValue = match.Value,
-                    Key = $"{ValidationLocalization.MaxLengthPrefix}{propertyName}{maxLength}"
+                    Key = $"{SpeakItGlobals.MaxLengthPrefix}{propertyName}{maxLength}"
                 });
             }
 
@@ -220,7 +220,7 @@ namespace BedBrigade.SpeakIt
                     MatchingExpression = _requiredAttributeWithMessageRegex,
                     FilePath = string.Empty,
                     MatchValue = match.Value,
-                    Key = $"{ValidationLocalization.RequiredPrefix}{propertyName}"
+                    Key = $"{SpeakItGlobals.RequiredPrefix}{propertyName}"
                 });
             }
 
@@ -252,7 +252,7 @@ namespace BedBrigade.SpeakIt
                     MatchingExpression = _requiredAttributeWithMessageRegex,
                     FilePath = string.Empty,
                     MatchValue = match.Value,
-                    Key = $"{ValidationLocalization.RequiredPrefix}{propertyName}"
+                    Key = $"{SpeakItGlobals.RequiredPrefix}{propertyName}"
                 });
             }
 
@@ -357,8 +357,8 @@ namespace BedBrigade.SpeakIt
             var existingKeys = ReadYamlFile(parms.ResourceFilePath).Keys.ToList();
 
             //Exclude Required and MaxLength because those are used dynamically in ValidationLocalization
-            existingKeys = existingKeys.Where(k => !k.StartsWith(ValidationLocalization.RequiredPrefix)
-                                                   && !k.StartsWith(ValidationLocalization.MaxLengthPrefix)).ToList();
+            existingKeys = existingKeys.Where(k => !k.StartsWith(SpeakItGlobals.RequiredPrefix)
+                                                   && !k.StartsWith(SpeakItGlobals.MaxLengthPrefix)).ToList();
 
             // Get localizable strings to find keys in use
             var parseResults = GetExistingLocalizedStrings(parms);

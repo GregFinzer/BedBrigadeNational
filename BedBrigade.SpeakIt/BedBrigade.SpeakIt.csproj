@@ -15,10 +15,4 @@
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Components.Forms">
-      <HintPath>..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.8\Microsoft.AspNetCore.Components.Forms.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

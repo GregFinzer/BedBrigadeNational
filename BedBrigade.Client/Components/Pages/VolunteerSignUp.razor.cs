@@ -12,6 +12,7 @@ using Azure;
 using BedBrigade.Common.Models;
 using System.Net;
 using BedBrigade.SpeakIt;
+using ValidationLocalization = BedBrigade.Client.Services.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {

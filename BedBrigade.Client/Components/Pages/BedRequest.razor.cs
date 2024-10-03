@@ -10,6 +10,7 @@ using AKSoftware.Localization.MultiLanguages.Blazor;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using BedBrigade.SpeakIt;
+using ValidationLocalization = BedBrigade.Client.Services.ValidationLocalization;
 
 
 namespace BedBrigade.Client.Components.Pages

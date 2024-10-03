@@ -10,6 +10,7 @@ using System.Diagnostics;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Edit;
 using BedBrigade.SpeakIt;
+using ValidationLocalization = BedBrigade.Client.Services.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
