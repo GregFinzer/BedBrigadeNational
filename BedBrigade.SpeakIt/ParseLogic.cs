@@ -4,18 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using OfficeOpenXml.Drawing;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
 
 namespace BedBrigade.SpeakIt
 {
     public class ParseLogic
     {
         private const string ReplacementMarker = "~~~";
-        private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"\\]", RegexOptions.Compiled | RegexOptions.Multiline);
+        private const string StringType = "string";
+        private const string PropertyTypeGroup = "propertyType";
+        private const string ContentGroup = "content";
+        //We intentionally do not end with a ] because of other parameters that may be in the string
+        private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"", RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _propertyRegex =
             new Regex(@"public\s+(?<propertyType>[^\s\?]+\??)\s+(?<content>\w+)\s*{\s*get;\s*set;\s*}",
@@ -139,15 +140,15 @@ namespace BedBrigade.SpeakIt
 
             foreach (Match match in matches)
             {
-                string errorMessage = match.Groups["content"].Value;
+                string errorMessage = match.Groups[ContentGroup].Value;
                 string maxLength = match.Groups["maxLength"].Value;
                 int index = text.IndexOf(match.Value);
                 Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups["content"].Value;
-                string propertyType = propertyStringMatch.Groups["propertyType"].Value;
+                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
+                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
 
                 //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith("string"))
+                if (!propertyType.ToLower().StartsWith(StringType))
                     continue;
 
                 result.Add(new ParseResult
@@ -174,11 +175,11 @@ namespace BedBrigade.SpeakIt
                 string maxLength = match.Groups["maxLength"].Value;
                 int index = text.IndexOf(match.Value);
                 Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups["content"].Value;
-                string propertyType = propertyStringMatch.Groups["propertyType"].Value;
+                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
+                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
 
                 //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith("string"))
+                if (!propertyType.ToLower().StartsWith(StringType))
                     continue;
 
                 string errorMessage = $"{StringUtil.InsertSpaces(propertyName)} has a maximum length of {maxLength} characters";
@@ -203,14 +204,14 @@ namespace BedBrigade.SpeakIt
 
             foreach (Match match in matches)
             {
-                string errorMessage = match.Groups["content"].Value;
+                string errorMessage = match.Groups[ContentGroup].Value;
                 int index = text.IndexOf(match.Value);
                 Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups["content"].Value;
-                string propertyType = propertyStringMatch.Groups["propertyType"].Value;
+                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
+                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
 
                 //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith("string"))
+                if (!propertyType.ToLower().StartsWith(StringType))
                     continue;
 
                 result.Add(new ParseResult
@@ -236,11 +237,11 @@ namespace BedBrigade.SpeakIt
             {
                 int index = text.IndexOf(match.Value);
                 Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups["content"].Value;
-                string propertyType = propertyStringMatch.Groups["propertyType"].Value;
+                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
+                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
 
                 //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith("string"))
+                if (!propertyType.ToLower().StartsWith(StringType))
                     continue;
 
                 string errorMessage = $"{StringUtil.InsertSpaces(propertyName)} is required";
@@ -267,7 +268,7 @@ namespace BedBrigade.SpeakIt
                 MatchCollection matches = pattern.Matches(text);
                 foreach (Match match in matches)
                 {
-                    string content = match.Groups["content"].Value;
+                    string content = match.Groups[ContentGroup].Value;
                     content = RemovePatterns(content);
                     AddParseResult(pattern, match, result, content);
                 }
@@ -292,7 +293,7 @@ namespace BedBrigade.SpeakIt
             MatchCollection matches = _keyReferenceRegex.Matches(html);
             foreach (Match match in matches)
             {
-                string existingKey = match.Groups["content"].Value;
+                string existingKey = match.Groups[ContentGroup].Value;
                 string existingValue =
                     existingKeyValues.ContainsKey(existingKey) ? existingKeyValues[existingKey] : null;
 

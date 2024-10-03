@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AKSoftware.Localization.MultiLanguages;
+using Microsoft.EntityFrameworkCore;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
@@ -15,18 +16,21 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     private readonly IAuthService _authService;
     private readonly IConfigurationDataService _configurationDataService;
     private readonly IContentDataService _contentDataService;
+    private readonly ILanguageContainerService _lc;
 
     public LocationDataService(IDbContextFactory<DataContext> contextFactory,
         ICachingService cachingService,
         IAuthService authService,
         IConfigurationDataService configurationDataService,
-        IContentDataService contentDataService) : base(contextFactory, cachingService, authService)
+        IContentDataService contentDataService,
+        ILanguageContainerService languageContainerService) : base(contextFactory, cachingService, authService)
     {
         _cachingService = cachingService;
         _configurationDataService = configurationDataService;
         _contentDataService = contentDataService;
         _contextFactory = contextFactory;
         _authService = authService;
+        _lc = languageContainerService;
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -146,14 +150,14 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
         if (!parser.IsValidZipCode(postalCode))
         {
-            return new ServiceResponse<List<LocationDistance>>($"Invalid postal code {postalCode}");
+            return new ServiceResponse<List<LocationDistance>>(_lc.Keys["InvalidPostalCode"] + " " + postalCode);
         }
 
         var zipCodeInfo = parser.GetInfoForZipCode(postalCode);
         
         if (zipCodeInfo.Latitude == null || zipCodeInfo.Longitude == null)
         {
-            return new ServiceResponse<List<LocationDistance>>($"Postal code {postalCode} is a military or PO Box and cannot be used");
+            return new ServiceResponse<List<LocationDistance>>(_lc.Keys["PostalCodeIsMilitary"] + " " + postalCode);
         }
 
         int maxMiles;
@@ -164,7 +168,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         }
         else
         {
-            return new ServiceResponse<List<LocationDistance>>($"BedBrigadeNearMeMaxMiles is not set or is not an integer");
+            return new ServiceResponse<List<LocationDistance>>(_lc.Keys["BedBrigadeNearMeMaxMiles"]);
         }
 
         var locationsResult = await GetAllAsync();
@@ -172,34 +176,53 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
         if (!anyPostalCodes)
         {
-            return new ServiceResponse<List<LocationDistance>>($"No locations have postal codes");
+            return new ServiceResponse<List<LocationDistance>>(_lc.Keys["NoLocationsHavePostalCodes"]);
         }
 
 
         var availableLocations = GetAvailableLocations(locationsResult.Data.ToList());
 
+        var result = BuildLocationDistanceResult(postalCode, availableLocations, parser, maxMiles);
+
+        if (result.Count == 0)
+        {
+            string message = _lc.Keys["NoLocationsFoundWithin",new {maxMiles = maxMiles.ToString(), postalCode = postalCode }];
+            return new ServiceResponse<List<LocationDistance>>(message, true, result);
+        }
+
+        string foundMessage = _lc.Keys["FoundLocationsWithin", new { count = result.Count.ToString(), maxMiles = maxMiles.ToString(), postalCode = postalCode }];
+        return new ServiceResponse<List<LocationDistance>>(foundMessage, true, result);
+    }
+
+    private List<LocationDistance> BuildLocationDistanceResult(string postalCode, List<Location> availableLocations, AddressParser parser, int maxMiles)
+    {
         var result = new List<LocationDistance>();
         foreach (var loc in availableLocations) // locationsResult.Data
         {
             var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
-                    if (distance < maxMiles)
-                    {
-                        LocationDistance locationDistance = new LocationDistance();
-                        locationDistance.LocationId = loc.LocationId;
-                        locationDistance.Name = loc.IsActive ? loc.Name : $"*{loc.Name}";
-                        locationDistance.Route = loc.Route;
-                        locationDistance.Distance = distance;
-                        result.Add(locationDistance);
-                    }                           
+            if (distance < maxMiles)
+            {
+                LocationDistance locationDistance = new LocationDistance();
+                locationDistance.LocationId = loc.LocationId;
+                locationDistance.Name = loc.IsActive ? loc.Name : $"*{loc.Name}";
+                locationDistance.Route = loc.Route;
+                locationDistance.Distance = distance;
+                locationDistance.MilesAwayString = BuildMilesAwayString(locationDistance);
+                result.Add(locationDistance);
+            }                           
         }
         result = result.OrderBy(r => r.Distance).ToList();
+        return result;
+    }
 
-        if (result.Count == 0)
+    private string BuildMilesAwayString(LocationDistance locationDistance)
+    {
+        if (locationDistance.Distance == 0)
         {
-            return new ServiceResponse<List<LocationDistance>>($"No locations found within {maxMiles} miles of {postalCode}", true, result);
+            return _lc.Keys["IsInYourZipCode"];
         }
 
-        return new ServiceResponse<List<LocationDistance>>($"Found {result.Count} locations within {maxMiles} miles of {postalCode}", true, result);
+        return Math.Round(locationDistance.Distance, 1).ToString("0.0") + " " + _lc.Keys["MilesAway"];
     }
 
     public async Task<ServiceResponse<List<Location>>> GetLocationsByMetroAreaId(int metroAreaId)

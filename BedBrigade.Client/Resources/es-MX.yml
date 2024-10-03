@@ -5,6 +5,7 @@ AgesGender: Edades / Género
 AgesGenders: Edades Géneros
 Amount: Importe
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
+BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
 BedBrigadeWeb: Cama Brigade Web
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
@@ -45,11 +46,14 @@ EventType: Tipo de evento
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FindABedBrigade: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
+FoundLocationsWithin: Se han encontrado {count} ubicaciones dentro de {maxMiles} millas de {postalCode}
 FolderColon: 'Carpeta:'
 FutureScheduled: Futuro programado
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
+InvalidPostalCode: Código postal no válido
+IsInYourZipCode: está en su código postal
 LastName: Apellido
 Latitude: Latitud
 Loading: Carga....
@@ -77,12 +81,15 @@ MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MediaFileManager: Administrador de archivos multimedia
 Message: Mensaje
+MilesAway: Km
 Name: Nombre
 NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
+NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
+NoLocationsHavePostalCodes: Ninguna ubicación tiene códigos postales
 Notes: Notas
 NothingToSend: Nada que enviar
 NotSent: No enviado
@@ -97,7 +104,9 @@ PhoneNumber: Número de teléfono
 PleaseCheckRecaptcha: Por favor, marque la casilla de verificación Recaptcha
 PleaseEnterAValid: Ingrese un código postal válido donde vive
 PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
+PleaseSelectAnEvent: Por favor, seleccione un evento
 PostalCode: Código postal
+PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
 RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
@@ -159,5 +168,6 @@ VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
+VolunteerFormNotCompleted: ¡El Formulario de Voluntariado no está completo!
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
 ZipCode: Código postal

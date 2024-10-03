@@ -5,6 +5,7 @@ AgesGender: Ages / Gender
 AgesGenders: Ages Genders
 Amount: Amount
 BedBrigadeLocationEvents: Bed Brigade Location Events
+BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
 BedBrigadeWeb: Bed Brigade Web
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
@@ -45,11 +46,14 @@ EventType: Event Type
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FindABedBrigade: Find a Bed Brigade Near Me
 FirstName: First Name
+FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FolderColon: 'Folder:'
 FutureScheduled: Future Scheduled
 GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
+InvalidPostalCode: Invalid postal code
+IsInYourZipCode: is in your Zip Code
 LastName: Last Name
 Latitude: Latitude
 Loading: Loading....
@@ -77,12 +81,15 @@ MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet40: Street Address has a maximum length of 40 characters
 MediaFileManager: Media File Manager
 Message: Message
+MilesAway: miles away
 Name: Name
 NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
+NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
+NoLocationsHavePostalCodes: No locations have postal codes
 Notes: Notes
 NothingToSend: Nothing to send
 NotSent: Not Sent
@@ -97,7 +104,9 @@ PhoneNumber: Phone Number
 PleaseCheckRecaptcha: Please check the Recaptcha checkbox
 PleaseEnterAValid: Please enter a valid Zip code where you live
 PleaseEnterYourLogin: Please enter your login details
+PleaseSelectAnEvent: Please select an event
 PostalCode: Postal Code
+PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
 RegistrationidColon: 'RegistrationID:'
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
@@ -159,5 +168,6 @@ VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
 VolunteerRegistration: Volunteer Registration
 VolunteersRegisteredneeded: Volunteers registered/needed
+VolunteerFormNotCompleted: The Volunteer Form is not completed!
 YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code

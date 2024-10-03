@@ -14,7 +14,8 @@ namespace BedBrigade.SpeakIt.Tests
             string solutionPath = TestHelper.GetSolutionPath();
             string componentsPath = Path.Combine(solutionPath, "BedBrigade.Client", "Components");
             string modelPath = Path.Combine(solutionPath, "BedBrigade.Common", "Models");
-            return new List<string>() { componentsPath, modelPath };
+            string servicesPath = Path.Combine(solutionPath, "BedBrigade.Data", "Services");
+            return new List<string>() { componentsPath, modelPath, servicesPath };
         }
 
         /// <summary>

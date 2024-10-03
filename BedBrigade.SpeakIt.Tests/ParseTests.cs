@@ -189,6 +189,7 @@ namespace BedBrigade.SpeakIt.Tests
             parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
+            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
             var result = _logic.GetLocalizableStrings(parms);
             string outputFileName = "RazorFiles.txt";
 
@@ -216,6 +217,7 @@ namespace BedBrigade.SpeakIt.Tests
             string htmlDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml");
             parms.SourceDirectories = new List<string>() { htmlDirectory };
             parms.WildcardPatterns = new List<string>() { "*.html" };
+            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
             var result = _logic.GetLocalizableStrings(parms);
             string outputFileName = "HtmlFiles.txt";
 
