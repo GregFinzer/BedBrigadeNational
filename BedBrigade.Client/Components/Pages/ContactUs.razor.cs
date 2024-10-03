@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using System.Diagnostics;
 using BedBrigade.Common.Models;
+using BedBrigade.Client.Components.Pages.Administration.Edit;
+using BedBrigade.SpeakIt;
+using ValidationLocalization = BedBrigade.Client.Services.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -29,8 +32,6 @@ namespace BedBrigade.Client.Components.Pages
 
         private const string DisplayNone = "none";
         private const string AlertDanger = "alert alert-danger";
-        private const string FormMessage = "Please fill out all the mandatory fields marked with an asterisk (*).";
-        private const string FormNotCompleted = "The Contact Us Form is not completed!";
 
         private string DisplayForm = DisplayNone;
         private string DisplayAddressMessage = DisplayNone;
@@ -74,15 +75,18 @@ namespace BedBrigade.Client.Components.Pages
         };
 
         [Parameter] public string PreloadLocation { get; set; }
+
+        private ValidationMessageStore _validationMessageStore;
         #endregion
         #region Initialization
 
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
+            
             newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
-
+            _validationMessageStore = new ValidationMessageStore(EC);
             if (!string.IsNullOrEmpty(PreloadLocation))
             {
                 _locationQueryParm = PreloadLocation;
@@ -126,6 +130,7 @@ namespace BedBrigade.Client.Components.Pages
         {
             MyValidationMessage = string.Empty;
             MyValidationDisplay = DisplayNone;
+            _validationMessageStore.Clear();
         }
 
         private void ShowValidationMessage(string message)
@@ -137,11 +142,15 @@ namespace BedBrigade.Client.Components.Pages
         private bool IsValid()
         {
             ClearValidationMessage();
-            bool formIsValid = EC.Validate();
+            bool isValid = true;
+            
+            
+            isValid = ValidationLocalization.ValidateModel(newRequest, _validationMessageStore, _lc);
 
-            if (!formIsValid)
+            if (!isValid)
             {
-                ShowValidationMessage(FormNotCompleted);
+                EC.NotifyValidationStateChanged();
+                ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
                 return false;
             }
 
@@ -149,20 +158,22 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!isPhoneValid)
             {
-                ShowValidationMessage("Please enter a valid phone number.");
+                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Phone)), _lc.Keys["ValidPhoneNumber"]);
+                ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
                 return false;
             }
 
             var emailResult = Validation.IsValidEmail(newRequest.Email);
             if (!emailResult.IsValid)
             {
-                ShowValidationMessage(emailResult.UserMessage);
+                _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Email)), emailResult.UserMessage);
+                ShowValidationMessage(_lc.Keys["ValidEmail"]);
                 return false;
             }
 
             if (!ValidReCAPTCHA)
             {
-                ShowValidationMessage("Please check reCAPTCHA");
+                ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 

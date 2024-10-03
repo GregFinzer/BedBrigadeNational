@@ -11,27 +11,29 @@ namespace BedBrigade.SpeakIt.Tests
     [TestFixture]
     public class VerifyLocalization
     {
-        private SpeakItLogic _logic = new SpeakItLogic();
+        private ParseLogic _logic = new ParseLogic();
 
         /// <summary>
-        /// If this test is failing it means that there are new strings in your razor file that need to be localized.
+        /// If this test is failing it means that there are new strings in your razor file or in your model file Required Attribute that need to be localized.
         /// Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md
         /// </summary>
         [Test]
-        public void VerifyAllRazorFilesAreLocalized()
+        public void VerifyAllSourceCodeFilesAreLocalized()
         {
-            ParseParms parms = new ParseParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
-            parms.WildcardPattern = "*.razor";
+            SpeakItParms parms = new SpeakItParms();
+            parms.SourceDirectories = TestHelper.GetSourceDirectories();
+            parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
+            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
+
             var result = _logic.GetLocalizableStrings(parms);
 
             if (result.Any())
             {
                 if (TestHelper.IsRunningUnderGitHubActions())
                 {
-                    Assert.Fail("VerifyAllRazorFilesAreLocalized failed. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                    Assert.Fail("VerifyAllSourceCodeFilesAreLocalized failed. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
                 }
                 else
                 {
@@ -42,7 +44,7 @@ namespace BedBrigade.SpeakIt.Tests
                     }
                     File.WriteAllText("RazorFiles.txt", sb.ToString());
                     TestHelper.Shell("RazorFiles.txt", string.Empty, ProcessWindowStyle.Maximized, false);
-                    Assert.Fail("VerifyAllRazorFilesAreLocalized failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                    Assert.Fail("VerifyAllSourceCodeFilesAreLocalized failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
                 }
             }
         }
@@ -55,11 +57,13 @@ namespace BedBrigade.SpeakIt.Tests
         [Test]
         public void VerifyDuplicateKeys()
         {
-            ParseParms parms = new ParseParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
-            parms.WildcardPattern = "*.razor";
+            SpeakItParms parms = new SpeakItParms();
+            parms.SourceDirectories = TestHelper.GetSourceDirectories();
+            parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
+            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
+
             var failedKeys = _logic.GetDuplicateValues(parms);
 
             if (failedKeys.Any())
@@ -100,9 +104,9 @@ namespace BedBrigade.SpeakIt.Tests
         [Test]
         public void VerifyAllKeysCanBeFound()
         {
-            CreateParms parms = new CreateParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
-            parms.WildcardPattern = "*.razor";
+            SpeakItParms parms = new SpeakItParms();
+            parms.SourceDirectories = TestHelper.GetSourceDirectories();
+            parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
             parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
@@ -137,9 +141,9 @@ namespace BedBrigade.SpeakIt.Tests
         [Test]
         public void VerifyNoUnusedKeys()
         {
-            CreateParms parms = new CreateParms();
-            parms.TargetDirectory = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Components");
-            parms.WildcardPattern = "*.razor";
+            SpeakItParms parms = new SpeakItParms();
+            parms.SourceDirectories = TestHelper.GetSourceDirectories();
+            parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
             parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");

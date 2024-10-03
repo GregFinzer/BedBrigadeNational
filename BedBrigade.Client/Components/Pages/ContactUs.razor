@@ -1,6 +1,6 @@
 @page "/contact-us"
 
-<RotatorContainer RotatorTitle="Contact Us" ImagePath="pages/Contact" LocationId="1" />
+<RotatorContainer RotatorTitle="@_lc.Keys["ContactUs"]" ImagePath="pages/Contact" LocationId="1" />
 
 <div class="container-fluid" style="display: @DisplaySearch">
     <SearchLocation @ref="SearchLocation" Title="@_lc.Keys["FindABedBrigade"]" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
@@ -11,8 +11,6 @@
 <div class="container-fluid" style="display: @DisplayForm">
 
     <EditForm EditContext="@EC">
-        <DataAnnotationsValidator />
-
         <div class="row">
             <div class="col-md-3">
                 <div class="card">

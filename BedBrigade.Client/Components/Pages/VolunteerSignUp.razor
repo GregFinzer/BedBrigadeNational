@@ -1,7 +1,7 @@
 @page "/volunteer"
 @using BedBrigade.Common.Models
 
-<RotatorContainer RotatorTitle="Volunteer Registration" ImagePath="pages/Volunteer" LocationId="1" />
+<RotatorContainer RotatorTitle="@_lc.Keys["VolunteerRegistration"]" ImagePath="pages/Volunteer" LocationId="1" />
 
 
 <div class="container-fluid" style="display: @DisplaySearch">
@@ -14,7 +14,7 @@
     </div>
 
     <SearchLocation @ref="SearchLocation"
-                    Title="Find a Bed Brigade Locations Near Me"
+                    Title="@_lc.Keys["FindABedBrigade"]"
                     ResultType="DropDownList"
                     ParentMethod="(childData)=>CheckChildData(childData)"
                     LocationChanged="(ddlValue)=>HandleSelectedValueChanged(ddlValue)" />
@@ -23,8 +23,6 @@
 <div class="container-fluid" style="display: @DisplayForm">
 
     <EditForm EditContext="@EC">
-        <DataAnnotationsValidator />
-
         <div class="row">
             
             <div class="@(AreSignUpsAvailable ? "col-md-3" : "col-md-12")">
@@ -160,7 +158,7 @@
                             <div class="card-body">
                                 <div class="control-section">
                                     <div class="radio-control">
-                                        @BootstrapHelper.GetBootstrapMessage("help", "@_lc.Keys[\"DeliveryVehicleQuestion\"]", "", false, "compact")
+                                        @BootstrapHelper.GetBootstrapMessage("help", _lc.Keys["DeliveryVehicleQuestion"], "", false, "compact")
                                         <div class="row">
                                             <SfRadioButton Label="@_lc.Keys["DeliveryVehicleNone"]" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>

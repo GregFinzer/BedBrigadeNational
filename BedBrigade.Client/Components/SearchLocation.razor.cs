@@ -122,13 +122,13 @@ namespace BedBrigade.Client.Components
             if (string.IsNullOrEmpty(PostalCode))
             {
                 strAlertType = "alert alert-warning";
-                PostalCodeResult = "Warning! Please enter a zip code"; // warning
+                PostalCodeResult = _lc.Keys["RequiredPostalCode"];
                 return false;
             }
             if (!Regex.IsMatch(PostalCode, @"\d{5}$"))
             {
                 strAlertType = "alert alert-danger";
-                PostalCodeResult = "Zip code must be numeric and have a length of 5.";
+                PostalCodeResult = _lc.Keys["InvalidPostalCode"];
                 return false;
             }
 
@@ -155,45 +155,42 @@ namespace BedBrigade.Client.Components
                 return;
 
             IsSearching = true;
-            var Result = await _svcLocation.GetBedBrigadeNearMe(PostalCode);
+            var result = await _svcLocation.GetBedBrigadeNearMe(PostalCode);
             StateHasChanged();
             IsSearching = false;
 
-            if (!Result.Success || Result.Data == null)
+            if (!result.Success || result.Data == null)
             {
                 strAlertType = AlertDanger;
-                PostalCodeResult = Result.Message;
+                PostalCodeResult = result.Message;
                 Locations = new List<LocationDistance>(); // empty location list
                 await SetZipBoxFocus();
                 return;
             } // some error
 
 
-            if (Result.Message != null && Result.Message.Length > 0)
-            {
-                await GetSearchResult(Result.Message, Result);
-            }
-            else
-            {
-                strAlertType = AlertDanger;
-                PostalCodeResult = "Unknown Error!";
-                Locations = new List<LocationDistance>(); // empty location list
-                await SetZipBoxFocus();
-            }
+            await GetSearchResult(result);
 
 
         } // HandleSearchClick()
 
-        private async Task GetSearchResult(string ResultMessage, ServiceResponse<List<LocationDistance>> Result)
+        private async Task GetSearchResult(ServiceResponse<List<LocationDistance>> result)
         {
             strDisplayNotActive = DisplayNone;
 
-            if (!ResultMessage.Contains("No locations found"))
+            if (result.Data.Count == 0)
+            {
+                strAlertType = "alert alert-warning";
+                PostalCodeResult = result.Message;
+                Locations = new List<LocationDistance>(); // empty location list
+                await SetZipBoxFocus();
+            }
+            else
             {
                 
                 strAlertType = "alert alert-success";
-                PostalCodeResult = "Success! " + ResultMessage;
-                Locations = Result.Data;
+                PostalCodeResult = result.Message;
+                Locations = result.Data;
                 PostalCodeSuccess = true;
                 if (ResultType == "DropDownList")
                 {
@@ -213,13 +210,7 @@ namespace BedBrigade.Client.Components
                 }
 
             } // Locations Found
-            else
-            { // Locations not found
-                strAlertType = "alert alert-warning";
-                PostalCodeResult = ResultMessage;
-                Locations = new List<LocationDistance>(); // empty location list
-                await SetZipBoxFocus();
-            }
+
         } // Search Result
 
         private void ZipCodeInputChange(ChangeEventArgs e)

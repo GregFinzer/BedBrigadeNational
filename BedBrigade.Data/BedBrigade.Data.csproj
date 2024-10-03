@@ -7,6 +7,7 @@
   </PropertyGroup>
   
     <ItemGroup>
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.9.12" />
     <PackageReference Include="BetterAddressParser" Version="1.18.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="Bogus" Version="35.6.0" />

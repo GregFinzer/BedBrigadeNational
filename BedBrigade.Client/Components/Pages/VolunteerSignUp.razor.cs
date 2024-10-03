@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Azure;
 using BedBrigade.Common.Models;
 using System.Net;
+using BedBrigade.SpeakIt;
+using ValidationLocalization = BedBrigade.Client.Services.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -34,8 +36,6 @@ namespace BedBrigade.Client.Components.Pages
         private SearchLocation? SearchLocation;
 
         private const string DisplayNone = "none";
-        private const string FormMessage = "Please fill out all the mandatory fields marked with an asterisk (*).";
-        private const string FormNotCompleted = FormMessage; //"The Bed Request Form is not completed!<br />"+FormMessage;
 
         private string DisplayForm = DisplayNone;
         private string DisplayAddressMessage = DisplayNone;
@@ -88,12 +88,17 @@ namespace BedBrigade.Client.Components.Pages
         };
 
         [Parameter] public string PreloadLocation { get; set; }
+        private ValidationMessageStore _validationMessageStore;
+
         #endregion
         #region Initialization
 
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
+            newVolunteer = new Volunteer();
+            EC = new EditContext(newVolunteer);
+            _validationMessageStore = new ValidationMessageStore(EC);
             //Yes, this has to be here instead of in OnInitializedAsync
             if (!string.IsNullOrEmpty(PreloadLocation))
             {
@@ -109,12 +114,6 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
         }
-
-        protected override async Task OnInitializedAsync()
-        {
-            newVolunteer = new Volunteer();
-            EC = new EditContext(newVolunteer);
-        } 
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -232,11 +231,11 @@ namespace BedBrigade.Client.Components.Pages
         {
             ClearMessage();
 
-            bool formIsValid = EC.Validate();
+            bool formIsValid = ValidationLocalization.ValidateModel(newVolunteer, _validationMessageStore, _lc);
 
             if (!formIsValid)
             {
-                ShowMessage(FormNotCompleted);
+                ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
                 return false;
             }
 
@@ -244,26 +243,28 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!isPhoneValid)
             {
-                ShowMessage("Phone numbers must be 10 digits with a valid area code and prefix.");
+                _validationMessageStore.Add(new FieldIdentifier(newVolunteer, nameof(newVolunteer.Phone)), _lc.Keys["ValidPhoneNumber"]);
+                ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
                 return false;
             }
 
             var emailResult = Validation.IsValidEmail(newVolunteer.Email);
             if (!emailResult.IsValid)
             {
-                ShowMessage(emailResult.UserMessage);
+                _validationMessageStore.Add(new FieldIdentifier(newVolunteer, nameof(newVolunteer.Email)), emailResult.UserMessage);
+                ShowMessage(_lc.Keys["ValidEmail"]);
                 return false;
             }
 
             if (SelectedEvent == null)
             {
-                ShowMessage("Please select an event.");
+                ShowMessage(_lc.Keys["PleaseSelectAnEvent"]);
                 return false;
             }
 
             if (!ValidReCAPTCHA)
             {
-                ShowMessage("Please check reCAPTCHA");
+                ShowMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 

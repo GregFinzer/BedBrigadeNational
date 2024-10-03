@@ -14,15 +14,15 @@ public class User : BaseEntity, ILocationId, IEmail
     [ForeignKey("LocationId")]
     public Int32 LocationId { get; set; }
 
-    [Required(ErrorMessage = "First name is required")]
+    [Required(ErrorMessage = "First Name is required")]
     [MaxLength(20)]
     public String FirstName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Last name is required")]
+    [Required(ErrorMessage = "Last Name is required")]
     [MaxLength(25)]
     public String LastName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "An email address is required")]
+    [Required(ErrorMessage = "Email Address is required")]
     [MaxLength(255)]
     public String Email { get; set; } = string.Empty;
     
@@ -33,7 +33,7 @@ public class User : BaseEntity, ILocationId, IEmail
     public byte[]? PasswordSalt { get; set; }
 
     [MaxLength(14)]
-    [Required(ErrorMessage = "Please enter a phone number")]
+    [Required(ErrorMessage = "Phone Number is required")]
     public String? Phone { get; set; } = string.Empty;
 
     public String? Role { get; set; } = string.Empty;

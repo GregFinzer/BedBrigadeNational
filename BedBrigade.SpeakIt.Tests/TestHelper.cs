@@ -6,7 +6,17 @@ namespace BedBrigade.SpeakIt.Tests
     {
 
         public static List<string> ExcludeDirectories = new List<string> { "Administration", "Layout" };
-        public static List<string> ExcludeFiles = new List<string> { "Error.razor", "CustomErrorBoundary.razor" };
+        public static List<string> ExcludeFiles = new List<string> { "Error.razor", "CustomErrorBoundary.razor", "SignUpGrid.razor.cs", "SignUpHelper.cs" };
+        public static List<string> WildcardPatterns = new List<string> { "*.razor", "*.cs" };
+
+        public static List<string> GetSourceDirectories()
+        {
+            string solutionPath = TestHelper.GetSolutionPath();
+            string componentsPath = Path.Combine(solutionPath, "BedBrigade.Client", "Components");
+            string modelPath = Path.Combine(solutionPath, "BedBrigade.Common", "Models");
+            string servicesPath = Path.Combine(solutionPath, "BedBrigade.Data", "Services");
+            return new List<string>() { componentsPath, modelPath, servicesPath };
+        }
 
         /// <summary>
         /// Execute an external program.
