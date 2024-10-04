@@ -10,6 +10,7 @@ using AKSoftware.Localization.MultiLanguages.Blazor;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using BedBrigade.SpeakIt;
+using Serilog;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 
@@ -38,9 +39,8 @@ namespace BedBrigade.Client.Components.Pages
         private string DisplaySearch = DisplayNone;
         public int NumericValue { get; set; } = 1;
 
-        private string SuccessClass = "alert alert-success";
-        private string SuccessMessage = string.Empty;
-        private string SuccessDisplay = DisplayNone;
+        private string ResultMessage = string.Empty;
+        private string ResultDisplay = DisplayNone;
 
         private ReCAPTCHA? reCAPTCHAComponent;
         private bool ValidReCAPTCHA = false;
@@ -74,7 +74,7 @@ namespace BedBrigade.Client.Components.Pages
 
         [Parameter] public string PreloadLocation { get; set; }
         private ValidationMessageStore _validationMessageStore;
-
+        private string AlertType = AlertDanger;
         #endregion
         #region Initialization
 
@@ -234,21 +234,21 @@ namespace BedBrigade.Client.Components.Pages
         {
             if (!Validation.IsValidZipCode(newRequest.PostalCode))
             {
-                return "The zip code that you have entered is not a valid U.S. Zip Code";
+                return _lc.Keys["InvalidPostalCode"];
             }
 
             List<string> cities = Validation.GetCitiesForZipCode(newRequest.PostalCode);
 
             if (!cities.Any(o => o.ToLower() == newRequest.City.ToLower()))
             {
-                return "The city that you have entered does not match the zip code. Valid city names are: "
-                    + String.Join(", ", cities);
+                string cityNames = string.Join(", ", cities);
+                return _lc.Keys["InvalidCity", new {cityNames = cityNames}];
             }
 
             string stateForZipCode = Validation.GetStateForZipCode(newRequest.PostalCode);
             if (newRequest.State != stateForZipCode)
             {
-                return "The state that you have entered does not match the zip code.  It should be " + stateForZipCode;
+                return _lc.Keys["StateNotMatchZipCode", stateForZipCode];
             }
 
             return string.Empty;
@@ -282,7 +282,6 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
-            var FormStatusMessage = "The Request Form is completed.";
             bool isValid = await IsValid();
 
             if (isValid)
@@ -293,15 +292,15 @@ namespace BedBrigade.Client.Components.Pages
 
                 await UpdateDatabase();
             }
-        } 
+        }
 
         private async Task UpdateDatabase()
         {
             try
-            {  
+            {
                 //Set it to the primary city name
                 newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
-                
+
                 Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
                 ObjectUtil.CopyProperties(newRequest, bedRequest);
                 var addResult = await _svcBedRequest.CreateAsync(bedRequest);
@@ -312,29 +311,28 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (bedRequest != null && bedRequest.BedRequestId > 0)
                 {
-                    //AlertType = "alert alert-success";
+                    AlertType = "alert alert-success";
                     DisplaySearch = DisplayNone;
                     DisplayForm = DisplayNone;
-                    // ResultMessage = "New Bed Request #" + newRequest.BedRequestId.ToString() + " created Successfully!<br />";
-                    SuccessMessage += "We have received your request and would like to thank you for writing to us.<br />";
-                    SuccessMessage += "We will look over your request and reply by email as soon as possible.<br />";
-                    SuccessMessage += "Talk to you soon, Bed Brigade.";
-                    SuccessDisplay = "";
+                    ResultMessage = _lc.Keys["BedRequestFormSubmitted"];
+                    ResultDisplay = "";
                 }
                 else
                 {
-                    //SubmitAlertMessage = "Warning! Unable to add new Bed Request!";
-                    //AlertType = AlertDanger;
-                    //AlertDisplay = "";
+                    ResultMessage = addResult.Message;
+                    AlertType = AlertDanger;
+                    ResultDisplay = "";
+                    Log.Error("Error saving BedRequest: " + addResult.Message);
                 }
             }
             catch (Exception ex)
             {
-                //AlertType = AlertDanger;
-                //SubmitAlertMessage = "Error! " + ex.Message;
-                //AlertDisplay = "";
+                AlertType = AlertDanger;
+                ResultMessage = "Error! " + ex.Message;
+                ResultDisplay = "";
+                Log.Error(ex, "Error saving BedRequest");
             }
-        } // update database
+        }
 
         #endregion
 

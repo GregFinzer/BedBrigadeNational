@@ -4,11 +4,13 @@ Address: Address
 AgesGender: Ages / Gender
 AgesGenders: Ages Genders
 Amount: Amount
+AtBedBrigadeLocation: at Bed Brigade location {locationName}
 BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
 BedBrigadeWeb: Bed Brigade Web
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
+BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 BedsRequested: Beds Requested
 Cancel: Cancel
 ChooseADate: Choose a Date & Time
@@ -21,6 +23,7 @@ ContactInformation: Contact Information
 ContactMessage: Contact Message
 ContactUs: Contact Us
 ContactUsFormNotCompleted: The Contact Us Form is not completed!
+ContactUsFormSubmitted: Thank you for contacting us. We will get back to you as soon as possible.
 DateColon: 'Date:'
 DeliveryAddress: Delivery Address
 DeliveryDate: Delivery Date
@@ -84,11 +87,13 @@ FindABedBrigade: Find a Bed Brigade Near Me
 FirstName: First Name
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FolderColon: 'Folder:'
+FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
 GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
-InvalidPostalCode: Invalid postal code
+InvalidCity: 'The city that you have entered does not match the zip code. Valid city names are: {cityNames}'
+InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code
 IsInYourZipCode: is in your Zip Code
 LastName: Last Name
 Latitude: Latitude
@@ -186,6 +191,7 @@ SorryYouAreNot: Sorry, you are not authorized to view this page.
 Spanish: Spanish
 SpecialInstructions: Special Instructions
 State: State
+StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}
 Status: Status
 Street: Street
 SubmitRequest: Submit Request
@@ -193,6 +199,7 @@ SubmitVolunteerRegistration: Submit Volunteer Registration
 SuitepoBox: Suite/PO Box
 TaxFormSent: Tax Form Sent
 Team: 'Team #'
+ThankYou: Thank you!
 TransactionId: Transaction ID
 UserName: User Name
 ValidEmail: Please enter a valid email address
@@ -205,5 +212,12 @@ VolunteerInformation: Volunteer Information
 VolunteerRegistration: Volunteer Registration
 VolunteersRegisteredneeded: Volunteers registered/needed
 VolunteerFormNotCompleted: The Volunteer Form is not completed!
+VolunteerFormSubmitted: Thank you for summitting your Volunteer Registration. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
+VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
+VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
+VolunteerSignUpAgain: Thanks for serving again {fullName}
+VolunteerSignUpAgainSubtitle: We appreciate you continuing to serve with the Bed Brigade Volunteer Team.
 YouWereTryingTo: 'You were trying to access the page: '
+WeLookForwardToSeeingYou: We look forward to seeing you.
+WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
 ZipCode: Zip Code

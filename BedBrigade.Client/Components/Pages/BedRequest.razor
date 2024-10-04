@@ -148,13 +148,13 @@
 
 </div>
 
-<div class="container-fluid" style="display: @SuccessDisplay">
-    <div class="alert alert-success" role="alert">
-        @((MarkupString)SuccessMessage)
+<div class="container-fluid" style="display: @ResultDisplay">
+    <div class="@AlertType" role="alert">
+        @((MarkupString)ResultMessage)
     </div>
 </div>
 
-@if (SuccessDisplay != DisplayNone)
+@if (ResultDisplay != DisplayNone)
 {
     <SfButton CssClass="btn btn-primary ms-3 mt-3" OnClick="@RefreshPage">@_lc.Keys["RequestABedFor"]</SfButton>
 }

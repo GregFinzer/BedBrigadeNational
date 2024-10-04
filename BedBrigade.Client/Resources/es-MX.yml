@@ -4,11 +4,13 @@ Address: Dirección
 AgesGender: Edades / Género
 AgesGenders: Edades Géneros
 Amount: Importe
+AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
 BedBrigadeWeb: Cama Brigade Web
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
+BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revise su correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 BedsRequested: Camas solicitadas
 Cancel: Cancelar
 ChooseADate: Elija una fecha y hora
@@ -21,6 +23,7 @@ ContactInformation: Información de contacto
 ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
+ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
 DeliveryDate: Fecha de entrega
@@ -84,11 +87,13 @@ FindABedBrigade: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
 FoundLocationsWithin: Se han encontrado {count} ubicaciones dentro de {maxMiles} millas de {postalCode}
 FolderColon: 'Carpeta:'
+FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro programado
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
-InvalidPostalCode: Código postal no válido
+InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
+InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
 LastName: Apellido
 Latitude: Latitud
@@ -186,6 +191,7 @@ SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
 Spanish: Español
 SpecialInstructions: Instrucciones especiales
 State: Estado
+StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
 Status: Estado
 Street: Calle
 SubmitRequest: Enviar solicitud
@@ -193,6 +199,7 @@ SubmitVolunteerRegistration: Enviar Registro de Voluntarios
 SuitepoBox: Suite/Apartado de correos
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
+ThankYou: ¡Gracias!
 TransactionId: ID de transacción
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
@@ -205,5 +212,12 @@ VolunteerInformation: Información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 VolunteerFormNotCompleted: ¡El Formulario de Voluntariado no está completo!
+VolunteerFormSubmitted: Gracias por coronar su Registro de Voluntarios. Revise su correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
+VolunteerSignUpNew: Bienvenidos a Bed Brigade {fullName}
+VolunteerSignUpNewSubtitle: Agradecemos que se una al Equipo de Voluntarios de la Brigada de Camas.
+VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
+VolunteerSignUpAgainSubtitle: Le agradecemos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
+WeLookForwardToSeeingYou: Esperamos verte.
+WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
 ZipCode: Código postal

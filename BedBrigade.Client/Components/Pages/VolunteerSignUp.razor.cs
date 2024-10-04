@@ -26,7 +26,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ISignUpDataService? _svcSignUp { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
-
+        [Inject] private ITranslateLogic _translateLogic { get; set; }
         private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
@@ -439,23 +439,26 @@ namespace BedBrigade.Client.Components.Pages
 
             if (isNewVolunteer)
             {
-                ResultTitle = "Welcome, " + newVolunteer.FullName + ".<br />";
-                ResultSubTitle = "We appreciate your wish to join the Bed Brigade Volunteer Team. ";
+                ResultTitle = _lc.Keys["VolunteerSignUpNew", new { fullName = newVolunteer.FullName }] + "<br />";
+                ResultSubTitle = _lc.Keys["VolunteerSignUpNewSubtitle"] + " ";
             }
             else // new Volunteer
             {
-                ResultTitle = "Welcome back, " + newVolunteer.FullName + "!";
-                ResultSubTitle = "Thank you so much for your enthusiasm and genuine commitment to assisting us. ";
+                ResultTitle = _lc.Keys["VolunteerSignUpAgain", new { fullName = newVolunteer.FullName }] + "<br />";
+                ResultSubTitle = _lc.Keys["VolunteerSignUpAgainSubtitle"] + " ";
             }
 
-            ResultMessage += "We received your registration as a participant to scheduled Event:<br />" + SelectedEvent.EventName  + ", ";
-            ResultMessage += SelectedEvent.EventDateScheduled.ToShortDateString() + "&nbsp;" + SelectedEvent.EventDateScheduled.ToShortTimeString();
-            ResultMessage += " to " + SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours)
-                .ToShortTimeString();
-            ResultMessage += "<br /> at Bed Brigade Location: " + selectedLocationName;
-            ResultMessage += "<br />We will look forward to seeing you!<br />";
+            string startTime = SelectedEvent.EventDateScheduled.ToShortDateString() + " " +
+                               SelectedEvent.EventDateScheduled.ToShortTimeString();
+            string endTime = SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString();
+            ResultMessage += _lc.Keys["WeReceivedYourRegistration"] + "<br />" +  _translateLogic.GetTranslation(SelectedEvent.EventName)  + ", ";
+            ResultMessage += _lc.Keys["FromStartTimeToEndTime", new {startTime = startTime, endTime = endTime}] + " ";
+            ResultMessage += _lc.Keys["AtBedBrigadeLocation", new { locationName = selectedLocationName }] + "<br />";
+            ResultMessage += SelectedEvent.EventNote + "<br /><br />";
+            ResultMessage += _lc.Keys["WeForwardToSeeingYou"] + "<br />";
 
-            ResultMessage += "Thank you!<br />" + selectedLocationName;
+            ResultMessage += _lc.Keys["ThankYou"] +  "<br />";
+            ResultMessage += selectedLocationName;
             ResultDisplay = "";
             FinalMessage = BootstrapHelper.GetBootstrapJumbotron(ResultTitle, ResultSubTitle, ResultMessage);
         } // Create Final Message

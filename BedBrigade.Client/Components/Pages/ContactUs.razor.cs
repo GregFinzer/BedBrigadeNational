@@ -10,6 +10,7 @@ using System.Diagnostics;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Edit;
 using BedBrigade.SpeakIt;
+using Serilog;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -237,17 +238,15 @@ namespace BedBrigade.Client.Components.Pages
                     AlertType = "alert alert-success";
                     DisplaySearch = DisplayNone;
                     DisplayForm = DisplayNone;
-                    // ResultMessage = "New Bed Request #" + newRequest.BedRequestId.ToString() + " created Successfully!<br />";
-                    ResultMessage += "We have received your contact request (contact #" + newRequest.ContactUsId.ToString() + ") and would like to thank you for writing to us.<br />";
-                    ResultMessage += "We will look over your request and reply by email as soon as possible.<br />";
-                    ResultMessage += "Talk to you soon, Bed Brigade.";
+                    ResultMessage = _lc.Keys["ContactUsFormSubmitted"];
                     ResultDisplay = "";
                 }
                 else
                 {
-                    ResultMessage = "Warning! Unable to add new Contact!";
+                    ResultMessage = addResult.Message;
                     AlertType = AlertDanger;
                     ResultDisplay = "";
+                    Log.Error("Error saving ContactUs: " + addResult.Message);
                 }
             }
             catch (Exception ex)
@@ -255,6 +254,7 @@ namespace BedBrigade.Client.Components.Pages
                 AlertType = AlertDanger;
                 ResultMessage = "Error! " + ex.Message;
                 ResultDisplay = "";
+                Log.Error(ex, "Error saving ContactUs");
             }
         } // update database
 
