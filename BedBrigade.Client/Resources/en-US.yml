@@ -212,7 +212,6 @@ VolunteerInformation: Volunteer Information
 VolunteerRegistration: Volunteer Registration
 VolunteersRegisteredneeded: Volunteers registered/needed
 VolunteerFormNotCompleted: The Volunteer Form is not completed!
-VolunteerFormSubmitted: Thank you for summitting your Volunteer Registration. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
 VolunteerSignUpAgain: Thanks for serving again {fullName}

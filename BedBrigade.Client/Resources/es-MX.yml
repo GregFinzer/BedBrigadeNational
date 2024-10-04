@@ -212,7 +212,6 @@ VolunteerInformation: Información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 VolunteerFormNotCompleted: ¡El Formulario de Voluntariado no está completo!
-VolunteerFormSubmitted: Gracias por coronar su Registro de Voluntarios. Revise su correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 VolunteerSignUpNew: Bienvenidos a Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: Agradecemos que se una al Equipo de Voluntarios de la Brigada de Camas.
 VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
