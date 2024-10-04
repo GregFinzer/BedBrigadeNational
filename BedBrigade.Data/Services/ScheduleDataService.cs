@@ -31,13 +31,13 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         _translateLogic = translateLogic;
     }
 
-    public override Task<ServiceResponse<Schedule>> GetByIdAsync(object? id)
+    public override async Task<ServiceResponse<Schedule>> GetByIdAsync(object? id)
     {
-        var result = base.GetByIdAsync(id);
+        var result = await base.GetByIdAsync(id);
 
-        if (result.Result.Success && result.Result.Data != null)
+        if (result.Success && result.Data != null)
         {
-            FillSingleEventSelect(result.Result.Data);
+            FillSingleEventSelect(result.Data);
             return result;
         }
 
