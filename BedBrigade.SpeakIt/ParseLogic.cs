@@ -37,6 +37,10 @@ namespace BedBrigade.SpeakIt
             @"\[MaxLength\((?<maxLength>\d+)\]",
             RegexOptions.Compiled | RegexOptions.Multiline);
 
+        private static Regex _styleTag = new Regex(@"<style[^>]*>[^<]*<\/style>", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _scriptTag = new Regex(@"<script[^>]*>[^<]*<\/script>", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _imgTag = new Regex(@"<img[^>]*>", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _codeTag = new(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
         private static List<Regex> _removePatterns = new List<Regex>()
         {
             // Begin and end tag:  <i class="fa fa-home"></i>
@@ -74,8 +78,9 @@ namespace BedBrigade.SpeakIt
             new Regex(@"<pre[^>]*>(?<content>[\s\S]+?)<\/pre>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<p[^>]*>(?<content>[\s\S]+?)<\/p>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<div[^>]*>(?<content>\s*[A-Za-z][\s\S]*?)<\/div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            //This pattern matches text that is NOT wrapped by an HTML tag. If the HTML is minified, this will not work. It expects CR or LF before the text
-            new Regex(@"([\r\n]+\s*(?<content>[A-Za-z][^<\r\n>]+))|(^(?<content>[A-Za-z][^<\r\n>]+)$)", RegexOptions.Compiled | RegexOptions.Multiline),
+            //Not wrapped inside an HTML Tag
+            new Regex(@"(<\/[A-Za-z0-9]+>+\s*(?<content>[A-Za-z][^<]+))|(^\s*(?<content>[A-Za-z][^<]+))",
+                RegexOptions.Compiled | RegexOptions.Multiline),
         };
 
         
@@ -101,11 +106,21 @@ namespace BedBrigade.SpeakIt
             foreach (var file in filesToProcess)
             {
                 string content = File.ReadAllText(file);
-                List<ParseResult> fileResults = GetLocalizableStringsInText(content);
-                fileResults.AddRange(GetRequiredWithErrorMessageInText(content));
-                fileResults.AddRange(GetRequiredAttributeInText(content));
-                fileResults.AddRange(GetMaxLengthAttributesWithErrorMessageInText(content));
-                fileResults.AddRange(GetMaxLengthAttributesInText(content));
+
+                List<ParseResult> fileResults = new List<ParseResult>();
+
+                if (Path.GetExtension(file) == ".cs")
+                {
+                    fileResults.AddRange(GetRequiredWithErrorMessageInText(content));
+                    fileResults.AddRange(GetRequiredAttributeInText(content));
+                    fileResults.AddRange(GetMaxLengthAttributesWithErrorMessageInText(content));
+                    fileResults.AddRange(GetMaxLengthAttributesInText(content));
+                }
+                else
+                {
+                    fileResults.AddRange(GetLocalizableStringsInText(content));
+                }
+
                 foreach (var fileResult in fileResults)
                 {
                     fileResult.FilePath = file;
@@ -113,10 +128,20 @@ namespace BedBrigade.SpeakIt
                 result.AddRange(fileResults);
             }
 
-            var existingKeyValues = ReadYamlFile(parms.ResourceFilePath);
-            result = RemoveLocalizedKeys(result, existingKeyValues);
-            return result;
+            if (parms.RemoveLocalizedKeys)
+            {
+                var existingKeyValues = ReadYamlFile(parms.ResourceFilePath);
+                result = RemoveLocalizedKeys(result, existingKeyValues);
+            }
+
+            return result
+                .OrderBy(o => o.Key)
+                .ToList();
         }
+
+
+
+
 
         private List<ParseResult> RemoveLocalizedKeys(List<ParseResult> parseResults, Dictionary<string, string> existingKeyValues)
         {
@@ -263,9 +288,13 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
+
+
         public List<ParseResult> GetLocalizableStringsInText(string text)
         {
             List<ParseResult> result = new List<ParseResult>();
+
+            text = PreProcess(text);
 
             foreach (Regex pattern in _contentPatterns)
             {
@@ -293,7 +322,7 @@ namespace BedBrigade.SpeakIt
             Dictionary<string, string> existingKeyValues)
         {
             List<ParseResult> result = new List<ParseResult>();
-            html = RemoveScript(html);
+            html = PreProcess(html);
 
             MatchCollection matches = _keyReferenceRegex.Matches(html);
             foreach (Match match in matches)
@@ -315,14 +344,28 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public Dictionary<string, List<string>> GetDuplicateValues(SpeakItParms parms)
+        public string PreProcess(string input)
         {
-            var parseResults = GetLocalizableStrings(parms);
-            var conflictingKeys = GetDuplicateValues(parseResults);
+            input = RemoveByTag(input, _scriptTag);
+            input = RemoveByTag(input, _styleTag);
+            input = RemoveByTag(input, _imgTag);
+            input = RemoveByTag(input, _codeTag);
+            return input;
+        }
+
+        private string RemoveByTag(string input, Regex tag)
+        {
+            return tag.Replace(input, string.Empty);
+        }
+
+        public Dictionary<string, List<string>> GetDuplicateKeys(SpeakItParms parms)
+        {
+            List<ParseResult> parseResults = GetLocalizableStrings(parms);
+            Dictionary<string, List<string>> conflictingKeys = GetDuplicateKeys(parseResults);
             return conflictingKeys;
         }
 
-        private Dictionary<string, List<string>> GetDuplicateValues(List<ParseResult> parseResults)
+        private Dictionary<string, List<string>> GetDuplicateKeys(List<ParseResult> parseResults)
         {
             var conflictingKeys = new Dictionary<string, List<string>>();
             var keyDict = new Dictionary<string, string>();
@@ -457,6 +500,8 @@ namespace BedBrigade.SpeakIt
                     && !trimmed.StartsWith("@(")
                     && !trimmed.StartsWith("@_")
                     && !trimmed.StartsWith("[@_")
+                    && !trimmed.StartsWith("else")
+                    && !trimmed.Contains("=\"")
                     && AtLeastOneAlphabeticCharacter(trimmed)
                     && !_ignoreStartsWith.Any(o => trimmed.StartsWith(o)))
                 {
@@ -530,15 +575,12 @@ namespace BedBrigade.SpeakIt
             }
         }
 
-        public string RemoveScript(string input)
-        {
-            // Regular expression to match anything between <script ...> and </script> tags
-            string pattern = @"<script.*?>.*?</script>";
 
-            // Replace the matched script block with an empty string
-            string result = Regex.Replace(input, pattern, string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
-            return result;
-        }
+
+
+
+
+
     }
 }

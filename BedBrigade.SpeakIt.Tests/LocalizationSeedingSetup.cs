@@ -49,9 +49,6 @@ namespace BedBrigade.SpeakIt.Tests
 
                 foreach (ParseResult parseResult in parseResults)
                 {
-                    if (parseResult.LocalizableString.StartsWith("class="))
-                        Console.WriteLine("Here");
-
                     string key = ComputeSHA512Hash(parseResult.LocalizableString);
                     if (!_localizableStrings.ContainsKey(key))
                     {

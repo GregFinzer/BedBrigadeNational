@@ -26,6 +26,7 @@ namespace BedBrigade.SpeakIt.Tests
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
             parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
+            parms.RemoveLocalizedKeys = true;
 
             var result = _logic.GetLocalizableStrings(parms);
 
@@ -51,11 +52,11 @@ namespace BedBrigade.SpeakIt.Tests
 
         /// <summary>
         /// If this test is failing it means that there are new strings that need to be localized
-        /// and if they were to be created automatically, two values would be created with the same key.
+        /// and if they were to be created automatically, there would be the same key that different values
         /// Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md
         /// </summary>
         [Test]
-        public void VerifyDuplicateKeys()
+        public void VerifyNoDuplicateKeys()
         {
             SpeakItParms parms = new SpeakItParms();
             parms.SourceDirectories = TestHelper.GetSourceDirectories();
@@ -64,7 +65,7 @@ namespace BedBrigade.SpeakIt.Tests
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
             parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
 
-            var failedKeys = _logic.GetDuplicateValues(parms);
+            var failedKeys = _logic.GetDuplicateKeys(parms);
 
             if (failedKeys.Any())
             {
