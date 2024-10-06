@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BedBrigade.SpeakIt.Tests
+﻿namespace BedBrigade.SpeakIt.Tests
 {
     [TestFixture]
     public class CreateTests
     {
         private CreateLogic _logic = new CreateLogic();
 
-        [Test]
+        [Test, Ignore("This test should be ignored except locally")]
         public void CreateLocalizationStringsTest()
         {
+            if (TestHelper.IsRunningUnderGitHubActions())
+            {
+                Assert.Fail("This test should be ignored on the build server. Please add:\r\n[Ignore(\"This test should be ignored except locally\")]");
+            }
+
             SpeakItParms parms = new SpeakItParms();
             string solutionPath = TestHelper.GetSolutionPath();
             string componentsPath = Path.Combine(solutionPath, "BedBrigade.Client", "Components");
