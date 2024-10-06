@@ -11,6 +11,7 @@ namespace BedBrigade.SpeakIt
 {
     public class ParseLogic
     {
+        private static List<string> _ignoreStartsWith = new List<string>() { "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%", "display:" };
         private const string ReplacementMarker = "~~~";
         private const string StringType = "string";
         private const string PropertyTypeGroup = "propertyType";
@@ -73,6 +74,8 @@ namespace BedBrigade.SpeakIt
             new Regex(@"<pre[^>]*>(?<content>[\s\S]+?)<\/pre>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<p[^>]*>(?<content>[\s\S]+?)<\/p>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<div[^>]*>(?<content>\s*[A-Za-z][\s\S]*?)<\/div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            //This pattern matches text that is NOT wrapped by an HTML tag. If the HTML is minified, this will not work. It expects CR or LF before the text
+            new Regex(@"([\r\n]+\s*(?<content>[A-Za-z][^<\r\n>]+))|(^(?<content>[A-Za-z][^<\r\n>]+)$)", RegexOptions.Compiled | RegexOptions.Multiline),
         };
 
         
@@ -290,6 +293,7 @@ namespace BedBrigade.SpeakIt
             Dictionary<string, string> existingKeyValues)
         {
             List<ParseResult> result = new List<ParseResult>();
+            html = RemoveScript(html);
 
             MatchCollection matches = _keyReferenceRegex.Matches(html);
             foreach (Match match in matches)
@@ -453,7 +457,8 @@ namespace BedBrigade.SpeakIt
                     && !trimmed.StartsWith("@(")
                     && !trimmed.StartsWith("@_")
                     && !trimmed.StartsWith("[@_")
-                    && AtLeastOneAlphabeticCharacter(trimmed))
+                    && AtLeastOneAlphabeticCharacter(trimmed)
+                    && !_ignoreStartsWith.Any(o => trimmed.StartsWith(o)))
                 {
                     result.Add(new ParseResult
                     {
@@ -523,6 +528,17 @@ namespace BedBrigade.SpeakIt
                 }
 
             }
+        }
+
+        public string RemoveScript(string input)
+        {
+            // Regular expression to match anything between <script ...> and </script> tags
+            string pattern = @"<script.*?>.*?</script>";
+
+            // Replace the matched script block with an empty string
+            string result = Regex.Replace(input, pattern, string.Empty, RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            return result;
         }
     }
 }
