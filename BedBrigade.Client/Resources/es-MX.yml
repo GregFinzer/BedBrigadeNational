@@ -101,6 +101,7 @@ Loading: Carga....
 Location: Ubicación
 LocationAvailableEvents: Ubicación Disponible Eventos
 LocationColon: 'Ubicación:'
+LocationNotActive: 'Lo sentimos, este local de Bed Brigade ya no está activo: '
 LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
 LogIn: Inicia sesión

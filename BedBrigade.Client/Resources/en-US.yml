@@ -101,6 +101,7 @@ Loading: Loading....
 Location: Location
 LocationAvailableEvents: Location Available Events
 LocationColon: 'Location:'
+LocationNotActive: "We're sorry, this Bed Brigade location is no longer active: "
 LocationPathColon: 'Location Path:'
 LocationsMarkedWithAn: Locations marked with an asterisk (*) are currently inactive
 LogIn: Log In
