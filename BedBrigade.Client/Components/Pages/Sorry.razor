@@ -15,16 +15,16 @@
 
     @if (mylocation != null && mypageName != null)
     {
-        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation/@mypageName</h2>
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@mylocation/@mypageName</h2>
     }
     else if (mylocation != null)
     {
-        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation</h2>
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@mylocation</h2>
     }
 }
 else
 {
-    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"] /@mylocation</h1>
+    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"]<br />/@mylocation</h1>
 }
 
 <div class="text-center">
@@ -62,17 +62,25 @@ else
 
     private async void CheckLocationStatus(string location)
     {        
+        // location can be not active or not exists
         var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
-
-        if (locationResponse.Success && locationResponse.Data != null)
+        if (locationResponse.Message.ToLower().Contains("not found"))
         {
-            IsLocationActive = locationResponse.Data.IsActive;
-            if (!IsLocationActive)
+            IsLocationActive = false;
+            HomeUrl = $"/"; // return to national home
+        }
+        else
+        {
+            if (locationResponse.Success && locationResponse.Data != null)
             {
-                HomeUrl = $"/"; // return to national home
+                IsLocationActive = locationResponse.Data.IsActive;
+                if (!IsLocationActive)
+                {
+                    HomeUrl = $"/"; // return to national home
+                }
             }
         }
-        
+
     } // location status
 
 }
