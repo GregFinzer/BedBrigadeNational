@@ -1,9 +1,14 @@
 ﻿using BedBrigade.Client.Services;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
+using BedBrigade.Common.Logic;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Serilog;
+using System;
+using System.Data.Entity.Core.Mapping;
+using System.Diagnostics;
+using KellermanSoftware.NetEmailValidation;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -28,9 +33,12 @@ namespace BedBrigade.Client.Components.Pages
         private string previousLocation = SeedConstants.SeedNationalName;
         private string previousPageName = defaultPageName;
         private string BodyContent = string.Empty;
-
+        private string SorryPageUrl = String.Empty;
+       
         protected override async Task OnInitializedAsync()
         {
+            ValidateUrlParameters();
+
             string location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
             string pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
             await LoadLocationPage(location, pageName);
@@ -38,6 +46,8 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnParametersSetAsync()
         {
+            ValidateUrlParameters();
+
             string location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
             string pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
             
@@ -73,25 +83,26 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
-                    Console.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
+                    //Debug.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
                     var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
-                    Console.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
+                    //Debug.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
                     if (contentResult.Success)
-                    {
-                        //string content = contentResult.Data;
+                    {                       
                         var path = $"/{location}/pages/{pageName}";
                         string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
                         BodyContent = html;
                     }
                     else
                     {
-                        _navigationManager.NavigateTo($"/Sorry/{location}/{pageName}", true);
+                        //_navigationManager.NavigateTo($"/Sorry/{location}/{pageName}", true);
+                        _navigationManager.NavigateTo(SorryPageUrl, true);
                         return false;
                     }
                 }
                 else
                 {
-                    _navigationManager.NavigateTo($"/Sorry/{location}", true);
+                    //_navigationManager.NavigateTo($"/Sorry/{location}", true);
+                    _navigationManager.NavigateTo(SorryPageUrl, true);
                     return false;
                 }
             }
@@ -102,6 +113,48 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        }
-    }
-}
+        } // Load Location Page
+
+
+        private async void ValidateUrlParameters()
+        {
+            bool isValidLocationRoute = await IsLocationRoute(StringUtil.IsNull(mylocation,""));
+            var uri = new Uri(_navigationManager.Uri);
+            var myUrlContent = new BedBrigade.Common.Logic.UrlContent();
+            myUrlContent = UrlUtil.ValidateUrlContent(uri.ToString(), isValidLocationRoute);
+
+           // Debug.WriteLine($"Full Page URL: {myUrlContent.FullUrl}");
+           // Debug.WriteLine($"Parameterized URL?: {myUrlContent.IsParameterizedUrl.ToString()}");
+           // Debug.WriteLine($"Positioning Parameters: {myUrlContent.PositioningCount}");
+           // Debug.WriteLine($"Query Parameters: {myUrlContent.QueryCount}");
+           // Debug.WriteLine($"Accepted Location Route: {myUrlContent.AcceptedLocationRoute}");
+           // Debug.WriteLine($"Accepted Page Name: {myUrlContent.AcceptedPageName}");
+           // Debug.WriteLine($"Final Sorry Page URL: {myUrlContent.SorryPageUrl}");
+
+            mylocation = myUrlContent.AcceptedLocationRoute;
+            mypageName = myUrlContent.AcceptedPageName;
+            SorryPageUrl = myUrlContent.SorryPageUrl;
+
+
+        } // Validate Location Parameter
+
+        private async Task<bool> IsLocationRoute(string locationRoute)
+        {
+            bool IsValidLocation = false;
+            locationRoute = "/" + locationRoute;
+
+            var testLocation = await _svcLocation.GetLocationByRouteAsync(locationRoute);
+            if (testLocation != null && testLocation.Success)
+            {
+                IsValidLocation = true;
+            }
+
+          //  Debug.WriteLine($"Location Parameter: {locationRoute} is {IsValidLocation}");
+
+            return (IsValidLocation);
+        } // iS location parameter
+          
+
+
+    } // razor class
+} // namespace

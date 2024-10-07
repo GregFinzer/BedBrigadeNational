@@ -1,33 +1,54 @@
 @page "/sorry"
 @page "/sorry/{mylocation}"
 @page "/sorry/{mylocation}/{mypageName}"
+@page "/{mylocation}/sorry/"
+@page "/{mylocation}/sorry/{mypageName}"
+
 @using Serilog
 <PageTitle>@_lc.Keys["Sorry"]</PageTitle>
-<h1 class="text-center mt-5">@_lc.Keys["SorryThePage"] </h1>
-@if (mylocation != null && mypageName != null)
+
+@if (IsLocationActive)
 {
-    <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]: /@mylocation/@mypageName</h2>
+
+    <h1 class="text-center mt-5">@_lc.Keys["SorryThePage"] </h1>
+
+
+    @if (mylocation != null && mypageName != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation/@mypageName</h2>
+    }
+    else if (mylocation != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation</h2>
+    }
 }
-else if (mylocation != null)
+else
 {
-    <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"] /@mylocation</h2>
+    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"] /@mylocation</h1>
 }
 
 <div class="text-center">
-    <a href="/" class="btn btn-primary">@_lc.Keys["ReturnToHome"]</a>
+    <a href="@HomeUrl" class="btn btn-primary">@_lc.Keys["ReturnToHome"]</a>
 </div>
 
 @code {
     [Inject] private ILanguageContainerService _lc { get; set; }
+    [Inject] private ILocationDataService _svcLocation { get; set; }
     [Parameter] public string? mylocation { get; set; }
     [Parameter] public string? mypageName { get; set; }
+
+    public string HomeUrl = "/";
+    private bool IsLocationActive = true;
 
     protected override void OnInitialized()
     {
         _lc.InitLocalizedComponent(this);
         if (mylocation != null && mypageName != null)
         {
+            HomeUrl = $"/{mylocation}";
+            CheckLocationStatus(mylocation);           
             Log.Logger.Warning($"404 for Page: /{mylocation}/{mypageName}");
+
         }
         else if (mylocation != null)
         {
@@ -37,5 +58,21 @@ else if (mylocation != null)
         {
             Log.Logger.Warning($"404 for Page: /sorry");
         }
-    }
+    } // init
+
+    private async void CheckLocationStatus(string location)
+    {        
+        var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+
+        if (locationResponse.Success && locationResponse.Data != null)
+        {
+            IsLocationActive = locationResponse.Data.IsActive;
+            if (!IsLocationActive)
+            {
+                HomeUrl = $"/"; // return to national home
+            }
+        }
+        
+    } // location status
+
 }
