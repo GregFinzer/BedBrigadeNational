@@ -60,7 +60,7 @@ One thing you will notice about the following project plan is the lack of due da
     * National Home Page :heavy_check_mark:
     * National About Us Page  :heavy_check_mark:
     * National History of Bed Brigade Page 
-    * National Donations Page
+    * National Donations Page  :heavy_check_mark:
     
 * Locations
     * Location List :heavy_check_mark:
@@ -80,7 +80,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Manage Locations Page :heavy_check_mark:
     * Edit Location :heavy_check_mark:
     * Add Location :heavy_check_mark:
-    * Deactivate/Activate Location
+    * Deactivate/Activate Location :heavy_check_mark:
     * Metro Areas :heavy_check_mark:
     
 * Location Request Bed
@@ -153,20 +153,16 @@ One thing you will notice about the following project plan is the lack of due da
     * Cache get files :heavy_check_mark:
     * Remove Unused Components and Pages
     * Add three image rotators to Bed Brigade Near Me
-    * Location Latitude & Longitude
     * FM Dependent Functionality
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
     * Refresh Header and Footer :heavy_check_mark:
     * Add Page Titles
-    * Custom Icons in Grid Toolbar
     * Review All Code
     * AppOffline for Development :heavy_check_mark:
     * Syncfusion Spinner :heavy_check_mark:
     * Re-add compilerconfig.json :heavy_check_mark:
     * Rework Seeding :heavy_check_mark:
-    * Upgrade to Blazor 9
-    * Blazor 9 Change Render Mode
     * Add Notification Code to Sorry Page :heavy_check_mark:
     * Make seeding environment specific :heavy_check_mark:
     * Add Database Indexes
@@ -199,6 +195,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Design Bulk Email Mailing List
     * Donations Design
     * SMS Design
+    * Delivery Sheet Slow
+    * Update Documentation for Localization
     
 * New Stories
     * Send confirmation email for Bed Request
@@ -210,6 +208,15 @@ One thing you will notice about the following project plan is the lack of due da
     * Volunteer Sign Up New Fields
     * New Manage Bed Request Fields
     * New Bed Request Form Fields
+    * Bust Browser Cache for New Version :heavy_check_mark:
+    * Localizable String Parsing :heavy_check_mark:
+    * Localize Strings :heavy_check_mark:
+    * Test Non-Localized Strings :heavy_check_mark:
+    * Localize Validation Messages :heavy_check_mark:
+    * Localize Drop Downs :heavy_check_mark:
+    * Save Messages Localization :heavy_check_mark:
+    * Send Confirmation Email for Volunteer Sign Up
+    * Localize Dynamic Content
 
     
     
