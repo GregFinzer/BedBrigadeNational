@@ -25,10 +25,7 @@ namespace BedBrigade.Common.Models
 		[MaxLength(30)]
 		public String Name { get; set; } = string.Empty;
 
-		public String? ContentHtml { get; set; } = string.Empty;
-
-
-
-
+        //No MaxLength attribute will default to nvarchar(max)
+        public String? ContentHtml { get; set; } = string.Empty;
 	}
 }

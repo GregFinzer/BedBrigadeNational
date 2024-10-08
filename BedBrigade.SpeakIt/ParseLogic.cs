@@ -11,7 +11,12 @@ namespace BedBrigade.SpeakIt
 {
     public class ParseLogic
     {
-        private static List<string> _ignoreStartsWith = new List<string>() { "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%", "display:" };
+        private static List<string> _ignoreStartsWith = new List<string>()
+        {
+            "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%",
+            "display:", "}", "@(", "@_", "[@_", "else"
+        };
+
         private const string ReplacementMarker = "~~~";
         private const string StringType = "string";
         private const string PropertyTypeGroup = "propertyType";
@@ -40,7 +45,11 @@ namespace BedBrigade.SpeakIt
         private static Regex _styleTag = new Regex(@"<style[^>]*>[^<]*<\/style>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _scriptTag = new Regex(@"<script[^>]*>[^<]*<\/script>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _imgTag = new Regex(@"<img[^>]*>", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _iconTag = new Regex(@"<i\s+class[^>]*><\/i>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _codeTag = new(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _brTag = new(@"(<br>)|(<br\s*\/>)", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _htmlComment = new Regex(@"<!--[\s\S]*?-->", RegexOptions.Compiled | RegexOptions.Multiline);
+
         private static List<Regex> _removePatterns = new List<Regex>()
         {
             // Begin and end tag:  <i class="fa fa-home"></i>
@@ -61,23 +70,40 @@ namespace BedBrigade.SpeakIt
 
         private static List<Regex> _contentPatterns = new List<Regex>()
         {
-            new Regex(@"<a[^>]*>(?<content>.*?)<\/a>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
+            new Regex(@"<a\s[^>]*>(?<content>[\s\S]+?)<\/a>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
             new Regex(@"\sPlaceholder=""(?<content>[^""]+)""\s", RegexOptions.Compiled | RegexOptions.Multiline),
             new Regex(@"\sLabel=""(?<content>[^""]+)""\s", RegexOptions.Compiled | RegexOptions.Multiline),
-            new Regex(@"<button[^<]+>(?<content>.*?)</button>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
-            new Regex(@"<SfButton[^<]+>(?<content>.*?)</SfButton>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
+            new Regex(@"<button[^<]+>(?<content>[\s\S]+?)</button>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
+            new Regex(@"<SfButton[^\/<]+>(?<content>[\s\S]+?)</SfButton>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
             new Regex(@"<label[^<]+>(?<content>\s*[A-Za-z].*?)</label>", RegexOptions.Compiled|RegexOptions.IgnoreCase|RegexOptions.Multiline),
-            new Regex(@"<strong>(?<content>.*?)<\/strong>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<i>(?<content>.*?)<\/i>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<PageTitle>(?<content>.*?)<\/PageTitle>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<span[^>]*>(?<content>.*?)<\/span>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<th[^>]*>(?<content>[A-Za-z].*?)<\/th>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<td[^>]*>(?<content>.*?)<\/td>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<h\d[^>]*>(?<content>.*?)<\/h\d>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<li[^>]*>(?<content>.*?)<\/li>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<pre[^>]*>(?<content>[\s\S]+?)<\/pre>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<p[^>]*>(?<content>[\s\S]+?)<\/p>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            new Regex(@"<div[^>]*>(?<content>\s*[A-Za-z][\s\S]*?)<\/div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<b>(?<content>[\s\S]+?)<\/b>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<i>(?<content>[\s\S]+?)<\/i>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<strong>(?<content>[\s\S]+?)<\/strong>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<em>(?<content>[\s\S]+?)<\/em>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<small>(?<content>[\s\S]+?)<\/small>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<mark>(?<content>[\s\S]+?)<\/mark>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<sub>(?<content>[\s\S]+?)<\/sub>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<sup>(?<content>[\s\S]+?)<\/sup>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<u>(?<content>[\s\S]+?)<\/u>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<s>(?<content>[\s\S]+?)<\/s>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<PageTitle>(?<content>[\s\S]+?)<\/PageTitle>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<span[^\/>]*>(?<content>[\s\S]+?)<\/span>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<th[^\/>]*>(?<content>[A-Za-z].*?)<\/th>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<td[^\/>]*>(?<content>[\s\S]+?)<\/td>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<h\d[^\/>]*>(?<content>[^<]+)<\/h\d>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<li[^\/>]*>(?<content>[\s\S]+?)<\/li>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<code[^\/>]*>(?<content>[\s\S]+?)<\/code>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<pre[^\/>]*>(?<content>[\s\S]+?)<\/pre>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<p[^\/>]*>(?<content>[\s\S]+?)<\/p>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<div[^\/>]*>(?<content>\s*[A-Za-z][\s\S]*?)<\/div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<blockquote[^\/>]*>(?<content>[\s\S]+?)<\/blockquote>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<aside[^\/>]*>(?<content>[\s\S]+?)<\/aside>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<article[^\/>]*>(?<content>[\s\S]+?)<\/article>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<section[^\/>]*>(?<content>[\s\S]+?)<\/section>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<header[^\/>]*>(?<content>[\s\S]+?)<\/header>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<footer[^\/>]*>(?<content>[\s\S]+?)<\/footer>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<nav[^\/>]*>(?<content>[\s\S]+?)<\/nav>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
+            new Regex(@"<main[^\/>]*>(?<content>[\s\S]+?)<\/main>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             //Not wrapped inside an HTML Tag
             new Regex(@"(<\/[A-Za-z0-9]+>+\s*(?<content>[A-Za-z][^<]+))|(^\s*(?<content>[A-Za-z][^<]+))",
                 RegexOptions.Compiled | RegexOptions.Multiline),
@@ -86,7 +112,7 @@ namespace BedBrigade.SpeakIt
         
         public List<ParseResult> GetLocalizableStrings(SpeakItParms parms)
         {
-            if (String.IsNullOrEmpty(parms.ResourceFilePath))
+            if (parms.RemoveLocalizedKeys && String.IsNullOrEmpty(parms.ResourceFilePath))
             {
                 throw new ArgumentException("ResourceFilePath is required");
             }
@@ -302,6 +328,9 @@ namespace BedBrigade.SpeakIt
                 foreach (Match match in matches)
                 {
                     string content = match.Groups[ContentGroup].Value;
+                    if (content.ToLower().Contains("bed frame"))
+                        Console.WriteLine("here");
+
                     content = RemovePatterns(content);
                     AddParseResult(pattern, match, result, content);
                 }
@@ -350,6 +379,9 @@ namespace BedBrigade.SpeakIt
             input = RemoveByTag(input, _styleTag);
             input = RemoveByTag(input, _imgTag);
             input = RemoveByTag(input, _codeTag);
+            input = RemoveByTag(input, _iconTag);
+            input = RemoveByTag(input, _brTag);
+            input = RemoveByTag(input, _htmlComment);
             return input;
         }
 
@@ -467,7 +499,7 @@ namespace BedBrigade.SpeakIt
             return files.Distinct().OrderBy(o => o) .ToList();
         }
 
-        private Dictionary<string, string> ReadYamlFile(string filePath)
+        public Dictionary<string, string> ReadYamlFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -497,13 +529,10 @@ namespace BedBrigade.SpeakIt
 
                 if (!String.IsNullOrEmpty(trimmed)
                     && trimmed.Length >= minStringLength
-                    && !trimmed.StartsWith("@(")
-                    && !trimmed.StartsWith("@_")
-                    && !trimmed.StartsWith("[@_")
-                    && !trimmed.StartsWith("else")
                     && !trimmed.Contains("=\"")
                     && AtLeastOneAlphabeticCharacter(trimmed)
-                    && !_ignoreStartsWith.Any(o => trimmed.StartsWith(o)))
+                    && !_ignoreStartsWith.Any(o => trimmed.StartsWith(o))
+                    && !result.Any(o => String.IsNullOrEmpty(o.FilePath) && o.LocalizableString == trimmed))
                 {
                     result.Add(new ParseResult
                     {
@@ -547,7 +576,7 @@ namespace BedBrigade.SpeakIt
         {
             foreach (var pattern in _removePatterns)
             {
-                html = pattern.Replace(html, string.Empty);
+                html = pattern.Replace(html, ReplacementMarker);
             }
 
             return html;

@@ -262,6 +262,15 @@ namespace BedBrigade.Common.Logic
 
             return currency.Trim();
         }
+
+        public static string CleanUpSpacesAndLineFeeds(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return input.Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ').Replace("  ", " ");
+        }
+
     } // class
 
 

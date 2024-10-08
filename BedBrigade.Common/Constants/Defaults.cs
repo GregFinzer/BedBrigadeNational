@@ -13,5 +13,6 @@
         public const int MetroAreaNoneId = 1;
         public const string PagesDirectory = "pages";
         public const string GroveCityTrimmedRoute = "grove-city";
+        public const int GroveCityLocationId = 2;
     }
 }

@@ -25,6 +25,8 @@ namespace BedBrigade.SpeakIt
             ModifyRazorCSharpFiles(parms, parseResults);
         }
 
+        
+        
         private void ModifyResourceFile(SpeakItParms parms, List<ParseResult> parseResults)
         {
             foreach (var parseResult in parseResults)

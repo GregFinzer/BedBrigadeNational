@@ -14,9 +14,10 @@ namespace BedBrigade.SpeakIt.Tests
     public class LocalizationSeedingSetup
     {
         private ParseLogic _parseLogic = new ParseLogic();
+        private TranslateLogic _translateLogic = new TranslateLogic(null);
         private Dictionary<string, string> _localizableStrings = new Dictionary<string, string>();
 
-        [Test]
+        [Test, Ignore("Seeded National and Grove City. Keep for Polaris.")]
         public void Setup()
         {
             FillLocalizableStrings();
@@ -49,7 +50,7 @@ namespace BedBrigade.SpeakIt.Tests
 
                 foreach (ParseResult parseResult in parseResults)
                 {
-                    string key = ComputeSHA512Hash(parseResult.LocalizableString);
+                    string key = _translateLogic.ComputeSHA512Hash(parseResult.LocalizableString);
                     if (!_localizableStrings.ContainsKey(key))
                     {
                         _localizableStrings.Add(key, parseResult.LocalizableString);
@@ -66,14 +67,6 @@ namespace BedBrigade.SpeakIt.Tests
             }
         }
 
-        private string ComputeSHA512Hash(string input)
-        {
-            using (SHA512 sha512 = SHA512.Create())
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(input);
-                byte[] hash = sha512.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
-        }
+
     }
 }
