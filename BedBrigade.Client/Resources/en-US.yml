@@ -13,7 +13,6 @@ BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 BedsRequested: Beds Requested
 Cancel: Cancel
-ChangePassword: Change Password
 ChooseADate: Choose a Date & Time
 City: City
 ConfigurationKey: Configuration Key
@@ -193,7 +192,6 @@ SelectAVolunteer: Select a Volunteer
 SelectedEventDetails: Selected Event Details
 SelectMetroArea: Select Metro Area
 Send: Send
-SendTaxForms: Send Tax Forms
 ShowPassword: Show Password
 ShowSchedules: Show Schedules
 Sorry: Sorry

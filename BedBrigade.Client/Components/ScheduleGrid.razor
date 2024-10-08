@@ -97,11 +97,11 @@
                                     <div class="row" >
                                         <div class="col-md-7">
                                             <fieldset class="border rounded-3 p-1">
-                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Event Details</b></legend>
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>@_lc.Keys["EventDetails"]</b></legend>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label required"><b>Location</b></label>
+                                                            <label class="example-label required"><b>@_lc.Keys["Location"]</b></label>
                                                             <SfDropDownList TItem="Location" TValue="Int32" DataSource="lstLocations" @bind-Value=@schedule.LocationId Enabled="@enabledLocationSelector" Placeholder="@_lc.Keys["Location"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                                             </SfDropDownList>
@@ -109,7 +109,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label required"><b>Event Name</b></label>
+                                                            <label class="example-label required"><b>@_lc.Keys["EventName"]</b></label>
                                                             <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="@_lc.Keys["EventName"]" maxlength="50" minlength="5" ValidateOnInput="true" />
                                                         </div>
                                                     </div>
@@ -117,7 +117,7 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label required"><b>Event Type</b></label>
+                                                            <label class="example-label required"><b>@_lc.Keys["EventType"]</b></label>
                                                             <SfDropDownList TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="@_lc.Keys["EventType"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                                             </SfDropDownList>
@@ -125,7 +125,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label required"><b>Event Date</b></label>
+                                                            <label class="example-label required"><b>@_lc.Keys["EventDate"]</b></label>
                                                             <SfDateTimePicker ID="EventDateScheduled" TValue="DateTime" @bind-Value="@schedule.EventDateScheduled" Placeholder="@_lc.Keys["ChooseADate"]" ShowClearButton="true" Enabled="true"></SfDateTimePicker>
                                                         </div>
                                                     </div>
@@ -133,13 +133,13 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label"><b>Group Name</b></label>
+                                                            <label class="example-label"><b>@_lc.Keys["GroupName"]</b></label>
                                                             <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="@_lc.Keys["GroupName"]" maxlength="50" />
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label"><b>Event Status</b></label>
+                                                            <label class="example-label"><b>@_lc.Keys["EventStatus"]</b></label>
                                                             <SfDropDownList TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="@_lc.Keys["EventStatus"]">
                                                                 <DropDownListFieldSettings Text="Name" Value="Value" />
                                                             </SfDropDownList>
@@ -150,11 +150,11 @@
                                         </div>
                                         <div class="col-md-2">
                                             <fieldset class="border rounded-3 p-1">
-                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Resources</b></legend>
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>@_lc.Keys["Resources"]</b></legend>
                                                 <div class="row">
                                                     <div class="col">
                                                         <div class="control-wrapper">
-                                                            <label class="example-label"><b>Volunteers</b></label>
+                                                            <label class="example-label"><b>@_lc.Keys["Volunteers"]</b></label>
                                                             <SfNumericTextBox ID="VolunteersMax" TValue="Int32" @bind-Value="@schedule.VolunteersMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
                                                         </div>
                                                     </div>
@@ -163,7 +163,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <fieldset class="border rounded-3 p-1">
-                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>Note / Comment</b></legend>
+                                                <legend class="float-none w-auto p-1" style="font-size: small"><b>@_lc.Keys["NoteComment"]</b></legend>
                                                 <div class="control-wrapper">                                                   
                                                     <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="@_lc.Keys["EventNote"]" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
                                                 </div>

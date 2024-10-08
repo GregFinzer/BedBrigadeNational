@@ -23,6 +23,7 @@ namespace BedBrigade.Tests
             //The static code analysis tool has a defect where it cannot parse the file properly
             //because SpeakItLogic.cs has embedded curly braces in the code
             _qualityLogic.Config.FilesToExclude.Add("CreateLogic.cs");
+            _qualityLogic.Config.FilesToExclude.Add("ParseLogic.cs");
 
             //The static code analysis tool has a defect where it cannot parse the file properly
             //because it cannot handle string interpolation
