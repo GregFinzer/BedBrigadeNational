@@ -21,8 +21,8 @@ namespace BedBrigade.SpeakIt
 
             List<ParseResult> parseResults = _parseLogic.GetLocalizableStrings(parms);
             ModifyResourceFile(parms, parseResults);
-            ModifyRazorFiles(parseResults);
-            ModifyRazorCSharpFiles(parms, parseResults);
+            //ModifyRazorFiles(parseResults);
+            //ModifyRazorCSharpFiles(parms, parseResults);
         }
 
         

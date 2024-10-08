@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Logic;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,12 @@ namespace BedBrigade.SpeakIt
         private static List<string> _ignoreStartsWith = new List<string>()
         {
             "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%",
-            "display:", "}", "@(", "@_", "[@_", "else"
+            "display:", "}", "else", "@*"
+        };
+
+        private static List<string> _ignoreContains = new List<string>()
+        {
+            "@(", "@_", "[@_", "=\""
         };
 
         private const string ReplacementMarker = "~~~";
@@ -49,6 +55,11 @@ namespace BedBrigade.SpeakIt
         private static Regex _codeTag = new(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _brTag = new(@"(<br>)|(<br\s*\/>)", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _htmlComment = new Regex(@"<!--[\s\S]*?-->", RegexOptions.Compiled | RegexOptions.Multiline);
+
+        //Not wrapped inside an HTML Tag
+        private static Regex _notWrapped =
+            new Regex(@"(<\/[A-Za-z0-9]+>+\s*(?<content>[A-Za-z][^<]+))|(^\s*(?<content>[A-Za-z][^<]+))",
+                RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static List<Regex> _removePatterns = new List<Regex>()
         {
@@ -104,9 +115,6 @@ namespace BedBrigade.SpeakIt
             new Regex(@"<footer[^\/>]*>(?<content>[\s\S]+?)<\/footer>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<nav[^\/>]*>(?<content>[\s\S]+?)<\/nav>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
             new Regex(@"<main[^\/>]*>(?<content>[\s\S]+?)<\/main>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
-            //Not wrapped inside an HTML Tag
-            new Regex(@"(<\/[A-Za-z0-9]+>+\s*(?<content>[A-Za-z][^<]+))|(^\s*(?<content>[A-Za-z][^<]+))",
-                RegexOptions.Compiled | RegexOptions.Multiline),
         };
 
         
@@ -328,7 +336,8 @@ namespace BedBrigade.SpeakIt
                 foreach (Match match in matches)
                 {
                     string content = match.Groups[ContentGroup].Value;
-                    if (content.ToLower().Contains("bed frame"))
+
+                    if (content.Contains("@_lc.Keys"))
                         Console.WriteLine("here");
 
                     content = RemovePatterns(content);
@@ -340,6 +349,18 @@ namespace BedBrigade.SpeakIt
                 if (matches.Count > 0)
                 {
                     text = pattern.Replace(text, ReplacementMarker);
+                }
+            }
+
+            //If there is no code, then check for text that is not wrapped in an HTML tag
+            if (!text.Contains("{"))
+            {
+                MatchCollection matches = _notWrapped.Matches(text);
+                foreach (Match match in matches)
+                {
+                    string content = match.Groups[ContentGroup].Value;
+                    content = RemovePatterns(content);
+                    AddParseResult(_notWrapped, match, result, content);
                 }
             }
 
@@ -387,7 +408,7 @@ namespace BedBrigade.SpeakIt
 
         private string RemoveByTag(string input, Regex tag)
         {
-            return tag.Replace(input, string.Empty);
+            return tag.Replace(input, ReplacementMarker);
         }
 
         public Dictionary<string, List<string>> GetDuplicateKeys(SpeakItParms parms)
@@ -529,9 +550,9 @@ namespace BedBrigade.SpeakIt
 
                 if (!String.IsNullOrEmpty(trimmed)
                     && trimmed.Length >= minStringLength
-                    && !trimmed.Contains("=\"")
+                    && !_ignoreStartsWith.Any(sw => trimmed.StartsWith(sw))
+                    && !_ignoreContains.Any(c => trimmed.Contains(c))
                     && AtLeastOneAlphabeticCharacter(trimmed)
-                    && !_ignoreStartsWith.Any(o => trimmed.StartsWith(o))
                     && !result.Any(o => String.IsNullOrEmpty(o.FilePath) && o.LocalizableString == trimmed))
                 {
                     result.Add(new ParseResult

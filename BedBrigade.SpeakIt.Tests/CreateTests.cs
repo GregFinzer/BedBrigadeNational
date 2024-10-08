@@ -5,7 +5,7 @@
     {
         private CreateLogic _logic = new CreateLogic();
 
-        [Test, Ignore("This test should be ignored except locally")]
+        [Test]
         public void CreateLocalizationStringsTest()
         {
             if (TestHelper.IsRunningUnderGitHubActions())
