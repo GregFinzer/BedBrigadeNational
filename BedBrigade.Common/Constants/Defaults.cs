@@ -14,5 +14,6 @@
         public const string PagesDirectory = "pages";
         public const string GroveCityTrimmedRoute = "grove-city";
         public const int GroveCityLocationId = 2;
+        public const string DefaultLanguage = "en-US";
     }
 }

@@ -44,6 +44,15 @@ namespace BedBrigade.Data.Services
             return _cache.BuildCacheKey(entityName, parms);
         }
 
+        public string BuildCacheKey(string entityName, int location, string key, string culture)
+        {
+            Dictionary<string, object> parms = new Dictionary<string, object>();
+            parms.Add("Location", location);
+            parms.Add("StringKey", key);
+            parms.Add("Culture", culture);
+            return _cache.BuildCacheKey(entityName, parms);
+        }
+
         public void ClearAll()
         {
             if (!IsCachingEnabled)

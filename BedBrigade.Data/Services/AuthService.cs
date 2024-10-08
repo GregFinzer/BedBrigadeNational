@@ -1,10 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BedBrigade.Client.Services
+namespace BedBrigade.Data.Services
 {
     /// <summary>
     /// Store and manage the current user's authentication state as a browser Session JWT and in Server Side Blazor

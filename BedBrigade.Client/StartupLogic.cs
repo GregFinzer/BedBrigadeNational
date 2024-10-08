@@ -123,6 +123,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ILoadImagesService, LoadImagesService>();
             builder.Services.AddScoped<ILocationState, LocationState>();
             builder.Services.AddLanguageContainerForBlazorServer<EmbeddedResourceKeysProvider>(Assembly.GetExecutingAssembly(), "Resources");
+            builder.Services.AddScoped<ILanguageService, LanguageService>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace BedBrigade.Client.Services
+namespace BedBrigade.Data.Services
 {
     public interface IAuthService
     {

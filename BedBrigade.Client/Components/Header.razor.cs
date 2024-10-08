@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Security.Claims;
 using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -22,7 +24,9 @@ namespace BedBrigade.Client.Components
         [Inject] private NavigationManager _nm { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
+        [Inject] private ILanguageService _svcLanguage { get; set; }
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
@@ -42,6 +46,13 @@ namespace BedBrigade.Client.Components
             await LoadContent();
             _svcAuth.AuthChanged += OnAuthChanged;
             _locationState.OnChange += OnLocationChanged;
+            _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
+
+        private async Task OnLanguageChanged(CultureInfo arg)
+        {
+            await LoadContent();
+            StateHasChanged();
         }
 
         private Task OnAuthChanged(ClaimsPrincipal arg)
@@ -77,17 +88,44 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                var contentResult = await _svcContent.GetAsync("Header", locationResult.Data.LocationId);
-
-                if (contentResult.Success)
+                if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
                 {
-                    headerContent = contentResult.Data.ContentHtml;
-                    PreviousLocation = locationName;
+                    await LoadDefaultContent(locationResult, locationName);
                 }
                 else
                 {
-                    Log.Logger.Error($"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
+                    await LoadContentByLanguage(locationResult, locationName);
                 }
+            }
+        }
+
+        private async Task LoadContentByLanguage(ServiceResponse<Location> locationResult, string locationName)
+        {
+            var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId, _svcLanguage.CurrentCulture.Name);
+
+            if (contentResult.Success)
+            {
+                headerContent = contentResult.Data.ContentHtml;
+                PreviousLocation = locationName;
+            }
+            else
+            {
+                await LoadDefaultContent(locationResult, locationName);
+            }
+        }
+
+        private async Task LoadDefaultContent(ServiceResponse<Location> locationResult, string locationName)
+        {
+            var contentResult = await _svcContent.GetAsync("Header", locationResult.Data.LocationId);
+
+            if (contentResult.Success)
+            {
+                headerContent = contentResult.Data.ContentHtml;
+                PreviousLocation = locationName;
+            }
+            else
+            {
+                Log.Logger.Error($"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
             }
         }
 
@@ -95,6 +133,7 @@ namespace BedBrigade.Client.Components
         {
             _svcAuth.AuthChanged -= OnAuthChanged;
             _locationState.OnChange -= OnLocationChanged; // Unsubscribe from the event
+            _svcLanguage.LanguageChanged -= OnLanguageChanged;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -179,13 +218,13 @@ namespace BedBrigade.Client.Components
 
         private void SetSpanish()
         {
-            _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("es-MX"));
+            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("es-MX");
             English = false;
         }
 
         private void SetEnglish()
         {
-            _lc.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
             English = true;
         }
     }
