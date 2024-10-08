@@ -41,6 +41,12 @@
     </ItemGroup>
 
   
+  
+    <ItemGroup>
+      <Folder Include="Data\Seeding\SeedTranslations\" />
+    </ItemGroup>
+
+  
 
 
 </Project>

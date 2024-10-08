@@ -6,6 +6,7 @@ namespace BedBrigade.Common.Logic
 {
     public static class StringUtil
     {
+        private const char spaceChar = ' ';
         private const string hrefExpression = @"<a[^>]*>.*<\/a>";
         private static Regex _hrefRegex = new Regex(hrefExpression, RegexOptions.Compiled);
         private const string javaScriptExpression = @"<a.+javascript[^>]+>[^>]+>";
@@ -165,7 +166,7 @@ namespace BedBrigade.Common.Logic
                 else if (isUpperOrNumber && isLastUpper == false
                     || isUpperOrNumber && isNextCharLower && isLastUpper == true)
                 {
-                    sb.Append(' ');
+                    sb.Append(space);
                     isLastUpper = true;
                 }
                 else if (isLower)
@@ -262,6 +263,15 @@ namespace BedBrigade.Common.Logic
 
             return currency.Trim();
         }
+
+        public static string CleanUpSpacesAndLineFeeds(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return input.Replace('\r', spaceChar).Replace('\n', spaceChar).Replace('\t', spaceChar).Replace("  ", " ");
+        }
+
     } // class
 
 

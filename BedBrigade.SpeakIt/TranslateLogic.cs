@@ -1,6 +1,9 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 
@@ -8,6 +11,7 @@ namespace BedBrigade.SpeakIt
 {
     public class TranslateLogic : ITranslateLogic
     {
+        private static ParseLogic _parseLogic = new ParseLogic();
         public static string ResourceName = "Resources.en-US.yml"; 
         private static Dictionary<string, string>? _keyValuePairs;
         private static Dictionary<string, string>? _valueKeyPairs;
@@ -18,6 +22,68 @@ namespace BedBrigade.SpeakIt
         {
             _lc = languageContainerService;
         }
+
+        public string? ParseAndTranslateText(string input, string targetCulture,
+            Dictionary<string, List<Translation>> translations)
+        {
+            var parseResults = _parseLogic.GetLocalizableStringsInText(input);
+            parseResults = parseResults.OrderByDescending(o => o.LocalizableString.Length).ToList();
+
+            foreach (var parseResult in parseResults)
+            {
+                if (parseResult.LocalizableString.Contains("We are compelled"))
+                    Console.WriteLine("here");
+
+                string hash = ComputeSHA512Hash(parseResult.LocalizableString);
+
+                if (!translations.ContainsKey(hash))
+                    continue;
+
+                var source = translations[hash].FirstOrDefault(o =>
+                    o.Culture == "en-US" && StringUtil.CleanUpSpacesAndLineFeeds(o.Content) == StringUtil.CleanUpSpacesAndLineFeeds(parseResult.LocalizableString));
+
+                if (source == null)
+                    continue;
+
+                var target = translations[hash].FirstOrDefault(o => o.Culture == targetCulture && o.ParentId == source.TranslationId);
+
+                if (target != null)
+                {
+                    input = input.Replace(parseResult.LocalizableString, target.Content);
+                }
+            }
+
+            return input;
+        }
+
+        public string ComputeSHA512Hash(string input)
+        {
+            using (SHA512 sha512 = SHA512.Create())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
+                byte[] hash = sha512.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+        public Dictionary<string, List<Translation>> TranslationsToDictionary(List<Translation> translations)
+        {
+            Dictionary<string, List<Translation>> translationsDictionary = new Dictionary<string, List<Translation>>();
+
+            foreach (var translation in translations)
+            {
+                if (!translationsDictionary.ContainsKey(translation.Hash))
+                {
+                    translationsDictionary.Add(translation.Hash, new List<Translation>());
+                }
+
+                translationsDictionary[translation.Hash].Add(translation);
+            }
+
+            return translationsDictionary;
+
+        }
+
 
         public string? GetTranslation(string? value)
         {
@@ -70,6 +136,7 @@ namespace BedBrigade.SpeakIt
 
         private void Initialize()
         {
+            
             if (_keyValuePairs != null && _valueKeyPairs != null)
             {
                 return;

@@ -34,48 +34,51 @@ DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress
 DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationDate: Donation Date
+DynamicApril: April
+DynamicAprilBedBuild: April Bed Build
+DynamicAugust: August
+DynamicAugustBedBuild: August Bed Build
 DynamicBed: Bed
 DynamicBuild: Build
 DynamicCut: Cut
-DynamicDelivery: Delivery
-DynamicOther: Other
-DynamicJanuary: January
-DynamicFebruary: February
-DynamicMarch: March
-DynamicApril: April
-DynamicMay: May
-DynamicJune: June
-DynamicJuly: July
-DynamicAugust: August
-DynamicSeptember: September
-DynamicOctober: October
-DynamicNovember: November
 DynamicDecember: December
-DynamicSunday: Sunday
+DynamicDecemberBedBuild: December Bed Build
+DynamicDelivery: Delivery
+DynamicFebruary: February
+DynamicFebruaryBedBuild: February Bed Build
+DynamicFriday: Friday
+DynamicJanuary: January
+DynamicJanuaryBedBuild: January Bed Build
+DynamicJuly: July
+DynamicJulyBedBuild: July Bed Build
+DynamicJune: June
+DynamicJuneBedBuild: June Bed Build
+DynamicMarch: March
+DynamicMarchBedBuild: March Bed Build
+DynamicMay: May
+DynamicMayBedBuild: May Bed Build
 DynamicMonday: Monday
+DynamicNovember: November
+DynamicNovemberBedBuild: November Bed Build
+DynamicOctober: October
+DynamicOctoberBedBuild: October Bed Build
+DynamicOther: Other
+DynamicSaturday: Saturday
+DynamicSeptember: September
+DynamicSeptemberBedBuild: September Bed Build
+DynamicSunday: Sunday
+DynamicThursday: Thursday
 DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
-DynamicThursday: Thursday
-DynamicFriday: Friday
-DynamicSaturday: Saturday
-DynamicJanuaryBedBuild: January Bed Build
-DynamicFebruaryBedBuild: February Bed Build
-DynamicMarchBedBuild: March Bed Build
-DynamicAprilBedBuild: April Bed Build
-DynamicMayBedBuild: May Bed Build
-DynamicJuneBedBuild: June Bed Build
-DynamicJulyBedBuild: July Bed Build
-DynamicAugustBedBuild: August Bed Build
-DynamicSeptemberBedBuild: September Bed Build
-DynamicOctoberBedBuild: October Bed Build
-DynamicNovemberBedBuild: November Bed Build
-DynamicDecemberBedBuild: December Bed Build
 Email: Email
 EmailColon: 'Email:'
 English: English
 EnterText: Enter text
 EnterYourZipCode: Enter your Zip code
+Event: Event
+EventDate: Event Date
 EventDateTime: Event Date & Time
+EventDetails: Event Details
 EventGroup: Event Group
 EventidColon: 'EventID:'
 EventName: Event Name
@@ -85,8 +88,8 @@ EventType: Event Type
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FindABedBrigade: Find a Bed Brigade Near Me
 FirstName: First Name
-FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FolderColon: 'Folder:'
+FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
 GroupName: Group Name
@@ -132,6 +135,7 @@ NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
 NoLocationsHavePostalCodes: No locations have postal codes
+NoteComment: Note / Comment
 Notes: Notes
 NothingToSend: Nothing to send
 NotSent: Not Sent
@@ -156,8 +160,11 @@ RequiredAgesGender: Please indicate the age and gender of children
 RequiredBody: Body is required.
 RequiredCity: City is required
 RequiredConfirmPassword: Confirm Password is required
+RequiredContent: Content is required
+RequiredCulture: Culture is required
 RequiredEmail: Email Address is required
 RequiredFirstName: First Name is required
+RequiredHash: Hash is required
 RequiredLastName: Last Name is required
 RequiredMessage: Message is required
 RequiredName: Name is required
@@ -169,6 +176,7 @@ RequiredPostalCode: Postal Code (Zip Code) is required
 RequiredStreet: Street Address is required
 RequiredSubject: Subject is required.
 RequiredUserId: User Id is required
+Resources: Resources
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
@@ -206,18 +214,20 @@ UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
 VehicleTypeColon: 'Vehicle Type:'
+Volunteer: Volunteer
 VolunteerForAnotherEvent: Volunteer for Another Event
+VolunteerFormNotCompleted: The Volunteer Form is not completed!
 VolunteeridColon: 'VolunteerID:'
 VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
 VolunteerRegistration: Volunteer Registration
-VolunteersRegisteredneeded: Volunteers registered/needed
-VolunteerFormNotCompleted: The Volunteer Form is not completed!
-VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
-VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
+Volunteers: Volunteers
 VolunteerSignUpAgain: Thanks for serving again {fullName}
 VolunteerSignUpAgainSubtitle: We appreciate you continuing to serve with the Bed Brigade Volunteer Team.
-YouWereTryingTo: 'You were trying to access the page: '
+VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
+VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
+VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
+YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code

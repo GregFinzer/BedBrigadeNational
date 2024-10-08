@@ -233,7 +233,148 @@ namespace BedBrigade.SpeakIt.Tests
             File.WriteAllText(outputFileName, sb.ToString());
         }
 
+        [Test]
+        public void ParseH4WithSpaces()
+        {
+            string input = @"    <section id=""nat-our-mission-section""
+             class=""container-fluid py-5""
+             style=""background-color: #f8f9fa"">
+        <div class=""container"">
+            <div class=""row justify-content-center"">
+                <div class=""col-lg-8 text-center"">
+                    <h2 class=""display-4 mb-4 wow fadeInUp"">NUESTRA MISIÓN</h2>
+                    <h4 class=""mb-4 wow fadeInUp""
+                        style=""font-style: italic; color: #495057"">
+                        We are compelled by the love of Christ to impact the Kingdom of
+                        God by serving those in need. We will not give up in doing good.
+                    </h4>
+                    <p class=""mb-4 wow fadeInUp"" style=""color: #6c757d"">
+                        Bed Brigade is a non-profit faith based charity that builds and
+                        delivers beds for those in need of a bed. We want you to know
+                        that God sees the situation that you are in. God knows who you
+                        are. God loves you.
+                    </p>
+                    <div class=""wow fadeInUp mb-4"">
+                        <img src=""media/national/pages/home/YouAreLoved.webp""
+                             alt=""You Are Loved""
+                             class=""img-fluid rounded-10 shadow""
+                             style=""max-width: 100%; height: auto"" />
+                    </div>
+                    <a href=""/National/AboutUs"" class=""btn btn-primary wow fadeInUp"">Más Sobre Nosotros</a>
+                </div>
+            </div>
+        </div>
+    </section>";
 
+            //Act
+            List<ParseResult> result = _logic.GetLocalizableStringsInText(input);
 
+            //Assert
+            Assert.IsTrue(result.Count > 0);
+            Assert.IsTrue(result.Any(o => o.LocalizableString.Contains("We are compelled")));
+
+        }
+
+        [Test]
+
+        public void LiWithIcon()
+        {
+            string input = @"        <div class=""row"">
+            <!-- Left Column: Subtitle with Bullet Points -->
+            <div class=""col-md-6 wow fadeInUp"">
+                <h3 class=""mb-3"">Estamos marcando la diferencia una cama a la vez</h3>
+                <ul class=""list-unstyled"">
+                    <li>
+                        <i class=""fas fa-check-circle me-2""></i> Do you or your child
+                        need a good nights sleep?
+                    </li>
+                    <li>
+                        <i class=""fas fa-check-circle me-2""></i> Do you or your child
+                        want to be rested so that they can be all that God created them
+                        to be?
+                    </li>
+                    <li>
+                        <i class=""fas fa-check-circle me-2""></i> We are ready to serve
+                        you
+                    </li>
+                </ul>
+                <a class=""btn btn-primary"" href=""/request-bed"">Solicitar una cama</a>
+                <div class=""spacer-single""></div>
+            </div>
+
+            <!-- Right Column: Image -->
+            <div class=""col-md-6 text-center wow fadeInRight"">
+                <img src=""media/national/pages/home/RequestABedRotator/20231007_103601.webp""
+                     width=""300px""
+                     alt=""Bed Brigade""
+                     class=""img-fluid rounded-10"" />
+            </div>
+        </div>";
+
+            //Act
+            List<ParseResult> result = _logic.GetLocalizableStringsInText(input);
+
+            //Assert
+            Assert.IsTrue(result.Count > 0);
+            Assert.IsTrue(result.Any(o => o.LocalizableString.Contains("Do you or your child")));
+
+        }
+
+        [Test]
+
+        public void PWithSpace()
+        {
+            string input = @"    <section id=""nat-our-mission-section""
+             class=""container-fluid py-5""
+             style=""background-color: #f8f9fa"">
+        <div class=""container"">
+            <div class=""row justify-content-center"">
+                <div class=""col-lg-8 text-center"">
+                    <h2 class=""display-4 mb-4 wow fadeInUp"">NUESTRA MISIÓN</h2>
+                    <h4 class=""mb-4 wow fadeInUp""
+                        style=""font-style: italic; color: #495057"">
+                        We are compelled by the love of Christ to impact the Kingdom of
+                        God by serving those in need. We will not give up in doing good.
+                    </h4>
+                    <p class=""mb-4 wow fadeInUp"" style=""color: #6c757d"">
+                        Bed Brigade is a non-profit faith based charity that builds and
+                        delivers beds for those in need of a bed. We want you to know
+                        that God sees the situation that you are in. God knows who you
+                        are. God loves you.
+                    </p>
+                    <div class=""wow fadeInUp mb-4"">
+                        <img src=""media/national/pages/home/YouAreLoved.webp""
+                             alt=""You Are Loved""
+                             class=""img-fluid rounded-10 shadow""
+                             style=""max-width: 100%; height: auto"" />
+                    </div>
+                    <a href=""/National/AboutUs"" class=""btn btn-primary wow fadeInUp"">Más Sobre Nosotros</a>
+                </div>
+            </div>
+        </div>
+    </section>";
+
+            //Act
+            List<ParseResult> result = _logic.GetLocalizableStringsInText(input);
+
+            //Assert
+            Assert.IsTrue(result.Count > 0);
+            Assert.IsTrue(result.Any(o => o.LocalizableString.Contains("faith based charity")));
+
+        }
+
+        [Test]
+        public void ParseHomePage()
+        {
+            string filePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml", "Home.html");
+            string html = File.ReadAllText(filePath);
+
+            //Act
+            List<ParseResult> result = _logic.GetLocalizableStringsInText(html);
+
+            //Assert
+            Assert.IsTrue(result.Count > 0);
+            Assert.IsTrue(result.Any(o => o.LocalizableString.StartsWith("Do you or your child") && o.LocalizableString.EndsWith("need a good nights sleep?") ));
+        }
     }
 }

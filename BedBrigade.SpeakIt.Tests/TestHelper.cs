@@ -6,7 +6,15 @@ namespace BedBrigade.SpeakIt.Tests
     {
 
         public static List<string> ExcludeDirectories = new List<string> { "Administration", "Layout" };
-        public static List<string> ExcludeFiles = new List<string> { "Error.razor", "CustomErrorBoundary.razor", "SignUpGrid.razor.cs", "SignUpHelper.cs" };
+
+        public static List<string> ExcludeFiles = new List<string>
+        {
+            "Error.razor", 
+            "CustomErrorBoundary.razor",
+            "SignUpGrid.razor.cs", 
+            "SignUpHelper.cs",
+        };
+
         public static List<string> WildcardPatterns = new List<string> { "*.razor", "*.cs" };
 
         public static List<string> GetSourceDirectories()

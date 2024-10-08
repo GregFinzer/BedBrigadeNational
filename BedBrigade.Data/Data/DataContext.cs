@@ -28,6 +28,8 @@ namespace BedBrigade.Data
         public virtual DbSet<SignUp> SignUps { get; set; }
         public virtual DbSet<Template> Templates { get; set; }
         public virtual DbSet<MetroArea> MetroAreas { get; set; }
+        public virtual DbSet<Translation> Translations { get; set; }
+        public virtual DbSet<ContentTranslation> ContentTranslations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

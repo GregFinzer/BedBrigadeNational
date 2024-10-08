@@ -107,6 +107,8 @@ public static class Seed
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
         await SeedSchedules(contextFactory);
+        await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
+        await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
     }
 
     private static async Task SeedMetroAreas(IDbContextFactory<DataContext> contextFactory)
