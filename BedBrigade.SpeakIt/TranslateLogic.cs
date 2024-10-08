@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using YamlDotNet.Serialization.NamingConventions;
@@ -49,8 +50,28 @@ namespace BedBrigade.SpeakIt
 
                 if (target != null)
                 {
-                    input = input.Replace(parseResult.LocalizableString, target.Content);
+                    input = IntelligentReplace(input, parseResult.LocalizableString, target.Content);
                 }
+            }
+
+            return input;
+        }
+
+        public string IntelligentReplace(string input, string search, string replace)
+        {
+            //Basically we don't want to replace the search string if it is part of a URL, or an HTML attribute
+            string pattern = $"(?<leftChar>[^\\/\"'])(?<content>{Regex.Escape(search)})(?<rightChar>[^\\/\"'])";
+            Regex regex = new Regex(pattern, RegexOptions.Multiline);
+
+            MatchCollection matches = regex.Matches(input);
+
+            foreach (Match match in matches)
+            {
+                string leftChar = match.Groups["leftChar"].Value;
+                string rightChar = match.Groups["rightChar"].Value;
+                string newSearch = leftChar + search + rightChar;
+                string newReplace = leftChar + replace + rightChar;
+                input = input.Replace(newSearch, newReplace);
             }
 
             return input;

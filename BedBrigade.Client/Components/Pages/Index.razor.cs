@@ -8,12 +8,15 @@ using Serilog;
 using System;
 using System.Data.Entity.Core.Mapping;
 using System.Diagnostics;
+using System.Globalization;
+using BedBrigade.Common.Models;
 using KellermanSoftware.NetEmailValidation;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components.Pages
 {
 
-    public partial class Index : ComponentBase
+    public partial class Index : ComponentBase, IDisposable
     {
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
@@ -23,6 +26,9 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject]
         private ILocationState _locationState { get; set; }
+        [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
+
+        [Inject] private ILanguageService _svcLanguage { get; set; }
 
         [Parameter] public string? mylocation { get; set; }
         [Parameter] public string? mypageName { get; set; }
@@ -42,6 +48,20 @@ namespace BedBrigade.Client.Components.Pages
             string location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
             string pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
             await LoadLocationPage(location, pageName);
+            _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
+
+        private async Task OnLanguageChanged(CultureInfo arg)
+        {
+            string location = string.IsNullOrEmpty(mylocation) ? defaultLocation : mylocation;
+            string pageName = string.IsNullOrEmpty(mypageName) ? defaultPageName : mypageName;
+            await LoadLocationPage(location, pageName);
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            _svcLanguage.LanguageChanged -= OnLanguageChanged;
         }
 
         protected override async Task OnParametersSetAsync()
@@ -76,32 +96,25 @@ namespace BedBrigade.Client.Components.Pages
         private async Task<bool> LoadLocationPage(string location, string pageName)
         {
             Log.Logger.Debug("Index.LoadLocationPage");
-
+            bool found = false;
             try
             {
                 var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
 
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
-                    //Debug.WriteLine($"Location passed {location} Location {locationResponse.Data.LocationId} ");
-                    var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
-                    //Debug.WriteLine($"Page: {pageName} Location: {locationResponse.Data.LocationId}");
-                    if (contentResult.Success)
-                    {                       
-                        var path = $"/{location}/pages/{pageName}";
-                        string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-                        BodyContent = html;
+                    if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                    {
+                        found= await LoadDefaultContent(location, pageName, locationResponse);
                     }
                     else
                     {
-                        //_navigationManager.NavigateTo($"/Sorry/{location}/{pageName}", true);
-                        _navigationManager.NavigateTo(SorryPageUrl, true);
-                        return false;
+                        found = await LoadContentByLanguage(location, pageName, locationResponse);
                     }
                 }
-                else
+
+                if (!found)
                 {
-                    //_navigationManager.NavigateTo($"/Sorry/{location}", true);
                     _navigationManager.NavigateTo(SorryPageUrl, true);
                     return false;
                 }
@@ -113,7 +126,40 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        } // Load Location Page
+        }
+
+        private async Task<bool> LoadContentByLanguage(string location, string pageName, ServiceResponse<Location> locationResponse)
+        {
+            var contentResult = await _svcContentTranslation.GetAsync(pageName, locationResponse.Data.LocationId, _svcLanguage.CurrentCulture.Name);
+            if (contentResult.Success)
+            {
+                var path = $"/{location}/pages/{pageName}";
+                string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
+                BodyContent = html;
+                return true;
+            }
+
+            return await LoadDefaultContent(location, pageName, locationResponse);
+        }
+
+        private async Task<bool> LoadDefaultContent(string location, string pageName, ServiceResponse<Location> locationResponse)
+        {
+            var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
+            if (contentResult.Success)
+            {                       
+                var path = $"/{location}/pages/{pageName}";
+                string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
+                BodyContent = html;
+            }
+            else
+            {
+                _navigationManager.NavigateTo(SorryPageUrl, true);
+                return false;
+            }
+
+            return true;
+        }
+        
 
 
         private async void ValidateUrlParameters()
