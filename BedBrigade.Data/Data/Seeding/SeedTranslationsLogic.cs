@@ -92,8 +92,7 @@ namespace BedBrigade.Data.Data.Seeding
         private static async Task SeedCultureTranslation(DataContext context, string culture, List<Translation>? englishContent)
         {
             string fileName = culture + ".yml";
-            string path = Path.Combine(FileUtil.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding",
-                "SeedTranslations", fileName);
+            string path = Path.Combine(FileUtil.GetSeedingDirectory(), "SeedTranslations", fileName);
 
             Dictionary<string, string> fileTranslations = parseLogic.ReadYamlFile(path);
 
