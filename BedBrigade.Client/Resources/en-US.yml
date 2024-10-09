@@ -72,7 +72,6 @@ DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
 Email: Email
 EmailColon: 'Email:'
-English: English
 EnterText: Enter text
 EnterYourZipCode: Enter your Zip code
 Event: Event
@@ -197,7 +196,6 @@ ShowSchedules: Show Schedules
 Sorry: Sorry
 SorryThePage: Sorry - the page associated with this link was not found.
 SorryYouAreNot: Sorry, you are not authorized to view this page.
-Spanish: Spanish
 SpecialInstructions: Special Instructions
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}

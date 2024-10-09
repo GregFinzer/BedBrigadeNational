@@ -7,6 +7,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 
 using Microsoft.JSInterop;
@@ -27,6 +28,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
+        [Inject] private ITranslateLogic _translateLogic { get; set; } 
+
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
@@ -38,7 +41,23 @@ namespace BedBrigade.Client.Components
 
         private string PreviousLocation { get; set; } 
         private ClaimsPrincipal? User { get; set; }
-        private bool English { get; set; } = true;
+
+        private string? _selectedCulture;
+        public List<CultureInfo> Cultures { get; set; } = new List<CultureInfo>();
+
+        public string? SelectedCulture
+        {
+            get => _selectedCulture;
+            set
+            {
+                if (_selectedCulture != value)
+                {
+                    _selectedCulture = value;
+                    _svcLanguage.CurrentCulture = CultureInfo.GetCultureInfo(value);
+                }
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
@@ -47,6 +66,13 @@ namespace BedBrigade.Client.Components
             _svcAuth.AuthChanged += OnAuthChanged;
             _locationState.OnChange += OnLocationChanged;
             _svcLanguage.LanguageChanged += OnLanguageChanged;
+
+            if (Cultures.Count == 0)
+            {
+                Cultures = _translateLogic.GetRegisteredLanguages();
+            }
+
+            _selectedCulture = _lc.CurrentCulture.Name;
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)
@@ -70,6 +96,14 @@ namespace BedBrigade.Client.Components
             return Task.CompletedTask;
         }
 
+        public static string RemoveTextAfterParenthesis(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            int parenthesisIndex = input.IndexOf('(');
+            return parenthesisIndex > 0 ? input.Substring(0, parenthesisIndex).Trim() : input;
+        }
 
         private async Task OnLocationChanged()
         {
@@ -216,16 +250,6 @@ namespace BedBrigade.Client.Components
         }
 
 
-        private void SetSpanish()
-        {
-            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("es-MX");
-            English = false;
-        }
 
-        private void SetEnglish()
-        {
-            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-            English = true;
-        }
     }
 }

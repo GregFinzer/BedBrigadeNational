@@ -72,7 +72,6 @@ DynamicTuesday: Martes
 DynamicWednesday: Miércoles
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
-English: Inglés
 EnterText: Introducir texto
 EnterYourZipCode: Ingresa tu código postal
 Event: Evento
@@ -197,7 +196,6 @@ ShowSchedules: Mostrar horarios
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
 SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
-Spanish: Español
 SpecialInstructions: Instrucciones especiales
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}

@@ -1,4 +1,5 @@
-﻿using AKSoftware.Localization.MultiLanguages;
+﻿using System.Globalization;
+using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -16,12 +17,48 @@ namespace BedBrigade.SpeakIt
         public static string ResourceName = "Resources.en-US.yml"; 
         private static Dictionary<string, string>? _keyValuePairs;
         private static Dictionary<string, string>? _valueKeyPairs;
+        private static List<CultureInfo>? _registeredLanguages;
 
         private readonly ILanguageContainerService _lc;
 
         public TranslateLogic(ILanguageContainerService languageContainerService)
         {
             _lc = languageContainerService;
+        }
+
+        public List<CultureInfo> GetRegisteredLanguages()
+        {
+            const string resourceFolder = "Resources";
+
+            if (_registeredLanguages != null)
+                return _registeredLanguages;
+
+            Assembly[] loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<CultureInfo> cultures = new List<CultureInfo>();
+
+            foreach (Assembly assembly in loadedAssemblies)
+            {
+                // Get the resource names in the current assembly
+                string[] resourceNames = assembly.GetManifestResourceNames();
+
+                foreach (var resourceName in resourceNames)
+                {
+                    if (resourceName.Contains("Resources") && resourceName.EndsWith(".yml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int resourceIndex = resourceName.IndexOf(resourceFolder, StringComparison.Ordinal);
+
+                        if (resourceIndex == -1)
+                            continue;
+
+                        string file = resourceName.Substring(resourceIndex + resourceFolder.Length + 1);
+                        string cultureName = Path.GetFileNameWithoutExtension(file);
+                        cultures.Add(new CultureInfo(cultureName));
+                    }
+                }
+            }
+        
+            _registeredLanguages = cultures;
+            return _registeredLanguages;
         }
 
         public string? CleanUpSpacesAndLineFeedsFromHtml(string input)
