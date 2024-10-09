@@ -269,7 +269,7 @@ namespace BedBrigade.Common.Logic
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            return input.Replace('\r', spaceChar).Replace('\n', spaceChar).Replace('\t', spaceChar).Replace("  ", " ");
+            return Regex.Replace(input, @"\s+", " ");
         }
 
     } // class

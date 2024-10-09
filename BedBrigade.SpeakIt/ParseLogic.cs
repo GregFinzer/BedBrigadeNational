@@ -336,10 +336,6 @@ namespace BedBrigade.SpeakIt
                 foreach (Match match in matches)
                 {
                     string content = match.Groups[ContentGroup].Value;
-
-                    if (content.Contains("@_lc.Keys"))
-                        Console.WriteLine("here");
-
                     content = RemovePatterns(content);
                     AddParseResult(pattern, match, result, content);
                 }

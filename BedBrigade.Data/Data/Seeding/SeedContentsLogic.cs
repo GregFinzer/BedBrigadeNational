@@ -2,6 +2,7 @@
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Seeding;
+using BedBrigade.SpeakIt;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -9,6 +10,8 @@ namespace BedBrigade.Data.Data.Seeding;
 
 public static class SeedContentsLogic
 {
+    private static TranslateLogic _translateLogic = new TranslateLogic(null);
+
     public static async Task SeedContents(IDbContextFactory<DataContext> _contextFactory)
     {
         using (var context = _contextFactory.CreateDbContext())
@@ -43,6 +46,8 @@ public static class SeedContentsLogic
         if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == (int) LocationNumber.National))
         {
             var seedHtml = WebHelper.GetHtml("Donations.html");
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
             var content = new Content
             {
                 LocationId = (int)LocationNumber.National,
@@ -105,6 +110,7 @@ public static class SeedContentsLogic
             seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
             seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
             seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
         }
 
         var content = new Content
@@ -175,6 +181,12 @@ public static class SeedContentsLogic
                 seedHtml = WebHelper.GetHtml("LocationHeader.html");
             }
 
+            seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+            seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+            seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
             Content content = new Content
             {
                 LocationId = location.LocationId,
@@ -183,9 +195,7 @@ public static class SeedContentsLogic
                 ContentHtml = seedHtml,
             };
 
-            content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
-            content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
-            content.ContentHtml = content.ContentHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+
 
             SeedRoutines.SetMaintFields(content);
             context.Content.Add(content);
@@ -225,6 +235,12 @@ public static class SeedContentsLogic
                 seedHtml = WebHelper.GetHtml("LocationFooter.html");
             }
 
+            seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+            seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+            seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
             var content = new Content
             {
                 LocationId = location.LocationId,
@@ -233,9 +249,6 @@ public static class SeedContentsLogic
                 ContentHtml = seedHtml
             };
 
-            content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
-            content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
-            content.ContentHtml = content.ContentHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
             SeedRoutines.SetMaintFields(content);
             context.Content.Add(content);
 
@@ -287,6 +300,8 @@ public static class SeedContentsLogic
                         break;
                 }
 
+                seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
                 var content = new Content
                 {
                     LocationId = location.LocationId!,
@@ -325,6 +340,7 @@ public static class SeedContentsLogic
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
             var seedHtml = WebHelper.GetHtml("History.html");
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
             {
@@ -356,6 +372,8 @@ public static class SeedContentsLogic
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
             var seedHtml = WebHelper.GetHtml("Locations.html");
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
             var content = new Content
             {
                 LocationId = (int)LocationNumber.National,
@@ -427,6 +445,12 @@ public static class SeedContentsLogic
                     seedHtml = WebHelper.GetHtml("LocationAboutUs.html");
                 }
 
+                seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
+                seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+                seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
+
+                seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
                 var content = new Content
                 {
                     LocationId = location.LocationId!,
@@ -436,9 +460,6 @@ public static class SeedContentsLogic
                     Title = "About Us"
                 };
 
-                content.ContentHtml = content.ContentHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
-                content.ContentHtml = content.ContentHtml.Replace("%%LocationName%%", location.Name);
-                content.ContentHtml = content.ContentHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
 
                 SeedRoutines.SetMaintFields(content);
                 context.Content.Add(content);
