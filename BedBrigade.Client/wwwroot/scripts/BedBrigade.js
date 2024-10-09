@@ -116,5 +116,8 @@ window.BedBrigadeUtil = {
             speed: 0.2,
             imgPosition: imgPosition
         });
+    },
+    GetBrowserLocale: function () {
+        return (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.userLanguage || navigator.language || navigator.browserLanguage || 'en-US';
     }
 }

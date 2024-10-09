@@ -24,9 +24,12 @@ namespace BedBrigade.Data.Services
             }
             set
             {
-                _currentCulture = value;
-                _lc.SetLanguage(value);
-                NotifyLanguageChangedAsync();
+                if (_currentCulture.Name != value.Name)
+                {
+                    _currentCulture = value;
+                    _lc.SetLanguage(value);
+                    NotifyLanguageChangedAsync();
+                }
             }
         }
 

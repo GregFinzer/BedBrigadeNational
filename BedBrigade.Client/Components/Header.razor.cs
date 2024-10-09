@@ -8,6 +8,7 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 
 using Microsoft.JSInterop;
@@ -28,8 +29,9 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
-        [Inject] private ITranslateLogic _translateLogic { get; set; } 
+        [Inject] private ITranslateLogic _translateLogic { get; set; }
 
+        [Inject] private ILocalStorageService _localStorage { get; set; }
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
@@ -39,7 +41,7 @@ namespace BedBrigade.Client.Components
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
 
-        private string PreviousLocation { get; set; } 
+        private string PreviousLocation { get; set; }
         private ClaimsPrincipal? User { get; set; }
 
         private string? _selectedCulture;
@@ -60,13 +62,17 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
             Log.Debug("Header.OnInitializedAsync");
+            SetupCulture();
             await LoadContent();
             _svcAuth.AuthChanged += OnAuthChanged;
             _locationState.OnChange += OnLocationChanged;
             _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
 
+        private void SetupCulture()
+        {
+            _lc.InitLocalizedComponent(this);
             if (Cultures.Count == 0)
             {
                 Cultures = _translateLogic.GetRegisteredLanguages();
@@ -135,7 +141,8 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContentByLanguage(ServiceResponse<Location> locationResult, string locationName)
         {
-            var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId, _svcLanguage.CurrentCulture.Name);
+            var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId,
+                _svcLanguage.CurrentCulture.Name);
 
             if (contentResult.Success)
             {
@@ -159,7 +166,8 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                Log.Logger.Error($"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
+                Log.Logger.Error(
+                    $"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
             }
         }
 
@@ -173,7 +181,46 @@ namespace BedBrigade.Client.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("Header.OnAfterRenderAsync");
+
+            if (firstRender)
+            {
+                await LanguageLoadedFromBrowser();
+            }
+
             await HandleRender();
+        }
+
+        private async Task<bool> LanguageLoadedFromBrowser()
+        {
+            //Try to load from local storage
+            string? browserLanguage = await _localStorage.GetItemAsync<string>("language");
+
+            // If not found, try to get from the browser
+            if (string.IsNullOrEmpty(browserLanguage))
+            {
+                browserLanguage = await _js.InvokeAsync<string>("BedBrigadeUtil.GetBrowserLocale");
+            }
+
+            if (string.IsNullOrEmpty(browserLanguage))
+            {
+                return false;
+            }
+
+            // Try to find a matching culture
+            var matchingCulture =
+                Cultures.FirstOrDefault(c => c.Name.Equals(browserLanguage, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingCulture != null)
+            {
+                _selectedCulture = browserLanguage;
+                if (matchingCulture.Name != _svcLanguage.CurrentCulture.Name)
+                {
+                    _svcLanguage.CurrentCulture = matchingCulture;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private async Task HandleRender()
@@ -214,34 +261,34 @@ namespace BedBrigade.Client.Components
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalEditor))
                 {
-                    await Show( "neditor");
+                    await Show("neditor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAdmin))
                 {
-                    await Show( "ladmin");
+                    await Show("ladmin");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationEditor))
                 {
-                    await Show( "leditor");
+                    await Show("leditor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAuthor))
                 {
-                    await Show( "lauthor");
+                    await Show("lauthor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationScheduler))
                 {
-                    await Show( "lscheduler");
+                    await Show("lscheduler");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationTreasurer))
                 {
-                    await Show( "ltreasurer");
+                    await Show("ltreasurer");
                 }
             }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
             }
-        
+
         }
 
         private async Task Show(string cssClass)
