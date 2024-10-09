@@ -1,10 +1,11 @@
-@if (English)
+@if (Cultures != null && SelectedCulture != null)
 {
-    <button id="languageButton" @onclick="SetSpanish">@_lc.Keys["English"]</button>
-}
-else
-{
-    <button id="languageButton" @onclick="SetEnglish">@_lc.Keys["Spanish"]</button>
+    <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange">
+        @foreach (var culture in Cultures)
+        {
+            <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
+        }
+    </select>
 }
 
 @((MarkupString)headerContent) 
@@ -25,11 +26,26 @@ else
             content: '';
         }
 
-        #languageButton {
+        #languageSelect {
         z-index: 1500;
         position: fixed;
-        top: 30px;
+        top: 35px;
         right: 10px;
         }
+
+    @@media screen and (max-width: 1500px)
+    {
+        #languageSelect {
+            top: 60px;
+        }
+    }
+
+    @@media screen and (max-width: 767px) {
+        #languageSelect {
+            top: 20px;
+            right: 50%;
+            font-size: 1.5em;
+        }
+    }
 </style>
 

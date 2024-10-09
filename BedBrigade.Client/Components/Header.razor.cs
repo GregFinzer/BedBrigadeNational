@@ -41,7 +41,7 @@ namespace BedBrigade.Client.Components
         private bool IsAuthenicated { get; set; } = false;
         private string Menu { get; set; }
 
-        private string PreviousLocation { get; set; } 
+        private string PreviousLocation { get; set; }
         private ClaimsPrincipal? User { get; set; }
 
         private string? _selectedCulture;
@@ -69,9 +69,16 @@ namespace BedBrigade.Client.Components
             _locationState.OnChange += OnLocationChanged;
             _svcLanguage.LanguageChanged += OnLanguageChanged;
         }
+
         private void SetupCulture()
         {
             _lc.InitLocalizedComponent(this);
+            if (Cultures.Count == 0)
+            {
+                Cultures = _translateLogic.GetRegisteredLanguages();
+            }
+
+            _selectedCulture = _lc.CurrentCulture.Name;
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)
@@ -95,6 +102,14 @@ namespace BedBrigade.Client.Components
             return Task.CompletedTask;
         }
 
+        public static string RemoveTextAfterParenthesis(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            int parenthesisIndex = input.IndexOf('(');
+            return parenthesisIndex > 0 ? input.Substring(0, parenthesisIndex).Trim() : input;
+        }
 
         private async Task OnLocationChanged()
         {
@@ -126,7 +141,8 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContentByLanguage(ServiceResponse<Location> locationResult, string locationName)
         {
-            var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId, _svcLanguage.CurrentCulture.Name);
+            var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId,
+                _svcLanguage.CurrentCulture.Name);
 
             if (contentResult.Success)
             {
@@ -150,7 +166,8 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                Log.Logger.Error($"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
+                Log.Logger.Error(
+                    $"Error loading Header for LocationId {locationResult.Data.LocationId}: {contentResult.Message}");
             }
         }
 
@@ -190,7 +207,8 @@ namespace BedBrigade.Client.Components
             }
 
             // Try to find a matching culture
-            var matchingCulture = Cultures.FirstOrDefault(c => c.Name.Equals(browserLanguage, StringComparison.OrdinalIgnoreCase));
+            var matchingCulture =
+                Cultures.FirstOrDefault(c => c.Name.Equals(browserLanguage, StringComparison.OrdinalIgnoreCase));
 
             if (matchingCulture != null)
             {
@@ -243,34 +261,34 @@ namespace BedBrigade.Client.Components
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalEditor))
                 {
-                    await Show( "neditor");
+                    await Show("neditor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAdmin))
                 {
-                    await Show( "ladmin");
+                    await Show("ladmin");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationEditor))
                 {
-                    await Show( "leditor");
+                    await Show("leditor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAuthor))
                 {
-                    await Show( "lauthor");
+                    await Show("lauthor");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationScheduler))
                 {
-                    await Show( "lscheduler");
+                    await Show("lscheduler");
                 }
                 else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationTreasurer))
                 {
-                    await Show( "ltreasurer");
+                    await Show("ltreasurer");
                 }
             }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
             }
-        
+
         }
 
         private async Task Show(string cssClass)
@@ -279,16 +297,6 @@ namespace BedBrigade.Client.Components
         }
 
 
-        private void SetSpanish()
-        {
-            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("es-MX");
-            English = false;
-        }
 
-        private void SetEnglish()
-        {
-            _svcLanguage.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-            English = true;
-        }
     }
 }
