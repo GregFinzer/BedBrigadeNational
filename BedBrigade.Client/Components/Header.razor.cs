@@ -55,6 +55,7 @@ namespace BedBrigade.Client.Components
                 if (_selectedCulture != value)
                 {
                     _selectedCulture = value;
+                    _localStorage.SetItemAsync("language", value);
                     _svcLanguage.CurrentCulture = CultureInfo.GetCultureInfo(value);
                 }
             }
