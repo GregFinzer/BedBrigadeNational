@@ -14,8 +14,8 @@ namespace BedBrigade.Data.Data.Seeding
 {
     public static class SeedTranslationsLogic
     {
-        private static ParseLogic parseLogic = new ParseLogic();
-        private static TranslateLogic _translateLogic = new TranslateLogic(null);
+        private static readonly ParseLogic parseLogic = new ParseLogic();
+        private static readonly TranslateLogic _translateLogic = new TranslateLogic(null);
 
         public static async Task SeedContentTranslations(IDbContextFactory<DataContext> _contextFactory)
         {

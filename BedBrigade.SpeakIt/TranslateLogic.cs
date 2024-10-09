@@ -24,6 +24,27 @@ namespace BedBrigade.SpeakIt
             _lc = languageContainerService;
         }
 
+        public string? CleanUpSpacesAndLineFeedsFromHtml(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            var parseResults = _parseLogic.GetLocalizableStringsInText(input);
+            parseResults = parseResults.OrderByDescending(o => o.LocalizableString.Length).ToList();
+
+            foreach (var parseResult in parseResults)
+            {
+                string replace = StringUtil.CleanUpSpacesAndLineFeeds(parseResult.LocalizableString);
+
+                if (replace == parseResult.LocalizableString)
+                    continue;
+
+                input = IntelligentReplace(input, parseResult.LocalizableString, replace);
+            }
+
+            return input;
+        }
+
         public string? ParseAndTranslateText(string input, string targetCulture,
             Dictionary<string, List<Translation>> translations)
         {
@@ -32,9 +53,6 @@ namespace BedBrigade.SpeakIt
 
             foreach (var parseResult in parseResults)
             {
-                if (parseResult.LocalizableString.Contains("We are compelled"))
-                    Console.WriteLine("here");
-
                 string hash = ComputeSHA512Hash(parseResult.LocalizableString);
 
                 if (!translations.ContainsKey(hash))

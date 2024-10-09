@@ -29,6 +29,10 @@ drop table if exists Volunteers
 go
 drop table if exists VolunteersFor
 go
+drop table if exists Translations
+go
+drop table if exists ContentTranslations
+go
 drop table if exists Locations
 go
 drop table if exists MetroAreas

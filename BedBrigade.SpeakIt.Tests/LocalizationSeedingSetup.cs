@@ -46,6 +46,8 @@ namespace BedBrigade.SpeakIt.Tests
             foreach (string file in files)
             {
                 string text = File.ReadAllText(file);
+                text = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(text);
+
                 List<ParseResult> parseResults = _parseLogic.GetLocalizableStringsInText(text);
 
                 foreach (ParseResult parseResult in parseResults)
