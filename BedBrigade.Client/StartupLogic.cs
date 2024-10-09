@@ -16,6 +16,7 @@ using AKSoftware.Localization.MultiLanguages.Providers;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using BedBrigade.SpeakIt;
+using Blazored.LocalStorage;
 
 namespace BedBrigade.Client
 {
@@ -83,6 +84,10 @@ namespace BedBrigade.Client
 
             builder.Services.AddHttpClient();
 
+            //Used to store the culture
+            builder.Services.AddBlazoredLocalStorage(config =>
+                config.JsonSerializerOptions.WriteIndented = true);
+            
             SetupAuth(builder);
             ClientServices(builder);
             DataServices(builder);

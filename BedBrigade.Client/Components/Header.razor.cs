@@ -7,6 +7,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 
 using Microsoft.JSInterop;
@@ -27,6 +28,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
+        [Inject] private ITranslateLogic _translateLogic { get; set; } 
+
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
@@ -38,15 +41,35 @@ namespace BedBrigade.Client.Components
 
         private string PreviousLocation { get; set; } 
         private ClaimsPrincipal? User { get; set; }
-        private bool English { get; set; } = true;
+
+        private string? _selectedCulture;
+        public List<CultureInfo> Cultures { get; set; } = new List<CultureInfo>();
+
+        public string? SelectedCulture
+        {
+            get => _selectedCulture;
+            set
+            {
+                if (_selectedCulture != value)
+                {
+                    _selectedCulture = value;
+                    _svcLanguage.CurrentCulture = CultureInfo.GetCultureInfo(value);
+                }
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
             Log.Debug("Header.OnInitializedAsync");
+            SetupCulture();
             await LoadContent();
             _svcAuth.AuthChanged += OnAuthChanged;
             _locationState.OnChange += OnLocationChanged;
             _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
+        private void SetupCulture()
+        {
+            _lc.InitLocalizedComponent(this);
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)
@@ -139,7 +162,45 @@ namespace BedBrigade.Client.Components
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("Header.OnAfterRenderAsync");
+
+            if (firstRender)
+            {
+                await LanguageLoadedFromBrowser();
+            }
+
             await HandleRender();
+        }
+
+        private async Task<bool> LanguageLoadedFromBrowser()
+        {
+            //Try to load from local storage
+            string? browserLanguage = await _localStorage.GetItemAsync<string>("language");
+
+            // If not found, try to get from the browser
+            if (string.IsNullOrEmpty(browserLanguage))
+            {
+                browserLanguage = await _js.InvokeAsync<string>("BedBrigadeUtil.GetBrowserLocale");
+            }
+
+            if (string.IsNullOrEmpty(browserLanguage))
+            {
+                return false;
+            }
+
+            // Try to find a matching culture
+            var matchingCulture = Cultures.FirstOrDefault(c => c.Name.Equals(browserLanguage, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingCulture != null)
+            {
+                _selectedCulture = browserLanguage;
+                if (matchingCulture.Name != _svcLanguage.CurrentCulture.Name)
+                {
+                    _svcLanguage.CurrentCulture = matchingCulture;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private async Task HandleRender()
