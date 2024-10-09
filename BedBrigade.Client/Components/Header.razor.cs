@@ -8,6 +8,7 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 
 using Microsoft.JSInterop;
@@ -28,8 +29,9 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
-        [Inject] private ITranslateLogic _translateLogic { get; set; } 
+        [Inject] private ITranslateLogic _translateLogic { get; set; }
 
+        [Inject] private ILocalStorageService _localStorage { get; set; }
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
