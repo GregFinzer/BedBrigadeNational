@@ -36,6 +36,9 @@ namespace BedBrigade.Client.Components
 
         [Parameter] public string? Id { get; set; }
 
+        private List<UsState>? StateList = AddressHelper.GetStateList();
+        public int NumericValue { get; set; } = 1;
+
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
@@ -68,7 +71,11 @@ namespace BedBrigade.Client.Components
 
         public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "200px" };
+                protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
+        {
+            { "rows", "4" },
+        };
 
         private bool IsDialogVisible { get; set; } = false;
         private string DialogHeader { get; set; } = string.Empty;
