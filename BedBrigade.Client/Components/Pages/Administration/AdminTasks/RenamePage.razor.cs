@@ -13,6 +13,7 @@ public partial class RenamePage : ComponentBase
     [Inject] private NavigationManager _navigationManager { get; set; }
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ToastService _toastService { get; set; }
+    [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
     [Parameter] public string LocationId { get; set; }
     [Parameter] public string ContentName { get; set; }
     public string ErrorMessage { get; set; }
@@ -104,6 +105,8 @@ public partial class RenamePage : ComponentBase
         updateResponse = await _svcContentDataService.UpdateAsync(_originalContent);
         if (updateResponse.Success)
         {
+            await _svcTranslationProcessorDataService.QueueContentTranslation(updateResponse.Data);
+
             _toastService.Success("Content Saved",
                 $"Page updated " +
                 $"for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");

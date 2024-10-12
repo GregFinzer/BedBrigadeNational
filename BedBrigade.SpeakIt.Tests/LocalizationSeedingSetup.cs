@@ -17,11 +17,45 @@ namespace BedBrigade.SpeakIt.Tests
         private TranslateLogic _translateLogic = new TranslateLogic(null);
         private Dictionary<string, string> _localizableStrings = new Dictionary<string, string>();
 
-        [Test, Ignore("Seeded National and Grove City. Keep for Polaris.")]
+        [Test]
         public void Setup()
         {
             FillLocalizableStrings();
+            FillTitles();
             CreateYamlFile();
+        }
+
+        private void FillTitles()
+        {
+            string titles = @"About Us
+Assembly Instructions
+Calendar
+Donations
+History
+History of Bed Brigade
+Home
+Inventory
+Locations
+Partners";
+
+            string[] titleArray = titles.Split('\r','\n',StringSplitOptions.RemoveEmptyEntries);
+            foreach (string title in titleArray)
+            {
+                string trimmed = title.Trim();
+                string key = _translateLogic.ComputeSHA512Hash(trimmed);
+                if (!_localizableStrings.ContainsKey(key))
+                {
+                    _localizableStrings.Add(key, trimmed);
+                }
+                else
+                {
+                    if (_localizableStrings[key] != trimmed)
+                    {
+                        throw new ArgumentException(
+                            $"Duplicate key found with different values. Key: {key}. Value1: {_localizableStrings[key]}. Value2: {trimmed}");
+                    }
+                }
+            }
         }
 
         private void CreateYamlFile()

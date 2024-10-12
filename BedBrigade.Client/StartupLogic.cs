@@ -159,6 +159,10 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ITranslateLogic, TranslateLogic>();
             builder.Services.AddScoped<ITranslationDataService, TranslationDataService>();
             builder.Services.AddScoped<IContentTranslationDataService, ContentTranslationDataService>();
+            builder.Services.AddScoped<ITranslationProcessorDataService, TranslationProcessorDataService>();
+            builder.Services.AddScoped<ITranslationQueueDataService, TranslationQueueDataService>();
+            builder.Services.AddScoped<IContentTranslationQueueDataService, ContentTranslationQueueDataService>();
+            builder.Services.AddHostedService<TranslationBackgroundService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

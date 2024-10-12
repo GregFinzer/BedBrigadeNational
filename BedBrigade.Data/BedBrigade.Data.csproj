@@ -25,6 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NetCachingLibrary" Version="3.18.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Serilog.Enrichers.RequestUserId" Version="1.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />

@@ -30,6 +30,8 @@ namespace BedBrigade.Data
         public virtual DbSet<MetroArea> MetroAreas { get; set; }
         public virtual DbSet<Translation> Translations { get; set; }
         public virtual DbSet<ContentTranslation> ContentTranslations { get; set; }
+        public virtual DbSet<TranslationQueue> TranslationQueues { get; set; }
+        public virtual DbSet<ContentTranslationQueue> ContentTranslationQueues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

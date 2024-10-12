@@ -20,15 +20,6 @@ namespace BedBrigade.Tests
             //This has duplicate strings but it is okay since roles have multiple similar permissions
             _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
 
-            //The static code analysis tool has a defect where it cannot parse the file properly
-            //because SpeakItLogic.cs has embedded curly braces in the code
-            _qualityLogic.Config.FilesToExclude.Add("CreateLogic.cs");
-            _qualityLogic.Config.FilesToExclude.Add("ParseLogic.cs");
-
-            //The static code analysis tool has a defect where it cannot parse the file properly
-            //because it cannot handle string interpolation
-            _qualityLogic.Config.FilesToExclude.Add("VolunteerSignUp.razor.cs");
-
             _solutionPath = TestHelper.GetSolutionPath();
         }
 

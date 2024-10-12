@@ -357,3 +357,4 @@ MigrationBackup/
 /BedBrigade.Client/wwwroot/Media
 /Documentation/*.bak
 /*.bak
+/Documentation/~Entity Framework.md.saved.bak.md
