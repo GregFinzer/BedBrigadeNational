@@ -2,7 +2,6 @@
 Active: Active
 Address: Address
 AgesGender: Ages / Gender
-AgesGenders: Ages Genders
 Amount: Amount
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 BedBrigadeLocationEvents: Bed Brigade Location Events
@@ -180,6 +179,7 @@ ReturnToHome: Return to Home
 Role: Role
 Route: Route
 Save: Save
+Scheduling: Scheduling
 SeachAVolunteerBy: Seach a Volunteer by Name
 Search: Search
 SearchBedBrigadeLocations: Search Bed Brigade Locations
