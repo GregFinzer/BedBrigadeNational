@@ -2,7 +2,6 @@
 Active: Activo
 Address: Dirección
 AgesGender: Edades / Género
-AgesGenders: Edades Géneros
 Amount: Importe
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
@@ -180,6 +179,7 @@ ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
 Save: Salvar
+Scheduling: Programación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
