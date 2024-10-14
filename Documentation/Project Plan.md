@@ -171,7 +171,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Add try catch and alert
     * Seed Only Grove City and Rock City :heavy_check_mark:
     * Location Timezone
-    * Redo Manage Bed Request Form
+    * Redo Manage Bed Request Form :heavy_check_mark:
     * Delivery Sheet Sort By Team Then By Distance :heavy_check_mark:
     * Add Delivery Checklist to the Delivery Sheet :heavy_check_mark:
     * Use Animate.css and Wow.js :heavy_check_mark:
@@ -184,19 +184,20 @@ One thing you will notice about the following project plan is the lack of due da
     * Refactor Grid Persistence :heavy_check_mark:
     * Seed Only Grove City and Rock City :heavy_check_mark:
     * Download Delivery Sheet :heavy_check_mark:
-    * Mobile Bed Brigade Near Me
+    * Mobile Bed Brigade Near Me :heavy_check_mark:
     * Mobile After Submit Bed Request
     * Mobile after Contact Us
     * Mobile after Submit Volunteer
     * Admin Mobile Margin and Padding
     * Manage Users Unusable in Mobile
-    * Design Spanish Translation
+    * Design Spanish Translation  :heavy_check_mark:
     * Address Autocomplete Design
     * Design Bulk Email Mailing List
     * Donations Design
     * SMS Design
     * Delivery Sheet Slow
     * Update Documentation for Localization
+    * Make EmailQueue into a Background Service :heavy_check_mark:
     
 * New Stories
     * Send confirmation email for Bed Request
@@ -216,7 +217,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Localize Drop Downs :heavy_check_mark:
     * Save Messages Localization :heavy_check_mark:
     * Send Confirmation Email for Volunteer Sign Up
-    * Localize Dynamic Content
+    * Localize Dynamic Content :heavy_check_mark:
+    * Apply String Localization :heavy_check_mark:
 
     
     
