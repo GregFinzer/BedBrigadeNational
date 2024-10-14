@@ -58,7 +58,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         private async Task HandleValidSubmit()
         {
             var emails = await _svcEmailQueueDataService.GetEmailsToSend(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId);
-            var result = await EmailQueueLogic.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
+            var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
             if (result.Success)
             {
                 ShowSuccess("Email successfully queued.");

@@ -258,6 +258,234 @@ public static class Seed
         }
     }
 
+    private static List<Configuration> _configurations =
+    [
+        new()
+        {
+            ConfigurationKey = ConfigNames.TokenExpiration,
+            ConfigurationValue = "24",
+            Section = ConfigSection.System
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.AllowedFileExtensions,
+            ConfigurationValue = ".jpg, .png, .pdf, .webp",
+            Section = ConfigSection.Media
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.AllowedVideoExtensions,
+            ConfigurationValue = ".mp4",
+            Section = ConfigSection.Media
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.MediaFolder,
+            ConfigurationValue = "media",
+            Section = ConfigSection.Media
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.MainMediaSubFolder,
+            ConfigurationValue = "national",
+            Section = ConfigSection.Media
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.MaxFileSize,
+            ConfigurationValue = "104857600",
+            Section = ConfigSection.Media
+        },
+
+        new() // added by VS 2/19/2023
+        {
+            ConfigurationKey = ConfigNames.MaxVideoSize,
+            ConfigurationValue = "262144000",
+            Section = ConfigSection.Media
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.IsCachingEnabled,
+            ConfigurationValue = "true",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.BedBrigadeNearMeMaxMiles,
+            ConfigurationValue = "30",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
+            ConfigurationValue = "6LeDtS0qAAAAANLi2IY68WW555JXAWIelpoZQIWO",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.ReCaptchaSecret,
+            ConfigurationValue = "6LeDtS0qAAAAANGrgPxMV2vTcgVG1e01KaRGjuqL",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.FromEmailAddress,
+            ConfigurationValue = "devtest@bedbrigadecolumbus.org",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailBeginHour,
+            ConfigurationValue = "0",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailEndHour,
+            ConfigurationValue = "23",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailBeginDayOfWeek,
+            ConfigurationValue = "0",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailEndDayOfWeek,
+            ConfigurationValue = "6",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailMaxSendPerMinute,
+            ConfigurationValue = "30",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailMaxSendPerHour,
+            ConfigurationValue = "60",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailMaxSendPerDay,
+            ConfigurationValue = "1440",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailLockWaitMinutes,
+            ConfigurationValue = "10",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailKeepDays,
+            ConfigurationValue = "30",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailMaxPerChunk,
+            ConfigurationValue = "30",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailUseFileMock,
+            ConfigurationValue = "true",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.FromEmailDisplayName,
+            ConfigurationValue = "Bed Brigade NoReply",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailHost,
+            ConfigurationValue = "mail5019.site4now.net",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailPort,
+            ConfigurationValue = "8889",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailUserName,
+            ConfigurationValue = "devtest@bedbrigadecolumbus.org",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmailPassword,
+            ConfigurationValue = "AskGregForPassword",
+            Section = ConfigSection.Email
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.DisplayIdFields,
+            ConfigurationValue = "No",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EmptyGridText,
+            ConfigurationValue = "No matching records found",
+            Section = ConfigSection.System
+        },
+
+        new()
+        {
+            ConfigurationKey = ConfigNames.EventCutOffTimeDays,
+            ConfigurationValue = "4",
+            Section = ConfigSection.System
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.TranslationApiKey,
+            ConfigurationValue = "",
+            Section = ConfigSection.System
+        }
+
+    ];
+
+
 
 
     private static async Task SeedConfigurations(IDbContextFactory<DataContext> contextFactory)
@@ -266,204 +494,40 @@ public static class Seed
 
         using (var context = contextFactory.CreateDbContext())
         {
-            if (await context.Configurations.AnyAsync()) return;
+            // Read all existing configurations into a list
+            var existingConfigurations = await context.Configurations.ToListAsync();
 
-            Log.Logger.Information("No configurations found, adding");
-            var configurations = new List<Configuration>
+            if (existingConfigurations.Any())
             {
-                new()
-                {
-                    ConfigurationKey = ConfigNames.TokenExpiration,
-                    ConfigurationValue = "24",
-                    Section = ConfigSection.System
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.AllowedFileExtensions,
-                    ConfigurationValue = ".jpg, .png, .pdf, .webp",
-                    Section = ConfigSection.Media
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.AllowedVideoExtensions,
-                    ConfigurationValue = ".mp4",
-                    Section = ConfigSection.Media
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.MediaFolder,
-                    ConfigurationValue = "media",
-                    Section = ConfigSection.Media
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.MainMediaSubFolder,
-                    ConfigurationValue = "national",
-                    Section = ConfigSection.Media
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.MaxFileSize,
-                    ConfigurationValue = "104857600",
-                    Section = ConfigSection.Media
-                },
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.MaxVideoSize,
-                    ConfigurationValue = "262144000",
-                    Section = ConfigSection.Media
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.IsCachingEnabled,
-                    ConfigurationValue = "true",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.BedBrigadeNearMeMaxMiles,
-                    ConfigurationValue = "30",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.ReCaptchaSiteKey,
-                    ConfigurationValue = "6LeDtS0qAAAAANLi2IY68WW555JXAWIelpoZQIWO",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.ReCaptchaSecret,
-                    ConfigurationValue = "6LeDtS0qAAAAANGrgPxMV2vTcgVG1e01KaRGjuqL",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.FromEmailAddress,
-                    ConfigurationValue = "devtest@bedbrigadecolumbus.org",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailBeginHour,
-                    ConfigurationValue = "0",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailEndHour,
-                    ConfigurationValue = "23",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailBeginDayOfWeek,
-                    ConfigurationValue = "0",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailEndDayOfWeek,
-                    ConfigurationValue = "6",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailMaxSendPerMinute,
-                    ConfigurationValue = "30",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailMaxSendPerHour,
-                    ConfigurationValue = "60",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailMaxSendPerDay,
-                    ConfigurationValue = "1440",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailLockWaitMinutes,
-                    ConfigurationValue = "10",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailKeepDays,
-                    ConfigurationValue = "30",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailMaxPerChunk,
-                    ConfigurationValue = "30",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailUseFileMock,
-                    ConfigurationValue = "true",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.FromEmailDisplayName,
-                    ConfigurationValue = "Bed Brigade NoReply",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailHost,
-                    ConfigurationValue = "mail5019.site4now.net",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailPort,
-                    ConfigurationValue = "8889",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailUserName,
-                    ConfigurationValue = "devtest@bedbrigadecolumbus.org",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmailPassword,
-                    ConfigurationValue = "AskGregForPassword",
-                    Section = ConfigSection.Email
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.DisplayIdFields,
-                    ConfigurationValue = "No",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EmptyGridText,
-                    ConfigurationValue = "No matching records found",
-                    Section = ConfigSection.System
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.EventCutOffTimeDays,
-                    ConfigurationValue = "4",
-                    Section = ConfigSection.System
-                },
-            };
+                Log.Logger.Information("Existing configurations found, checking for new ones to add");
+            }
+            else
+            {
+                Log.Logger.Information("No configurations found, adding all");
+            }
 
-            SeedRoutines.SetMaintFields(configurations);
-            await context.Configurations.AddRangeAsync(configurations);
-            Log.Logger.Information("After AddRangeAsync");
-            await context.SaveChangesAsync();
-            Log.Logger.Information("After SaveChanges");
+            var configurationsToAdd = new List<Configuration>();
+
+            foreach (var newConfig in _configurations)
+            {
+                if (!existingConfigurations.Any(c => c.ConfigurationKey == newConfig.ConfigurationKey))
+                {
+                    configurationsToAdd.Add(newConfig);
+                }
+            }
+
+            if (configurationsToAdd.Any())
+            {
+                Log.Logger.Information($"Adding {configurationsToAdd.Count} new configurations");
+                SeedRoutines.SetMaintFields(configurationsToAdd);
+                await context.Configurations.AddRangeAsync(configurationsToAdd);
+                await context.SaveChangesAsync();
+                Log.Logger.Information("New configurations added successfully");
+            }
+            else
+            {
+                Log.Logger.Information("No new configurations to add");
+            }
         }
     }
 

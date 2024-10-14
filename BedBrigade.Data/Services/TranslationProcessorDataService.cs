@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.SpeakIt;
 using RestSharp;
@@ -16,6 +18,7 @@ namespace BedBrigade.Data.Services
 {
     public class TranslationProcessorDataService : ITranslationProcessorDataService
     {
+        private readonly IConfigurationDataService _configurationDataService;
         private readonly IContentDataService _contentDataService;
         private readonly ITranslationDataService _translationDataService;
         private readonly IContentTranslationDataService _contentTranslationDataService;
@@ -24,13 +27,15 @@ namespace BedBrigade.Data.Services
         private readonly ITranslateLogic _translateLogic;
         private readonly ParseLogic _parseLogic = new ParseLogic();
 
-        public TranslationProcessorDataService(IContentDataService contentDataService, 
+        public TranslationProcessorDataService(IConfigurationDataService configurationDataService,
+            IContentDataService contentDataService, 
             ITranslationDataService translationDataService,
             IContentTranslationDataService contentTranslationDataService,
             ITranslationQueueDataService translationQueueDataService,
             IContentTranslationQueueDataService contentTranslationQueueDataService,
             ITranslateLogic translateLogic)
         {
+            _configurationDataService = configurationDataService;
             _contentDataService = contentDataService;
             _translationDataService = translationDataService;
             _contentTranslationDataService = contentTranslationDataService;
@@ -39,13 +44,13 @@ namespace BedBrigade.Data.Services
             _translateLogic = translateLogic;
         }
 
-        public async Task ProcessQueue()
+        public async Task ProcessQueue(CancellationToken cancellationToken)
         {
-            await ProcessTranslations();
-            await ProcessContentTranslations();
+            await ProcessTranslations(cancellationToken);
+            await ProcessContentTranslations(cancellationToken);
         }
 
-        private async Task ProcessContentTranslations()
+        private async Task ProcessContentTranslations(CancellationToken cancellationToken)
         {
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
@@ -87,43 +92,54 @@ namespace BedBrigade.Data.Services
             var translationsDictionary = _translateLogic.TranslationsToDictionary(translationsResult.Data);
             foreach (var itemToProcess in contentQueueResult.Data)
             {
-                var parent = contentResult.Data.FirstOrDefault(o => o.ContentId == itemToProcess.ContentId);
+                await TranslateContentItem(contentResult, itemToProcess, translationsDictionary);
 
-                if (parent == null)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    Log.Error("ProcessContentTranslations parent is null for ContentId " + itemToProcess.ContentId);
-                    continue;
+                    break;
                 }
-
-                string cleaned = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(parent.ContentHtml);
-                string translated = _translateLogic.ParseAndTranslateText(cleaned, itemToProcess.Culture, translationsDictionary);
-                
-                var existingResult = await _contentTranslationDataService.GetAsync(parent.Name, parent.LocationId, itemToProcess.Culture);
-
-                if (existingResult.Success && existingResult.Data != null)
-                {
-                    existingResult.Data.ContentHtml = translated;
-                    await _contentTranslationDataService.UpdateAsync(existingResult.Data);
-                }
-                else
-                {
-                    ContentTranslation contentTranslation = new ContentTranslation
-                    {
-                        LocationId = parent.LocationId,
-                        ContentType = parent.ContentType,
-                        Title = parent.Title,
-                        Culture = itemToProcess.Culture,
-                        Name = parent.Name,
-                        ContentHtml = translated
-                    };
-                    await _contentTranslationDataService.CreateAsync(contentTranslation);
-                }
-
-                await _contentTranslationQueueDataService.DeleteAsync(itemToProcess.ContentTranslationQueueId);
             }
         }
 
-        private async Task ProcessTranslations()
+        private async Task TranslateContentItem(ServiceResponse<List<Content>> contentResult, ContentTranslationQueue itemToProcess,
+            Dictionary<string, List<Translation>> translationsDictionary)
+        {
+            var parent = contentResult.Data.FirstOrDefault(o => o.ContentId == itemToProcess.ContentId);
+
+            if (parent == null)
+            {
+                Log.Error("ProcessContentTranslations parent is null for ContentId " + itemToProcess.ContentId);
+                return;
+            }
+
+            string cleaned = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(parent.ContentHtml);
+            string translated = _translateLogic.ParseAndTranslateText(cleaned, itemToProcess.Culture, translationsDictionary);
+                
+            var existingResult = await _contentTranslationDataService.GetAsync(parent.Name, parent.LocationId, itemToProcess.Culture);
+
+            if (existingResult.Success && existingResult.Data != null)
+            {
+                existingResult.Data.ContentHtml = translated;
+                await _contentTranslationDataService.UpdateAsync(existingResult.Data);
+            }
+            else
+            {
+                ContentTranslation contentTranslation = new ContentTranslation
+                {
+                    LocationId = parent.LocationId,
+                    ContentType = parent.ContentType,
+                    Title = parent.Title,
+                    Culture = itemToProcess.Culture,
+                    Name = parent.Name,
+                    ContentHtml = translated
+                };
+                await _contentTranslationDataService.CreateAsync(contentTranslation);
+            }
+
+            await _contentTranslationQueueDataService.DeleteAsync(itemToProcess.ContentTranslationQueueId);
+        }
+
+        private async Task ProcessTranslations(CancellationToken cancellationToken)
         {
             var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
 
@@ -160,6 +176,11 @@ namespace BedBrigade.Data.Services
                     break;
                 }
 
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 Translation translation = new Translation
                 {
                     Hash = parentTranslation.Hash,
@@ -169,7 +190,11 @@ namespace BedBrigade.Data.Services
                 };
                 await _translationDataService.CreateAsync(translation);
                 await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
-                //TODO:  If we have reached the max per minute/ hour / day / month then break
+                
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
             }
         }
 
@@ -178,14 +203,28 @@ namespace BedBrigade.Data.Services
             try
             {
                 string[] words = cultureName.Split("-");
-                string url = $"https://api.apilayer.com/language_translation/translate?target={words[0]}";
+                string locale = words[0];
+                string url = $"https://api.apilayer.com/language_translation/translate?target={locale}";
                 var client = new RestClient(url);
 
+                CultureInfo cultureInfo = new CultureInfo(locale);
+
+                Log.Debug($"Using: {url}");
+                Log.Debug($"Translating to {cultureInfo.DisplayName}: {textToTranslate}");
 
                 var request = new RestRequest();
                 request.Method = Method.Post;
-                @@@GETFROMCONFIG
-                request.AddHeader("apikey", "GETFROMCONFIG");
+
+                var apiKey =
+                    await _configurationDataService.GetConfigValueAsync(ConfigSection.System,
+                        ConfigNames.TranslationApiKey);
+
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    Log.Error("TranslateTextAsync TranslationApiKey is null or empty");
+                }
+
+                request.AddHeader("apikey", apiKey);
 
                 request.AddParameter("text/plain", textToTranslate, ParameterType.RequestBody);
 
@@ -197,8 +236,10 @@ namespace BedBrigade.Data.Services
                     return null;
                 }
 
-                return GetFirstTranslation(response.Content);
+                string translation = GetFirstTranslation(response.Content);
 
+                Log.Debug($"Translated to: {translation}");
+                return translation;
             }
             catch (Exception ex)
             {

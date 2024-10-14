@@ -18,11 +18,11 @@ namespace BedBrigade.Data.Services
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(80), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(80), cancellationToken);
 
-            while (!stoppingToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if (!_isProcessing)
                 {
@@ -33,7 +33,7 @@ namespace BedBrigade.Data.Services
                         using (var scope = _serviceProvider.CreateScope())
                         {
                             var translationService = scope.ServiceProvider.GetRequiredService<ITranslationProcessorDataService>();
-                            await translationService.ProcessQueue();
+                            await translationService.ProcessQueue(cancellationToken);
                         }
                     }
                     catch (Exception ex)
@@ -47,7 +47,7 @@ namespace BedBrigade.Data.Services
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
             }
         }
     }

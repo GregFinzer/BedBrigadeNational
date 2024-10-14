@@ -5,6 +5,6 @@ namespace BedBrigade.Data.Services
     public interface ITranslationProcessorDataService
     {
         Task QueueContentTranslation(Content content);
-        Task ProcessQueue();
+        Task ProcessQueue(CancellationToken cancellationToken);
     }
 }
