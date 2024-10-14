@@ -324,9 +324,14 @@ namespace BedBrigade.SpeakIt
 
 
 
-        public List<ParseResult> GetLocalizableStringsInText(string text)
+        public List<ParseResult> GetLocalizableStringsInText(string? text)
         {
             List<ParseResult> result = new List<ParseResult>();
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return result;
+            }
 
             text = PreProcess(text);
 

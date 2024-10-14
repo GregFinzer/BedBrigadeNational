@@ -13,6 +13,8 @@ public partial class AddPage : ComponentBase
     [Inject] private NavigationManager _navigationManager { get; set; }
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ITemplateDataService _svcTemplateDataService { get; set; }
+    [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
+
     public string ErrorMessage { get; set; }
     
     public AddPageModel Model { get; set; } = new();
@@ -73,6 +75,7 @@ public partial class AddPage : ComponentBase
 
         if (createResponse.Success)
         {
+            await _svcTranslationProcessorDataService.QueueContentTranslation(createResponse.Data);
             _navigationManager.NavigateTo($"/administration/edit/editcontent/{Model.CurrentLocationId}/{Model.PageName}");
         }
         else

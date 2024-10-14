@@ -91,6 +91,7 @@ namespace BedBrigade.Client
             SetupAuth(builder);
             ClientServices(builder);
             DataServices(builder);
+            BackgroundServices(builder);
 
             builder.Services.AddScoped<ToastService, ToastService>();
             builder.Services.AddSignalR(e =>
@@ -110,6 +111,12 @@ namespace BedBrigade.Client
             builder.Services.AddSyncfusionBlazor();
 
             _svcProvider = builder.Services.BuildServiceProvider();
+        }
+
+        private static void BackgroundServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddHostedService<TranslationBackgroundService>();
+            builder.Services.AddHostedService<EmailQueueBackgroundService>();
         }
 
         private static void SetupAuth(WebApplicationBuilder builder)
@@ -159,6 +166,9 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ITranslateLogic, TranslateLogic>();
             builder.Services.AddScoped<ITranslationDataService, TranslationDataService>();
             builder.Services.AddScoped<IContentTranslationDataService, ContentTranslationDataService>();
+            builder.Services.AddScoped<ITranslationProcessorDataService, TranslationProcessorDataService>();
+            builder.Services.AddScoped<ITranslationQueueDataService, TranslationQueueDataService>();
+            builder.Services.AddScoped<IContentTranslationQueueDataService, ContentTranslationQueueDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
@@ -301,14 +311,6 @@ namespace BedBrigade.Client
             }
         }
 
-        public static void SetupEmailQueueProcessing(WebApplication app)
-        {
-            Log.Logger.Information("Setup Email Queue Processing");
-            using var scope = app.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            var configurationDataService = services.GetRequiredService<IConfigurationDataService>();
-            var emailQueueDataService = services.GetRequiredService<IEmailQueueDataService>();
-            EmailQueueLogic.Start(emailQueueDataService, configurationDataService);
-        }
+
     }
 }

@@ -10,6 +10,7 @@ using Syncfusion.Blazor.Popups;
 using Microsoft.AspNetCore.Mvc;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using Syncfusion.Blazor.Kanban.Internal;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
@@ -23,6 +24,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ICachingService _svcCaching { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
+        [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
         [Parameter] public string LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
@@ -170,6 +172,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 {
                     await _locationState.NotifyStateChangedAsync();
                 }
+
+                await _svcTranslationProcessorDataService.QueueContentTranslation(updateResult.Data);
 
                 _toastService.Success("Content Saved", 
                     $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024

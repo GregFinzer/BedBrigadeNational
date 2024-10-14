@@ -61,7 +61,7 @@ namespace BedBrigade.SpeakIt
             return _registeredLanguages;
         }
 
-        public string? CleanUpSpacesAndLineFeedsFromHtml(string input)
+        public string? CleanUpSpacesAndLineFeedsFromHtml(string? input)
         {
             if (string.IsNullOrEmpty(input))
                 return input;
@@ -82,8 +82,7 @@ namespace BedBrigade.SpeakIt
             return input;
         }
 
-        public string? ParseAndTranslateText(string input, string targetCulture,
-            Dictionary<string, List<Translation>> translations)
+        public string? ParseAndTranslateText(string input, string targetCulture, Dictionary<string, List<Translation>> translations)
         {
             var parseResults = _parseLogic.GetLocalizableStringsInText(input);
             parseResults = parseResults.OrderByDescending(o => o.LocalizableString.Length).ToList();
