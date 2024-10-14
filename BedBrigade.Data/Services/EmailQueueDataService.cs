@@ -233,6 +233,64 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
+        {
+            try
+            {
+                email.Status = EmailQueueStatus.Queued.ToString();
+                email.QueueDate = DateTime.UtcNow;
+                email.FailureMessage = string.Empty;
+                await CreateAsync(email);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>(ex.Message, false);
+            }
+
+            return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
+        }
+
+        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body)
+        {
+            if (emailList.Count == 0)
+                return new ServiceResponse<string>("No emails to send", false);
+
+            try
+            {
+                var emailQueueList = emailList.Select(email => new EmailQueue
+                {
+                    ToAddress = email,
+                    Subject = subject,
+                    Body = body,
+                    Status = EmailQueueStatus.Queued.ToString(),
+                    QueueDate = DateTime.UtcNow,
+                    FailureMessage = string.Empty
+                }).ToList();
+
+                string userName = await GetUserName();
+
+                foreach (var emailQueue in emailQueueList)
+                {
+                    emailQueue.SetCreateAndUpdateUser(userName);
+                }
+
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    await dbSet.AddRangeAsync(emailQueueList);
+                    await ctx.SaveChangesAsync();
+                }
+
+                _cachingService.ClearByEntityName(GetEntityName());
+
+                return new ServiceResponse<string>($"Queued {emailList.Count} emails", true, EmailQueueStatus.Queued.ToString());
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>($"Failed to queue bulk emails: {ex.Message}", false);
+            }
+        }
+
         private async Task<string> GetEventName(int scheduleId)
         {
             if (scheduleId == 0)

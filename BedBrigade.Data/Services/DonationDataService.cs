@@ -15,6 +15,7 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
     private readonly IUserDataService _userDataService;
     private readonly ILocationDataService _locationDataService;
     private readonly IContentDataService _contentDataService;
+    private readonly IEmailQueueDataService _emailQueueDataService;
 
     public DonationDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -22,12 +23,14 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
         ICommonService commonService,
         IUserDataService userDataService,
         ILocationDataService locationDataService,
-        IContentDataService contentDataService) : base(contextFactory, cachingService, authService)
+        IContentDataService contentDataService,
+        IEmailQueueDataService emailQueueDataService) : base(contextFactory, cachingService, authService)
     {
         _commonService = commonService;
         _userDataService = userDataService;
         _locationDataService = locationDataService;
         _contentDataService = contentDataService;
+        _emailQueueDataService = emailQueueDataService;
     }
 
     public async Task<ServiceResponse<List<Donation>>> GetAllForLocationAsync(int locationId)
@@ -71,7 +74,7 @@ public class DonationDataService : Repository<Donation>, IDonationDataService
                 Subject = BuildSubject(location.Data, donationsForEmail.First().DonationDate),
                 Body = BuildBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail)
             };
-            var emailResult = await EmailQueueLogic.QueueEmail(emailQueue);
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
             if (!emailResult.Success)
             {
