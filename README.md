@@ -16,8 +16,8 @@ The national web site is being built in Blazor Server.  NET Core 8 is being used
 * The styling of the header and footer will be minimal so that each Bed Brigade location can have their own colors.
 
 **Business Pain**
-* Currently the only Bed Brigade location that has a website is Grove City.  All other locations are using either Facebook or an email address and phone number.  This is not optimal as everything is a manual process for handling volunteers, Bed Requests, scheduling, donations and contacts. 
-* The current Orchard Core CMS is too complicated to use.
+* Currently only Bed Brigade Grove City and Bed Brigade Polaris have websites. All other locations are using either Facebook or an email address and phone number.  This is not optimal as everything is a manual process for handling volunteers, Bed Requests, scheduling, donations and contacts. 
+* The current Orchard Core CMS is too complicated to use and can't be customized to our needs.
 * The current volunteer page is sub optimal as it allows people to volunteer on days where there is no cut, build, or delivery happening.
 * There is no scheduling system which results in a out order of delivery schedule.
 * No tax forms are sent for donations.
@@ -36,6 +36,8 @@ The national web site is being built in Blazor Server.  NET Core 8 is being used
 
 Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 
+## Project Links
+
 * [Architecture](Documentation/Architecture.md)
 * [Getting Started](Documentation/Getting%20Started.md)
 * [Coding Standards](Documentation/Coding%20Standards.md)
@@ -52,7 +54,8 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 * [Roles](Documentation/Roles.md)
 * <a href="https://bedbrigade.slack.com" target="_blank">Slack Workspace</a> used for project communication
 * [Story Points](Documentation/Story%20Points.md)
-* <a href="https://trello.com/b/SfXILMoU/bed-brigade" target="_blank">Trello Board</a> used for Kanban
 * [Style Guide](Documentation/Style%20Guide.md)
+* <a href="https://trello.com/b/SfXILMoU/bed-brigade" target="_blank">Trello Board</a> used for Kanban
+
 
  

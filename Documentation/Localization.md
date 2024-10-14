@@ -1,6 +1,6 @@
 # Localization
+TLDR; The localization process for the project involves using resource files and the aksoftware.localization.multilanguages package for translating static strings and dynamic content. Automated tests ensure that all strings are localized correctly, and any updates to pages trigger content to be queued for translation, with detailed steps provided for handling validation messages, dropdowns, and seeded content.
 
-TLDR; This document outlines the localization process for translating static strings in a project using resource files and the aksoftware.localization.multilanguages NuGet package, which includes a language translation tool. It also details how the custom SpeakItLogic.cs automates modifications to Razor files and resource files, while providing guidelines for addressing localization test failures and instructions on how to localize new strings within Razor files.
 
 ## Overview
 Localization also known as language translation is one of the more complicated pieces of the project.  There are three major pieces which perform the language translation.
@@ -12,10 +12,11 @@ Localization also known as language translation is one of the more complicated p
     c.  It tests to make sure there are no duplicate values in the key value pairs.
     d.  It tests to ensure any keys that are in use in the razor files can be found in the resource file.
     e.  It tests to ensure all keys are in use in the razor files.
+3. Dynamic Translation.  Whenever the user changes the text on any Page using the Manage Pages on the Administration Menu; any content that is changed will be queued to be translated.  If a user adds a new page, the content will also be queued to be translated.  See TranslationProcessorDataService.QueueContentTranslation and TranslationBackgroundService
 
 ## Failing Tests
-* **VerifyAllRazorFilesAreLocalized** - If this test is failing it means that there are new strings in your razor file that need to be localized. Follow the instructions below on "How to localize a new string in a Razor file"
-* **VerifyDuplicateKeys** - If this test is failing it means that there are new strings that need to be localized and if they were to be created automatically, two values would be created with the same key.  You may have to create the key value pairs manually in BedBrigade.Client\Resources\en-US.yml and then modify your razor file manually.
+* **VerifyAllSourceCodeFilesAreLocalized** - If this test is failing it means that there are new strings in your razor file or in your model file Required Attribute that need to be localized. Follow the instructions below on "How to localize a new string in a Razor file"
+* **VerifyNoDuplicateKeys** - If this test is failing it means that there are new strings that need to be localized and if they were to be created automatically, two different values would be created with the same key.  You may have to create the key value pairs manually in BedBrigade.Client\Resources\en-US.yml and then modify your razor file manually.
 * **VerifyAllKeysCanBeFound** - If this test is failing it means that you manually typed in a key in your razor file, and it does not exist in the BedBrigade.Client\Resources\en-US.yml file, or you deleted a key value pair in the en-US.yml file that was in use.  Keys are case sensitive.  Correct your typo or add the key to the en-US.yml file.
 * **VerifyNoUnusedKeys** - If this test is failing, it means that you have keys in your BedBrigade.Client\Resources\en-US.yml file that are not being used in your razor files.  Most likely you deleted some code in a Razor file or you deleted the entire .razor file.  Remove the key value pair from the en-US.yml file.
 
@@ -54,3 +55,81 @@ protected override void OnInitialized()
     _lc.InitLocalizedComponent(this);
 }
 ```
+
+## How to localize validation messages
+1.  Perform a commit to Git to your feature branch so that you can revert any changes if needed.
+2. Use data attributes as you normally would on your model.
+
+    ```C#
+    [Required(ErrorMessage = "Email Address is required")]
+    [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
+    public String Email { get; set; } = string.Empty;
+    ```
+3.  In the project BedBrigade.SpeakIt.Tests remove the Ignore attribute in  CreateLocalizationStringsTest and run it.  It is okay to run it multiple times.  This code will create new key value pairs as needed in the en-US.yml file for your attributes.
+4.  Check and see if BedBrigade.Client\Resources\en-US.yml was modified locally.  
+5.  Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
+6.  Translate to es-MX
+7.  Download the file and replace the existing es-MX file in BedBrigade.Client\Resources
+8.  For a full example, see BedRequest.razor.cs  You will need to create a ValidationMessageStore private variable and initialize it.  Also, clear it before validating (see ClearValidationMessages).  In your IsValid method, instead of calling Validate() on the Edit Context, run this method:
+
+    ```C#
+    formIsValid = ValidationLocalization.ValidateModel(newRequest, _validationMessageStore, _lc);
+    ```
+## How to Translate Drop Down Lists and Other Dynamic Content
+1. In BedBrigade.Client\Resources\en-US.yml add a key value pair starting with the word Dynamic for phrases and words that will appear in your dropdown.  Example:  
+    ```yml
+    DynamicDelivery: Delivery
+    ```
+2. Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
+3. Translate to es-MX
+4. Download the file and replace the existing es-MX file in BedBrigade.Client\Resources
+5. In your Data Service that builds your drop down list key and value, use TranslationLogic to get the translation.  Example in ScheduleDataService:
+
+    ```C#
+    private void FillEventSelects(List<Schedule> schedules)
+    {
+        foreach (var schedule in schedules.ToList())
+        {
+            FillSingleEventSelect(schedule);
+        }
+    }
+    
+    private void FillSingleEventSelect(Schedule schedule)
+    {
+        string? eventName = _translateLogic.GetTranslation(schedule.EventName);
+        schedule.EventSelect = $"{eventName}: {schedule.EventDateScheduled.ToShortDateString()}, {schedule.EventDateScheduled.ToShortTimeString()}";
+    }
+    ```
+## Seeding Localized Content
+1.  Add the HTML file to this directory:  BedBrigade.Data\Data\Seeding\SeedHtml
+2.  Modify the SeedContentsLogic.  Example: 
+
+    ```C#
+    private static async Task SeedGroveCity(DataContext context)
+    {
+        Log.Logger.Information("SeedGroveCity Started");
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == (int)LocationNumber.GroveCity);
+    
+        if (location == null)
+        {
+            Console.WriteLine($"Error cannot find location with id: " + LocationNumber.GroveCity);
+            return;
+        }
+    
+        await SeedContentItem(context, ContentType.Header, location, "Header", "GroveCityHeader.html");
+        await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
+        await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
+        await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
+        await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
+        await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
+        await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
+        await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
+        await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
+    }
+    ```    
+3. In BedBrigade.SpeakIt.Tests.LocalizationSeedingSetup remove the ignore for the Setup and run the test.
+4. Check and see if BedBrigade.Data\Data\Seeding\SeedTranslations\en-US.yml was modified locally.  
+5.  Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
+6.  Translate to es-MX
+7.  Download the file and replace the existing es-MX file in BedBrigade.Data\Data\Seeding\SeedTranslations
+8.  Upload the en-US.yml and es-MX.yml files to the Data\Seeding\SeedTranslations folder on Development using FTP

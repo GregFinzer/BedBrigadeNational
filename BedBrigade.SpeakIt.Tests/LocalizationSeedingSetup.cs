@@ -17,9 +17,14 @@ namespace BedBrigade.SpeakIt.Tests
         private TranslateLogic _translateLogic = new TranslateLogic(null);
         private Dictionary<string, string> _localizableStrings = new Dictionary<string, string>();
 
-        [Test]
+        [Test, Ignore("This test should be ignored except locally")]
         public void Setup()
         {
+            if (TestHelper.IsRunningUnderGitHubActions())
+            {
+                Assert.Fail("This test should be ignored on the build server. Please add:\r\n[Ignore(\"This test should be ignored except locally\")]");
+            }
+
             FillLocalizableStrings();
             FillTitles();
             CreateYamlFile();

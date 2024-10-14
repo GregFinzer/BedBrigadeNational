@@ -52,7 +52,7 @@ namespace BedBrigade.SpeakIt.Tests
 
         /// <summary>
         /// If this test is failing it means that there are new strings that need to be localized
-        /// and if they were to be created automatically, there would be the same key that different values
+        /// and if they were to be created automatically, there would be the same key that have different values
         /// Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md
         /// </summary>
         [Test]
