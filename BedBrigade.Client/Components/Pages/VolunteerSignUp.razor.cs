@@ -13,6 +13,7 @@ using BedBrigade.Common.Models;
 using System.Net;
 using BedBrigade.SpeakIt;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
+using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -27,6 +28,8 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ITranslateLogic _translateLogic { get; set; }
+        [Inject] private IJSRuntime _js { get; set; }
+
         private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
@@ -184,7 +187,7 @@ namespace BedBrigade.Client.Components.Pages
                 else
                 {
                     Log.Logger.Error($"Error GetLocationEvents, response: {response.Message}");
-                    ShowMessage(response.Message);
+                    await ShowMessage(response.Message);
                 }
 
                 if (LocationEvents.Count > 0)
@@ -201,7 +204,7 @@ namespace BedBrigade.Client.Components.Pages
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error GetLocationEvents: {ex.Message}");
-                ShowMessage(ex.Message);
+                await ShowMessage(ex.Message);
             }
 
         }//GetLocationEvents
@@ -221,13 +224,15 @@ namespace BedBrigade.Client.Components.Pages
             MyMessage = string.Empty;
             MyMessageDisplay = DisplayNone;
         }
-        private void ShowMessage(string message)
+
+        private async Task ShowMessage(string message)
         {
             MyMessage = message;
             MyMessageDisplay = "";
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "myMessage");
         }
 
-        private bool IsValid()
+        private async Task<bool> IsValid()
         {
             ClearMessage();
 
@@ -235,7 +240,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!formIsValid)
             {
-                ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
+                await ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
                 return false;
             }
 
@@ -244,7 +249,7 @@ namespace BedBrigade.Client.Components.Pages
             if (!isPhoneValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newVolunteer, nameof(newVolunteer.Phone)), _lc.Keys["ValidPhoneNumber"]);
-                ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
+                await ShowMessage(_lc.Keys["VolunteerFormNotCompleted"]);
                 return false;
             }
 
@@ -252,19 +257,19 @@ namespace BedBrigade.Client.Components.Pages
             if (!emailResult.IsValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newVolunteer, nameof(newVolunteer.Email)), emailResult.UserMessage);
-                ShowMessage(_lc.Keys["ValidEmail"]);
+                await ShowMessage(_lc.Keys["ValidEmail"]);
                 return false;
             }
 
             if (SelectedEvent == null)
             {
-                ShowMessage(_lc.Keys["PleaseSelectAnEvent"]);
+                await ShowMessage(_lc.Keys["PleaseSelectAnEvent"]);
                 return false;
             }
 
             if (!ValidReCAPTCHA)
             {
-                ShowMessage(_lc.Keys["PleaseCheckRecaptcha"]);
+                await ShowMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 
@@ -306,7 +311,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveVolunteer()
         {
-            if (!IsValid())
+            if (!await IsValid())
             {
                 return;
             }
@@ -349,7 +354,7 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (!createResult.Success)
                 {
-                    ShowMessage(createResult.Message);
+                    await ShowMessage(createResult.Message);
                     Log.Logger.Error($"Error ScheduleVolunteer: {createResult.Message}");
                     return false;
                 }
@@ -359,7 +364,7 @@ namespace BedBrigade.Client.Components.Pages
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error ScheduleVolunteer: {ex.Message}");
-                ShowMessage(ex.Message);
+                await ShowMessage(ex.Message);
                 return false;
             }
         }
@@ -394,7 +399,7 @@ namespace BedBrigade.Client.Components.Pages
                     if (!updateResult.Success)
                     {
                         Log.Logger.Error($"Error UpdateVolunteer, updateResult: {updateResult.Message}");
-                        ShowMessage(updateResult.Message);
+                        await ShowMessage(updateResult.Message);
                         return false;
                     }
                     newVolunteer = updateResult.Data;
@@ -407,7 +412,7 @@ namespace BedBrigade.Client.Components.Pages
                     if (!createResult.Success)
                     {
                         Log.Logger.Error($"Error UpdateVolunteer, updateResult: {createResult.Message}");
-                        ShowMessage(createResult.Message);
+                        await ShowMessage(createResult.Message);
                         return false;
                     }
                 }
@@ -416,7 +421,7 @@ namespace BedBrigade.Client.Components.Pages
             {
 
                 Log.Logger.Error(ex, $"Error UpdateVolunteer: {ex.Message}");
-                ShowMessage(ex.Message);
+                await ShowMessage(ex.Message);
                 return false;
             }
 
@@ -461,6 +466,7 @@ namespace BedBrigade.Client.Components.Pages
             ResultMessage += selectedLocationName;
             ResultDisplay = "";
             FinalMessage = BootstrapHelper.GetBootstrapJumbotron(ResultTitle, ResultSubTitle, ResultMessage);
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollPastImages");
         } // Create Final Message
 
         private async Task<bool> UpdateScheduleVolunteerCount()
@@ -470,7 +476,7 @@ namespace BedBrigade.Client.Components.Pages
                 var existingResult = await _svcSchedule.GetByIdAsync(SelectedEvent.ScheduleId);
                 if (!existingResult.Success)
                 {
-                    ShowMessage(existingResult.Message);
+                    await ShowMessage(existingResult.Message);
                     return false;
                 }
 
@@ -487,14 +493,14 @@ namespace BedBrigade.Client.Components.Pages
                 if (!updateResult.Success)
                 {
                     Log.Logger.Error($"Error UpdateScheduleVolunteerCount, updateResult: {updateResult.Message}");
-                    ShowMessage(updateResult.Message);
+                    await ShowMessage(updateResult.Message);
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error UpdateScheduleVolunteerCount: {ex.Message}");
-                ShowMessage(ex.Message);
+                await ShowMessage(ex.Message);
                 return false;
             }
 
