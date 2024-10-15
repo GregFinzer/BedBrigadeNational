@@ -124,7 +124,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div>
-                    <div class="alert alert-danger" role="alert" style="display: @MyValidationDisplay">
+                    <div id="myValidationMessage" class="alert alert-danger" role="alert" style="display: @MyValidationDisplay">
                         @MyValidationMessage
                     </div>
                 </div>
@@ -148,7 +148,7 @@
 
 </div>
 
-<div class="container-fluid" style="display: @ResultDisplay">
+<div id="resultMessage" class="container-fluid" style="display: @ResultDisplay">
     <div class="@AlertType" role="alert">
         @((MarkupString)ResultMessage)
     </div>

@@ -119,5 +119,38 @@ window.BedBrigadeUtil = {
     },
     GetBrowserLocale: function () {
         return (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.userLanguage || navigator.language || navigator.browserLanguage || 'en-US';
+    },
+    ScrollPastImages: function() {
+        window.scrollTo({
+            top: 500,
+            behavior: 'instant'
+        });
+    },
+    //From here:  https://stackoverflow.com/questions/5007530/how-do-i-scroll-to-an-element-using-javascript
+    ScrollToElementId: function (elementId, scrollAdditional = 0) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'instant'
+            });
+
+            element.style.visibility = 'visible';
+            element.style.display = 'block';
+            element.setAttribute('tabindex', '-1');
+            element.focus();
+            element.removeAttribute('tabindex');
+
+            if (scrollAdditional) {
+                window.scrollBy({
+                    top: scrollAdditional,
+                    behavior: 'instant'
+                });
+            }
+        } else {
+            console.error(`Element with id ${elementId} not found`);
+        }
     }
+
+
 }

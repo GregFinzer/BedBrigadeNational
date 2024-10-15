@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private IJSRuntime _js { get; set; }
 
         private Common.Models.ContactUs? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -134,13 +135,14 @@ namespace BedBrigade.Client.Components.Pages
             _validationMessageStore.Clear();
         }
 
-        private void ShowValidationMessage(string message)
+        private async Task ShowValidationMessage(string message)
         {
             MyValidationMessage = message;
             MyValidationDisplay = "";
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "myValidationMessage");
         }
 
-        private bool IsValid()
+        private async Task<bool> IsValid()
         {
             ClearValidationMessage();
             bool isValid = true;
@@ -151,7 +153,7 @@ namespace BedBrigade.Client.Components.Pages
             if (!isValid)
             {
                 EC.NotifyValidationStateChanged();
-                ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
+                await ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
                 return false;
             }
 
@@ -160,7 +162,7 @@ namespace BedBrigade.Client.Components.Pages
             if (!isPhoneValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Phone)), _lc.Keys["ValidPhoneNumber"]);
-                ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
+                await ShowValidationMessage(_lc.Keys["ContactUsFormNotCompleted"]);
                 return false;
             }
 
@@ -168,13 +170,13 @@ namespace BedBrigade.Client.Components.Pages
             if (!emailResult.IsValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Email)), emailResult.UserMessage);
-                ShowValidationMessage(_lc.Keys["ValidEmail"]);
+                await ShowValidationMessage(_lc.Keys["ValidEmail"]);
                 return false;
             }
 
             if (!ValidReCAPTCHA)
             {
-                ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
+                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 
@@ -211,7 +213,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
-            if (!IsValid())
+            if (!await IsValid())
                 return;
 
             newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
@@ -255,6 +257,10 @@ namespace BedBrigade.Client.Components.Pages
                 ResultMessage = "Error! " + ex.Message;
                 ResultDisplay = "";
                 Log.Error(ex, "Error saving ContactUs");
+            }
+            finally
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 200);
             }
         } // update database
 

@@ -192,7 +192,7 @@
                 <div class="col-md-3" style="text-align: center">
                     <ReCAPTCHA @ref="reCAPTCHAComponent" OnSuccess="OnSuccess" OnExpired="OnExpired"/>
                 </div>
-                <div class="col-md-9">
+                <div id="myMessage" class="col-md-9">
                     <div class="alert alert-danger" role="alert" style="display: @MyMessageDisplay">
                         @MyMessage
                     </div>
@@ -211,7 +211,7 @@
 
 </div>
 
-<div class="container-fluid" style="display: @ResultDisplay">@FinalMessage</div>
+<div id="finalMessage" class="container-fluid" style="display: @ResultDisplay">@FinalMessage</div>
 
 @if (ResultDisplay != DisplayNone)
 {

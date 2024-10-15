@@ -25,7 +25,6 @@
     <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
     <None Include="wwwroot\css\open-iconic\README.md" />
 	<None Include="wwwroot\scripts\Recaptcha.js" />
-    <None Include="wwwroot\scripts\SetGetValue.js" />
   </ItemGroup>
 
   <ItemGroup>
