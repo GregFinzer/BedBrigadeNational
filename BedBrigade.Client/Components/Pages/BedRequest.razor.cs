@@ -25,6 +25,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager? _nav { get; set; }
 
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private IJSRuntime _js { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -136,10 +137,11 @@ namespace BedBrigade.Client.Components.Pages
 
         #region Validation & Events
 
-        private void ShowValidationMessage(string message)
+        private async Task ShowValidationMessage(string message)
         {
             MyValidationMessage = message;
             MyValidationDisplay = "";
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "myValidationMessage");
         }
         private async Task<bool> IsValid()
         {
@@ -150,7 +152,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!formIsValid)
             {
-                ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
+                await ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
                 return false;
             }
 
@@ -159,7 +161,7 @@ namespace BedBrigade.Client.Components.Pages
             if (!isPhoneValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Phone)), _lc.Keys["ValidPhoneNumber"]);
-                ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
+                await ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
                 return false;
             }
 
@@ -167,7 +169,7 @@ namespace BedBrigade.Client.Components.Pages
             if (!emailResult.IsValid)
             {
                 _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.Email)), emailResult.UserMessage);
-                ShowValidationMessage(_lc.Keys["ValidEmail"]);
+                await ShowValidationMessage(_lc.Keys["ValidEmail"]);
                 return false;
             }
 
@@ -175,13 +177,13 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!string.IsNullOrEmpty(addressMessage))
             {
-                ShowValidationMessage(addressMessage);
+                await ShowValidationMessage(addressMessage);
                 return false;
             }
 
             if (!ValidReCAPTCHA)
             {
-                ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
+                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
                 return false;
             }
 
@@ -189,7 +191,7 @@ namespace BedBrigade.Client.Components.Pages
 
             if (!string.IsNullOrEmpty(distanceMessage))
             {
-                ShowValidationMessage(distanceMessage);
+                await ShowValidationMessage(distanceMessage);
                 return false;
             }
 
@@ -331,6 +333,10 @@ namespace BedBrigade.Client.Components.Pages
                 ResultMessage = "Error! " + ex.Message;
                 ResultDisplay = "";
                 Log.Error(ex, "Error saving BedRequest");
+            }
+            finally
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
             }
         }
 
