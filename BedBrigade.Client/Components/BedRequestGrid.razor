@@ -8,12 +8,13 @@
 }
 else
 {
-    <fieldset >
-        <legend class="ms-3">@ManageBedRequestsMessage</legend>
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper" style="width: 100%">
-                <div class="row">
-                    <div style="width: 100%">
+    <br/>
+    <h3 class="ms-3">@ManageBedRequestsMessage</h3>
+    <div class="col-md-12">
+    <div class="content-wrapper">
+    <div class="row">
+    <div style="width: 100%" >
+
                     <SfGrid @ref="Grid" TValue="BedRequest" DataSource=@BedRequests
                             ContextMenuItems=@ContextMenu
                             EnablePersistence="true"
@@ -240,7 +241,7 @@ else
                 </div>
             </div>
         </div>
-    </fieldset>}
+}
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
     <ToastPosition X="Center" Y="Top" ></ToastPosition>
 </SfToast>

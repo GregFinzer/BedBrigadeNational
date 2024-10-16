@@ -19,30 +19,33 @@
 }
 else
 {
-    <fieldset>
-        <legend class="ms-3">Bed Brigade Users</legend>
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper">
-                <div class="row align-content-center">
-                    <SfGrid ID="UserGrid" @ref="Grid" TValue="User" DataSource=@BBUsers 
-                        ContextMenuItems=@ContextMenu
-                        EnablePersistence="true"
-                        ShowColumnChooser="true"
-                        Toolbar=@ToolBar
-                        AllowPaging="true"
-                        AllowSorting="true"
-                        AllowExcelExport="true"
-                        ShowColumnMenu="true"
-                        AllowFiltering="true"
-                        AllowReordering="true"
-                        AllowResizing="true"
-                        AllowSelection="true"
-                        AllowPdfExport="true"
-                        AllowTextWrap="true"
-                        AllowGrouping="true">
-                        <GridTextWrapSettings WrapMode="WrapMode.Header" />
-                        <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
-                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad Destroyed="@OnDestroyed" TValue="User" />
+    <br/>
+    <h3 class="ms-3">Bed Brigade Users</h3>
+    <div class="col-md-12">
+        <div class="content-wrapper">
+            <div class="row">
+                <div style="width: 100%">
+
+                    <SfGrid ID="UserGrid" @ref="Grid" TValue="User" DataSource=@BBUsers
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true"
+                            AllowGrouping="true"
+                            Width="100%">
+                        <GridTextWrapSettings WrapMode="WrapMode.Header"/>
+                        <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15"/>
+                        <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad Destroyed="@OnDestroyed" TValue="User"/>
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <Validator>
@@ -62,46 +65,46 @@ else
                                     var user = (context as User);
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="@_lc.Keys["UserName"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.UserName)" />
+                                            <SfTextBox ID="username" CssClass="form-control" @bind-Value=@user.UserName Enabled=@AddUser Placeholder="@_lc.Keys["UserName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => user.UserName)"/>
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@userRegister.Password Enabled=@AddUser Placeholder="@_lc.Keys["Password"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => userRegister.Password)" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfTextBox ID="firstname" CssClass="form-control" @bind-Value=@user.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.FirstName)" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox ID="lastname" CssClass="form-control" @bind-Value=@user.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.LastName)" />
+                                            <SfTextBox ID="password" CssClass="form-control" @bind-Value=@userRegister.Password Enabled=@AddUser Placeholder="@_lc.Keys["Password"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => userRegister.Password)"/>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="@_lc.Keys["PhoneNumber"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.Phone)" />
+                                            <SfTextBox ID="firstname" CssClass="form-control" @bind-Value=@user.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => user.FirstName)"/>
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox ID="email" @bind-Value=@user.Email Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
-                                            <ValidationMessage For="@(() => user.Email)" />
+                                            <SfTextBox ID="lastname" CssClass="form-control" @bind-Value=@user.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => user.LastName)"/>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto" >
-                                                <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="@_lc.Keys["PhoneNumber"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => user.Phone)"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox ID="email" @bind-Value=@user.Email Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <ValidationMessage For="@(() => user.Email)"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@user.LocationId Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="Name" Value="LocationId"/>
                                             </SfDropDownList>
-                                            <ValidationMessage For="@(() => user.LocationId)" />
+                                            <ValidationMessage For="@(() => user.LocationId)"/>
                                         </div>
                                         <div class="col-md-6">
-                                            <SfDropDownList ID="role" TItem="Role" TValue="Int32" DataSource="Roles" @bind-Value=@user.FkRole Enabled="true" Placeholder="@_lc.Keys["Role"]" FloatLabelType="FloatLabelType.Auto" >
-                                                <DropDownListFieldSettings Text="Name" Value="RoleId" />
+                                            <SfDropDownList ID="role" TItem="Role" TValue="Int32" DataSource="Roles" @bind-Value=@user.FkRole Enabled="true" Placeholder="@_lc.Keys["Role"]" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="Name" Value="RoleId"/>
                                             </SfDropDownList>
-                                            <ValidationMessage For="@(() => user.FkRole)" />
+                                            <ValidationMessage For="@(() => user.FkRole)"/>
                                         </div>
                                     </div>
                                 }
@@ -110,24 +113,23 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending"/>
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true" />
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true"/>
                         <GridColumns>
-                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
-                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
-                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" />
-                            <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" />
-                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" />
+                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
+                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="190px" AutoFit="true"/>
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="120px" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="290px" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
-
                 </div>
             </div>
         </div>
-    </fieldset>
+    </div>
 }
 <SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#UserTarget">
     <ToastPosition X="Center" Y="Top"></ToastPosition>
