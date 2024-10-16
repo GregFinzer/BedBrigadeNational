@@ -26,6 +26,7 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -292,11 +293,24 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.NumberOfBeds = NumericValue;
                 newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
 
-                await UpdateDatabase();
+                var bedRequest = await UpdateDatabase();
+
+                if (bedRequest != null)
+                {
+                    var emailResult = await _svcEmailBuilder.SendBedRequestConfirmationEmail(bedRequest);
+
+                    if (!emailResult.Success)
+                    {
+                        AlertType = AlertDanger;
+                        ResultMessage = emailResult.Message;
+                        ResultDisplay = "";
+                        await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
+                    }
+                }
             }
         }
 
-        private async Task UpdateDatabase()
+        private async Task<Common.Models.BedRequest?> UpdateDatabase()
         {
             try
             {
@@ -318,6 +332,7 @@ namespace BedBrigade.Client.Components.Pages
                     DisplayForm = DisplayNone;
                     ResultMessage = _lc.Keys["BedRequestFormSubmitted"];
                     ResultDisplay = "";
+                    return bedRequest;
                 }
                 else
                 {
@@ -338,6 +353,8 @@ namespace BedBrigade.Client.Components.Pages
             {
                 await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
             }
+
+            return null;
         }
 
         #endregion

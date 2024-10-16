@@ -31,6 +31,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private NavigationManager? _navManager { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -406,7 +407,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task SendTax()
         {
-            var result =  await _svcDonation.EmailTaxForms(LB_Send.GetDataList().ToList());
+            var result =  await _svcEmailBuilder.EmailTaxForms(LB_Send.GetDataList().ToList());
 
             if (result.Success)
             {
