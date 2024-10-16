@@ -207,7 +207,9 @@ SuitepoBox: Suite/PO Box
 TaxFormSent: Tax Form Sent
 Team: 'Team #'
 ThankYou: Thank you!
+TheBedBrigade: The Bed Brigade
 TransactionId: Transaction ID
+Unauthorized: Unauthorized
 UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix

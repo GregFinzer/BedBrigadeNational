@@ -179,7 +179,7 @@ ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
 Save: Salvar
-Scheduling: Programación
+Scheduling: Planificación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
@@ -207,7 +207,9 @@ SuitepoBox: Suite/Apartado de correos
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
 ThankYou: ¡Gracias!
+TheBedBrigade: La Brigada de la Cama
 TransactionId: ID de transacción
+Unauthorized: Desautorizado
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos

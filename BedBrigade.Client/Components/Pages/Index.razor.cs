@@ -12,6 +12,7 @@ using System.Globalization;
 using BedBrigade.Common.Models;
 using KellermanSoftware.NetEmailValidation;
 using BedBrigade.Common.Constants;
+using BedBrigade.SpeakIt;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -30,6 +31,8 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
 
+        [Inject] private ITranslationDataService _translateLogic { get; set; }
+
         [Parameter] public string? mylocation { get; set; }
         [Parameter] public string? mypageName { get; set; }
 
@@ -38,7 +41,9 @@ namespace BedBrigade.Client.Components.Pages
 
         private string previousLocation = SeedConstants.SeedNationalName;
         private string previousPageName = defaultPageName;
+        private string PreviousBodyContent = null;
         private string BodyContent = string.Empty;
+        private string CurrentPageTitle = string.Empty;
         private string SorryPageUrl = String.Empty;
        
         protected override async Task OnInitializedAsync()
@@ -135,7 +140,26 @@ namespace BedBrigade.Client.Components.Pages
             {
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-                BodyContent = html;
+
+                if (html != PreviousBodyContent)
+                {
+                    PreviousBodyContent = html;
+                    BodyContent = html;
+                }
+
+
+                if (locationResponse.Data.LocationId == Defaults.NationalLocationId)
+                {
+                    string bedBrigade = await _translateLogic.GetTranslation("The Bed Brigade", _svcLanguage.CurrentCulture.Name);
+                    string title = await _translateLogic.GetTranslation(contentResult.Data.Title, _svcLanguage.CurrentCulture.Name);
+                    CurrentPageTitle = $"{bedBrigade} | {title}";
+                }
+                else
+                {
+                    string locationName = await _translateLogic.GetTranslation(locationResponse.Data.Name, _svcLanguage.CurrentCulture.Name);
+                    string title = await _translateLogic.GetTranslation(contentResult.Data.Title, _svcLanguage.CurrentCulture.Name);
+                    CurrentPageTitle = $"{locationName} | {title}";
+                }
                 return true;
             }
 
@@ -149,7 +173,21 @@ namespace BedBrigade.Client.Components.Pages
             {                       
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-                BodyContent = html;
+
+                if (html != PreviousBodyContent)
+                {
+                    PreviousBodyContent = html;
+                    BodyContent = html;
+                }
+
+                if (locationResponse.Data.LocationId == Defaults.NationalLocationId)
+                {
+                    CurrentPageTitle = $"The Bed Brigade | {contentResult.Data.Title}";
+                }
+                else
+                {
+                    CurrentPageTitle = $"{locationResponse.Data.Name} | {contentResult.Data.Title}";
+                }
             }
             else
             {
