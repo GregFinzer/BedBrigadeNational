@@ -953,7 +953,7 @@ a.back-btn:hover {
   body #mainNav .navbar-nav .nav-item ul.dropdown-menu {
     left: auto;
     right: 0;
-    width: 220px;
+    width: 300px;
   }
 }
 @media (max-width: 767px) {
