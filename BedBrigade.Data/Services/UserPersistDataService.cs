@@ -37,14 +37,20 @@ namespace BedBrigade.Data.Services
                     var result = await context.UserPersist.FirstOrDefaultAsync(o => o.UserName == persist.UserName
                         && o.Grid == persist.Grid);
 
+                    //This is intentional not to use the base repository. We do not log the save of the persist data.
                     if (result == null)
                     {
-                        await base.CreateAsync(persist);
+                        persist.SetCreateAndUpdateUser(persist.UserName);
+                        context.UserPersist.Add(persist);
                     }
                     else
                     {
-                        await base.UpdateAsync(persist);
+                        result.Data = persist.Data;
+                        result.SetUpdateUser(persist.UserName);
+                        context.UserPersist.Update(result);
                     }
+
+                    await context.SaveChangesAsync();
 
                     return new ServiceResponse<bool>("Persist data saved", true, true);
                 }
