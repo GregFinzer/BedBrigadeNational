@@ -35,6 +35,7 @@ public static class SeedContentsLogic
             await SeedTaxForm(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
+            await SeedBedRequestConfirmationForm(context, locations);
         }
     }
 
@@ -608,6 +609,50 @@ public static class SeedContentsLogic
             catch (Exception ex)
             {
                 Log.Logger.Debug($"Error in content {ex.Message}");
+            }
+        }
+    }
+
+    private static async Task SeedBedRequestConfirmationForm(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }
+
+        Log.Logger.Information("SeedBedRequestConfirmationForm Started");
+
+        string name = ContentType.BedRequestConfirmationForm.ToString();
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedText;
+
+            foreach (var location in locations)
+            {
+                seedText = WebHelper.GetHtml("BedRequestConfirmationForm.txt");
+
+                var content = new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.BedRequestConfirmationForm,
+                    Name = name,
+                    ContentHtml = seedText,
+                    Title = StringUtil.InsertSpaces(name)
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in SeedBedRequestConfirmationForm content {ex.Message}");
             }
         }
     }

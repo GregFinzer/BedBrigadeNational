@@ -28,7 +28,8 @@ namespace BedBrigade.SpeakIt
         private const string PropertyTypeGroup = "propertyType";
         private const string ContentGroup = "content";
         //We intentionally do not end with a ] because of other parameters that may be in the string
-        private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"", RegexOptions.Compiled | RegexOptions.Multiline);
+        //private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _keyReferenceRegex = new Regex(@"_lc\.Keys\[""(?<content>[^""]+)?""", RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _propertyRegex =
             new Regex(@"public\s+(?<propertyType>[^\s\?]+\??)\s+(?<content>\w+)\s*{\s*get;\s*set;\s*}",
@@ -122,7 +123,7 @@ namespace BedBrigade.SpeakIt
         {
             if (parms.RemoveLocalizedKeys && String.IsNullOrEmpty(parms.ResourceFilePath))
             {
-                throw new ArgumentException("ResourceFilePath is required");
+                throw new ArgumentException($"{nameof(parms.ResourceFilePath)} is required");
             }
 
             ValidateParseParameters(parms);
@@ -227,7 +228,7 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public List<ParseResult> GetMaxLengthAttributesInText(string text)
+        private List<ParseResult> GetMaxLengthAttributesInText(string text)
         {
             List<ParseResult> result = new List<ParseResult>();
 
@@ -259,7 +260,7 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public List<ParseResult> GetRequiredWithErrorMessageInText(string text)
+        private List<ParseResult> GetRequiredWithErrorMessageInText(string text)
         {
             List<ParseResult> result = new List<ParseResult>();
 
@@ -290,7 +291,7 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public List<ParseResult> GetRequiredAttributeInText(string text)
+        private List<ParseResult> GetRequiredAttributeInText(string text)
         {
             List<ParseResult> result = new List<ParseResult>();
 
@@ -323,7 +324,11 @@ namespace BedBrigade.SpeakIt
         }
 
 
-
+        /// <summary>
+        /// Get a list of localizable strings in the text.  The text can be a razor, HTML, or a C# model class
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public List<ParseResult> GetLocalizableStringsInText(string? text)
         {
             List<ParseResult> result = new List<ParseResult>();
@@ -369,7 +374,7 @@ namespace BedBrigade.SpeakIt
         }
 
         
-        public List<ParseResult> GetExistingLocalizedStringsInText(string html,
+        private List<ParseResult> GetExistingLocalizedStringsInText(string html,
             Dictionary<string, string> existingKeyValues)
         {
             List<ParseResult> result = new List<ParseResult>();
@@ -395,7 +400,7 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public string PreProcess(string input)
+        private string PreProcess(string input)
         {
             input = RemoveByTag(input, _scriptTag);
             input = RemoveByTag(input, _styleTag);

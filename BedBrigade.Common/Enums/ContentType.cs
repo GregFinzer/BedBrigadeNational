@@ -11,5 +11,7 @@ public enum ContentType
     [Description("Delivery Check List")]
     DeliveryCheckList = 5,
     [Description("Email Tax Form")]
-    EmailTaxForm =6
+    EmailTaxForm =6,
+    [Description("Bed Request Confirmation Form")]
+    BedRequestConfirmationForm = 7,
 }

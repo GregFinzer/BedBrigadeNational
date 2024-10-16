@@ -1,0 +1,7 @@
+﻿%%BedRequest.FirstName%%,
+
+We have received your Bed Request for %%BedRequest.NumberOfBeds%% bed(s) with Genders/Ages of %%BedRequest.AgesGender%%
+
+Your request has been assigned to this location:  %%Location.Name%%
+
+There are currently %%BedRequest.NumberOfBedsWaitingSum%% Bed Requests in line ahead of you.
