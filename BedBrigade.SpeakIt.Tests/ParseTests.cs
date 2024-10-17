@@ -376,5 +376,24 @@ namespace BedBrigade.SpeakIt.Tests
             Assert.IsTrue(result.Count > 0);
             Assert.IsTrue(result.Any(o => o.LocalizableString.StartsWith("Do you or your child") && o.LocalizableString.EndsWith("need a good nights sleep?") ));
         }
+
+        [Test]
+        public void GroveCityHomePageShouldNotHaveIdEqual()
+        {
+            string filePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding", "SeedHtml", "GroveCityHome.html");
+            string html = File.ReadAllText(filePath);
+
+            //Act
+            List<ParseResult> result = _logic.GetLocalizableStringsInText(html);
+
+            //Assert
+            Assert.IsTrue(result.Count > 0);
+
+            foreach (var parseResult in result)
+            {
+                Console.WriteLine(parseResult.LocalizableString);
+            }
+            Assert.IsFalse(result.Any(o => o.LocalizableString.Contains("id=")));
+        }
     }
 }
