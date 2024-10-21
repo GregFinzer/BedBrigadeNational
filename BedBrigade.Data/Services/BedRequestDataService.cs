@@ -159,7 +159,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     {
         var locationResult = await _locationDataService.GetByIdAsync(locationId);
 
-        if (!locationResult.Success || locationResult.Data == null || !Validation.IsValidZipCode(locationResult.Data.PostalCode))
+        if (!locationResult.Success || locationResult.Data == null || !Validation.IsValidZipCode(locationResult.Data.MailingPostalCode))
         {
             return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.PostalCode).ToList();
         }
@@ -170,9 +170,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         foreach (var bedRequest in bedRequests)
         {
             bedRequest.Distance = 0;
-            if (location.PostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
+            if (location.MailingPostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
             {
-                bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.PostalCode, bedRequest.PostalCode);
+                bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode, bedRequest.PostalCode);
             }
         }
 

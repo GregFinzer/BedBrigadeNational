@@ -47,11 +47,10 @@ else
                 <GridColumn Field=@nameof(Location.LocationId) HeaderText="ID" TextAlign="TextAlign.Right" Width="120"></GridColumn>
                 <GridColumn Field=@nameof(Location.Name) HeaderText="Name" Width="150"></GridColumn>
                 <GridColumn Field=@nameof(Location.Route) HeaderText="Route" Width="150"></GridColumn>
-                <GridColumn Field=@nameof(Location.Address1) HeaderText="Address 1" Width="150"></GridColumn>
-                <GridColumn Field=@nameof(Location.Address2) HeaderText="Address 2" Width="150"></GridColumn>
-                <GridColumn Field=@nameof(Location.City) HeaderText="City" Width="120"></GridColumn>
-                <GridColumn Field=@nameof(Location.State) HeaderText="State" Width="120"></GridColumn>
-                <GridColumn Field=@nameof(Location.PostalCode) HeaderText="Postal Code" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildAddress) HeaderText="Address" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildCity) HeaderText="City" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildState) HeaderText="State" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildPostalCode) HeaderText="Postal Code" Width="120"></GridColumn>
                 <GridColumn Field=@nameof(Location.Latitude) HeaderText="Latitude" Format="N10" TextAlign="TextAlign.Right" Width="150"></GridColumn>
                 <GridColumn Field=@nameof(Location.Longitude) HeaderText="Longitude" Format="N10" TextAlign="TextAlign.Right" Width="150"></GridColumn>
                 <GridColumn Field=@nameof(Location.MetroAreaId) HeaderText="Metro Area ID" TextAlign="TextAlign.Right" Width="120"></GridColumn>

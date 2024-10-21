@@ -11,6 +11,10 @@ BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 BedsRequested: Camas solicitadas
+BuildAddress: Dirección de compilación
+BuildCity: Construir ciudad
+BuildState: Estado de compilación
+BuildPostalCode: Construir código postal
 Cancel: Cancelar
 ChooseADate: Elija una fecha y hora
 City: Ciudad
@@ -107,6 +111,10 @@ LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
 LogIn: Inicia sesión
 Longitude: Longitud
+MailingAddress: Dirección postal
+MailingCity: Ciudad de correo
+MailingState: Estado de envío
+MailingPostalCode: Código Postal
 ManageSchedule: Administrar el horario
 ManageSignups: Gestionar las inscripciones
 MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres

@@ -18,6 +18,6 @@ Sincerely,
 %%User.Phone%%
 
 %%Location.Name%% 
-%%Location.Address1%% %%Location.Address2%% 
-%%Location.City%%, %%Location.State%% %%Location.PostalCode%% 
+%%Location.MailingAddress%%
+%%Location.MailingCity%%, %%Location.MailingState%% %%Location.MailingPostalCode%% 
 https://www.bedbrigade.org%%Location.Route%%

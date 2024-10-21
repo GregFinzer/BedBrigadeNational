@@ -83,16 +83,24 @@
                         <Template >                             
                             @{
                                 Schedule schedule = (context as Schedule)!; 
+
                                 if(schedule.ScheduleId == 0) // new event
                                 {
                                     DateTime myDate = DateTime.Today;
-                                    //myDate = myDate.AddDays(1);
                                     string strDate = myDate.ToShortDateString();
                                     string strTime = "9:00 AM";
                                     myDate = DateTime.Parse(strDate + " " + strTime);
                                     schedule.EventDateScheduled = myDate;
+                                    schedule.LocationId = _selectedLocationId;
+                                    Location loc = lstLocations.First(x => x.LocationId == _selectedLocationId);
+                                    schedule.Address = loc.BuildAddress;
+                                    schedule.City = loc.BuildCity;
+                                    schedule.State = loc.BuildState;
+                                    schedule.PostalCode = loc.BuildPostalCode;
+                                    schedule.OrganizerName = _currentUser.FullName;
+                                    schedule.OrganizerEmail = _currentUser.Email;
+                                    schedule.OrganizerPhone = _currentUser.Phone.FormatPhoneNumber();
                                 }
-
 
                                 <div class="row" >
                                     <div class="col-md-7">
@@ -228,7 +236,7 @@
           
                     <GridColumns>
                         <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
-                        <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@userLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
+                        <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" DefaultValue="@_selectedLocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"  />                    
                         <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="false" AllowAdding="true" AllowEditing="true" ></GridColumn>
                         <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">

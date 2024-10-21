@@ -34,18 +34,34 @@ public static class Seed
     {
         new Location
         {
-            Name = SeedConstants.SeedNationalName, Route = "/national", Address1 = "", Address2 = "", City = "Columbus",
-            State = "Ohio", PostalCode = "",  IsActive = true
+            Name = SeedConstants.SeedNationalName, Route = "/national", MailingCity = "Columbus", MailingState = "Ohio", IsActive = true
         },
         new Location
         {
-            Name = "Grove City Bed Brigade", Route = "/grove-city", Address1 = "4004 Thistlewood Dr", Address2 = "", City = "Grove City",
-            State = "Ohio", PostalCode = "43123", IsActive = true
+            Name = "Grove City Bed Brigade", 
+            Route = "/grove-city", 
+            MailingAddress = "1788 Killdeer Rd", 
+            MailingCity = "Grove City",
+            MailingState = "OH", 
+            MailingPostalCode = "43123",
+            BuildAddress = "4004 Thistlewood Dr",
+            BuildCity = "Grove City",
+            BuildState= "OH",
+            BuildPostalCode= "43123",
+            IsActive = true
         },
         new Location
         {
-            Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", Address1 = "1250 Gemini Pl", Address2 = "", City = "Columbus",
-            State = "Ohio", PostalCode = "43240", IsActive = true
+            Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", 
+            MailingAddress = "1250 Gemini Pl", 
+            MailingCity = "Columbus",
+            MailingState = "OH", 
+            MailingPostalCode = "43240",
+            BuildAddress = "1250 Gemini Pl",
+            BuildCity = "Columbus",
+            BuildState = "OH",
+            BuildPostalCode = "43240",
+            IsActive = true
         }
 
     };

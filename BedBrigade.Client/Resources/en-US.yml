@@ -11,6 +11,10 @@ BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 BedsRequested: Beds Requested
+BuildAddress: Build Address
+BuildCity: Build City
+BuildState: Build State
+BuildPostalCode: Build Postal Code
 Cancel: Cancel
 ChooseADate: Choose a Date & Time
 City: City
@@ -107,6 +111,10 @@ LocationPathColon: 'Location Path:'
 LocationsMarkedWithAn: Locations marked with an asterisk (*) are currently inactive
 LogIn: Log In
 Longitude: Longitude
+MailingAddress: Mailing Address
+MailingCity: Mailing City
+MailingState: Mailing State
+MailingPostalCode: Mailing Postal Code
 ManageSchedule: Manage Schedule
 ManageSignups: Manage Sign-Ups
 MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters

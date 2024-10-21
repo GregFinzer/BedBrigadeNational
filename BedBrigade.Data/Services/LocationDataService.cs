@@ -134,7 +134,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
        // Debug.WriteLine("User authenticated -  " + isAuthenticated.ToString());
 
         // Step 1: Filter locations by postal code
-        var filteredLocations = locations.Where(l => !string.IsNullOrEmpty(l.PostalCode)).ToList();
+        var filteredLocations = locations.Where(l => !string.IsNullOrEmpty(l.BuildPostalCode)).ToList();
 
         // Step 2: If user is not authenticated, select only active locations
         if (!isAuthenticated)
@@ -173,7 +173,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         }
 
         var locationsResult = await GetAllAsync();
-        bool anyPostalCodes = locationsResult.Data.Any(l => !string.IsNullOrEmpty(l.PostalCode));
+        bool anyPostalCodes = locationsResult.Data.Any(l => !string.IsNullOrEmpty(l.BuildPostalCode));
 
         if (!anyPostalCodes)
         {
@@ -200,7 +200,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         var result = new List<LocationDistance>();
         foreach (var loc in availableLocations) // locationsResult.Data
         {
-            var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.PostalCode);
+            var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.BuildPostalCode);
             if (distance < maxMiles)
             {
                 LocationDistance locationDistance = new LocationDistance();
