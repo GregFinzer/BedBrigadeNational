@@ -68,6 +68,32 @@
                                     <label class="formlabel">@_lc.Keys["EventDateTime"]</label>
                                     <label>@SelectedEvent.EventDateScheduled.ToString("dddd, MM/dd/yyyy h:mm tt") to @SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString()</label>
                                 </div>
+                                @if (!String.IsNullOrEmpty(SelectedEvent.Address))
+                                {
+                                    <div class="form-group">
+                                        <label class="formlabel">@_lc.Keys["Address"]</label>
+                                        <label>
+                                            <a href="@GoogleMaps.CreateGoogleMapsLinkForSchedule(SelectedEvent)" target="_blank">
+                                                @($"{SelectedEvent.Address}, {SelectedEvent.City}, {SelectedEvent.State} {SelectedEvent.PostalCode}")
+                                            </a>
+                                        </label>
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(SelectedEvent.OrganizerName))
+                                {
+                                    <div class="form-group">
+                                        <label class="formlabel">@_lc.Keys["Organizer"]</label>
+                                        <label>
+                                            @SelectedEvent.OrganizerName&nbsp;
+                                            <a href="@($"mailto:{SelectedEvent.OrganizerEmail}")">
+                                                @SelectedEvent.OrganizerEmail
+                                            </a>&nbsp;
+                                            <a href="@($"tel:{StringUtil.ExtractDigits(SelectedEvent.OrganizerPhone)}")">
+                                                @SelectedEvent.OrganizerPhone.FormatPhoneNumber()
+                                            </a>
+                                        </label>
+                                    </div>
+                                }
                                 <div class="form-group">
                                     <label class="formlabel">@_lc.Keys["VolunteersRegisteredneeded"]</label>
                                     <label>@SelectedEvent.VolunteersRegistered/@SelectedEvent.VolunteersMax</label>

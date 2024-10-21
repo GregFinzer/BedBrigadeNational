@@ -19,20 +19,29 @@ public class Location : BaseEntity
     [Required] [MaxLength(256)] 
     public String Route { get; set; } = string.Empty;
 
-    [MaxLength(128)] 
-    public String? Address1 { get; set; } = string.Empty;
+    [MaxLength(256)] 
+    public String? MailingAddress { get; set; } = string.Empty;
 
     [MaxLength(128)] 
-    public String? Address2 { get; set; } = string.Empty;
+    public String? MailingCity { get; set; } = string.Empty;
 
     [MaxLength(128)] 
-    public String? City { get; set; } = string.Empty;
-
-    [MaxLength(128)] 
-    public String? State { get; set; } = string.Empty;
+    public String? MailingState { get; set; } = string.Empty;
 
     [MaxLength(10)] 
-    public String PostalCode { get; set; } = string.Empty;
+    public String? MailingPostalCode { get; set; } = string.Empty;
+
+    [MaxLength(256)]
+    public String? BuildAddress { get; set; } = string.Empty;
+
+    [MaxLength(128)]
+    public String? BuildCity { get; set; } = string.Empty;
+
+    [MaxLength(128)]
+    public String? BuildState { get; set; } = string.Empty;
+
+    [MaxLength(10)]
+    public String BuildPostalCode { get; set; } = string.Empty;
 
     [Column(TypeName = "decimal(18,10)")] 
     public Decimal? Latitude { get; set; }

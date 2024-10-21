@@ -34,7 +34,6 @@ namespace BedBrigade.Client.Components
         private string userRole = String.Empty;
         private string userName = String.Empty;
         private string userLocationName = String.Empty;
-        private int userLocationId = 0;
         public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         private MediaHelper.MediaUser MediaUser = new MediaHelper.MediaUser();
@@ -67,6 +66,8 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight="200px", EnableResize=true };
 
+        private User? _currentUser = new User();
+        private int _selectedLocationId = 0;
 
         protected override async Task OnInitializedAsync()
         {
@@ -100,8 +101,6 @@ namespace BedBrigade.Client.Components
             Identity = _svcAuth.CurrentUser;
             userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
             Log.Information($"{userName} went to the Manage Schedules Page");
-
-            userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
             {
@@ -141,6 +140,16 @@ namespace BedBrigade.Client.Components
 
 
             } // Get User Data
+
+            _currentUser = (await _svcUser!.GetCurrentLoggedInUser()).Data;
+            if (_currentUser.LocationId == Defaults.NationalLocationId)
+            {
+                _selectedLocationId = Defaults.GroveCityLocationId;
+            }
+            else
+            {
+                _selectedLocationId = _currentUser.LocationId;
+            }
         } // User Data
 
         private async Task LoadLocations()
@@ -152,7 +161,7 @@ namespace BedBrigade.Client.Components
                 lstLocations = dataLocations.Data;
                 if (lstLocations != null && lstLocations.Count > 0)
                 { // select User Location Name 
-                    userLocationName = lstLocations.Find(e => e.LocationId == userLocationId).Name;                    
+                    userLocationName = lstLocations.Find(e => e.LocationId == _selectedLocationId).Name;                    
                 } // Locations found             
 
             }
@@ -169,7 +178,7 @@ namespace BedBrigade.Client.Components
                 }
                 else
                 {
-                    recordResult = await _svcSchedule.GetSchedulesByLocationId(userLocationId);
+                    recordResult = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
                 }
 
                 if (recordResult.Success)
@@ -406,6 +415,7 @@ namespace BedBrigade.Client.Components
         public void RowSelectHandler(RowSelectEventArgs<Schedule> args)
         {
             selectedScheduleId = args.Data.ScheduleId;
+            _selectedLocationId = args.Data.LocationId;
         }
 
         public class GridFilterOption

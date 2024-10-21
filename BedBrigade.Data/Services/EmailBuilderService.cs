@@ -213,11 +213,17 @@ namespace BedBrigade.Data.Services
         private StringBuilder ReplaceLocationFields(Location location, StringBuilder sb)
         {
             sb = sb.Replace("%%Location.Name%%", location.Name);
-            sb = sb.Replace("%%Location.Address1%%", location.Address1);
-            sb = sb.Replace("%%Location.Address2%%", location.Address2);
-            sb = sb.Replace("%%Location.City%%", location.City);
-            sb = sb.Replace("%%Location.State%%", location.State);
-            sb = sb.Replace("%%Location.PostalCode%%", location.PostalCode);
+
+            sb = sb.Replace("%%Location.BuildAddress%%", location.BuildAddress);
+            sb = sb.Replace("%%Location.BuildCity%%", location.BuildCity);
+            sb = sb.Replace("%%Location.BuildState%%", location.BuildState);
+            sb = sb.Replace("%%Location.BuildPostalCode%%", location.BuildPostalCode);
+
+            sb = sb.Replace("%%Location.MailingAddress%%", location.MailingAddress);
+            sb = sb.Replace("%%Location.MailingCity%%", location.MailingCity);
+            sb = sb.Replace("%%Location.MailingState%%", location.MailingState);
+            sb = sb.Replace("%%Location.MailingPostalCode%%", location.MailingPostalCode);
+
             sb = sb.Replace("%%Location.Route%%", location.Route);
             return sb;
         }

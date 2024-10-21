@@ -6,11 +6,15 @@ Amount: Importe
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
-BedBrigadeWeb: Cama Brigade Web
+BedBrigadeWeb: Web de la Brigada de Camas
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
-BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revise su correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
+BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 BedsRequested: Camas solicitadas
+BuildAddress: Dirección de compilación
+BuildCity: Construir ciudad
+BuildState: Estado de compilación
+BuildPostalCode: Construir código postal
 Cancel: Cancelar
 ChooseADate: Elija una fecha y hora
 City: Ciudad
@@ -34,22 +38,22 @@ DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Fo
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
 DonationDate: Fecha de donación
 DynamicApril: Abril
-DynamicAprilBedBuild: Construcción de camas de abril
+DynamicAprilBedBuild: Construcción de cama de abril
 DynamicAugust: Agosto
 DynamicAugustBedBuild: Construcción de cama de agosto
 DynamicBed: Cama
 DynamicBuild: Construir
 DynamicCut: Cortar
 DynamicDecember: Diciembre
-DynamicDecemberBedBuild: Construcción de camas de diciembre
+DynamicDecemberBedBuild: Construcción de camas en diciembre
 DynamicDelivery: Entrega
 DynamicFebruary: Febrero
 DynamicFebruaryBedBuild: Construcción de camas de febrero
 DynamicFriday: Viernes
 DynamicJanuary: Enero
-DynamicJanuaryBedBuild: Construcción de camas de enero
+DynamicJanuaryBedBuild: Construcción de cama de enero
 DynamicJuly: Julio
-DynamicJulyBedBuild: Construcción de camas de julio
+DynamicJulyBedBuild: Construcción de camas en julio
 DynamicJune: Junio
 DynamicJuneBedBuild: Construcción de cama de junio
 DynamicMarch: Marzo
@@ -58,9 +62,9 @@ DynamicMay: Mayo
 DynamicMayBedBuild: Construcción de camas de mayo
 DynamicMonday: Lunes
 DynamicNovember: Noviembre
-DynamicNovemberBedBuild: Construcción de camas de noviembre
+DynamicNovemberBedBuild: Construcción de cama de noviembre
 DynamicOctober: Octubre
-DynamicOctoberBedBuild: Construcción de camas de octubre
+DynamicOctoberBedBuild: Construcción de cama de octubre
 DynamicOther: Otro
 DynamicSaturday: Sábado
 DynamicSeptember: Septiembre
@@ -87,9 +91,9 @@ FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el f
 FindABedBrigade: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
 FolderColon: 'Carpeta:'
-FoundLocationsWithin: Se han encontrado {count} ubicaciones dentro de {maxMiles} millas de {postalCode}
+FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
-FutureScheduled: Futuro programado
+FutureScheduled: Futuro Programado
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
@@ -107,12 +111,16 @@ LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
 LogIn: Inicia sesión
 Longitude: Longitud
+MailingAddress: Dirección postal
+MailingCity: Ciudad de correo
+MailingState: Estado de envío
+MailingPostalCode: Código Postal
 ManageSchedule: Administrar el horario
 ManageSignups: Gestionar las inscripciones
 MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
-MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres
+MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
 MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
 MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
@@ -140,6 +148,10 @@ NotSent: No enviado
 NumberOfBeds: Número de camas
 Ok: De acuerdo
 OrganizationOrGroup: Organización o grupo
+Organizer: Organizador
+OrganizerName: Nombre del organizador
+OrganizerEmail: Correo electrónico del organizador
+OrganizerPhone: Teléfono del organizador
 Pages: Páginas
 Password: Contraseña
 Phone: Teléfono
@@ -171,8 +183,8 @@ RequiredPageTitle: El título de la página es obligatorio
 RequiredPassword: Se requiere contraseña
 RequiredPhone: Se requiere un número de teléfono
 RequiredPostalCode: Se requiere el código postal
-RequiredStreet: Se requiere la dirección
-RequiredSubject: El sujeto es obligatorio.
+RequiredStreet: Se requiere la dirección postal
+RequiredSubject: El asunto es obligatorio.
 RequiredUserId: Se requiere un ID de usuario
 Resources: Recursos
 ReturnToHome: Volver a casa
@@ -185,9 +197,9 @@ Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
 SelectAGridFilter: Seleccionar un filtro de cuadrícula
 SelectALocation: Seleccione una ubicación
-SelectAnEvent: Seleccionar un evento
-SelectAState: Seleccionar un estado
-SelectAVolunteer: Seleccione un voluntario
+SelectAnEvent: Seleccione un evento
+SelectAState: Seleccione un estado
+SelectAVolunteer: Selecciona un Voluntario
 SelectedEventDetails: Detalles del evento seleccionado
 SelectMetroArea: Seleccione Área Metropolitana
 Send: Enviar
@@ -203,7 +215,6 @@ Status: Estado
 Street: Calle
 SubmitRequest: Enviar solicitud
 SubmitVolunteerRegistration: Enviar Registro de Voluntarios
-SuitepoBox: Suite/Apartado de correos
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
 ThankYou: ¡Gracias!
@@ -216,15 +227,15 @@ ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un códi
 VehicleTypeColon: 'Tipo de vehículo:'
 Volunteer: Voluntario
 VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
-VolunteerFormNotCompleted: ¡El Formulario de Voluntariado no está completo!
-VolunteeridColon: 'Identificación de voluntario:'
+VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
+VolunteeridColon: 'Identificación de voluntarios:'
 VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
 Volunteers: Voluntarios
 VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
-VolunteerSignUpAgainSubtitle: Le agradecemos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
-VolunteerSignUpNew: Bienvenidos a Bed Brigade {fullName}
+VolunteerSignUpAgainSubtitle: Apreciamos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
+VolunteerSignUpNew: Bienvenido a Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: Agradecemos que se una al Equipo de Voluntarios de la Brigada de Camas.
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
