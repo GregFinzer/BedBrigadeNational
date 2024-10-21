@@ -157,7 +157,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
     * Refresh Header and Footer :heavy_check_mark:
-    * Add Page Titles
+    * Add Page Titles :heavy_check_mark:
     * Review All Code
     * AppOffline for Development :heavy_check_mark:
     * Syncfusion Spinner :heavy_check_mark:
@@ -185,22 +185,23 @@ One thing you will notice about the following project plan is the lack of due da
     * Seed Only Grove City and Rock City :heavy_check_mark:
     * Download Delivery Sheet :heavy_check_mark:
     * Mobile Bed Brigade Near Me :heavy_check_mark:
-    * Mobile After Submit Bed Request
-    * Mobile after Contact Us
-    * Mobile after Submit Volunteer
-    * Admin Mobile Margin and Padding
-    * Manage Users Unusable in Mobile
+    * Mobile After Submit Bed Request :heavy_check_mark:
+    * Mobile after Contact Us :heavy_check_mark:
+    * Mobile after Submit Volunteer :heavy_check_mark:
+    * Admin Mobile Margin and Padding :heavy_check_mark:
+    * Manage Users Unusable in Mobile :heavy_check_mark:
     * Design Spanish Translation  :heavy_check_mark:
     * Address Autocomplete Design
     * Design Bulk Email Mailing List
     * Donations Design
     * SMS Design
     * Delivery Sheet Slow
-    * Update Documentation for Localization
+    * Update Documentation for Localization :heavy_check_mark:
     * Make EmailQueue into a Background Service :heavy_check_mark:
+    * Menu not wide enough when translated to Spanish :heavy_check_mark:
     
 * New Stories
-    * Send confirmation email for Bed Request
+    * Send confirmation email for Bed Request :heavy_check_mark:
     * Import Bed Requests
     * Calendar
     * Upcoming Events
