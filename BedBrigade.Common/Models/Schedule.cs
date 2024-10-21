@@ -61,6 +61,7 @@ namespace BedBrigade.Common.Models
         public string EventSelect { get; set; }
 
 
+
     }
 }
 
