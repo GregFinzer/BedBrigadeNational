@@ -148,6 +148,7 @@ NotSent: Not Sent
 NumberOfBeds: Number of Beds
 Ok: OK
 OrganizationOrGroup: Organization or Group
+Organizer: Organizer
 OrganizerName: Organizer Name
 OrganizerEmail: Organizer Email
 OrganizerPhone: Organizer Phone
@@ -214,7 +215,6 @@ Status: Status
 Street: Street
 SubmitRequest: Submit Request
 SubmitVolunteerRegistration: Submit Volunteer Registration
-SuitepoBox: Suite/PO Box
 TaxFormSent: Tax Form Sent
 Team: 'Team #'
 ThankYou: Thank you!

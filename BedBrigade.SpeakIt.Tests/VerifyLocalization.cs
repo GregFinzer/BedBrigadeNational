@@ -25,28 +25,24 @@ namespace BedBrigade.SpeakIt.Tests
             parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
-            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
+            parms.ResourceFilePath =
+                Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
             parms.RemoveLocalizedKeys = true;
 
             var result = _logic.GetLocalizableStrings(parms);
 
             if (result.Any())
             {
-                if (TestHelper.IsRunningUnderGitHubActions())
+                StringBuilder sb = new StringBuilder(result.Count * 80);
+                sb.AppendLine(
+                    "VerifyAllSourceCodeFilesAreLocalized failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                foreach (var parseResult in result)
                 {
-                    Assert.Fail("VerifyAllSourceCodeFilesAreLocalized failed. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                    sb.AppendLine(
+                        $"{Path.GetFileName(parseResult.FilePath)} | {parseResult.MatchValue} | {parseResult.LocalizableString}");
                 }
-                else
-                {
-                    StringBuilder sb = new StringBuilder(result.Count * 80);
-                    foreach (var parseResult in result)
-                    {
-                        sb.AppendLine($"{Path.GetFileName(parseResult.FilePath)} | {parseResult.MatchValue} | {parseResult.LocalizableString}");
-                    }
-                    File.WriteAllText("RazorFiles.txt", sb.ToString());
-                    TestHelper.Shell("RazorFiles.txt", string.Empty, ProcessWindowStyle.Maximized, false);
-                    Assert.Fail("VerifyAllSourceCodeFilesAreLocalized failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
-                }
+
+                Assert.Fail(sb.ToString());
             }
         }
 
@@ -69,30 +65,17 @@ namespace BedBrigade.SpeakIt.Tests
 
             if (failedKeys.Any())
             {
-                if (TestHelper.IsRunningUnderGitHubActions())
+                StringBuilder sb = new StringBuilder(failedKeys.Count * 80);
+                sb.AppendLine("VerifyDuplicateKeys Failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                foreach (var failedKey in failedKeys)
                 {
-                    Assert.Fail("VerifyDuplicateKeys Failed. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
-                }
-                else
-                {
-                    string outputFileName = "FailedKeys.txt";
-                    if (File.Exists(outputFileName))
-                        File.Delete(outputFileName);
-
-                    StringBuilder sb = new StringBuilder(failedKeys.Count * 80);
-                    foreach (var failedKey in failedKeys)
+                    foreach (var item in failedKey.Value)
                     {
-                        foreach (var item in failedKey.Value)
-                        {
-                            sb.AppendLine($"{failedKey.Key} : {item}");
-                        }
+                        sb.AppendLine($"{failedKey.Key} : {item}");
                     }
-
-                    File.WriteAllText(outputFileName, sb.ToString());
-                    TestHelper.Shell(outputFileName, string.Empty, ProcessWindowStyle.Maximized, false);
-                    Assert.Fail(
-                        "VerifyDuplicateKeys Failed. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
                 }
+
+                Assert.Fail(sb.ToString());
             }
         }
 
@@ -110,28 +93,23 @@ namespace BedBrigade.SpeakIt.Tests
             parms.WildcardPatterns = TestHelper.WildcardPatterns;
             parms.ExcludeDirectories = TestHelper.ExcludeDirectories;
             parms.ExcludeFiles = TestHelper.ExcludeFiles;
-            parms.ResourceFilePath = Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
+            parms.ResourceFilePath =
+                Path.Combine(TestHelper.GetSolutionPath(), "BedBrigade.Client", "Resources", "en-US.yml");
 
-            var result = _logic.GetExistingLocalizedStrings(parms).Where(o => String.IsNullOrEmpty(o.LocalizableString));
+            var result = _logic.GetExistingLocalizedStrings(parms)
+                .Where(o => String.IsNullOrEmpty(o.LocalizableString));
 
             if (result.Any())
             {
-                if (TestHelper.IsRunningUnderGitHubActions())
+                StringBuilder sb = new StringBuilder(result.Count() * 80);
+                sb.AppendLine(
+                    "VerifyAllKeysCanBeFound Failed. Missing key in en-US.yml Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                foreach (var parseResult in result)
                 {
-                    Assert.Fail("VerifyAllKeysCanBeFound Failed. Missing key in en-US.yml. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                    sb.AppendLine($"{parseResult.FilePath} | {parseResult.MatchValue}");
                 }
-                else
-                {
-                    StringBuilder sb = new StringBuilder(result.Count() * 80);
-                    foreach (var parseResult in result)
-                    {
-                        sb.AppendLine($"{parseResult.FilePath} | {parseResult.MatchValue}");
-                    }
-                    File.WriteAllText("MissingKeys.txt", sb.ToString());
 
-                    TestHelper.Shell("MissingKeys.txt", string.Empty, ProcessWindowStyle.Maximized, false);
-                    Assert.Fail("VerifyAllKeysCanBeFound Failed. Missing key in en-US.yml Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
-                }
+                Assert.Fail(sb.ToString());
             }
         }
 
@@ -153,20 +131,16 @@ namespace BedBrigade.SpeakIt.Tests
 
             if (result.Any())
             {
-                if (TestHelper.IsRunningUnderGitHubActions())
-                {
-                    Assert.Fail("Unused keys in en-US.yml. Run locally to see the issues. Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
-                }
-                else
-                {
-                    File.WriteAllLines("UnusedKeys.txt", result);
+                StringBuilder sb = new StringBuilder(result.Count * 80);
+                sb.AppendLine(
+                    "Unused keys in en-US.yml Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
 
-                    TestHelper.Shell("UnusedKeys.txt", string.Empty, ProcessWindowStyle.Maximized, false);
-                    Assert.Fail("Unused keys in en-US.yml Follow these instructions:  https://github.com/GregFinzer/BedBrigadeNational/blob/develop/Documentation/Localization.md");
+                foreach (var item in result)
+                {
+                    sb.AppendLine(item);
                 }
+                Assert.Fail(sb.ToString());
             }
         }
-
-
     }
 }
