@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241019114336_PolarisScheduleFields")]
-    partial class PolarisScheduleFields
+    [Migration("20241021130352_NewScheduleFields")]
+    partial class NewScheduleFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -728,13 +728,9 @@ namespace BedBrigade.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleId"));
 
-                    b.Property<string>("Address1")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Address2")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                    b.Property<string>("Address")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("City")
                         .HasMaxLength(128)

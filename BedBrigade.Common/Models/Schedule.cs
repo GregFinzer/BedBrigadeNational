@@ -30,11 +30,8 @@ namespace BedBrigade.Common.Models
 
         public int EventDurationHours { get; set; } = 0;
 
-        [MaxLength(128)]
-        public String? Address1 { get; set; } = string.Empty;
-
-        [MaxLength(128)]
-        public String? Address2 { get; set; } = string.Empty;
+        [MaxLength(256)]
+        public String? Address { get; set; } = string.Empty;
 
         [MaxLength(128)]
         public String? City { get; set; } = string.Empty;

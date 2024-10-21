@@ -5,23 +5,16 @@
 namespace BedBrigade.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class PolarisScheduleFields : Migration
+    public partial class NewScheduleFields : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Address1",
+                name: "Address",
                 table: "Schedules",
-                type: "nvarchar(128)",
-                maxLength: 128,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Address2",
-                table: "Schedules",
-                type: "nvarchar(128)",
-                maxLength: 128,
+                type: "nvarchar(256)",
+                maxLength: 256,
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
@@ -71,11 +64,7 @@ namespace BedBrigade.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Address1",
-                table: "Schedules");
-
-            migrationBuilder.DropColumn(
-                name: "Address2",
+                name: "Address",
                 table: "Schedules");
 
             migrationBuilder.DropColumn(
