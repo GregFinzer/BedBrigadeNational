@@ -80,6 +80,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private ValidationMessageStore _validationMessageStore;
         #endregion
+
         #region Initialization
 
         protected override void OnInitialized()

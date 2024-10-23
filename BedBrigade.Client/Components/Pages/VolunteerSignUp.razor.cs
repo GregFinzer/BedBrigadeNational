@@ -14,6 +14,7 @@ using System.Net;
 using BedBrigade.SpeakIt;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Routing;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -29,6 +30,9 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ITranslateLogic _translateLogic { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
+
+        [Parameter] public string? LocationRoute { get; set; }
+        [Parameter] public int? ScheduleId { get; set; }
 
         private Volunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
@@ -68,7 +72,6 @@ namespace BedBrigade.Client.Components.Pages
         private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
         private EditContext? EC { get; set; }
 
-        private string? _locationQueryParm;
         private string MyMessage = string.Empty;
         private string MyMessageDisplay = DisplayNone;
         private bool AreSignUpsAvailable = false;
@@ -102,29 +105,23 @@ namespace BedBrigade.Client.Components.Pages
             newVolunteer = new Volunteer();
             EC = new EditContext(newVolunteer);
             _validationMessageStore = new ValidationMessageStore(EC);
-            //Yes, this has to be here instead of in OnInitializedAsync
-            if (!string.IsNullOrEmpty(PreloadLocation))
-            {
-                _locationQueryParm = PreloadLocation;
-            }
-            else
-            {
-                var uri = _nav.ToAbsoluteUri(_nav.Uri);
-
-                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
-                {
-                    _locationQueryParm = locationQueryParm;
-                }
-            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                if (!string.IsNullOrEmpty(_locationQueryParm))
+                if (!string.IsNullOrEmpty(LocationRoute))
                 {
-                    await SearchLocation.ForceLocationByName(_locationQueryParm);
+                    var result = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
+
+                    if (!result.Success)
+                    {
+                        _nav.NavigateTo($"/Sorry/{LocationRoute}/Volunteer");
+                        return;
+                    }
+
+                    await SearchLocation.ForceLocationByName(LocationRoute);
                     await HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
                     DisplayForm = "";
                     StateHasChanged();
@@ -194,6 +191,11 @@ namespace BedBrigade.Client.Components.Pages
                 {
                     DisplayLocationEvents = "";
                     AreSignUpsAvailable = true;
+
+                    if (response.Data.Any(o => o.ScheduleId == ScheduleId))
+                    {
+                        ddlSchedule.Value = ScheduleId.Value;
+                    }
                 }
                 else
                 {

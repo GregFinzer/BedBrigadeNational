@@ -1,0 +1,167 @@
+﻿@page "/{LocationRoute:nonfile}/events"
+@using BedBrigade.Common.Models
+@using BedBrigade.Common.Enums
+@inject ILogger<UpcomingEvents> Logger
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Upcoming Events</h1>
+    <p class="text-center">Select an upcoming event and register to join us in either delivering or building beds!</p>
+    <!-- Skip to Builds link for mobile devices -->
+    <div class="d-md-none text-center mb-3">
+        <button class="btn btn-primary" @onclick="ScrollToBuilds">Skip to Builds</button>
+    </div>
+    <div class="row">
+        <!-- Delivery Events Column -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bb-bg-primary text-white">
+                    <h3 class="card-title mb-0">Upcoming Deliveries</h3>
+                </div>
+                <div class="card-body">
+                    @if (DeliveryEvents?.Any() == true)
+                    {
+                        @foreach (var evt in DeliveryEvents)
+                        {
+                            <div class="event-card mb-3 p-3 border rounded">
+                                <h4 class="bb-fore-primary"><a class="bb-fore-primary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@evt.EventName</a> (Click to Signup)</h4>
+                                <div class="event-details">
+                                    <p class="mb-1">
+                                        <i class="far fa-calendar-alt"></i>
+                                        @evt.EventDateScheduled.ToString("dddd, MMMM d, yyyy")
+                                        @evt.EventDateScheduled.ToString("h:mm tt")
+                                        - @evt.EventDateScheduled.AddHours(evt.EventDurationHours).ToString("h:mm tt")
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(evt.Address))
+                                    {
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <a href="@GoogleMaps.CreateGoogleMapsLinkForSchedule(evt)" target="_blank">
+                                                @evt.Address, @evt.City, @evt.State @evt.PostalCode
+                                            </a>
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(evt.OrganizerName))
+                                    {
+                                        <p class="mb-1">
+                                            <i class="far fa-user"></i> Organizer: @evt.OrganizerName
+                                        </p>
+
+                                        @if (!string.IsNullOrEmpty(evt.OrganizerEmail))
+                                        {
+                                            <p class="mb-1">
+                                                <i class="far fa-envelope"></i> <a href="mailto:@evt.OrganizerEmail">@evt.OrganizerEmail</a>
+                                            </p>
+                                        }
+
+                                        @if (!string.IsNullOrEmpty(evt.OrganizerPhone))
+                                        {
+                                            <p class="mb-1">
+                                                <i class="fas fa-phone"></i>
+                                                <!-- Display as hyperlink on mobile devices -->
+                                                <a class="d-md-none" href="tel:@StringUtil.ExtractDigits(evt.OrganizerPhone)" target="_blank">@evt.OrganizerPhone.FormatPhoneNumber()</a>
+                                                <!-- Display as plain text on larger screens -->
+                                                <span class="d-none d-md-inline">@evt.OrganizerPhone.FormatPhoneNumber()</span>
+                                            </p>
+                                        }
+                                    }
+                                    @if (evt.VolunteersMax > 0)
+                                    {
+                                        <p class="mb-1">
+                                            <i class="bi bi-people"></i>
+                                            Volunteers Registered: @evt.VolunteersRegistered / @evt.VolunteersMax
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(evt.EventNote))
+                                    {
+                                        <p class="mt-2">@evt.EventNote</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center">No upcoming deliveries scheduled.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Build Events Column -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bb-bg-secondary text-white">
+                    <h3 class="card-title mb-0" id="upcoming-builds">Upcoming Builds</h3>
+                </div>
+                <div class="card-body">
+                    @if (BuildEvents?.Any() == true)
+                    {
+                        @foreach (var evt in BuildEvents)
+                        {
+                            <div class="event-card mb-3 p-3 border rounded">
+                                <h4 class="bb-fore-secondary"><a class="bb-fore-secondary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@evt.EventName</a>  (Click to Signup)</h4>
+                                <div class="event-details">
+                                    <p class="mb-1">
+                                        <i class="far fa-calendar-alt"></i>
+                                        @evt.EventDateScheduled.ToString("dddd, MMMM d, yyyy")
+                                        @evt.EventDateScheduled.ToString("h:mm tt")
+                                        - @evt.EventDateScheduled.AddHours(evt.EventDurationHours).ToString("h:mm tt")
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(evt.Address))
+                                    {
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <a href="@GoogleMaps.CreateGoogleMapsLinkForSchedule(evt)" target="_blank">
+                                                @evt.Address, @evt.City, @evt.State @evt.PostalCode
+                                            </a>
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(evt.OrganizerName))
+                                    {
+                                        <p class="mb-1">
+                                            <i class="far fa-user"></i> Organizer: @evt.OrganizerName
+                                        </p>
+
+                                        @if (!string.IsNullOrEmpty(evt.OrganizerEmail))
+                                        {
+                                            <p class="mb-1">
+                                                <i class="far fa-envelope"></i> <a href="mailto:@evt.OrganizerEmail">@evt.OrganizerEmail</a>
+                                            </p>
+                                        }
+
+                                        @if (!string.IsNullOrEmpty(evt.OrganizerPhone))
+                                        {
+                                            <p class="mb-1">
+                                                <i class="fas fa-phone"></i>
+                                                <!-- Display as hyperlink on mobile devices -->
+                                                <a class="d-md-none" href="tel:@StringUtil.ExtractDigits(evt.OrganizerPhone)" target="_blank">@evt.OrganizerPhone.FormatPhoneNumber()</a>
+                                                <!-- Display as plain text on larger screens -->
+                                                <span class="d-none d-md-inline">@evt.OrganizerPhone.FormatPhoneNumber()</span>
+                                            </p>
+                                        }
+                                    }
+                                    @if (evt.VolunteersMax > 0)
+                                    {
+                                        <p class="mb-1">
+                                            <i class="bi bi-people"></i>
+                                            Volunteers Registered: @evt.VolunteersRegistered / @evt.VolunteersMax
+                                        </p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(evt.EventNote))
+                                    {
+                                        <p class="mt-2">@evt.EventNote</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center">No upcoming builds scheduled.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

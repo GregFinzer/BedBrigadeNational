@@ -98,6 +98,24 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+/*This is green*/
+.bb-fore-primary {
+    color: #0e9249
+}
+
+.bb-bg-primary {
+    background: #0e9249
+}
+
+/*This is blue*/
+.bb-fore-secondary {
+    color: #1B5F8F
+}
+
+.bb-bg-secondary {
+    background: #1B5F8F
+}
+
 /* ============ National Home Page ==================== */
 
 #nat-home p, li {

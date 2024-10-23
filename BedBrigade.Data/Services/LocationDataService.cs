@@ -117,7 +117,8 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         //There will always be less than 100 locations, so we can cache all of them
         var allLocations = await GetAllAsync();
 
-        var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower());
+        var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
+        || l.Route.ToLower() == $"/{routeName}".ToLower());
 
         if (location != null)
         {
