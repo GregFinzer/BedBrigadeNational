@@ -1,6 +1,7 @@
-﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -14,6 +15,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
+        [Inject] private ITranslateLogic _translateLogic { get; set; }
         private List<Schedule>? DeliveryEvents { get; set; }
         private List<Schedule>? BuildEvents { get; set; }
 
@@ -21,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
 
             if (!locationResponse.Success)

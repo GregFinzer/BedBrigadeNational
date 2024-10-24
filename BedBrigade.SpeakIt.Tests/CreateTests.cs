@@ -5,7 +5,7 @@
     {
         private CreateLogic _logic = new CreateLogic();
 
-        [Test, Ignore("Unignore to create resource strings")]
+        [Test]
         public void CreateLocalizationStringsTest()
         {
             if (TestHelper.IsRunningUnderGitHubActions())
