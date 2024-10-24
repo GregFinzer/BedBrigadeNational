@@ -1,8 +1,5 @@
 ﻿using BedBrigade.Common.Logic;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
@@ -14,13 +11,12 @@ namespace BedBrigade.SpeakIt
     {
         private static List<string> _ignoreStartsWith = new List<string>()
         {
-            "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%",
-            "display:", "}", "else", "@*"
+            "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%", "display:", "else", "@", "<"
         };
 
         private static List<string> _ignoreContains = new List<string>()
         {
-            "@(", "@_", "[@_", "=\""
+            "@(", "@_", "[@_", "=\"", "{", "}", "(\""
         };
 
         private const string ReplacementMarker = "~~~";
@@ -31,8 +27,7 @@ namespace BedBrigade.SpeakIt
         //private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _keyReferenceRegex = new Regex(@"_lc\.Keys\[""(?<content>[^""]+)?""", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        private static Regex _propertyRegex =
-            new Regex(@"public\s+(?<propertyType>[^\s\?]+\??)\s+(?<content>\w+)\s*{\s*get;\s*set;\s*}",
+        private static Regex _propertyRegex =  new Regex(@"public\s+(?<propertyType>[^\s\?]+\??)\s+(?<content>\w+)\s*{\s*get;\s*set;\s*}",
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _requiredAttributeWithMessageRegex = new Regex(
@@ -41,12 +36,10 @@ namespace BedBrigade.SpeakIt
         private static Regex _requiredAttributeRegex = new Regex(
             @"\[Required\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        private static Regex _maxLengthAttributeWithMessageRegex = new Regex(
-            @"\[MaxLength\((?<maxLength>\d+),\s*ErrorMessage\s*=\s*""(?<content>.*?)""\)\]",
+        private static Regex _maxLengthAttributeWithMessageRegex = new Regex(@"\[MaxLength\((?<maxLength>\d+),\s*ErrorMessage\s*=\s*""(?<content>.*?)""\)\]",
             RegexOptions.Compiled | RegexOptions.Multiline);
 
-        private static Regex _maxLengthAttributeRegex = new Regex(
-            @"\[MaxLength\((?<maxLength>\d+)\]",
+        private static Regex _maxLengthAttributeRegex = new Regex(@"\[MaxLength\((?<maxLength>\d+)\]",
             RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _styleTag = new Regex(@"<style[^>]*>[^<]*<\/style>", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -184,13 +177,21 @@ namespace BedBrigade.SpeakIt
 
             foreach (var parseResult in parseResults)
             {
+                //Special logic for data attributes
                 if ((parseResult.Key.StartsWith(SpeakItGlobals.RequiredPrefix)
                     || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix)
-                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix))
-                    && !existingKeyValues.ContainsKey(parseResult.Key))
+                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix)))
+                {
+                    if (!existingKeyValues.ContainsKey(parseResult.Key))
+                    {
+                        result.Add(parseResult);
+                    }
+                }
+                else
                 {
                     result.Add(parseResult);
                 }
+
             }
 
             return result;

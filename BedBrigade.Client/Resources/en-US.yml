@@ -6,6 +6,7 @@ Amount: Amount
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
+BedBrigadeUsers: Bed Brigade Users
 BedBrigadeWeb: Bed Brigade Web
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
@@ -13,11 +14,13 @@ BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your e
 BedsRequested: Beds Requested
 BuildAddress: Build Address
 BuildCity: Build City
-BuildState: Build State
 BuildPostalCode: Build Postal Code
+BuildState: Build State
 Cancel: Cancel
+ChangePassword: Change Password
 ChooseADate: Choose a Date & Time
 City: City
+ClickToSignup: (Click to Signup)
 ConfigurationKey: Configuration Key
 ConfigurationSection: Configuration Section
 ConfigurationValue: Configuration Value
@@ -37,6 +40,7 @@ DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress
 DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationDate: Donation Date
+Donations: Donations
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
 DynamicAugust: August
@@ -113,8 +117,8 @@ LogIn: Log In
 Longitude: Longitude
 MailingAddress: Mailing Address
 MailingCity: Mailing City
-MailingState: Mailing State
 MailingPostalCode: Mailing Postal Code
+MailingState: Mailing State
 ManageSchedule: Manage Schedule
 ManageSignups: Manage Sign-Ups
 MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
@@ -145,12 +149,15 @@ NoteComment: Note / Comment
 Notes: Notes
 NothingToSend: Nothing to send
 NotSent: Not Sent
+NoUpcomingBuildsScheduled: No upcoming builds scheduled.
+NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
 Ok: OK
 OrganizationOrGroup: Organization or Group
 Organizer: Organizer
-OrganizerName: Organizer Name
+OrganizerColon: 'Organizer:'
 OrganizerEmail: Organizer Email
+OrganizerName: Organizer Name
 OrganizerPhone: Organizer Phone
 Pages: Pages
 Password: Password
@@ -198,13 +205,16 @@ SearchBedBrigadeLocations: Search Bed Brigade Locations
 SelectAGridFilter: Select a grid filter
 SelectALocation: Select a Location
 SelectAnEvent: Select an event
+SelectAnUpcomingEvent: Select an upcoming event and register to join us in either delivering or building beds!
 SelectAState: Select a state
 SelectAVolunteer: Select a Volunteer
 SelectedEventDetails: Selected Event Details
 SelectMetroArea: Select Metro Area
 Send: Send
+SendTaxForms: Send Tax Forms
 ShowPassword: Show Password
 ShowSchedules: Show Schedules
+SkipToBuilds: Skip to Builds
 Sorry: Sorry
 SorryThePage: Sorry - the page associated with this link was not found.
 SorryYouAreNot: Sorry, you are not authorized to view this page.
@@ -221,6 +231,9 @@ ThankYou: Thank you!
 TheBedBrigade: The Bed Brigade
 TransactionId: Transaction ID
 Unauthorized: Unauthorized
+UpcomingBuilds: Upcoming Builds
+UpcomingDeliveries: Upcoming Deliveries
+UpcomingEvents: Upcoming Events
 UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
@@ -237,6 +250,7 @@ VolunteerSignUpAgain: Thanks for serving again {fullName}
 VolunteerSignUpAgainSubtitle: We appreciate you continuing to serve with the Bed Brigade Volunteer Team.
 VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
+VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'

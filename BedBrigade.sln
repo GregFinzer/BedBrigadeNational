@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Client", "BedBri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.Tests.Integration", "BedBrigade.Tests.Integration\BedBrigade.Tests.Integration.csproj", "{CFA0AC89-E841-49C2-9C26-FDF5271D590A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.SpeakIt", "BedBrigade.SpeakIt\BedBrigade.SpeakIt.csproj", "{FF68F283-69CE-4B1E-A069-1255F13A3D79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.SpeakIt", "BedBrigade.SpeakIt\BedBrigade.SpeakIt.csproj", "{FF68F283-69CE-4B1E-A069-1255F13A3D79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedBrigade.SpeakIt.Tests", "BedBrigade.SpeakIt.Tests\BedBrigade.SpeakIt.Tests.csproj", "{EA0CAE11-2F7B-49B7-A19C-88CDF762C20F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BedBrigade.SpeakIt.Tests", "BedBrigade.SpeakIt.Tests\BedBrigade.SpeakIt.Tests.csproj", "{EA0CAE11-2F7B-49B7-A19C-88CDF762C20F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

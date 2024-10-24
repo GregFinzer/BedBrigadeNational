@@ -39,7 +39,7 @@ namespace BedBrigade.SpeakIt.Tests
                 foreach (var parseResult in result)
                 {
                     sb.AppendLine(
-                        $"{Path.GetFileName(parseResult.FilePath)} | {parseResult.MatchValue} | {parseResult.LocalizableString}");
+                        $"{Path.GetFileName(parseResult.FilePath)} | {parseResult.LocalizableString}");
                 }
 
                 Assert.Fail(sb.ToString());
