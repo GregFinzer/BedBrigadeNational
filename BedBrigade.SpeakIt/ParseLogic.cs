@@ -15,12 +15,12 @@ namespace BedBrigade.SpeakIt
         private static List<string> _ignoreStartsWith = new List<string>()
         {
             "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%",
-            "display:", "}", "else", "@*"
+            "display:", "else", "@", "<"
         };
 
         private static List<string> _ignoreContains = new List<string>()
         {
-            "@(", "@_", "[@_", "=\""
+            "@(", "@_", "[@_", "=\"", "{", "}", "(\""
         };
 
         private const string ReplacementMarker = "~~~";
@@ -184,13 +184,21 @@ namespace BedBrigade.SpeakIt
 
             foreach (var parseResult in parseResults)
             {
+                //Special logic for data attributes
                 if ((parseResult.Key.StartsWith(SpeakItGlobals.RequiredPrefix)
                     || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix)
-                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix))
-                    && !existingKeyValues.ContainsKey(parseResult.Key))
+                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix)))
+                {
+                    if (!existingKeyValues.ContainsKey(parseResult.Key))
+                    {
+                        result.Add(parseResult);
+                    }
+                }
+                else
                 {
                     result.Add(parseResult);
                 }
+
             }
 
             return result;
