@@ -21,6 +21,7 @@ ChangePassword: Change Password
 ChooseADate: Choose a Date & Time
 City: City
 ClickToSignup: (Click to Signup)
+CompareConfirmPasswordToPassword: The passwords do not match.
 ConfigurationKey: Configuration Key
 ConfigurationSection: Configuration Section
 ConfigurationValue: Configuration Value
@@ -174,24 +175,35 @@ RegistrationidColon: 'RegistrationID:'
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
 RequiredAgesGender: Please indicate the age and gender of children
+RequiredAmount: Amount is required
 RequiredBody: Body is required.
 RequiredCity: City is required
 RequiredConfirmPassword: Confirm Password is required
 RequiredContent: Content is required
+RequiredContentId: Content ID is required
+RequiredContentType: Content Type is required
 RequiredCulture: Culture is required
 RequiredEmail: Email Address is required
+RequiredFileUse: File Use is required
 RequiredFirstName: First Name is required
 RequiredHash: Hash is required
 RequiredLastName: Last Name is required
+RequiredLocationId: Location Id is required
+RequiredLocations: Locations is required
 RequiredMessage: Message is required
 RequiredName: Name is required
+RequiredNumberOfBeds: The number of ordered beds is required and must be > 0
 RequiredPageName: Page Name is required
 RequiredPageTitle: Page Title is required
 RequiredPassword: Password is required
 RequiredPhone: Phone Number is required
 RequiredPostalCode: Postal Code (Zip Code) is required
+RequiredQueueDate: Queue Date is required
+RequiredSection: Section is required
+RequiredStatus: Status is required
 RequiredStreet: Street Address is required
 RequiredSubject: Subject is required.
+RequiredTranslationId: Translation ID is required
 RequiredUserId: User Id is required
 Resources: Resources
 ReturnToHome: Return to Home

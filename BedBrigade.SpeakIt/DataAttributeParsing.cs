@@ -69,15 +69,11 @@ namespace BedBrigade.SpeakIt
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _compareAttributeRegex =
-            new Regex(@"\[Compare\(\s*""(?<compare>.*?)""\s*\)\]",
+            new Regex(@"\[Compare\(\s*""(?<compare>[A-Za-z]+)""\s*\)\]",
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _compareAttributeWithMessageRegex =
             new Regex(@"\[Compare\(\s*""(?<compare>.*?)""\s*,\s*ErrorMessage\s*=\s*""(?<content>.*?)""\s*\)\]",
-                RegexOptions.Compiled | RegexOptions.Multiline);
-
-        private static Regex _regularExpressionAttributeRegex =
-            new Regex(@"\[RegularExpression\(\s*@?""(?<pattern>.*?)""\s*\)\]",
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _regularExpressionWithMessageRegex =

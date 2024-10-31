@@ -21,6 +21,7 @@ ChangePassword: Cambiar contraseña
 ChooseADate: Elija una fecha y hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
+CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
 ConfigurationKey: Clave de configuración
 ConfigurationSection: Sección de configuración
 ConfigurationValue: Valor de configuración
@@ -174,24 +175,35 @@ RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
 RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
+RequiredAmount: La cantidad es requerida
 RequiredBody: Se requiere cuerpo.
 RequiredCity: Se requiere ciudad
 RequiredConfirmPassword: Confirmar que la contraseña es obligatoria
 RequiredContent: El contenido es obligatorio
+RequiredContentId: Se requiere Content ID
+RequiredContentType: El tipo de contenido es obligatorio
 RequiredCulture: La cultura es necesaria
 RequiredEmail: Se requiere una dirección de correo electrónico
+RequiredFileUse: Se requiere el uso de archivos
 RequiredFirstName: El nombre de pila es obligatorio
 RequiredHash: Se requiere hash
 RequiredLastName: El apellido es obligatorio
+RequiredLocationId: Se requiere el ID de ubicación
+RequiredLocations: Se requieren ubicaciones
 RequiredMessage: El mensaje es obligatorio
 RequiredName: El nombre es obligatorio
+RequiredNumberOfBeds: El número de camas solicitadas es obligatorio y debe ser > 0
 RequiredPageName: El nombre de la página es obligatorio
 RequiredPageTitle: El título de la página es obligatorio
 RequiredPassword: Se requiere contraseña
 RequiredPhone: Se requiere un número de teléfono
 RequiredPostalCode: Se requiere el código postal
+RequiredQueueDate: Se requiere la fecha de cola
+RequiredSection: La sección es obligatoria
+RequiredStatus: El estado es obligatorio
 RequiredStreet: Se requiere la dirección postal
 RequiredSubject: El asunto es obligatorio.
+RequiredTranslationId: Se requiere el ID de traducción
 RequiredUserId: Se requiere un ID de usuario
 Resources: Recursos
 ReturnToHome: Volver a casa
