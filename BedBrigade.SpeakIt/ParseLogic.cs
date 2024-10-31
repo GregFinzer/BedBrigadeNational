@@ -412,7 +412,7 @@ namespace BedBrigade.SpeakIt
             return files.Distinct().OrderBy(o => o) .ToList();
         }
 
-        internal Dictionary<string, string> ReadYamlFile(string filePath)
+        public Dictionary<string, string> ReadYamlFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
