@@ -9,9 +9,11 @@ namespace BedBrigade.SpeakIt
 {
     public class ParseLogic
     {
+        private DataAttributeParsing _dataAttributeParsing = new DataAttributeParsing();
+
         private static List<string> _ignoreStartsWith = new List<string>()
         {
-            "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%", "display:", "else", "@", "<"
+            "http://", "https://", "class=", "style=", "src=", "alt=", "width=", "height=", "id=", "if (", "var ", "%", "display:", "else", "@", "<", "["
         };
 
         private static List<string> _ignoreContains = new List<string>()
@@ -20,34 +22,17 @@ namespace BedBrigade.SpeakIt
         };
 
         private const string ReplacementMarker = "~~~";
-        private const string StringType = "string";
-        private const string PropertyTypeGroup = "propertyType";
         private const string ContentGroup = "content";
-        //We intentionally do not end with a ] because of other parameters that may be in the string
-        //private static Regex _keyReferenceRegex = new Regex("_lc.Keys\\[\\\\?\"(?<content>[^\\\\\"]+)\\\\?\"", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static Regex _keyReferenceRegex = new Regex(@"_lc\.Keys\[""(?<content>[^""]+)?""", RegexOptions.Compiled | RegexOptions.Multiline);
+        private Regex _keyReferenceRegex;
 
-        private static Regex _propertyRegex =  new Regex(@"public\s+(?<propertyType>[^\s\?]+\??)\s+(?<content>\w+)\s*{\s*get;\s*set;\s*}",
-                RegexOptions.Compiled | RegexOptions.Multiline);
 
-        private static Regex _requiredAttributeWithMessageRegex = new Regex(
-            @"\[Required\(ErrorMessage\s*=\s*""(?<content>.*?)""\)\]", RegexOptions.Compiled | RegexOptions.Multiline);
-
-        private static Regex _requiredAttributeRegex = new Regex(
-            @"\[Required\]", RegexOptions.Compiled | RegexOptions.Multiline);
-
-        private static Regex _maxLengthAttributeWithMessageRegex = new Regex(@"\[MaxLength\((?<maxLength>\d+),\s*ErrorMessage\s*=\s*""(?<content>.*?)""\)\]",
-            RegexOptions.Compiled | RegexOptions.Multiline);
-
-        private static Regex _maxLengthAttributeRegex = new Regex(@"\[MaxLength\((?<maxLength>\d+)\]",
-            RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _styleTag = new Regex(@"<style[^>]*>[^<]*<\/style>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _scriptTag = new Regex(@"<script[^>]*>[^<]*<\/script>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _imgTag = new Regex(@"<img[^>]*>", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _iconTag = new Regex(@"<i\s+class[^>]*><\/i>", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static Regex _codeTag = new(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static Regex _brTag = new(@"(<br>)|(<br\s*\/>)", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _codeTag = new Regex(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _brTag = new Regex(@"(<br>)|(<br\s*\/>)", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _htmlComment = new Regex(@"<!--[\s\S]*?-->", RegexOptions.Compiled | RegexOptions.Multiline);
 
         //Not wrapped inside an HTML Tag
@@ -111,7 +96,12 @@ namespace BedBrigade.SpeakIt
             new Regex(@"<main[^\/>]*>(?<content>[\s\S]+?)<\/main>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline),
         };
 
-        
+        /// <summary>
+        /// Get a list of localizable strings from the source directories
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public List<ParseResult> GetLocalizableStrings(SpeakItParms parms)
         {
             if (parms.RemoveLocalizedKeys && String.IsNullOrEmpty(parms.ResourceFilePath))
@@ -139,10 +129,7 @@ namespace BedBrigade.SpeakIt
 
                 if (Path.GetExtension(file) == ".cs")
                 {
-                    fileResults.AddRange(GetRequiredWithErrorMessageInText(content));
-                    fileResults.AddRange(GetRequiredAttributeInText(content));
-                    fileResults.AddRange(GetMaxLengthAttributesWithErrorMessageInText(content));
-                    fileResults.AddRange(GetMaxLengthAttributesInText(content));
+                    fileResults = _dataAttributeParsing.ParseDataAttributes(fileResults, content);
                 }
                 else
                 {
@@ -174,13 +161,12 @@ namespace BedBrigade.SpeakIt
         private List<ParseResult> RemoveLocalizedKeys(List<ParseResult> parseResults, Dictionary<string, string> existingKeyValues)
         {
             List<ParseResult> result = new List<ParseResult>();
+            var attributePrefixes = _dataAttributeParsing.GetDataAttributePrefixes();
 
             foreach (var parseResult in parseResults)
             {
                 //Special logic for data attributes
-                if ((parseResult.Key.StartsWith(SpeakItGlobals.RequiredPrefix)
-                    || parseResult.Key.StartsWith(SpeakItGlobals.MaxLengthPrefix)
-                    || parseResult.Key.StartsWith(SpeakItGlobals.DynamicPrefix)))
+                if (attributePrefixes.Any(o => parseResult.Key.StartsWith(o) && parseResult.Key.Length > o.Length))
                 {
                     if (!existingKeyValues.ContainsKey(parseResult.Key))
                     {
@@ -197,132 +183,11 @@ namespace BedBrigade.SpeakIt
             return result;
         }
 
-        public List<ParseResult> GetMaxLengthAttributesWithErrorMessageInText(string text)
-        {
-            List<ParseResult> result = new List<ParseResult>();
 
-            MatchCollection matches = _maxLengthAttributeWithMessageRegex.Matches(text);
 
-            foreach (Match match in matches)
-            {
-                string errorMessage = match.Groups[ContentGroup].Value;
-                string maxLength = match.Groups["maxLength"].Value;
-                int index = text.IndexOf(match.Value);
-                Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
-                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
 
-                //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith(StringType))
-                    continue;
 
-                result.Add(new ParseResult
-                {
-                    LocalizableString = errorMessage,
-                    MatchingExpression = _maxLengthAttributeWithMessageRegex,
-                    FilePath = string.Empty,
-                    MatchValue = match.Value,
-                    Key = $"{SpeakItGlobals.MaxLengthPrefix}{propertyName}{maxLength}"
-                });
-            }
 
-            return result;
-        }
-
-        private List<ParseResult> GetMaxLengthAttributesInText(string text)
-        {
-            List<ParseResult> result = new List<ParseResult>();
-
-            MatchCollection matches = _maxLengthAttributeRegex.Matches(text);
-
-            foreach (Match match in matches)
-            {
-                string maxLength = match.Groups["maxLength"].Value;
-                int index = text.IndexOf(match.Value);
-                Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
-                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
-
-                //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith(StringType))
-                    continue;
-
-                string errorMessage = $"{StringUtil.InsertSpaces(propertyName)} has a maximum length of {maxLength} characters";
-                result.Add(new ParseResult
-                {
-                    LocalizableString = errorMessage,
-                    MatchingExpression = _maxLengthAttributeRegex,
-                    FilePath = string.Empty,
-                    MatchValue = match.Value,
-                    Key = $"{SpeakItGlobals.MaxLengthPrefix}{propertyName}{maxLength}"
-                });
-            }
-
-            return result;
-        }
-
-        private List<ParseResult> GetRequiredWithErrorMessageInText(string text)
-        {
-            List<ParseResult> result = new List<ParseResult>();
-
-            MatchCollection matches = _requiredAttributeWithMessageRegex.Matches(text);
-
-            foreach (Match match in matches)
-            {
-                string errorMessage = match.Groups[ContentGroup].Value;
-                int index = text.IndexOf(match.Value);
-                Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
-                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
-
-                //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith(StringType))
-                    continue;
-
-                result.Add(new ParseResult
-                {
-                    LocalizableString = errorMessage,
-                    MatchingExpression = _requiredAttributeWithMessageRegex,
-                    FilePath = string.Empty,
-                    MatchValue = match.Value,
-                    Key = $"{SpeakItGlobals.RequiredPrefix}{propertyName}"
-                });
-            }
-
-            return result;
-        }
-
-        private List<ParseResult> GetRequiredAttributeInText(string text)
-        {
-            List<ParseResult> result = new List<ParseResult>();
-
-            MatchCollection matches = _requiredAttributeRegex.Matches(text);
-
-            foreach (Match match in matches)
-            {
-                int index = text.IndexOf(match.Value);
-                Match propertyStringMatch = _propertyRegex.Match(text.Substring(index));
-                string propertyName = propertyStringMatch.Groups[ContentGroup].Value;
-                string propertyType = propertyStringMatch.Groups[PropertyTypeGroup].Value;
-
-                //TODO:  We currently only support string properties for required
-                if (!propertyType.ToLower().StartsWith(StringType))
-                    continue;
-
-                string errorMessage = $"{StringUtil.InsertSpaces(propertyName)} is required";
-
-                result.Add(new ParseResult
-                {
-                    LocalizableString = errorMessage,
-                    MatchingExpression = _requiredAttributeWithMessageRegex,
-                    FilePath = string.Empty,
-                    MatchValue = match.Value,
-                    Key = $"{SpeakItGlobals.RequiredPrefix}{propertyName}"
-                });
-            }
-
-            return result;
-        }
 
 
         /// <summary>
@@ -418,6 +283,11 @@ namespace BedBrigade.SpeakIt
             return tag.Replace(input, ReplacementMarker);
         }
 
+        /// <summary>
+        /// Get a list of duplicate keys
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
         public Dictionary<string, List<string>> GetDuplicateKeys(SpeakItParms parms)
         {
             List<ParseResult> parseResults = GetLocalizableStrings(parms);
@@ -454,6 +324,12 @@ namespace BedBrigade.SpeakIt
             return conflictingKeys;
         }
 
+        /// <summary>
+        /// Get a list of keys that are in the YAML file but are not in use
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public List<string> GetUnusedKeys(SpeakItParms parms)
         {
             if (string.IsNullOrEmpty(parms.ResourceFilePath))
@@ -464,11 +340,10 @@ namespace BedBrigade.SpeakIt
             // Read existing keys from the YAML file
             var existingKeys = ReadYamlFile(parms.ResourceFilePath).Keys.ToList();
 
-            //Exclude Required, MaxLength, Dynamic because those are used dynamically in ValidationLocalization
-            existingKeys = existingKeys.Where(k => !k.StartsWith(SpeakItGlobals.RequiredPrefix)
-                                                   && !k.StartsWith(SpeakItGlobals.MaxLengthPrefix)
-                                                   && !k.StartsWith(SpeakItGlobals.DynamicPrefix)
-                                                   ).ToList();
+            var attributePrefixes = _dataAttributeParsing.GetDataAttributePrefixes();
+            //Exclude Data Attributes and Dynamic because those are used dynamically in ValidationLocalization
+            existingKeys = existingKeys.Where(k => !parms.Prefixes.Any(p => k.StartsWith(p)) 
+                                                   && !attributePrefixes.Any(ap => k.StartsWith(ap))).ToList();
 
             // Get localizable strings to find keys in use
             var parseResults = GetExistingLocalizedStrings(parms);
@@ -482,9 +357,19 @@ namespace BedBrigade.SpeakIt
             return unusedKeys;
         }
 
+        /// <summary>
+        /// Get a list of localizable strings that are already in the YAML file and in use
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <returns></returns>
         public List<ParseResult> GetExistingLocalizedStrings(SpeakItParms parms)
         {
             ValidateParseParameters(parms);
+
+            string escapedKeyReference = Regex.Escape(parms.KeyReference);
+            string pattern = $@"({escapedKeyReference}\.Keys\[""?(?<content>[^,""\]]+)?)|({escapedKeyReference}\[""?(?<content>[^,""\]]+)?)";
+            _keyReferenceRegex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Multiline);
+
             var existingKeyValues = ReadYamlFile(parms.ResourceFilePath);
             List<string> files =  GetAllFilesForSourceDirectoriesAndWildcards(parms);
 
@@ -540,10 +425,34 @@ namespace BedBrigade.SpeakIt
                 yamlContent = reader.ReadToEnd();
             }
 
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            return deserializer.Deserialize<Dictionary<string, string>>(yamlContent);
+            var objectDictionary = new Deserializer().Deserialize<Dictionary<object, object>>(yamlContent);
+            var result = new Dictionary<string, string>();
+            FlattenKeysRecursive(objectDictionary, "", result);
+            return result;
+
+        }
+
+        private void FlattenKeysRecursive(object obj, string prefix, Dictionary<string, string> result)
+        {
+            if (obj is IReadOnlyDictionary<object, object> dict)
+            {
+                foreach (var kvp in dict)
+                {
+                    string newPrefix = string.IsNullOrEmpty(prefix) ? kvp.Key.ToString() : $"{prefix}:{kvp.Key}";
+                    if (kvp.Value is IReadOnlyDictionary<object, object>)
+                    {
+                        FlattenKeysRecursive(kvp.Value, newPrefix, result);
+                    }
+                    else
+                    {
+                        result[newPrefix] = kvp.Value?.ToString() ?? string.Empty;
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(prefix))
+            {
+                result[prefix] = obj?.ToString() ?? string.Empty;
+            }
         }
 
         private void AddParseResult(Regex pattern, Match match, List<ParseResult> result, string content)
@@ -612,6 +521,11 @@ namespace BedBrigade.SpeakIt
 
         private void ValidateParseParameters(SpeakItParms parms)
         {
+            if (String.IsNullOrWhiteSpace(parms.KeyReference))
+            {
+                throw new ArgumentException("KeyReference is required");
+            }
+
             if (parms.SourceDirectories == null || parms.SourceDirectories.Count == 0)
             {
                 throw new ArgumentException("SourceDirectories is required and must have at least one directory specified");
