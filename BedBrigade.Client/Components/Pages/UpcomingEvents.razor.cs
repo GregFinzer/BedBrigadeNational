@@ -1,3 +1,4 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -16,6 +17,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private ITranslateLogic _translateLogic { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
         private List<Schedule>? DeliveryEvents { get; set; }
         private List<Schedule>? BuildEvents { get; set; }
 
@@ -36,7 +38,10 @@ namespace BedBrigade.Client.Components.Pages
             if (!allEventsResponse.Success)
             {
                 _toastService.Error("Error", allEventsResponse.Message);
+                return;
             }
+
+            _locationState.Location = LocationRoute;
 
             // Filter and sort events by date
             DeliveryEvents = allEventsResponse.Data
