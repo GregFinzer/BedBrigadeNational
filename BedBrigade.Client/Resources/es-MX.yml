@@ -130,6 +130,7 @@ MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
 MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
 MaxLengthOrganizationOrGroup80: El grupo tiene una longitud máxima de 20
+MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
 MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres

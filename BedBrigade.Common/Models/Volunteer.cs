@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
@@ -41,8 +42,16 @@ namespace BedBrigade.Common.Models
 
         public VehicleType VehicleType { get; set; } = VehicleType.None; // default value
 
+        public bool AttendChurch { get; set; } = false;
 
-		[NotMapped]
+        [MaxLength(4000, ErrorMessage = "Other Languages Spoken has a maximum length of 4000 characters")]
+        public string? OtherLanguagesSpoken { get; set;} = string.Empty;
+
+        public bool SubscribedEmail { get; set; } = true;
+
+        public bool SubscribedSms { get; set; } = true;
+    
+        [NotMapped]
         public string FullName {
 			get
 			{
