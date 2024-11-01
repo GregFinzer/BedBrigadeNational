@@ -130,6 +130,7 @@ MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
+MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
