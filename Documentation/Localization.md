@@ -133,3 +133,11 @@ protected override void OnInitialized()
 6.  Translate to es-MX
 7.  Download the file and replace the existing es-MX file in BedBrigade.Data\Data\Seeding\SeedTranslations
 8.  Upload the en-US.yml and es-MX.yml files to the Data\Seeding\SeedTranslations folder on Development using FTP
+
+## Adding a New Language like French, Chinese etc.
+1.  Go to this site:  https://akmultilanguages.azurewebsites.net/TranslateApplication
+2.  Upload BedBrigade.Client\Resources\en-US.yml
+3.  Select the desired language and download to BedBrigade.Client\Resources
+4.  Upload BedBrigade.Data\Data\Seeding\SeedTranslations\en-US.yml
+5.  Select the desired language and download to BedBrigade.Data\Data\Seeding\SeedTranslations
+6.  In BedBrigade.Data\Data\Seeding\SeedTranslationLogic you will need to alter a bunch of code to support the new language and then get those translations into development/test/production, etc.  Really it should loop through the languages other than English based on what is in the directory:  BedBrigade.Data\Data\Seeding\SeedTranslations
