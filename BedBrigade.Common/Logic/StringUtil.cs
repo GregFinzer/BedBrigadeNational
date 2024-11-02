@@ -272,6 +272,57 @@ namespace BedBrigade.Common.Logic
             return Regex.Replace(input, @"\s+", " ");
         }
 
+        public static string SplitTextByLength(string text, int maxLineLength)
+        {
+            if (string.IsNullOrEmpty(text) || maxLineLength <= 0)
+            {
+                return text;
+            }
+
+            StringBuilder result = new StringBuilder();
+            int currentIndex = 0;
+
+            while (currentIndex < text.Length)
+            {
+                int nextBreak = Math.Min(currentIndex + maxLineLength, text.Length);
+
+                // Look for the nearest space, comma, or period before the next break
+                int breakIndex = FindBreakIndex(text, currentIndex, nextBreak);
+
+                // If no space or punctuation was found, break at maxLineLength
+                if (breakIndex == currentIndex)
+                {
+                    breakIndex = nextBreak;
+                }
+
+                // Append the current line to the result
+                result.Append(text.Substring(currentIndex, breakIndex - currentIndex).Trim());
+
+                // Add <br/> tag if more text remains
+                if (breakIndex < text.Length)
+                {
+                    result.Append("<br/>");
+                }
+
+                currentIndex = breakIndex;
+            }
+
+            return result.ToString();
+        }
+
+        private static int FindBreakIndex(string text, int startIndex, int endIndex)
+        {
+            // Find the last space, comma, or period within the range
+            int lastSpace = text.LastIndexOf(' ', endIndex - 1, endIndex - startIndex);
+            int lastComma = text.LastIndexOf(',', endIndex - 1, endIndex - startIndex);
+            int lastDot = text.LastIndexOf('.', endIndex - 1, endIndex - startIndex);
+
+            // Find the maximum of these, but within the allowed range
+            int bestBreak = Math.Max(lastSpace, Math.Max(lastComma, lastDot));
+            return bestBreak >= startIndex ? bestBreak + 1 : startIndex; // +1 to include punctuation
+        }
+
+
     } // class
 
 
