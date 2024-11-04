@@ -191,22 +191,24 @@ One thing you will notice about the following project plan is the lack of due da
     * Admin Mobile Margin and Padding :heavy_check_mark:
     * Manage Users Unusable in Mobile :heavy_check_mark:
     * Design Spanish Translation  :heavy_check_mark:
-    * Address Autocomplete Design
-    * Design Bulk Email Mailing List
-    * Donations Design
-    * SMS Design
+    * Address Autocomplete Design :heavy_check_mark:
+    * Design Bulk Email Mailing List :heavy_check_mark:
+    * Donations Design :heavy_check_mark:
+    * SMS Design  :heavy_check_mark:
     * Delivery Sheet Slow
     * Update Documentation for Localization :heavy_check_mark:
     * Make EmailQueue into a Background Service :heavy_check_mark:
     * Menu not wide enough when translated to Spanish :heavy_check_mark:
+    * Going to Events loads National Header and Footer :heavy_check_mark:
+    * Data Attribute Validation :heavy_check_mark:
     
 * New Stories
     * Send confirmation email for Bed Request :heavy_check_mark:
     * Import Bed Requests
     * Calendar
-    * Upcoming Events
-    * Add new Schedule Fields
-    * New Manage Volunteer Fields
+    * Upcoming Events :heavy_check_mark:
+    * Add new Schedule Fields :heavy_check_mark:
+    * New Manage Volunteer Fields :heavy_check_mark:
     * Volunteer Sign Up New Fields
     * New Manage Bed Request Fields
     * New Bed Request Form Fields
@@ -221,6 +223,35 @@ One thing you will notice about the following project plan is the lack of due da
     * Localize Dynamic Content :heavy_check_mark:
     * Apply String Localization :heavy_check_mark:
 
+* Address
+    * Location Latitude & Longitude
+    * Autocomplete Address
+    * Geolocation Routing
+    
+* Donations    
+    * New Donation Fields
+    * Donation Campaign Table
+    * Seed Donation Campaign
+    * Stripe Seed Configuration
+    * Stripe Processing Code
+    * Paypal IPN Handler
+    * Donations Sum By Campaign Name
+    * Edit Donations Page
+
+ * Newsletter
+    * Create Newsletter Tables
+    * Manage Newsletters
+    * Volunteer Subscribe to Newsletter
+    * Subscribe/Unsubscribe to Newsletter Page
+    * Ability to Send Newsletters
+    
+* SMS
+    * Add LocationId to Configuration with a default of National
+    * Create Code for SMS Queue
+    * Create UI to send and receive SMS Messages and Reply
+ 
+
+    
     
     
 
