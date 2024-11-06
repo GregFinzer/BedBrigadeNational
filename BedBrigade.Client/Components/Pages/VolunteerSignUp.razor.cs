@@ -96,6 +96,9 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter] public string PreloadLocation { get; set; }
         private ValidationMessageStore _validationMessageStore;
 
+        private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
+        private string[] SelectedLanguages { get; set; } = [];
+
         #endregion
         #region Initialization
 
@@ -111,6 +114,8 @@ namespace BedBrigade.Client.Components.Pages
         {
             if (firstRender)
             {
+                SpokenLanguages = await _svcVolunteer.GetSpokenLanguages();
+
                 if (!string.IsNullOrEmpty(LocationRoute))
                 {
                     var result = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
@@ -276,10 +281,13 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        } 
+        }
 
 
-
+        private void OnOtherSpokenLanguagesChanged(MultiSelectChangeEventArgs<string[]> args)
+        {
+            newVolunteer.OtherLanguagesSpoken = string.Join(", ", args.Value);
+        }
 
 
 
@@ -323,6 +331,8 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task UpdateDatabase()
         {
+            newVolunteer.OtherLanguagesSpoken = string.Join(", ", SelectedLanguages);
+
             bool updateVolunteerSuccess = await UpdateVolunteer();
 
             if (!updateVolunteerSuccess)

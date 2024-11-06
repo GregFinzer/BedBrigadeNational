@@ -10,5 +10,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<string>>> GetVolunteerEmailsWithDeliveryVehicles(int locationId);
         Task<ServiceResponse<List<string>>> GetVolunteerEmailsForASchedule(int scheduleId);
         Task<ServiceResponse<Volunteer>> GetByEmail(string email);
+        Task<List<SpokenLanguage>> GetSpokenLanguages();
     }
 }

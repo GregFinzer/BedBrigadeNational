@@ -33,6 +33,8 @@ namespace BedBrigade.Data.Services
             }
         }
 
+
+
         public async Task NotifyLanguageChangedAsync()
         {
             if (LanguageChanged != null)

@@ -177,6 +177,29 @@
                     </div>
                 </div>
 
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center">Volunteer Information Continued</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="otherLanguagesSpokenList" class="formlabel">Other Languages Spoken</label>
+                                <SfMultiSelect id="otherLanguagesSpokenList" TValue="string[]" TItem="SpokenLanguage" @bind-value="@SelectedLanguages" DataSource="@SpokenLanguages" Placeholder="Select Languages" Mode="VisualMode.CheckBox">
+                                    <MultiSelectFieldSettings Text="Name" Value="Value"></MultiSelectFieldSettings>
+                                </SfMultiSelect>
+                            </div>
+                            <div class="form-group">
+                                <SfCheckBox Label="Do you attend church regularly?" @bind-Checked="newVolunteer.AttendChurch"></SfCheckBox>
+                            </div>
+                            <div class="form-group">
+                                <SfCheckBox Label="Subscribe to our Email Newsletter?" @bind-Checked="newVolunteer.SubscribedEmail"></SfCheckBox>
+                            </div>
+                            <div class="form-group">
+                                <SfCheckBox Label="Subscribe to our Text List?" @bind-Checked="newVolunteer.SubscribedSms"></SfCheckBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @if (SelectedEvent != null && SelectedEvent.EventType == EventType.Delivery)
                 {
                     <div class="col-md-3">
