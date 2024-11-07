@@ -42,6 +42,7 @@ DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, For
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationDate: Donation Date
 Donations: Donations
+DoYouAttendChurch: Do you attend church regularly?
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
 DynamicAugust: August
@@ -161,6 +162,7 @@ OrganizerColon: 'Organizer:'
 OrganizerEmail: Organizer Email
 OrganizerName: Organizer Name
 OrganizerPhone: Organizer Phone
+OtherLanguagesSpoken: Other Languages Spoken
 Pages: Pages
 Password: Password
 Phone: Phone
@@ -222,6 +224,7 @@ SelectAnUpcomingEvent: Select an upcoming event and register to join us in eithe
 SelectAState: Select a state
 SelectAVolunteer: Select a Volunteer
 SelectedEventDetails: Selected Event Details
+SelectLanguages: Select Languages
 SelectMetroArea: Select Metro Area
 Send: Send
 SendTaxForms: Send Tax Forms
@@ -238,6 +241,8 @@ Status: Status
 Street: Street
 SubmitRequest: Submit Request
 SubmitVolunteerRegistration: Submit Volunteer Registration
+SubscribeToOurEmail: Subscribe to our Email Newsletter?
+SubscribeToOurText: Subscribe to our Text List?
 TaxFormSent: Tax Form Sent
 Team: 'Team #'
 ThankYou: Thank you!
@@ -257,6 +262,7 @@ VolunteerFormNotCompleted: The Volunteer Form is not completed!
 VolunteeridColon: 'VolunteerID:'
 VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
+VolunteerInformationContinued: Volunteer Information Continued
 VolunteerRegistration: Volunteer Registration
 Volunteers: Volunteers
 VolunteerSignUpAgain: Thanks for serving again {fullName}
