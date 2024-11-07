@@ -31,6 +31,8 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ITranslateLogic _translateLogic { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
 
+        [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
+
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
 
@@ -114,7 +116,7 @@ namespace BedBrigade.Client.Components.Pages
         {
             if (firstRender)
             {
-                SpokenLanguages = await _svcVolunteer.GetSpokenLanguages();
+                SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
 
                 if (!string.IsNullOrEmpty(LocationRoute))
                 {

@@ -144,15 +144,7 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         }
     }
 
-    public async Task<List<SpokenLanguage>> GetSpokenLanguages()
-    {
-        return new List<SpokenLanguage>()
-        {
-            new SpokenLanguage() { Name = "Spanish", Value = "Spanish" },
-            new SpokenLanguage() { Name = "Haitian Creole", Value = "Haitian Creole" },
-            new SpokenLanguage() { Name = "French", Value = "French" },
-        };
-    }
+
 }
 
 
