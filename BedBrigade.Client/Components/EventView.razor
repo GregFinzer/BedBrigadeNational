@@ -1,0 +1,196 @@
+﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Logic
+@using BedBrigade.SpeakIt;
+
+<div class='@RequestedView-wrap'>
+    <div>
+        @{
+
+            switch(RequestedView){
+                case "quick": // modal window
+                    <h3 class="bb-fore-primary">
+                        @_translateLogic.GetTranslation(EventData.Subject)
+                    </h3>
+                    break;
+                case "agenda":
+                 <h4 class="bb-fore-primary text-black">
+                        @_translateLogic.GetTranslation(EventData.Subject)
+
+                    </h4>
+                    break;
+                case "month":
+                    <div style="font-weight: bold">
+                        @_translateLogic.GetTranslation(EventData.Subject)
+                    </div>
+                    break;
+                case "week":
+                default:
+                    <div>
+                        <h4 class="bb-fore-primary text-white">
+                            @_translateLogic.GetTranslation(EventData.Subject)
+                        </h4>
+                    </div>
+                 break;
+            }
+        }
+    </div>
+    
+        @if (RequestedView == "quick")
+        {
+            <div>
+                <p class="mb-1">
+                    <i class="far fa-calendar-alt"></i>
+                        @EventData.StartTime.ToString("dddd, MMMM d, yyyy")
+                        @EventData.StartTime.ToString("hh:mm tt")
+                        - @EventData.EndTime.ToString("hh:mm tt")
+                </p>
+            </div>
+        }
+        else
+        {
+            <div>
+                    <i class="far fa-clock"></i>&nbsp;@EventData.StartTime.ToString("hh:mm tt") - @EventData.EndTime.ToString("hh:mm tt")
+            </div>
+        }
+
+           
+ 
+    @if (!string.IsNullOrEmpty(EventData.Location))
+    {
+        <div>
+            <i class="fas fa-map-marker-alt"></i>&nbsp;
+            
+            @{
+                string urlEncodedAddress = System.Net.WebUtility.UrlEncode(EventData.Location);
+                string googleMapsLink = $"https://www.google.com/maps/search/?api=1&query={urlEncodedAddress}";
+             }
+
+            <a href="@googleMapsLink" target="_blank" title="View location on Google Maps" @onclick="HandleHyperlinkClick" >
+                @EventData.Location
+            </a>
+
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(EventData.OrganizerName))
+    {
+        <div>
+            <i class="far fa-user"></i>
+            @_lc.Keys["OrganizerColon"] @EventData.OrganizerName
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(EventData.OrganizerEmail))
+    {
+        <div>
+            <i class="far fa-envelope"></i> <a href="mailto:@EventData.OrganizerEmail" @onclick="HandleHyperlinkClick" target="_blank" >@EventData.OrganizerEmail</a>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(EventData.OrganizerPhone))
+    {
+        <div>
+            <i class="fas fa-phone"></i>&nbsp;<a href="tel:@StringUtil.ExtractDigits(EventData.OrganizerPhone)" @onclick="HandleHyperlinkClick" > @EventData.OrganizerPhone</a>           
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(EventData.Volunteers))
+    {
+        <div>
+            <i class="fas fa-user-friends"></i>
+            @_lc.Keys["VolunteersRegisteredColon"] @EventData.Volunteers
+        </div>
+    }
+
+     @if (!string.IsNullOrEmpty(EventData.Description))
+    {
+        @switch (RequestedView)
+        {
+            case "quick": // modal window
+                SplitDescription = StringUtil.SplitTextByLength(EventData.Description, 50);
+                break;
+            case "agenda":
+                SplitDescription = EventData.Description;
+                break;           
+            case "week":
+                SplitDescription = StringUtil.SplitTextByLength(EventData.Description, 35);
+                break;
+            case "month":
+                SplitDescription = StringUtil.SplitTextByLength(EventData.Description, 40);
+            break;
+                default:
+                    SplitDescription = EventData.Description;
+                break;
+        }
+
+        
+        
+            <div>            
+                <i class="far fa-comments"></i>&nbsp;
+                   @((MarkupString)SplitDescription)                 
+            </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public AppointmentData? EventData { get; set; }
+    [Parameter]
+    public string? RequestedView { get; set; }
+    [Parameter]
+    public EventCallback OnHyperlinkClicked { get; set; }
+
+    [Inject] private ILanguageContainerService _lc { get; set; }
+    [Inject] private ITranslateLogic _translateLogic { get; set; }
+
+    public string? SplitDescription = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+
+    private async Task HandleHyperlinkClick()
+    {
+        // Trigger the event callback to notify the parent component
+        if (OnHyperlinkClicked.HasDelegate)
+        {
+            await OnHyperlinkClicked.InvokeAsync(null);
+        }
+    }
+
+}
+
+<style>
+    .customize-schedule
+    .e-quick-popup-wrapper
+    .e-event-popup
+    .e-popup-footer {
+        display: none;
+    }
+
+    .e-schedule .week-wrap .day-wrap {
+        height: 200px;
+        white-space: normal;
+    }
+
+    .e-schedule .agenda-wrap {
+        height: 300px;       
+        white-space: normal;
+    }
+
+    .quick-wrap {
+        height: 300px;
+        width: 550px;
+        font-family: Arial;
+        font-size: 16px
+    }
+
+    a, a:hover {
+        color: inherit;
+      }
+ 
+ 
+
+</style>
