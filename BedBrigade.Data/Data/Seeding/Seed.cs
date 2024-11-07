@@ -125,6 +125,36 @@ public static class Seed
         await SeedSchedules(contextFactory);
         await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
         await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
+        await SeedSpokenLanguages(contextFactory);
+    }
+
+    private static async Task SeedSpokenLanguages(IDbContextFactory<DataContext> contextFactory)
+    {
+        Log.Logger.Information("SeedSpokenLanguages Started");
+
+        using (var context = contextFactory.CreateDbContext())
+        {
+            if (await context.SpokenLanguages.AnyAsync()) return;
+
+            try
+            {
+                List<SpokenLanguage> spokenLanguages = new List<SpokenLanguage>()
+                {
+                    new SpokenLanguage() { Name = "Spanish", Value = "Spanish" },
+                    new SpokenLanguage() { Name = "Haitian Creole", Value = "Haitian Creole" },
+                    new SpokenLanguage() { Name = "French", Value = "French" }
+                };
+
+                SeedRoutines.SetMaintFields(spokenLanguages);
+                await context.SpokenLanguages.AddRangeAsync(spokenLanguages);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Information($"SeedSpokenLanguages seed error: {ex.Message}");
+                throw;
+            }
+        }
     }
 
     private static async Task SeedMetroAreas(IDbContextFactory<DataContext> contextFactory)

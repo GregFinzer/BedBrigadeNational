@@ -170,6 +170,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ITranslationQueueDataService, TranslationQueueDataService>();
             builder.Services.AddScoped<IContentTranslationQueueDataService, ContentTranslationQueueDataService>();
             builder.Services.AddScoped<IEmailBuilderService, EmailBuilderService>();
+            builder.Services.AddScoped<ISpokenLanguageDataService, SpokenLanguageDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

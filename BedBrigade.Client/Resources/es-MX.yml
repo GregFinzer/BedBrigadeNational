@@ -42,6 +42,7 @@ DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Fo
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
 DonationDate: Fecha de donación
 Donations: Donaciones
+DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
 DynamicAugust: Agosto
@@ -161,6 +162,7 @@ OrganizerColon: 'Organizador:'
 OrganizerEmail: Correo electrónico del organizador
 OrganizerName: Nombre del organizador
 OrganizerPhone: Teléfono del organizador
+OtherLanguagesSpoken: Otros idiomas hablados
 Pages: Páginas
 Password: Contraseña
 Phone: Teléfono
@@ -222,6 +224,7 @@ SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse
 SelectAState: Seleccione un estado
 SelectAVolunteer: Selecciona un Voluntario
 SelectedEventDetails: Detalles del evento seleccionado
+SelectLanguages: Seleccionar Idiomas
 SelectMetroArea: Seleccione Área Metropolitana
 Send: Enviar
 SendTaxForms: Enviar formularios de impuestos
@@ -238,6 +241,8 @@ Status: Estado
 Street: Calle
 SubmitRequest: Enviar solicitud
 SubmitVolunteerRegistration: Enviar Registro de Voluntarios
+SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
+SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
 ThankYou: ¡Gracias!
@@ -257,6 +262,7 @@ VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
 VolunteeridColon: 'Identificación de voluntarios:'
 VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
+VolunteerInformationContinued: Continuación de la información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
 Volunteers: Voluntarios
 VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
