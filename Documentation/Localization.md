@@ -20,6 +20,11 @@ Localization also known as language translation is one of the more complicated p
 * **VerifyAllKeysCanBeFound** - If this test is failing it means that you manually typed in a key in your razor file, and it does not exist in the BedBrigade.Client\Resources\en-US.yml file, or you deleted a key value pair in the en-US.yml file that was in use.  Keys are case sensitive.  Correct your typo or add the key to the en-US.yml file.
 * **VerifyNoUnusedKeys** - If this test is failing, it means that you have keys in your BedBrigade.Client\Resources\en-US.yml file that are not being used in your razor files.  Most likely you deleted some code in a Razor file or you deleted the entire .razor file.  Remove the key value pair from the en-US.yml file.
 
+## About the en-US.yml
+There are three different styles of localization keys in the en-US.yml
+* **Regular Key** - Example:  *AboutUs*.  This will be a Pascal cased key that originally was from an HTML element like ```<h1>About Us</h1>```
+* **Dynamic Key** - Example: *DynamicApril*.  This is a Pascal cased key that has the word Dynamic in front of the word.  This translation is used in a code behind instead of an HTML  element.  When VerifyNoUnusedKeys is run it does not look for usage in code behind because we allow partial translations.  So if there is text like April 2025 then it will still translate the April.  
+* **Data Annotation Key** - Example: *RequiredAmount*.  This is a Pascal cased key that has the Data Annotation name and then the property name.  All other data annotations are supported such as MaxLength, Email, Phone, etc.
 
 ## How to localize a new string in a Razor file
 1.  Perform a commit to Git to your feature branch so that you can revert any changes if needed.
