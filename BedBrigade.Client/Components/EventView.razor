@@ -2,8 +2,21 @@
 @using BedBrigade.Common.Logic
 @using BedBrigade.SpeakIt;
 
-<div class='@RequestedView-wrap'>
-    <div>
+ @{
+       if (RequestedView == "month"){
+        <div >
+                <span style="font-weight: bold" >@_translateLogic.GetTranslation(EventData.Subject)</span><br />
+                @EventData.StartTime.ToString("hh:mm tt")
+                - @EventData.EndTime.ToString("hh:mm tt")        
+                 @if (!string.IsNullOrEmpty(EventData.GroupName)){
+                   <br />@EventData.GroupName        
+                 }
+        </div>
+    }    
+    else
+    {
+      <div class='@RequestedView-wrap'>
+        <div>
         @{
 
             switch(RequestedView){
@@ -17,12 +30,7 @@
                         @_translateLogic.GetTranslation(EventData.Subject)
 
                     </h4>
-                    break;
-                case "month":
-                    <div style="font-weight: bold">
-                        @_translateLogic.GetTranslation(EventData.Subject)
-                    </div>
-                    break;
+                    break;               
                 case "week":
                 default:
                     <div>
@@ -52,10 +60,9 @@
                     <i class="far fa-clock"></i>&nbsp;@EventData.StartTime.ToString("hh:mm tt") - @EventData.EndTime.ToString("hh:mm tt")
             </div>
         }
-
-           
+                 
  
-    @if (!string.IsNullOrEmpty(EventData.Location))
+        @if (!string.IsNullOrEmpty(EventData.Location))
     {
         <div>
             <i class="fas fa-map-marker-alt"></i>&nbsp;
@@ -72,37 +79,46 @@
         </div>
     }
 
-    @if (!string.IsNullOrEmpty(EventData.OrganizerName))
-    {
-        <div>
-            <i class="far fa-user"></i>
-            @_lc.Keys["OrganizerColon"] @EventData.OrganizerName
-        </div>
-    }
+        @if (!string.IsNullOrEmpty(EventData.GroupName))
+        {
+            <div>
+                    <i class="fas fa-users"></i>
+                @_lc.Keys["Group"]&colon;&nbsp;@EventData.GroupName
+            </div>
+        }
 
-    @if (!string.IsNullOrEmpty(EventData.OrganizerEmail))
-    {
-        <div>
-            <i class="far fa-envelope"></i> <a href="mailto:@EventData.OrganizerEmail" @onclick="HandleHyperlinkClick" target="_blank" >@EventData.OrganizerEmail</a>
-        </div>
-    }
 
-    @if (!string.IsNullOrEmpty(EventData.OrganizerPhone))
-    {
-        <div>
-            <i class="fas fa-phone"></i>&nbsp;<a href="tel:@StringUtil.ExtractDigits(EventData.OrganizerPhone)" @onclick="HandleHyperlinkClick" > @EventData.OrganizerPhone</a>           
-        </div>
-    }
+        @if (!string.IsNullOrEmpty(EventData.OrganizerName))
+        {
+            <div>
+                <i class="far fa-user"></i>
+                @_lc.Keys["OrganizerColon"] @EventData.OrganizerName
+            </div>
+        }
 
-    @if (!string.IsNullOrEmpty(EventData.Volunteers))
-    {
-        <div>
-            <i class="fas fa-user-friends"></i>
-            @_lc.Keys["VolunteersRegisteredColon"] @EventData.Volunteers
-        </div>
-    }
+        @if (!string.IsNullOrEmpty(EventData.OrganizerEmail))
+        {
+            <div>
+                <i class="far fa-envelope"></i> <a href="mailto:@EventData.OrganizerEmail" @onclick="HandleHyperlinkClick" target="_blank" >@EventData.OrganizerEmail</a>
+            </div>
+        }
 
-     @if (!string.IsNullOrEmpty(EventData.Description))
+        @if (!string.IsNullOrEmpty(EventData.OrganizerPhone))
+        {
+            <div>
+                <i class="fas fa-phone"></i>&nbsp;<a href="tel:@StringUtil.ExtractDigits(EventData.OrganizerPhone)" @onclick="HandleHyperlinkClick" > @EventData.OrganizerPhone</a>           
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(EventData.Volunteers))
+        {
+            <div>
+                <i class="fas fa-user-friends"></i>
+                @_lc.Keys["VolunteersRegisteredColon"] @EventData.Volunteers
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(EventData.Description))
     {
         @switch (RequestedView)
         {
@@ -128,9 +144,13 @@
             <div>            
                 <i class="far fa-comments"></i>&nbsp;
                    @((MarkupString)SplitDescription)                 
-            </div>
+            </div>    
     }
+
 </div>
+    }
+}
+    
 
 @code {
 

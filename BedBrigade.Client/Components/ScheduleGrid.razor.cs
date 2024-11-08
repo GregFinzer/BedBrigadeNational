@@ -41,6 +41,7 @@ namespace BedBrigade.Client.Components
         public List<EventStatusEnumItem>? lstEventStatuses { get; private set; }
         public List<EventTypeEnumItem>? lstEventTypes { get; private set; }
         public DateTime ScheduleStartDate { get; set; }
+        public DateTime ScheduleStartTime { get; set; }
         public DateTime ScheduleEndDate { get; set; }
         public bool enabledLocationSelector { get; set; } = true;
 
@@ -68,6 +69,8 @@ namespace BedBrigade.Client.Components
 
         private User? _currentUser = new User();
         private int _selectedLocationId = 0;
+        private List<UsState>? StateList = AddressHelper.GetStateList();
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -292,8 +295,8 @@ namespace BedBrigade.Client.Components
 
         private void Add()
         {
-            HeaderTitle = "Add Schedule";
-            ButtonTitle = "Add Schedule";
+            HeaderTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"];
+            ButtonTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"]; 
             if (isLocationAdmin)
             {
                 enabledLocationSelector = false;
@@ -308,7 +311,10 @@ namespace BedBrigade.Client.Components
         private async Task Save(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)
         {
             Schedule editSchedule = args.Data;
-            
+
+            editSchedule.EventDateScheduled = ScheduleStartDate.Date + ScheduleStartTime.TimeOfDay;
+
+
             if (editSchedule.ScheduleId != 0) // Updated schedule
             {
                 //Update Schedule Record
@@ -355,17 +361,18 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {          
-            HeaderTitle = "Update Schedule #"+ selectedScheduleId.ToString();
-            ButtonTitle = "Update";
+            HeaderTitle = _lc.Keys["Update"] + " " + _lc.Keys["Schedule"]+ " #" + selectedScheduleId.ToString();
+            ButtonTitle = _lc.Keys["Update"];
             enabledLocationSelector = false;          
         }
 
-        protected async Task Save(Schedule schedule)
-        {
+        public async Task Save(Schedule schedule)        {          
+
+
             await Grid.EndEditAsync();
         }
 
-        protected async Task Cancel()
+        public async Task Cancel()
         {
             await Grid.CloseEditAsync();
         }
@@ -454,7 +461,7 @@ namespace BedBrigade.Client.Components
         private string cssClass { get; set; } = "e-outline";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
-            { "rows", "7" },
+            { "rows", "3" },
         };
 
         Dictionary<string, object> htmlattributeSize = new Dictionary<string, object>()

@@ -172,6 +172,7 @@ namespace BedBrigade.Client.Components.Pages
                     EndTime = s.EventDateScheduled.AddHours(s.EventDurationHours),
                     Description = StringUtil.IsNull(s.EventNote,""),
                     Location = FormatAddress(s.Address, s.City, s.State, s.PostalCode),
+                    GroupName = StringUtil.IsNull(s.GroupName, ""),
                     OrganizerName = s.OrganizerName,
                     OrganizerPhone = s.OrganizerPhone,
                     OrganizerEmail = s.OrganizerEmail,
