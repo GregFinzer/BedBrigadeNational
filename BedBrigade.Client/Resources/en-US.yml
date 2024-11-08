@@ -1,5 +1,6 @@
 5CharactersContainingOnly: (5 characters containing only digits 0-9)
 Active: Active
+Add: Add
 Address: Address
 AgesGender: Ages / Gender
 Amount: Amount
@@ -18,7 +19,8 @@ BuildPostalCode: Build Postal Code
 BuildState: Build State
 Cancel: Cancel
 ChangePassword: Change Password
-ChooseADate: Choose a Date & Time
+ChooseADate: Choose a Date
+ChooseATime: Choose a Time
 City: City
 ClickToSignup: (Click to Signup)
 CompareConfirmPasswordToPassword: The passwords do not match.
@@ -43,6 +45,7 @@ DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a 
 DonationDate: Donation Date
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
+DurationHours: Duration (hours)
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
 DynamicAugust: August
@@ -92,6 +95,7 @@ EventidColon: 'EventID:'
 EventName: Event Name
 EventNote: Event Note
 EventStatus: Event Status
+EventTime: Event Time
 EventType: Event Type
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FindABedBrigade: Find a Bed Brigade Near Me
@@ -100,6 +104,7 @@ FolderColon: 'Folder:'
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
+Group: Group
 GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
@@ -208,11 +213,11 @@ RequiredStreet: Street Address is required
 RequiredSubject: Subject is required.
 RequiredTranslationId: Translation ID is required
 RequiredUserId: User Id is required
-Resources: Resources
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
 Save: Save
+Schedule: Schedule
 Scheduling: Scheduling
 SeachAVolunteerBy: Seach a Volunteer by Name
 Search: Search
@@ -252,6 +257,7 @@ Unauthorized: Unauthorized
 UpcomingBuilds: Upcoming Builds
 UpcomingDeliveries: Upcoming Deliveries
 UpcomingEvents: Upcoming Events
+Update: Update
 UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix

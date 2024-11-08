@@ -14,6 +14,7 @@ namespace BedBrigade.Common.Models
         public string? Description { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public string? GroupName { get; set; }
         public string? OrganizerName { get; set; }
         public string? OrganizerEmail { get; set; }
         public string? OrganizerPhone { get; set; }

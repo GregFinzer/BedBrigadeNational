@@ -1,5 +1,6 @@
 5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
 Active: Activo
+Add: Añadir
 Address: Dirección
 AgesGender: Edades / Género
 Amount: Importe
@@ -18,7 +19,8 @@ BuildPostalCode: Construir código postal
 BuildState: Estado de compilación
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
-ChooseADate: Elija una fecha y hora
+ChooseADate: Elija una fecha
+ChooseATime: Elija una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
@@ -43,6 +45,7 @@ DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas
 DonationDate: Fecha de donación
 Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
+DurationHours: Duración (horas)
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
 DynamicAugust: Agosto
@@ -92,6 +95,7 @@ EventidColon: 'ID de evento:'
 EventName: Nombre del evento
 EventNote: Nota del evento
 EventStatus: Estado del evento
+EventTime: Hora del evento
 EventType: Tipo de evento
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FindABedBrigade: Encuentra una brigada de camas cerca de mí
@@ -100,6 +104,7 @@ FolderColon: 'Carpeta:'
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
+Group: Grupo
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
@@ -208,11 +213,11 @@ RequiredStreet: Se requiere la dirección postal
 RequiredSubject: El asunto es obligatorio.
 RequiredTranslationId: Se requiere el ID de traducción
 RequiredUserId: Se requiere un ID de usuario
-Resources: Recursos
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
 Save: Salvar
+Schedule: Horario
 Scheduling: Planificación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
@@ -252,6 +257,7 @@ Unauthorized: Desautorizado
 UpcomingBuilds: Próximas compilaciones
 UpcomingDeliveries: Próximas entregas
 UpcomingEvents: Próximos eventos
+Update: Actualización
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
