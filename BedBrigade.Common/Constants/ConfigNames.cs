@@ -39,7 +39,8 @@
         public const string EmailPort = "EmailPort";
         public const string EmailUserName = "EmailUserName";
         public const string EmailPassword = "EmailPassword";
+        public const string PrimaryLanguage = "PrimaryLanguage";
+        public const string SpeakEnglish = "SpeakEnglish";
 
-        
     }
 }

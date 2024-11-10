@@ -559,6 +559,18 @@ public static class Seed
             ConfigurationValue = "",
             Section = ConfigSection.System,
             LocationId = Defaults.NationalLocationId
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.PrimaryLanguage,
+            ConfigurationValue = "English;Spanish;Haitian Creole;Portuguese;Other",
+            Section = ConfigSection.System
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.SpeakEnglish,
+            ConfigurationValue = "Yes;No;A little",
+            Section = ConfigSection.System
         }
 
     ];

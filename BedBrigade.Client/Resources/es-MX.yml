@@ -9,10 +9,10 @@ BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
 BedBrigadeUsers: Usuarios de Bed Brigade
 BedBrigadeWeb: Web de la Brigada de Camas
+BedRequest: Solicitud de cama
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
-BedsRequested: Camas solicitadas
 BuildAddress: Dirección de compilación
 BuildCity: Construir ciudad
 BuildPostalCode: Construir código postal
@@ -111,6 +111,7 @@ IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicaci
 InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
 InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
+LanguagePreference: Preferencia lingüística
 LastName: Apellido
 Latitude: Latitud
 Loading: Carga....
@@ -179,6 +180,8 @@ PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
 PleaseSelectAnEvent: Por favor, seleccione un evento
 PostalCode: Código postal
 PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
+PrimaryLanguageCaption: Lengua principal
+PrimaryLanguagePlaceholder: Elige idioma
 RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
@@ -206,8 +209,10 @@ RequiredPageTitle: El título de la página es obligatorio
 RequiredPassword: Se requiere contraseña
 RequiredPhone: Se requiere un número de teléfono
 RequiredPostalCode: Se requiere el código postal
+RequiredPrimaryLanguage: Seleccione su lengua principal
 RequiredQueueDate: Se requiere la fecha de cola
 RequiredSection: La sección es obligatoria
+RequiredSpeakEnglish: Por favor, seleccione su nivel de inglés
 RequiredStatus: El estado es obligatorio
 RequiredStreet: Se requiere la dirección postal
 RequiredSubject: El asunto es obligatorio.
@@ -239,6 +244,8 @@ SkipToBuilds: Ir a Compilaciones
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
 SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
+SpeakEnglishCaption: ¿Habla inglés?
+SpeakEnglishPlaceholder: Conocimientos de inglés
 SpecialInstructions: Instrucciones especiales
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}

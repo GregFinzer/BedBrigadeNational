@@ -12,6 +12,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using BedBrigade.SpeakIt;
 using Serilog;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
+using Syncfusion.Blazor.DropDowns;
 
 
 namespace BedBrigade.Client.Components.Pages
@@ -27,9 +30,12 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
+        protected List<string>? lstPrimaryLanguage;
+        protected List<string>? lstSpeakEnglish;
 
         private SearchLocation? SearchLocation;
 
@@ -39,6 +45,8 @@ namespace BedBrigade.Client.Components.Pages
         private string DisplayForm = DisplayNone;
         private string DisplayAddressMessage = DisplayNone;
         private string DisplaySearch = DisplayNone;
+        private string DisplaySpeakEnglish = DisplayNone;
+
         public int NumericValue { get; set; } = 1;
 
         private string ResultMessage = string.Empty;
@@ -53,6 +61,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private string MyValidationMessage = string.Empty;
         private string MyValidationDisplay = DisplayNone;
+      
 
         private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
         private EditContext? EC { get; set; }
@@ -80,7 +89,7 @@ namespace BedBrigade.Client.Components.Pages
         #endregion
         #region Initialization
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
             newRequest = new Common.Models.NewBedRequest();
@@ -100,9 +109,23 @@ namespace BedBrigade.Client.Components.Pages
                     _locationQueryParm = locationQueryParm;
                 }
             }
-
+            await LoadConfiguration();
             base.OnInitialized();
         }
+
+        private async Task LoadConfiguration()
+        {
+            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System); // Configuration ============================
+            if (dataConfiguration.Success && dataConfiguration != null)
+            {
+                var dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
+                string delimitedString = dctConfiguration[ConfigNames.PrimaryLanguage].ToString();
+                lstPrimaryLanguage = new List<string>(delimitedString.Split(';'));
+                delimitedString = dctConfiguration[ConfigNames.SpeakEnglish].ToString();
+                lstSpeakEnglish = new List<string>(delimitedString.Split(';'));
+
+            }
+        } // Configuration
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -256,9 +279,18 @@ namespace BedBrigade.Client.Components.Pages
 
             return string.Empty;
 
-        } 
-
-
+        }
+        public void OnLanguageChange(ChangeEventArgs<string, string> args)
+        {
+            DisplaySpeakEnglish = DisplayNone;
+            if (args.Value != null)
+            {
+                if (args.Value.ToString() != "English")
+                {
+                    DisplaySpeakEnglish = "";
+                }
+            }
+        }
 
         #endregion
         #region reCaptcha
@@ -292,6 +324,19 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
                 newRequest.NumberOfBeds = NumericValue;
                 newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
+                if (newRequest.PrimaryLanguage == "English")
+                {
+                    newRequest.SpeakEnglish = "Yes";
+                }
+                else
+                {
+                    if (String.IsNullOrEmpty(newRequest.SpeakEnglish))
+                    {
+                        newRequest.SpeakEnglish = "No"; // cannot be null
+                    }
+                }
+
+
 
                 var bedRequest = await UpdateDatabase();
 
