@@ -156,7 +156,7 @@ else
                                                 <div class="card-body">
                                                     <div class="form-group">
                                                         <label for="numbed" class="formlabel required">@_lc.Keys["NumberOfBeds"]</label>
-                                                        <SfNumericTextBox ID="mumbed" @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" Placeholder="@_lc.Keys["BedsRequested"]" FloatLabelType="FloatLabelType.Auto" />
+                                                        <SfNumericTextBox ID="numbed" @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" />
                                                          <div style="font-size: smaller">
                                                             <ValidationMessage For="@(() => BedRequest.NumberOfBeds)"></ValidationMessage>
                                                         </div>
@@ -203,11 +203,47 @@ else
                                         </div>
 
                                     </div> 
-                                    <div class="row" >
+                                                                                                          
+                                     <div class="row" >
+                                        <div class="col-md-9">
+                                            <div class="container">
+
+                                                @{
+                                                    SpeakEnglishVisibility = "hidden";
+                                                    if(!String.IsNullOrEmpty(BedRequest.PrimaryLanguage)){
+                                                           if (BedRequest.PrimaryLanguage.Length > 0 && BedRequest.PrimaryLanguage != "English"){
+                                                                SpeakEnglishVisibility = "visible";
+                                                            }                                                        
+                                                    }
+                                                }
+
+                                                <div class="row">
+                                                    <div class="col-md-3" style="text-align: right; vertical-align:middle; white-space: nowrap">
+                                                        <label class="formlabel required">@_lc.Keys["PrimaryLanguageCaption"]</label>
+                                                    </div>
+                                                    <div class="col-md-3" style="text-align: left">
+                                                        <SfDropDownList TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value=@BedRequest.PrimaryLanguage Enabled="true" Placeholder="@_lc.Keys["PrimaryLanguagePlaceholder"]">
+                                                            <DropDownListEvents TValue="string" TItem="string" ValueChange="OnLanguageChange"></DropDownListEvents>
+                                                        </SfDropDownList>                                                  
+                                                    </div>
+                                                    <div class="col-md-3" style="text-align: right; vertical-align:middle; white-space: nowrap; visibility: @SpeakEnglishVisibility">
+                                                        <label class="formlabel required">@_lc.Keys["SpeakEnglishCaption"]</label>
+                                                    </div>
+                                                    <div class="col-md-3" style="text-align: left; visibility: @SpeakEnglishVisibility">
+                                                        <SfDropDownList TItem="string" TValue="string" DataSource=@lstSpeakEnglish @bind-Value=@BedRequest.SpeakEnglish Enabled="true" Placeholder="@_lc.Keys["SpeakEnglishPlaceholder"]">
+                                                        </SfDropDownList>                                                  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3"></div>
+                                    </div>
+
+                                    <div class="row" >                                       
                                      <div class="col-md-12">
                                             <div class="form-group">
                                             <label for="note" class="formlabel required">@_lc.Keys["Notes"]</label>
-                                               <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="@_lc.Keys["Notes"]" Multiline="true" FloatLabelType="FloatLabelType.Never" />
+                                               <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="@_lc.Keys["Notes"]" Multiline="true"  FloatLabelType="FloatLabelType.Never" />
                                             </div>
                                      </div>
                                     </div>
@@ -235,6 +271,8 @@ else
                             <GridColumn Field=@nameof(BedRequest.DeliveryDate) Format="d" ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.TeamNumber) ShowColumnMenu="false" HeaderText="Team #" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) ShowColumnMenu="false" HeaderText="Primary Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
                    </div>
@@ -311,6 +349,6 @@ else
     }
 
     .custom-textbox-height {
-        height: 100px;
+        height: 80px;
     }
 </style>

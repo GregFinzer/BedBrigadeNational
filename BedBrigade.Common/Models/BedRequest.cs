@@ -73,6 +73,15 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
     [MaxLength(4000, ErrorMessage = "Notes has a maximum length of 4000")] 
     public String? Notes { get; set; } = string.Empty;
 
+    [MaxLength(50)]
+    [Column(TypeName = "nvarchar(50)")]
+    [Required(ErrorMessage = "Please select your Primary Language")]
+    public string PrimaryLanguage { get; set; } = string.Empty;
+
+    [MaxLength(10)]
+    [Column(TypeName = "nvarchar(10)")]
+    public string SpeakEnglish { get; set; } = string.Empty;
+
     [NotMapped]
     public string FullName
     {

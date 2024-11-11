@@ -9,10 +9,10 @@ BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
 BedBrigadeUsers: Bed Brigade Users
 BedBrigadeWeb: Bed Brigade Web
+BedRequest: Bed Request
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
-BedsRequested: Beds Requested
 BuildAddress: Build Address
 BuildCity: Build City
 BuildPostalCode: Build Postal Code
@@ -111,6 +111,7 @@ IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Locati
 InvalidCity: 'The city that you have entered does not match the zip code. Valid city names are: {cityNames}'
 InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code
 IsInYourZipCode: is in your Zip Code
+LanguagePreference: Language Preference
 LastName: Last Name
 Latitude: Latitude
 Loading: Loading....
@@ -179,6 +180,8 @@ PleaseEnterYourLogin: Please enter your login details
 PleaseSelectAnEvent: Please select an event
 PostalCode: Postal Code
 PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
+PrimaryLanguageCaption: Primary Language
+PrimaryLanguagePlaceholder: Choose language
 RegistrationidColon: 'RegistrationID:'
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
@@ -206,8 +209,10 @@ RequiredPageTitle: Page Title is required
 RequiredPassword: Password is required
 RequiredPhone: Phone Number is required
 RequiredPostalCode: Postal Code (Zip Code) is required
+RequiredPrimaryLanguage: Please select your Primary Language
 RequiredQueueDate: Queue Date is required
 RequiredSection: Section is required
+RequiredSpeakEnglish: Please select your English ability level
 RequiredStatus: Status is required
 RequiredStreet: Street Address is required
 RequiredSubject: Subject is required.
@@ -239,6 +244,8 @@ SkipToBuilds: Skip to Builds
 Sorry: Sorry
 SorryThePage: Sorry - the page associated with this link was not found.
 SorryYouAreNot: Sorry, you are not authorized to view this page.
+SpeakEnglishCaption: Do you speak English?
+SpeakEnglishPlaceholder: English ability...
 SpecialInstructions: Special Instructions
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}

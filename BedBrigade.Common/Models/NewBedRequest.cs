@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Common.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Common.Models
 {
@@ -51,6 +52,13 @@ namespace BedBrigade.Common.Models
         public String? SpecialInstructions { get; set; } = string.Empty;
 
         [Required] public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
+
+        [Required(ErrorMessage = "Please select your Primary Language")]       
+        public string PrimaryLanguage { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select your English ability level")]             
+        public string SpeakEnglish { get; set; } = string.Empty;
+        
 
     }
 }

@@ -16,6 +16,9 @@ using BedBrigade.Common.Models;
 using Microsoft.JSInterop;
 using System.IO;
 using ContentType = BedBrigade.Common.Enums.ContentType;
+using System.Data.Entity;
+using Syncfusion.Blazor.DropDowns;
+using System.Diagnostics;
 
 namespace BedBrigade.Client.Components
 {
@@ -30,6 +33,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IHeaderMessageService _headerMessageService { get; set; }
         [Inject] private IDeliverySheetService _svcDeliverySheet { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
 
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
@@ -49,6 +53,9 @@ namespace BedBrigade.Client.Components
         protected SfGrid<BedRequest>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
+        protected List<string>? lstPrimaryLanguage;
+        protected List<string>? lstSpeakEnglish;
+
         protected BedRequest BedRequest { get; set; } = new BedRequest();
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
@@ -66,15 +73,16 @@ namespace BedBrigade.Client.Components
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public bool IsLocationColumnVisible { get; set; } = false;
+        public string SpeakEnglishVisibility = "hidden";
 
         public string ManageBedRequestsMessage { get; set; } = "Manage Bed Requests";
 
         public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "200px" };
-                protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
+        protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
-            { "rows", "4" },
+            { "rows", "3" },
         };
 
         private bool IsDialogVisible { get; set; } = false;
@@ -94,8 +102,10 @@ namespace BedBrigade.Client.Components
             Log.Information($"{userName} went to the Manage Bed Requests Page");
 
             SetupToolbar();
+            await LoadConfiguration();
             await LoadLocations();
             await LoadBedRequests();
+            
 
             BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
         }
@@ -172,6 +182,20 @@ namespace BedBrigade.Client.Components
                 }
             }
         }
+
+        private async Task LoadConfiguration()
+        {
+            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System); // Configuration ============================
+            if (dataConfiguration.Success && dataConfiguration != null)
+            {
+                var dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
+                string delimitedString = dctConfiguration[ConfigNames.PrimaryLanguage].ToString();
+                lstPrimaryLanguage = new List<string>(delimitedString.Split(';'));
+                delimitedString = dctConfiguration[ConfigNames.SpeakEnglish].ToString();
+                lstSpeakEnglish = new List<string>(delimitedString.Split(';'));
+                
+            }
+        } // Configuration
 
         private void SetupToolbar()
         {
@@ -315,8 +339,8 @@ namespace BedBrigade.Client.Components
 
         private void Add()
         {
-            HeaderTitle = "Add Bed Request";
-            ButtonTitle = "Add Bed Request";
+            HeaderTitle = @_lc.Keys["Add"]+" "+ @_lc.Keys["BedRequest"];
+            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"]; 
             BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
         }
 
@@ -325,6 +349,19 @@ namespace BedBrigade.Client.Components
         {
             BedRequest BedRequest = args.Data;
             BedRequest.Phone = BedRequest.Phone.FormatPhoneNumber();
+            // Set Speak English  to avoid NULL error
+            if (BedRequest.PrimaryLanguage == "English")
+            {
+                BedRequest.SpeakEnglish = "Yes";
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(BedRequest.SpeakEnglish))
+                {
+                    BedRequest.SpeakEnglish = "No";
+                }
+            }
+
             if (BedRequest.BedRequestId != 0)
             {
                 //Update BedRequest Record
@@ -364,8 +401,8 @@ namespace BedBrigade.Client.Components
 
         private void BeginEdit()
         {
-            HeaderTitle = "Update Bed Request";
-            ButtonTitle = "Update";
+            HeaderTitle = @_lc.Keys["Update"] + " " + @_lc.Keys["BedRequest"];
+            ButtonTitle = @_lc.Keys["Update"];
         }
 
         protected async Task Save(BedRequest BedRequest)
@@ -535,6 +572,19 @@ namespace BedBrigade.Client.Components
         {
             IsDialogVisible = false;
         }
+
+        public void OnLanguageChange(ChangeEventArgs<string, string> args)
+        {
+            SpeakEnglishVisibility = "hidden";
+            if (args.Value != null)
+            {
+                if (args.Value.ToString() != "English")
+                {
+                    SpeakEnglishVisibility = "visible";
+                }
+            }
+        }
+
     }
 }
 
