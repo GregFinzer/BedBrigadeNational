@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private ILocationDataService _svcLocation { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -50,6 +51,7 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
+        protected List<Location> Locations { get; set; } = new List<Location>();
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -77,6 +79,12 @@ namespace BedBrigade.Client.Components
             if (result.Success)
             {
                 ConfigRecs = result.Data.ToList();
+            }
+
+            var locationResult = await _svcLocation.GetAllAsync();
+            if (locationResult.Success)
+            {
+                Locations = locationResult.Data.ToList();
             }
 
             ConfigSectionEnumItems = EnumHelper.GetConfigSectionItems();
