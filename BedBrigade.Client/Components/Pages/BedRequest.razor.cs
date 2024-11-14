@@ -180,6 +180,16 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            if (newRequest.PrimaryLanguage != "English")
+            {
+                if (string.IsNullOrEmpty(newRequest.SpeakEnglish))
+                {
+                    _validationMessageStore.Add(new FieldIdentifier(newRequest, nameof(newRequest.SpeakEnglish)), _lc.Keys["RequiredSpeakEnglish"]);
+                    await ShowValidationMessage(_lc.Keys["BedRequestFormNotCompleted"]);
+                    return false;
+                }
+            }
+
             bool isPhoneValid = Validation.IsValidPhoneNumber(newRequest.Phone);
 
             if (!isPhoneValid)

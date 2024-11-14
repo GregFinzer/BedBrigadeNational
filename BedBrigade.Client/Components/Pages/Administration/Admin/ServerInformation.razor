@@ -1,4 +1,5 @@
-﻿@page "/administration/admin/serverinfo"
+﻿@layout Layout.AdminLayout
+@page "/administration/admin/serverinfo"
 
 @using System;
 @using System.Diagnostics;
@@ -56,6 +57,10 @@
     </tbody>
 </table>
 
+<h3 class="mb-4">Clear Cache</h3>
+<p>Click the button below to clear the cache.</p>
+<button class="btn btn-primary" @onclick="ClearCache">Clear Cache</button>
+
 @code {
     private string ProcessorArchitecture { get; set; }
     private string ProcessorName { get; set; }
@@ -65,6 +70,8 @@
     private double FreeMemory { get; set; }
     private float CpuUtilization { get; set; }
     private string Timezone { get; set; }
+    [Inject] private ICachingService _cachingService { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
 
     protected override void OnInitialized()
     {
@@ -152,4 +159,12 @@
         }
 
     }
+
+    private Task ClearCache()
+    {
+        _cachingService.ClearAll();
+        _toastService.Success("Cache Cleared", "The cache has been cleared.");
+        return Task.CompletedTask;
+    }
+
 }

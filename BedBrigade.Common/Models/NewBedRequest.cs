@@ -56,7 +56,7 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "Please select your Primary Language")]       
         public string PrimaryLanguage { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Please select your English ability level")]             
+                  
         public string SpeakEnglish { get; set; } = string.Empty;
         
 
