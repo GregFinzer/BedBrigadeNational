@@ -32,8 +32,12 @@ namespace BedBrigade.Data.Seeding
 
         public static void SetMaintFields<T>(T entity) where T : BaseEntity
         {
-            entity.CreateUser = SeedConstants.SeedUserName;
-            entity.CreateDate = DateTime.UtcNow;
+            if (string.IsNullOrEmpty(entity.CreateUser))
+            {
+                entity.CreateUser = SeedConstants.SeedUserName;
+                entity.CreateDate = DateTime.UtcNow;
+            }
+
             entity.UpdateUser = SeedConstants.SeedUserName;
             entity.UpdateDate = DateTime.UtcNow;
             entity.MachineName = Environment.MachineName;

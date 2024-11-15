@@ -48,20 +48,25 @@ public static class Seed
             BuildCity = "Grove City",
             BuildState= "OH",
             BuildPostalCode= "43123",
-            IsActive = true
+            IsActive = true,
+            Latitude = 39.879740M,
+            Longitude = -83.042570M
+
         },
         new Location
         {
             Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", 
-            MailingAddress = "1250 Gemini Pl", 
+            MailingAddress = "171 E. Fifth Ave", 
             MailingCity = "Columbus",
             MailingState = "OH", 
-            MailingPostalCode = "43240",
-            BuildAddress = "1250 Gemini Pl",
+            MailingPostalCode = "43201",
+            BuildAddress = "171 E. Fifth Ave",
             BuildCity = "Columbus",
             BuildState = "OH",
-            BuildPostalCode = "43240",
-            IsActive = true
+            BuildPostalCode = "43201",
+            IsActive = true,
+            Latitude = 39.986740M,
+            Longitude = -83.000680M
         }
 
     };
@@ -113,6 +118,7 @@ public static class Seed
     {
         await SeedConfigurations(contextFactory);
         await SeedLocations(contextFactory);
+        await UpdateLocations(contextFactory);
         await SeedMetroAreas(contextFactory);
         await SeedContentsLogic.SeedContents(contextFactory);
         await SeedMedia(contextFactory);
@@ -128,6 +134,47 @@ public static class Seed
         await SeedSpokenLanguages(contextFactory);
     }
 
+    private static async Task UpdateLocations(IDbContextFactory<DataContext> contextFactory)
+    {
+        Log.Logger.Information("UpdateLocations Started");
+
+        using (var context = contextFactory.CreateDbContext())
+        {
+            var existingLocations =
+                await context.Locations.Where(o => o.LocationId > Defaults.NationalLocationId && o.Longitude == null).ToListAsync();
+
+            if (!existingLocations.Any())
+                return;
+
+            try
+            {
+                foreach (var existingLocation in existingLocations)
+                {
+                    var newData = _locations.First(o => o.Name == existingLocation.Name);
+                    existingLocation.Latitude = newData.Latitude;
+                    existingLocation.Longitude = newData.Longitude;
+                    existingLocation.MailingAddress = newData.MailingAddress;
+                    existingLocation.MailingCity = newData.MailingCity;
+                    existingLocation.MailingState = newData.MailingState;
+                    existingLocation.MailingPostalCode = newData.MailingPostalCode;
+
+                    existingLocation.BuildAddress = newData.BuildAddress;
+                    existingLocation.BuildCity = newData.BuildCity;
+                    existingLocation.BuildState = newData.BuildState;
+                    existingLocation.BuildPostalCode = newData.BuildPostalCode;
+
+                    SeedRoutines.SetMaintFields(existingLocation);
+                    context.Locations.Update(existingLocation);
+                }
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Information($"Location seed error: {ex.Message}");
+                throw;
+            }
+        }
+    }
     private static async Task SeedSpokenLanguages(IDbContextFactory<DataContext> contextFactory)
     {
         Log.Logger.Information("SeedSpokenLanguages Started");
