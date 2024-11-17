@@ -18,6 +18,6 @@
         public const int EmailLowPriority = 1;
         public const int EmailMediumPriority = 2;
         public const int EmailHighPriority = 3;
-
+        public const string CountryCode = "US";
     }
 }

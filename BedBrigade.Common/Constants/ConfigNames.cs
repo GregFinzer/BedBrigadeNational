@@ -42,5 +42,12 @@
         public const string PrimaryLanguage = "PrimaryLanguage";
         public const string SpeakEnglish = "SpeakEnglish";
 
+        //GeoLocation
+        public const string GeoLocationUrl = "GeoLocationUrl";
+        public const string GeoLocationApiKey = "GeoLocationApiKey";
+        public const string GeoLocationMaxRequestsPerDay = "GeoLocationMaxRequestsPerDay";
+        public const string GeoLocationMaxRequestsPerSecond = "GeoLocationMaxRequestsPerSecond";
+        public const string GeoLocationLockWaitMinutes = "GeoLocationLockWaitMinutes";
+        public const string GeoLocationKeepDays = "GeoLocationKeepDays";
     }
 }

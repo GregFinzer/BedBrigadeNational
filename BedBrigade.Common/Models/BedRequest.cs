@@ -82,6 +82,14 @@ public class BedRequest : BaseEntity, ILocationId, IEmail
     [Column(TypeName = "nvarchar(10)")]
     public string SpeakEnglish { get; set; } = string.Empty;
 
+    [Column(TypeName = "decimal(18,10)")]
+    [Range(-90, 90)]
+    public Decimal? Latitude { get; set; }
+
+    [Column(TypeName = "decimal(18,10)")]
+    [Range(-180, 180)]
+    public Decimal? Longitude { get; set; }
+
     [NotMapped]
     public string FullName
     {

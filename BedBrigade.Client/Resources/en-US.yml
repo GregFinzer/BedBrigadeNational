@@ -131,6 +131,7 @@ ManageSchedule: Manage Schedule
 ManageSignups: Manage Sign-Ups
 MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
 MaxLengthCity50: City has a maximum length of 50 characters
+MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
@@ -143,6 +144,7 @@ MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
 MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet40: Street Address has a maximum length of 40 characters
+MaxLengthTableName50: Table Name has a maximum length of 50 characters
 MediaFileManager: Media File Manager
 Message: Message
 MilesAway: miles away

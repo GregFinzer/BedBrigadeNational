@@ -43,10 +43,12 @@ public class Location : BaseEntity
     [MaxLength(10)]
     public String BuildPostalCode { get; set; } = string.Empty;
 
-    [Column(TypeName = "decimal(18,10)")] 
+    [Column(TypeName = "decimal(18,10)")]
+    [Range(-90, 90)]
     public Decimal? Latitude { get; set; }
 
-    [Column(TypeName = "decimal(18,10)")] 
+    [Column(TypeName = "decimal(18,10)")]
+    [Range(-180, 180)]
     public Decimal? Longitude { get; set; }
 
     public int? MetroAreaId { get; set; }

@@ -117,6 +117,7 @@ namespace BedBrigade.Client
         {
             builder.Services.AddHostedService<TranslationBackgroundService>();
             builder.Services.AddHostedService<EmailQueueBackgroundService>();
+            builder.Services.AddHostedService<GeoLocationBackgroundService>();
         }
 
         private static void SetupAuth(WebApplicationBuilder builder)
@@ -171,6 +172,8 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IContentTranslationQueueDataService, ContentTranslationQueueDataService>();
             builder.Services.AddScoped<IEmailBuilderService, EmailBuilderService>();
             builder.Services.AddScoped<ISpokenLanguageDataService, SpokenLanguageDataService>();
+            builder.Services.AddScoped<IGeoLocationQueueDataService, GeoLocationQueueDataService>();
+            builder.Services.AddScoped<IGeoLocationProcessorDataService, GeoLocationProcessorDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

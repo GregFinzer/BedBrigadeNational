@@ -1,6 +1,6 @@
 5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
 Active: Activo
-Add: Añadir
+Add: Agregar
 Address: Dirección
 AgesGender: Edades / Género
 Amount: Importe
@@ -19,8 +19,8 @@ BuildPostalCode: Construir código postal
 BuildState: Estado de compilación
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
-ChooseADate: Elija una fecha
-ChooseATime: Elija una hora
+ChooseADate: Escoge una fecha
+ChooseATime: Escoge una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
@@ -111,7 +111,7 @@ IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicaci
 InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
 InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
-LanguagePreference: Preferencia lingüística
+LanguagePreference: Preferencia de idioma
 LastName: Apellido
 Latitude: Latitud
 Loading: Carga....
@@ -131,6 +131,7 @@ ManageSchedule: Administrar el horario
 ManageSignups: Gestionar las inscripciones
 MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
+MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
 MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
 MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
 MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
@@ -143,6 +144,7 @@ MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracter
 MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
+MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
 MediaFileManager: Administrador de archivos multimedia
 Message: Mensaje
 MilesAway: Km
@@ -180,8 +182,8 @@ PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
 PleaseSelectAnEvent: Por favor, seleccione un evento
 PostalCode: Código postal
 PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
-PrimaryLanguageCaption: Lengua principal
-PrimaryLanguagePlaceholder: Elige idioma
+PrimaryLanguageCaption: Lengua materna
+PrimaryLanguagePlaceholder: Elegir idioma
 RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
@@ -209,10 +211,10 @@ RequiredPageTitle: El título de la página es obligatorio
 RequiredPassword: Se requiere contraseña
 RequiredPhone: Se requiere un número de teléfono
 RequiredPostalCode: Se requiere el código postal
-RequiredPrimaryLanguage: Seleccione su lengua principal
+RequiredPrimaryLanguage: Por favor, seleccione su idioma principal
 RequiredQueueDate: Se requiere la fecha de cola
 RequiredSection: La sección es obligatoria
-RequiredSpeakEnglish: Por favor, seleccione su nivel de inglés
+RequiredSpeakEnglish: Por favor, selecciona tu nivel de inglés
 RequiredStatus: El estado es obligatorio
 RequiredStreet: Se requiere la dirección postal
 RequiredSubject: El asunto es obligatorio.
@@ -244,8 +246,8 @@ SkipToBuilds: Ir a Compilaciones
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
 SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
-SpeakEnglishCaption: ¿Habla inglés?
-SpeakEnglishPlaceholder: Conocimientos de inglés
+SpeakEnglishCaption: ¿Hablas inglés?
+SpeakEnglishPlaceholder: Habilidad en inglés...
 SpecialInstructions: Instrucciones especiales
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
@@ -264,7 +266,7 @@ Unauthorized: Desautorizado
 UpcomingBuilds: Próximas compilaciones
 UpcomingDeliveries: Próximas entregas
 UpcomingEvents: Próximos eventos
-Update: Actualización
+Update: Actualizar
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos

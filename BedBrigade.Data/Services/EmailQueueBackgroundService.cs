@@ -226,7 +226,7 @@ namespace BedBrigade.Data.Services
             {
                 //If there are emails locked less than an hour ago, skip
                 if (firstLockedEmail.LockDate.HasValue
-                    && firstLockedEmail.LockDate.Value > DateTime.UtcNow.AddMinutes(_emailLockWaitMinutes))
+                    && firstLockedEmail.LockDate.Value > DateTime.UtcNow.AddMinutes(_emailLockWaitMinutes * -1))
                 {
                     _logger.LogDebug($"EmailQueueLogic:  Emails are currently locked, waiting for {_emailLockWaitMinutes} minutes");
                     return true;
