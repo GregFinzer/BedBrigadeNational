@@ -618,8 +618,43 @@ public static class Seed
             ConfigurationKey = ConfigNames.SpeakEnglish,
             ConfigurationValue = "Yes;No;A little",
             Section = ConfigSection.System
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationUrl,
+            ConfigurationValue = "https://us1.locationiq.com/v1/search/structured",
+            Section = ConfigSection.GeoLocation
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationApiKey,
+            ConfigurationValue = string.Empty,
+            Section = ConfigSection.GeoLocation
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationMaxRequestsPerDay,
+            ConfigurationValue = "5000",
+            Section = ConfigSection.GeoLocation
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationMaxRequestsPerSecond,
+            ConfigurationValue = "2",
+            Section = ConfigSection.GeoLocation
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationLockWaitMinutes,
+            ConfigurationValue = "10",
+            Section = ConfigSection.GeoLocation
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.GeoLocationKeepDays,
+            ConfigurationValue = "30",
+            Section = ConfigSection.GeoLocation
         }
-
     ];
 
 

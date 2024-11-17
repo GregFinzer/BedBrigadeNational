@@ -14,6 +14,7 @@ using Serilog;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 using Syncfusion.Blazor.DropDowns;
 
 
@@ -31,7 +32,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
-
+        [Inject] private IGeoLocationQueueDataService? _svcGeoLocation { get; set; }
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
         protected List<string>? lstPrimaryLanguage;
@@ -352,16 +353,46 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (bedRequest != null)
                 {
-                    var emailResult = await _svcEmailBuilder.SendBedRequestConfirmationEmail(bedRequest);
-
-                    if (!emailResult.Success)
-                    {
-                        AlertType = AlertDanger;
-                        ResultMessage = emailResult.Message;
-                        ResultDisplay = "";
-                        await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
-                    }
+                    await SendConfirmationEmail(bedRequest);
+                    await QueueForGeoLocation(bedRequest);
                 }
+            }
+        }
+
+        private async Task QueueForGeoLocation(Common.Models.BedRequest bedRequest)
+        {
+            GeoLocationQueue item = new GeoLocationQueue();
+            item.Street = bedRequest.Street;
+            item.City = bedRequest.City;
+            item.State = bedRequest.State;
+            item.PostalCode = bedRequest.PostalCode;
+            item.CountryCode = Defaults.CountryCode;
+            item.TableName = TableNames.BedRequests.ToString();
+            item.TableId = bedRequest.BedRequestId;
+            item.QueueDate = DateTime.UtcNow;
+            item.Priority = 1;
+            item.Status = GeoLocationStatus.Queued.ToString();
+            var result = await _svcGeoLocation.CreateAsync(item);
+
+            if (!result.Success)
+            {
+                AlertType = AlertDanger;
+                ResultMessage = result.Message;
+                ResultDisplay = "";
+                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
+            }
+        }
+
+        private async Task SendConfirmationEmail(Common.Models.BedRequest bedRequest)
+        {
+            var emailResult = await _svcEmailBuilder.SendBedRequestConfirmationEmail(bedRequest);
+
+            if (!emailResult.Success)
+            {
+                AlertType = AlertDanger;
+                ResultMessage = emailResult.Message;
+                ResultDisplay = "";
+                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
             }
         }
 
