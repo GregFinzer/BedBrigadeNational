@@ -167,17 +167,17 @@ namespace BedBrigade.Data.Services
                     }
                     else
                     {
-                        throw new Exception("JSON does not contain required 'lat' or 'lon' properties.");
+                        throw new System.Text.Json.JsonException("JSON does not contain required 'lat' or 'lon' properties.");
                     }
                 }
                 else
                 {
-                    throw new Exception("JSON does not contain a valid array.");
+                    throw new System.Text.Json.JsonException("JSON does not contain a valid array.");
                 }
             }
             catch (JsonException ex)
             {
-                throw new Exception("Error parsing JSON.", ex);
+                throw new System.Text.Json.JsonException("Error parsing JSON.", ex);
             }
         }
 

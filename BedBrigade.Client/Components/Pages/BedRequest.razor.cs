@@ -379,7 +379,7 @@ namespace BedBrigade.Client.Components.Pages
                 AlertType = AlertDanger;
                 ResultMessage = result.Message;
                 ResultDisplay = "";
-                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
+                await ScrollToResultMessage();
             }
         }
 
@@ -392,8 +392,13 @@ namespace BedBrigade.Client.Components.Pages
                 AlertType = AlertDanger;
                 ResultMessage = emailResult.Message;
                 ResultDisplay = "";
-                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
+                await ScrollToResultMessage();
             }
+        }
+
+        private async Task ScrollToResultMessage()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
         }
 
         private async Task<Common.Models.BedRequest?> UpdateDatabase()
@@ -437,7 +442,7 @@ namespace BedBrigade.Client.Components.Pages
             }
             finally
             {
-                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 100);
+                await ScrollToResultMessage();
             }
 
             return null;
