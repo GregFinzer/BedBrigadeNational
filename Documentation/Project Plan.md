@@ -152,7 +152,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Update NuGet Packages and Change NUnit Assertions :heavy_check_mark:
     * Cache get files :heavy_check_mark:
     * Remove Unused Components and Pages
-    * Add three image rotators to Bed Brigade Near Me
+    * Add three image rotators to Bed Brigade Near Me :heavy_check_mark:
     * FM Dependent Functionality
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
@@ -201,6 +201,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Menu not wide enough when translated to Spanish :heavy_check_mark:
     * Going to Events loads National Header and Footer :heavy_check_mark:
     * Data Attribute Validation :heavy_check_mark:
+    * Admin Clear Cache :heavy_check_mark:
+    * Manage Configuration Location  :heavy_check_mark:
     
 * New Stories
     * Send confirmation email for Bed Request :heavy_check_mark:
@@ -209,7 +211,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Upcoming Events :heavy_check_mark:
     * Add new Schedule Fields :heavy_check_mark:
     * New Manage Volunteer Fields :heavy_check_mark:
-    * Volunteer Sign Up New Fields
+    * Volunteer Sign Up New Fields :heavy_check_mark:
     * New Manage Bed Request Fields
     * New Bed Request Form Fields
     * Bust Browser Cache for New Version :heavy_check_mark:
@@ -224,8 +226,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Apply String Localization :heavy_check_mark:
 
 * Address
-    * Location Latitude & Longitude
-    * Autocomplete Address
+    * Location Latitude & Longitude :heavy_check_mark:
+    * Geolocation of Address :heavy_check_mark:
     * Geolocation Routing
     
 * Donations    
@@ -246,7 +248,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Ability to Send Newsletters
     
 * SMS
-    * Add LocationId to Configuration with a default of National
+    * Add LocationId to Configuration with a default of National :heavy_check_mark:
     * Create Code for SMS Queue
     * Create UI to send and receive SMS Messages and Reply
  
