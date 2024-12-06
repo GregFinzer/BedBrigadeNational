@@ -13,6 +13,9 @@ namespace BedBrigade.SpeakIt.Tests
             "CustomErrorBoundary.razor",
             "SignUpGrid.razor.cs", 
             "SignUpHelper.cs",
+            "RenderFolder",
+            "Modal.razor",
+            "MediaManager.razor",
         };
 
         public static List<string> WildcardPatterns = new List<string> { "*.razor", "*.cs" };

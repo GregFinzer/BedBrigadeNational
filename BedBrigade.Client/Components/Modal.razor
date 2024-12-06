@@ -1,0 +1,182 @@
+﻿@using Microsoft.JSInterop
+<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay; overflow-y: auto;">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center" style="padding-left:31px">@Title</h5>
+                <button type="button" class="close border-0 bg-white" data-dismiss="modal" aria-label="Close" @onclick="() => Close(true)">
+                    <span aria-hidden="true" style="font-size: 2rem;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    @if (MIcon != ModalIcon.None)
+                    {
+                        <div class="col-1"></div>
+                        <div class="col-2">
+                            @switch (MIcon)
+                            {
+                                case ModalIcon.Success:
+                                    <i class="fas fa-thumbs-up fa-4x text-success modal-icon-style me-2"></i>
+                                    break;
+                                case ModalIcon.Info:
+                                    <i class="fas fa-info-circle fa-4x text-info modal-icon-style me-2"></i>
+                                    break;
+                                case ModalIcon.Question:
+                                    <i class="fas fa-question-circle fa-4x text-primary modal-icon-style me-2"></i>
+                                    break;
+                                case ModalIcon.Warning:
+                                    <i class="fas fa-exclamation-triangle fa-4x text-warning modal-icon-style me-2"></i>
+                                    break;
+                                case ModalIcon.Error:
+                                    <i class="fas fa-exclamation-circle fa-4x text-danger modal-icon-style me-2"></i>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </div>
+                    }
+                    <div class="@(MIcon == ModalIcon.None ? "" : "col-9")">
+                        @((MarkupString)Body)
+
+                        @if (MType == ModalType.Prompt)
+                        {
+                            <input type="text" class="form-control text-center my-2" @bind-value="PromptValue" style="max-width:400px"></input>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                @if (MType == ModalType.Prompt || MType == ModalType.Confirm)
+                {
+                    <button type="button" class="btn btn-primary me-2" data-dismiss="modal" @onclick="() => Close(false)">OK</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close(true)">Cancel</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="() => Close(false)">Close</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+<style>
+    .modal-icon-style {
+        border-radius: 4px; 
+        box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px;
+        padding: 5px; 
+    }
+
+</style>
+@code {
+
+    [Inject] IJSRuntime JS { get; set; }
+
+    public enum ModalType
+    {
+        Alert,
+        Prompt,
+        Confirm
+    }
+
+    public enum ModalIcon
+    {
+        None,
+        Info,
+        Question,
+        Warning,
+        Error,
+        Success
+    }
+
+    /// <summary>
+    /// (Optional) We can setup an instance of this .net object to call directly from JavaScript. See JavaScript Usage section.
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        JS.InvokeVoidAsync("MODAL.SetDotnetReference", DotNetObjectReference.Create(this));
+    }
+
+    private string Title { get; set; }
+    private string Body { get; set; }
+
+
+    public Guid Guid = Guid.NewGuid();
+    public string ModalDisplay = "none;";
+    public string ModalClass = "";
+    public bool ShowBackdrop = false;
+
+
+    private string PromptValue { get; set; }
+    private bool ConfirmValue { get; set; }
+    private ModalType MType { get; set; }
+    private ModalIcon MIcon { get; set; }
+
+
+    private List<string> MsgIds = new List<string>();
+    [JSInvokable("Show")]
+    public async Task<dynamic> Show(ModalType mType, ModalIcon icon, string title, string body, string promptValue = "")
+    {
+        // The JavaScript call MODAL.DotNetReference.invokeMethodAsync is non-blocking
+        // This means multiple calls to show the modal using invokeMethodAsync will only show the modal once.
+        // We can solve this by making sure each message waits in line.
+
+        string msgId = Guid.NewGuid().ToString();
+
+        if (!MsgIds.Contains(msgId))
+            MsgIds.Add(msgId);
+
+        // If multiple messages are being processed, wait for this msgs turn.
+        while (MsgIds.Count > 1 && MsgIds.IndexOf(msgId) != 0)
+            await Task.Delay(250);
+
+        Title = title;
+        Body = body;
+        ModalDisplay = "block;";
+        ModalClass = "Show";
+        MType = mType;
+        MIcon = icon;
+        PromptValue = promptValue;
+        ShowBackdrop = true;
+        StateHasChanged();
+
+        while (ShowBackdrop)
+            await Task.Delay(250);
+
+        switch (mType)
+        {
+            default:
+            case ModalType.Alert:
+                MsgIds.Remove(msgId);
+                return string.Empty;
+            case ModalType.Confirm:
+                bool confirmResponse = ConfirmValue;
+                MsgIds.Remove(msgId);
+                return confirmResponse;
+            case ModalType.Prompt:
+                string promptResponse = PromptValue;
+                MsgIds.Remove(msgId);
+                return promptResponse;
+        }
+
+    }
+
+    private void Close(bool isCancel)
+    {
+        // Determine returned values.
+        PromptValue = isCancel ? string.Empty : PromptValue;
+        ConfirmValue = isCancel ? false : true;
+
+        ModalDisplay = "none";
+        ModalClass = "";
+        ShowBackdrop = false;
+        StateHasChanged();
+    }
+}
