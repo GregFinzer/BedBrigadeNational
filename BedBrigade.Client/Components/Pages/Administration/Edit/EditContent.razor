@@ -56,7 +56,11 @@ else
             <Header>Upload Files</Header>
             <Content>
 
-                <FileManager ShowHeader="false" FolderPath="@FolderPath"/>
+                <MediaManager AllowedExtensions="@_allowedExtensions" 
+                              EnableFolderOperations="@_enableFolderOperations" 
+                              MaxFileSize="@_maxFileSize" 
+                              RootFolder="@FolderPath"
+                              MediaFolderName="@_mediaFolder"/>
 
             </Content>
         </DialogTemplates>

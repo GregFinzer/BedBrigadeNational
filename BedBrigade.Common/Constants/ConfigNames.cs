@@ -20,6 +20,7 @@
         public const string MainMediaSubFolder = "MainMediaSubFolder";
         public const string MaxFileSize = "MaxFileSize";
         public const string MaxVideoSize = "MaxVideoSize";
+        public const string EnableFolderOperations = "EnableFolderOperations";
 
         //Email Section
         public const string FromEmailAddress = "FromEmailAddress";

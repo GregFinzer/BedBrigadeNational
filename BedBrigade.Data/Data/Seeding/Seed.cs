@@ -364,7 +364,7 @@ public static class Seed
         new() // added by VS 2/19/2023
         {
             ConfigurationKey = ConfigNames.AllowedFileExtensions,
-            ConfigurationValue = ".jpg, .png, .pdf, .webp",
+            ConfigurationValue = ".jpg, .png, .pdf, .webp, .jpeg, .gif, .svg, .ico",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
@@ -372,7 +372,7 @@ public static class Seed
         new() // added by VS 2/19/2023
         {
             ConfigurationKey = ConfigNames.AllowedVideoExtensions,
-            ConfigurationValue = ".mp4",
+            ConfigurationValue = ".mp4, .webm, .avi, .av1, .mov",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
@@ -380,7 +380,7 @@ public static class Seed
         new() // added by VS 2/19/2023
         {
             ConfigurationKey = ConfigNames.MediaFolder,
-            ConfigurationValue = "media",
+            ConfigurationValue = "Media",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
@@ -396,6 +396,7 @@ public static class Seed
         new() // added by VS 2/19/2023
         {
             ConfigurationKey = ConfigNames.MaxFileSize,
+            //100 MB
             ConfigurationValue = "104857600",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
@@ -404,11 +405,18 @@ public static class Seed
         new() // added by VS 2/19/2023
         {
             ConfigurationKey = ConfigNames.MaxVideoSize,
+            //250 MB
             ConfigurationValue = "262144000",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
-
+        new() 
+        {
+            ConfigurationKey = ConfigNames.EnableFolderOperations,
+            ConfigurationValue = "false",
+            Section = ConfigSection.Media,
+            LocationId = Defaults.NationalLocationId
+        },
         new()
         {
             ConfigurationKey = ConfigNames.IsCachingEnabled,

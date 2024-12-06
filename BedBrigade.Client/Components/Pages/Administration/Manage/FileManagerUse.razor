@@ -3,5 +3,9 @@
 
 <CheckAuth Roles=@RoleNames.CanManageMedia></CheckAuth>
 
-<FileManager />
+<MediaManager AllowedExtensions="@_allowedExtensions" 
+              EnableFolderOperations="@_enableFolderOperations" 
+              MaxFileSize="@_maxFileSize" 
+              RootFolder="@_folderPath"
+              MediaFolderName="@_mediaFolder"/>
 

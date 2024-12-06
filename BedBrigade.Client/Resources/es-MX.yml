@@ -100,7 +100,6 @@ EventType: Tipo de evento
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FindABedBrigade: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
-FolderColon: 'Carpeta:'
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
@@ -145,7 +144,6 @@ MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longit
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
-MediaFileManager: Administrador de archivos multimedia
 Message: Mensaje
 MilesAway: Km
 Name: Nombre

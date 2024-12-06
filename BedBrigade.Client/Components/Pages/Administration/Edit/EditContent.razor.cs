@@ -16,6 +16,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
     public partial class EditContent : ComponentBase
     {
+        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _navigationManager { get; set; }
@@ -47,6 +48,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             ".gif"
         };
         private string contentRootPath = string.Empty;
+        private int _maxFileSize;
+
+        private string _mediaFolder;
+        private List<string> _allowedExtensions = new List<string>();
+        private bool _enableFolderOperations = false;
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -97,6 +103,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     $"Could not parse location as integer: {LocationId}");
                 return;
             }
+
+            _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
+            _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
+
+            string allowedFileExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedFileExtensions");
+            string allowedVideoExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedVideoExtensions");
+            _allowedExtensions.AddRange(allowedFileExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+            _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+            _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
 
             await SetLocationName(locationId);
             contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
@@ -194,8 +209,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            //FolderPath = $"{LocationRoute}/pages/{ContentName}/{itemValue}"; // old
-            FolderPath = contentRootPath + $"/pages/{ContentName}/{itemValue}"; // VS 9/3/2024
+            FolderPath = contentRootPath + $"\\pages\\{ContentName}\\{itemValue}";
+            FolderPath = FolderPath.TrimEnd('\\');
             await OpenDialog();
         }
 
