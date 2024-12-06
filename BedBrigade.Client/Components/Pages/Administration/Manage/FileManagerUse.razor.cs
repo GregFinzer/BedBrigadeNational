@@ -15,6 +15,8 @@ public partial class FileManagerUse : ComponentBase
     [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IWebHostEnvironment? _env { get; set; }
 
+    [Inject] private NavigationManager _navigation { get; set; }
+
     private int _maxFileSize;
     
     private string _folderPath;
@@ -42,6 +44,14 @@ public partial class FileManagerUse : ComponentBase
         Identity = _svcAuth.CurrentUser;
         userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
         Log.Information($"{userName} went to the Manage Media Page");
+
+        if (!Identity.Claims.Any())
+        {
+            string returnUrl = _navigation.ToBaseRelativePath(_navigation.Uri);
+            _navigation.NavigateTo($"/login?returnUrl={returnUrl}", true);
+            return;
+        }
+
         userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
         userRoute = Identity.Claims.FirstOrDefault(c => c.Type == "UserRoute").Value;
         userRoute = userRoute.Replace(PathDivider, "");

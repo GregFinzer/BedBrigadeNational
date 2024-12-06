@@ -457,8 +457,8 @@ namespace BedBrigade.Client.Components
                     return;
                 }
 
-                File.Move(file.Path.Replace("/" + _mediaFolderPath, RootFolder).Replace("/", "\\"),
-                    newFilePath);
+                var oldFilePath = Path.Combine(CurrentFolderPath, file.Name);
+                File.Move(oldFilePath, newFilePath);
 
                 // Refresh files and update UI
                 RefreshFiles(CurrentFolderPath);
@@ -492,7 +492,7 @@ namespace BedBrigade.Client.Components
             {
                 foreach (var file in SelectedFiles)
                 {
-                    var filePath = file.Path.Replace("/" + _mediaFolderPath, RootFolder).Replace("/", "\\");
+                    var filePath = Path.Combine(CurrentFolderPath, file.Name);
                     if (File.Exists(filePath))
                     {
                         File.Delete(filePath);
