@@ -1,6 +1,4 @@
-﻿using System.Text;
-using BedBrigade.Common.Models;
-using Bogus.DataSets;
+﻿using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -22,6 +20,11 @@ namespace BedBrigade.Client.Components
         private List<FileItem> AllFiles = new();
         private string _mediaFolderPath = string.Empty;
         private const string ErrorTitle = "Error";
+        private List<FileItem> CutOrCopyFiles = new();
+        private string CutSourceFolder = string.Empty;
+        private string CopySourceFolder = string.Empty;
+        private bool ShowCopyPasteButton => CutOrCopyFiles.Any() && CopySourceFolder != CurrentFolderPath && CutSourceFolder != CurrentFolderPath;
+
 
         [Parameter]
         public string RootFolder { get; set; } = string.Empty;
@@ -34,19 +37,7 @@ namespace BedBrigade.Client.Components
         [Parameter]
         public List<string> AllowedExtensions { get; set; } = new List<string>()
         {
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".gif",
-            ".webp",
-            ".svg",
-            ".ico",
-            ".mp4",
-            ".webm",
-            ".avi",
-            ".av1",
-            ".mov",
-            ".pdf"
+            ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".mp4", ".webm", ".avi", ".av1", ".mov", ".pdf"
         };
 
         [Parameter] public bool EnableFolderOperations { get; set; } = true;
@@ -586,5 +577,77 @@ namespace BedBrigade.Client.Components
 
             StateHasChanged();
         }
+        private void CutSelectedFiles()
+        {
+            CutOrCopyFiles = new List<FileItem>(SelectedFiles);
+            CutSourceFolder = CurrentFolderPath;
+            SelectedFiles.Clear(); 
+            StateHasChanged();
+        }
+
+        private void CopySelectedFiles()
+        {
+            CutOrCopyFiles = new List<FileItem>(SelectedFiles);
+            CopySourceFolder = CurrentFolderPath;
+            SelectedFiles.Clear(); 
+            StateHasChanged();
+        }
+
+        private async Task PasteFiles()
+        {
+            var sourceFiles = CutOrCopyFiles;
+            var sourceFolder = String.IsNullOrEmpty(CopySourceFolder) ? CutSourceFolder : CopySourceFolder;
+
+            if (sourceFiles.Any() && !string.IsNullOrEmpty(sourceFolder))
+            {
+                foreach (var file in sourceFiles)
+                {
+                    var sourcePath = Path.Combine(sourceFolder, file.Name);
+                    var targetPath = Path.Combine(CurrentFolderPath, file.Name);
+
+                    if (!File.Exists(sourcePath))
+                    {
+                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                            $"Source file '{file.Name}' does not exist.");
+                        continue;
+                    }
+
+                    if (File.Exists(targetPath))
+                    {
+                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                            $"File '{file.Name}' already exists in the target folder.");
+                        continue;
+                    }
+
+                    try
+                    {
+                        if (String.IsNullOrEmpty(CopySourceFolder))
+                        {
+                            File.Move(sourcePath, targetPath);
+                        }
+                        else 
+                        {
+                            File.Copy(sourcePath, targetPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        string operation = String.IsNullOrEmpty(CopySourceFolder) ? "move" : "copy";
+                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
+                            $"Failed to {operation} file '{file.Name}': {ex.Message}");
+                    }
+                }
+
+                CutOrCopyFiles.Clear();
+                CutSourceFolder = string.Empty;
+                CopySourceFolder = string.Empty;
+                RefreshFiles(CurrentFolderPath);
+
+                StateHasChanged();
+            }
+        }
+
+
+
     }
 }

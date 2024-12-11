@@ -32,6 +32,24 @@
                                 </button>
                             </li>
                         }
+                        
+                        <button class="btn me-2 nav-link" @onclick="CopySelectedFiles" disabled="@(!SelectedFiles.Any())">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+
+                        <li class="nav-item">
+                            <button class="btn me-2 nav-link" @onclick="CutSelectedFiles" disabled="@(!SelectedFiles.Any())">
+                                <i class="fas fa-cut"></i> Cut
+                            </button>
+                        </li>
+                        @if (ShowCopyPasteButton)
+                        {
+                            <li class="nav-item">
+                                <button class="btn me-2 nav-link" @onclick="PasteFiles">
+                                    <i class="fas fa-paste"></i> Paste
+                                </button>
+                            </li>
+                        }
                         <li class="nav-item">
                             <button class="btn me-2 nav-link" @onclick="ShowRenameFileModal" disabled="@(SelectedFiles.Count != 1)">
                                 <i class="fas fa-edit"></i> Rename File
