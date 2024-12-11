@@ -20,6 +20,8 @@ namespace BedBrigade.Tests
             //This has duplicate strings but it is okay since roles have multiple similar permissions
             _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
 
+            //This file is large, but it does not make sense to split it up
+            _qualityLogic.Config.FilesToExclude.Add("MediaManager.razor.cs");
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
