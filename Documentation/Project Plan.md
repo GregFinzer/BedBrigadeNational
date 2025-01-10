@@ -153,7 +153,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Cache get files :heavy_check_mark:
     * Remove Unused Components and Pages
     * Add three image rotators to Bed Brigade Near Me :heavy_check_mark:
-    * FM Dependent Functionality
+    * Protected Directories
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
     * Refresh Header and Footer :heavy_check_mark:
