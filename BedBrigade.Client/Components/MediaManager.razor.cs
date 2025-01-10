@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -8,6 +9,7 @@ namespace BedBrigade.Client.Components
     public partial class MediaManager : ComponentBase
     {
         [Inject] private IJSRuntime JS { get; set; }
+        [Inject] private ILocationDataService LocationDataService { get; set; }
         private int _currentId = 1;
         
         private List<FolderItem> Folders = new List<FolderItem>();
@@ -24,7 +26,7 @@ namespace BedBrigade.Client.Components
         private string CutSourceFolder = string.Empty;
         private string CopySourceFolder = string.Empty;
         private bool ShowCopyPasteButton => CutOrCopyFiles.Any() && CopySourceFolder != CurrentFolderPath && CutSourceFolder != CurrentFolderPath;
-
+        private List<string> _protectedFolders = new List<string>();
 
         [Parameter]
         public string RootFolder { get; set; } = string.Empty;
@@ -58,17 +60,17 @@ namespace BedBrigade.Client.Components
             get { return _mediaFolderPath + @CurrentFolderPath.Replace(RootFolder, ""); }
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            CommonInit();
+            await CommonInit();
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
-            CommonInit();
+            await CommonInit();
         }
 
-        private void CommonInit()
+        private async Task CommonInit()
         {
             if (!String.IsNullOrEmpty(RootFolder))
             {
@@ -76,6 +78,13 @@ namespace BedBrigade.Client.Components
                 _mediaFolderPath = GetMediaFolderPath();
                 RefreshFolders();
                 RefreshFiles(RootFolder);
+                var locationResult = await LocationDataService.GetAllAsync();
+                if (locationResult.Success)
+                {
+                    _protectedFolders = locationResult.Data.Select(l => l.Route.TrimStart('/')).ToList();
+                    _protectedFolders.Add(MediaFolderName);
+                    _protectedFolders.Add("pages");
+                }
             }
         }
 
@@ -264,10 +273,10 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-                if (CurrentFolderPath == RootFolder)
+                if (_protectedFolders.Any(o => CurrentFolderPath.EndsWith("\\" + o)))
                 {
                     await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                        "The root folder cannot be deleted.");
+                        "This is a protected folder and cannot be deleted.");
                     return;
                 }
 
