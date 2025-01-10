@@ -16,12 +16,12 @@ namespace BedBrigade.Tests
         {
             _qualityLogic = LibraryFactory.CreateQualityLogic();
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
+            _qualityLogic.Config.SetConfig("MaxFileLength", 600);
 
             //This has duplicate strings but it is okay since roles have multiple similar permissions
             _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
 
-            //This file is large, but it does not make sense to split it up
-            _qualityLogic.Config.FilesToExclude.Add("MediaManager.razor.cs");
+
             _solutionPath = TestHelper.GetSolutionPath();
         }
 

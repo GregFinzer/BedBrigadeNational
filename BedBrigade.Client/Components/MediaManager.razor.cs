@@ -367,39 +367,41 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-                if (e != null)
+                if (e == null)
+                    return;
+
+                IReadOnlyList<IBrowserFile> inputFiles = e.GetMultipleFiles();
+
+                foreach (var file in inputFiles)
                 {
-                    var inputFiles = e.GetMultipleFiles();
+                    var targetPath = Path.Combine(CurrentFolderPath, file.Name);
 
-                    foreach (var file in inputFiles)
+                    if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
                     {
-                        var targetPath = Path.Combine(CurrentFolderPath, file.Name);
-
-                        if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
-                        {
-                            await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                                $"File type not allowed for {file.Name}. Valid File Types are:<br />" + String.Join("<br />",AllowedExtensions));
-                            return;
-                        }
-
-                        if (file.Size > MaxFileSize)
-                        {
-                            await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                                $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
-                            return;
-                        }
-
-                        MemoryStream stream = new MemoryStream();
-                        await file.OpenReadStream(file.Size).CopyToAsync(stream);
-                        byte[] fileBytes = stream.ToArray();
-
-                        await File.WriteAllBytesAsync(targetPath, fileBytes);
+                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                            $"File type not allowed for {file.Name}. Valid File Types are:<br />" +
+                            String.Join("<br />", AllowedExtensions));
+                        return;
                     }
 
-                    // Refresh files after upload
-                    RefreshFiles(CurrentFolderPath);
-                    StateHasChanged();
+                    if (file.Size > MaxFileSize)
+                    {
+                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                            $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
+                        return;
+                    }
+
+                    MemoryStream stream = new MemoryStream();
+                    await file.OpenReadStream(file.Size).CopyToAsync(stream);
+                    byte[] fileBytes = stream.ToArray();
+
+                    await File.WriteAllBytesAsync(targetPath, fileBytes);
                 }
+
+                // Refresh files after upload
+                RefreshFiles(CurrentFolderPath);
+                StateHasChanged();
+
             }
             catch (Exception ex)
             {
