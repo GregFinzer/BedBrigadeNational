@@ -5,14 +5,11 @@ using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 
 public class LocationDataService : Repository<Location>, ILocationDataService
 {
-    private readonly ICachingService _cachingService;
-    private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly IAuthService _authService;
     private readonly IConfigurationDataService _configurationDataService;
     private readonly IContentDataService _contentDataService;
@@ -25,10 +22,8 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         IContentDataService contentDataService,
         ILanguageContainerService languageContainerService) : base(contextFactory, cachingService, authService)
     {
-        _cachingService = cachingService;
         _configurationDataService = configurationDataService;
         _contentDataService = contentDataService;
-        _contextFactory = contextFactory;
         _authService = authService;
         _lc = languageContainerService;
     }

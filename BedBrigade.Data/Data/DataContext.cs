@@ -48,24 +48,105 @@ namespace BedBrigade.Data
         /// <param name="modelBuilder"></param>
         private static void CreateIndexes(ModelBuilder modelBuilder)
         {
+            CreateBedRequestIndexes(modelBuilder);
+            CreateContactUsIndexes(modelBuilder);
+            CreateContentIndexes(modelBuilder);
+            CreateContentTranslationIndexes(modelBuilder);
+
+            //Donation
+            modelBuilder.Entity<Donation>()
+                .HasIndex(o => o.LocationId);
+
+            CreateScheduleIndexes(modelBuilder);
+            CreateSignUpIndexes(modelBuilder);
+
+            //Translation
+            modelBuilder.Entity<Translation>()
+                .HasIndex(o => o.Culture);
+
+            //User 
+            modelBuilder.Entity<User>()
+                .HasIndex(o => o.LocationId);
+            
+            //User Persist
             modelBuilder.Entity<UserPersist>()
                 .HasKey(up => new { up.UserName, up.Grid });
 
-            modelBuilder.Entity<ContactUs>()
-                .HasIndex(o => o.Status);
+            CreateVolunteerIndexes(modelBuilder);
+        }
 
-            modelBuilder.Entity<Content>()
-                .HasIndex(o => o.ContentType);
-
-            modelBuilder.Entity<Schedule>()
-                .HasIndex(o => o.EventType);
-
-            modelBuilder.Entity<BedRequest>()
-                .HasIndex(o => o.ScheduleId);
-
+        private static void CreateVolunteerIndexes(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(e => e.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<Volunteer>()
+                .HasIndex(e => e.LocationId);
+        }
+
+        private static void CreateSignUpIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SignUp>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<SignUp>()
+                .HasIndex(o => o.ScheduleId);
+        }
+
+        private static void CreateScheduleIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Schedule>()
+                .HasIndex(o => o.EventType);
+
+            modelBuilder.Entity<Schedule>()
+                .HasIndex(o => o.LocationId);
+
+        }
+
+        private static void CreateContentTranslationIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ContentTranslation>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<ContentTranslation>()
+                .HasIndex(o => o.Name);
+
+            modelBuilder.Entity<ContentTranslation>()
+                .HasIndex(o => o.Culture);
+        }
+
+        private static void CreateContentIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Content>()
+                .HasIndex(o => o.ContentType);
+
+            modelBuilder.Entity<Content>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<Content>()
+                .HasIndex(o => o.Name);
+        }
+
+        private static void CreateContactUsIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ContactUs>()
+                .HasIndex(o => o.Status);
+
+            modelBuilder.Entity<ContactUs>()
+                .HasIndex(o => o.LocationId);
+        }
+
+        private static void CreateBedRequestIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.ScheduleId);
+
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.Status);
         }
     }
 }

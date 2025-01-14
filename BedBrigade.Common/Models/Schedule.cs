@@ -58,7 +58,7 @@ namespace BedBrigade.Common.Models
         public int DeliveryVehiclesRegistered { get; set; } = 0;
 
         [NotMapped]
-        public string EventSelect { get; set; }
+        public string? EventSelect { get; set; }
 
 
 
