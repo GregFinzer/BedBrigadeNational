@@ -172,7 +172,14 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             bedRequest.Distance = 0;
             if (location.MailingPostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
             {
-                bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode, bedRequest.PostalCode);
+                try
+                {
+                    bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode, bedRequest.PostalCode);
+                }
+                catch (Exception)
+                {
+                    // Can't determine distance, default to distance of zero 
+                }
             }
         }
 
