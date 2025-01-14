@@ -5,9 +5,8 @@ using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Services;
 using BedBrigade.SpeakIt;
-using KellermanSoftware.NetEmailValidation;
+
 
 namespace BedBrigade.Data.Services;
 

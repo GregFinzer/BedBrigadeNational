@@ -1,14 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
 using System.Security;
-using BedBrigade.Common;
-using Azure;
 using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -17,12 +13,10 @@ namespace BedBrigade.Data.Services
     public class AuthDataService : IAuthDataService
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
-        private readonly IConfiguration _configuration;
         private readonly ILocationDataService _locationDataService;
-        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, IConfiguration config, ILocationDataService locationDataService)
+        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, ILocationDataService locationDataService)
         {
             _contextFactory = dbContextFactory;
-            _configuration = config;
             _locationDataService = locationDataService;
         }
 
