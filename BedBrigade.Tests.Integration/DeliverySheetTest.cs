@@ -24,8 +24,11 @@ namespace BedBrigade.Tests
                 Assert.Ignore("This test will open Excel. It is not supported on this platform.");
             }
 
+            // Set the Syncfusion license key
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
+
             //Arrange
-                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sample.xlsx");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sample.xlsx");
 
             // Calculate the first Saturday
             int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;

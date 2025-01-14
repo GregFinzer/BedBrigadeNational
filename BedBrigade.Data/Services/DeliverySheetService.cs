@@ -23,9 +23,6 @@ namespace BedBrigade.Data.Services
 
         public Stream CreateDeliverySheet(Location location, List<BedRequest> bedRequests, string? deliveryChecklist= null)
         {
-            // Set the Syncfusion license key
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(LicenseLogic.SyncfusionLicenseKey);
-
             // Create a new Excel document
             using (ExcelEngine excelEngine = new ExcelEngine())
             {
