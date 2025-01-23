@@ -36,6 +36,51 @@ public static class SeedContentsLogic
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
             await SeedBedRequestConfirmationForm(context, locations);
+            await SeedSignUpConfirmationForm(context, locations);
+        }
+    }
+
+    private static async Task SeedSignUpConfirmationForm(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }
+
+        Log.Logger.Information("SeedSignUpConfirmationForm Started");
+
+        string name = ContentType.SignUpConfirmationForm.ToString();
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedText;
+
+            foreach (var location in locations)
+            {
+                seedText = WebHelper.GetHtml("SignUpConfirmationForm.txt");
+
+                var content = new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.SignUpConfirmationForm,
+                    Name = name,
+                    ContentHtml = seedText,
+                    Title = StringUtil.InsertSpaces(name)
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in SeedSignUpConfirmationForm content {ex.Message}");
+            }
         }
     }
 
