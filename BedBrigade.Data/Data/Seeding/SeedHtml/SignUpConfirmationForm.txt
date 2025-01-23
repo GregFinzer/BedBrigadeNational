@@ -1,0 +1,25 @@
+﻿%%Volunteer.FirstName%%,
+
+This is to confirm that you have signed up to volunteer for this event.
+Location:  %%Location.Name%%
+%%Schedule.GroupName%%
+Event Name:  %%Schedule.EventName%% %%Schedule.EventType%%
+%%Schedule.EventNote%%
+Event Date:  %%Schedule.EventDateScheduled%%
+Event Duration:  %%Schedule.EventDurationHours%%
+Address: %%Schedule.Address%%, %%Schedule.City%%, %%Schedule.State%%, %%Schedule.PostalCode%%
+
+Please arrive early or on time.  If you have any questions, please contact the event organizer.
+Organizer Name: %%Schedule.OrganizerName%%
+Organizer Email: %%Schedule.OrganizerEmail%%
+Organizer Phone: %%Schedule.OrganizerPhone%%
+
+Volunteer Information
+Name:  %%Volunteer.FirstName%% %%Volunteer.LastName%%
+%%Volunteer.OrganizationOrGroup%%
+Email:  %%Volunteer.Email%%
+Phone:  %%Volunteer.Phone%%
+Attend Church Regularly:  %%Volunteer.AttendChurch%%
+Other Languages Spoken: %%Volunteer.OtherLanguagesSpoken%%
+%%Volunteer.VehicleType%%
+%%Volunteer.Message%%

@@ -30,8 +30,9 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ITranslateLogic _translateLogic { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
-
         [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
+
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
 
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
@@ -351,14 +352,15 @@ namespace BedBrigade.Client.Components.Pages
             if (!updateCountSuccess)
                 return;
 
+
             await CreateFinalMessage();
         }
+
 
         private async Task<bool> ScheduleVolunteer()
         {
             try
             {
-
                 SignUp newRegister = new SignUp();
                 newRegister.ScheduleId = SelectedEvent.ScheduleId;
                 newRegister.VolunteerId = newVolunteer.VolunteerId;
@@ -370,6 +372,15 @@ namespace BedBrigade.Client.Components.Pages
                 {
                     await ShowMessage(createResult.Message);
                     Log.Logger.Error($"Error ScheduleVolunteer: {createResult.Message}");
+                    return false;
+                }
+
+                var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(createResult.Data);
+
+                if (!emailResponse.Success)
+                {
+                    await ShowMessage(emailResponse.Message);
+                    Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
                     return false;
                 }
 
