@@ -33,6 +33,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
 
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
 
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
@@ -383,6 +384,8 @@ namespace BedBrigade.Client.Components.Pages
                     Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
                     return false;
                 }
+
+                var smsResponse = await _sendSmsLogic.c(createResult.Data);
 
                 return true;
             }

@@ -17,6 +17,7 @@ namespace BedBrigade.Data.Services
         private readonly IDonationDataService _donationDataService;
         private readonly IVolunteerDataService _volunteerDataService;
         private readonly IScheduleDataService _scheduleDataService;
+        private readonly IMailMergeLogic _mailMergeLogic;
 
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
@@ -25,7 +26,8 @@ namespace BedBrigade.Data.Services
             IUserDataService userDataService,
             IDonationDataService donationDataService,
             IVolunteerDataService volunteerDataService,
-            IScheduleDataService scheduleDataService)
+            IScheduleDataService scheduleDataService,
+            IMailMergeLogic mailMergeLogic)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -35,6 +37,7 @@ namespace BedBrigade.Data.Services
             _donationDataService = donationDataService;
             _volunteerDataService = volunteerDataService;
             _scheduleDataService = scheduleDataService;
+            _mailMergeLogic = mailMergeLogic;
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)
@@ -111,12 +114,12 @@ namespace BedBrigade.Data.Services
             sb = sb.Replace("%%Donation.TotalAmount%%", donations.Sum(d => d.Amount).ToString("C"));
 
             if (donations.First().DonationDate.HasValue)
-                sb = sb.Replace("%%Year%%", donations.First().DonationDate.Value.Year.ToString());
+                sb = sb.Replace("%%Donation.Year%%", donations.First().DonationDate.Value.Year.ToString());
             else
-                sb = sb.Replace("%%Year%%", "Unknown");
+                sb = sb.Replace("%%Donation.Year%%", "Unknown");
 
-            sb = ReplaceUserFields(user, sb);
-            sb = ReplaceLocationFields(location, sb);
+            sb = _mailMergeLogic.ReplaceUserFields(user, sb);
+            sb = _mailMergeLogic.ReplaceLocationFields(location, sb);
             sb = ReplaceItemizedDonations(donations, sb);
             return sb.ToString();
         }
@@ -134,7 +137,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp)
         {
-            ServiceResponse<Content> templateResult = await _contentDataService.GetByLocationAndContentType(signUp.LocationId, ContentType.SignUpConfirmationForm);
+            ServiceResponse<Content> templateResult = await _contentDataService.GetByLocationAndContentType(signUp.LocationId, ContentType.SignUpEmailConfirmationForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
@@ -235,9 +238,9 @@ namespace BedBrigade.Data.Services
             }
 
             StringBuilder sb = new StringBuilder(template, template.Length * 2);
-            sb = ReplaceVolunteerFields(volunteer, schedule, sb);
-            sb = ReplaceLocationFields(locationResult.Data, sb);    
-            sb = ReplaceScheduleFields(schedule, sb);
+            sb = _mailMergeLogic.ReplaceVolunteerFields(volunteer, schedule, sb);
+            sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);    
+            sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 
@@ -296,97 +299,19 @@ namespace BedBrigade.Data.Services
             }
 
             StringBuilder sb = new StringBuilder(template, template.Length*2);
-            sb = ReplaceBedRequestFields(entity, sb);
-            sb = ReplaceLocationFields(locationResult.Data, sb);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(entity, sb);
+            sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
             sb = sb.Replace("%%BedRequest.NumberOfBedsWaitingSum%%", (countResult.Data - 1).ToString());
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 
-        private StringBuilder ReplaceScheduleFields(Schedule entity, StringBuilder sb)
-        {
-            sb = sb.Replace("%%Schedule.GroupName%%", entity.GroupName);
-            sb = sb.Replace("%%Schedule.EventName%%", entity.EventName);
 
-            if (entity.EventName != entity.EventType.ToString() && entity.EventType != EventType.Other)
-            {
-                sb = sb.Replace("%%Schedule.EventType%%", entity.EventType.ToString());
-            }
-            else
-            {
-                sb = sb.Replace("%%Schedule.EventType%%", String.Empty);
-            }
 
-            sb = sb.Replace("%%Schedule.EventNote%%", entity.EventNote);
-            sb = sb.Replace("%%Schedule.EventDateScheduled%%", entity.EventDateScheduled.ToString("MM/dd/yyyy h:mm tt"));
-            sb = sb.Replace("%%Schedule.EventDurationHours%%", entity.EventDurationHours + " hours");
-            sb = sb.Replace("%%Schedule.Address%%", entity.Address);
-            sb = sb.Replace("%%Schedule.City%%", entity.City);
-            sb = sb.Replace("%%Schedule.State%%", entity.State);
-            sb = sb.Replace("%%Schedule.PostalCode%%", entity.PostalCode);
-            sb = sb.Replace("%%Schedule.OrganizerName%%", entity.OrganizerName);
-            sb = sb.Replace("%%Schedule.OrganizerEmail%%", entity.OrganizerEmail);
-            sb = sb.Replace("%%Schedule.OrganizerPhone%%", entity.OrganizerPhone.FormatPhoneNumber());
-            return sb;
-        }
 
-        private StringBuilder ReplaceVolunteerFields(Volunteer volunteer, Schedule schedule, StringBuilder sb)
-        {
-            sb = sb.Replace("%%Volunteer.FirstName%%", volunteer.FirstName);
-            sb = sb.Replace("%%Volunteer.LastName%%", volunteer.LastName);
-            sb = sb.Replace("%%Volunteer.Email%%", volunteer.Email);
-            sb = sb.Replace("%%Volunteer.Phone%%", volunteer.Phone.FormatPhoneNumber());
-            sb = sb.Replace("%%Volunteer.AttendChurch%%", volunteer.AttendChurch ? "Yes" : "No");
-            sb = sb.Replace("%%Volunteer.OtherLanguagesSpoken%%", volunteer.OtherLanguagesSpoken);
-            sb = sb.Replace("%%Volunteer.OrganizationOrGroup%%", volunteer.OrganizationOrGroup);
-            sb = sb.Replace("%%Volunteer.Message%%", volunteer.Message);
 
-            if (schedule.EventType == EventType.Delivery)
-            {
-                sb = sb.Replace("%%Volunteer.VehicleType%%", volunteer.VehicleType.ToString());
-            }
-            else
-            {
-                sb = sb.Replace("%%Volunteer.VehicleType%%", string.Empty);
-            }
 
-            return sb;
-        }
 
-        private StringBuilder ReplaceBedRequestFields(BedRequest entity, StringBuilder sb)
-        {
-            sb = sb.Replace("%%BedRequest.FirstName%%", entity.FirstName);
-            sb = sb.Replace("%%BedRequest.NumberOfBeds%%", entity.NumberOfBeds.ToString());
-            sb = sb.Replace("%%BedRequest.AgesGender%%", entity.AgesGender);
-            return sb;
-        }
 
-        private StringBuilder ReplaceUserFields(User user, StringBuilder sb)
-        {
-            sb = sb.Replace("%%User.FirstName%%", user.FirstName);
-            sb = sb.Replace("%%User.LastName%%", user.LastName);
-            sb = sb.Replace("%%User.Role%%", user.Role);
-            sb = sb.Replace("%%User.Email%%", user.Email);
-            sb = sb.Replace("%%User.Phone%%", user.Phone.FormatPhoneNumber());
-            return sb;
-        }
-
-        private StringBuilder ReplaceLocationFields(Location location, StringBuilder sb)
-        {
-            sb = sb.Replace("%%Location.Name%%", location.Name);
-
-            sb = sb.Replace("%%Location.BuildAddress%%", location.BuildAddress);
-            sb = sb.Replace("%%Location.BuildCity%%", location.BuildCity);
-            sb = sb.Replace("%%Location.BuildState%%", location.BuildState);
-            sb = sb.Replace("%%Location.BuildPostalCode%%", location.BuildPostalCode);
-
-            sb = sb.Replace("%%Location.MailingAddress%%", location.MailingAddress);
-            sb = sb.Replace("%%Location.MailingCity%%", location.MailingCity);
-            sb = sb.Replace("%%Location.MailingState%%", location.MailingState);
-            sb = sb.Replace("%%Location.MailingPostalCode%%", location.MailingPostalCode);
-
-            sb = sb.Replace("%%Location.Route%%", location.Route);
-            return sb;
-        }
     }
 
 

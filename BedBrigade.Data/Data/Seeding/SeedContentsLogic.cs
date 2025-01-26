@@ -36,11 +36,12 @@ public static class SeedContentsLogic
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
             await SeedBedRequestConfirmationForm(context, locations);
-            await SeedSignUpConfirmationForm(context, locations);
+            await SeedSignUpEmailConfirmationForm(context, locations);
+            await SeedSignUpSmsConfirmationForm(context, locations);
         }
     }
 
-    private static async Task SeedSignUpConfirmationForm(DataContext context, List<Location> locations)
+    private static async Task SeedSignUpSmsConfirmationForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
         var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
@@ -49,9 +50,9 @@ public static class SeedContentsLogic
             locations.Remove(National);
         }
 
-        Log.Logger.Information("SeedSignUpConfirmationForm Started");
+        Log.Logger.Information("SeedSignUpSmsConfirmationForm Started");
 
-        string name = ContentType.SignUpConfirmationForm.ToString();
+        string name = ContentType.SignUpSmsConfirmationForm.ToString();
 
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
@@ -59,12 +60,12 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                seedText = WebHelper.GetHtml("SignUpConfirmationForm.txt");
+                seedText = WebHelper.GetHtml("SignUpSmsConfirmationForm.txt");
 
                 var content = new Content
                 {
                     LocationId = location.LocationId!,
-                    ContentType = ContentType.SignUpConfirmationForm,
+                    ContentType = ContentType.SignUpSmsConfirmationForm,
                     Name = name,
                     ContentHtml = seedText,
                     Title = StringUtil.InsertSpaces(name)
@@ -79,7 +80,51 @@ public static class SeedContentsLogic
             }
             catch (Exception ex)
             {
-                Log.Logger.Debug($"Error in SeedSignUpConfirmationForm content {ex.Message}");
+                Log.Logger.Debug($"Error in SeedSignUpSmsConfirmationForm content {ex.Message}");
+            }
+        }
+    }
+
+    private static async Task SeedSignUpEmailConfirmationForm(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }
+
+        Log.Logger.Information("SeedSignUpEmailConfirmationForm Started");
+
+        string name = ContentType.SignUpEmailConfirmationForm.ToString();
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedText;
+
+            foreach (var location in locations)
+            {
+                seedText = WebHelper.GetHtml("SignUpEmailConfirmationForm.txt");
+
+                var content = new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.SignUpEmailConfirmationForm,
+                    Name = name,
+                    ContentHtml = seedText,
+                    Title = StringUtil.InsertSpaces(name)
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in SeedSignUpEmailConfirmationForm content {ex.Message}");
             }
         }
     }

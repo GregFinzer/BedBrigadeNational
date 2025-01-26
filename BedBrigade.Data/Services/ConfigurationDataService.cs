@@ -95,6 +95,16 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return config.ConfigurationValue;
     }
 
+    public async Task<string> GetConfigValueAsync(ConfigSection section, string key, int locationId)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == locationId);
+        if (config == null)
+            throw new KeyNotFoundException($"Configuration not found for {section} - {key} for location {locationId}");
+
+        return config.ConfigurationValue;
+    }
+
     public async Task<decimal> GetConfigValueAsDecimalAsync(ConfigSection section, string key)
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;

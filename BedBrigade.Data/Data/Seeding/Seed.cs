@@ -619,50 +619,151 @@ public static class Seed
         {
             ConfigurationKey = ConfigNames.PrimaryLanguage,
             ConfigurationValue = "English;Spanish;Haitian Creole;Portuguese;Other",
-            Section = ConfigSection.System
+            Section = ConfigSection.System,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.SpeakEnglish,
             ConfigurationValue = "Yes;No;A little",
-            Section = ConfigSection.System
+            Section = ConfigSection.System,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationUrl,
             ConfigurationValue = "https://us1.locationiq.com/v1/search/structured",
-            Section = ConfigSection.GeoLocation
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationApiKey,
             ConfigurationValue = string.Empty,
-            Section = ConfigSection.GeoLocation
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationMaxRequestsPerDay,
             ConfigurationValue = "5000",
-            Section = ConfigSection.GeoLocation
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationMaxRequestsPerSecond,
             ConfigurationValue = "2",
-            Section = ConfigSection.GeoLocation
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationLockWaitMinutes,
             ConfigurationValue = "10",
-            Section = ConfigSection.GeoLocation
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
         },
         new()
         {
             ConfigurationKey = ConfigNames.GeoLocationKeepDays,
             ConfigurationValue = "30",
-            Section = ConfigSection.GeoLocation
-        }
+            Section = ConfigSection.GeoLocation,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsBeginHour,
+            ConfigurationValue = "8",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsEndHour,
+            ConfigurationValue = "21",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsBeginDayOfWeek,
+            ConfigurationValue = "0",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsEndDayOfWeek,
+            ConfigurationValue = "6",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        //Twillio can send a max of one SMS per second
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsMaxSendPerSecond,
+            ConfigurationValue = "1",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsLockWaitMinutes,
+            ConfigurationValue = "10",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsKeepDays,
+            ConfigurationValue = "30",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        //Twillio can send a max of one SMS per second. We are on a one minute timer
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsMaxPerChunk,
+            ConfigurationValue = "60",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsUseFileMock,
+            ConfigurationValue = "true",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsAccountSid,
+            ConfigurationValue = "SmsAccountSid",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsAuthToken,
+            ConfigurationValue = "SmsAuthToken",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsPhone,
+            ConfigurationValue = "SmsPhone",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.GroveCityLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsPhone,
+            ConfigurationValue = "SmsPhone",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.RockCityPolarisLocationId
+        },
     ];
 
 
@@ -690,7 +791,7 @@ public static class Seed
 
             foreach (var newConfig in _configurations)
             {
-                if (!existingConfigurations.Any(c => c.ConfigurationKey == newConfig.ConfigurationKey))
+                if (!existingConfigurations.Any(c => c.ConfigurationKey == newConfig.ConfigurationKey && c.LocationId == newConfig.LocationId))
                 {
                     configurationsToAdd.Add(newConfig);
                 }
