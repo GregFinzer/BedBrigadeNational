@@ -1,9 +1,11 @@
 ﻿
 
+using BedBrigade.Common.Models;
+
 namespace BedBrigade.Data.Services
 {
     public interface ISendSmsLogic
     {
-        //Task<string> CreateAppointmentReminder(Appointment appointment);
+        Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp);
     }
 }

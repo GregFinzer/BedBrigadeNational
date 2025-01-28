@@ -27,12 +27,40 @@ public class SendSmsLogic : ISendSmsLogic
 
     public async Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp)
     {
-        @@@HERE Add Error Handling
-        ServiceResponse<Content> templateResult = await _contentDataService.GetByLocationAndContentType(signUp.LocationId, ContentType.SignUpSmsConfirmationForm);
-        var fromPhone = await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone, signUp.LocationId);
+        ServiceResponse<Content> templateResult =
+            await _contentDataService.GetByLocationAndContentType(signUp.LocationId,
+                ContentType.SignUpSmsConfirmationForm);
+
+        if (!templateResult.Success)
+        {
+            return new ServiceResponse<bool>("Failed to get SignUpSmsConfirmationForm: " + templateResult.Message);
+        }
+
+        string fromPhone;
+        try
+        {
+            fromPhone = await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone,
+                signUp.LocationId);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<bool>(ex.Message);
+        }
 
         ServiceResponse<Volunteer> volunteerResult = await _volunteerDataService.GetByIdAsync(signUp.VolunteerId);
+
+        if (!volunteerResult.Success)
+        {
+            return new ServiceResponse<bool>($"Failed to get volunteer for {signUp.VolunteerId}: " +
+                                             volunteerResult.Message);
+        }
+
         ServiceResponse<Schedule> scheduleResult = await _scheduleDataService.GetByIdAsync(signUp.ScheduleId);
+        if (!scheduleResult.Success)
+        {
+            return new ServiceResponse<bool>($"Failed to get schedule for {signUp.ScheduleId}: " +
+                                             scheduleResult.Message);
+        }
 
         SmsQueue smsQueue = new SmsQueue()
         {
@@ -47,7 +75,13 @@ public class SendSmsLogic : ISendSmsLogic
             TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2)
         };
 
-        await _smsQueueDataService.CreateAsync(smsQueue);
+        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
+        if (createResult.Success)
+        {
+            return new ServiceResponse<bool>("SMS Message queued", true);
+        }
+
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
     }
 }
 

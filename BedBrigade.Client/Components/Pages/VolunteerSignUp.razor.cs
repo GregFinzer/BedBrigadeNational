@@ -385,8 +385,14 @@ namespace BedBrigade.Client.Components.Pages
                     return false;
                 }
 
-                var smsResponse = await _sendSmsLogic.c(createResult.Data);
+                var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
 
+                if (!smsResponse.Success)
+                {
+                    await ShowMessage(smsResponse.Message);
+                    Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                    return false;
+                }
                 return true;
             }
             catch (Exception ex)
