@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
-using Log = Serilog.Log;
 
 #endregion
 
@@ -103,57 +102,6 @@ public class SmsQueueBackgroundService : BackgroundService
         }
     }
 
-    //public static void Start(ISmsQueueDataService smsQueueDataService,
-    //    IConfigurationDataService configurationDataService,
-    //    IAppointmentService appointmentService,
-    //    ICalendarService calendarService,
-    //    IMailMergeLogic mailMergeLogic)
-    //{
-    //    _smsQueueDataService = smsQueueDataService;
-    //    _configurationDataService = configurationDataService;
-    //    _appointmentService = appointmentService;
-    //    _calendarService = calendarService;
-    //    _mailMergeLogic = mailMergeLogic;
-
-    //    const int oneMinuteAndThirtySeconds = (1000 * 90);
-    //    _timer = new Timer(ProcessQueue, null, oneMinuteAndThirtySeconds, oneMinuteAndThirtySeconds);
-    //}
-
-
-
-    //public static async Task<ServiceResponse<string>> QueueMessage(SmsQueue message)
-    //{
-    //    try
-    //    {
-    //        Appointment? appointment = null;
-
-    //        if (message.AppointmentId.HasValue)
-    //        {
-    //            appointment = (await _appointmentService.GetByIdAsync(message.AppointmentId)).Data;
-    //        }
-
-    //        message.Status = SmsQueueStatus.Queued.ToString();
-    //        message.QueueDate = DateTime.UtcNow;
-    //        message.FailureMessage = string.Empty;
-
-    //        if (appointment != null)
-    //        {
-    //            message.TargetDate = appointment.Start.Date.AddHours(_smsAppointmentReminderHour);
-    //        }
-    //        else
-    //        {
-    //            message.TargetDate = DateTime.Now;
-    //        }
-
-    //        await _smsQueueDataService.CreateAsync(message);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return new ServiceResponse<string>(ex.Message, false);
-    //    }
-
-    //    return new ServiceResponse<string>(SmsQueueStatus.Queued.ToString(), true);
-    //}
 
     #endregion
 
@@ -179,17 +127,17 @@ public class SmsQueueBackgroundService : BackgroundService
     private async Task SendQueuedMessages(CancellationToken cancellationToken)
     {
         List<SmsQueue> messagesToProcess = await _smsQueueDataService.GetMessagesToProcess(_smsMaxPerChunk);
-        Log.Debug("SmsQueueLogic:  Messages to send now: " + messagesToProcess.Count);
+        _logger.LogDebug("SmsQueueLogic:  Messages to send now: " + messagesToProcess.Count);
 
         if (messagesToProcess.Count == 0)
             return;
 
         if (!_smsUseFileMock)
         {
-            Log.Debug("SmsQueueLogic:  Sending LIVE Text Messages");
+            _logger.LogDebug("SmsQueueLogic:  Sending LIVE Text Messages");
         }
 
-        Log.Debug("SmsQueueLogic:  Locking Messages");
+        _logger.LogDebug("SmsQueueLogic:  Locking Messages");
         await _smsQueueDataService.LockMessagesToProcess(messagesToProcess);
         DateTime currentTime = DateTime.Now;
         int millisecondDelay = 1000 / _smsMaxSendPerSecond;
@@ -208,10 +156,7 @@ public class SmsQueueBackgroundService : BackgroundService
             }
             catch (Exception ex)
             {
-                smsQueue.Status = SmsQueueStatus.Failed.ToString();
-                smsQueue.FailureMessage = ex.Message;
-                await _smsQueueDataService.UpdateAsync(smsQueue);
-                Log.Error(ex, "Error merging SMS message");
+                await HandleFailure(smsQueue, ex);
                 continue;
             }
 
@@ -238,9 +183,16 @@ public class SmsQueueBackgroundService : BackgroundService
         int sent = messagesToProcess.Count(o => o.Status == SmsQueueStatus.Sent.ToString());
         int failed = messagesToProcess.Count(o => o.Status == SmsQueueStatus.Failed.ToString());
 
-        string msg = string.Format("{0} SMS messages sent, {1} SMS messages failed, {2} total SMS messages", sent,
-            failed, total);
-        Log.Debug(msg);
+        string msg = string.Format("{0} SMS messages sent, {1} SMS messages failed, {2} total SMS messages", sent, failed, total);
+        _logger.LogDebug(msg);
+    }
+
+    private async Task HandleFailure(SmsQueue smsQueue, Exception ex)
+    {
+        smsQueue.Status = SmsQueueStatus.Failed.ToString();
+        smsQueue.FailureMessage = ex.Message;
+        await _smsQueueDataService.UpdateAsync(smsQueue);
+        _logger.LogError(ex, "Error merging SMS message");
     }
 
     private async Task PerformMailMerge(SmsQueue message)
@@ -294,7 +246,7 @@ public class SmsQueueBackgroundService : BackgroundService
         sb.AppendLine($"ToPhoneNumber:  {message.ToPhoneNumber}");
         sb.AppendLine($"Body:  {message.Body}");
         sb.AppendLine("=".PadRight(40, '='));
-        Log.Information(sb.ToString());
+        _logger.LogInformation(sb.ToString());
 
         message.SentDate = DateTime.UtcNow;
         message.Status = SmsQueueStatus.Sent.ToString();
@@ -352,16 +304,9 @@ public class SmsQueueBackgroundService : BackgroundService
         await _smsQueueDataService.UpdateAsync(message);
     }
 
-
-
-
-
-
-
-
     private async Task<bool> WaitForLock()
     {
-        Log.Debug("SmsQueueLogic:  GetLockedMessages");
+        _logger.LogDebug("SmsQueueLogic:  GetLockedMessages");
         List<SmsQueue> lockedMessages = await _smsQueueDataService.GetLockedMessages();
 
         SmsQueue firstLockedMessage = lockedMessages.FirstOrDefault();
@@ -372,7 +317,7 @@ public class SmsQueueBackgroundService : BackgroundService
             if (firstLockedMessage.LockDate.HasValue
                 && firstLockedMessage.LockDate.Value > DateTime.UtcNow.AddMinutes(_smsLockWaitMinutes))
             {
-                Log.Debug($"SmsQueueLogic:  Messages are currently locked, waiting for {_smsLockWaitMinutes} minutes");
+                _logger.LogDebug($"SmsQueueLogic:  Messages are currently locked, waiting for {_smsLockWaitMinutes} minutes");
                 return true;
             }
 
@@ -398,13 +343,13 @@ public class SmsQueueBackgroundService : BackgroundService
         {
             message =
                 $"SmsQueueLogic:  Not Time to Send (valid days are {(DayOfWeek)_smsBeginDayOfWeek}->{(DayOfWeek)_smsEndDayOfWeek}): {currentDate.DayOfWeek}";
-            Log.Logger.Debug(message);
+            _logger.LogDebug(message);
         }
         else if (!validTime)
         {
             message = string.Format("SmsQueueLogic:  Not Time to Send (valid hours are {0} to {1}): ",
                 _smsBeginHour, _smsEndHour);
-            Log.Debug(message);
+            _logger.LogDebug(message);
         }
 
         return validDay && validTime;
@@ -414,7 +359,7 @@ public class SmsQueueBackgroundService : BackgroundService
 
     private async Task LoadConfiguration()
     {
-        Log.Debug("SmsQueueLogic: LoadConfiguration");
+        _logger.LogDebug("SmsQueueLogic: LoadConfiguration");
         _smsBeginHour = await LoadSmsConfigValue(ConfigNames.SmsBeginHour);
         _smsEndHour = await LoadSmsConfigValue(ConfigNames.SmsEndHour);
         _smsBeginDayOfWeek = await LoadSmsConfigValue(ConfigNames.SmsBeginDayOfWeek);
