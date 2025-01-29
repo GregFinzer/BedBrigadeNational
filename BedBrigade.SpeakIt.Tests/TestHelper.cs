@@ -16,6 +16,7 @@ namespace BedBrigade.SpeakIt.Tests
             "RenderFolder",
             "Modal.razor",
             "MediaManager.razor",
+            "SmsQueue.cs"
         };
 
         public static List<string> WildcardPatterns = new List<string> { "*.razor", "*.cs" };
