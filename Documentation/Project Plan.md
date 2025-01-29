@@ -153,7 +153,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Cache get files :heavy_check_mark:
     * Remove Unused Components and Pages
     * Add three image rotators to Bed Brigade Near Me :heavy_check_mark:
-    * Protected Directories
+    * Protected Directories :heavy_check_mark:
     * Verify security for all pages
     * Global Error Handler :heavy_check_mark:
     * Refresh Header and Footer :heavy_check_mark:
@@ -165,7 +165,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Rework Seeding :heavy_check_mark:
     * Add Notification Code to Sorry Page :heavy_check_mark:
     * Make seeding environment specific :heavy_check_mark:
-    * Add Database Indexes
+    * Add Database Indexes :heavy_check_mark:
     * Verify Mobile for all pages :heavy_check_mark:
     * Refactor Grid Persistence :heavy_check_mark:
     * Add try catch and alert
@@ -195,7 +195,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Design Bulk Email Mailing List :heavy_check_mark:
     * Donations Design :heavy_check_mark:
     * SMS Design  :heavy_check_mark:
-    * Delivery Sheet Slow
+    * Delivery Sheet Slow :heavy_check_mark:
     * Update Documentation for Localization :heavy_check_mark:
     * Make EmailQueue into a Background Service :heavy_check_mark:
     * Menu not wide enough when translated to Spanish :heavy_check_mark:
@@ -203,6 +203,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Data Attribute Validation :heavy_check_mark:
     * Admin Clear Cache :heavy_check_mark:
     * Manage Configuration Location  :heavy_check_mark:
+    
     
 * New Stories
     * Send confirmation email for Bed Request :heavy_check_mark:
@@ -221,7 +222,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Localize Validation Messages :heavy_check_mark:
     * Localize Drop Downs :heavy_check_mark:
     * Save Messages Localization :heavy_check_mark:
-    * Send Confirmation Email for Volunteer Sign Up
+    * Send Confirmation Email for Volunteer Sign Up :heavy_check_mark:
     * Localize Dynamic Content :heavy_check_mark:
     * Apply String Localization :heavy_check_mark:
 
@@ -249,10 +250,13 @@ One thing you will notice about the following project plan is the lack of due da
     
 * SMS
     * Add LocationId to Configuration with a default of National :heavy_check_mark:
-    * Create Code for SMS Queue
+    * Create Code for SMS Queue :heavy_check_mark:
     * Create UI to send and receive SMS Messages and Reply
  
-
+* Custom Media Manager
+    * Custom Media Manager :heavy_check_mark:
+    * Media Manager ability to Cut, Copy, Paste, Files  :heavy_check_mark:
+    * Media Manager Refactoring  :heavy_check_mark:
     
     
     
