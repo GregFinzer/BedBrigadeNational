@@ -4,18 +4,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Common.Models
 {
+    [PrimaryKey(nameof(ConfigurationKey), nameof(LocationId))]
     [Table("Configurations")]
     public class Configuration : BaseEntity
     {
-        [Key, MaxLength(50), Required] public String ConfigurationKey { get; set; } = string.Empty;
-
-        [MaxLength(255), Required] public String? ConfigurationValue { get; set; } = string.Empty;
+        [MaxLength(50), Required]
+        public String ConfigurationKey { get; set; } = string.Empty;
 
         [Required, DefaultValue(1)]
         public int LocationId { get; set; } = Defaults.NationalLocationId;
+
+        [MaxLength(255), Required]
+        public String? ConfigurationValue { get; set; } = string.Empty;
 
         /// <summary>
         /// Defines the section that configuration value belongs to. Defaulted to overall system.

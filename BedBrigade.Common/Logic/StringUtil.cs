@@ -322,6 +322,18 @@ namespace BedBrigade.Common.Logic
             return bestBreak >= startIndex ? bestBreak + 1 : startIndex; // +1 to include punctuation
         }
 
+        public static string FilterNumeric(string input)
+        {
+            var sb = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (char.IsDigit(c))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
 
     } // class
 

@@ -33,6 +33,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
 
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
 
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
@@ -384,6 +385,14 @@ namespace BedBrigade.Client.Components.Pages
                     return false;
                 }
 
+                var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
+
+                if (!smsResponse.Success)
+                {
+                    await ShowMessage(smsResponse.Message);
+                    Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                    return false;
+                }
                 return true;
             }
             catch (Exception ex)

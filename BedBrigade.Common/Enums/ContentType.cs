@@ -14,6 +14,8 @@ public enum ContentType
     EmailTaxForm =6,
     [Description("Bed Request Confirmation Form")]
     BedRequestConfirmationForm = 7,
-    [Description("SignUp Confirmation Form")]
-    SignUpConfirmationForm = 8,
+    [Description("SignUp Email Confirmation Form")]
+    SignUpEmailConfirmationForm = 8,
+    [Description("SignUp SMS Confirmation Form")]
+    SignUpSmsConfirmationForm = 9,
 }

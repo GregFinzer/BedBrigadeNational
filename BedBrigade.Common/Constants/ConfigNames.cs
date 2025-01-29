@@ -50,5 +50,19 @@
         public const string GeoLocationMaxRequestsPerSecond = "GeoLocationMaxRequestsPerSecond";
         public const string GeoLocationLockWaitMinutes = "GeoLocationLockWaitMinutes";
         public const string GeoLocationKeepDays = "GeoLocationKeepDays";
+
+        //SMS Section
+        public const string SmsBeginHour = "SmsBeginHour";
+        public const string SmsEndHour = "SmsEndHour";
+        public const string SmsBeginDayOfWeek = "SmsBeginDayOfWeek";
+        public const string SmsEndDayOfWeek = "SmsEndDayOfWeek";
+        public const string SmsMaxSendPerSecond = "SmsMaxSendPerSecond";
+        public const string SmsLockWaitMinutes = "SmsLockWaitMinutes";
+        public const string SmsKeepDays = "SmsKeepDays";
+        public const string SmsMaxPerChunk = "SmsMaxPerChunk";
+        public const string SmsUseFileMock = "SmsUseFileMock";
+        public const string SmsPhone = "SmsPhone";
+        public const string SmsAccountSid = "SmsAccountSid";
+        public const string SmsAuthToken = "SmsAuthToken";
     }
 }

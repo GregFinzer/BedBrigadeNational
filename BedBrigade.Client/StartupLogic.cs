@@ -18,6 +18,7 @@ using System.Reflection;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
 
+
 namespace BedBrigade.Client
 {
     public static class StartupLogic
@@ -90,6 +91,7 @@ namespace BedBrigade.Client
             
             SetupAuth(builder);
             ClientServices(builder);
+            CommonLogic(builder);
             DataServices(builder);
             BackgroundServices(builder);
 
@@ -118,6 +120,7 @@ namespace BedBrigade.Client
             builder.Services.AddHostedService<TranslationBackgroundService>();
             builder.Services.AddHostedService<EmailQueueBackgroundService>();
             builder.Services.AddHostedService<GeoLocationBackgroundService>();
+            builder.Services.AddHostedService<SmsQueueBackgroundService>();
         }
 
         private static void SetupAuth(WebApplicationBuilder builder)
@@ -127,6 +130,11 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+        }
+
+        private static void CommonLogic(WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IMailMergeLogic, MailMergeLogic>();
         }
 
         private static void ClientServices(WebApplicationBuilder builder)
@@ -174,6 +182,8 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ISpokenLanguageDataService, SpokenLanguageDataService>();
             builder.Services.AddScoped<IGeoLocationQueueDataService, GeoLocationQueueDataService>();
             builder.Services.AddScoped<IGeoLocationProcessorDataService, GeoLocationProcessorDataService>();
+            builder.Services.AddScoped<ISmsQueueDataService, SmsQueueDataService>();
+            builder.Services.AddScoped<ISendSmsLogic, SendSmsLogic>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
@@ -294,7 +304,7 @@ namespace BedBrigade.Client
             var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
             using (var context = dbContextFactory.CreateDbContext())
             {
-                var config = await context.Configurations.FindAsync(ConfigNames.IsCachingEnabled);
+                var config = await context.Configurations.FindAsync(ConfigNames.IsCachingEnabled, Defaults.NationalLocationId);
                 if (config != null)
                 {
                     if (config != null)
@@ -315,6 +325,7 @@ namespace BedBrigade.Client
                 }
             }
         }
+
 
 
     }
