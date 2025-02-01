@@ -132,6 +132,8 @@ namespace BedBrigade.Server.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("Phone");
+
                     b.HasIndex("ScheduleId");
 
                     b.HasIndex("Status");
@@ -239,6 +241,8 @@ namespace BedBrigade.Server.Migrations
                     b.HasKey("ContactUsId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("Phone");
 
                     b.HasIndex("Status");
 
@@ -1304,6 +1308,8 @@ namespace BedBrigade.Server.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("Phone");
+
                     b.ToTable("Users");
                 });
 
@@ -1426,6 +1432,8 @@ namespace BedBrigade.Server.Migrations
                         .IsUnique();
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("Phone");
 
                     b.ToTable("Volunteers");
                 });

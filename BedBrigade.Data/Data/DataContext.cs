@@ -65,15 +65,22 @@ namespace BedBrigade.Data
             modelBuilder.Entity<Translation>()
                 .HasIndex(o => o.Culture);
 
-            //User 
-            modelBuilder.Entity<User>()
-                .HasIndex(o => o.LocationId);
-            
+            CreateUserIndexes(modelBuilder);
+
             //User Persist
             modelBuilder.Entity<UserPersist>()
                 .HasKey(up => new { up.UserName, up.Grid });
 
             CreateVolunteerIndexes(modelBuilder);
+        }
+
+        private static void CreateUserIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(o => o.Phone);
         }
 
         private static void CreateVolunteerIndexes(ModelBuilder modelBuilder)
@@ -84,6 +91,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(e => e.LocationId);
+
+            modelBuilder.Entity<Volunteer>()
+                .HasIndex(e => e.Phone);
         }
 
         private static void CreateSignUpIndexes(ModelBuilder modelBuilder)
@@ -136,6 +146,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<ContactUs>()
                 .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<ContactUs>()
+                .HasIndex(o => o.Phone);
         }
 
         private static void CreateBedRequestIndexes(ModelBuilder modelBuilder)
@@ -148,6 +161,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<BedRequest>()
                 .HasIndex(o => o.Status);
+
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.Phone);
         }
     }
 }
