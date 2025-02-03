@@ -72,7 +72,10 @@ public class SendSmsLogic : ISendSmsLogic
             Status = SmsQueueStatus.Queued.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
-            TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2)
+            TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2),
+            IsRead = true,
+            IsReply = false,
+            LocationId = signUp.LocationId
         };
 
         var createResult = await _smsQueueDataService.CreateAsync(smsQueue);

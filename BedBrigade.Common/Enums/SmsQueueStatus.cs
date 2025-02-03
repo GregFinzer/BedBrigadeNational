@@ -5,6 +5,7 @@ public enum SmsQueueStatus
     Queued,
     Locked,
     Sent,
-    Failed
+    Failed,
+    Received
 }
 

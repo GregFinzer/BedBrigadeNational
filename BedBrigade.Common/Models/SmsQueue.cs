@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Models
 {
@@ -42,5 +44,14 @@ namespace BedBrigade.Common.Models
         [ForeignKey("SignUpId")]
         public Int32? SignUpId { get; set; }
         public SignUp? SignUp { get; set; }
+
+        [Required, DefaultValue(false)]
+        public bool IsReply { get; set; }
+
+        [Required, DefaultValue(false)]
+        public bool IsRead { get; set; }
+
+        [Required, DefaultValue(Defaults.GroveCityLocationId)] 
+        public Int32 LocationId { get; set; } = Defaults.GroveCityLocationId;
     }
 }
