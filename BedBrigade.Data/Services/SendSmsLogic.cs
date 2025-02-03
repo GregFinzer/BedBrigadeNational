@@ -62,6 +62,22 @@ public class SendSmsLogic : ISendSmsLogic
                                              scheduleResult.Message);
         }
 
+        SmsQueue smsQueue = BuildQueueRecord(signUp, fromPhone, volunteerResult, templateResult, scheduleResult);
+
+        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
+        if (createResult.Success)
+        {
+            return new ServiceResponse<bool>("SMS Message queued", true);
+        }
+
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
+    }
+
+    private static SmsQueue BuildQueueRecord(SignUp signUp, string fromPhone, 
+        ServiceResponse<Volunteer> volunteerResult,
+        ServiceResponse<Content> templateResult, 
+        ServiceResponse<Schedule> scheduleResult)
+    {
         SmsQueue smsQueue = new SmsQueue()
         {
             SignUpId = signUp.SignUpId,
@@ -77,14 +93,7 @@ public class SendSmsLogic : ISendSmsLogic
             IsReply = false,
             LocationId = signUp.LocationId
         };
-
-        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
-        if (createResult.Success)
-        {
-            return new ServiceResponse<bool>("SMS Message queued", true);
-        }
-
-        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
+        return smsQueue;
     }
 }
 
