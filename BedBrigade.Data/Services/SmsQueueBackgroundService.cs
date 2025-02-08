@@ -263,8 +263,7 @@ public class SmsQueueBackgroundService : BackgroundService
             string authToken =
                 await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsAuthToken);
 
-            string fromPhone =
-                await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone);
+            string fromPhone = StringUtil.FilterNumeric(message.FromPhoneNumber);
 
             TwilioClient.Init(accountSid, authToken);
 

@@ -60,6 +60,7 @@ namespace BedBrigade.Data
 
             CreateScheduleIndexes(modelBuilder);
             CreateSignUpIndexes(modelBuilder);
+            CreateSmsQueueIndexes(modelBuilder);
 
             //Translation
             modelBuilder.Entity<Translation>()
@@ -72,6 +73,15 @@ namespace BedBrigade.Data
                 .HasKey(up => new { up.UserName, up.Grid });
 
             CreateVolunteerIndexes(modelBuilder);
+        }
+
+        private static void CreateSmsQueueIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SmsQueue>()
+                .HasIndex(o => o.LocationId);
+
+            modelBuilder.Entity<SmsQueue>()
+                .HasIndex(o => o.ToPhoneNumber);
         }
 
         private static void CreateUserIndexes(ModelBuilder modelBuilder)

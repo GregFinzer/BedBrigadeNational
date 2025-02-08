@@ -55,9 +55,37 @@ namespace BedBrigade.Common.Models
         public string FullName {
 			get
 			{
-				return $"{FirstName} {LastName}";
+                if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName))
+                    return "Unknown";
+
+                return $"{FirstName} {LastName}".Trim();
 			}
 		}
+
+        [NotMapped]
+        public string Initials
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(FirstName) && !String.IsNullOrEmpty(LastName))
+                {
+                    return $"{FirstName.Substring(0, 1)}{LastName.Substring(0, 1)}";
+                }
+                else if (!String.IsNullOrEmpty(FirstName))
+                {
+                    return $"{FirstName.Substring(0, 1)}";
+                }
+                else if (!String.IsNullOrEmpty(LastName))
+                {
+                    return $"{LastName.Substring(0, 1)}";
+                }
+                else
+                {
+                    return "UK";
+                }
+            }
+        }
+
         [NotMapped]
         public string SearchName
         {
