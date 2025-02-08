@@ -18,4 +18,7 @@ public enum ContentType
     SignUpEmailConfirmationForm = 8,
     [Description("SignUp SMS Confirmation Form")]
     SignUpSmsConfirmationForm = 9,
+    Reserved = 10,
+    News = 11,
+    Stories = 12
 }
