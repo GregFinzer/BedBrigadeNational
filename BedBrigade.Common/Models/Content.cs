@@ -18,11 +18,11 @@ namespace BedBrigade.Common.Models
 		public ContentType ContentType { get; set; } = ContentType.Body;
 
 		[Required]
-		[MaxLength(50)]
+		[MaxLength(255)]
 		public String Title { get; set; } = string.Empty;
 
 		[Required]
-		[MaxLength(50)]
+		[MaxLength(255)]
 		public String Name { get; set; } = string.Empty;
 
         //No MaxLength attribute will default to nvarchar(max)
