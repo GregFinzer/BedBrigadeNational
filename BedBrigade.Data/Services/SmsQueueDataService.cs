@@ -153,7 +153,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                         ContactName = g.First().ContactName,
                         Body = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().Body,
                         MessageDate = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().SentDate,
-                        UnRead = g.All(o => !o.IsRead)
+                        UnRead = g.Any(o => !o.IsRead)
                     })
                     .ToListAsync();
 
