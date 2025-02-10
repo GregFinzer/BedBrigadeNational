@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models
 {
@@ -61,8 +60,7 @@ namespace BedBrigade.Common.Models
         [Required, StringLength(50)]
         public string ContactName { get; set; } = string.Empty;
 
-        [Required, StringLength(2)]
-        public string ContactInitials { get; set; } = string.Empty;
+
 
 
 

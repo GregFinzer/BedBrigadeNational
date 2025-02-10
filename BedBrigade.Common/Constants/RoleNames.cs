@@ -32,6 +32,8 @@
         public const string CanViewAdminDashboard =
             "National Admin, National Editor, Location Admin, Location Editor, Location Author, Location Scheduler, Location Contributor, Location Treasurer, Location Communications";
 
+        public const string CanSendSms = "National Admin, Location Admin, Location Scheduler, Location Communications";
+
         public const string CanViewBedRequests = CanViewAdminDashboard;
         public const string CanViewContacts = CanViewAdminDashboard;
         public const string CanViewLocations = CanViewAdminDashboard;
@@ -40,7 +42,7 @@
         public const string CanViewVolunteers = CanViewAdminDashboard;
         public const string CanViewSchedule = CanViewAdminDashboard;
         public const string CanViewUsers = CanViewAdminDashboard;
-
+        public const string CanViewSmsSummary = CanViewAdminDashboard;
 
     }
 }

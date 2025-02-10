@@ -9,7 +9,7 @@ namespace BedBrigade.Data.Services
         Task<List<SmsQueue>> GetMessagesToProcess(int maxPerChunk);
         Task DeleteOldSmsQueue(int daysOld);
         Task LockMessagesToProcess(List<SmsQueue> messagesToProcess);
-        Task<List<SmsQueueSummary>> GetSummaryForLocation(int locationId);
-        Task<List<SmsQueue>> GetMessagesForLocationAndToPhoneNumber(int locationId, string toPhoneNumber);
+        Task<ServiceResponse<List<SmsQueueSummary>>> GetSummaryForLocation(int locationId);
+        Task<ServiceResponse<List<SmsQueue>>> GetMessagesForLocationAndToPhoneNumber(int locationId, string toPhoneNumber);
     }
 }

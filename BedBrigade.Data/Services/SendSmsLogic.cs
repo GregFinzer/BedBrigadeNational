@@ -94,8 +94,7 @@ public class SendSmsLogic : ISendSmsLogic
             IsReply = false,
             LocationId = signUp.LocationId,
             ContactType = "Volunteer",
-            ContactName = volunteerResult.Data.FullName,
-            ContactInitials = volunteerResult.Data.Initials
+            ContactName = volunteerResult.Data.FullName
         };
         return smsQueue;
     }
