@@ -79,7 +79,7 @@ public partial class SmsSummary : ComponentBase
         }
         else
         {
-            RecordText = "No Text Messages found";
+            SummaryList = new List<SmsQueueSummary>();
         }
     }
 
