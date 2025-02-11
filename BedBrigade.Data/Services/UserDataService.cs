@@ -109,6 +109,11 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>($"Email Signature for {user.Data.FirstName} {user.Data.LastName}", true, result);
         }
 
+        public async Task<ServiceResponse<User>> GetByPhone(string phone)
+        {
+            return await _commonService.GetByPhone(this, phone);
+        }
+
         public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
         {
             var existingUser = await GetByIdAsync(id);

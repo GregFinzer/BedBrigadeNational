@@ -5,7 +5,7 @@ namespace BedBrigade.Common.Models;
 
 
 [Table("Users")]
-public class User : BaseEntity, ILocationId, IEmail
+public class User : BaseEntity, ILocationId, IEmail, IPhone
 {
     [Key, MaxLength(50), Required(ErrorMessage = "User name is required")]
     public String UserName { get; set; } = string.Empty;

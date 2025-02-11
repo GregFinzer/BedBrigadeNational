@@ -5,7 +5,7 @@ using BedBrigade.Common.Enums;
 namespace BedBrigade.Common.Models
 {
     [Table("ContactUs")]
-	public class ContactUs : BaseEntity, ILocationId, IEmail
+	public class ContactUs : BaseEntity, ILocationId, IEmail, IPhone
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -21,6 +21,12 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "Last Name is required")]
 		[MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
 		public String LastName { get; set; } = string.Empty;
+
+        [NotMapped]
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
 
         [Required(ErrorMessage = "Email Address is required")]
 		[MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]

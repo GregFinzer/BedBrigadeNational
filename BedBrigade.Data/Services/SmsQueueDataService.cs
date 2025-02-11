@@ -1,9 +1,10 @@
 ﻿using System.Data.Common;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using Twilio.Rest.Studio.V2.Flow;
-
+using Serilog;
 
 namespace BedBrigade.Data.Services;
 
@@ -11,12 +12,28 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 {
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICachingService _cachingService;
+    private IUserDataService _svcUser;
+    private IVolunteerDataService _svcVolunteer;
+    private IBedRequestDataService _svcBedRequest;
+    private IContactUsDataService _svcContactUs;
+    private IConfigurationDataService _svcConfiguration;
 
-    public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        IAuthService authService) : base(contextFactory, cachingService, authService)
+    public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
+        ICachingService cachingService,
+        IAuthService authService, 
+        IUserDataService svcUser, 
+        IVolunteerDataService svcVolunteer, 
+        IBedRequestDataService svcBedRequest, 
+        IContactUsDataService svcContactUs, 
+        IConfigurationDataService svcConfiguration) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
+        _svcUser = svcUser;
+        _svcVolunteer = svcVolunteer;
+        _svcBedRequest = svcBedRequest;
+        _svcContactUs = svcContactUs;
+        _svcConfiguration = svcConfiguration;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -204,6 +221,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     }
 
 
+
+
     //This is overridden because we don't want to log the SmsQueue entity
     public override async Task<ServiceResponse<SmsQueue>> CreateAsync(SmsQueue entity)
     {
@@ -252,9 +271,128 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
+    public async Task<ServiceResponse<SmsQueue>> CreateSmsReply(string fromPhoneNumber, string toPhoneNumber,
+        string body)
+    {
+        SmsQueue smsQueue = new SmsQueue
+        {
+            //This is a reply so we switch the from and to phone numbers
+            FromPhoneNumber = toPhoneNumber.FormatPhoneNumber(),
+            ToPhoneNumber = fromPhoneNumber.FormatPhoneNumber(),
+            Body = body,
+            QueueDate = DateTime.UtcNow,
+            TargetDate = DateTime.UtcNow,
+            SentDate = DateTime.UtcNow,
+            Priority = 1,
+            FailureMessage = string.Empty,
+            IsReply = true,
+            Status = SmsQueueStatus.Received.ToString(),
+            IsRead = false
+        };
 
+        string errorMessage = await FillLocationByFromPhoneNumber(smsQueue);
 
+        if (!string.IsNullOrEmpty(errorMessage))
+        {
+            Log.Error(errorMessage);
+            return new ServiceResponse<SmsQueue>(errorMessage);
+        }
 
+        await FillContactByToPhoneNumber(smsQueue);
+        return await CreateAsync(smsQueue);
+    }
+
+    private async Task FillContactByToPhoneNumber(SmsQueue smsQueue)
+    {
+        if (await FillContactByPhoneNumberFromUser(smsQueue))
+            return;
+
+        if (await FillContactByPhoneNumberFromVolunteer(smsQueue))
+            return;
+
+        if (await FillContactByPhoneNumberFromBedRequest(smsQueue))
+            return;
+        
+        if (await FillContactByPhoneNumberFromContactUs(smsQueue))
+            return;
+
+        Log.Warning($"FillContactByToPhoneNumber could not find a contact for {smsQueue.ToPhoneNumber}");
+        smsQueue.ContactType = ContactTypes.Unknown;
+        smsQueue.ContactName = "Unknown";
+    }
+
+    private async Task<bool> FillContactByPhoneNumberFromContactUs(SmsQueue smsQueue)
+    {
+        var result = await _svcContactUs.GetByPhone(smsQueue.ToPhoneNumber);
+        if (result.Success && result.Data != null)
+        {
+            smsQueue.ContactType = ContactTypes.ContactUs;
+            smsQueue.ContactName = result.Data.FullName;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<bool> FillContactByPhoneNumberFromBedRequest(SmsQueue smsQueue)
+    {
+        var result = await _svcBedRequest.GetByPhone(smsQueue.ToPhoneNumber);
+        if (result.Success && result.Data != null)
+        {
+            smsQueue.ContactType = ContactTypes.BedRequestor;
+            smsQueue.ContactName = result.Data.FullName;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<bool> FillContactByPhoneNumberFromVolunteer(SmsQueue smsQueue)
+    {
+        var result = await _svcVolunteer.GetByPhone(smsQueue.ToPhoneNumber);
+        if (result.Success && result.Data != null)
+        {
+            smsQueue.ContactType = ContactTypes.Volunteer;
+            smsQueue.ContactName = result.Data.FullName;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<bool> FillContactByPhoneNumberFromUser(SmsQueue smsQueue)
+    {
+        var result = await _svcUser.GetByPhone(smsQueue.ToPhoneNumber);
+
+        if (result.Success && result.Data != null)
+        {
+            smsQueue.ContactType = ContactTypes.User;
+            smsQueue.ContactName = result.Data.FullName;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<string> FillLocationByFromPhoneNumber(SmsQueue smsQueue)
+    {
+        var result = await _svcConfiguration.GetAllAsync(ConfigSection.Sms);
+        if (!result.Success || result.Data == null || !result.Data.Any())
+        {
+            return "FillLocationByFromPhoneNumber could not get any ConfigSection.Sms";
+        }
+
+        var config = result.Data.FirstOrDefault(c => c.ConfigurationKey == ConfigNames.SmsPhone 
+                                                     && StringUtil.ExtractDigits(c.ConfigurationValue) == StringUtil.ExtractDigits(smsQueue.FromPhoneNumber));
+
+        if (config == null)
+        {
+            return $"FillLocationByFromPhoneNumber could not get ConfigNames.SmsPhone for {smsQueue.FromPhoneNumber}";
+        }
+
+        smsQueue.LocationId = config.LocationId;
+        return string.Empty;
+    }
 }
 
 

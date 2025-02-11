@@ -7,5 +7,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<ContactUs>>> GetAllForLocationAsync(int locationId);
         Task<ServiceResponse<List<string>>> GetDistinctEmail();
         Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
+        Task<ServiceResponse<ContactUs>> GetByPhone(string phone);
     }
 }

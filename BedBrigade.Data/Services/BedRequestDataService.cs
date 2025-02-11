@@ -76,6 +76,11 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
+    public async Task<ServiceResponse<BedRequest>> GetByPhone(string phone)
+    {
+        return await _commonService.GetByPhone(this, phone);
+    }
+
     public async Task<ServiceResponse<List<string>>> EmailsForNotReceivedABed(int locationId)
     {
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"EmailsForNotReceivedABed");
