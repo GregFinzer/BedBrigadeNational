@@ -2,6 +2,8 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Twilio.Rest.Studio.V2.Flow;
+
 
 namespace BedBrigade.Data.Services;
 
@@ -39,6 +41,9 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     public async Task ClearSmsQueueLock()
     {
         var lockedMessages = await GetLockedMessages();
+
+        if (lockedMessages.Count == 0)
+            return;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -87,9 +92,14 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             var dbSet = ctx.Set<SmsQueue>();
             var oldMessages = dbSet.Where(o =>
                 o.Status != SmsQueueStatus.Queued.ToString() && o.UpdateDate < DateTime.UtcNow.AddDays(-daysOld));
-            dbSet.RemoveRange(oldMessages);
-            await ctx.SaveChangesAsync();
-            _cachingService.ClearByEntityName(GetEntityName());
+
+            var oldMessagesList = await oldMessages.ToListAsync();
+            if (oldMessagesList.Count > 0)
+            {
+                dbSet.RemoveRange(oldMessagesList);
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+            }
         }
     }
 
@@ -98,19 +108,100 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
+            bool anyLocked = false;
             foreach (var message in messagesToProcess)
             {
                 message.LockDate = DateTime.UtcNow;
                 message.Status = SmsQueueStatus.Locked.ToString();
                 message.UpdateDate = DateTime.UtcNow;
                 dbSet.Update(message);
+                anyLocked = true;
             }
 
-            await ctx.SaveChangesAsync();
-            _cachingService.ClearByEntityName(GetEntityName());
+            if (anyLocked)
+            {
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+            }
         }
     }
 
+    public async Task<ServiceResponse<List<SmsQueueSummary>>> GetSummaryForLocation(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetSummaryForLocation({locationId})");
+        List<SmsQueueSummary>? cachedContent = _cachingService.Get<List<SmsQueueSummary>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SmsQueueSummary>>($"Found {cachedContent.Count} {GetEntityName()} in cache",
+                true,
+                cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.Set<SmsQueue>()
+                    .Where(o => o.LocationId == locationId)
+                    .GroupBy(o => o.ToPhoneNumber)
+                    .Select(g => new SmsQueueSummary
+                    {
+                        ToPhoneNumber = g.Key,
+                        MessageCount = g.Count(),
+                        ContactType = g.First().ContactType,
+                        ContactName = g.First().ContactName,
+                        Body = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().Body,
+                        MessageDate = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().SentDate,
+                        UnRead = g.Any(o => !o.IsRead)
+                    })
+                    .ToListAsync();
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SmsQueueSummary>>($"Found {result.Count} {GetEntityName()}", true,
+                    result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SmsQueueSummary>>(
+                $"Error GetSummaryForLocation for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<List<SmsQueue>>> GetMessagesForLocationAndToPhoneNumber(int locationId,
+        string toPhoneNumber)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),
+            $"GetMessagesForLocationAndToPhoneNumber({locationId},{toPhoneNumber})");
+        List<SmsQueue>? cachedContent = _cachingService.Get<List<SmsQueue>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Found {cachedContent.Count} {GetEntityName()} in cache", true,
+                cachedContent);
+        }
+
+        try
+        {
+
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                var result = await dbSet.Where(o => o.LocationId == locationId
+                                                    && o.ToPhoneNumber == toPhoneNumber)
+                    .OrderBy(o => o.SentDate).ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SmsQueue>>($"Found {result.Count} {GetEntityName()}", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>(
+                $"Error GetMessagesForLocationAndToPhoneNumber for {GetEntityName()} : {ex.Message} ({ex.ErrorCode})",
+                false, null);
+        }
+    }
 
 
     //This is overridden because we don't want to log the SmsQueue entity
@@ -161,34 +252,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
-    //public async Task<ServiceResponse<bool>> DeleteByAppointmentId(int appointmentId)
-    //{
-    //    try
-    //    {
-    //        using (var ctx = _contextFactory.CreateDbContext())
-    //        {
-    //            var dbSet = ctx.Set<SmsQueue>();
-    //            var messages = await dbSet.Where(o => o.AppointmentId == appointmentId).ToListAsync();
 
-    //            if (messages.Count == 0)
-    //            {
-    //                return new ServiceResponse<bool>($"No {GetEntityName()} to delete for appointment {appointmentId}", true, true);
-    //            }
 
-    //            dbSet.RemoveRange(messages);
-    //            await ctx.SaveChangesAsync();
-    //            _cachingService.ClearByEntityName(GetEntityName());
-    //            return new ServiceResponse<bool>(
-    //                $"Deleted {messages.Count} {GetEntityName()} for appointment {appointmentId}", true, true);
-    //        }
-    //    }
-    //    catch (DbException ex)
-    //    {
-    //        return new ServiceResponse<bool>(
-    //            $"Could not DeleteByAppointmentId {appointmentId} {GetEntityName()}: {ex.Message} ({ex.ErrorCode})",
-    //            false);
-    //    }
-    //}
 
 }
 

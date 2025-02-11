@@ -15,4 +15,5 @@ public enum PersistGrid
     ContactUs = 11,
     Evol = 12,
     MetroAreas =13,
+    SmsSummary=14
 }

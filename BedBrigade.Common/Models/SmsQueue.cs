@@ -13,10 +13,10 @@ namespace BedBrigade.Common.Models
         public Int32 SmsQueueId { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(14)]
         public string FromPhoneNumber { get; set; }
 
-        [Required][StringLength(10)]
+        [Required][StringLength(14)]
         public string ToPhoneNumber { get; set; }
 
         [Required]
@@ -53,5 +53,16 @@ namespace BedBrigade.Common.Models
 
         [Required, DefaultValue(Defaults.GroveCityLocationId)] 
         public Int32 LocationId { get; set; } = Defaults.GroveCityLocationId;
+
+        [Required, StringLength(20)]
+        public string ContactType { get; set; } = string.Empty;
+
+        [Required, StringLength(50)]
+        public string ContactName { get; set; } = string.Empty;
+
+
+
+
+
     }
 }

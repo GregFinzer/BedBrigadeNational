@@ -1,5 +1,6 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services;
@@ -81,8 +82,8 @@ public class SendSmsLogic : ISendSmsLogic
         SmsQueue smsQueue = new SmsQueue()
         {
             SignUpId = signUp.SignUpId,
-            FromPhoneNumber = fromPhone,
-            ToPhoneNumber = volunteerResult.Data.Phone,
+            FromPhoneNumber = fromPhone.FormatPhoneNumber(),
+            ToPhoneNumber = volunteerResult.Data.Phone.FormatPhoneNumber(),
             Body = templateResult.Data.ContentHtml,
             Priority = 1,
             Status = SmsQueueStatus.Queued.ToString(),
@@ -91,7 +92,9 @@ public class SendSmsLogic : ISendSmsLogic
             TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2),
             IsRead = true,
             IsReply = false,
-            LocationId = signUp.LocationId
+            LocationId = signUp.LocationId,
+            ContactType = "Volunteer",
+            ContactName = volunteerResult.Data.FullName
         };
         return smsQueue;
     }

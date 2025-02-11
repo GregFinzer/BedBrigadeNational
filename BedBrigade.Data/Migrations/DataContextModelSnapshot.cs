@@ -1016,6 +1016,16 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(1600)
                         .HasColumnType("nvarchar(1600)");
 
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ContactType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
@@ -1029,8 +1039,8 @@ namespace BedBrigade.Server.Migrations
 
                     b.Property<string>("FromPhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(14)
+                        .HasColumnType("nvarchar(14)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
@@ -1070,8 +1080,8 @@ namespace BedBrigade.Server.Migrations
 
                     b.Property<string>("ToPhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(14)
+                        .HasColumnType("nvarchar(14)");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
@@ -1082,7 +1092,11 @@ namespace BedBrigade.Server.Migrations
 
                     b.HasKey("SmsQueueId");
 
+                    b.HasIndex("LocationId");
+
                     b.HasIndex("SignUpId");
+
+                    b.HasIndex("ToPhoneNumber");
 
                     b.ToTable("SmsQueue");
                 });

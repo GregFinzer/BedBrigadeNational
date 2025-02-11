@@ -55,9 +55,13 @@ namespace BedBrigade.Common.Models
         public string FullName {
 			get
 			{
-				return $"{FirstName} {LastName}";
+                if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName))
+                    return "Unknown";
+
+                return $"{FirstName} {LastName}".Trim();
 			}
 		}
+
         [NotMapped]
         public string SearchName
         {
