@@ -9,6 +9,9 @@ namespace BedBrigade.Common.Logic
             if (string.IsNullOrEmpty(phone))
                 return phone;
 
+            if (phone.StartsWith("+1") && phone.Length > 2)
+                phone = phone.Substring(2);
+
             var numbersOnly = StringUtil.ExtractDigits(phone);
 
             if (numbersOnly.Length != 10)

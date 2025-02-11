@@ -7,7 +7,7 @@ using BedBrigade.Common.Logic;
 namespace BedBrigade.Common.Models
 {
     [Table("Volunteers")]
-	public class Volunteer : BaseEntity, ILocationId, IEmail
+	public class Volunteer : BaseEntity, ILocationId, IEmail, IPhone
     {
 		[Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

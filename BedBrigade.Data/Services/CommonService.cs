@@ -83,6 +83,27 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<TEntity>>($"Found {result.Count()} {repository.GetEntityName()} records with LocationIds {string.Join(",", locationIds)}", true, result);
             }
         }
+
+        public async Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity : class, IPhone
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetByPhone({phone})");
+            var cachedContent = _cachingService.Get<TEntity>(cacheKey);
+
+            if (cachedContent != null)
+                return new ServiceResponse<TEntity>($"Found {repository.GetEntityName()} record in cache with phone {phone}", true, cachedContent); ;
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.FirstOrDefaultAsync(b => b.Phone == phone);
+
+                if (result == null)
+                    return new ServiceResponse<TEntity>($"No {repository.GetEntityName()} record found with phone {phone}", false);
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<TEntity>($"Found {repository.GetEntityName()} record with phone {phone}", true, result);
+            }
+        }
     }
 
 

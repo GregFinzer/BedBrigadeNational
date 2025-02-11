@@ -30,6 +30,11 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
     {
         return await _commonService.GetDistinctEmailByLocation(this, locationId);
     }
+
+    public async Task<ServiceResponse<ContactUs>> GetByPhone(string phone)
+    {
+        return await _commonService.GetByPhone(this, phone);
+    }
 }
 
 

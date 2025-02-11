@@ -13,5 +13,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<BedRequest>>> GetAllForLocationList(List<int> locationIds);
         Task<ServiceResponse<List<BedRequest>>> GetScheduledBedRequestsForLocation(int locationId);
         Task<ServiceResponse<int>> SumBedsForNotReceived(int locationId);
+        Task<ServiceResponse<BedRequest>> GetByPhone(string phone);
     }
 }

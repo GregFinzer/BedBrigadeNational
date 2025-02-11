@@ -144,7 +144,10 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         }
     }
 
-
+    public async Task<ServiceResponse<Volunteer>> GetByPhone(string phone)
+    {
+        return await _commonService.GetByPhone(this, phone);
+    }
 }
 
 

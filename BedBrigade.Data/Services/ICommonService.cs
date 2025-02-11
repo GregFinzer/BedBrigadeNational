@@ -15,5 +15,7 @@ namespace BedBrigade.Data.Services
 
         Task<ServiceResponse<List<TEntity>>> GetAllForLocationList<TEntity>(IRepository<TEntity> repository, List<int> locationIds)
             where TEntity : class, ILocationId;
+
+        Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity: class, IPhone;
     }
 }

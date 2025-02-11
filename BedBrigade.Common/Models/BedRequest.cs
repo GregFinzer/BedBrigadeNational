@@ -6,7 +6,7 @@ using BedBrigade.Common.Logic;
 namespace BedBrigade.Common.Models;
 
 [Table("BedRequests")]
-public class BedRequest : BaseEntity, ILocationId, IEmail
+public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
