@@ -17,6 +17,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IBedRequestDataService _svcBedRequest;
     private IContactUsDataService _svcContactUs;
     private IConfigurationDataService _svcConfiguration;
+    private ISmsState _smsState;
 
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -25,7 +26,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         IVolunteerDataService svcVolunteer, 
         IBedRequestDataService svcBedRequest, 
         IContactUsDataService svcContactUs, 
-        IConfigurationDataService svcConfiguration) : base(contextFactory, cachingService, authService)
+        IConfigurationDataService svcConfiguration, 
+        ISmsState smsState) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -34,6 +36,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _svcBedRequest = svcBedRequest;
         _svcContactUs = svcContactUs;
         _svcConfiguration = svcConfiguration;
+        _smsState = smsState;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -299,7 +302,14 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
 
         await FillContactByToPhoneNumber(smsQueue);
-        return await CreateAsync(smsQueue);
+        var result = await CreateAsync(smsQueue);
+
+        if (result.Success && result.Data != null)
+        {
+            await _smsState.NotifyStateChangedAsync(result.Data);
+        }
+
+        return result;
     }
 
     private async Task FillContactByToPhoneNumber(SmsQueue smsQueue)

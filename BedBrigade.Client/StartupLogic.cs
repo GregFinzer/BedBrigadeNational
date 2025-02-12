@@ -184,6 +184,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IGeoLocationProcessorDataService, GeoLocationProcessorDataService>();
             builder.Services.AddScoped<ISmsQueueDataService, SmsQueueDataService>();
             builder.Services.AddScoped<ISendSmsLogic, SendSmsLogic>();
+            builder.Services.AddSingleton<ISmsState, SmsState>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

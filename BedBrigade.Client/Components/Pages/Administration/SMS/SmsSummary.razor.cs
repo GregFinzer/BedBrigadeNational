@@ -15,14 +15,14 @@ using UserPersist = BedBrigade.Common.Models.UserPersist;
 
 namespace BedBrigade.Client.Components.Pages.Administration.SMS;
 
-public partial class SmsSummary : ComponentBase
+public partial class SmsSummary : ComponentBase, IDisposable
 {
     [Inject] private IUserDataService? _svcUser { get; set; }
     [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
     [Inject] private ISmsQueueDataService? _svcSmsQueue { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
-
+    [Inject] private ISmsState _smsState { get; set; }
     protected List<SmsQueueSummary>? SummaryList { get; set; }
     private ClaimsPrincipal? Identity { get; set; }
     private const string LastPage = "LastPage";
@@ -60,6 +60,7 @@ public partial class SmsSummary : ComponentBase
 
             await LoadLocations();
             await LoadSummary();
+            _smsState.OnChange += OnSmsStateChange;
         }
         catch (Exception ex)
         {
@@ -67,6 +68,20 @@ public partial class SmsSummary : ComponentBase
             throw;
         }
 
+    }
+
+    private async Task OnSmsStateChange(SmsQueue smsQueue)
+    {
+        if (CurrentLocationId == smsQueue.LocationId)
+        {
+            await LoadSummary();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        _smsState.OnChange -= OnSmsStateChange;
     }
 
     private async Task LoadSummary()
