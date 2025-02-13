@@ -1,0 +1,51 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/SMS/SmsDetails/{locationId:int}/{phone}"
+
+<CheckAuth Roles=@RoleNames.CanViewSmsSummary></CheckAuth>
+
+<div class="sms-details-container">
+    <!-- Sticky Header -->
+    <div class="header">
+        <button class="back-button" @onclick="GoBack">
+            <!-- Font Awesome icon for the back arrow -->
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-title">
+            <!-- Circle with initials -->
+            <div class="contact-initials">@ContactInitials</div>
+            <div class="contact-name">@ContactName | @phone | @ContactType</div>
+        </div>
+    </div>
+
+    <!-- Scrollable message area -->
+    <div class="messages-container" id="messagesContainer">
+        @if (smsMessages == null)
+        {
+            <div class="loading">Loading messages...</div>
+        }
+        else if (!smsMessages.Any())
+        {
+            <div class="no-messages">No messages found.</div>
+        }
+        else
+        {
+            @foreach (var msg in smsMessages.OrderBy(m => m.QueueDate))
+            {
+                <div class="message-block">
+                    <!-- Date/Time above each message -->
+                    <div class="message-time">@msg.QueueDate.ToString("f")</div>
+
+                    <div class="@(msg.IsReply ? "message-bubble reply" : "message-bubble sent")">
+                        @msg.Body
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Text input and Send button at the bottom -->
+    <div class="input-bar">
+        <textarea @bind="newMessage" placeholder="Message @ContactName"></textarea>
+        <button class="send-button" @onclick="SendMessage">Send</button>
+    </div>
+</div>
