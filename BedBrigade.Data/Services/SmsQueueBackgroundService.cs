@@ -28,11 +28,8 @@ public class SmsQueueBackgroundService : BackgroundService
 
     private ISmsQueueDataService _smsQueueDataService;
     private IConfigurationDataService _configurationDataService;
-    private IMailMergeLogic _mailMergeLogic;
-    private ISignUpDataService _signUpDataService;
-    private IVolunteerDataService _volunteerDataService;
-    private ILocationDataService _locationDataService;
-    private IScheduleDataService _scheduleDataService;
+
+    private ISendSmsLogic _sendSmsLogic;
     private bool _isProcessing = false;
     private int _smsBeginHour;
     private int _smsEndHour;
@@ -43,10 +40,8 @@ public class SmsQueueBackgroundService : BackgroundService
     private int _smsKeepDays;
     private int _smsMaxPerChunk;
     private bool _smsUseFileMock;
-    private string _smsPhone;
     private int _smsAppointmentReminderHour;
-    private string _smsAccountSid;
-    private string _smsAuthToken;
+
 
     #endregion
 
@@ -77,11 +72,6 @@ public class SmsQueueBackgroundService : BackgroundService
                         _smsQueueDataService = scope.ServiceProvider.GetRequiredService<ISmsQueueDataService>();
                         _configurationDataService =
                             scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
-                        _mailMergeLogic = scope.ServiceProvider.GetRequiredService<IMailMergeLogic>();
-                        _signUpDataService = scope.ServiceProvider.GetRequiredService<ISignUpDataService>();
-                        _volunteerDataService = scope.ServiceProvider.GetRequiredService<IVolunteerDataService>();
-                        _locationDataService = scope.ServiceProvider.GetRequiredService<ILocationDataService>();
-                        _scheduleDataService = scope.ServiceProvider.GetRequiredService<IScheduleDataService>();
 
                         await LoadConfiguration();
                         await ProcessQueue(cancellationToken);
@@ -150,24 +140,10 @@ public class SmsQueueBackgroundService : BackgroundService
                 return;
             }
 
-            try
-            {
-                await PerformMailMerge(smsQueue);
-            }
-            catch (Exception ex)
-            {
-                await HandleFailure(smsQueue, ex);
-                continue;
-            }
+            var result = await _sendSmsLogic.SendTextMessage(smsQueue);
 
-            if (_smsUseFileMock)
-            {
-                await LogSmsMessage(smsQueue);
-            }
-            else
-            {
-                await SendLiveTextMessage(smsQueue);
-            }
+            if (!result.Success)
+                continue;
 
             var elapsed = DateTime.Now - currentTime;
             if (elapsed.TotalMilliseconds < millisecondDelay)
@@ -187,121 +163,10 @@ public class SmsQueueBackgroundService : BackgroundService
         _logger.LogDebug(msg);
     }
 
-    private async Task HandleFailure(SmsQueue smsQueue, Exception ex)
-    {
-        smsQueue.Status = SmsQueueStatus.Failed.ToString();
-        smsQueue.FailureMessage = ex.Message;
-        await _smsQueueDataService.UpdateAsync(smsQueue);
-        _logger.LogError(ex, "Error merging SMS message");
-    }
-
-    private async Task PerformMailMerge(SmsQueue message)
-    {
-        if (message.SignUpId.HasValue)
-        {
-            ServiceResponse<SignUp> signUpResponse = await _signUpDataService.GetByIdAsync(message.SignUpId.Value);
-            if (!signUpResponse.Success || signUpResponse.Data == null)
-            {
-                _logger.LogError("Error getting SignUp for SMS message: {0}", signUpResponse.Message);
-            }
-
-            ServiceResponse<Volunteer> volunteerResponse =
-                await _volunteerDataService.GetByIdAsync(signUpResponse.Data.VolunteerId);
-
-            if (!volunteerResponse.Success || volunteerResponse.Data == null)
-            {
-                _logger.LogError("Error getting Volunteer for SMS message: {0}", volunteerResponse.Message);
-            }
-
-            ServiceResponse<Location> locationResponse =
-                await _locationDataService.GetByIdAsync(signUpResponse.Data.LocationId);
-
-            if (!locationResponse.Success || locationResponse.Data == null)
-            {
-                _logger.LogError("Error getting Location for SMS message: {0}", locationResponse.Message);
-            }
-
-            ServiceResponse<Schedule> scheduleResponse =
-                await _scheduleDataService.GetByIdAsync(signUpResponse.Data.ScheduleId);
-
-            if (!scheduleResponse.Success || scheduleResponse.Data == null)
-            {
-                _logger.LogError("Error getting Schedule for SMS message: {0}", scheduleResponse.Message);
-            }
-
-            StringBuilder sb = new StringBuilder(message.Body, message.Body.Length * 2);
-            sb = _mailMergeLogic.ReplaceVolunteerFields(volunteerResponse.Data, scheduleResponse.Data, sb);
-            sb = _mailMergeLogic.ReplaceLocationFields(locationResponse.Data, sb);
-            sb = _mailMergeLogic.ReplaceScheduleFields(scheduleResponse.Data, sb);
-            message.Body = sb.ToString().Trim();
-        }
-    }
 
 
-    private async Task LogSmsMessage(SmsQueue message)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Send Text Message (nothing actually sent see Configuration.SmsUseFileMock");
-        sb.AppendLine($"FromPhoneNumber:  {message.FromPhoneNumber}");
-        sb.AppendLine($"ToPhoneNumber:  {message.ToPhoneNumber}");
-        sb.AppendLine($"Body:  {message.Body}");
-        sb.AppendLine("=".PadRight(40, '='));
-        _logger.LogInformation(sb.ToString());
 
-        message.SentDate = DateTime.UtcNow;
-        message.Status = SmsQueueStatus.Sent.ToString();
-        await _smsQueueDataService.UpdateAsync(message);
-    }
 
-    private async Task SendLiveTextMessage(SmsQueue message)
-    {
-        try
-        {
-            string accountSid =
-                await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsAccountSid);
-
-            string authToken =
-                await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsAuthToken);
-
-            string fromPhone = StringUtil.FilterNumeric(message.FromPhoneNumber);
-
-            TwilioClient.Init(accountSid, authToken);
-
-            CreateMessageOptions messageOptions =
-                new CreateMessageOptions(new PhoneNumber(StringUtil.FilterNumeric(message.ToPhoneNumber)));
-            messageOptions.From = new PhoneNumber(fromPhone);
-            messageOptions.Body = message.Body;
-
-            MessageResource? result = await MessageResource.CreateAsync(messageOptions);
-
-            if (result == null)
-            {
-                message.FailureMessage =
-                    $"SMS send operation failed: result is null";
-                message.Status = EmailQueueStatus.Failed.ToString();
-            }
-            else if (result.ErrorCode.HasValue && result.ErrorCode.Value > 0)
-            {
-                message.FailureMessage =
-                    $"SMS send operation failed with error code: {result.ErrorCode}, message: {result.ErrorMessage}";
-                message.Status = EmailQueueStatus.Failed.ToString();
-            }
-            else
-            {
-                message.Status = EmailQueueStatus.Sent.ToString();
-            }
-        }
-        catch (Exception ex)
-        {
-            message.FailureMessage =
-                $"SMS send operation failed: {ex.Message}";
-            message.Status = EmailQueueStatus.Failed.ToString();
-        }
-
-        message.LockDate = null;
-        message.SentDate = DateTime.UtcNow;
-        await _smsQueueDataService.UpdateAsync(message);
-    }
 
     private async Task<bool> WaitForLock()
     {
@@ -370,21 +235,7 @@ public class SmsQueueBackgroundService : BackgroundService
         _smsUseFileMock =
             await _configurationDataService.GetConfigValueAsBoolAsync(ConfigSection.Sms,
                 ConfigNames.SmsUseFileMock);
-        _smsPhone = await LoadSmsConfigString(ConfigNames.SmsPhone);
-        _smsAccountSid = await LoadSmsConfigString(ConfigNames.SmsAccountSid);
-        _smsAuthToken = await LoadSmsConfigString(ConfigNames.SmsAuthToken);
-    }
 
-    private async Task<string> LoadSmsConfigString(string id)
-    {
-        var configResult = await _configurationDataService.GetByIdAsync(id);
-
-        if (!configResult.Success || configResult.Data == null)
-        {
-            throw new ArgumentException("Could not find Config setting: " + id);
-        }
-
-        return configResult.Data.ConfigurationValue ?? string.Empty;
     }
 
     private async Task<int> LoadSmsConfigValue(string id)

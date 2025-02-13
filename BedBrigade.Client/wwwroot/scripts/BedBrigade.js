@@ -120,7 +120,7 @@ window.BedBrigadeUtil = {
     GetBrowserLocale: function () {
         return (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.userLanguage || navigator.language || navigator.browserLanguage || 'en-US';
     },
-    ScrollPastImages: function() {
+    ScrollPastImages: function () {
         window.scrollTo({
             top: 500,
             behavior: 'instant'
@@ -150,7 +150,15 @@ window.BedBrigadeUtil = {
         } else {
             console.error(`Element with id ${elementId} not found`);
         }
+    },
+    ScrollToBottom: function (elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.scrollTop = element.scrollHeight;
+        }
+    },
+    playNotification: function () {        
+        const audio = new Audio('/sounds/Notification.mp3');
+        audio.play();
     }
-
-
 }

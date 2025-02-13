@@ -23,6 +23,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
     [Inject] private ISmsQueueDataService? _svcSmsQueue { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] private ISmsState _smsState { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
     protected List<SmsQueueSummary>? SummaryList { get; set; }
     private ClaimsPrincipal? Identity { get; set; }
     private const string LastPage = "LastPage";
@@ -240,13 +241,21 @@ public partial class SmsSummary : ComponentBase, IDisposable
         }
     }
 
-
-
-    public void RowBound(RowDataBoundEventArgs<SmsQueueSummary> args)
+    public void OnRowBound(RowDataBoundEventArgs<SmsQueueSummary> args)
     {
         if (args.Data.UnRead)
         {
             args.Row.AddClass(new string[] { "new-message" });
+        }
+    }
+
+    protected void OnRowSelected(RowSelectEventArgs<SmsQueueSummary> args)
+    {
+        var item = args.Data;
+        if (item != null)
+        {
+            // Navigate to the SmsDetails page passing locationId and phone (using ToPhoneNumber)
+            NavigationManager.NavigateTo($"/administration/SMS/SmsDetails/{CurrentLocationId}/{item.ToPhoneNumber}");
         }
     }
 }

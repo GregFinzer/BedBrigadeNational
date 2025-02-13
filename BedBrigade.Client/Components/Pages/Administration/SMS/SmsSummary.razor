@@ -50,7 +50,7 @@ else
                             AllowEditing="false"
                             Width="100%">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
-                        <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowDataBound="RowBound" TValue="SmsQueueSummary" />
+                        <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowDataBound="OnRowBound" RowSelected="OnRowSelected" TValue="SmsQueueSummary" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
                                 <span>@RecordText</span>

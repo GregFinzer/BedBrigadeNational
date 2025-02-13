@@ -34,6 +34,7 @@ namespace BedBrigade.Client.Components.Layout
             {
                 _toastService.Success($"SMS Message: {smsQueue.ContactName} {smsQueue.FromPhoneNumber}",
                     smsQueue.Body);
+                await _js.InvokeVoidAsync("BedBrigadeUtil.playNotification");
             }
         }
 

@@ -12,5 +12,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<SmsQueueSummary>>> GetSummaryForLocation(int locationId);
         Task<ServiceResponse<List<SmsQueue>>> GetMessagesForLocationAndToPhoneNumber(int locationId, string toPhoneNumber);
         Task<ServiceResponse<SmsQueue>> CreateSmsReply(string fromPhoneNumber, string toPhoneNumber, string body);
+        Task FillContactByToPhoneNumber(SmsQueue smsQueue);
     }
 }

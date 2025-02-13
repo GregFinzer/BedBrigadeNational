@@ -312,7 +312,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         return result;
     }
 
-    private async Task FillContactByToPhoneNumber(SmsQueue smsQueue)
+    public async Task FillContactByToPhoneNumber(SmsQueue smsQueue)
     {
         if (await FillContactByPhoneNumberFromUser(smsQueue))
             return;
@@ -322,7 +322,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
         if (await FillContactByPhoneNumberFromBedRequest(smsQueue))
             return;
-        
+
         if (await FillContactByPhoneNumberFromContactUs(smsQueue))
             return;
 
