@@ -17,6 +17,7 @@ namespace BedBrigade.Data.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<EmailQueueBackgroundService> _logger;
         private bool _isProcessing = false;
+        private bool _isStopping;
 
         // Configuration fields
         private int _emailBeginHour;
@@ -45,12 +46,17 @@ namespace BedBrigade.Data.Services
             _logger = logger;
         }
 
+        public void StopService()
+        {
+            _isStopping = true;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             // Initial delay before starting the service
             await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested && !_isStopping)
             {
                 if (!_isProcessing)
                 {

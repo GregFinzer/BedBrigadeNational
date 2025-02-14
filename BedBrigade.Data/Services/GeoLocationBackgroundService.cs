@@ -9,6 +9,7 @@ namespace BedBrigade.Data.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<GeoLocationBackgroundService> _logger;
         private bool _isProcessing = false;
+        private bool _isStopping;
 
         public GeoLocationBackgroundService(
             IServiceProvider serviceProvider,
@@ -18,11 +19,16 @@ namespace BedBrigade.Data.Services
             _logger = logger;
         }
 
+        public void StopService()
+        {
+            _isStopping = true;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             await Task.Delay(TimeSpan.FromSeconds(90), cancellationToken);
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested && !_isStopping)
             {
                 if (!_isProcessing)
                 {
