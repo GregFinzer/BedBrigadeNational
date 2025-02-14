@@ -17,6 +17,7 @@ using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
+using Microsoft.Extensions.Hosting;
 
 
 namespace BedBrigade.Client
@@ -117,10 +118,17 @@ namespace BedBrigade.Client
 
         private static void BackgroundServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddHostedService<TranslationBackgroundService>();
-            builder.Services.AddHostedService<EmailQueueBackgroundService>();
-            builder.Services.AddHostedService<GeoLocationBackgroundService>();
-            builder.Services.AddHostedService<SmsQueueBackgroundService>();
+            builder.Services.AddSingleton<TranslationBackgroundService>();
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<TranslationBackgroundService>());
+
+            builder.Services.AddSingleton<EmailQueueBackgroundService>();
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EmailQueueBackgroundService>());
+
+            builder.Services.AddSingleton<GeoLocationBackgroundService>();
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<GeoLocationBackgroundService>());
+
+            builder.Services.AddSingleton<SmsQueueBackgroundService>();
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<SmsQueueBackgroundService>());
         }
 
         private static void SetupAuth(WebApplicationBuilder builder)

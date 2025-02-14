@@ -6,5 +6,6 @@ namespace BedBrigade.Data.Services
     {
         event Func<SmsQueue, Task> OnChange;
         Task NotifyStateChangedAsync(SmsQueue smsQueue);
+        void StopService();
     }
 }

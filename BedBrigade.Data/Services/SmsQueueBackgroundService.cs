@@ -1,19 +1,10 @@
 ﻿#region Includes
-using System.Net.Mail;
-using System.Text;
-using System.Threading;
-using Azure;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using BedBrigade.Data.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Types;
 
 #endregion
 
@@ -41,7 +32,7 @@ public class SmsQueueBackgroundService : BackgroundService
     private int _smsMaxPerChunk;
     private bool _smsUseFileMock;
     private int _smsAppointmentReminderHour;
-
+    private bool _isStopping;
 
     #endregion
 
@@ -53,13 +44,17 @@ public class SmsQueueBackgroundService : BackgroundService
     }
 
     #region Public Methods
+    public void StopService()
+    {
+        _isStopping = true;
+    }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         // Initial delay before starting the service
         await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
 
-        while (!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested && !_isStopping)
         {
             if (!_isProcessing)
             {
