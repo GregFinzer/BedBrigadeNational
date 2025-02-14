@@ -305,7 +305,8 @@ namespace BedBrigade.Client
             var dbContextFactory = services.GetRequiredService<Microsoft.EntityFrameworkCore.IDbContextFactory<DataContext>>();
             using (var context = dbContextFactory.CreateDbContext())
             {
-                var config = await context.Configurations.FindAsync(ConfigNames.IsCachingEnabled, Defaults.NationalLocationId);
+                var config = await context.Configurations.FirstOrDefaultAsync( o => o.ConfigurationKey == ConfigNames.IsCachingEnabled
+                    && o.LocationId == Defaults.NationalLocationId);
                 if (config != null)
                 {
                     if (config != null)

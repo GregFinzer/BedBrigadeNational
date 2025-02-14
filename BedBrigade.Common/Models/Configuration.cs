@@ -4,14 +4,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Common.Models
 {
-    [PrimaryKey(nameof(ConfigurationKey), nameof(LocationId))]
     [Table("Configurations")]
     public class Configuration : BaseEntity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Int32 ConfigurationId { get; set; }
+
         [MaxLength(50), Required]
         public String ConfigurationKey { get; set; } = string.Empty;
 
