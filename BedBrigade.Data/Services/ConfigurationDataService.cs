@@ -1,4 +1,4 @@
-﻿using BedBrigade.Client.Services;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +51,7 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         if (!response.Success || response.Data == null)
             return new ServiceResponse<Configuration>(response.Message, false);
 
-        Configuration result = response.Data.FirstOrDefault(o => o.ConfigurationKey == id.ToString());
+        Configuration result = response.Data.FirstOrDefault(o => o.ConfigurationKey == id.ToString() && o.LocationId == Defaults.NationalLocationId);
 
         if (result == null)
         {
@@ -65,10 +65,10 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
-            ThrowKeyNotFound(section, key);
+            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
 
         if (!int.TryParse(config.ConfigurationValue, out int result))
         {
@@ -78,7 +78,7 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return result;
     }
 
-    public void ThrowKeyNotFound(ConfigSection section, string key)
+    public void ThrowKeyNotFound(ConfigSection section, string key, int locationId)
     {
         throw new KeyNotFoundException($"Configuration not found for {section} - {key}");
     }
@@ -87,10 +87,10 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
-            ThrowKeyNotFound(section, key);
+            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
 
         return config.ConfigurationValue;
     }
@@ -109,10 +109,10 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
-            ThrowKeyNotFound(section, key);
+            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
 
         if (!decimal.TryParse(config.ConfigurationValue, out decimal result))
         {
@@ -126,10 +126,10 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key);
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
-            ThrowKeyNotFound(section, key);
+            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
 
         return config.ConfigurationValue.ToLower() == "true" || config.ConfigurationValue.ToLower() == "yes";
     }

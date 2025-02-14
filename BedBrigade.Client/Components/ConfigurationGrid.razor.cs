@@ -201,7 +201,7 @@ namespace BedBrigade.Client.Components
             List<Configuration> records = await Grid.GetSelectedRecordsAsync();
             foreach (var rec in records)
             {
-                var deleteResult = await _svcConfiguration.DeleteAsync(rec.ConfigurationKey);
+                var deleteResult = await _svcConfiguration.DeleteAsync(rec.ConfigurationId);
                 ToastTitle = "Delete Configuration";
                 if (deleteResult.Success)
                 {

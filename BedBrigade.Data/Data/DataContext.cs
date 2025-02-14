@@ -50,6 +50,7 @@ namespace BedBrigade.Data
         private static void CreateIndexes(ModelBuilder modelBuilder)
         {
             CreateBedRequestIndexes(modelBuilder);
+            CreateConfigurationIndexes(modelBuilder);
             CreateContactUsIndexes(modelBuilder);
             CreateContentIndexes(modelBuilder);
             CreateContentTranslationIndexes(modelBuilder);
@@ -73,6 +74,13 @@ namespace BedBrigade.Data
                 .HasKey(up => new { up.UserName, up.Grid });
 
             CreateVolunteerIndexes(modelBuilder);
+        }
+
+        private static void CreateConfigurationIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Configuration>()
+                .HasIndex(o => new { o.LocationId, o.ConfigurationKey })
+                .HasDatabaseName("IX_Configuration_LocationId_ConfigurationKey");
         }
 
         private static void CreateSmsQueueIndexes(ModelBuilder modelBuilder)
