@@ -67,7 +67,7 @@ jobs:
       run: dotnet publish --configuration Release --output ./publish
 
     - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_DEV_HOST }}  
         username: ${{ secrets.FTP_DEV_USERNAME }}  
