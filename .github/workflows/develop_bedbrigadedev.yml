@@ -34,85 +34,86 @@ jobs:
     - name: Run tests
       run: dotnet test
       
-    - name: Perform Shutdown
-      run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/api/Shutdown/PerformShutdown)
-        if [ $response -ne 200 ]; then
-            echo "Shutdown failed with status code: $response, but ignoring the error."
-        fi
-      timeout-minutes: 1   
+    # This no longer works in GitHub Actions.  You have to do a manual publish.
+    # - name: Perform Shutdown
+    #   run: |
+    #     response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/api/Shutdown/PerformShutdown)
+    #     if [ $response -ne 200 ]; then
+    #         echo "Shutdown failed with status code: $response, but ignoring the error."
+    #     fi
+    #   timeout-minutes: 1   
       
-    - name: Wait for 10 seconds for PerformShutdown
-      run: sleep 10      
+    # - name: Wait for 10 seconds for PerformShutdown
+    #   run: sleep 10      
 
-    - name: Create TmpFolder
-      run: mkdir TmpFolder
+    # - name: Create TmpFolder
+    #   run: mkdir TmpFolder
 
-    - name: Create app_offline.htm
-      run: echo "<html><body><h1>The application is offline for maintenance</h1></body></html>" > ./TmpFolder/app_offline.htm
+    # - name: Create app_offline.htm
+    #   run: echo "<html><body><h1>The application is offline for maintenance</h1></body></html>" > ./TmpFolder/app_offline.htm
 
-    - name: Upload file app_offline.htm
-      uses: tomasbkk/action-ftp-upload@v1.0
-      with:
-        user: ${{ secrets.FTP_DEV_USERNAME }}
-        password: ${{ secrets.FTP_DEV_PASSWORD }}
-        host: ${{ secrets.FTP_DEV_HOST }}
-        src: ./TmpFolder/app_offline.htm
-        dest: app_offline.htm
+    # - name: Upload file app_offline.htm
+    #   uses: tomasbkk/action-ftp-upload@v1.0
+    #   with:
+    #     user: ${{ secrets.FTP_DEV_USERNAME }}
+    #     password: ${{ secrets.FTP_DEV_PASSWORD }}
+    #     host: ${{ secrets.FTP_DEV_HOST }}
+    #     src: ./TmpFolder/app_offline.htm
+    #     dest: app_offline.htm
 
-    - name: Wait for 10 seconds to be offline
-      run: sleep 10
+    # - name: Wait for 10 seconds to be offline
+    #   run: sleep 10
       
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish
+    # - name: Publish
+    #   run: dotnet publish --configuration Release --output ./publish
 
-    - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: ${{ secrets.FTP_DEV_HOST }}  
-        username: ${{ secrets.FTP_DEV_USERNAME }}  
-        password: ${{ secrets.FTP_DEV_PASSWORD }}  
-        local-dir: ./publish/
-        server-dir: /  
-        protocol: ftp  
+    # - name: FTP Deploy
+    #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    #   with:
+    #     server: ${{ secrets.FTP_DEV_HOST }}  
+    #     username: ${{ secrets.FTP_DEV_USERNAME }}  
+    #     password: ${{ secrets.FTP_DEV_PASSWORD }}  
+    #     local-dir: ./publish/
+    #     server-dir: /  
+    #     protocol: ftp  
     
-    - name: Delete app_offline.htm
-      uses: StephanThierry/ftp-delete-action@v2.1
-      with:
-        host: ${{ secrets.FTP_DEV_HOST }}
-        user: ${{ secrets.FTP_DEV_USERNAME }}
-        password: ${{ secrets.FTP_DEV_PASSWORD }}
-        remoteFiles: "app_offline.htm"
-        ignoreSSL: "1"
+    # - name: Delete app_offline.htm
+    #   uses: StephanThierry/ftp-delete-action@v2.1
+    #   with:
+    #     host: ${{ secrets.FTP_DEV_HOST }}
+    #     user: ${{ secrets.FTP_DEV_USERNAME }}
+    #     password: ${{ secrets.FTP_DEV_PASSWORD }}
+    #     remoteFiles: "app_offline.htm"
+    #     ignoreSSL: "1"
 
-    - name: Perform Database Setup
-      run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/api/DatabaseSetup/PerformSetup)
-        if [ $response -ne 200 ]; then
-          echo "Database setup failed with status code: $response"
-          exit 1
-        fi
-      timeout-minutes: 10
+    # - name: Perform Database Setup
+    #   run: |
+    #     response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/api/DatabaseSetup/PerformSetup)
+    #     if [ $response -ne 200 ]; then
+    #       echo "Database setup failed with status code: $response"
+    #       exit 1
+    #     fi
+    #   timeout-minutes: 10
       
-    - name: Navigate to preload page and wait for it to load
-      run: |
-        max_attempts=3
-        attempt=1
-        while [ $attempt -le $max_attempts ]; do
-          echo "Attempt $attempt: Loading preload page..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/administration/preload)
-          if [ $response -eq 200 ]; then
-            echo "Preload page loaded successfully"
-            exit 0
-          else
-            echo "Attempt $attempt: Preload page failed to load with status code: $response"
-            if [ $attempt -lt $max_attempts ]; then
-              echo "Waiting for 2 minutes before retrying..."
-              sleep 120
-            fi
-          fi
-          attempt=$((attempt+1))
-        done
-        echo "Failed to load preload page after $max_attempts attempts"
-        exit 1
-      timeout-minutes: 8      
+    # - name: Navigate to preload page and wait for it to load
+    #   run: |
+    #     max_attempts=3
+    #     attempt=1
+    #     while [ $attempt -le $max_attempts ]; do
+    #       echo "Attempt $attempt: Loading preload page..."
+    #       response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site3.ctempurl.com/administration/preload)
+    #       if [ $response -eq 200 ]; then
+    #         echo "Preload page loaded successfully"
+    #         exit 0
+    #       else
+    #         echo "Attempt $attempt: Preload page failed to load with status code: $response"
+    #         if [ $attempt -lt $max_attempts ]; then
+    #           echo "Waiting for 2 minutes before retrying..."
+    #           sleep 120
+    #         fi
+    #       fi
+    #       attempt=$((attempt+1))
+    #     done
+    #     echo "Failed to load preload page after $max_attempts attempts"
+    #     exit 1
+    #   timeout-minutes: 8      
