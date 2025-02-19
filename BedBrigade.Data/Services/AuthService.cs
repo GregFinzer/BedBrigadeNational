@@ -98,7 +98,26 @@ namespace BedBrigade.Data.Services
                 return 0;
             }
         }
-    
+
+        public string TimeZoneId
+        {
+            get
+            {
+                if (CurrentUser != null
+                    && CurrentUser.Identity != null
+                    && CurrentUser.Identity.IsAuthenticated)
+                {
+                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "TimeZoneId")?.Value;
+                    if (!String.IsNullOrEmpty(timeZoneId))
+                    {
+                        return timeZoneId;
+                    }
+                }
+
+                return Defaults.DefaultTimeZoneId;
+            }
+        }
+
         public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
 
         public async Task LogoutAsync()
@@ -220,6 +239,8 @@ namespace BedBrigade.Data.Services
 
             return false;
         }
+
+
     }
 
 

@@ -29,11 +29,11 @@
         }
         else
         {
-            @foreach (var msg in smsMessages.OrderBy(m => m.QueueDate))
+            @foreach (var msg in smsMessages.OrderBy(m => m.SentDateLocal))
             {
                 <div class="message-block">
                     <!-- Date/Time above each message -->
-                    <div class="message-time">@msg.QueueDate.ToString("f")</div>
+                    <div class="message-time">@msg.SentDateLocal.Value.ToString("f")</div>
 
                     <div class="@(msg.IsReply ? "message-bubble reply" : "message-bubble sent")">
                         @msg.Body

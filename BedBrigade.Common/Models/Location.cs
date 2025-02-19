@@ -56,6 +56,9 @@ public class Location : BaseEntity
     [Column(TypeName = "bit")]
     public bool IsActive { get; set; } = false;
 
+    [MaxLength(40)]
+    public string TimeZoneId { get; set;  } 
+
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
     public ICollection<Content> Contents { get; set; } = new List<Content>();

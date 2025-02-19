@@ -65,7 +65,8 @@ namespace BedBrigade.Data.Services
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("LocationId", user.LocationId.ToString()),
-                new Claim("UserRoute", location.Data.Route)
+                new Claim("UserRoute", location.Data.Route),
+                new Claim("TimeZoneId", location.Data.TimeZoneId),
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

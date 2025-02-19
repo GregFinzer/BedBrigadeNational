@@ -20,5 +20,6 @@
         public const int EmailMediumPriority = 2;
         public const int EmailHighPriority = 3;
         public const string CountryCode = "US";
+        public const string DefaultTimeZoneId = "Eastern Standard Time";
     }
 }

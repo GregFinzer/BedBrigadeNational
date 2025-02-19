@@ -32,6 +32,9 @@ namespace BedBrigade.Common.Models
         public DateTime? LockDate { get; set; }
         public DateTime? SentDate { get; set; }
 
+        [NotMapped]
+        public DateTime? SentDateLocal { get; set; }
+
         [Required]
         public int Priority { get; set; }
 
