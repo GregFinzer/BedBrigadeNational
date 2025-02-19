@@ -116,7 +116,7 @@ else
                                             </SfDropDownList>
                                         </div>
                                         <div class="col-md-6">
-                                            <SfDropDownList TValue="string?" TItem="TimeZoneItem" DataSource="@TimeZones" Placeholder="Select Time Zone" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.TimeZoneId">
+                                            <SfDropDownList TValue="string?" TItem="TimeZoneItem" DataSource="@TimeZones" Placeholder="@_lc.Keys["SelectTimeZone"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.TimeZoneId">
                                                 <DropDownListFieldSettings Value="TimeZoneId" Text="TimeZoneWithGmt" />
                                             </SfDropDownList>
                                         </div>
