@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Models
@@ -7,10 +8,16 @@ namespace BedBrigade.Common.Models
     {
         public DateTime? CreateDate { get; set; }
 
+        [NotMapped]
+        public DateTime? CreateDateLocal { get; set; }
+
         [MaxLength(100)]
         public String? CreateUser { get; set; } = string.Empty;
 
         public DateTime? UpdateDate { get; set; }
+
+        [NotMapped]
+        public DateTime? UpdateDateLocal { get; set; }
 
         [MaxLength(100)]
         public String? UpdateUser { get; set; } = string.Empty;

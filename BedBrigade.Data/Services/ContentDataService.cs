@@ -12,14 +12,18 @@ public class ContentDataService : Repository<Content>, IContentDataService
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICommonService _commonService;
+    private readonly ITimezoneDataService _timezoneDataService;
 
-    public ContentDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
+    public ContentDataService(IDbContextFactory<DataContext> contextFactory, 
+        ICachingService cachingService,
         IAuthService authService,
-        ICommonService commonService) : base(contextFactory, cachingService, authService)
+        ICommonService commonService,
+        ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
     {
         _cachingService = cachingService;
         _contextFactory = contextFactory;
         _commonService = commonService;
+        _timezoneDataService = timezoneDataService;
     }
 
     public Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
@@ -47,12 +51,28 @@ public class ContentDataService : Repository<Content>, IContentDataService
         }
     }
 
-    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
+    public override async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
-        return await _commonService.GetAllForLocationAsync(this, locationId);
+        var result = await base.GetAllAsync();
+
+        if (result.Success && result.Data != null)
+        {
+            _timezoneDataService.FillLocalDates(result.Data);
+        }
+
+        return result;
     }
 
+    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
+    {
+        var contentResult = await _commonService.GetAllForLocationAsync(this, locationId);
 
+        if (contentResult.Success && contentResult.Data != null)
+        {
+            _timezoneDataService.FillLocalDates(contentResult.Data);
+        }
+        return contentResult;
+    }
 
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
     {

@@ -27,7 +27,7 @@ namespace BedBrigade.Client.Components
 
         [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
-
+        [Inject] private ITimezoneDataService _svcTimeZone { get; set; }
         [Parameter] public string? Id { get; set; }
 
         List<string> PageNames = new List<string> { "AboutUs", "Assembly", "Contact", "Donate", "History", "Locations", "News", "Partners", "RequestBed", "Stories", "Volunteer" };
@@ -39,6 +39,7 @@ namespace BedBrigade.Client.Components
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Location>? Locations { get; set; }
         protected List<MetroArea>? MetroAreas { get; set; }
+        protected List<TimeZoneItem> TimeZones { get; set; }
         protected SfGrid<Location>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
@@ -95,7 +96,11 @@ namespace BedBrigade.Client.Components
             {
                 MetroAreas = metroResult.Data.ToList();
             }
+
+            
+            TimeZones = _svcTimeZone.GetTimeZones();
         }
+
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)

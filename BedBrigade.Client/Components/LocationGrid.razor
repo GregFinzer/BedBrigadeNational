@@ -110,9 +110,14 @@ else
                                                           Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="@_lc.Keys["SelectMetroArea"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
                                                 <DropDownListFieldSettings Value="MetroAreaId" Text="Name" />
+                                            </SfDropDownList>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfDropDownList TValue="string?" TItem="TimeZoneItem" DataSource="@TimeZones" Placeholder="@_lc.Keys["SelectTimeZone"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.TimeZoneId">
+                                                <DropDownListFieldSettings Value="TimeZoneId" Text="TimeZoneWithGmt" />
                                             </SfDropDownList>
                                         </div>
                                     </div>
@@ -129,7 +134,7 @@ else
                             <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true"  TextAlign="TextAlign.Center"  />
+                            <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" />
                             <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(Location.MailingCity) ShowColumnMenu="false" HeaderText="Mailing City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(Location.MailingState) ShowColumnMenu="false" HeaderText="Mailing State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
@@ -141,6 +146,7 @@ else
                             <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridForeignColumn Field=@nameof(Location.MetroAreaId) ForeignDataSource=@MetroAreas ForeignKeyField="MetroAreaId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Metro Area" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Location.TimeZoneId) ShowColumnMenu="false" HeaderText="Timezone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 

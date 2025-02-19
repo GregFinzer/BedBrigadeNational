@@ -18,6 +18,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IContactUsDataService _svcContactUs;
     private IConfigurationDataService _svcConfiguration;
     private ISmsState _smsState;
+    private readonly ITimezoneDataService _svcTimeZone;
 
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -27,7 +28,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         IBedRequestDataService svcBedRequest, 
         IContactUsDataService svcContactUs, 
         IConfigurationDataService svcConfiguration, 
-        ISmsState smsState) : base(contextFactory, cachingService, authService)
+        ISmsState smsState,
+        ITimezoneDataService svcTimeZone) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -37,6 +39,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _svcContactUs = svcContactUs;
         _svcConfiguration = svcConfiguration;
         _smsState = smsState;
+        _svcTimeZone = svcTimeZone;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -95,7 +98,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         {
             var dbSet = ctx.Set<SmsQueue>();
             var result = await dbSet.Where(o => o.Status == SmsQueueStatus.Queued.ToString()
-                                                && DateTime.Now >= o.TargetDate)
+                                                && DateTime.UtcNow >= o.TargetDate)
                 .OrderByDescending(o => o.Priority)
                 .ThenBy(o => o.QueueDate)
                 .Take(maxPerChunk)
@@ -177,6 +180,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                     })
                     .ToListAsync();
 
+                _svcTimeZone.FillLocalDates(result);
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<SmsQueueSummary>>($"Found {result.Count} {GetEntityName()}", true,
                     result);
@@ -211,6 +215,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 var result = await dbSet.Where(o => o.LocationId == locationId
                                                     && o.ToPhoneNumber == toPhoneNumber)
                     .OrderBy(o => o.SentDate).ToListAsync();
+
+                _svcTimeZone.FillLocalDates(result);
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<SmsQueue>>($"Found {result.Count} {GetEntityName()}", true, result);
             }

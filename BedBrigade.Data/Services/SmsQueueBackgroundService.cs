@@ -124,7 +124,7 @@ public class SmsQueueBackgroundService : BackgroundService
 
         _logger.LogDebug("SmsQueueLogic:  Locking Messages");
         await _smsQueueDataService.LockMessagesToProcess(messagesToProcess);
-        DateTime currentTime = DateTime.Now;
+        DateTime currentTime = DateTime.UtcNow;
         int millisecondDelay = 1000 / _smsMaxSendPerSecond;
 
         foreach (var smsQueue in messagesToProcess)
@@ -140,14 +140,14 @@ public class SmsQueueBackgroundService : BackgroundService
             if (!result.Success)
                 continue;
 
-            var elapsed = DateTime.Now - currentTime;
+            var elapsed = DateTime.UtcNow - currentTime;
             if (elapsed.TotalMilliseconds < millisecondDelay)
             {
                 int toWait = millisecondDelay - (int)elapsed.TotalMilliseconds;
                 System.Threading.Thread.Sleep(toWait);
             }
 
-            currentTime = DateTime.Now;
+            currentTime = DateTime.UtcNow;
         }
 
         int total = messagesToProcess.Count;
