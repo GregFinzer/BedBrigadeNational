@@ -172,9 +172,11 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                     {
                         ToPhoneNumber = g.Key,
                         MessageCount = g.Count(),
+                        UnReadCount = g.Count(o => !o.IsRead),
                         ContactType = g.First().ContactType,
                         ContactName = g.First().ContactName,
                         Body = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().Body,
+                        IsReply =g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().IsReply,
                         MessageDate = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().SentDate,
                         UnRead = g.Any(o => !o.IsRead)
                     })
@@ -409,6 +411,22 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         smsQueue.LocationId = config.LocationId;
         return string.Empty;
     }
+
+    public async Task MarkMessagesAsRead(int locationId, string toPhoneNumber)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<SmsQueue>();
+            var messages = await dbSet.Where(o => o.LocationId == locationId && o.ToPhoneNumber == toPhoneNumber && !o.IsRead).ToListAsync();
+            foreach (var message in messages)
+            {
+                message.IsRead = true;
+                dbSet.Update(message);
+            }
+            await ctx.SaveChangesAsync();
+            _cachingService.ClearByEntityName(GetEntityName());
+        }
+    }   
 }
 
 

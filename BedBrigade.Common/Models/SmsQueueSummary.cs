@@ -11,5 +11,8 @@
         public int MessageCount { get; set; }
 
         public bool UnRead { get; set; }
+
+        public int UnReadCount { get; set; }
+        public bool IsReply { get; set; }
     }
 }
