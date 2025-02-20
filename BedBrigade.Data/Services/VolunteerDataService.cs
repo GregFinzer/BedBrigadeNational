@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Services;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Data.Services;
 
@@ -147,6 +148,66 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
     public async Task<ServiceResponse<Volunteer>> GetByPhone(string phone)
     {
         return await _commonService.GetByPhone(this, phone);
+    }
+
+    public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
+    {
+        return await _commonService.GetDistinctPhone(this);
+    }
+
+    public async Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation(int locationId)
+    {
+        return await _commonService.GetDistinctPhoneByLocation(this, locationId);
+    }
+
+    public async Task<ServiceResponse<List<string>>> GetVolunteerPhonesWithDeliveryVehicles(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetVolunteerPhonesWithDeliveryVehicles({locationId})");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+        if (cachedContent != null)
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Volunteer>();
+            var result = await dbSet.Where(o => o.LocationId == locationId
+                && !String.IsNullOrEmpty(o.Phone)
+                && (o.VehicleType == VehicleType.Minivan
+                    || o.VehicleType == VehicleType.SUV
+                    || o.VehicleType == VehicleType.Truck)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
+        }
+    }
+
+    public async Task<ServiceResponse<List<string>>> GetVolunteerPhonesForASchedule(int scheduleId)
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetVolunteerPhonesForASchedule({scheduleId})");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+        if (cachedContent != null)
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache",
+                true, cachedContent);
+        ;
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.SignUps
+                    .Where(o => o.ScheduleId == scheduleId)
+                    .Select(b => b.Volunteer.Phone.FormatPhoneNumber())
+                    .Where(b => !String.IsNullOrEmpty(b))
+                    .Distinct().ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true,
+                    result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<string>>(
+                $"Could not GetVolunteerPhonesForASchedule {GetEntityName()}  with scheduleId {scheduleId}: {ex.Message} ({ex.ErrorCode})",
+                false);
+        }
     }
 }
 

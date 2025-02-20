@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services
@@ -104,7 +105,43 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<TEntity>($"Found {repository.GetEntityName()} record with phone {phone}", true, result);
             }
         }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctPhone<TEntity>(IRepository<TEntity> repository) where TEntity : class, IPhone
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetDistinctPhone");
+            var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+            if (cachedContent != null)
+                return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {repository.GetEntityName()} records in cache", true, cachedContent); ;
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.Where(o => !String.IsNullOrEmpty(o.Phone)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records", true, result);
+            }
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation<TEntity>(
+            IRepository<TEntity> repository, int locationId) where TEntity : class, IPhone, ILocationId
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(),
+                $"GetDistinctPhoneByLocation({locationId}");
+            var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+            if (cachedContent != null)
+                return new ServiceResponse<List<string>>(
+                    $"Found {cachedContent.Count} {repository.GetEntityName()} records in cache", true, cachedContent);
+            ;
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.Where(o => o.LocationId == locationId
+                                                    && !String.IsNullOrEmpty(o.Phone))
+                    .Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records",
+                    true, result);
+
+            }
+        }
     }
-
-
 }

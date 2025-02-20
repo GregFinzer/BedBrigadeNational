@@ -1,7 +1,4 @@
 ﻿using System.Data.Common;
-using System.Linq;
-using System.Security.Claims;
-using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -30,6 +27,10 @@ namespace BedBrigade.Data.Services
         public async Task<string?> GetUserEmail()
         {
             return _authService.Email;
+        }
+        public async Task<string?> GetUserPhone()
+        {
+            return _authService.Phone;
         }
 
         //This is the user name stored in the nameidentifier

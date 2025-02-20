@@ -133,5 +133,15 @@ namespace BedBrigade.Data.Services
 
             return new ServiceResponse<bool>($"Deleted {GetEntityName()} with id {id} for UserName {existingUser.Data.UserName}", true);
         }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
+        {
+            return await _commonService.GetDistinctPhone(this);
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation(int locationId)
+        {
+            return await _commonService.GetDistinctPhoneByLocation(this, locationId);
+        }
     }
 }
