@@ -1,0 +1,95 @@
+﻿.header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 16px;
+    background-color: #007AFF;
+    color: white;
+}
+
+.loading-text, .no-messages {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 20px;
+}
+
+.message-list {
+    background: black;
+    color: white;
+    padding: 10px;
+}
+
+.message-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+
+    .message-item:hover {
+        background: #222;
+    }
+
+.message-initials-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.message-initials {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007AFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    margin-right: 10px;
+}
+
+.unread-badge {
+    position: absolute;
+    bottom: -7px;
+    right: 5px;
+    background: #00C853;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-content {
+    flex-grow: 1;
+    padding-left: 20px;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.message-name {
+    color: white;
+}
+
+.message-time {
+    color: #bbb;
+    font-size: 0.9rem;
+}
+
+.message-preview {
+    font-size: 0.9rem;
+    color: #bbb;
+}
+
+

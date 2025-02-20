@@ -84,6 +84,11 @@ public partial class SmsDetails : ComponentBase, IDisposable
                 }
             }
         }
+
+        if (smsMessages != null && smsMessages.Any(o => !o.IsRead))
+        {
+            await SmsQueueDataService.MarkMessagesAsRead(locationId, phone);
+        }
     }
 
     private async Task ScrollToBottom()
