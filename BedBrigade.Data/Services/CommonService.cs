@@ -115,7 +115,8 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.Where(o => !String.IsNullOrEmpty(o.Phone)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                var result = await dbSet.Where(o => !String.IsNullOrEmpty(o.Phone)).Select(b => b.Phone).Distinct().ToListAsync();
+                result = result.Select(p => p.FormatPhoneNumber()).Distinct().ToList();
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records", true, result);
             }
@@ -136,7 +137,8 @@ namespace BedBrigade.Data.Services
                 var dbSet = ctx.Set<TEntity>();
                 var result = await dbSet.Where(o => o.LocationId == locationId
                                                     && !String.IsNullOrEmpty(o.Phone))
-                    .Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                    .Select(b => b.Phone).Distinct().ToListAsync();
+                result = result.Select(p => p.FormatPhoneNumber()).Distinct().ToList();
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records",
                     true, result);

@@ -264,7 +264,8 @@ namespace BedBrigade.Data.Services
                     Body = body,
                     Status = EmailQueueStatus.Queued.ToString(),
                     QueueDate = DateTime.UtcNow,
-                    FailureMessage = string.Empty
+                    FailureMessage = string.Empty,
+                    Priority = Defaults.BulkLowPriority
                 }).ToList();
 
                 string userName = await GetUserName();

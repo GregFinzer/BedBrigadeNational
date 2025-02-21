@@ -189,7 +189,7 @@ namespace BedBrigade.Data.Services
                 ToAddress = volunteer.Email,
                 Subject = BuildSignUpConfirmationSubject(volunteer),
                 Body = body,
-                Priority = Defaults.EmailHighPriority
+                Priority = Defaults.BulkHighPriority
             };
             ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -210,7 +210,7 @@ namespace BedBrigade.Data.Services
                     ToAddress = schedule.OrganizerEmail,
                     Subject = BuildSignUpConfirmationSubject(volunteer),
                     Body = body,
-                    Priority = Defaults.EmailHighPriority
+                    Priority = Defaults.BulkHighPriority
                 };
                 ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -265,7 +265,7 @@ namespace BedBrigade.Data.Services
                 ToAddress = entity.Email,
                 Subject = BuildBedRequestConfirmationSubject(entity),
                 Body = bodyResult.Data,
-                Priority = Defaults.EmailHighPriority
+                Priority = Defaults.BulkHighPriority
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 

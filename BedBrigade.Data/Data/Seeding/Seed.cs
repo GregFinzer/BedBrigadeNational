@@ -760,14 +760,21 @@ public static class Seed
         new ()
         {
             ConfigurationKey = ConfigNames.SmsPhone,
-            ConfigurationValue = "SmsPhone",
+            ConfigurationValue = "(999) 123-4567",
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        },
+        new ()
+        {
+            ConfigurationKey = ConfigNames.SmsPhone,
+            ConfigurationValue = "(999) 456-7890",
             Section = ConfigSection.Sms,
             LocationId = Defaults.GroveCityLocationId
         },
         new ()
         {
             ConfigurationKey = ConfigNames.SmsPhone,
-            ConfigurationValue = "SmsPhone",
+            ConfigurationValue = "(999) 987-6543",
             Section = ConfigSection.Sms,
             LocationId = Defaults.RockCityPolarisLocationId
         },

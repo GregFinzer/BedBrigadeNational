@@ -14,6 +14,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId);
         Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId);
         Task<ServiceResponse<string>> QueueEmail(EmailQueue email);
-        Task<ServiceResponse<string>> QueueBulkEmail(List<string> emaiList, string subject, string body);
+        Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body);
     }
 }

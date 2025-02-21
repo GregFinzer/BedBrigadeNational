@@ -118,7 +118,7 @@ public class SendSmsLogic : ISendSmsLogic
             FromPhoneNumber = fromPhone.FormatPhoneNumber(),
             ToPhoneNumber = volunteerResult.Data.Phone.FormatPhoneNumber(),
             Body = templateResult.Data.ContentHtml,
-            Priority = 1,
+            Priority = Defaults.BulkHighPriority,
             Status = SmsQueueStatus.Queued.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
@@ -127,7 +127,7 @@ public class SendSmsLogic : ISendSmsLogic
             IsReply = false,
             LocationId = signUp.LocationId,
             ContactType = ContactTypes.Volunteer,
-            ContactName = volunteerResult.Data.FullName
+            ContactName = volunteerResult.Data.FullName,
         };
         return smsQueue;
     }

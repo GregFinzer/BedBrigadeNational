@@ -67,6 +67,7 @@ public class SmsQueueBackgroundService : BackgroundService
                         _smsQueueDataService = scope.ServiceProvider.GetRequiredService<ISmsQueueDataService>();
                         _configurationDataService =
                             scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
+                        _sendSmsLogic = scope.ServiceProvider.GetRequiredService<ISendSmsLogic>();
 
                         await LoadConfiguration();
                         await ProcessQueue(cancellationToken);

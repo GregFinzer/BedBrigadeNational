@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -14,5 +15,9 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<SmsQueue>> CreateSmsReply(string fromPhoneNumber, string toPhoneNumber, string body);
         Task FillContactByToPhoneNumber(SmsQueue smsQueue);
         Task MarkMessagesAsRead(int locationId, string toPhoneNumber);
+
+        Task<ServiceResponse<List<string>>> GetPhoneNumbersToSend(int locationId, SmsRecipientOption option, int scheduleId);
+        Task<ServiceResponse<string>> QueueBulkSms(int locationId, List<string> phoneNumberList, string body);
+        Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, SmsRecipientOption option, int scheduleId);
     }
 }

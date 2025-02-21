@@ -18,6 +18,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IContactUsDataService _contactUsDataService;
     private IConfigurationDataService _svcConfiguration;
     private ISmsState _smsState;
+    private ILocationDataService _locationDataService;
+    private IScheduleDataService _scheduleDataService;
     private readonly ITimezoneDataService _svcTimeZone;
 
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
@@ -29,7 +31,9 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         IContactUsDataService contactUsDataService, 
         IConfigurationDataService svcConfiguration, 
         ISmsState smsState,
-        ITimezoneDataService svcTimeZone) : base(contextFactory, cachingService, authService)
+        ITimezoneDataService svcTimeZone, 
+        ILocationDataService locationDataService, 
+        IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -40,6 +44,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _svcConfiguration = svcConfiguration;
         _smsState = smsState;
         _svcTimeZone = svcTimeZone;
+        _locationDataService = locationDataService;
+        _scheduleDataService = scheduleDataService;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -294,7 +300,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             QueueDate = DateTime.UtcNow,
             TargetDate = DateTime.UtcNow,
             SentDate = DateTime.UtcNow,
-            Priority = 1,
+            Priority = Defaults.BulkHighPriority,
             FailureMessage = string.Empty,
             IsReply = true,
             Status = SmsQueueStatus.Received.ToString(),
@@ -483,6 +489,144 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         return everyone.Distinct().ToList();
     }
 
+    public async Task<ServiceResponse<string>> QueueBulkSms(int locationId, List<string> phoneNumberList, string body)
+    {
+        if (phoneNumberList.Count == 0)
+            return new ServiceResponse<string>("No text messages to send", false);
+
+        string fromPhoneNumber = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone, locationId);
+        fromPhoneNumber = fromPhoneNumber.FormatPhoneNumber();
+
+        try
+        {
+            var smsQueueList = phoneNumberList.Select(phone => new SmsQueue()
+            {
+                FromPhoneNumber = fromPhoneNumber,
+                ToPhoneNumber = phone.FormatPhoneNumber(),
+                Body = body,
+                Priority = Defaults.BulkLowPriority,
+                Status = SmsQueueStatus.Queued.ToString(),
+                QueueDate = DateTime.UtcNow,
+                FailureMessage = string.Empty,
+                TargetDate = DateTime.UtcNow,
+                IsRead = true,
+                IsReply = false,
+                LocationId = locationId
+            }).ToList();
+
+            string userName = await GetUserName();
+
+            foreach (var smsQueue in smsQueueList)
+            {
+                smsQueue.SetCreateAndUpdateUser(userName);
+            }
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                await dbSet.AddRangeAsync(smsQueueList);
+                await ctx.SaveChangesAsync();
+            }
+
+            _cachingService.ClearByEntityName(GetEntityName());
+
+            return new ServiceResponse<string>($"Queued {smsQueueList.Count} text messages", true, SmsQueueStatus.Queued.ToString());
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<string>($"Failed to queue bulk text messages: {ex.Message}", false);
+        }
+    }
+
+    public async Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, SmsRecipientOption option, int scheduleId)
+    {
+        try
+        {
+            int queueCount = await GetQueueCount();
+            int phoneNumberCount = (await GetPhoneNumbersToSend(locationId, option, scheduleId)).Data.Count;
+            string estimatedTime = await GetEstimatedTime(queueCount, phoneNumberCount);
+            string liveTextMessage = await IsLiveSms() ? "Text Messaging is LIVE." : "Text Messaging is NOT live, it is logged.";
+            string locationName = await GetLocationName(locationId);
+            string eventName = await GetEventName(scheduleId);
+            string message;
+            if (option == SmsRecipientOption.Everyone || option == SmsRecipientOption.BedBrigadeLeadersNationwide)
+            {
+                message = $"{phoneNumberCount} text messages will be sent to {EnumHelper.GetEnumDescription(option)}. There are currently {queueCount} other text messages in the queue. It will take an estimated {estimatedTime} to send. {liveTextMessage}";
+            }
+            else if (option.ToString().Contains("Event"))
+            {
+                message = $"{phoneNumberCount} text messages will be sent to {EnumHelper.GetEnumDescription(option)} {locationName} for the event {eventName}. There are currently {queueCount} other text messages in the queue. It will take an estimated {estimatedTime} to send. {liveTextMessage}";
+            }
+            else
+            {
+                message = $"{phoneNumberCount} text messages will be sent to {EnumHelper.GetEnumDescription(option)} {locationName}. There are currently {queueCount} other text messages in the queue. It will take an estimated {estimatedTime} to send. {liveTextMessage}";
+            }
+
+            return new ServiceResponse<string>("Created plan message", true, message);
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<string>($"Could not GetSendPlanMessage {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
+        }
+    }
+
+    public async Task<int> GetQueueCount()
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetQueueCount()");
+        int? cachedContent = _cachingService.Get<int>(cacheKey);
+
+        if (cachedContent.HasValue)
+        {
+            return cachedContent.Value;
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<SmsQueue>();
+            var result = await dbSet.CountAsync(o => o.Status == SmsQueueStatus.Queued.ToString());
+            _cachingService.Set(cacheKey, result);
+            return result;
+        }
+    }
+
+    public async Task<string> GetEstimatedTime(int queueCount, int phoneNumberCount)
+    {
+        int totalCount = queueCount + phoneNumberCount;
+        int maxTextMessagesPerSecond = Convert.ToInt32((await _svcConfiguration.GetByIdAsync(ConfigNames.SmsMaxSendPerSecond)).Data.ConfigurationValue);
+
+        if (totalCount <= maxTextMessagesPerSecond)
+        {
+            return "1 minute";
+        }
+
+
+        double seconds = Convert.ToDouble(totalCount) / Convert.ToDouble(maxTextMessagesPerSecond);
+        seconds += 60;
+
+        long milliseconds = Convert.ToInt64(seconds * (double)1000);
+        return DateUtil.MillisecondsToTimeLapse(milliseconds);
+    }
+
+    private async Task<bool> IsLiveSms()
+    {
+        string configValue = (await _svcConfiguration.GetByIdAsync(ConfigNames.SmsUseFileMock)).Data.ConfigurationValue;
+        return configValue != "true";
+    }
+
+    private async Task<string> GetEventName(int scheduleId)
+    {
+        if (scheduleId == 0)
+        {
+            return string.Empty;
+        }
+
+        return (await _scheduleDataService.GetByIdAsync(scheduleId)).Data.EventSelect;
+    }
+
+    private async Task<string> GetLocationName(int locationId)
+    {
+        return (await _locationDataService.GetByIdAsync(locationId)).Data.Name;
+    }
 }
 
 
