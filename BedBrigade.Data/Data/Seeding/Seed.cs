@@ -34,7 +34,12 @@ public static class Seed
     {
         new Location
         {
-            Name = SeedConstants.SeedNationalName, Route = "/national", MailingCity = "Columbus", MailingState = "Ohio", IsActive = true
+            Name = SeedConstants.SeedNationalName, 
+            Route = "/national", 
+            MailingCity = "Columbus", 
+            MailingState = "Ohio", 
+            IsActive = true,
+            TimeZoneId = Defaults.DefaultTimeZoneId
         },
         new Location
         {
@@ -50,7 +55,8 @@ public static class Seed
             BuildPostalCode= "43123",
             IsActive = true,
             Latitude = 39.879740M,
-            Longitude = -83.042570M
+            Longitude = -83.042570M,
+            TimeZoneId = Defaults.DefaultTimeZoneId
 
         },
         new Location
@@ -66,7 +72,8 @@ public static class Seed
             BuildPostalCode = "43201",
             IsActive = true,
             Latitude = 39.986740M,
-            Longitude = -83.000680M
+            Longitude = -83.000680M,
+            TimeZoneId = Defaults.DefaultTimeZoneId
         }
 
     };
