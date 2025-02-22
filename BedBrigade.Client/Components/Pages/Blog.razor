@@ -1,4 +1,4 @@
-﻿@page "/{LocationRoute}/Blog/{ContentType}"
+@page "/{LocationRoute}/Blog/{ContentType}"
 @using System.Diagnostics
 @using BedBrigade.Client.Components
 
@@ -15,11 +15,11 @@
 }
 else
 {
-    @if(lstContents == null || lstContents.Count==0)
+    @if(!IsBlogData)
     {
         <div class="d-flex justify-content-center">
             <div class="alert alert-primary text-center" role="alert">
-                There are no <b>@ContentType</b> available for <b>@LocationName</b> at this time. Please check back later for updates!
+               <p>@NoDataMessage</p>
             </div>
         </div>
     }
@@ -32,60 +32,48 @@ else
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Location
-                    </div>
+                <div class="card">      
                     <div class="card-body">
-                        <label>Location Route:</label>&nbsp;
+                        Location Route:&nbsp;
                         <b>@LocationRoute</b>
-                        <br /><label>Location Id:</label>&nbsp;
+                        <br />Location Id:&nbsp;
                         <b>@LocationId</b>
-                        <br /><label>Location Name:</label>&nbsp;
+                        <br />Location Name:&nbsp;
                         <b>@LocationName</b>
 
                     </div>
                 </div>
              </div>
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Blog Type
-                    </div>
+                <div class="card">                
                     <div class="card-body">
-                        <label>Content Type:</label>&nbsp;
+                        Content Type:&nbsp;
                         <b>@ContentType</b>                    
-                        <br /><label>Router Image Path:</label><br />
+                        <br />Router Image Path:<br />
                         <b>@(LocationRoute+"/"+ImagePath)</b>
                     </div>
                 </div>
             </div>
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Configuration
-                    </div>
+                <div class="card">               
                     <div class="card-body">
-                        <label><i>Blog Data Options</i></label><br />
+                        <i>Blog Data Options</i><br />
                         @OptionsDisplay
-                        <br /><label>Allowed Images</label><br />
+                        <br />Allowed Images<br />
                         @BlogModuleImagesExt
                     </div>
                 </div>
             </div>
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Test Data
-                    </div>
+                <div class="card">                 
                     <div class="card-body">
-                        <label>All Location Records:</label>&nbsp;
+                        All Location Records:&nbsp;
                         <b>@LocationCount</b>
-                        <br /><label>Requested Location:</label>&nbsp;
+                        <br />Requested Location:&nbsp;
                         <b>@LocationStatus</b>
-                        <br /><label>All Content Records:</label>&nbsp;
+                        <br />All Content Records:&nbsp;
                         <b>@ContentCount</b>
-                        <br /><label>Requested Location Blogs:</label>&nbsp;
+                        <br />Requested Location Blogs:&nbsp;
                         <b>@ContentStatus</b>
                     </div>
                 </div>
