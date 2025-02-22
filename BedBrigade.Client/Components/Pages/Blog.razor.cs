@@ -86,9 +86,8 @@ namespace BedBrigade.Client.Components.Pages
         private int ContentCount = 0;
         private string LocationStatus = "Not Found";
         private string ContentStatus = "Not Found";
-
-
-        MarkupString ErrorMessage;
+        public MarkupString NoDataMessage;
+        public MarkupString ErrorMessage;
 
 
         private static readonly Dictionary<string, string> ValidContentTypes = new()
@@ -214,6 +213,8 @@ namespace BedBrigade.Client.Components.Pages
             await LoadLocation(); //all Locations or Location by Route
             await LoadContent(); // all Contents
 
+            NoDataMessage = (MarkupString)$"There are no&nbsp;<b>{ContentType}</b> available for <b>{LocationName}</b> at this time.<br/>Please check back later for updates!";
+
             // ONE time test data creation
             if (IsTestMode)
             {
@@ -234,9 +235,9 @@ namespace BedBrigade.Client.Components.Pages
                     ContentStatus = "Found";
                     IsBlogData = true; // otherwise cannot show Blog Cards
                 }
-            }
-
-
+            }         
+               
+            
         }
 
 
