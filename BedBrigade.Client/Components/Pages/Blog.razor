@@ -25,64 +25,7 @@ else
     }
 }
 
-<hr />
 
-<fieldset>
-    <legend>Blog Module Data Status. Current URL:&nbsp;@_navigationManager.Uri</legend>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="card">      
-                    <div class="card-body">
-                        Location Route:&nbsp;
-                        <b>@LocationRoute</b>
-                        <br />Location Id:&nbsp;
-                        <b>@LocationId</b>
-                        <br />Location Name:&nbsp;
-                        <b>@LocationName</b>
-
-                    </div>
-                </div>
-             </div>
-            <div class="col">
-                <div class="card">                
-                    <div class="card-body">
-                        Content Type:&nbsp;
-                        <b>@ContentType</b>                    
-                        <br />Router Image Path:<br />
-                        <b>@(LocationRoute+"/"+ImagePath)</b>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">               
-                    <div class="card-body">
-                        <i>Blog Data Options</i><br />
-                        @OptionsDisplay
-                        <br />Allowed Images<br />
-                        @BlogModuleImagesExt
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">                 
-                    <div class="card-body">
-                        All Location Records:&nbsp;
-                        <b>@LocationCount</b>
-                        <br />Requested Location:&nbsp;
-                        <b>@LocationStatus</b>
-                        <br />All Content Records:&nbsp;
-                        <b>@ContentCount</b>
-                        <br />Requested Location Blogs:&nbsp;
-                        <b>@ContentStatus</b>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    
-</fieldset>
 
 
 <style>
