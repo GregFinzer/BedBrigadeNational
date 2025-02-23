@@ -21,7 +21,7 @@
         public const string MaxFileSize = "MaxFileSize";
         public const string MaxVideoSize = "MaxVideoSize";
         public const string EnableFolderOperations = "EnableFolderOperations";
-
+       
         //Email Section
         public const string FromEmailAddress = "FromEmailAddress";
         public const string FromEmailDisplayName = "FromEmailDisplayName";
@@ -64,5 +64,13 @@
         public const string SmsPhone = "SmsPhone";
         public const string SmsAccountSid = "SmsAccountSid";
         public const string SmsAuthToken = "SmsAuthToken";
+
+        // Blog Module
+
+        public const string BlogModuleOptions = "BlogModuleOptions";
+        public const string BlogModuleImages = "BlogModuleImages";
+
+
+
     }
 }

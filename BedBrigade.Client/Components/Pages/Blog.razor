@@ -1,0 +1,46 @@
+@page "/{LocationRoute}/Blog/{ContentType}"
+@using System.Diagnostics
+@using BedBrigade.Client.Components
+
+@if (IsShowBanner)
+{
+<RotatorContainer @key="@Key" RotatorTitle="@RotatorTitle" ImagePath="@ImagePath" LocationId="@LocationId" />
+}
+
+@if (!string.IsNullOrWhiteSpace(ErrorMessage.Value))
+{
+    <div class="alert alert-warning text-center mt-4">       
+        <p>@ErrorMessage</p>
+    </div>
+}
+else
+{
+    @if(!IsBlogData)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="alert alert-primary text-center" role="alert">
+               <p>@NoDataMessage</p>
+            </div>
+        </div>
+    }
+}
+
+
+
+
+<style>
+
+    .container {
+        display: inline-flex;
+        width: auto;
+        padding: 0;
+    }
+
+    .content {
+       
+        margin-left: 10px;
+    }
+
+
+</style>
+ 
