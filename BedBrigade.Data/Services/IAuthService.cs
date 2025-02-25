@@ -11,6 +11,7 @@ namespace BedBrigade.Data.Services
         string Email { get; }
         string? UserRole { get; }
         string TimeZoneId { get; }
+        string Phone { get; }
 
         Task<bool> GetStateFromTokenAsync();
         Task LogoutAsync(); 

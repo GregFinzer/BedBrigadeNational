@@ -34,40 +34,31 @@ public partial class SmsSummary : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        Identity = _svcAuth.CurrentUser;
+        ContextMenu = new List<string>
         {
-            Identity = _svcAuth.CurrentUser;
-            ContextMenu = new List<string>
-            {
-                FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
-                "SortDescending"
-            };
+            FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
+            "SortDescending"
+        };
 
-            if (_svcAuth.UserHasRole(RoleNames.CanSendSms))
-            {
-                ToolBar = new List<string>
-                    { "Print", "Pdf Export", "Excel Export", "Csv Export", "Reset", "Search",  };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Reset", "Search" };
-            }
-
-            await LoadLocations();
-            await LoadSummary();
-            _smsState.OnChange += OnSmsStateChange;
+        if (_svcAuth.UserHasRole(RoleNames.CanSendSms))
+        {
+            ToolBar = new List<string>
+                { "Print", "Pdf Export", "Excel Export", "Csv Export", "Reset", "Search", };
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine(ex);
-            throw;
+            ToolBar = new List<string> { "Reset", "Search" };
         }
 
+        await LoadLocations();
+        await LoadSummary();
+        _smsState.OnChange += OnSmsStateChange;
     }
 
     private async Task OnSmsStateChange(SmsQueue smsQueue)
     {
-        if (CurrentLocationId == smsQueue.LocationId)
+        if (smsQueue != null && CurrentLocationId == smsQueue.LocationId)
         {
             await LoadSummary();
             await InvokeAsync(StateHasChanged);
@@ -81,6 +72,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
 
     private async Task LoadSummary()
     {
+
         var result = await _svcSmsQueue.GetSummaryForLocation(CurrentLocationId);
 
         if (result.Success && result.Data != null && result.Data.Any())
@@ -91,10 +83,12 @@ public partial class SmsSummary : ComponentBase, IDisposable
         {
             SummaryList = new List<SmsQueueSummary>();
         }
+
     }
 
     private async Task LoadLocations()
     {
+
         var locationResult = await _svcLocation.GetAllAsync();
         if (locationResult.Success)
         {
@@ -115,6 +109,8 @@ public partial class SmsSummary : ComponentBase, IDisposable
         {
             CurrentLocationId = await _svcUser.GetUserLocationId();
         }
+
+
     }
 
     private async void LocationChangeEvent(ChangeEventArgs<int, Location> args)

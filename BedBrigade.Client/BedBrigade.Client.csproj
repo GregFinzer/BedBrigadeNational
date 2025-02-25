@@ -50,4 +50,11 @@
     <ProjectReference Include="..\BedBrigade.SpeakIt\BedBrigade.SpeakIt.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Update="Components\Pages\Administration\SMS\BulkSms.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -173,7 +173,9 @@ namespace BedBrigade.Data.Services
 
         private bool TimeToSendEmail()
         {
-            DateTime currentDate = DateTime.UtcNow;
+            TimeZoneInfo defaultTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Defaults.DefaultTimeZoneId);
+            DateTime currentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, defaultTimeZoneInfo);
+
             bool validTime = currentDate.Hour >= _emailBeginHour && currentDate.Hour <= _emailEndHour;
             bool validDay = currentDate.DayOfWeek >= (DayOfWeek)_emailBeginDayOfWeek && currentDate.DayOfWeek <= (DayOfWeek)_emailEndDayOfWeek;
 

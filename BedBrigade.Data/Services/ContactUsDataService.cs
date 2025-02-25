@@ -35,6 +35,16 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
     {
         return await _commonService.GetByPhone(this, phone);
     }
+
+    public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
+    {
+        return await _commonService.GetDistinctPhone(this);
+    }
+
+    public async Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation(int locationId)
+    {
+        return await _commonService.GetDistinctPhoneByLocation(this, locationId);
+    }
 }
 
 

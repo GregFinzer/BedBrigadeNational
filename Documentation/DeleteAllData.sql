@@ -11,6 +11,10 @@ drop table if exists Donations
 go
 drop table if exists EmailQueue
 go
+drop table if exists SmsQueue
+go
+drop table if exists GeoLocationQueue
+go
 drop table if exists Media
 go
 drop table if exists Roles
@@ -32,6 +36,12 @@ go
 drop table if exists Translations
 go
 drop table if exists ContentTranslations
+go
+drop table if exists ContentTranslationQueue
+go
+drop table if exists TranslationQueue
+go
+drop table if exists SpokenLanguages
 go
 drop table if exists Locations
 go

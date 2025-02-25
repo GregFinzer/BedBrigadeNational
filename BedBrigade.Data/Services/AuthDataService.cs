@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
 using System.Security;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -67,6 +68,7 @@ namespace BedBrigade.Data.Services
                 new Claim("LocationId", user.LocationId.ToString()),
                 new Claim("UserRoute", location.Data.Route),
                 new Claim("TimeZoneId", location.Data.TimeZoneId),
+                new Claim("Phone", (user.Phone ?? string.Empty).FormatPhoneNumber())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

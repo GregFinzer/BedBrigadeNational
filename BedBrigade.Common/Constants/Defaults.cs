@@ -16,9 +16,9 @@
         public const string PagesDirectory = "pages";
         public const string GroveCityTrimmedRoute = "grove-city";
         public const string DefaultLanguage = "en-US";
-        public const int EmailLowPriority = 1;
-        public const int EmailMediumPriority = 2;
-        public const int EmailHighPriority = 3;
+        public const int BulkLowPriority = 1;
+        public const int BulkMediumPriority = 2;
+        public const int BulkHighPriority = 3;
         public const string CountryCode = "US";
         public const string DefaultTimeZoneId = "Eastern Standard Time";
     }

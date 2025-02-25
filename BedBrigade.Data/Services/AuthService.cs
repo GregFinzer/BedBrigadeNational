@@ -118,6 +118,25 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        public string Phone
+        {
+            get
+            {
+                if (CurrentUser != null
+                    && CurrentUser.Identity != null
+                    && CurrentUser.Identity.IsAuthenticated)
+                {
+                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "Phone")?.Value;
+                    if (!String.IsNullOrEmpty(timeZoneId))
+                    {
+                        return timeZoneId;
+                    }
+                }
+
+                return Defaults.DefaultTimeZoneId;
+            }
+        }
+
         public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
 
         public async Task LogoutAsync()

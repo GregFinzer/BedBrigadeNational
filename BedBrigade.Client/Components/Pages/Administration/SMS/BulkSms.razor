@@ -1,9 +1,9 @@
 ﻿@layout Layout.AdminLayout
-@page "/administration/admin/email"
+@page "/administration/SMS/BulkSms"
 @using BedBrigade.Common.EnumModels
 @using BedBrigade.Common.Enums
 @using BedBrigade.Common.Models
-<CheckAuth Roles=@RoleNames.CanSendBulkEmail></CheckAuth>
+<CheckAuth Roles=@RoleNames.CanSendSms></CheckAuth>
 
 @if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
 {
@@ -12,15 +12,15 @@
 else
 {
     <div class="container my-5 ">
-        <h1>Send Bulk Email</h1>
+        <h1>Send Bulk Text Messages</h1>
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator/>
             
             <div class="form-group mb-3">
-                <label for="emailRecipientOptionDropdown">To</label>
-                <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
+                <label for="smsRecipientOptionDropdown">To</label>
+                <SfDropDownList ID="smsRecipientOptionDropdown" TItem="EnumNameValue<SmsRecipientOption>" TValue="SmsRecipientOption" DataSource=@Model.SmsRecipientOptions @bind-Value=@Model.CurrentSmsRecipientOption Enabled="true" Placeholder="Text Message Recipient Option" FloatLabelType="FloatLabelType.Auto">
                     <DropDownListFieldSettings Text="Name" Value="Value" />
-                    <DropDownListEvents TValue="EmailRecipientOption" TItem="EnumNameValue<EmailRecipientOption>" ValueChange="EmailRecipientChangeEvent"></DropDownListEvents>
+                    <DropDownListEvents TValue="SmsRecipientOption" TItem="EnumNameValue<SmsRecipientOption>" ValueChange="SmsRecipientChangeEvent"></DropDownListEvents>
                 </SfDropDownList>
             </div>
 
@@ -46,17 +46,10 @@ else
                 </div>
             }
 
-            <div class="form-group mb-3">
-                <label for="subject">Subject:</label>
-                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"  />
-                <div style="font-size: smaller">
-                    <ValidationMessage For="@(() => Model.Subject)"></ValidationMessage>
-                </div>  
-            </div>
 
             <div class="form-group mb-3">
                 <label for="body">Body:</label>
-                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="4000"></InputTextArea>
+                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="1600"></InputTextArea>
                 <div style="font-size: smaller">
                     <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
                 </div> 

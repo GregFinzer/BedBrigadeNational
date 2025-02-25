@@ -284,6 +284,10 @@ namespace BedBrigade.Client.Components
                 {
                     await Show("ltreasurer");
                 }
+                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationCommunications))
+                {
+                    await Show("lcommunications");
+                }
             }
             catch (Exception ex)
             {
