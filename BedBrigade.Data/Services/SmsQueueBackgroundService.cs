@@ -12,14 +12,12 @@ namespace BedBrigade.Data.Services;
 
 public class SmsQueueBackgroundService : BackgroundService
 {
+    #region Class Variables
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<SmsQueueBackgroundService> _logger;
-
-    #region Class Variables
-
     private ISmsQueueDataService _smsQueueDataService;
     private IConfigurationDataService _configurationDataService;
-
+    private ILocationDataService _locationDataService;
     private ISendSmsLogic _sendSmsLogic;
     private bool _isProcessing = false;
     private int _smsBeginHour;
@@ -31,9 +29,8 @@ public class SmsQueueBackgroundService : BackgroundService
     private int _smsKeepDays;
     private int _smsMaxPerChunk;
     private bool _smsUseFileMock;
-    private int _smsAppointmentReminderHour;
     private bool _isStopping;
-
+    
     #endregion
 
     public SmsQueueBackgroundService(IServiceProvider serviceProvider,
@@ -68,7 +65,7 @@ public class SmsQueueBackgroundService : BackgroundService
                         _configurationDataService =
                             scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
                         _sendSmsLogic = scope.ServiceProvider.GetRequiredService<ISendSmsLogic>();
-
+                        _locationDataService = scope.ServiceProvider.GetRequiredService<ILocationDataService>();
                         await LoadConfiguration();
                         await ProcessQueue(cancellationToken);
                     }
@@ -95,11 +92,6 @@ public class SmsQueueBackgroundService : BackgroundService
 
     private async Task ProcessQueue(CancellationToken cancellationToken)
     {
-
-        //We only send between _smsBeginDayOfWeek through _smsEndDayOfWeek between _smsBeginHour and _smsEndHour
-        if (!TimeToSendMessages())
-            return;
-
         if (cancellationToken.IsCancellationRequested)
             return;
 
@@ -136,6 +128,17 @@ public class SmsQueueBackgroundService : BackgroundService
                 return;
             }
 
+            if (!(await TimeToSendMessage(smsQueue.LocationId)))
+            {
+                await UnlockMessage(smsQueue);
+                continue;
+            }
+
+            if (String.IsNullOrEmpty(smsQueue.ContactName))
+            {
+                await _smsQueueDataService.FillContactByToPhoneNumber(smsQueue);
+            }
+
             var result = await _sendSmsLogic.SendTextMessage(smsQueue);
 
             if (!result.Success)
@@ -159,7 +162,13 @@ public class SmsQueueBackgroundService : BackgroundService
         _logger.LogDebug(msg);
     }
 
-
+    private async Task UnlockMessage(SmsQueue message)
+    {
+        message.Status = SmsQueueStatus.Queued.ToString();
+        message.LockDate = null;
+        message.UpdateDate = DateTime.UtcNow;
+        await _smsQueueDataService.UpdateAsync(message);
+    }
 
 
 
@@ -190,9 +199,18 @@ public class SmsQueueBackgroundService : BackgroundService
 
 
 
-    private bool TimeToSendMessages()
+    private async Task<bool> TimeToSendMessage(int locationId)
     {
-        DateTime currentDate = DateTime.UtcNow;
+        TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(Defaults.DefaultTimeZoneId);
+        var result = await _locationDataService.GetByIdAsync(locationId);
+
+        if (result.Success && result.Data != null && !String.IsNullOrEmpty(result.Data.TimeZoneId))
+        {
+            timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(result.Data.TimeZoneId);
+        }
+
+        DateTime currentDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneInfo);
+
         bool validTime = currentDate.Hour >= _smsBeginHour && currentDate.Hour <= _smsEndHour;
         bool validDay = currentDate.DayOfWeek >= (DayOfWeek)_smsBeginDayOfWeek &&
                         currentDate.DayOfWeek <= (DayOfWeek)_smsEndDayOfWeek;
@@ -231,6 +249,7 @@ public class SmsQueueBackgroundService : BackgroundService
         _smsUseFileMock =
             await _configurationDataService.GetConfigValueAsBoolAsync(ConfigSection.Sms,
                 ConfigNames.SmsUseFileMock);
+        
 
     }
 

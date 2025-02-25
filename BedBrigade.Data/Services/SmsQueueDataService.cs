@@ -172,7 +172,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var result = await ctx.Set<SmsQueue>()
-                    .Where(o => o.LocationId == locationId)
+                    .Where(o => o.LocationId == locationId
+                        && o.Status == SmsQueueStatus.Sent.ToString())
                     .GroupBy(o => o.ToPhoneNumber)
                     .Select(g => new SmsQueueSummary
                     {
@@ -186,6 +187,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                         MessageDate = g.OrderByDescending(m => m.SentDate ?? DateTime.MinValue).First().SentDate,
                         UnRead = g.Any(o => !o.IsRead)
                     })
+                    .OrderByDescending(o => o.MessageDate)
                     .ToListAsync();
 
                 _svcTimeZone.FillLocalDates(result);
@@ -221,7 +223,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             {
                 var dbSet = ctx.Set<SmsQueue>();
                 var result = await dbSet.Where(o => o.LocationId == locationId
-                                                    && o.ToPhoneNumber == toPhoneNumber)
+                                                    && o.ToPhoneNumber == toPhoneNumber
+                                                    && o.Status == SmsQueueStatus.Sent.ToString())
                     .OrderBy(o => o.SentDate).ToListAsync();
 
                 _svcTimeZone.FillLocalDates(result);
