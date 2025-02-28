@@ -64,6 +64,7 @@
         public const string SmsPhone = "SmsPhone";
         public const string SmsAccountSid = "SmsAccountSid";
         public const string SmsAuthToken = "SmsAuthToken";
+        public const string SmsMissedMessageMinutes = "SmsMissedMessageMinutes";
 
         // Blog Module
 

@@ -1,7 +1,11 @@
 ﻿#region Includes
+
+using System.Text;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,7 +22,10 @@ public class SmsQueueBackgroundService : BackgroundService
     private ISmsQueueDataService _smsQueueDataService;
     private IConfigurationDataService _configurationDataService;
     private ILocationDataService _locationDataService;
+    private IUserDataService _userDataService;
+    private IEmailQueueDataService _emailQueueDataService;
     private ISendSmsLogic _sendSmsLogic;
+    private IConfiguration _configuration;
     private bool _isProcessing = false;
     private int _smsBeginHour;
     private int _smsEndHour;
@@ -66,8 +73,12 @@ public class SmsQueueBackgroundService : BackgroundService
                             scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
                         _sendSmsLogic = scope.ServiceProvider.GetRequiredService<ISendSmsLogic>();
                         _locationDataService = scope.ServiceProvider.GetRequiredService<ILocationDataService>();
+                        _userDataService = scope.ServiceProvider.GetRequiredService<IUserDataService>();
+                        _emailQueueDataService = scope.ServiceProvider.GetRequiredService<IEmailQueueDataService>();
+                        _configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
                         await LoadConfiguration();
                         await ProcessQueue(cancellationToken);
+                        await CheckMissedMessages(cancellationToken);
                     }
                 }
                 catch (Exception ex)
@@ -89,6 +100,93 @@ public class SmsQueueBackgroundService : BackgroundService
     #endregion
 
     #region Private Methods
+
+    private async Task CheckMissedMessages(CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        var missedMessages = await _smsQueueDataService.GetOldUnreadMessages();
+
+        if (missedMessages.Success && missedMessages.Data != null && missedMessages.Data.Count > 0)
+        {
+            foreach (var smsQueue in missedMessages.Data)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                if (!smsQueue.SentDate.HasValue)
+                    continue;
+
+                string subject = BuildSubject(smsQueue);
+                
+                var sentToday = await _emailQueueDataService.GetEmailsSentToday();
+
+                if (!sentToday.Any(o => o.Subject == subject))
+                {
+                    await SendMissedMessageEmails(smsQueue, subject);
+                }
+            }
+        }
+
+    }
+
+    private async Task SendMissedMessageEmails(SmsQueue smsQueue, string subject)
+    {
+        List<string> emails = await _userDataService.GetMissedMessageEmailsForLocation(smsQueue.LocationId);
+
+        foreach (var email in emails)
+        {
+            EmailQueue emailQueue = new EmailQueue
+            {
+                ToAddress = email,
+                Subject = subject,
+                Body = BuildBody(smsQueue),
+                QueueDate = DateTime.UtcNow,
+                FailureMessage = string.Empty,
+                Status = EmailQueueStatus.Queued.ToString(),
+                Priority = Defaults.BulkMediumPriority
+            };
+            await _emailQueueDataService.QueueEmail(emailQueue);
+        }
+    }
+
+    private string BuildBody(SmsQueue smsQueue)
+    {
+        string contactName = smsQueue.ContactName;
+
+        if (String.IsNullOrEmpty(contactName))
+        {
+            contactName = smsQueue.ToPhoneNumber.FormatPhoneNumber();
+        }
+
+        StringBuilder sb = new StringBuilder(1024);
+        string sentDateString = smsQueue.SentDate.Value.ToString("f");
+        sb.AppendLine($"You have a missed text message from {contactName} on {sentDateString}.");
+        sb.AppendLine($"Phone: {smsQueue.ToPhoneNumber.FormatPhoneNumber()}");
+        sb.AppendLine($"Contact Type: {smsQueue.ContactType}");
+        sb.AppendLine();
+        sb.AppendLine("Message:");
+        sb.AppendLine(smsQueue.Body);
+        sb.AppendLine();
+        sb.AppendLine("Please respond to this message by going to the following URL:");
+        string baseUrl = _configuration.GetSection("AppSettings:BaseUrl").Value.TrimEnd('/');
+        string phoneHtmlEncoded = System.Web.HttpUtility.UrlEncode(smsQueue.ToPhoneNumber.FormatPhoneNumber());
+        sb.AppendLine($"{baseUrl}/administration/SMS/SmsDetails/{smsQueue.LocationId}/{phoneHtmlEncoded}");
+        return sb.ToString();
+    }
+
+    private string BuildSubject(SmsQueue smsQueue)
+    {
+        string contactName = smsQueue.ContactName;
+
+        if (String.IsNullOrEmpty(contactName))
+        {
+            contactName = smsQueue.ToPhoneNumber.FormatPhoneNumber();
+        }
+
+        return $"Missed Text Message from {contactName} on {smsQueue.SentDate.Value.ToString("f")}";
+    }
 
     private async Task ProcessQueue(CancellationToken cancellationToken)
     {

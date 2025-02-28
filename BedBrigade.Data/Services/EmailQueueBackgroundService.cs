@@ -200,7 +200,7 @@ namespace BedBrigade.Data.Services
         private async Task<bool> MaxSent()
         {
             _logger.LogDebug("EmailQueueLogic:  GetEmailsSentToday");
-            List<EmailQueue> emailsSentToday = await _emailQueueDataService.GetEmailsSentToday();
+            List<EmailSlim> emailsSentToday = await _emailQueueDataService.GetEmailsSentToday();
 
             if (emailsSentToday.Count(o => o.SentDate >= DateTime.UtcNow.AddMinutes(-1)) >= _emailMaxSendPerMinute)
             {

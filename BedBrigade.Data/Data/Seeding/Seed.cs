@@ -792,6 +792,13 @@ public static class Seed
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
+        new()
+        {
+            ConfigurationKey = ConfigNames.SmsMissedMessageMinutes,
+            ConfigurationValue = "30", 
+            Section = ConfigSection.Sms,
+            LocationId = Defaults.NationalLocationId
+        }
     ];
 
 
