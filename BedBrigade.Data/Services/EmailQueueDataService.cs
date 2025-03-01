@@ -63,10 +63,30 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<List<EmailQueue>> GetEmailsSentToday()
+        public async Task<int> GetEmailsSentTodayCount()
+        {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetEmailsSentTodayCount()");
+            int? cachedCount = _cachingService.Get<int?>(cacheKey);
+
+            if (cachedCount.HasValue)
+            {
+                return cachedCount.Value;
+            }
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<EmailQueue>();
+                DateTime targetDate = DateTime.Now.Date.ToUniversalTime();
+                int count = await dbSet.CountAsync(o => o.SentDate.HasValue && o.SentDate.Value >= targetDate);
+                _cachingService.Set(cacheKey, count);
+                return count;
+            }
+        }
+
+        public async Task<List<EmailSlim>> GetEmailsSentToday()
         {
             string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetEmailsSentToday()");
-            List<EmailQueue>? cachedContent = _cachingService.Get<List<EmailQueue>>(cacheKey);
+            List<EmailSlim>? cachedContent = _cachingService.Get<List<EmailSlim>>(cacheKey);
 
             if (cachedContent != null)
             {
@@ -76,7 +96,17 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.SentDate.HasValue && o.SentDate.Value.Date == DateTime.UtcNow.Date).ToListAsync();
+                DateTime targetDate = DateTime.Now.Date.ToUniversalTime();
+                var result = await dbSet
+                    .Where(o => o.SentDate.HasValue && o.SentDate.Value >= targetDate)
+                    .Select(o => new EmailSlim
+                    {
+                        Email = o.ToAddress,
+                        Subject = o.Subject,
+                        SentDate = o.SentDate
+                    })
+                    .ToListAsync();
+
                 _cachingService.Set(cacheKey, result);
                 return result;
             }

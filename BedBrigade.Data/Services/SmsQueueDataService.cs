@@ -16,7 +16,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IVolunteerDataService _volunteerDataService;
     private IBedRequestDataService _bedRequestDataService;
     private IContactUsDataService _contactUsDataService;
-    private IConfigurationDataService _svcConfiguration;
+    private IConfigurationDataService _configDataService;
     private ISmsState _smsState;
     private ILocationDataService _locationDataService;
     private IScheduleDataService _scheduleDataService;
@@ -29,7 +29,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         IVolunteerDataService volunteerDataService, 
         IBedRequestDataService bedRequestDataService, 
         IContactUsDataService contactUsDataService, 
-        IConfigurationDataService svcConfiguration, 
+        IConfigurationDataService configDataService, 
         ISmsState smsState,
         ITimezoneDataService svcTimeZone, 
         ILocationDataService locationDataService, 
@@ -41,7 +41,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _volunteerDataService = volunteerDataService;
         _bedRequestDataService = bedRequestDataService;
         _contactUsDataService = contactUsDataService;
-        _svcConfiguration = svcConfiguration;
+        _configDataService = configDataService;
         _smsState = smsState;
         _svcTimeZone = svcTimeZone;
         _locationDataService = locationDataService;
@@ -173,7 +173,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             {
                 var result = await ctx.Set<SmsQueue>()
                     .Where(o => o.LocationId == locationId
-                        && o.Status == SmsQueueStatus.Sent.ToString())
+                        && (o.Status == SmsQueueStatus.Sent.ToString() 
+                        || o.Status == SmsQueueStatus.Received.ToString()))
                     .GroupBy(o => o.ToPhoneNumber)
                     .Select(g => new SmsQueueSummary
                     {
@@ -224,7 +225,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 var dbSet = ctx.Set<SmsQueue>();
                 var result = await dbSet.Where(o => o.LocationId == locationId
                                                     && o.ToPhoneNumber == toPhoneNumber
-                                                    && o.Status == SmsQueueStatus.Sent.ToString())
+                                                    && (o.Status == SmsQueueStatus.Sent.ToString() 
+                                                    || o.Status == SmsQueueStatus.Received.ToString()))
                     .OrderBy(o => o.SentDate).ToListAsync();
 
                 _svcTimeZone.FillLocalDates(result);
@@ -403,7 +405,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<string> FillLocationByFromPhoneNumber(SmsQueue smsQueue)
     {
-        var result = await _svcConfiguration.GetAllAsync(ConfigSection.Sms);
+        var result = await _configDataService.GetAllAsync(ConfigSection.Sms);
         if (!result.Success || result.Data == null || !result.Data.Any())
         {
             return "FillLocationByFromPhoneNumber could not get any ConfigSection.Sms";
@@ -426,14 +428,23 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
-            var messages = await dbSet.Where(o => o.LocationId == locationId && o.ToPhoneNumber == toPhoneNumber && !o.IsRead).ToListAsync();
-            foreach (var message in messages)
+            var messages = await dbSet.Where(o => o.LocationId == locationId 
+                                                  && (o.Status == SmsQueueStatus.Sent.ToString()
+                                                    || o.Status == SmsQueueStatus.Received.ToString())
+                                                  && o.ToPhoneNumber == toPhoneNumber 
+                                                  && !o.IsRead).ToListAsync();
+
+            if (messages.Any())
             {
-                message.IsRead = true;
-                dbSet.Update(message);
+                foreach (var message in messages)
+                {
+                    message.IsRead = true;
+                    dbSet.Update(message);
+                }
+
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
             }
-            await ctx.SaveChangesAsync();
-            _cachingService.ClearByEntityName(GetEntityName());
         }
     }
 
@@ -497,7 +508,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         if (phoneNumberList.Count == 0)
             return new ServiceResponse<string>("No text messages to send", false);
 
-        string fromPhoneNumber = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone, locationId);
+        string fromPhoneNumber = await _configDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone, locationId);
         fromPhoneNumber = fromPhoneNumber.FormatPhoneNumber();
 
         try
@@ -595,7 +606,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     public async Task<string> GetEstimatedTime(int queueCount, int phoneNumberCount)
     {
         int totalCount = queueCount + phoneNumberCount;
-        int maxTextMessagesPerSecond = Convert.ToInt32((await _svcConfiguration.GetByIdAsync(ConfigNames.SmsMaxSendPerSecond)).Data.ConfigurationValue);
+        int maxTextMessagesPerSecond = Convert.ToInt32((await _configDataService.GetByIdAsync(ConfigNames.SmsMaxSendPerSecond)).Data.ConfigurationValue);
 
         if (totalCount <= maxTextMessagesPerSecond)
         {
@@ -612,7 +623,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<bool> IsLiveSms()
     {
-        string configValue = (await _svcConfiguration.GetByIdAsync(ConfigNames.SmsUseFileMock)).Data.ConfigurationValue;
+        string configValue = (await _configDataService.GetByIdAsync(ConfigNames.SmsUseFileMock)).Data.ConfigurationValue;
         return configValue != "true";
     }
 
@@ -629,6 +640,39 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private async Task<string> GetLocationName(int locationId)
     {
         return (await _locationDataService.GetByIdAsync(locationId)).Data.Name;
+    }
+
+    public async Task<ServiceResponse<List<SmsQueue>>> GetOldUnreadMessages()
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetOldUnreadMessages()");
+
+        List<SmsQueue>? cachedContent = _cachingService.Get<List<SmsQueue>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Found {cachedContent.Count} {GetEntityName()} in cache", true,
+                cachedContent);
+        }
+
+        int missedMessageMinutes = await _configDataService.GetConfigValueAsIntAsync(ConfigSection.Sms, ConfigNames.SmsMissedMessageMinutes);
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                var result = await dbSet.Where(o => o.IsRead == false && o.SentDate < DateTime.UtcNow.AddMinutes(missedMessageMinutes * -1))
+                    .OrderBy(o => o.SentDate)
+                    .ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SmsQueue>>($"Found {result.Count} unread messages older than 30 minutes", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>(
+                $"Error GetOldUnreadMessages for {GetEntityName()} : {ex.Message} ({ex.ErrorCode})",
+                false, null);
+        }
     }
 }
 

@@ -6,7 +6,6 @@ namespace BedBrigade.Data.Services
     public interface IEmailQueueDataService : IRepository<EmailQueue>
     {
         Task<List<EmailQueue>> GetLockedEmails();
-        Task<List<EmailQueue>> GetEmailsSentToday();
         Task ClearEmailQueueLock();
         Task<List<EmailQueue>> GetEmailsToProcess(int maxPerChunk);
         Task DeleteOldEmailQueue(int daysOld);
@@ -15,5 +14,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId);
         Task<ServiceResponse<string>> QueueEmail(EmailQueue email);
         Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body);
+        Task<int> GetEmailsSentTodayCount();
+        Task<List<EmailSlim>> GetEmailsSentToday();
     }
 }
