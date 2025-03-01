@@ -173,7 +173,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             {
                 var result = await ctx.Set<SmsQueue>()
                     .Where(o => o.LocationId == locationId
-                        && o.Status == SmsQueueStatus.Sent.ToString())
+                        && (o.Status == SmsQueueStatus.Sent.ToString() 
+                        || o.Status == SmsQueueStatus.Received.ToString()))
                     .GroupBy(o => o.ToPhoneNumber)
                     .Select(g => new SmsQueueSummary
                     {
@@ -224,7 +225,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 var dbSet = ctx.Set<SmsQueue>();
                 var result = await dbSet.Where(o => o.LocationId == locationId
                                                     && o.ToPhoneNumber == toPhoneNumber
-                                                    && o.Status == SmsQueueStatus.Sent.ToString())
+                                                    && (o.Status == SmsQueueStatus.Sent.ToString() 
+                                                    || o.Status == SmsQueueStatus.Received.ToString()))
                     .OrderBy(o => o.SentDate).ToListAsync();
 
                 _svcTimeZone.FillLocalDates(result);
@@ -426,14 +428,23 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
-            var messages = await dbSet.Where(o => o.LocationId == locationId && o.ToPhoneNumber == toPhoneNumber && !o.IsRead).ToListAsync();
-            foreach (var message in messages)
+            var messages = await dbSet.Where(o => o.LocationId == locationId 
+                                                  && (o.Status == SmsQueueStatus.Sent.ToString()
+                                                    || o.Status == SmsQueueStatus.Received.ToString())
+                                                  && o.ToPhoneNumber == toPhoneNumber 
+                                                  && !o.IsRead).ToListAsync();
+
+            if (messages.Any())
             {
-                message.IsRead = true;
-                dbSet.Update(message);
+                foreach (var message in messages)
+                {
+                    message.IsRead = true;
+                    dbSet.Update(message);
+                }
+
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
             }
-            await ctx.SaveChangesAsync();
-            _cachingService.ClearByEntityName(GetEntityName());
         }
     }
 

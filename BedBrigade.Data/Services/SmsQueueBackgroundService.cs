@@ -26,6 +26,7 @@ public class SmsQueueBackgroundService : BackgroundService
     private IEmailQueueDataService _emailQueueDataService;
     private ISendSmsLogic _sendSmsLogic;
     private IConfiguration _configuration;
+    private ITimezoneDataService _timezoneDataService;
     private bool _isProcessing = false;
     private int _smsBeginHour;
     private int _smsEndHour;
@@ -76,6 +77,7 @@ public class SmsQueueBackgroundService : BackgroundService
                         _userDataService = scope.ServiceProvider.GetRequiredService<IUserDataService>();
                         _emailQueueDataService = scope.ServiceProvider.GetRequiredService<IEmailQueueDataService>();
                         _configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                        _timezoneDataService = scope.ServiceProvider.GetRequiredService<ITimezoneDataService>();
                         await LoadConfiguration();
                         await ProcessQueue(cancellationToken);
                         await CheckMissedMessages(cancellationToken);
@@ -118,6 +120,17 @@ public class SmsQueueBackgroundService : BackgroundService
                 if (!smsQueue.SentDate.HasValue)
                     continue;
 
+                var locationResult = await _locationDataService.GetByIdAsync(smsQueue.LocationId);
+
+                if (locationResult.Success && locationResult.Data != null)
+                {
+                    smsQueue.SentDateLocal = _timezoneDataService.ConvertUtcToTimeZone(smsQueue.SentDate.Value, locationResult.Data.TimeZoneId);
+                }
+                else
+                {
+                    smsQueue.SentDateLocal = _timezoneDataService.ConvertUtcToTimeZone(smsQueue.SentDate.Value, Defaults.DefaultTimeZoneId);
+                }
+
                 string subject = BuildSubject(smsQueue);
                 
                 var sentToday = await _emailQueueDataService.GetEmailsSentToday();
@@ -137,17 +150,19 @@ public class SmsQueueBackgroundService : BackgroundService
 
         foreach (var email in emails)
         {
+            string body = BuildBody(smsQueue);
             EmailQueue emailQueue = new EmailQueue
             {
                 ToAddress = email,
                 Subject = subject,
-                Body = BuildBody(smsQueue),
+                Body = body,
                 QueueDate = DateTime.UtcNow,
                 FailureMessage = string.Empty,
                 Status = EmailQueueStatus.Queued.ToString(),
                 Priority = Defaults.BulkMediumPriority
             };
             await _emailQueueDataService.QueueEmail(emailQueue);
+            _logger.LogInformation($"Queued Missed Message to {email}:\r\n{body}");
         }
     }
 
@@ -161,7 +176,7 @@ public class SmsQueueBackgroundService : BackgroundService
         }
 
         StringBuilder sb = new StringBuilder(1024);
-        string sentDateString = smsQueue.SentDate.Value.ToString("f");
+        string sentDateString = smsQueue.SentDateLocal.Value.ToString("f");
         sb.AppendLine($"You have a missed text message from {contactName} on {sentDateString}.");
         sb.AppendLine($"Phone: {smsQueue.ToPhoneNumber.FormatPhoneNumber()}");
         sb.AppendLine($"Contact Type: {smsQueue.ContactType}");
@@ -171,8 +186,10 @@ public class SmsQueueBackgroundService : BackgroundService
         sb.AppendLine();
         sb.AppendLine("Please respond to this message by going to the following URL:");
         string baseUrl = _configuration.GetSection("AppSettings:BaseUrl").Value.TrimEnd('/');
-        string phoneHtmlEncoded = System.Web.HttpUtility.UrlEncode(smsQueue.ToPhoneNumber.FormatPhoneNumber());
+        string phoneHtmlEncoded = System.Web.HttpUtility.UrlPathEncode(smsQueue.ToPhoneNumber.FormatPhoneNumber());
         sb.AppendLine($"{baseUrl}/administration/SMS/SmsDetails/{smsQueue.LocationId}/{phoneHtmlEncoded}");
+        sb.AppendLine();
+        sb.AppendLine("You must go to this link to read the message or it will continue to send a reminder every day.");
         return sb.ToString();
     }
 
@@ -185,7 +202,7 @@ public class SmsQueueBackgroundService : BackgroundService
             contactName = smsQueue.ToPhoneNumber.FormatPhoneNumber();
         }
 
-        return $"Missed Text Message from {contactName} on {smsQueue.SentDate.Value.ToString("f")}";
+        return $"Missed Text Message from {contactName} on {smsQueue.SentDateLocal.Value.ToString("f")}";
     }
 
     private async Task ProcessQueue(CancellationToken cancellationToken)
