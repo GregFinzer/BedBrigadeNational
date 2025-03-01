@@ -170,7 +170,7 @@ One thing you will notice about the following project plan is the lack of due da
     * Refactor Grid Persistence :heavy_check_mark:
     * Add try catch and alert
     * Seed Only Grove City and Rock City :heavy_check_mark:
-    * Location Timezone
+    * Location Timezone :heavy_check_mark:
     * Redo Manage Bed Request Form :heavy_check_mark:
     * Delivery Sheet Sort By Team Then By Distance :heavy_check_mark:
     * Add Delivery Checklist to the Delivery Sheet :heavy_check_mark:
@@ -208,13 +208,13 @@ One thing you will notice about the following project plan is the lack of due da
 * New Stories
     * Send confirmation email for Bed Request :heavy_check_mark:
     * Import Bed Requests
-    * Calendar
+    * Calendar :heavy_check_mark:
     * Upcoming Events :heavy_check_mark:
     * Add new Schedule Fields :heavy_check_mark:
     * New Manage Volunteer Fields :heavy_check_mark:
     * Volunteer Sign Up New Fields :heavy_check_mark:
-    * New Manage Bed Request Fields
-    * New Bed Request Form Fields
+    * New Manage Bed Request Fields :heavy_check_mark:
+    * New Bed Request Form Fields :heavy_check_mark:
     * Bust Browser Cache for New Version :heavy_check_mark:
     * Localizable String Parsing :heavy_check_mark:
     * Localize Strings :heavy_check_mark:
@@ -225,6 +225,8 @@ One thing you will notice about the following project plan is the lack of due da
     * Send Confirmation Email for Volunteer Sign Up :heavy_check_mark:
     * Localize Dynamic Content :heavy_check_mark:
     * Apply String Localization :heavy_check_mark:
+    * Fix Publish :heavy_check_mark:
+    * Shutdown Background Services :heavy_check_mark:
 
 * Address
     * Location Latitude & Longitude :heavy_check_mark:
@@ -250,8 +252,18 @@ One thing you will notice about the following project plan is the lack of due da
     
 * SMS
     * Add LocationId to Configuration with a default of National :heavy_check_mark:
+    * Design send and receive SMS Messages and Reply :heavy_check_mark:
+    * SMS Table :heavy_check_mark:
+    * SMS Database Indexes :heavy_check_mark:
     * Create Code for SMS Queue :heavy_check_mark:
-    * Create UI to send and receive SMS Messages and Reply
+    * SMS Message Summary :heavy_check_mark:
+    * SMS Message Detail :heavy_check_mark:
+    * SMS Controller and Test Harness  :heavy_check_mark:
+    * Bulk SMS :heavy_check_mark:
+    * SMS Missed Messages :heavy_check_mark:
+    * Re-Style Summary Page  :heavy_check_mark:
+    * SMS Delete Old Records :heavy_check_mark:
+    
  
 * Custom Media Manager
     * Custom Media Manager :heavy_check_mark:
