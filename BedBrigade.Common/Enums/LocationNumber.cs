@@ -4,6 +4,6 @@
     {
         National = 1,
         GroveCity = 2,
-        RockCity = 3
+        RockCityPolaris = 3
     }
 }

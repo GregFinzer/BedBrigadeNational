@@ -1,0 +1,77 @@
+﻿/* Custom adjustments for the Bootstrap navbar with rockp- prefixed classes */
+
+.rockp-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Keeps it on top */
+    background-color: rgba(255, 255, 255, 0.9); /* White with 80% opacity */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    height: 100px; /* Set a fixed height */
+    transition: background-color 0.3s ease-in-out; /* Smooth transition */
+    padding-right: 200px;
+    padding-left: 40px;    
+}
+
+@media (max-width: 768px) {
+    .rockp-navbar {
+        padding-left: 10px;
+        padding-right: 20px;
+    }
+}
+
+/* Limit the logo image height */
+.rockp-navbar-brand img {
+    max-height: 80px;
+}
+
+/* Add vertical dividers between nav items */
+.rockp-navbar-nav .rockp-nav-item + .rockp-nav-item {
+    border-left: 1px solid #ccc;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+/* Style the active nav link */
+.rockp-nav-link.active {
+    color: #00b2b2 !important;
+    border-bottom: 2px solid #00b2b2;
+}
+
+.rockp-nav-link:hover {
+    border-bottom: 2px solid #00b2b2;
+}
+
+/* Style the default nav links */
+.rockp-nav-link {
+    color: #666 !important;
+    font-weight: bold;
+    font-size: 16px !important;
+}
+
+/* Ensure mobile dropdown menu background is solid white */
+.navbar-collapse {
+    background-color: white; /* Ensures the dropdown menu is fully visible */
+}
+
+/* Ensure dropdown items are clearly visible */
+.navbar-nav .dropdown-menu {
+    background-color: white !important; /* Ensures the dropdown has a solid background */
+}
+
+    /* Style dropdown links */
+    .navbar-nav .dropdown-menu .dropdown-item {
+        color: black; /* Ensures text remains visible */
+    }
+
+        /* Ensure hover effect for dropdown items */
+        .navbar-nav .dropdown-menu .dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.05); /* Light gray background on hover */
+        }
+
+.rockp-dropdown-item {
+    color: #666 !important;
+    font-weight: bold;
+    font-size: 16px !important;
+}
