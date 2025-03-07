@@ -197,6 +197,7 @@ public static class SeedContentsLogic
         }
 
         await SeedContentItem(context, ContentType.Header, location, "Header", "RockCityPolarisHeader.html");
+        await SeedContentItem(context, ContentType.Footer, location, "Footer", "RockCityPolarisFooter.html");
         //await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
         //await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
         //await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
@@ -335,6 +336,11 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
+            if (location.LocationId == (int)LocationNumber.RockCityPolaris)
+            {
+                continue;
+            }
+
             bool alreadyAdded =
                 await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId);
             if (alreadyAdded)

@@ -75,3 +75,102 @@
     font-weight: bold;
     font-size: 16px !important;
 }
+
+/********************************************
+ * Footer Section (rockp- prefixed)
+ ********************************************/
+.rockp-footer {
+    background-color: #f5f5f5; /* Light gray background */
+    color: #333;
+    padding: 40px 0; /* Top & bottom spacing */
+    text-align: center; /* Center everything */
+    font-size: 1rem;
+}
+
+.rockp-footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Side padding for smaller screens */
+}
+
+/* Top: Three columns */
+.rockp-footer-columns {
+    display: flex;
+    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+    justify-content: space-evenly; /* Even horizontal spacing */
+    margin-bottom: 20px;
+}
+
+.rockp-footer-column {
+    flex: 1 1 200px; /* Grow/shrink, minimum width ~200px */
+    margin: 10px;
+}
+
+.rockp-footer-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+/* Responsive tweak for columns on very small screens */
+@media (max-width: 576px) {
+    .rockp-footer-columns {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Reduce vertical spacing between columns */
+    .rockp-footer-column {
+        margin: 0px;
+        text-align: center;
+        flex: 1 1 100px;
+        padding-bottom: 30px;
+    }
+}
+
+.rockp-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .rockp-footer-list li {
+        margin-bottom: 5px;
+    }
+
+    .rockp-footer-list a {
+        color: #333;
+        text-decoration: underline;
+        transition: color 0.2s ease;
+    }
+
+        .rockp-footer-list a:hover {
+            color: #00b2b2;
+        }
+
+/* Middle: Social icons row */
+.rockp-footer-icons {
+    margin-bottom: 20px;
+}
+
+    .rockp-footer-icons a {
+        color: #333;
+        margin: 0 10px;
+        font-size: 1.2rem;
+        text-decoration: none; /* No underline on normal state */
+        transition: color 0.2s ease;
+    }
+
+        .rockp-footer-icons a:hover {
+            color: #00b2b2;
+        }
+
+/* Bottom: Copyright */
+.rockp-footer-bottom p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+
