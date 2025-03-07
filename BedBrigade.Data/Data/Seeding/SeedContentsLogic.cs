@@ -198,7 +198,7 @@ public static class SeedContentsLogic
 
         await SeedContentItem(context, ContentType.Header, location, "Header", "RockCityPolarisHeader.html");
         await SeedContentItem(context, ContentType.Footer, location, "Footer", "RockCityPolarisFooter.html");
-        //await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
+        await SeedContentItem(context, ContentType.Home, location, "Home", "RockCityPolarisHome.html");
         //await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
         //await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
         //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
@@ -393,7 +393,8 @@ public static class SeedContentsLogic
         {
             foreach (var location in locations)
             {
-                if (location.LocationId == (int)LocationNumber.GroveCity)
+                if (location.LocationId == (int)LocationNumber.GroveCity 
+                    || location.LocationId == (int) LocationNumber.RockCityPolaris)
                 {
                     continue;
                 }
