@@ -20,5 +20,10 @@ namespace BedBrigade.Common.Models
 
         public List<string>? OptImagesUrl { get; set; } // all images, ecept current main
 
+        public string? CreatedDateMonth { get; set; }
+        public string? CreatedDatePeriod { get; set; } // Date & Year
+        public string? UpdatedDateMonth { get; set; }
+        public string? UpdatedDatePeriod { get; set; } // Date & Year
+
     }
 }

@@ -3,6 +3,7 @@ using BedBrigade.Data.Services;
 using BedBrigade.Common.Logic;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.EnumModels;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using KellermanSoftware.NetEmailValidation;
@@ -17,119 +18,162 @@ using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
 using System.Collections.Generic;
 using Microsoft.JSInterop.Infrastructure;
-using Syncfusion.Blazor.Kanban.Internal;
 using BedBrigade.Common.Constants;
+using Syncfusion.Blazor.Inputs;
+using System.Linq;
+using static BedBrigade.Common.Logic.BlogTest;
+using Microsoft.JSInterop;
+using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
+using static BedBrigade.Common.Logic.BlogHelper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Routing;
+
 
 namespace BedBrigade.Client.Components.Pages
 {
     public partial class Blog: ComponentBase
     {
+        // BedBrigade Services
        
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
-
-        [Inject] private IContentDataService? _svcContent { get; set; }
-      
+        [Inject] private IContentDataService? _svcContent { get; set; }      
         [Inject] private NavigationManager? _navigationManager { get; set; }
         [Inject] private ILocationState? _locationState { get; set; }
         [Inject] private ITranslationDataService? _translateLogic { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
-        [Inject] private IWebHostEnvironment _environment { get; set; }
+        [Inject] private ILanguageContainerService? _lc { get; set; }
+        [Inject] private IWebHostEnvironment? _environment { get; set; }
+        [Inject] private IConfiguration? _configuration { get; set; }
+        [Inject] private IJSRuntime? JS { get; set; }
 
-        [Inject] private IConfiguration _configuration { get; set; }
-
+        // Page Parameters (by URL)
 
         [Parameter]
-        public string? LocationRoute { get; set; }
+        public string? LocationRoute { get; set; }      
 
         [Parameter]
         public string? ContentType { get; set; } 
 
-        // constant data
-        public string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        // Parameters for Banner Rotator
 
         public string? RotatorTitle { get; set; }
-
         private string Key => $"{LocationId}-{ContentType}";
-
         public int LocationId { get; set; }
-
         public string? ImagePath { get; set; }
 
-        public string? LocationName { get; set; }
-        protected List<Location>? lstLocations { get; set; }
-
-        protected Location myLocation { get; set; }
-        protected List<Content>? lstContents { get; set; }
+        // passing parameters for Card View
 
         private string ChildKey = Guid.NewGuid().ToString();
         private List<BlogData> _cards = new();
-
-
-        private bool IsShowBlogs = true;
-        private bool IsPaging = true;       
+        protected Location? myLocation { get; set; }
+        private bool IsCardPaging = true;       
         private int NumberOfColumns = 4;
         private int NumberOfRows = 4;
         private int MaxTextSize = 150;
+        private MarkupString ErrorMessage;
+        private MarkupString NoDataMessage;
+        
+        public string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+               
+        public string? LocationName { get; set; }
+        protected List<Location>? lstLocations { get; set; }               
+        protected List<Content>? lstContents { get; set; }
 
+
+        private BlogConfiguration? blogConfig { get; set; } 
+
+
+        private bool IsShowBlogs = true;
         public bool IsShowBanner = false;
         public bool IsBlogData = false;
         private bool IsTestMode = false; 
         private bool IsCardSettings = false;
 
+
+        // Test Only Variables
+        protected List<Content>? lstBlogData { get; set; }
+        private String DataStatusMessage = string.Empty;
+        private String DataAddMessage = string.Empty;
+        private String FolderMessage = string.Empty;
+        private String FileMessage = string.Empty;
+        private int ImageFolderCount = 0;
+        private int BlogContentCount = 0;
+        private int UnzippedImagesCount = 0;
+
+       private string? connectionString { get; set; }
+        private string? webRootPath { get; set; }
+
+        private string TestBarClass = "row bg-danger";
+
+        private string ResetAction = "load"; 
+       
+        private bool SpinnerVisible { get; set; } = false;
+
         private string? BlogModuleOptions { get; set; }
         private string? BlogModuleImagesExt { get; set; }
 
-        // Temporary variables - to test display only
-        private MarkupString? OptionsDisplay;
-        private int LocationCount = 0;
-        private int ContentCount = 0;
-        private string LocationStatus = "Not Found";
-        private string ContentStatus = "Not Found";
-        public MarkupString NoDataMessage;
-        public MarkupString ErrorMessage;
-
-
-        private static readonly Dictionary<string, string> ValidContentTypes = new()
-        {
-            { "news", "News" },
-            { "new", "News" },      // Corrects "new" → "News"
-            { "stories", "Stories" },
-            { "story", "Stories" }  // Corrects "story" → "Stories"
-        };
-
-        private Dictionary<string, string> dctBlogModuleConfig = new Dictionary<string, string>();
-
+                
 
         protected override async Task OnInitializedAsync()
+        {
+
+            _lc.InitLocalizedComponent(this);
+            SetValidContentType();
+            await LoadConfiguration();
+
+            if (IsTestMode) // ===== RUN TEST DATA GENERATIOIN ===========
+            {
+                // await CheckTestData();
+                // Run the validation and get the result
+                HandleTestMode();             
+
+            } // Test Mode only     
+
+            await CheckParameters();
+
+            // Validate and prepare Banner Folders
+            if (LocationRoute != null && ContentType != null)
+            {
+                if (LocationRoute.ToLower() != "national")
+                {
+                    ValidateAndPrepareBannerFolders(LocationRoute, ContentType, _environment.WebRootPath);
+                }
+            }
+
+            await base.OnInitializedAsync();
+
+        }// Init       
+
+        private void SetValidContentType()
         {
             if (!string.IsNullOrWhiteSpace(ContentType))
             {
                 string lowerInput = ContentType.ToLower();
-                ContentType = ValidContentTypes.TryGetValue(lowerInput, out string correctedValue)
-                    ? correctedValue
-                    : ToCapitalized(ContentType);
+                ContentType = BlogHelper.ValidContentTypes.TryGetValue(lowerInput, out string? correctedValue)
+                ? correctedValue
+                    : StringUtil.ProperCase(ContentType);
             }
-
-            // run test data creation
-
-            await LoadConfiguration();
-
-            await CheckParameters();                           
-        
-
-        }// Init
+        } // SetValidContentType
 
         private async Task LoadConfiguration()
         {
             BlogModuleOptions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "BlogModuleOptions");
             if (BlogModuleOptions != null & BlogModuleOptions.Length > 0)
             {
-                // IsTestMode = BlogHelper.GetSettingValueAsBool(BlogModuleOptions, "TestMode");
-                // IsCardSettings = BlogHelper.GetSettingValueAsBool(BlogModuleOptions, "CardSettings");
-                dctBlogModuleConfig = ParseConfigString(BlogModuleOptions);
-                OptionsDisplay = (MarkupString)BlogModuleOptions.Replace("|", "<br/>");
-                // Get Configuration Dictionary 
+
+                blogConfig = new BlogConfiguration(BlogModuleOptions);
+                IsTestMode = blogConfig.TestMode;
+                IsCardSettings = blogConfig.CardSettings;
+                IsShowBanner = blogConfig.ShowBanner;
+
+                if (IsCardSettings) // Load more Settings, if missing - default values
+                {
+                    IsCardPaging = blogConfig.CardPaging;
+                    NumberOfColumns = blogConfig.CardColumns;
+                    NumberOfRows = blogConfig.CardRows;
+                    MaxTextSize = blogConfig.CardTextSize;
+                }
 
             }
 
@@ -137,34 +181,22 @@ namespace BedBrigade.Client.Components.Pages
             if (BlogModuleImagesExt != null & BlogModuleImagesExt.Length > 0)
             {
                 AllowedExtensions = BlogModuleImagesExt.Split(',');
-            }         
-
-        }
-
-
-        protected override async void OnParametersSet()
-        {
-            if (!string.IsNullOrWhiteSpace(ContentType))
-            {
-                string lowerInput = ContentType.ToLower();
-                ContentType = ValidContentTypes.TryGetValue(lowerInput, out string correctedValue)
-                    ? correctedValue
-                    : ToCapitalized(ContentType);
             }
 
-            await CheckParameters();
-                       
-            ChildKey = Guid.NewGuid().ToString();                                                               
-                       
+        }//LoadConfiguration
+
+        protected override async Task OnParametersSetAsync()
+        {
+            SetValidContentType();
+            await CheckParameters();                       
+            ChildKey = Guid.NewGuid().ToString();                                                                                      
             StateHasChanged();
-
         } // Parameters SET
-
-        
-
-
+            
         private async Task CheckParameters()
         {
+         
+
             var bLocationStatus = false;
             var bBlogTypeStatus = false;
 
@@ -178,18 +210,14 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
 
-            if (ContentType != null && ContentType.Length > 0 && IsValidContentType(ContentType))
+            if (ContentType != null && ContentType.Length > 0 && BlogHelper.IsValidContentType(ContentType))
             {
                 bBlogTypeStatus = true;
                 ImagePath = $"pages/{ContentType}";
                 // check path & images existing
                 var LocationBlogFolder = $"{LocationRoute}/pages/{ContentType}";
                 var BlogFolderPath = FileUtil.GetMediaDirectory(LocationBlogFolder);
-                // if(!BlogHelper.ValidateImageDirectory(BlogFolderPath, ContentType))               
-                // {                  
-                //    IsShowBanner = false;
-                //    ErrorMessage = BootstrapHelper.GetBootstrapMessage("warning", $"Requested Blog Type Folder '{LocationBlogFolder}' folder not found.<br />Please contact system administrator.");
-                // }                
+                              
             }
             else
             {
@@ -198,51 +226,31 @@ namespace BedBrigade.Client.Components.Pages
                 return;
             }
 
-            if(bLocationStatus && bBlogTypeStatus)
+            if(bLocationStatus && bBlogTypeStatus) // Show Banner only for correct location & type, if allowed
             {
                 RotatorTitle = $"{LocationName} {ContentType}";
-                IsShowBanner = dctBlogModuleConfig.ContainsKey("ShowBanner") ? dctBlogModuleConfig["ShowBanner"] == "true" : false;
-
+                IsShowBanner = blogConfig.ShowBanner;
             }
-        
-        } // Check Parameters
+            else
+            {
+                IsShowBanner = false;
+            }
 
+            string newMessage = _lc.Keys["BlogNoData", new { LocationName = LocationName, ContentType = ContentType }];
+            NoDataMessage = (MarkupString)newMessage;
+
+            StateHasChanged();
+
+        } // Check Parameters
 
         private async Task LoadSourceData()
         {
             await LoadLocation(); //all Locations or Location by Route
-            await LoadContent(); // all Contents
+            await LoadContent(); // all Contents for Blogs                                                      
+                           
+        } // Load Source Data
 
-            NoDataMessage = (MarkupString)$"There are no&nbsp;<b>{ContentType}</b> available for <b>{LocationName}</b> at this time.<br/>Please check back later for updates!";
-
-            // ONE time test data creation
-            if (IsTestMode)
-            {
-                // BlogHelper.ProcessBlogImages(lstContents, lstLocations, _environment.WebRootPath);
-                                  String? connectionString = _configuration.GetConnectionString("DefaultConnection");
-                    //Try to add test data
-                    //int intInsertedData = BlogHelper.CreateTestData(connectionString, _environment.WebRootPath);
-                
-            }
-
-            if (lstContents != null && lstContents.Count > 0)
-            {
-                // Filter to Current Location & Type
-                lstContents = lstContents.Where(c => c.LocationId == LocationId && c.ContentType.ToString() == ContentType).ToList();
-                if (lstContents != null && lstContents.Count > 0)
-                {
-                    // _cards = BlogHelper.GetBlogItemsDataList(lstContents, LocationRoute, LocationName, ContentType, AllowedExtensions);
-                    ContentStatus = "Found";
-                    IsBlogData = true; // otherwise cannot show Blog Cards
-                }
-            }         
-               
-            
-        }
-
-
-
-
+       
         private async Task LoadLocation()
         {
                       // Get Location by Route
@@ -253,71 +261,103 @@ namespace BedBrigade.Client.Components.Pages
                     myLocation = currentLocationResult.Data;
                     LocationId = myLocation.LocationId;
                     LocationName = myLocation.Name;
-                    _locationState.Location = LocationRoute;
-                    LocationStatus = "Found";
+                    _locationState.Location = LocationRoute;                   
             }
                 else {
                     LocationId = 0; // unknown Location
                     IsShowBanner = false; // no banner
                     ErrorMessage = BootstrapHelper.GetBootstrapMessage("warning", $"Cannot load location data. Please contact system administrator.");
-                }
-            
+                }           
             
         } // Load Location
 
-        private async Task LoadContent()
-        {
+        private async Task LoadContent()        {          
+
             var contentResult = await _svcContent.GetAllAsync();
             if (contentResult != null && contentResult.Success)
             {
                 lstContents = contentResult.Data.ToList();
                 if (lstContents != null && lstContents.Count > 0)
                 {
-                    ContentCount = lstContents.Count;
+
+                    // Filter to Current Location & Type
+                    lstContents = lstContents.Where(c => c.LocationId == LocationId && c.ContentType.ToString() == ContentType).ToList();
+                    if (lstContents != null && lstContents.Count > 0) // Data Found for current Location/Type
+                    {
+                        _cards = BlogHelper.GetBlogItemsDataList(lstContents, LocationRoute, LocationName, ContentType, AllowedExtensions);
+                        IsBlogData = true; // otherwise cannot show Blog Cards                        
+                    }
+                    else
+                    {
+                        IsBlogData = false;
+
+                    }
                 }
-            }
-
-            //if (IsTestMode)
-            //{  // get all locations
-            lstLocations = new List<Location>();
-
-            var result = await _svcLocation.GetAllAsync();
-            if (result.Success)
-            {
-                lstLocations = result.Data.ToList();
-                if(lstLocations != null && lstLocations.Count > 0)
-                {                   
-                    LocationCount = lstLocations.Count;
-                }
-            }
-
-            //}
-
-
+            }                      
+      
         } // Load Content
 
 
-        private bool IsValidContentType(string? contentTypeName)
+        // TEST DATA AREA - START ==============================================================================
+
+        private void HandleTestMode()
         {
-            if (!string.IsNullOrWhiteSpace(ContentType))
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
+            webRootPath = _environment.WebRootPath;
+
+            // Validate and create test data if needed
+            var validationResult = BlogTest.ValidateAndCreateTestData(connectionString, webRootPath, ResetAction);
+
+            if (validationResult != null)
             {
-                ContentType = StringUtil.ProperCase(ContentType);
+                BlogContentCount = validationResult.BlogCount;
+                ImageFolderCount = validationResult.FolderCount;
+                UnzippedImagesCount = validationResult.ImageCount;
+                TestBarClass = validationResult.TestBarStyleClass;
+
             }
 
-            return Enum.TryParse(contentTypeName, out ContentType _);
-        }
+        } // Handle Test Mode
 
-        private string ToCapitalized(string input)
-        {
-            return char.ToUpper(input[0]) + input.Substring(1).ToLower();
-        }
 
-        static Dictionary<string, string> ParseConfigString(string config)
+        private async Task ResetTestData()
         {
-            return config.Split('|')
-                         .Select(part => part.Split(':'))
-                         .ToDictionary(pair => pair[0], pair => pair[1]);
-        }
+            bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to reset the test data?");
+
+            if (isConfirmed)
+            {
+                ResetAction = "reset";
+                Debug.WriteLine($"Request Reset Test Data; current URL: {_navigationManager.Uri.ToString()}");
+                // Proceed with resetting the test data
+                HandleTestMode();  // Call the method that resets the data                
+                await ReloadPage();
+            }           
+
+        }// Reset Test Data
+
+        private async Task ClearTestData()
+        {
+            bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to delete the test data?");
+
+            if (isConfirmed)
+            {
+                ResetAction = "clear";
+                Debug.WriteLine($"Request Clear Test Data; current URL: {_navigationManager.Uri.ToString()}");
+                // Proceed with resetting the test data
+                HandleTestMode();  // Call the method that resets the data
+                await ReloadPage();
+            }
+        } // Clear Test Data
+
+        private async Task ReloadPage()
+        {
+            //_navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
+             //await JS.InvokeVoidAsync("reloadPage");
+             await JS.InvokeVoidAsync("eval", "window.location.href = window.location.href");
+        }// Reload Page                                 
+
+        // TEST DATA AREA - END  ==============================================================================
+
 
     } // class Blog
 } // namespace
