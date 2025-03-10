@@ -1,0 +1,181 @@
+﻿@using Microsoft.AspNetCore.Components
+@using BedBrigade.Common.Models
+@using BedBrigade.Common.Enums
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.RichTextEditor
+@using BedBrigade.Common.Logic
+@namespace BedBrigade.Client.Components
+@inject IJSRuntime JSRuntime
+
+<!-- DETAIL VIEW    -->
+
+<div class="container-fluid">
+    <!-- top navigation row -->
+    @if(ParentFrame == "Card"){
+
+        <div class="row mb-2">
+
+            <div class="col-md-6">                                          
+                <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-grip-horizontal"></i>&nbsp;&nbsp;@_lc.Keys["BlogBackToCards"]</button>               
+            </div>
+
+
+            <div class="col-md-6 text-end">
+
+                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MovePrev)"><i class="fas fa-chevron-circle-left"></i>&nbsp;@_lc.Keys["Previous"]</button>
+                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MoveNext)">@_lc.Keys["Next"]&nbsp;<i class="fas fa-chevron-circle-right"></i></button>                                        
+
+            </div>                
+
+        </div>
+    }
+
+    <!-- Blog Content Display Area -->
+    <!-- top content row -->
+
+     <div class="row mb-2">
+
+       <div class="col-md-6 jd-flex justify-content-center align-items-left">
+           <h4>@CurrentBlog.Title</h4>
+       </div>
+       <div class="col-md-6 jd-flex justify-content-center align-items-right">
+
+            <!-- blog dates -->
+       
+
+
+         </div>
+
+    </div>
+
+    <!-- Main Blog Image -->
+
+    <div class="row mb-2">
+        <div class="col-md-12 jd-flex justify-content-center align-items-center">
+            <img src="@CurrentBlog.MainImageUrl" alt="@CurrentBlog.Title" class="detail-image" />
+            <span style="font-size: smaller; display: none">@CurrentBlog.MainImageUrl</span>
+        </div>
+    </div>
+
+    <!-- Blog Content (HTML) -->
+
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <p style="width: 100%">
+                @((MarkupString)(SanitizeHtml(!string.IsNullOrEmpty(CurrentBlog?.ContentHtml) ? CurrentBlog.ContentHtml : string.Empty)))
+            </p>
+        </div>
+    </div>
+
+    <!-- Additional Images -->
+    @if (CurrentBlog.OptImagesUrl != null & CurrentBlog.OptImagesUrl.Count > 0)
+    {
+        foreach (var extraImageUrl in CurrentBlog.OptImagesUrl)
+        {
+            if (extraImageUrl.Replace("\\", "/") != CurrentBlog.MainImageUrl.Replace("\\", "/"))
+            {
+                <div class="row mb-2">
+                    <div class="col-md-12 jd-flex justify-content-center align-items-center">
+                        <img src="@extraImageUrl" alt="@CurrentBlog.Title" class="detail-image" />
+                        <span style="font-size: smaller; display: none">@extraImageUrl</span>
+                    </div>
+                </div>
+            }
+        }
+    }
+
+    <!-- bottom navigation row -->
+    @if (ParentFrame == "Card")
+    {
+        <div class="row d-flex align-items-stretch mb-3">
+
+            <div class="col-md-6 jd-flex justify-content-center align-items-left">
+                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MovePrev)"><i class="fas fa-chevron-circle-left"></i>&nbsp;@_lc.Keys["Previous"]</button>
+                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MoveNext)">@_lc.Keys["Next"]&nbsp;<i class="fas fa-chevron-circle-right"></i></button>
+            </div>
+            <div class="col-md-6 jd-flex justify-content-center align-items-right">
+                <div class="dbox" style="text-align: right; vertical-align:middle">
+                    <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-grip-horizontal"></i>&nbsp;&nbsp;@_lc.Keys["BlogBackToCards"]</button>
+                </div>
+          
+            </div>
+        </div>
+
+    }
+
+</div>
+
+@code{
+    
+
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
+    [Parameter]
+    public BlogData CurrentBlog { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<BlogData> OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnNavigate { get; set; } // "Next" or "Previous"
+
+    [Parameter]
+    public string? ParentFrame { get; set; }  
+      
+
+    private string MoveNext = "Next";
+    private string MovePrev = "Previous";
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+
+    private void Navigate(string direction)
+    {
+        OnNavigate.InvokeAsync(direction);
+    }
+
+    private string SanitizeHtml(string html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+            return string.Empty;
+
+        // Remove empty <p>, <div>, <br>, and other empty tags
+        html = System.Text.RegularExpressions.Regex.Replace(html, @"<(\w+)[^>]*>\s*</\1>", string.Empty);
+
+        // Trim spaces and line breaks
+        return html.Trim();
+    }
+}
+
+
+<style>
+
+  
+    .detail-image {
+        width: auto; /* Maintain the original width */
+        height: auto; /* Maintain the original height */
+        max-width: 100%; /* Ensure it doesn't exceed the container width */
+        display: block; /* Center-align the image if necessary */
+        margin: 0 auto; /* Center the image horizontally */
+    }     
+
+    /* Box Styling */
+    .dbox {
+        flex: 1 1 calc(33.333% - 20px); /* 3 boxes per row on wide screens */              
+        text-align: center;
+        vertical-align: middle;
+        padding: 5px;        
+    }
+       
+
+    .image {
+        width: 150px;
+        height: auto;
+        border: 2px solid transparent; /* Default border */
+        transition: border-color 0.3s ease; /* Smooth highlight transition */
+    }            
+      
+    
+</style>
