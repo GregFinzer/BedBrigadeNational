@@ -13,6 +13,18 @@ BedRequest: Bed Request
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
+BlogBackToCards: Return to Card View
+BlogImageFolders: Blog Folders
+BlogCardColumns: Number or Columns
+BlogCardPaging: Card View Pagination
+BlogCardRows: Number or Rows
+BlogCardTextSize: Card Content output (max size)
+BlogCardViewSettings: Blog Card View Settings
+BlogContentRecords: Data Records
+BlogNoData: There are no&nbsp;<b>{ContentType}</b> available for <b>{LocationName}</b> at this time.<br/>Please check back later for updates!
+BlogShowBanner: Show Page Banner
+BlogTestImages: Test Images
+BlogTestMode: TEST MODE
 BuildAddress: Build Address
 BuildCity: Build City
 BuildPostalCode: Build Postal Code
@@ -111,6 +123,7 @@ InvalidCity: 'The city that you have entered does not match the zip code. Valid 
 InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code
 IsInYourZipCode: is in your Zip Code
 LanguagePreference: Language Preference
+LastModifiedOn: Last Modified On
 LastName: Last Name
 Latitude: Latitude
 Loading: Loading....
@@ -150,6 +163,7 @@ Name: Name
 NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
+Next: Next
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
@@ -161,6 +175,7 @@ NotSent: Not Sent
 NoUpcomingBuildsScheduled: No upcoming builds scheduled.
 NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
+Of: of
 Ok: OK
 OrganizationOrGroup: Organization or Group
 Organizer: Organizer
@@ -169,6 +184,9 @@ OrganizerEmail: Organizer Email
 OrganizerName: Organizer Name
 OrganizerPhone: Organizer Phone
 OtherLanguagesSpoken: Other Languages Spoken
+Page: Page
+PageNext: Next Page
+PagePrevious: Previous Page
 Pages: Pages
 Password: Password
 Phone: Phone
@@ -179,7 +197,9 @@ PleaseEnterAValid: Please enter a valid Zip code where you live
 PleaseEnterYourLogin: Please enter your login details
 PleaseSelectAnEvent: Please select an event
 PostalCode: Postal Code
+PostedOn: Posted On
 PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
+Previous: Previous
 PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
 RegistrationidColon: 'RegistrationID:'
@@ -260,6 +280,7 @@ TaxFormSent: Tax Form Sent
 Team: 'Team #'
 ThankYou: Thank you!
 TheBedBrigade: The Bed Brigade
+TotalItems: Items Total
 TransactionId: Transaction ID
 Unauthorized: Unauthorized
 UpcomingBuilds: Upcoming Builds
