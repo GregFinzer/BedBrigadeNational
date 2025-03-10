@@ -97,16 +97,16 @@ public static class Seed
         new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
 
         //Rock City Users
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Contributor", Role = RoleNames.LocationContributor },
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Author", Role = RoleNames.LocationAuthor },
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Editor", Role = RoleNames.LocationEditor },
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
         new User
         {
-            FirstName = SeedConstants.SeedRockCityName, LastName = "Communications", Role = RoleNames.LocationCommunications
+            FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Communications", Role = RoleNames.LocationCommunications
         },
-        new User { FirstName = SeedConstants.SeedRockCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
 
     private static readonly List<User> _productionUsers = new()
@@ -248,12 +248,12 @@ public static class Seed
                     await context.SaveChangesAsync();
                 }
 
-                var rockCity = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.RockCity);
-                if (rockCity != null)
+                var rockCityPolaris = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.RockCityPolaris);
+                if (rockCityPolaris != null)
                 {
-                    rockCity.MetroAreaId = metroArea.MetroAreaId;
-                    rockCity.IsActive = true;
-                    context.Locations.Update(rockCity);
+                    rockCityPolaris.MetroAreaId = metroArea.MetroAreaId;
+                    rockCityPolaris.IsActive = true;
+                    context.Locations.Update(rockCityPolaris);
                     await context.SaveChangesAsync();
                 }
             }
@@ -1008,8 +1008,8 @@ public static class Seed
             case SeedConstants.SeedGroveCityName:
                 user.LocationId = (int)LocationNumber.GroveCity;
                 break;
-            case SeedConstants.SeedRockCityName:
-                user.LocationId = (int)LocationNumber.RockCity;
+            case SeedConstants.SeedRockCityPolarisName:
+                user.LocationId = (int)LocationNumber.RockCityPolaris;
                 break;
             default:
                 throw new Exception("Invalid location name: " + user.FirstName);

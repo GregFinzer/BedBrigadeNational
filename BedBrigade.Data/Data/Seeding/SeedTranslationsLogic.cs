@@ -45,6 +45,11 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Partners", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Calendar", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Inventory", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+
+                //Rock City Polaris Pages
+                await SeedContentTranslation(context, "Header", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Footer", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Home", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
             }
         }
 

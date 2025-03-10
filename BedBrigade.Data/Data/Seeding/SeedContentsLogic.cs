@@ -35,6 +35,7 @@ public static class SeedContentsLogic
             await SeedTaxForm(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
+            await SeedRockCityPolaris(context);
             await SeedBedRequestConfirmationForm(context, locations);
             await SeedSignUpEmailConfirmationForm(context, locations);
             await SeedSignUpSmsConfirmationForm(context, locations);
@@ -184,6 +185,29 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
 
+    private static async Task SeedRockCityPolaris(DataContext context)
+    {
+        Log.Logger.Information("SeedRockCityPolaris Started");
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == (int)LocationNumber.RockCityPolaris);
+
+        if (location == null)
+        {
+            Console.WriteLine($"Error cannot find location with id: " + LocationNumber.RockCityPolaris);
+            return;
+        }
+
+        await SeedContentItem(context, ContentType.Header, location, "Header", "RockCityPolarisHeader.html");
+        await SeedContentItem(context, ContentType.Footer, location, "Footer", "RockCityPolarisFooter.html");
+        await SeedContentItem(context, ContentType.Home, location, "Home", "RockCityPolarisHome.html");
+        //await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
+        //await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
+        //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
+        //await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
+        //await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
+        //await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
+        //await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
+    }
+
     private static async Task SeedContentItem(DataContext context,
         ContentType contentType,
         Location location,
@@ -252,7 +276,8 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            if (location.LocationId == (int)LocationNumber.GroveCity)
+            if (location.LocationId == (int)LocationNumber.GroveCity
+                || location.LocationId == (int) LocationNumber.RockCityPolaris)
             {
                 continue;
             }
@@ -311,6 +336,11 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
+            if (location.LocationId == (int)LocationNumber.RockCityPolaris)
+            {
+                continue;
+            }
+
             bool alreadyAdded =
                 await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId);
             if (alreadyAdded)
@@ -363,7 +393,8 @@ public static class SeedContentsLogic
         {
             foreach (var location in locations)
             {
-                if (location.LocationId == (int)LocationNumber.GroveCity)
+                if (location.LocationId == (int)LocationNumber.GroveCity 
+                    || location.LocationId == (int) LocationNumber.RockCityPolaris)
                 {
                     continue;
                 }
@@ -380,7 +411,7 @@ public static class SeedContentsLogic
                         seedHtml = WebHelper.GetHtml("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
                         break;
-                    case (int)LocationNumber.RockCity:
+                    case (int)LocationNumber.RockCityPolaris:
                         seedHtml = WebHelper.GetHtml("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
                         break;
