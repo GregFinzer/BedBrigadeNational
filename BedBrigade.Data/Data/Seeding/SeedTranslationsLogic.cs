@@ -51,6 +51,7 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Footer", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Home", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "AboutUs", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "History", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
             }
         }
 

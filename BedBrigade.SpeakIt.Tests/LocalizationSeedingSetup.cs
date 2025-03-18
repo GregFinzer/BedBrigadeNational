@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework.Internal;
-using YamlDotNet.Serialization.NamingConventions;
+﻿using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 
 namespace BedBrigade.SpeakIt.Tests
@@ -85,8 +78,8 @@ Partners";
             string[] files = Directory.GetFiles(htmlPath, "*.html");
             foreach (string file in files)
             {
-                if (file.Contains("RockCityPolarisAboutUs.html"))
-                    Console.WriteLine("Here");
+                //if (file.Contains("RockCityPolarisAboutUs.html"))
+                //    Console.WriteLine("Here");
 
                 string text = File.ReadAllText(file);
                 text = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(text);
