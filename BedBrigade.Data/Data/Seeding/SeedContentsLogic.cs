@@ -200,12 +200,12 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Footer, location, "Footer", "RockCityPolarisFooter.html");
         await SeedContentItem(context, ContentType.Home, location, "Home", "RockCityPolarisHome.html");
         await SeedContentItem(context, ContentType.Body, location, "AboutUs", "RockCityPolarisAboutUs.html");
+        await SeedContentItem(context, ContentType.Body, location, "History", "RockCityPolarisHistory.html");
         //await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
         //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
         //await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
         //await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
         //await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
-        //await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
 
     private static async Task SeedContentItem(DataContext context,
