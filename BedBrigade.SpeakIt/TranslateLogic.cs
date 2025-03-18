@@ -85,6 +85,8 @@ namespace BedBrigade.SpeakIt
         public string? ParseAndTranslateText(string input, string targetCulture, Dictionary<string, List<Translation>> translations)
         {
             var parseResults = _parseLogic.GetLocalizableStringsInText(input);
+
+            //The longest strings should be translated first
             parseResults = parseResults.OrderByDescending(o => o.LocalizableString.Length).ToList();
 
             foreach (var parseResult in parseResults)
