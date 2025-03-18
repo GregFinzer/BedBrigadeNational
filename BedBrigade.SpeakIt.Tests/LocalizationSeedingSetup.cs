@@ -18,6 +18,7 @@ namespace BedBrigade.SpeakIt.Tests
         private Dictionary<string, string> _localizableStrings = new Dictionary<string, string>();
 
         [Test, Ignore("This test should be ignored except locally")]
+        //[Test]
         public void Setup()
         {
             if (TestHelper.IsRunningUnderGitHubActions())
@@ -84,6 +85,9 @@ Partners";
             string[] files = Directory.GetFiles(htmlPath, "*.html");
             foreach (string file in files)
             {
+                if (file.Contains("RockCityPolarisAboutUs.html"))
+                    Console.WriteLine("Here");
+
                 string text = File.ReadAllText(file);
                 text = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(text);
 
