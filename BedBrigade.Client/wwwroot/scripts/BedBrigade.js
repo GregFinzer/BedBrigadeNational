@@ -160,5 +160,28 @@ window.BedBrigadeUtil = {
     playNotification: function () {        
         const audio = new Audio('/sounds/Notification.mp3');
         audio.play();
+    },
+    runCarousel: function (intervalMilliseconds) {
+        console.log('runCarousel');
+        document.querySelectorAll("[id*='carousel']").forEach(function (carouselElement) {
+            console.log('Carousel ID:  ' + carouselElement);
+
+            let carousel = new bootstrap.Carousel(carouselElement, {
+                interval: intervalMilliseconds, 
+                ride: 'carousel',
+                pause: false // Ensure it never stops even when out of view
+            });
+
+            // Override Bootstrap's default behavior that pauses the carousel when not visible
+            let observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        carousel.cycle(); // Continue cycling even when out of view
+                    }
+                });
+            }, { threshold: 0 });
+
+            observer.observe(carouselElement);
+        });
     }
 }

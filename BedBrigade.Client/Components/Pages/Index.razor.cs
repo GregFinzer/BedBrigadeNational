@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ILoadImagesService _loadImagesService { get; set; }
+        [Inject] private ICarouselService _carouselService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
 
         [Inject]
@@ -96,6 +97,11 @@ namespace BedBrigade.Client.Components.Pages
             {
                 await _js.InvokeVoidAsync("BedBrigadeUtil.InitializeJarallax");
             }
+
+            if (!String.IsNullOrEmpty(BodyContent) && BodyContent.Contains("carousel\""))
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.runCarousel", 3000);
+            }
         }
 
         private async Task<bool> LoadLocationPage(string location, string pageName)
@@ -140,7 +146,8 @@ namespace BedBrigade.Client.Components.Pages
             {
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-
+                html = _carouselService.ReplaceCarousel(html);
+                    
                 if (html != PreviousBodyContent)
                 {
                     PreviousBodyContent = html;
@@ -173,6 +180,7 @@ namespace BedBrigade.Client.Components.Pages
             {                       
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
+                html = _carouselService.ReplaceCarousel(html);
 
                 if (html != PreviousBodyContent)
                 {
