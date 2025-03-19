@@ -113,14 +113,15 @@ namespace BedBrigade.Client.Services
                 html.AppendLine("    </div>");
             }
 
+            const string spanClass = " <span class=";
             html.AppendLine("  </div>");
             html.AppendLine($"  <button class=\"carousel-control-prev\" type=\"button\" data-bs-target=\"#{divId}\" data-bs-slide=\"prev\">");
-            html.AppendLine("    <span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>");
-            html.AppendLine("    <span class=\"visually-hidden\">Previous</span>");
+            html.AppendLine($"    {spanClass}\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>");
+            html.AppendLine($"    {spanClass}\"visually-hidden\">Previous</span>");
             html.AppendLine("  </button>");
             html.AppendLine($"  <button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#{divId}\" data-bs-slide=\"next\">");
-            html.AppendLine("    <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>");
-            html.AppendLine("    <span class=\"visually-hidden\">Next</span>");
+            html.AppendLine($"    {spanClass}\"carousel-control-next-icon\" aria-hidden=\"true\"></span>");
+            html.AppendLine($"    {spanClass}\"visually-hidden\">Next</span>");
             html.AppendLine("  </button>");
             html.AppendLine("</div>");
 
