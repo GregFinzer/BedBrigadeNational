@@ -277,15 +277,17 @@ public static class Seed
         {
             if (await context.Schedules.AnyAsync()) return;
 
-            await SeedBuildSchedule(context);
-            await SeedDeliverySchedule(context);
+            await SeedGroveCityBuildSchedule(context);
+            await SeedGroveCityDeliverySchedule(context);
+            await SeedRockCityPolarisBuildSchedule(context);
+            await SeedRockCityPolarisDeliverySchedule(context);
             await context.SaveChangesAsync();
         }
     }
 
-    public static async Task SeedBuildSchedule(DataContext context)
+    public static async Task SeedGroveCityBuildSchedule(DataContext context)
     {
-        Log.Logger.Information("SeedBuildSchedule Started");
+        Log.Logger.Information("SeedGroveCityBuildSchedule Started");
 
         DateTime currentDate = DateTime.Today;
 
@@ -322,10 +324,94 @@ public static class Seed
         }
     }
 
-
-    public static async Task SeedDeliverySchedule(DataContext context)
+    public static async Task SeedRockCityPolarisBuildSchedule(DataContext context)
     {
-        Log.Logger.Information("SeedDeliverySchedule Started");
+        Log.Logger.Information("SeedRockCityPolarisBuildSchedule Started");
+
+        DateTime currentDate = DateTime.Today;
+
+        for (int i = 0; i < 12; i++)
+        {
+            // Get the first day of the current month
+            DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+
+            // Calculate the first Saturday of the month
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)firstDayOfMonth.DayOfWeek + 7) % 7;
+
+            DateTime firstSaturday = firstDayOfMonth.AddDays(daysUntilSaturday);
+
+            Schedule schedule = new Schedule
+            {
+                LocationId = (int)LocationNumber.RockCityPolaris,
+                EventName = "Build",
+                EventNote =
+                    "Come build beds with us at our shop at 171 E. 5th Ave, Columbus, OH.",
+                EventStatus = EventStatus.Scheduled,
+                EventType = EventType.Build,
+                EventDateScheduled = firstSaturday.AddHours(9),
+                EventDurationHours = 3,
+                VolunteersMax = 20,
+                VolunteersRegistered = 0,
+                DeliveryVehiclesRegistered = 0,
+                Address = "171 E. 5th Ave",
+                City = "Columbus",
+                State = "OH"
+            };
+
+            SeedRoutines.SetMaintFields(schedule);
+            await context.Schedules.AddAsync(schedule);
+
+            // Move to the next month
+            currentDate = currentDate.AddMonths(1);
+        }
+    }
+
+    public static async Task SeedRockCityPolarisDeliverySchedule(DataContext context)
+    {
+        Log.Logger.Information("SeedRockCityPolarisDeliverySchedule Started");
+
+        DateTime currentDate = DateTime.Today;
+
+        for (int i = 0; i < 12; i++)
+        {
+            // Get the first day of the current month
+            DateTime firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+
+            // Calculate the first Saturday of the month
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)firstDayOfMonth.DayOfWeek + 7) % 7;
+
+            DateTime firstSaturday = firstDayOfMonth.AddDays(daysUntilSaturday);
+            DateTime secondSaturday = firstSaturday.AddDays(7);
+
+            Schedule schedule = new Schedule
+            {
+                LocationId = (int)LocationNumber.RockCityPolaris,
+                EventName = "Delivery",
+                EventNote =
+                    "Come deliver beds with us from our shop at 171 E. 5th Ave, Columbus, OH.",
+                EventStatus = EventStatus.Scheduled,
+                EventType = EventType.Delivery,
+                EventDateScheduled = secondSaturday.AddHours(9),
+                EventDurationHours = 3,
+                VolunteersMax = 20,
+                VolunteersRegistered = 0,
+                DeliveryVehiclesRegistered = 0,
+                Address = "171 E. 5th Ave",
+                City = "Columbus",
+                State = "OH"
+            };
+
+            SeedRoutines.SetMaintFields(schedule);
+            await context.Schedules.AddAsync(schedule);
+
+            // Move to the next month
+            currentDate = currentDate.AddMonths(1);
+        }
+    }
+
+    public static async Task SeedGroveCityDeliverySchedule(DataContext context)
+    {
+        Log.Logger.Information("SeedGroveCityDeliverySchedule Started");
 
         // Calculate the first Saturday
         int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)DateTime.Today.DayOfWeek + 7) % 7;
@@ -336,8 +422,26 @@ public static class Seed
 
         DateTime nextSaturday = DateTime.Today.AddDays(daysUntilSaturday);
 
+        // Skip the first Saturday of the month if it's within the first 7 days of the month
+        if (nextSaturday.Day <= 7)
+        {
+            nextSaturday = nextSaturday.AddDays(7);  // Move to the second Saturday
+        }
+
+        // Loop through the next 52 weeks
         for (int i = 0; i < 52; i++)
         {
+            // Calculate the current Saturday
+            DateTime currentSaturday = nextSaturday.AddDays(i * 7);
+
+            // Check if the current Saturday is the first Saturday of the month
+            if (currentSaturday.Day <= 7)
+            {
+                // Skip the first Saturday by moving to the second Saturday
+                currentSaturday = currentSaturday.AddDays(7);
+            }
+
+            // Create the schedule
             Schedule schedule = new Schedule
             {
                 LocationId = (int)LocationNumber.GroveCity,
@@ -346,7 +450,7 @@ public static class Seed
                     "Come deliver beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.",
                 EventStatus = EventStatus.Scheduled,
                 EventType = EventType.Delivery,
-                EventDateScheduled = nextSaturday.AddDays(i * 7).AddHours(9),
+                EventDateScheduled = currentSaturday.AddHours(9), // Set the scheduled time
                 EventDurationHours = 3,
                 VolunteersMax = 20,
                 VolunteersRegistered = 0,
@@ -357,6 +461,7 @@ public static class Seed
             await context.Schedules.AddAsync(schedule);
         }
     }
+
 
     private static List<Configuration> _configurations =
     [
