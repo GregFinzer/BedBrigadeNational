@@ -14,6 +14,11 @@ BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 BlogBackToCards: Return to Card View
+BlogEditDragDrop: Drag & drop files here or use Browse... button to select files
+BlogEditFileDelete: file(s) selected to delete
+BlogEditMainImage: The main image is marked for deletion!
+BlogEditPageInstruction: Instruction - Click an image to set it as the main image. Use the checkbox to mark images for deletion. Click the eye icon to preview an image in full screen.
+BlogEditPageWarning: If you leave the page without using the cancel button, uploaded files will be saved and can be deleted later if needed.
 BlogImageFolders: Blog Folders
 BlogCardColumns: Number or Columns
 BlogCardPaging: Card View Pagination
@@ -35,6 +40,7 @@ ChooseADate: Choose a Date
 ChooseATime: Choose a Time
 City: City
 ClickToSignup: (Click to Signup)
+Close: Close
 CompareConfirmPasswordToPassword: The passwords do not match.
 ConfigurationKey: Configuration Key
 ConfigurationSection: Configuration Section
@@ -45,6 +51,7 @@ ContactMessage: Contact Message
 ContactUs: Contact Us
 ContactUsFormNotCompleted: The Contact Us Form is not completed!
 ContactUsFormSubmitted: Thank you for contacting us. We will get back to you as soon as possible.
+Content: Content
 DateColon: 'Date:'
 DeliveryAddress: Delivery Address
 DeliveryDate: Delivery Date
@@ -94,6 +101,7 @@ DynamicSunday: Sunday
 DynamicThursday: Thursday
 DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
+Edit: Edit
 Email: Email
 EmailColon: 'Email:'
 EnterText: Enter text
@@ -119,6 +127,10 @@ Group: Group
 GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
+ImageFileFormat: Allowed formats
+Image: Image
+ImagePreview: Image Preview
+Images: Images
 InvalidCity: 'The city that you have entered does not match the zip code. Valid city names are: {cityNames}'
 InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code
 IsInYourZipCode: is in your Zip Code
@@ -141,6 +153,7 @@ MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
 ManageSchedule: Manage Schedule
 ManageSignups: Manage Sign-Ups
+MaxFileSize: Max File Size
 MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
@@ -164,6 +177,7 @@ NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 Next: Next
+News: News
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
@@ -199,6 +213,7 @@ PleaseSelectAnEvent: Please select an event
 PostalCode: Postal Code
 PostedOn: Posted On
 PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
+Preview: Preview
 Previous: Previous
 PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
@@ -271,6 +286,8 @@ SpecialInstructions: Special Instructions
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}
 Status: Status
+Story: Story
+Stories: Stories
 Street: Street
 SubmitRequest: Submit Request
 SubmitVolunteerRegistration: Submit Volunteer Registration
@@ -278,6 +295,7 @@ SubscribeToOurEmail: Subscribe to our Email Newsletter?
 SubscribeToOurText: Subscribe to our Text List?
 TaxFormSent: Tax Form Sent
 Team: 'Team #'
+Title: Title
 ThankYou: Thank you!
 TheBedBrigade: The Bed Brigade
 TotalItems: Items Total
