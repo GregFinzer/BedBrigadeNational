@@ -1,0 +1,388 @@
+﻿@using BedBrigade.Common.Models
+@using BedBrigade.Common.Enums
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12"></div>
+        </div>
+        <div class="row">           
+            <div class="col-md-6 d-flex flex-wrap align-items-center gap-2">
+                @if (isNational)
+                {
+                    <SfDropDownList id="LocationFilter" TValue="int" TItem="Location"
+                    Width="300px"                 
+                    DataSource="@Locations"
+                    @bind-value="SelectedLocationId"                   
+                    CssClass="custom-dropdown">
+                        <DropDownListEvents TItem="Location" TValue="int" ValueChange="@OnLocationChange"></DropDownListEvents>                    
+                        <DropDownListFieldSettings Value="LocationId" Text="Name"></DropDownListFieldSettings>
+                    </SfDropDownList>
+                }
+                else
+                {
+                    <h3>@userLocation.Name</h3>
+                }
+                &nbsp;
+                <h3>@ContentTypeName</h3>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+        <div class="row">
+            <SfGrid @ref="MyGrid" 
+            TValue="BlogData"
+            DataSource="@FilteredBlogList"
+            Toolbar="@(new List<string>() { "Edit",  "Delete" })"
+            ContextMenuItems="@(new List<string> { "Edit", "Delete"})"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowTextWrap="false"
+            AllowResizing="true"
+            AllowSorting="true">
+
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"></GridFilterSettings>
+                <GridEvents RowUpdating="RowUpdating"
+                TValue="BlogData"
+                OnActionBegin="ActionBeginHandler"  
+                OnActionComplete="ActionCompleteHandler"
+                RowSelected="GetSelectedRecords"></GridEvents>
+                <GridEditSettings 
+                AllowAdding="true" 
+                AllowEditing="true" 
+                AllowDeleting="true"
+                ShowDeleteConfirmDialog="true"
+                Mode="Syncfusion.Blazor.Grids.EditMode.Normal">                                              
+                </GridEditSettings>
+                <GridColumns>
+                    <GridColumn Field=@nameof(BlogData.ContentId) IsPrimaryKey="true" HeaderText="ID" TextAlign="TextAlign.Right" MinWidth="50px" AutoFit="true" AllowEditing="false" AllowFiltering="false"></GridColumn>
+                    <GridColumn HeaderText="Img" TextAlign="TextAlign.Center" MinWidth="60" AutoFit="true"  AllowSorting="true" AllowFiltering="false" >
+                        <Template>
+                            @{
+                                var BlogItem = (context as BlogData);
+                                <div class="image">
+                                    <img src="@BlogItem.MainImageUrl" width="40" @onclick="() => ViewBlog(BlogItem)" />
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>                
+                    <GridColumn Field=@nameof(BlogData.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" MinWidth="200px" AutoFit="true">
+                        <Template>
+                            @{
+                                var BlogItem = (context as BlogData);
+                                var contentText = BlogItem.Title?.Length <= MaxContentSize ? BlogItem.Title : BlogItem.ContentHtml?.Substring(0, MaxContentSize) + "...";
+                                <span>@contentText</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(BlogData.ContentHtml) ShowColumnMenu="false" HeaderText="Content" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="400px" AutoFit="true" >
+                        <Template>
+                            @{
+                                var blogitem = (context as BlogData);
+                                var safeHtml = StripHtml(blogitem.ContentHtml, MaxContentSize);                                
+                                <span>@safeHtml</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(BlogData.CreateDate) HeaderText="Created" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+                    <GridColumn Field=@nameof(BlogData.UpdateDate) HeaderText="Updated" Format="d" Type="ColumnType.Date" TextAlign="TextAlign.Right" Width="130"></GridColumn>                  
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+</div>
+
+@if (ShowEditModal)
+{
+     <div class="modal-overlay" @onclick="OnBackgroundClick">
+     <div class="modal-content" @onclick:stopPropagation="true">
+
+    @switch (PageMode)
+    {        
+        case "Edit":
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <BlogEdit BlogItem="@CurrentBlog"
+                                  OnSave="OnEditSave"
+                                  OnCancel="OnEditCancel" />
+                    </div>
+                </div>
+            </div>
+            break;
+
+        case "View":
+            <!-- Show single card details -->
+            <div class="details-view">
+                <BlogView CurrentBlog="CurrentBlog"
+                          OnClose="CloseView"
+                          ParentFrame="Grid" />
+            </div>
+
+            break;
+     }            
+     </div>
+    </div>
+    }
+
+<style>
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5); /* Optional dimming */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        width: 95vw; /* Almost full width */
+        height: 95vh; /* Almost full height */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        overflow-y: auto; /* Enable scrolling if content is long */
+    }
+
+
+
+    details-view {
+        width: 100%; /* Full width of the wrapper */
+        background-color: #fff; /* White background for the content */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+        overflow: hidden; /* Clip overflowing content */
+        padding: 20px;
+    }
+
+    /* Style Save Button */
+    .e-edit-dialog .e-footer-content .e-primary {
+        background-color: #28a745 !important; /* Green color */
+        border-color: #218838 !important;
+        color: white !important;
+        font-weight: bold;
+    }
+
+    /* Style Cancel Button */
+    .e-edit-dialog .e-footer-content .e-btn:not(.e-primary) {
+        background-color: #dc3545 !important; /* Red color */
+        border-color: #c82333 !important;
+        color: white !important;
+        font-weight: bold;
+    }
+
+    .custom-bootstrap-modal {
+        position: fixed !important;
+        z-index: 11010 !important; /* Just above Syncfusion Grid Edit Dialog */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        width: auto;
+        max-width: 400px;
+        max-height: 300px;
+    }
+
+    .modal-backdrop {
+        z-index: 11000 !important; /* Ensure it's below the modal but above grid */
+        background-color: rgba(0, 0, 0, 0.3); /* Slightly dim the background */
+    }
+
+    .custom-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+   
+
+    .upload-panel {
+        margin-bottom: 10px;
+    }
+
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .image-item {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        border: 2px solid #ccc; /* Thin border for all images */
+        border-radius: 5px;
+    }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        .image-item input[type="checkbox"] {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+
+        .image-item .view-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+
+    .main-image {
+        border: 4px solid green; /* Thicker green border for main image */
+    }
+
+    .preview-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        height: 90vh;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .preview-header {
+        padding: 10px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+    }
+
+    .preview-content {
+        flex-grow: 1;
+        overflow: auto; /* Enables scrolling if content is long */
+        padding: 20px;
+    }
+
+    .blog-preview img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 10px auto;
+    }
+
+    /* Close Button */
+    .close-btn {
+        background: #20c997; /* Soft greenish-teal */
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+   
+
+    /* Full-Size Image (Auto-Scaled but Scrollable) */
+    .full-image {
+        max-width: 100%;
+        max-height: 80vh; /* Keeps image within the screen */
+    }
+
+    
+
+ .table.no-border tr td, .table.no-border tr th {
+        border-width: 0;
+        padding: 0 !important;
+}
+
+    #DropArea {
+        padding: 20px 20px;
+        margin: 20px auto;
+        border: 1px solid #c3c3c3;
+        text-align: center;
+        width: 90%;
+        min-height: 300px;
+        /*display: inline-flex;*/
+        background-color: lightgray;       
+        background-size: cover;
+    }
+
+
+
+    body .e-upload-drag-hover {
+        border-color: orangered;
+        cursor: pointer;
+        box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.3);
+    }
+
+
+
+    #uploadfile {
+        width: 60%;
+        display: inline-flex;
+        margin-left: 5%;
+    }
+
+    .custom-dropdown.e-input-group.e-control-wrapper .e-dropdownbase .e-list-item .e-input {
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: unset;
+        font-size: 14px;
+        font-weight: bold !important;
+        width: 300px;
+    }
+
+
+
+    .e-ddl.e-input-group input.e-input::placeholder {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .e-dropdownbase .e-list-item {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .upload-info {
+        font-size: 13px;
+        color: #555;
+        display: block;
+        margin-top: 5px;
+    }
+
+    .file-types {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+
+</style>
+
+

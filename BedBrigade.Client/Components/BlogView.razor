@@ -10,41 +10,57 @@
 <!-- DETAIL VIEW    -->
 
 <div class="container-fluid">
+
     <!-- top navigation row -->
+    @switch (ParentFrame)
+    {
+        case "Card":
+            <div class="row mb-2">
+
+                <div class="col-md-6">                                          
+                    <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-grip-horizontal"></i>&nbsp;&nbsp;@_lc.Keys["BlogBackToCards"]</button>               
+                </div>
+
+
+                <div class="col-md-6 text-end">
+
+                    <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MovePrev)"><i class="fas fa-chevron-circle-left"></i>&nbsp;@_lc.Keys["Previous"]</button>
+                    <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MoveNext)">@_lc.Keys["Next"]&nbsp;<i class="fas fa-chevron-circle-right"></i></button>                                        
+
+                </div>                
+
+            </div>
+            break;
+        case "Grid":
+            <div class="row mb-2">
+                <div class="col-md-12 text-end">
+                    <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)">@_lc.Keys["Close"]</button>
+                </div>
+            </div>
+            break;
+    }
+
+
     @if(ParentFrame == "Card"){
 
-        <div class="row mb-2">
 
-            <div class="col-md-6">                                          
-                <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-grip-horizontal"></i>&nbsp;&nbsp;@_lc.Keys["BlogBackToCards"]</button>               
-            </div>
-
-
-            <div class="col-md-6 text-end">
-
-                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MovePrev)"><i class="fas fa-chevron-circle-left"></i>&nbsp;@_lc.Keys["Previous"]</button>
-                <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MoveNext)">@_lc.Keys["Next"]&nbsp;<i class="fas fa-chevron-circle-right"></i></button>                                        
-
-            </div>                
-
-        </div>
     }
 
     <!-- Blog Content Display Area -->
     <!-- top content row -->
 
-     <div class="row mb-2">
+    <div class="row mb-2">
 
-       <div class="col-md-6 jd-flex justify-content-center align-items-left">
-           <h4>@CurrentBlog.Title</h4>
-       </div>
-       <div class="col-md-6 jd-flex justify-content-center align-items-right">
+        <div class="col-md-6 jd-flex justify-content-center align-items-left">
+            <h4>@CurrentBlog.Title</h4>
+        </div>
+        <div class="col-md-6 jd-flex justify-content-center align-items-right">
 
             <!-- blog dates -->
-       
 
 
-         </div>
+
+        </div>
 
     </div>
 
@@ -97,10 +113,18 @@
                 <div class="dbox" style="text-align: right; vertical-align:middle">
                     <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-grip-horizontal"></i>&nbsp;&nbsp;@_lc.Keys["BlogBackToCards"]</button>
                 </div>
-          
+
             </div>
         </div>
 
+    }
+    else
+    {
+       <div class="row d-flex align-items-stretch mb-3">
+            <div class="col-md-12 jd-flex justify-content-left align-items-left">
+                <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)">@_lc.Keys["Close"]</button>
+            </div>
+       </div>
     }
 
 </div>
