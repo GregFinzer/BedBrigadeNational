@@ -18,7 +18,11 @@ namespace BedBrigade.Common.Models
 
         public string? MainImageThumbnail { get; set; } // reserved string with thumbnail
 
-        public List<string>? OptImagesUrl { get; set; } // all images, ecept current main
+        public List<string>? OptImagesUrl { get; set; } = []; // all images
+
+        public List<string>? FileUploaded { get; set; } = [];  // the list of files, uploaded duiring session
+
+        public List<string>? FileDelete { get; set; } = []; // the list of files, selected to delete duiring session
 
         public string? CreatedDateMonth { get; set; }
         public string? CreatedDatePeriod { get; set; } // Date & Year

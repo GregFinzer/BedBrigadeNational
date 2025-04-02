@@ -14,6 +14,11 @@ BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 BlogBackToCards: Volver a la vista de cartas
+BlogEditDragDrop: Arrastra y suelta los archivos aquí o usa el botón "Browse..." para seleccionar archivos.
+BlogEditFileDelete: archivo(s) seleccionado(s) para eliminar
+BlogEditMainImage: ¡La imagen principal está marcada para eliminación!
+BlogEditPageInstruction: Instrucciones - Haz clic en una imagen para establecerla como la imagen principal. Usa la casilla de verificación para marcar imágenes para eliminación. Haz clic en el icono de ojo para previsualizar una imagen en pantalla completa.
+BlogEditPageWarning: Si sales de la página sin usar el botón de cancelar, los archivos cargados se guardarán y se podrán eliminar más tarde si es necesario."
 BlogImageFolders: Carpetas de blogs
 BlogCardColumns: Número o columnas
 BlogCardPaging: Paginación de la vista de tarjeta
@@ -35,6 +40,7 @@ ChooseADate: Escoge una fecha
 ChooseATime: Escoge una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
+Close: Cerrar
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
 ConfigurationKey: Clave de configuración
 ConfigurationSection: Sección de configuración
@@ -45,6 +51,7 @@ ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
+Content: Contenido
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
 DeliveryDate: Fecha de entrega
@@ -94,6 +101,7 @@ DynamicSunday: Domingo
 DynamicThursday: Jueves
 DynamicTuesday: Martes
 DynamicWednesday: Miércoles
+Edit: Editar
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 EnterText: Introducir texto
@@ -119,6 +127,10 @@ Group: Grupo
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
+ImageFileFormat: Formatos permitidos
+Image: Imagen
+ImagePreview: Vista previa de imagen
+Images: Imágenes
 InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
 InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
@@ -141,6 +153,7 @@ MailingPostalCode: Código Postal
 MailingState: Estado de envío
 ManageSchedule: Administrar el horario
 ManageSignups: Gestionar las inscripciones
+MaxFileSize: Máx. Tamaño de Archivo
 MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
@@ -164,6 +177,7 @@ NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 Next: Siguiente
+News: Noticias
 NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
@@ -199,6 +213,7 @@ PleaseSelectAnEvent: Por favor, seleccione un evento
 PostalCode: Código postal
 PostedOn: Publicado en
 PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
+Preview: Previsualizar
 Previous: Anterior
 PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
@@ -271,6 +286,8 @@ SpecialInstructions: Instrucciones especiales
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
 Status: Estado
+Story: Historia
+Stories: Historias
 Street: Calle
 SubmitRequest: Enviar solicitud
 SubmitVolunteerRegistration: Enviar Registro de Voluntarios
@@ -278,6 +295,7 @@ SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo ele
 SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
+Title: Título
 ThankYou: ¡Gracias!
 TheBedBrigade: La Brigada de la Cama
 TotalItems: Artículos Total

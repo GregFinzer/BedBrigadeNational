@@ -10,6 +10,9 @@ using BedBrigade.Common.Constants;
 using System.Diagnostics;
 using System.Text.Json;
 using System.ComponentModel;
+using System.Security.Principal;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace BedBrigade.Common.Logic
 {
@@ -17,6 +20,7 @@ namespace BedBrigade.Common.Logic
 public static class BlogHelper
     {
         private static readonly string[] RouterFolders = { "leftImageRotator", "middleImageRotator", "rightImageRotator" };
+        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
 
         public static readonly Dictionary<string, string> ValidContentTypes = new()
         {
@@ -89,6 +93,168 @@ public static class BlogHelper
             return Directory.EnumerateFiles(folderPath)
                 .Count(file => imageExtensions.Contains(Path.GetExtension(file).ToLower()));
         }
+
+        public static List<BlogData> GetBlogDataList(List<Content> lstContentData, List<Location> lstLocations)
+        {
+            List<BlogData> myBlogData = new();
+
+            if (lstContentData != null && lstContentData.Count > 0)
+            {
+                // Optimize lookups by creating a dictionary
+                var locationLookup = lstLocations.ToDictionary(loc => loc.LocationId);
+
+                myBlogData = lstContentData.Select(s =>
+                {
+                   
+
+                    // Try to get the location from the dictionary
+                    Location? myLocation = locationLookup.TryGetValue(s.LocationId, out var loc) ? loc : null;
+                    string locationRoute = myLocation?.Route ?? string.Empty;
+                    string locationName = myLocation?.Name ?? string.Empty;
+
+                    string BlogFolderPath = $"media/{locationRoute}/pages/{s.ContentType.ToString()}/BlogItem_{s.ContentId}";
+                    var (mainImageUrl, optImagesUrls) = BlogHelper.GetBlogImages(s.Name, BlogFolderPath, AllowedExtensions);
+
+                    // Handle null Enum.GetName cases
+                    string ContentTypeName = Enum.GetName(typeof(ContentType), s.ContentType) ?? "Unknown";
+
+                    return new BlogData
+                    {
+                        ContentId = s.ContentId,
+                        LocationId = s.LocationId,
+                        LocationRoute = locationRoute,
+                        LocationName = locationName,
+                        ContentType = s.ContentType,
+                        Title = StringUtil.IsNull(s.Title, ""),
+                        Name = StringUtil.IsNull(
+                            !string.IsNullOrEmpty(s.Name)
+                                ? s.Name
+                                : (!string.IsNullOrEmpty(mainImageUrl)
+                                    ? Path.GetFileName(new Uri(mainImageUrl).LocalPath)
+                                    : ""),
+                                ""),
+                        CreateDate = s.CreateDate,
+                        UpdateDate = s.UpdateDate ?? s.CreateDate,
+                        ContentHtml = s.ContentHtml,
+                        MainImageUrl = mainImageUrl, // Set the main image URL
+                        OptImagesUrl = optImagesUrls,   // Set the optional image URLs 
+                        BlogFolder = BlogFolderPath.Replace("//", "/")
+
+                    };
+                }).OrderByDescending(b => b.CreateDate).ToList();
+            }
+
+            return myBlogData;
+        }// Blog Data List
+
+        public static string GetCardMainImageUrl(string sourceFileName, int contentId, string LocationRoute, string? ContentTypeName)
+        {
+            var locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
+            string fullPathToParentFolder = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}/BlogItem_{contentId}");
+            string? imageFileUrl = Defaults.ErrorImagePath;
+
+            // Step 1: Validate file name and extension
+            if (string.IsNullOrWhiteSpace(sourceFileName) ||
+                Path.GetInvalidFileNameChars().Any(sourceFileName.Contains) ||
+                !AllowedExtensions.Contains(Path.GetExtension(sourceFileName), StringComparer.OrdinalIgnoreCase))
+            {
+                return imageFileUrl;
+            }
+
+            // Combine folder and file path
+            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fullPathToParentFolder.Replace("/", Path.DirectorySeparatorChar.ToString()));
+            string filePath = Path.Combine(folderPath, sourceFileName);
+
+            try
+            {
+                // Step 2: Check if folder exists
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                    return imageFileUrl;
+                }
+
+                // Step 3: Check if the specified file exists
+                if (File.Exists(filePath))
+                {
+                    imageFileUrl = GetRelativePathFromWebRoot(filePath);
+                    return imageFileUrl;
+                }
+
+                // Step 4: Check if there are other files in the folder with allowed extensions
+                var files = Directory.GetFiles(folderPath)
+                                      .Where(file => AllowedExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                                      .OrderBy(File.GetCreationTime)
+                                      .Select(Path.GetFileName)
+                                      .ToArray();
+
+                if (files.Length > 0)
+                {
+                    filePath = Path.Combine(folderPath, files[0]);
+                    imageFileUrl = GetRelativePathFromWebRoot(filePath);
+                    return imageFileUrl;
+                }
+
+                // No files found, return NoImageFound URL
+                return imageFileUrl;
+            }
+            catch
+            {
+                // Handle any exceptions (e.g., permissions issues) and return NoImageFound URL
+                return imageFileUrl;
+            }
+
+        } // Get Card Main Image Url
+
+
+        public static string GetBlogLocationFolder(string LocationRoute, string? ContentTypeName)
+        {
+            string locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
+            string imageFolderPath = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}");
+            string relatedUrl = GetRelativePathFromWebRoot(imageFolderPath);
+
+            return (relatedUrl);
+        }
+
+        public static List<string> GetBlogItemAdditionalFiles(int contentId, string LocationRoute, string? ContentTypeName)
+        {
+
+            string locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
+            string imageFolderPath = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}/BlogItem_{contentId}");
+            string relatedUrl = GetRelativePathFromWebRoot(imageFolderPath);
+
+            List<string>? FileUrls = new();
+            if (Directory.Exists(imageFolderPath))
+            {
+                // Get all files in the directory
+                string[] filesArray = Directory.GetFiles(imageFolderPath);
+
+                // Add a prefix to each file name
+                var prefix = relatedUrl + "/";
+                string[] prefixedFilesArray = Array.ConvertAll(filesArray, file => prefix + Path.GetFileName(file));
+
+                // Convert the array to a List<string>
+                FileUrls = new List<string>(prefixedFilesArray);
+            }
+
+            return (FileUrls);
+        }//GetBlogItemAdditionalFiles
+
+
+        public static string GetRelativePathFromWebRoot(string fullPath)
+        {
+            const string webRootKeyword = "wwwroot";
+            int index = fullPath.IndexOf(webRootKeyword, StringComparison.OrdinalIgnoreCase);
+
+            if (index >= 0)
+            {
+                // Extract the part after "wwwroot"
+                return fullPath.Substring(index + webRootKeyword.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            }
+
+            throw new ArgumentException("The fullPath does not contain 'wwwroot'.");
+        } // Relative URL
+
         public static List<BlogData> GetBlogItemsDataList(List<Content>? lstContentData, string? LocationRoute, string? LocationName, string? ContentType, string[] AllowedExtensions)
         {
             // Content Data already filtered to Location & Type
@@ -146,6 +312,7 @@ public static class BlogHelper
                                    AllowedExtensions.Contains(Path.GetExtension(sourceFileName), StringComparer.OrdinalIgnoreCase);
 
             // Combine folder and file paths
+            fullUrlPathToParentFolder=NormalizePath(fullUrlPathToParentFolder);
             string folderPath = ConvertToPhysicalPath(fullUrlPathToParentFolder);
            // Debug.WriteLine("Blog Folder: " + folderPath);
             string filePath = Path.Combine(folderPath, sourceFileName);
@@ -310,6 +477,103 @@ public static class BlogHelper
                 Debug.WriteLine($"BlogHelper: Copied: {file} -> {destFile}");
             }
         }
+
+        public static string NormalizePath(string inputPath, bool isUrl = true)
+        {
+            if (string.IsNullOrWhiteSpace(inputPath))
+            {
+                return string.Empty;
+            }
+
+            if (isUrl)
+            {
+                // Normalize for URL: Replace backslashes with forward slashes
+                return inputPath.Replace("\\", "/").Replace("//", "/");
+            }
+            else
+            {
+                // Normalize for file path: Use Path.Combine to ensure the correct path separator
+                string normalizedPath = inputPath.Replace("/", Path.DirectorySeparatorChar.ToString())
+                                             .Replace("\\\\", Path.DirectorySeparatorChar.ToString());
+
+                // Handle multiple separators (if necessary)
+                return normalizedPath;
+            }
+        }
+
+       
+        public static BlogData CloneBlog(BlogData BlogOriginal)
+        {
+            return JsonSerializer.Deserialize<BlogData>(JsonSerializer.Serialize(BlogOriginal));
+        } // Clone Blog
+        public static List<string> AuditBlogFiles(string folderPath, string baseUrl)
+        {
+            List<string> fileUrls = new List<string>();
+           
+            // Check if the directory exists
+            if (Directory.Exists(folderPath))
+            {
+                // Get all files from the directory
+                string[] files = Directory.GetFiles(folderPath);
+
+                foreach (string file in files)
+                {
+                    // Get the file name and convert to URL format
+                    string fileName = Path.GetFileName(file);
+
+                    // Create the URL by combining the base URL and file name
+                    string fileUrl = $"{baseUrl.TrimEnd('/')}/{fileName}";
+
+                    // Add the URL to the list
+                    fileUrls.Add(fileUrl);
+                }
+            }
+            else
+            {
+                Debug.WriteLine($"Directory not found: {folderPath}");
+            }
+
+            return fileUrls;
+        }
+        // 
+        public static void DeleteBlogFiles(string wwwrootPath, List<string> fileList)
+        {
+            foreach (var fileUrl in fileList)
+            {
+                // Convert URL path to physical file path
+                string filePath = Path.Combine(wwwrootPath, fileUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+
+                // Check if the file exists before attempting to delete
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                        Debug.WriteLine($"File Deleted: {filePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error deleting file: {filePath}. Exception: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine($"File not found: {filePath}");
+                }
+            }
+        }
+
+        public static string SanitizeFileName(string fileName)
+        {
+            // Replace any invalid characters (e.g., commas, spaces) with underscores or remove them
+            fileName = Regex.Replace(fileName, @"[^a-zA-Z0-9_\-\.]", "_");
+
+            // Optionally, if you want to handle multiple dots or other cases:
+            fileName = fileName.Replace("..", "_");
+
+            return fileName;
+        }
+     
 
 
     } // BlogHelper Class

@@ -27,5 +27,9 @@ namespace BedBrigade.Common.Models
 
         //No MaxLength attribute will default to nvarchar(max)
         public String? ContentHtml { get; set; } = string.Empty;
-	}
+        //No MaxLength attribute will default to nvarchar(max)
+        public string? UploadedFiles { get; set; } // JSON list of file names
+
+
+    }
 }
