@@ -33,6 +33,7 @@
             "National Admin, National Editor, Location Admin, Location Editor, Location Author, Location Scheduler, Location Contributor, Location Treasurer, Location Communications";
 
         public const string CanSendSms = "National Admin, Location Admin, Location Scheduler, Location Communications";
+        public const string CanManageNewsletters = "National Admin, Location Admin, Location Scheduler, Location Communications";
 
         public const string CanViewBedRequests = CanViewAdminDashboard;
         public const string CanViewContacts = CanViewAdminDashboard;
