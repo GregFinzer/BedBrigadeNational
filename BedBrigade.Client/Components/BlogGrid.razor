@@ -6,6 +6,7 @@
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Navigations
+@implements IDisposable;
 
 
 <div class="col-lg-12 control-section">
@@ -31,7 +32,14 @@
                     <h3>@userLocation.Name</h3>
                 }
                 &nbsp;
-                <h3>@ContentTypeName</h3>
+                @{
+                    var DisplayType = _lc.Keys["Stories"];
+                    if (ContentTypeName=="News")
+                    {
+                        DisplayType = _lc.Keys["News"];
+                    }                
+                }
+                <h3>@DisplayType</h3>
             </div>
             <div class="col-md-6">
             </div>
@@ -40,7 +48,7 @@
             <SfGrid @ref="MyGrid" 
             TValue="BlogData"
             DataSource="@FilteredBlogList"
-            Toolbar="@(new List<string>() { "Edit",  "Delete" })"
+            Toolbar="@(new List<string>() { "Add", "Edit",  "Delete" })"
             ContextMenuItems="@(new List<string> { "Edit", "Delete"})"
             AllowFiltering="true"
             AllowPaging="true"
@@ -132,6 +140,16 @@
      </div>
     </div>
     }
+
+<script>
+    window.addBeforeUnloadHandler = (dotnetHelper) => {
+        window.addEventListener('beforeunload', (event) => {
+            // Notify Blazor when the browser is closing
+            dotnetHelper.invokeMethodAsync('OnBrowserClosing');
+        });
+    };
+</script>
+
 
 <style>
 

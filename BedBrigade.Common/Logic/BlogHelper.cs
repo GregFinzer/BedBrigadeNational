@@ -21,6 +21,8 @@ public static class BlogHelper
     {
         private static readonly string[] RouterFolders = { "leftImageRotator", "middleImageRotator", "rightImageRotator" };
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        private const string PeriodMonth = "month";
+        private const string PeriodPeriod = "period";
 
         public static readonly Dictionary<string, string> ValidContentTypes = new()
         {
@@ -52,7 +54,8 @@ public static class BlogHelper
         }// FormatDateForRazor
 
         public static string GetFormattedDate(DateTime? theDate, string part)
-        {
+        {           
+
             // Check if theDate is null
             if (!theDate.HasValue)
             {
@@ -64,9 +67,9 @@ public static class BlogHelper
 
             switch (part.ToLower())
             {
-                case "month":
+                case PeriodMonth:
                     return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(myDate.Month);
-                case "period":
+                case PeriodPeriod:
                     return $"{myDate:dd}, {myDate:yyyy}";
                 default:
                     throw new ArgumentException("Invalid part. Use 'Month' or 'Period'.");
@@ -138,7 +141,11 @@ public static class BlogHelper
                         ContentHtml = s.ContentHtml,
                         MainImageUrl = mainImageUrl, // Set the main image URL
                         OptImagesUrl = optImagesUrls,   // Set the optional image URLs 
-                        BlogFolder = BlogFolderPath.Replace("//", "/")
+                        BlogFolder = BlogFolderPath.Replace("//", "/"),
+                        CreatedDateMonth = GetFormattedDate(s.CreateDate, PeriodMonth),
+                        CreatedDatePeriod = GetFormattedDate(s.CreateDate, PeriodPeriod),
+                        UpdatedDateMonth = GetFormattedDate(s.UpdateDate ?? s.CreateDate, PeriodMonth),
+                        UpdatedDatePeriod = GetFormattedDate(s.UpdateDate ?? s.CreateDate, PeriodPeriod)
 
                     };
                 }).OrderByDescending(b => b.CreateDate).ToList();
@@ -478,7 +485,7 @@ public static class BlogHelper
             }
         }
 
-        public static string NormalizePath(string inputPath, bool isUrl = true)
+        public static string NormalizePath(string? inputPath, bool isUrl = true)
         {
             if (string.IsNullOrWhiteSpace(inputPath))
             {
@@ -506,7 +513,7 @@ public static class BlogHelper
         {
             return JsonSerializer.Deserialize<BlogData>(JsonSerializer.Serialize(BlogOriginal));
         } // Clone Blog
-        public static List<string> AuditBlogFiles(string folderPath, string baseUrl)
+        public static List<string> AuditBlogFiles(string? folderPath, string? baseUrl)
         {
             List<string> fileUrls = new List<string>();
            
@@ -573,8 +580,130 @@ public static class BlogHelper
 
             return fileName;
         }
-     
 
+        public static string GenerateBlogHtml(BlogData CurrentBlog, bool IsPdf = false)
+        {
+            StringBuilder sb = new StringBuilder();
+            string divClose = "</div>";
+            string divOpen = "<div class=\"";
+
+            if (IsPdf)
+            {
+
+                sb.AppendLine("<!DOCTYPE html>");
+                sb.AppendLine("<html>");
+                sb.AppendLine("<head>");
+                sb.AppendLine("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css\" integrity=\"sha384-rbsA2VBKQ1eq+1JOGFNRaCW/KeLY1NHhFIMiIjRrL6v67Is92RuK0MlohR8c56Dd\" crossorigin=\"anonymous\">");
+                sb.AppendLine("<style>");
+                sb.AppendLine(".detail-image { max-width: 100%; height: auto; margin-top: 10px; }");
+                sb.AppendLine("</style>");
+                sb.AppendLine("</head>");
+                sb.AppendLine("<body class=\"container\">");
+            }
+
+            sb.AppendLine("<!-- Blog Content Display Area -->");
+
+            // Top content row
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-6 jd-flex justify-content-center align-items-left\">");
+            sb.AppendLine($"        <h4>{CurrentBlog.LocationName}</h4>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divOpen}col-md-6 jd-flex justify-content-center align-items-right\">");
+
+            // Placeholder for translation logic
+            string contentCreateMonth = CurrentBlog.CreatedDateMonth;
+            string contentUpdatedMonth = CurrentBlog.UpdatedDateMonth;
+
+            sb.AppendLine("        <h6 style=\"text-align: right; font-size: small; color: green\">");
+            sb.AppendLine("            <i>");
+            sb.AppendLine($"                Posted on {contentCreateMonth} {CurrentBlog.CreatedDatePeriod} | ");
+            sb.AppendLine($"                Last modified on {contentUpdatedMonth} {CurrentBlog.UpdatedDatePeriod}");
+            sb.AppendLine("            </i>");
+            sb.AppendLine("        </h6>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            // Title row
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-12 jd-flex justify-content-center align-items-left\">");
+            sb.AppendLine($"        <h4>{CurrentBlog.Title}</h4>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            // Main Blog Image
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-12 jd-flex justify-content-center align-items-center\">");
+            sb.AppendLine($"        <img src=\"{CurrentBlog.MainImageUrl}\" alt=\"{CurrentBlog.Title}\" class=\"detail-image\" />");
+            sb.AppendLine($"        <span style=\"font-size: smaller; display: none\">{CurrentBlog.MainImageUrl}</span>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            // Blog Content (HTML)
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-12\">");
+            sb.AppendLine("        <p style=\"width: 100%\">");
+            sb.AppendLine(SanitizeHtml(CurrentBlog.ContentHtml));
+            sb.AppendLine("        </p>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            if (IsPdf)
+            {
+
+                sb.AppendLine($"{divClose}");
+                sb.AppendLine("</body>");
+                sb.AppendLine("</html>");
+            }
+
+            return sb.ToString();
+        } // Get Blog Html
+
+        public static string SanitizeHtml(string? html)
+        {
+            if (string.IsNullOrWhiteSpace(html))
+                return string.Empty;
+
+            // Remove empty <p>, <div>, <br>, and other empty tags
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"<(\w+)[^>]*>\s*</\1>", string.Empty);
+
+            // Trim spaces and line breaks
+            return html.Trim();
+        }
+
+        public static string AddBaseUrlToRelativeImages(string htmlContent, string baseUrl)
+        {
+            // Regex to match <img src="..."> or <img src='...'>
+            string pattern = @"(<img\s+[^>]*src\s*=\s*[""'])([^""'http][^""]+)([""'])";
+
+            // Add base URL to relative paths
+            string updatedHtml = Regex.Replace(htmlContent, pattern, m =>
+            {
+                string originalSrc = m.Groups[2].Value;
+
+                // Check if it's a relative URL (not starting with http:// or https://)
+                if (!originalSrc.StartsWith("http://") && !originalSrc.StartsWith("https://"))
+                {
+                    string absoluteUrl = $"{baseUrl.TrimEnd('/')}/{originalSrc.TrimStart('/')}";
+                    return $"{m.Groups[1].Value}{absoluteUrl}{m.Groups[3].Value}";
+                }
+
+                // Return the original URL if it's already absolute
+                return m.Value;
+            });
+
+            return updatedHtml;
+        }
+
+        public static int GenerateTempContentId()
+        {
+            // Get the current UTC timestamp in seconds
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            // Reduce the value to fit within int range (0 to 2,147,483,647)
+            int tempContentId = (int)(timestamp % int.MaxValue);
+
+            return tempContentId;
+        }
 
     } // BlogHelper Class
 } // namespace

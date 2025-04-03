@@ -7,7 +7,8 @@
     {
         <!-- Show single card details -->
         <div class="details-view">
-            <BlogView CurrentBlog="ActiveCard"
+            <BlogView @key="ActiveCard"
+            CurrentBlog="ActiveCard"
             OnClose="CloseDetail"
             OnNavigate="NavigateDetail"                     
             ParentFrame="Card"                     

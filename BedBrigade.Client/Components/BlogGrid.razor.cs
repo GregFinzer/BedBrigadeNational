@@ -46,6 +46,7 @@ using BedBrigade.SpeakIt;
 
 
 
+
 namespace BedBrigade.Client.Components
 {
     public partial class BlogGrid: ComponentBase
@@ -97,11 +98,14 @@ namespace BedBrigade.Client.Components
         
         private string WebRootPath => WebhostEnvironment.WebRootPath;
         private Location userLocation { set; get; } = new Location();
-
+        private int intUserId = 0;
         private bool isNational = false;   
         public string PageMode = "Grid"; // other values: View, Edit
 
         private bool isEditing = true;
+        private bool isAddInProgress = false;
+        private string NewBlogTempPath = string.Empty;
+        private int tempContentId = 0;
 
         protected override async Task OnInitializedAsync()
         {
@@ -113,6 +117,15 @@ namespace BedBrigade.Client.Components
 
         }//OnInit
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // Register the JS event on initial render
+                await JSRuntime.InvokeVoidAsync("addBeforeUnloadHandler", DotNetObjectReference.Create(this));
+            }
+        }
+
         private async Task LoadUserData()
         {
             var locResult = await _svcLocation.GetAllAsync();
@@ -122,6 +135,8 @@ namespace BedBrigade.Client.Components
             }
 
             Identity = _svcAuth.CurrentUser;
+           
+            
             if (Identity.IsInRole(RoleNames.NationalAdmin))
             {
                 isNational = true;
@@ -184,6 +199,7 @@ namespace BedBrigade.Client.Components
 
         public void ActionBeginHandler(ActionEventArgs<BlogData> args)
         {
+            isAddInProgress = false;
             Debug.WriteLine($"Action begin: {args.RequestType}");
 
             var ModifiedBlogItem = args.Data; // Store the item to delete or save
@@ -194,19 +210,22 @@ namespace BedBrigade.Client.Components
 
                     // cancel default editing
                     args.Cancel = true;
-                    Debug.WriteLine("Add New Blog Item");
-                    
+                    tempContentId = BlogHelper.GenerateTempContentId();
+                    Debug.WriteLine("Add New Blog Item ");
+                    isAddInProgress = true;
                     CurrentBlog = new BlogData();
-                    CurrentBlog.ContentId = 0;
+                    CurrentBlog.IsNewItem = true;
+                    CurrentBlog.ContentId = tempContentId; // should be replaced after save to real new ContentId
                     CurrentBlog.LocationId = userLocation.LocationId;
                     CurrentBlog.LocationName = userLocation.Name;
                     CurrentBlog.LocationRoute = userLocation.Route;
-                    CurrentBlog.MainImageUrl = string.Empty;
-                    CurrentBlog.OptImagesUrl = new List<string>();
-                    CurrentBlog.BlogFolder = BlogHelper.GetBlogLocationFolder(userLocation.Route, userLocation.Name);
+                    CurrentBlog.MainImageUrl = Defaults.ErrorImagePath;
+                    CurrentBlog.Name = string.Empty; // Main Image File
+                    NewBlogTempPath = $"media{userLocation.Route}/pages/{ContentTypeName}/BlogItemNew_{tempContentId}";
+                    CurrentBlog.BlogFolder = NewBlogTempPath;
                     CurrentBlog.ContentType = CurrentContentType;
-                    CurrentBlog.Title = $"Enter New {ContentTypeName} Item Title...";
-                    CurrentBlog.ContentHtml = "Enter Blog Content Here...";
+                    CurrentBlog.Title = $"Enter {ContentTypeName} Item Title...";
+                    CurrentBlog.ContentHtml = "Enter Content Here...";
 
                     PageMode = "Edit"; // display edit component
                     OpenCustomModal();
@@ -223,7 +242,11 @@ namespace BedBrigade.Client.Components
                 case Syncfusion.Blazor.Grids.Action.Delete: // delete current blog item
                     Debug.WriteLine("Grid Record will be deleted");
                     _= DeleteBlogAsync(ModifiedBlogItem);
-                    break;             
+                    break;
+
+                case Syncfusion.Blazor.Grids.Action.Cancel: // cancel by page closing
+                    Debug.WriteLine($"Grid event - Cancel editing: {ModifiedBlogItem.ContentId}"); // 0 - should be new?
+                    break;
 
             }// Request Type
 
@@ -318,8 +341,6 @@ namespace BedBrigade.Client.Components
                 .ToList();
                 StateHasChanged();
             // Set Current Use Location
-
-
         }
 
         private void OnLocationChange(ChangeEventArgs<int, Location> args)
@@ -343,12 +364,16 @@ namespace BedBrigade.Client.Components
         {
             // Update record in list
             var index = FilteredBlogList.FindIndex(b => b.ContentId == updatedItem.ContentId);
-            if (index >= 0)
+            if (index >= 0) // item found
             {
                 FilteredBlogList[index] = updatedItem;
             }
-            // refresh Record in Grid?
-            await MyGrid.SetRowDataAsync(updatedItem.ContentId, updatedItem);
+            else // new item
+            {
+                FilteredBlogList.Add(updatedItem);
+            }
+                // refresh Record in Grid?
+                await MyGrid.SetRowDataAsync(updatedItem.ContentId, updatedItem);
             _ = MyGrid.Refresh();
             PageMode = PageGridMode;
             CloseCustomModal();
@@ -388,6 +413,44 @@ namespace BedBrigade.Client.Components
                 //await CloseCustomModal();
             }
         }
+
+        public void Dispose()
+        {
+            CancelNewItem();
+        }
+
+        // Called when the browser or tab is about to close
+        [JSInvokable]
+        public Task OnBrowserClosing()
+        {
+            CancelNewItem();
+            return Task.CompletedTask;
+        }
+
+        private void CancelNewItem()
+        {
+            Debug.WriteLine("Grid Page - Browser closed");
+
+            if (PageMode == "Edit" && isAddInProgress)
+            {
+                Debug.WriteLine("Grid Page - Cancel Adding by Browser close");
+                // check & delete temp folder
+                var tempFolderPath = Path.Combine(WebRootPath, NewBlogTempPath);
+                if (Directory.Exists(tempFolderPath))
+                {                    
+                    Directory.Delete(tempFolderPath, true);
+                    Debug.WriteLine($"Temporary Folder deleted: {tempFolderPath}");
+                }
+                else
+                {
+                    Debug.WriteLine($"No Temporary Folder to delete");
+                }                
+                
+            }
+
+        }//CancelNewItem()
+
+
 
     } // BlogGrid class
 }// namespace

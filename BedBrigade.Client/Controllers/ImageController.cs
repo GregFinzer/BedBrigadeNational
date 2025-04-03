@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using BedBrigade.Common.Constants;
+using System.Diagnostics;
 
 namespace ImageUpload.Controllers
 {
@@ -63,6 +64,47 @@ namespace ImageUpload.Controllers
                 Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = e.Message;
             }
         }
+        [Route("SaveBlog/{locationRoute}/{parentFolder}/{contentType}/{contentName}")]
+        [HttpPost]
+        public void SaveBlog(IList<IFormFile> UploadFiles, string locationRoute, string parentFolder, string contentType, string contentName)
+        {
+            try
+            {
+
+                foreach (var file in UploadFiles)
+                {
+                    string targetLocation = Path.Combine(hostingEnv.ContentRootPath,
+                        "wwwroot",
+                        "media",
+                        locationRoute,
+                        parentFolder, // pages
+                        contentType, // news or story
+                        contentName
+                        );
+
+                    Debug.WriteLine(targetLocation);
+
+                    if (!Directory.Exists(targetLocation))
+                    {
+                        Directory.CreateDirectory(targetLocation);
+                    }
+                    string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+
+                    Debug.WriteLine(filename);
+
+                    CreateFile(file, targetLocation, filename);
+                }
+            }
+            catch (Exception e)
+            {
+                Response.Clear();
+                Response.ContentType = "application/json; charset=utf-8";
+                Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = e.Message;
+                Debug.WriteLine(e.Message);
+            }
+        }
+
+
 
         private string CreateFile(IFormFile file, string targetLocation, string filename)
         {

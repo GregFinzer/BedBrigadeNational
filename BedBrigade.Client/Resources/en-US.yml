@@ -15,10 +15,6 @@ BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
 BlogBackToCards: Return to Card View
 BlogEditDragDrop: Drag & drop files here or use Browse... button to select files
-BlogEditFileDelete: file(s) selected to delete
-BlogEditMainImage: The main image is marked for deletion!
-BlogEditPageInstruction: Instruction - Click an image to set it as the main image. Use the checkbox to mark images for deletion. Click the eye icon to preview an image in full screen.
-BlogEditPageWarning: If you leave the page without using the cancel button, uploaded files will be saved and can be deleted later if needed.
 BlogImageFolders: Blog Folders
 BlogCardColumns: Number or Columns
 BlogCardPaging: Card View Pagination
@@ -128,9 +124,8 @@ GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
 ImageFileFormat: Allowed formats
-Image: Image
+ImageMain: Main Image
 ImagePreview: Image Preview
-Images: Images
 InvalidCity: 'The city that you have entered does not match the zip code. Valid city names are: {cityNames}'
 InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code
 IsInYourZipCode: is in your Zip Code

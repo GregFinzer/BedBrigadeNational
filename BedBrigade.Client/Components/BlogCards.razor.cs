@@ -158,30 +158,46 @@ namespace BedBrigade.Client.Components
 
         private void NavigateDetail(string direction)
         {
+
+           // Debug.WriteLine($"BlogCards - NavigateDetail: {direction}");
+          //  Debug.WriteLine($"BlogCards - Current Active Card: {ActiveCard?.Title}");
+
             if (ActiveCard == null) return;
 
-            int currentIndex = BlogItemList.IndexOf(ActiveCard);
-
-            if (direction == "Next" && currentIndex < BlogItemList.Count - 1)
+            try
             {
-                ActiveCard = BlogItemList[currentIndex + 1];
+
+                int currentIndex = BlogItemList.IndexOf(ActiveCard);
+
+                if (direction == "Next" && currentIndex < BlogItemList.Count - 1)
+                {
+                    ActiveCard = BlogItemList[currentIndex + 1];
+                }
+                else if (direction == "Previous" && currentIndex > 0)
+                {
+                    ActiveCard = BlogItemList[currentIndex - 1];
+                }
+
+                // Update the ActiveCard reference
+               // Debug.WriteLine($"BlogCards - New Active Card: {ActiveCard?.Title}");
+
+                if (TotalPages > 1)
+                {
+                    // Sync CurrentPage to the ActiveCard's position
+                    _currentPage = (BlogItemList.IndexOf(ActiveCard) / _pageSize) + 1;
+
+                    // Ensure CurrentPage does not exceed TotalPages
+                    _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
+                }
+
+
+                StateHasChanged();
+
             }
-            else if (direction == "Previous" && currentIndex > 0)
+            catch (Exception ex)
             {
-                ActiveCard = BlogItemList[currentIndex - 1];
+                Debug.WriteLine($"BlogCards - Error in NavigateDetail: {ex.Message}");
             }
-
-            if (TotalPages > 1)
-            {
-                // Sync CurrentPage to the ActiveCard's position
-                _currentPage = (BlogItemList.IndexOf(ActiveCard) / _pageSize) + 1;
-
-                // Ensure CurrentPage does not exceed TotalPages
-                _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
-            }
-                     
-
-            StateHasChanged();
         }
 
 

@@ -13,7 +13,7 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div class="row">
+                <div class="row"> <!-- TOP ROW - HEADER AND BUTTONS ->
                     <!-- Left Column - Vertically Centered -->
                     <div class="col-md-4 d-flex align-items-center justify-content-start">
                         <div class="h-100 d-flex align-items-center">                          
@@ -33,7 +33,7 @@
                     <!-- Right Column - Vertically Centered and Aligned to the Right -->
                     <div class="col-md-4 d-flex justify-content-end align-items-center text-end">
                         <button type="submit" class="btn btn-primary me-2" style="width: 180px">
-                            <i class="fas fa-save"></i>&nbsp;@_lc.Keys["Save"]
+                            <i class="fas fa-save"></i>&nbsp;@_lc.Keys["Save"]                            
                         </button>
                         <button class="btn btn-secondary" style="width: 230px" @onclick="CancelEdit">
                             @_lc.Keys["Cancel"]&nbsp;<i class="fas fa-times-circle"></i>
@@ -41,114 +41,92 @@
                     </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
+                <div class="row mt-3"> <!--MIDDLE ROW - ACTION PANELS -->
+
+                    <div class="col-md-9"> <!-- LEFT PANEL - EDITOR  -->
                         <div class="card shadow h-100">
                             <div class="card-header">
                                 <h6 class="m-0 font-weight-bold text-dark">@_lc.Keys["Content"]</h6>
                             </div>
                             <div class="card-body">
-                                <label style="font-weight: bold">@_lc.Keys["Title"]:</label>
-                                <input @bind="BlogEditItem.Title" class="form-control"  maxlength="255" />
+                                <div>
+                                    <label style="font-weight: bold">@_lc.Keys["Title"]:</label>
+                                    <input @bind="BlogEditItem.Title" class="form-control" maxlength="255" />
+                                </div>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => BlogEditItem.Title)"></ValidationMessage>
+                                </div>                          
+                                <div>
+                                    <label for="BlogItemContent" style="font-weight: bold">@_lc.Keys["Content"]:</label>
+                                    <SfRichTextEditor @ref="RteObj"
+                                        ID="BlogItemContent" 
+                                        @bind-Value="@BlogEditItem.ContentHtml" 
+                                        EditorMode=EditorMode.HTML
+                                        >
+                                        <RichTextEditorToolbarSettings Items="@EditorToolBar" />
+                                        <RichTextEditorImageSettings SaveUrl="@saveUrl"
+                                                                     Path=@imagePath
+                                                                     AllowedTypes="AllowedTypes" />
+                                                                    <RichTextEditorEvents ValueChange="@ValueChangeHandler"
+                                                                    OnImageUploadSuccess="@OnImageUploadSuccessHandler"
+                                                                    OnImageUploadFailed="@OnImageUploadFailedHandler"
+                                                                    ImageDelete="@OnImageDelete" />
+                                    </SfRichTextEditor>
                                 </div>
-                                <label for="BlogItemContent" style="font-weight: bold">@_lc.Keys["Content"]:</label>
-                                <SfRichTextEditor ID="BlogItemContent" @bind-Value="@BlogEditItem.ContentHtml">
-                                    <RichTextEditorToolbarSettings Items="@EditorToolBar" />
-                                </SfRichTextEditor>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card shadow h-100">
-                            <div class="card shadow h-100">
-                                <div class="card-header">
-                                    <h6 class="m-0 font-weight-bold text-dark">@_lc.Keys["Images"]</h6>
-                                </div>
-                                <div class="card-body">
-                                    @if (BlogEditItem.OptImagesUrl.Count > 0)
-                                    {
-                                        <div class="alert alert-info" role="alert" style="font-size: 0.85rem;">
-                                            @_lc.Keys["BlogEditPageInstruction"]
-                                        </div>
-                                    }
-                                    <div class="image-grid">
-                                        @foreach (var image in BlogEditItem.OptImagesUrl)
-                                        {
-                                            bool DelStatus = GetImageDelStatus(image);
 
-                                            var imageCurrent = Path.GetFileName(BlogHelper.NormalizePath(image));
-                                            var imageMain = Path.GetFileName(BlogHelper.NormalizePath(BlogEditItem.MainImageUrl));
-                                            if (SelectedMainImage != null && SelectedMainImage.Length > 0)
-                                            {
-                                                imageMain = Path.GetFileName(SelectedMainImage); // the last selected main image
+                    <div class="col-md-3">
+                        <!-- RIGHT PANEL -- MAIN IMAGE  -->                                         
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-dark">@_lc.Keys["ImageMain"]</h6>
+                            </div>
+                            <div class="card-body">
+                                            @{
+                                                var imageMainUrl = BlogHelper.NormalizePath(BlogEditItem.MainImageUrl);                                               
                                             }
-
-                                            <div class="image-item @(imageCurrent == imageMain ? "main-image" : "")">
-                                                <img src="@image" alt="Image" @onclick="() => SelectMainImage(image)">
-                                                <!-- Check if the image is in the lstFileDelete, and set the checkbox state accordingly -->
-                                                <input type="checkbox" checked="@DelStatus" @onchange="e => ToggleImageDeletion(e, image)">
-                                                <button class="view-icon" @onclick="@(() => ShowImagePreview(image))">
+                                            <div class="image-item main-image">
+                                                <img src="@imageMainUrl" alt="Image" >                                                                                         
+                                                <button class="view-icon" @onclick="@(() => ShowImagePreview(imageMainUrl))">
                                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                                 </button>
+                                             </div>
+                             <div>
+                              <div class="card-footer">
+                                            <!-- File Upload Main Image -->
+                                            <SfUploader @ref="UploaderRef"
+                                            AllowedExtensions="@BlogModuleImagesExt"
+                                            ShowFileList="true"                                                        
+                                            MaxFileSize="@BlogModuleFileSize"
+                                            AllowMultiple="false"
+                                            DropArea="DropArea"
+                                            AutoUpload="true">
+                                                <UploaderEvents ValueChange="@OnUploadMainImage">
+                                                </UploaderEvents>
+                                            </SfUploader>
+                                            <div id="DropArea">
+                                            <span style="font-size:small; width: 100%">@_lc.Keys["BlogEditDragDrop"]</span>
+                                            <br /><br />
+                                            <span style="font-size:small; width: 100%">
+                                                    @_lc.Keys["MaxFileSize"]: <b>@(BlogModuleFileSize / (1024 * 1024)) MB</b>                                                   
+                                            </span>
+                                            <br /><br />
+                                            <span style="font-size:small; width: 100%">
+                                                @_lc.Keys["ImageFileFormat"]:&nbsp;<span class="file-types">@BlogModuleImagesExt</span>                                                
+                                            </span>
                                             </div>
-                                        }
-                                    </div>
-
-                                    @if(BlogEditItem.ContentId > 0 && BlogEditItem.FileUploaded.Count > 0)
-                                    {
-                                        <div id="edit-warning-message" class="alert alert-info" role="alert" style="width: 100%; margin: 0; padding: 8px 15px; font-size: 0.85rem;">
-                                            @_lc.Keys["BlogEditPageWarning"]
-                                        </div>
-                                    }
-
-                                    <div>
-
-                                        <!-- File Upload -->
-                                        <SfUploader @ref="UploaderRef"                                            
-                                        AllowedExtensions="@BlogModuleImagesExt"                                        
-                                        ShowFileList="true"                                        
-                                        DropArea="#DropArea"
-                                        MaxFileSize="@BlogModuleFileSize"
-                                        AllowMultiple="true"                                         
-                                        AutoUpload="true">
-                                            <UploaderEvents ValueChange="@OnUploadChange">
-                                            </UploaderEvents>                                              
-                                        </SfUploader>
-                                    </div>
-
-                                    <div id="DropArea">
-                                        <p>@_lc.Keys["BlogEditDragDrop"]</p>
-                                        <p>
-                                            <small class="upload-info">
-                                                @_lc.Keys["MaxFileSize"]: <b>@(BlogModuleFileSize / (1024 * 1024)) MB</b>&nbsp;|&nbsp;
-                                                @_lc.Keys["ImageFileFormat"]:&nbsp;<span class="file-types">@BlogModuleImagesExt</span>
-                                            </small>
-                                        </p>
-                                    </div>
-                                </div>
-
-
-                                @if (BlogEditItem.FileDelete.Count > 0)
-                                {
-                                    <div class="alert alert-warning" role="alert">
-                                        <strong>@($"{BlogEditItem.FileDelete.Count}")</strong>&nbsp;
-                                        @_lc.Keys["BlogEditFileDelete"]
-                                    </div>
-                                }
-
-                                @if(isMainImageInDeleteList){
-                                <div class="alert alert-warning" role="alert">
-                                        @_lc.Keys["BlogEditMainImage"]
-                                    </div>
-                                }
-
-                                </div>
-                            </div>                       
-                        </div>                    
-                    </div>
-
+                               </div>
+                      </div>                                                        
+                    </div>                                 
+               </div>
+                                       
+                </div>
+                    
+                
+                </div>
+                
                 <div class="row">
                     <div class="col-md-6 jd-flex justify-content-center align-items-left">
                         <button type="submit" class="btn btn-primary" style="width: 180px"><i class="fas fa-save"></i>&nbsp;@_lc.Keys["Save"]</button>
@@ -160,10 +138,10 @@
                     </div>          
 
                 </div>
-
+                       
             </EditForm>
 
-            break;
+        break;
 
         case "View":
 
@@ -195,6 +173,15 @@
 
 
 <style>
+
+    #DropArea {
+        padding: 2px 2px;       
+        border: 1px solid #c3c3c3;
+        text-align: center;
+        width: 100%;
+        height: auto; /* This ensures the height adjusts to the content */       
+    }
+
     /* Hide the delete (trash) icon */
     .e-file-delete-btn {
         display: none !important;
@@ -300,6 +287,10 @@
         overflow: auto; /* Enables scrolling if content is long */
         padding: 20px;
     }
+
+  
+
+    
 
 </style>
 

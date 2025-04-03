@@ -28,6 +28,7 @@ namespace BedBrigade.Common.Models
         public string? CreatedDatePeriod { get; set; } // Date & Year
         public string? UpdatedDateMonth { get; set; }
         public string? UpdatedDatePeriod { get; set; } // Date & Year
+        public bool IsNewItem { get; set; } = false;
 
     }
 }
