@@ -154,6 +154,7 @@ namespace BedBrigade.Client
             builder.Services.AddLanguageContainerForBlazorServer<EmbeddedResourceKeysProvider>(Assembly.GetExecutingAssembly(), "Resources");
             builder.Services.AddScoped<ILanguageService, LanguageService>();
             builder.Services.AddScoped<ICarouselService, CarouselService>();
+            builder.Services.AddScoped<IScheduleControlService, ScheduleControlService>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)

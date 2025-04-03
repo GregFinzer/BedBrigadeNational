@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ILoadImagesService _loadImagesService { get; set; }
         [Inject] private ICarouselService _carouselService { get; set; }
+        [Inject] private IScheduleControlService _scheduleControlService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
 
         [Inject]
@@ -46,7 +47,7 @@ namespace BedBrigade.Client.Components.Pages
         private string BodyContent = string.Empty;
         private string CurrentPageTitle = string.Empty;
         private string SorryPageUrl = String.Empty;
-       
+
         protected override async Task OnInitializedAsync()
         {
             ValidateUrlParameters();
@@ -147,7 +148,8 @@ namespace BedBrigade.Client.Components.Pages
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
                 html = _carouselService.ReplaceCarousel(html);
-                    
+                html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
+
                 if (html != PreviousBodyContent)
                 {
                     PreviousBodyContent = html;
@@ -181,6 +183,7 @@ namespace BedBrigade.Client.Components.Pages
                 var path = $"/{location}/pages/{pageName}";
                 string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
                 html = _carouselService.ReplaceCarousel(html);
+                html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
 
                 if (html != PreviousBodyContent)
                 {

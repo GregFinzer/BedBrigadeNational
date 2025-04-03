@@ -376,12 +376,22 @@
     text-align: center;
 }
 
+.rockp-a-bold {
+    color: #2F4729;
+    font-weight: bold;
+}
+
+    .rockp-a-bold:hover {
+        color: #000;
+        font-weight: bolder;
+    }
+
 .rockp-a {
     color: #2F4729;
 }
 
     .rockp-a:hover {
-        color: #2F4729;
+        color: #000;
         font-weight: 600;
     }
 

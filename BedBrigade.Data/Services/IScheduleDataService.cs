@@ -7,5 +7,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<Schedule>>> GetSchedulesByLocationId(int locationId);
         Task<ServiceResponse<List<Schedule>>> GetFutureSchedulesByLocationId(int locationId);
         Task<ServiceResponse<List<Schedule>>> GetAvailableSchedulesByLocationId(int locationId);
+        Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway);
     }
 }
