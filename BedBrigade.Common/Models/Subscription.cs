@@ -13,8 +13,8 @@ namespace BedBrigade.Common.Models
         [ForeignKey("NewsletterId")]
         public Int32 NewsletterId { get; set; }
 
-        [Required]
-        [MaxLength(255)]
+        [Required(ErrorMessage = "Email Address is required")]
+        [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
         public String Email { get; set; } = string.Empty;
 
         public bool Subscribed { get; set; }
