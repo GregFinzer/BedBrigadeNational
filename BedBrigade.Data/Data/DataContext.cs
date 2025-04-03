@@ -74,6 +74,16 @@ namespace BedBrigade.Data
                 .HasKey(up => new { up.UserName, up.Grid });
 
             CreateVolunteerIndexes(modelBuilder);
+            CreateNewsletterIndexes(modelBuilder);
+        }
+
+        private static void CreateNewsletterIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Newsletter>()
+                .HasIndex(e => e.LocationId);
+
+            modelBuilder.Entity<Subscription>()
+                .HasIndex(e => e.NewsletterId);
         }
 
         private static void CreateConfigurationIndexes(ModelBuilder modelBuilder)
