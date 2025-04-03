@@ -64,6 +64,29 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         return result;
     }
 
+    public async Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway)
+    {
+        // Retrieve available schedules for the specified location.
+        var availableSchedulesResponse = await GetAvailableSchedulesByLocationId(locationId);
+        if (!availableSchedulesResponse.Success || availableSchedulesResponse.Data == null)
+        {
+            return availableSchedulesResponse;
+        }
+
+        // Calculate the upper bound date by adding the specified number of months to the first day of the month
+        DateTime upperBoundDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(numberOfMonthsAway);
+
+        // Filter schedules to include only those whose EventDateScheduled is within the desired range.
+        var filteredSchedules = availableSchedulesResponse.Data
+            .Where(schedule => schedule.EventDateScheduled <= upperBoundDate)
+            .ToList();
+
+        return new ServiceResponse<List<Schedule>>(
+            $"Found {filteredSchedules.Count} schedules within {numberOfMonthsAway} month(s)",
+            true,
+            filteredSchedules);
+    }
+
     public async Task<ServiceResponse<List<Schedule>>> GetAvailableSchedulesByLocationId(int locationId)
     {
         string cacheKey =
