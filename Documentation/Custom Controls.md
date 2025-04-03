@@ -21,6 +21,9 @@ Notice in the example below the id of headerImageRotator in GroveCityHome.html
 ### Flow of Replacement
 Index.razor.cs LoadDefaultContent or LoadContentByLanguage &rarr; LoadImagesService.SetImagesForHtml
 
+<hr />
+
+
 ## BBCarousel
 The Bed Brigade Carousel is an HTML replacement of a div.  It is identified by *data-component="bbcarousel"*.  It generates a <a href="https://getbootstrap.com/docs/5.0/components/carousel/" target="_blank">Bootstrap 5.x Carousel</a> with all of the image references and controls.  JavaScript is used to set the interval and to ensure that the images change regardless if the carousel is in the viewport.  This was done because the images would not change at all without it in Blazor.
 
@@ -40,3 +43,40 @@ These have to be in this exact order without any other attributes!
 ### Flow of replacement
 1. Index.razor.cs LoadDefaultContent or LoadContentByLanguage &rarr; CarouselService.ReplaceCarousel
 2. Index.razor.cs OnAfterRenderAsync &rarr; BedBrigadeUtil.runCarousel
+
+<hr />
+
+## BBSchedule
+The Bed Brigade Schedule is an HTML replacement of a div.  It is identified by *data-component="bbschedule"*.  It generates a block of HTML code.  The *data-months* determines how many months of the schedule to display.
+
+### Example Control Code
+This is an example of the Bed Brigade Schedule from RockCityPolarisHome.html
+
+```html
+<div data-component="bbschedule" data-months="3" id="rockp-schedule"></div>
+```
+
+### Example Output
+```html
+<div class="rockp-home-bipanel-container">
+    <div class="rockp-home-bipanel-left">
+        <h3 class="rockp-home-bipanel-title">MAY</h3>
+    </div>
+    <div class="rockp-home-bipanel-right">
+        <p>
+            <a class="rockp-a-bold" href="/rock-city-polaris/volunteer/66">Build: 5/3/2025, 9:00 AM</a>
+        </p>
+        <p class="rockp-home-bipanel-info">
+            <a class="rockp-a" href="https://www.google.com/maps/search/?api=1&query=171+E.+5th+Ave%2C+Columbus%2C+OH%2C+" target="_blank">171 E. 5th Ave, Columbus, OH</a>
+        </p>
+	<br />
+        <p>
+            <a class="rockp-a-bold" href="/rock-city-polaris/volunteer/78">Delivery: 5/10/2025, 9:00 AM</a>
+        </p>
+        <p class="rockp-home-bipanel-info">
+            <a class="rockp-a" href="https://www.google.com/maps/search/?api=1&query=171+E.+5th+Ave%2C+Columbus%2C+OH%2C+" target="_blank">171 E. 5th Ave, Columbus, OH</a>
+        </p>
+	<br />
+    </div>
+</div>
+```

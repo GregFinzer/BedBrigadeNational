@@ -196,6 +196,8 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ISendSmsLogic, SendSmsLogic>();
             builder.Services.AddSingleton<ISmsState, SmsState>();
             builder.Services.AddScoped<ITimezoneDataService, TimezoneDataService>();
+            builder.Services.AddScoped<INewsletterDataService, NewsletterDataService>();
+            builder.Services.AddScoped<ISubscriptionDataService, SubscriptionDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

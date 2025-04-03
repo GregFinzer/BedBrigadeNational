@@ -1,0 +1,9 @@
+﻿using BedBrigade.Common.Models;
+
+namespace BedBrigade.Data.Services
+{
+    public interface ISubscriptionDataService : IRepository<Subscription>
+    {
+        Task<ServiceResponse<List<Subscription>>> GetSubscriptionsByNewsletterAsync(int newsletterId);
+    }
+}
