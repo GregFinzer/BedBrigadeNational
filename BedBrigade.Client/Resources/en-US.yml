@@ -291,6 +291,7 @@ Stories: Stories
 Street: Street
 SubmitRequest: Submit Request
 SubmitVolunteerRegistration: Submit Volunteer Registration
+Subscribe: Subscribe
 SubscribeToOurEmail: Subscribe to our Email Newsletter?
 SubscribeToOurText: Subscribe to our Text List?
 TaxFormSent: Tax Form Sent
@@ -326,5 +327,6 @@ VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
+YourEmail: Your Email
 YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code

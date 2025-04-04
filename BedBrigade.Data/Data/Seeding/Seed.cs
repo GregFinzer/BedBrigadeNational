@@ -139,6 +139,38 @@ public static class Seed
         await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
         await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
         await SeedSpokenLanguages(contextFactory);
+        await SeedNewsletters(contextFactory);
+    }
+
+    private static async Task SeedNewsletters(IDbContextFactory<DataContext> contextFactory)
+    {
+        Log.Logger.Information("SeedNewsletters Started");
+
+        using (var context = contextFactory.CreateDbContext())
+        {
+            var existingNewsletters = await context.Newsletters.ToListAsync();
+
+            if (existingNewsletters.Any())
+                return;
+
+            try
+            {
+                Newsletter newsletter = new Newsletter
+                {
+                    Name = "Rock City Polaris Newsletter",
+                    LocationId = Defaults.RockCityPolarisLocationId
+                };
+
+                SeedRoutines.SetMaintFields(newsletter);
+                await context.Newsletters.AddAsync(newsletter);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Information($"Newsletters seed error: {ex.Message}");
+                throw;
+            }
+        }
     }
 
     private static async Task UpdateLocations(IDbContextFactory<DataContext> contextFactory)

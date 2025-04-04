@@ -1,0 +1,13 @@
+﻿@inherits LayoutComponentBase
+@using BedBrigade.Client.Services
+@inject IWebHostEnvironment HostEnvironment
+
+<CustomErrorBoundary @ref=errorBoundary>
+    @Body
+</CustomErrorBoundary>
+
+<style>
+    body {
+        padding: 0;
+    }
+</style>

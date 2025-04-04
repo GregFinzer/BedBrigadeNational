@@ -291,6 +291,7 @@ Stories: Historias
 Street: Calle
 SubmitRequest: Enviar solicitud
 SubmitVolunteerRegistration: Enviar Registro de Voluntarios
+Subscribe: Suscribirse
 SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
 SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
@@ -326,5 +327,6 @@ VolunteersRegisteredColon: 'Voluntarios registrados:'
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
+YourEmail: Tu correo electrónico
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
 ZipCode: Código postal
