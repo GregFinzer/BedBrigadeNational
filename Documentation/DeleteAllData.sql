@@ -43,6 +43,10 @@ drop table if exists TranslationQueue
 go
 drop table if exists SpokenLanguages
 go
+drop table if exists Subscriptions
+go
+drop table if exists Newsletters
+go
 drop table if exists Locations
 go
 drop table if exists MetroAreas
