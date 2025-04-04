@@ -2,6 +2,7 @@
 @layout Layout.NoHeaderFooterLayout
 @using System.ComponentModel.DataAnnotations
 @inject ISubscriptionDataService SubscriptionDataService
+@inject ILanguageContainerService _lc
 
 <section class="rockp-connect-with-us-section">
     <div class="rockp-connect-container">
@@ -9,9 +10,9 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <InputText id="email" class="rockp-connect-input" @bind-Value="subscriptionModel.Email" Placeholder="Your Email" />
+            <InputText id="email" class="rockp-connect-input" @bind-Value="subscriptionModel.Email" Placeholder="@_lc.Keys["YourEmail"]" />
 
-            <button type="submit" class="rockp-connect-button">Subscribe</button>
+            <button type="submit" class="rockp-connect-button">@_lc.Keys["Subscribe"]</button>
         </EditForm>
     </div>
 </section>
@@ -34,6 +35,11 @@
 
     private SubscriptionModel subscriptionModel = new SubscriptionModel();
     private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
 
     private async Task HandleSubmit()
     {
