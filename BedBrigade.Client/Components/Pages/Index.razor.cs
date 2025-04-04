@@ -5,14 +5,9 @@ using BedBrigade.Common.Logic;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Serilog;
-using System;
-using System.Data.Entity.Core.Mapping;
-using System.Diagnostics;
 using System.Globalization;
 using BedBrigade.Common.Models;
-using KellermanSoftware.NetEmailValidation;
 using BedBrigade.Common.Constants;
-using BedBrigade.SpeakIt;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -26,9 +21,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ICarouselService _carouselService { get; set; }
         [Inject] private IScheduleControlService _scheduleControlService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
-
-        [Inject]
-        private ILocationState _locationState { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
@@ -146,9 +139,7 @@ namespace BedBrigade.Client.Components.Pages
             if (contentResult.Success)
             {
                 var path = $"/{location}/pages/{pageName}";
-                string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-                html = _carouselService.ReplaceCarousel(html);
-                html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
+                string html = await ReplaceHtmlControls(path, locationResponse, contentResult.Data.ContentHtml);
 
                 if (html != PreviousBodyContent)
                 {
@@ -181,9 +172,7 @@ namespace BedBrigade.Client.Components.Pages
             if (contentResult.Success)
             {                       
                 var path = $"/{location}/pages/{pageName}";
-                string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
-                html = _carouselService.ReplaceCarousel(html);
-                html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
+                string html = await ReplaceHtmlControls(path, locationResponse, contentResult.Data.ContentHtml);
 
                 if (html != PreviousBodyContent)
                 {
@@ -208,7 +197,14 @@ namespace BedBrigade.Client.Components.Pages
 
             return true;
         }
-        
+
+        private async Task<string> ReplaceHtmlControls(string path, ServiceResponse<Location> locationResponse, string html)
+        {
+            html = _loadImagesService.SetImagesForHtml(path, html);
+            html = _carouselService.ReplaceCarousel(html);
+            html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
+            return html;
+        }
 
 
         private async void ValidateUrlParameters()

@@ -35,6 +35,8 @@ namespace BedBrigade.Data
         public virtual DbSet<SpokenLanguage> SpokenLanguages { get; set; }
         public virtual DbSet<GeoLocationQueue> GeoLocationQueue { get; set; }
         public virtual DbSet<SmsQueue> SmsQueue { get; set; }
+        public virtual DbSet<Newsletter> Newsletters { get; set; }
+        public virtual DbSet<Subscription> Subscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
