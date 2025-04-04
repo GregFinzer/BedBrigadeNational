@@ -1,0 +1,66 @@
+﻿@page "/SubscribeToNewsletter"
+@layout Layout.NoHeaderFooterLayout
+@using System.ComponentModel.DataAnnotations
+@inject ISubscriptionDataService SubscriptionDataService
+
+<section class="rockp-connect-with-us-section">
+    <div class="rockp-connect-container">
+        <EditForm Model="@subscriptionModel" OnValidSubmit="HandleSubmit" class="rockp-connect-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputText id="email" class="rockp-connect-input" @bind-Value="subscriptionModel.Email" Placeholder="Your Email" />
+
+            <button type="submit" class="rockp-connect-button">Subscribe</button>
+        </EditForm>
+    </div>
+</section>
+
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    // Query parameters passed via the URL.
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int locationId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string newsletterName { get; set; }
+
+    private SubscriptionModel subscriptionModel = new SubscriptionModel();
+    private string message;
+
+    private async Task HandleSubmit()
+    {
+        if (locationId == 0)
+            message = "locationId is required.";
+
+        if (string.IsNullOrEmpty(newsletterName))
+            message = "newsletterName is required.";
+
+        // Call the subscription service using the query parameter values and the email from the form.
+        var result = await SubscriptionDataService.Subscribe(locationId, newsletterName, subscriptionModel.Email);
+        message = result.Success 
+            ? "Thank you for subscribing!" 
+            : $"There was an error processing your subscription. Please try again. {result.Message}";
+    }
+
+    public class SubscriptionModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; }
+    }
+}
+
+<style>
+    body
+    {
+        background-color: #f5f5f5;
+    }
+</style>
