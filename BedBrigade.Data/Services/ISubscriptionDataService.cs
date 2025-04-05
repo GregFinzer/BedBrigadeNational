@@ -6,5 +6,6 @@ namespace BedBrigade.Data.Services
     {
         Task<ServiceResponse<List<Subscription>>> GetSubscriptionsByNewsletterAsync(int newsletterId);
         Task<ServiceResponse<bool>> Subscribe(int locationId, string newsletterName, string email);
+        Task<ServiceResponse<bool>> Unsubscribe(int locationId, string newsletterName, string email);
     }
 }

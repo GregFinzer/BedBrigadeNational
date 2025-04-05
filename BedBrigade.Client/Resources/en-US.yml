@@ -178,6 +178,7 @@ NationalPathColon: 'National Path:'
 NewPassword: New Password
 Next: Next
 News: News
+Newsletter: Newsletter
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
@@ -217,6 +218,7 @@ Preview: Preview
 Previous: Previous
 PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
+Processing: Processing
 RegistrationidColon: 'RegistrationID:'
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
@@ -264,6 +266,7 @@ Search: Search
 SearchBedBrigadeLocations: Search Bed Brigade Locations
 SelectAGridFilter: Select a grid filter
 SelectALocation: Select a Location
+SelectANewsletter: Select a Newsletter
 SelectAnEvent: Select an event
 SelectAnUpcomingEvent: Select an upcoming event and register to join us in either delivering or building beds!
 SelectAState: Select a state
@@ -302,6 +305,8 @@ TheBedBrigade: The Bed Brigade
 TotalItems: Items Total
 TransactionId: Transaction ID
 Unauthorized: Unauthorized
+Unsubscribe: Unsubscribe
+UnsubscribeFromNewsletter: Unsubscribe from Newsletter
 UpcomingBuilds: Upcoming Builds
 UpcomingDeliveries: Upcoming Deliveries
 UpcomingEvents: Upcoming Events
