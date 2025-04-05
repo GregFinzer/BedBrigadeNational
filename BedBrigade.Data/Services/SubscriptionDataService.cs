@@ -19,6 +19,35 @@ namespace BedBrigade.Data.Services
             _contextFactory = contextFactory;
         }
 
+        public async Task<ServiceResponse<bool>> Unsubscribe(int locationId, string newsletterName, string email)
+        {
+            var newsletterResponse = await _newsletterDataService.GetAsync(newsletterName, locationId);
+            if (!newsletterResponse.Success || newsletterResponse.Data == null)
+            {
+                return new ServiceResponse<bool>($"Could not find newsletter with name {newsletterName}", false, false);
+            }
+
+            var existingSubscriptions = await GetSubscriptionsByNewsletterAsync(newsletterResponse.Data.NewsletterId);
+
+            if (existingSubscriptions.Success && existingSubscriptions.Data != null)
+            {
+                var existingSubscription = existingSubscriptions.Data.FirstOrDefault(s => s.Email == email);
+                if (existingSubscription != null)
+                {
+                    if (existingSubscription.Subscribed)
+                    {
+                        existingSubscription.Subscribed = false;
+                        await UpdateAsync(existingSubscription);
+                        return new ServiceResponse<bool>($"Unsubscribed to {newsletterName}", true, true);
+                    }
+
+                    return new ServiceResponse<bool>($"Already unsubscribed to {newsletterName}", true, true);
+                }
+            }
+
+            return new ServiceResponse<bool>($"Was never subscribed to {newsletterName}", true, true);
+        }
+
         public async Task<ServiceResponse<bool>> Subscribe(int locationId, string newsletterName, string email)
         {
             var newsletterResponse = await _newsletterDataService.GetAsync(newsletterName, locationId);

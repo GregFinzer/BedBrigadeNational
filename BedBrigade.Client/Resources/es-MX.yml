@@ -178,6 +178,7 @@ NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 Next: Siguiente
 News: Noticias
+Newsletter: Boletín
 NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
@@ -217,6 +218,7 @@ Preview: Previsualizar
 Previous: Anterior
 PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
+Processing: Procesando
 RegistrationidColon: 'ID de registro:'
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
@@ -264,6 +266,7 @@ Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
 SelectAGridFilter: Seleccionar un filtro de cuadrícula
 SelectALocation: Seleccione una ubicación
+SelectANewsletter: Seleccione un boletín
 SelectAnEvent: Seleccione un evento
 SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse a nosotros en la entrega o construcción de camas!
 SelectAState: Seleccione un estado
@@ -302,6 +305,8 @@ TheBedBrigade: La Brigada de la Cama
 TotalItems: Artículos Total
 TransactionId: ID de transacción
 Unauthorized: Desautorizado
+Unsubscribe: Darse de baja
+UnsubscribeFromNewsletter: Darse de baja del boletín
 UpcomingBuilds: Próximas compilaciones
 UpcomingDeliveries: Próximas entregas
 UpcomingEvents: Próximos eventos

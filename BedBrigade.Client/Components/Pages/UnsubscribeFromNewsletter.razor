@@ -1,0 +1,167 @@
+﻿@page "/UnsubscribeFromNewsletter"
+@page "/UnsubscribeFromNewsletter/{locationId:int?}/{newsletterName?}/{email?}"
+
+@using System.ComponentModel.DataAnnotations
+@using BedBrigade.Common.Models
+@inject ISubscriptionDataService SubscriptionDataService
+@inject INewsletterDataService NewsletterDataService
+@inject ILocationDataService LocationDataService
+@inject ILanguageContainerService _lc
+
+<div class="container mt-4">
+    <h3 class="mb-4">@_lc.Keys["UnsubscribeFromNewsletter"]</h3>
+
+    @if (isProcessing)
+    {
+        <p>@_lc.Keys["Processing"]...</p>
+    }
+    else if (!string.IsNullOrEmpty(unsubscribeMessage))
+    {
+        <p>@unsubscribeMessage</p>
+    }
+    else if (allParametersProvided)
+    {
+        <!-- In this branch the unsubscribe has not started -->
+    }
+    else
+    {
+        <EditForm Model="formModel" OnValidSubmit="HandleUnsubscribe">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label class="form-label">@_lc.Keys["Location"]</label>
+                <InputSelect class="form-select" @bind-Value="formModel.LocationId" @bind-Value:after="LocationChanged">
+                    <option value="">-- @_lc.Keys["SelectALocation"] --</option>
+                    @foreach (var loc in locations)
+                    {
+                        <option value="@loc.LocationId">@loc.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@_lc.Keys["Newsletter"]</label>
+                <InputSelect class="form-select" @bind-Value="formModel.NewsletterName" disabled="@(!formModel.LocationId.HasValue)">
+                    <option value="">-- @_lc.Keys["SelectANewsletter"] --</option>
+                    @foreach (var news in newsletters)
+                    {
+                        <option value="@news.Name">@news.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@_lc.Keys["Email"]</label>
+                <InputText class="form-control" @bind-Value="formModel.Email" />
+            </div>
+            <button type="submit" class="btn btn-primary">@_lc.Keys["Unsubscribe"]</button>
+        </EditForm>
+    
+    }
+</div>
+
+@code {
+    // These parameters can be provided via the URL query string
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? locationId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? newsletterName { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? email { get; set; }
+
+    private bool isProcessing = false;
+    private string? unsubscribeMessage;
+    private bool allParametersProvided =>
+        locationId.HasValue && !string.IsNullOrEmpty(newsletterName) && !string.IsNullOrEmpty(email);
+
+    // Lists for the dropdowns
+    private List<Location> locations = new List<Location>();
+    private List<Newsletter> newsletters = new List<Newsletter>();
+
+    // Model for interactive form binding
+    private UnsubscribeModel formModel = new UnsubscribeModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // If all three query parameters are supplied, automatically attempt to unsubscribe.
+        if (allParametersProvided)
+        {
+            isProcessing = true;
+            var response = await SubscriptionDataService.Unsubscribe(locationId.Value, newsletterName!, email!);
+            if (response.Success)
+            {
+                unsubscribeMessage = "You have been unsubscribed successfully.";
+            }
+            else
+            {
+                unsubscribeMessage = $"Error unsubscribing: {response.Message}";
+            }
+            isProcessing = false;
+        }
+        else
+        {
+            // Load the locations for the dropdown 
+            var locResponse = await LocationDataService.GetAllAsync();
+            if (locResponse.Success)
+            {
+                locations = locResponse.Data;
+            }
+        }
+    }
+
+    private async Task LocationChanged()
+    {
+        // Update the selected location and load the corresponding newsletters.
+        var newsletterResponse = await NewsletterDataService.GetAllForLocationAsync(formModel.LocationId.Value);
+        if (newsletterResponse.Success)
+        {
+            newsletters = newsletterResponse.Data;
+        }
+    }
+
+    private async Task HandleUnsubscribe()
+    {
+        // Validate that all fields have a value before attempting to unsubscribe.
+        if (formModel.LocationId.HasValue &&
+            !string.IsNullOrEmpty(formModel.NewsletterName) &&
+            !string.IsNullOrEmpty(formModel.Email))
+        {
+            isProcessing = true;
+            var response = await SubscriptionDataService.Unsubscribe(formModel.LocationId.Value, formModel.NewsletterName!, formModel.Email!);
+            if (response.Success)
+            {
+                unsubscribeMessage = "You have been unsubscribed successfully.";
+            }
+            else
+            {
+                unsubscribeMessage = $"Error unsubscribing: {response.Message}";
+            }
+            isProcessing = false;
+        }
+        else
+        {
+            unsubscribeMessage = "Please provide all required fields.";
+        }
+    }
+
+    public class UnsubscribeModel
+    {
+        [Required(ErrorMessage = "Location is required.")]
+        public int? LocationId { get; set; }
+
+        [Required(ErrorMessage = "Newsletter name is required.")]
+        public string? NewsletterName { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string? Email { get; set; }
+    }
+}
