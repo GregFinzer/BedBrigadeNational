@@ -219,7 +219,7 @@ namespace BedBrigade.Client.Components
             if (BlogEditItem.FileUploaded != null && BlogEditItem.FileUploaded.Count > 0)
             {
                 BlogHelper.DeleteBlogFiles(WebRootPath, BlogEditItem.FileUploaded);
-                BlogEditItem.FileUploaded = [];
+                BlogEditItem.FileUploaded.Clear();
             }
 
             if (BlogEditItem.IsNewItem)
