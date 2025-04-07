@@ -101,14 +101,14 @@
     private string MovePrev = "Previous";
     private string BlogHtmlDisplay = String.Empty;
     private string BlogHtmlPrint = String.Empty;
-    private string baseUrI = String.Empty;
+    private string baseUri = String.Empty;
 
     protected override void OnInitialized()
     {
-        baseUrI = Navigation.BaseUri;
+        baseUri = Navigation.BaseUri;
         _lc.InitLocalizedComponent(this);
         BlogHtmlDisplay = BlogHelper.GenerateBlogHtml(CurrentBlog);
-        BlogHtmlPrint = BlogHelper.AddBaseUrlToRelativeImages(BlogHtmlDisplay, baseUrI);
+        BlogHtmlPrint = BlogHelper.AddBaseUrlToRelativeImages(BlogHtmlDisplay, baseUri);
     }
     protected override void OnParametersSet()
     {
