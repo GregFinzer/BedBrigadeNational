@@ -66,8 +66,7 @@ namespace BedBrigade.Client.Components
         private int SelectedLocationId = 1;
 
         private string WebRootPath => WebhostEnvironment.WebRootPath;
-        private Location userLocation { set; get; } = new Location();
-        private int intUserId = 0;
+        private Location userLocation { set; get; } = new Location();       
         private bool isNational = false;
         public string PageMode = "Grid"; // other values: View, Edit
 
