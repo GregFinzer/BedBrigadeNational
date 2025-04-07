@@ -1,15 +1,7 @@
-﻿using BedBrigade.Common.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BedBrigade.Common.Models
+﻿namespace BedBrigade.Common.Models
 {
-    public class BlogData: Content
-    {      
+    public class BlogData : Content
+    {
         public string? LocationRoute { get; set; } // Location Route/Path
         public string? LocationName { get; set; } // Location Name
                                                   // 
@@ -28,6 +20,7 @@ namespace BedBrigade.Common.Models
         public string? CreatedDatePeriod { get; set; } // Date & Year
         public string? UpdatedDateMonth { get; set; }
         public string? UpdatedDatePeriod { get; set; } // Date & Year
+        public bool IsNewItem { get; set; } = false;
 
     }
 }
