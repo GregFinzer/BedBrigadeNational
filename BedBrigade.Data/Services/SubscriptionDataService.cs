@@ -48,6 +48,27 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<bool>($"Was never subscribed to {newsletterName}", true, true);
         }
 
+        public async Task<ServiceResponse<List<string>>> GetEmailsByNewsletterAsync(int newsletterId)
+        {
+            string cacheKey = _cachingService.BuildCacheKey("GetEmailsByNewsletterAsync", newsletterId);
+            var cachedEmails = _cachingService.Get<List<string>>(cacheKey);
+            if (cachedEmails != null)
+            {
+                return new ServiceResponse<List<string>>($"Found {GetEntityName()} in cache", true, cachedEmails);
+            }
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Subscription>();
+                var result = await dbSet.Where(c => c.NewsletterId == newsletterId && c.Subscribed).Select(s => s.Email).ToListAsync();
+                if (result == null)
+                {
+                    return new ServiceResponse<List<string>>($"Could not find {GetEntityName()} with newsletterId of {newsletterId}", false, null);
+                }
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<string>>($"Found {GetEntityName()} with newsletterId of {newsletterId}", true, result);
+            }
+        }
+
         public async Task<ServiceResponse<bool>> Subscribe(int locationId, string newsletterName, string email)
         {
             var newsletterResponse = await _newsletterDataService.GetAsync(newsletterName, locationId);

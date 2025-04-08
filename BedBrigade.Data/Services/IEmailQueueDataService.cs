@@ -1,5 +1,4 @@
-﻿using BedBrigade.Common.Enums;
-using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -10,8 +9,8 @@ namespace BedBrigade.Data.Services
         Task<List<EmailQueue>> GetEmailsToProcess(int maxPerChunk);
         Task DeleteOldEmailQueue(int daysOld);
         Task LockEmailsToProcess(List<EmailQueue> emailsToProcess);
-        Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId);
-        Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId);
+        Task<ServiceResponse<string>> GetSendPlanMessage(EmailsToSendParms parms);
+        Task<ServiceResponse<List<string>>> GetEmailsToSend(EmailsToSendParms parms);
         Task<ServiceResponse<string>> QueueEmail(EmailQueue email);
         Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body);
         Task<int> GetEmailsSentTodayCount();

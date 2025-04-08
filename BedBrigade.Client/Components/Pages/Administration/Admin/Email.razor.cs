@@ -17,7 +17,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         [Inject] private ILocationDataService _svcLocationDataService { get; set; }
         [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
         [Inject] private IEmailQueueDataService _svcEmailQueueDataService { get; set; }
-        
+        [Inject] private INewsletterDataService _svcNewsletterDataService { get; set; }
+
         public BulkEmailModel Model { get; set; } = new();
         private bool isSuccess;
         private bool isFailure;
@@ -46,6 +47,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             Model.CurrentEmailRecipientOption = EmailRecipientOption.Myself;
             Model.ShowLocationDropdown = false;
             Model.ShowEventDropdown = false;
+            Model.ShowNewsletterDropdown = false;
             await BuildPlan();
         }
 
@@ -57,7 +59,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
 
         private async Task HandleValidSubmit()
         {
-            var emails = await _svcEmailQueueDataService.GetEmailsToSend(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId);
+            EmailsToSendParms parms = new()
+            {
+                LocationId = Model.CurrentLocationId,
+                Option = Model.CurrentEmailRecipientOption,
+                ScheduleId = Model.CurrentScheduleId,
+                NewsletterId = Model.CurrentNewsletterId
+            };
+            var emails = await _svcEmailQueueDataService.GetEmailsToSend(parms);
             var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
             if (result.Success)
             {
@@ -73,18 +82,34 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         {
             Model.CurrentLocationId = args.Value;
             Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(Model.CurrentLocationId)).Data;
+            Model.Newsletters = (await _svcNewsletterDataService.GetAllForLocationAsync(Model.CurrentLocationId)).Data;
             Model.CurrentScheduleId = 0;
+            Model.CurrentNewsletterId = 0;
             await BuildPlan();
             StateHasChanged();
         }
 
         private async Task BuildPlan()
         {
-            message = (await _svcEmailQueueDataService.GetSendPlanMessage(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId)).Data;
+            EmailsToSendParms parms = new()
+            {
+                LocationId = Model.CurrentLocationId,
+                Option = Model.CurrentEmailRecipientOption,
+                ScheduleId = Model.CurrentScheduleId,
+                NewsletterId = Model.CurrentNewsletterId
+            };
+            message = (await _svcEmailQueueDataService.GetSendPlanMessage(parms)).Data;
             showPlan = true;
         }
 
         private async void ScheduleChangeEvent(ChangeEventArgs<int, Common.Models.Schedule> args)
+        {
+            Model.CurrentNewsletterId = args.Value;
+            await BuildPlan();
+            StateHasChanged();
+        }
+
+        private async void NewsletterChangeEvent(ChangeEventArgs<int, Common.Models.Newsletter> args)
         {
             Model.CurrentScheduleId = args.Value;
             await BuildPlan();
@@ -97,6 +122,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             Model.ShowEventDropdown = Model.CurrentEmailRecipientOption.ToString().Contains("Event");
             Model.ShowLocationDropdown = isNationalAdmin && (Model.CurrentEmailRecipientOption.ToString().Contains("Location")
                 || Model.CurrentEmailRecipientOption.ToString().Contains("Event"));
+            Model.ShowNewsletterDropdown = Model.CurrentEmailRecipientOption.ToString().Contains("Newsletter");
             await BuildPlan();
             StateHasChanged();
         }
