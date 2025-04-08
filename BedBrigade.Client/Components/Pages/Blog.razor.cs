@@ -1,44 +1,24 @@
 ﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Services;
-using BedBrigade.Common.Logic;
-using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Enums;
-using BedBrigade.Common.EnumModels;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using KellermanSoftware.NetEmailValidation;
-using System.Data;
-using BedBrigade.Data;
-using System.Data.Entity.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.IO.Compression;
-using System.Data.SqlClient;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
-using System.Collections.Generic;
-using Microsoft.JSInterop.Infrastructure;
-using BedBrigade.Common.Constants;
-using Syncfusion.Blazor.Inputs;
-using System.Linq;
-using static BedBrigade.Common.Logic.BlogTest;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
+using System.Data;
+using System.Diagnostics;
 using static BedBrigade.Common.Logic.BlogHelper;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Routing;
 
 
 namespace BedBrigade.Client.Components.Pages
 {
-    public partial class Blog: ComponentBase
+    public partial class Blog : ComponentBase
     {
         // BedBrigade Services
-       
+
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
-        [Inject] private IContentDataService? _svcContent { get; set; }      
+        [Inject] private IContentDataService? _svcContent { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
         [Inject] private ILocationState? _locationState { get; set; }
         [Inject] private ITranslationDataService? _translateLogic { get; set; }
@@ -50,10 +30,10 @@ namespace BedBrigade.Client.Components.Pages
         // Page Parameters (by URL)
 
         [Parameter]
-        public string? LocationRoute { get; set; }      
+        public string? LocationRoute { get; set; }
 
         [Parameter]
-        public string? ContentType { get; set; } 
+        public string? ContentType { get; set; }
 
         // Parameters for Banner Rotator
 
@@ -67,27 +47,27 @@ namespace BedBrigade.Client.Components.Pages
         private string ChildKey = Guid.NewGuid().ToString();
         private List<BlogData> _cards = new();
         protected Location? myLocation { get; set; }
-        private bool IsCardPaging = true;       
+        private bool IsCardPaging = true;
         private int NumberOfColumns = 4;
         private int NumberOfRows = 4;
         private int MaxTextSize = 150;
         private MarkupString ErrorMessage;
         private MarkupString NoDataMessage;
-        
+
         public string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-               
+
         public string? LocationName { get; set; }
-        protected List<Location>? lstLocations { get; set; }               
+        protected List<Location>? lstLocations { get; set; }
         protected List<Content>? lstContents { get; set; }
 
 
-        private BlogConfiguration? blogConfig { get; set; } 
+        private BlogConfiguration? blogConfig { get; set; }
 
 
         private bool IsShowBlogs = true;
         public bool IsShowBanner = false;
         public bool IsBlogData = false;
-        private bool IsTestMode = false; 
+        private bool IsTestMode = false;
         private bool IsCardSettings = false;
 
 
@@ -101,19 +81,19 @@ namespace BedBrigade.Client.Components.Pages
         private int BlogContentCount = 0;
         private int UnzippedImagesCount = 0;
 
-       private string? connectionString { get; set; }
+        private string? connectionString { get; set; }
         private string? webRootPath { get; set; }
 
         private string TestBarClass = "row bg-danger";
 
-        private string ResetAction = "load"; 
-       
+        private string ResetAction = "load";
+
         private bool SpinnerVisible { get; set; } = false;
 
         private string? BlogModuleOptions { get; set; }
         private string? BlogModuleImagesExt { get; set; }
 
-                
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -126,7 +106,7 @@ namespace BedBrigade.Client.Components.Pages
             {
                 // await CheckTestData();
                 // Run the validation and get the result
-                HandleTestMode();             
+                //HandleTestMode();
 
             } // Test Mode only     
 
@@ -188,14 +168,14 @@ namespace BedBrigade.Client.Components.Pages
         protected override async Task OnParametersSetAsync()
         {
             SetValidContentType();
-            await CheckParameters();                       
-            ChildKey = Guid.NewGuid().ToString();                                                                                      
+            await CheckParameters();
+            ChildKey = Guid.NewGuid().ToString();
             StateHasChanged();
         } // Parameters SET
-            
+
         private async Task CheckParameters()
         {
-         
+
 
             var bLocationStatus = false;
             var bBlogTypeStatus = false;
@@ -217,7 +197,7 @@ namespace BedBrigade.Client.Components.Pages
                 // check path & images existing
                 var LocationBlogFolder = $"{LocationRoute}/pages/{ContentType}";
                 var BlogFolderPath = FileUtil.GetMediaDirectory(LocationBlogFolder);
-                              
+
             }
             else
             {
@@ -226,7 +206,7 @@ namespace BedBrigade.Client.Components.Pages
                 return;
             }
 
-            if(bLocationStatus && bBlogTypeStatus) // Show Banner only for correct location & type, if allowed
+            if (bLocationStatus && bBlogTypeStatus) // Show Banner only for correct location & type, if allowed
             {
                 RotatorTitle = $"{LocationName} {ContentType}";
                 IsShowBanner = blogConfig.ShowBanner;
@@ -247,31 +227,33 @@ namespace BedBrigade.Client.Components.Pages
         {
             await LoadLocation(); //all Locations or Location by Route
             await LoadContent(); // all Contents for Blogs                                                      
-                           
+
         } // Load Source Data
 
-       
+
         private async Task LoadLocation()
         {
-                      // Get Location by Route
-            
-                var currentLocationResult = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
-                if (currentLocationResult != null && currentLocationResult.Success)
-                { // single Location Only
-                    myLocation = currentLocationResult.Data;
-                    LocationId = myLocation.LocationId;
-                    LocationName = myLocation.Name;
-                    _locationState.Location = LocationRoute;                   
+            // Get Location by Route
+
+            var currentLocationResult = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
+            if (currentLocationResult != null && currentLocationResult.Success)
+            { // single Location Only
+                myLocation = currentLocationResult.Data;
+                LocationId = myLocation.LocationId;
+                LocationName = myLocation.Name;
+                _locationState.Location = LocationRoute;
             }
-                else {
-                    LocationId = 0; // unknown Location
-                    IsShowBanner = false; // no banner
-                    ErrorMessage = BootstrapHelper.GetBootstrapMessage("warning", $"Cannot load location data. Please contact system administrator.");
-                }           
-            
+            else
+            {
+                LocationId = 0; // unknown Location
+                IsShowBanner = false; // no banner
+                ErrorMessage = BootstrapHelper.GetBootstrapMessage("warning", $"Cannot load location data. Please contact system administrator.");
+            }
+
         } // Load Location
 
-        private async Task LoadContent()        {          
+        private async Task LoadContent()
+        {
 
             var contentResult = await _svcContent.GetAllAsync();
             if (contentResult != null && contentResult.Success)
@@ -293,8 +275,8 @@ namespace BedBrigade.Client.Components.Pages
 
                     }
                 }
-            }                      
-      
+            }
+
         } // Load Content
 
 
@@ -331,7 +313,7 @@ namespace BedBrigade.Client.Components.Pages
                 // Proceed with resetting the test data
                 HandleTestMode();  // Call the method that resets the data                
                 await ReloadPage();
-            }           
+            }
 
         }// Reset Test Data
 
@@ -352,8 +334,8 @@ namespace BedBrigade.Client.Components.Pages
         private async Task ReloadPage()
         {
             //_navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
-             //await JS.InvokeVoidAsync("reloadPage");
-             await JS.InvokeVoidAsync("eval", "window.location.href = window.location.href");
+            //await JS.InvokeVoidAsync("reloadPage");
+            await JS.InvokeVoidAsync("eval", "window.location.href = window.location.href");
         }// Reload Page                                 
 
         // TEST DATA AREA - END  ==============================================================================

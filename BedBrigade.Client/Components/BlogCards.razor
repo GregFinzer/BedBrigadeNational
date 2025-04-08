@@ -7,7 +7,8 @@
     {
         <!-- Show single card details -->
         <div class="details-view">
-            <BlogView CurrentBlog="ActiveCard"
+            <BlogView @key="ActiveCard"
+            CurrentBlog="ActiveCard"
             OnClose="CloseDetail"
             OnNavigate="NavigateDetail"                     
             ParentFrame="Card"                     
@@ -50,7 +51,9 @@
                     {
                         CurrentCard = card;
                         i++;
-                        var contentText = card.ContentHtml?.Length <= MaxContentSize ? card.ContentHtml : card.ContentHtml?.Substring(0, MaxContentSize) + "...";
+
+                        var TruncatedText = BlogHelper.TruncateHtmlText(card.ContentHtml, MaxContentSize);                       
+                                          
                         var contentCreateMonth = _translateLogic.GetTranslation(card.CreatedDateMonth);
                         var contentUpdatedMonth = _translateLogic.GetTranslation(card.UpdatedDateMonth);
 
@@ -73,7 +76,7 @@
                                                                     </i>
                                                                 </h6>
                                                                 <h4 class="card-title clickable" >@card.Title</h4>
-                                                                <p class="card-text">@((MarkupString)contentText)</p>                                                                  
+                                                                <p class="card-text">@((MarkupString)TruncatedText)</p>                                                                  
                                                             </div>
                                    
                                                     </div>
@@ -101,7 +104,7 @@
                                                            </i>
                                                         </h6>
                                                         <h4 class="card-title clickable" >@card.Title</h4>
-                                                        <p class="card-text">@((MarkupString)contentText)</p>                                                               
+                                                        <p class="card-text">@((MarkupString)TruncatedText)</p>                                                               
                                                     </div>     
                                          </div>
                                         </div>

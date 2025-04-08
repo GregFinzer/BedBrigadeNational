@@ -1,32 +1,25 @@
-﻿using Microsoft.AspNetCore.Components;
-using BedBrigade.Common.Models;
-using System.Diagnostics;
+﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using Microsoft.AspNetCore.Components.Forms;
-using Syncfusion.Blazor.RichTextEditor;
-using Microsoft.JSInterop;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
-using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Hosting;
-using Syncfusion.Blazor.Inputs;
-using static BedBrigade.Common.Logic.BlogHelper;
-using BedBrigade.Common.Enums;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using Syncfusion.Blazor.DataVizCommon;
-using System.Collections.Generic;
 using BedBrigade.SpeakIt;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Syncfusion.Blazor.Inputs;
+using Syncfusion.Blazor.RichTextEditor;
+using System.Diagnostics;
 
 namespace BedBrigade.Client.Components
 {
-    public partial class BlogEdit: ComponentBase
+    public partial class BlogEdit : ComponentBase
     {
         [Inject] private IContentDataService? _svcContent { get; set; }
         [Inject] IWebHostEnvironment? WebhostEnvironment { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private ILanguageContainerService? _lc { get; set; }
         [Inject] private ITranslateLogic? _translateLogic { get; set; }
-             
-        
+        [Inject] private ILanguageService? _svcLanguage { get; set; }
+
         [Parameter]
         public BlogData? BlogItem { get; set; }
 
@@ -36,13 +29,17 @@ namespace BedBrigade.Client.Components
         [Parameter]
         public EventCallback OnCancel { get; set; }
 
+        private SfRichTextEditor? RteObj { get; set; }
         public BlogData BlogEditItem = new BlogData();
         private const string PageEditMode = "Edit";
         public string PageMode = PageEditMode; // Another mode : view
         public string PageTitle = String.Empty;
+        private string? saveUrl { get; set; }
+        public string? imagePath { get; private set; }
         private string LastSubmitResult = string.Empty;
 
-    private List<ToolbarItemModel> EditorToolBar = new List<ToolbarItemModel>()
+
+        private List<ToolbarItemModel> EditorToolBar = new List<ToolbarItemModel>()
     {
         new ToolbarItemModel() { Command = ToolbarCommand.Bold },
         new ToolbarItemModel() { Command = ToolbarCommand.Italic },
@@ -59,10 +56,12 @@ namespace BedBrigade.Client.Components
         new ToolbarItemModel() { Command = ToolbarCommand.Indent },
         new ToolbarItemModel() { Command = ToolbarCommand.Separator },
         new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
+        new ToolbarItemModel() { Command = ToolbarCommand.Image },
+        new ToolbarItemModel() { Command = ToolbarCommand.SourceCode },
         new ToolbarItemModel() { Command = ToolbarCommand.Undo },
         new ToolbarItemModel() { Command = ToolbarCommand.Redo }
         };
-       
+
         private string statusMessage = string.Empty;
 
         // IMAGES VARIABLES
@@ -74,82 +73,85 @@ namespace BedBrigade.Client.Components
         private bool IsBlogPreviewMode = false;
         bool isMainImageInDeleteList = false;
         private string? selectedImageUrl { set; get; } = string.Empty;
-        public string? SelectedMainImage { set; get; }
+
         private double BlogModuleFileSize = 0;
         private string? BlogModuleImagesExt { get; set; }
         private string BlogFolderServerPath = string.Empty;
         private string BlogFolderRootPath = string.Empty;
-
+        private List<string> AllowedTypes { get; set; } = new List<string>();
 
         protected override async Task OnInitializedAsync()
         {
-           
+
             await LoadConfiguration();
-           
+
         }//OnInit
-              
+
 
         private async Task LoadConfiguration()
         {
             var MaxFileSize = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MaxFileSize");
             BlogModuleFileSize = Convert.ToDouble(MaxFileSize);
             BlogModuleImagesExt = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "BlogModuleImages");
+            //AllowedTypes = BlogModuleImagesExt.Split(',').ToList();
+            AllowedTypes = BlogModuleImagesExt.Split(',').Select(ext => ext.Trim()).ToList();
 
         }//LoadConfiguration
 
 
-        protected override void OnParametersSet()
+        protected override async void OnParametersSet()
         {
             // Create a copy to avoid direct changes on the original object
             if (BlogItem != null)
-            {               
+            {
                 BlogEditItem = BlogHelper.CloneBlog(BlogItem);
             }
 
             string ObjectName = BlogEditItem.ContentType.ToString().Replace("ies", "y");
-            PageTitle = ObjectName + " "  + $"{BlogEditItem.LocationName}";
 
-            // Temp holder for some translation items
-            var strImage1 = @_lc.Keys["Image"];
-            var strNews1 = @_lc.Keys["News"];
-            var strStory1 = @_lc.Keys["Story"];
-            var strStories1 = @_lc.Keys["Stories"];
-
-            if (BlogEditItem.ContentId > 0)
+            switch (ObjectName)
             {
-                PageTitle = @_lc.Keys["Edit"] + " " + PageTitle + $" #{BlogEditItem.ContentId}";
+                case "News":
+                    ObjectName = _lc.Keys["News"];
+                    break;
+                case "Story":
+                    ObjectName = _lc.Keys["Story"];
+                    break;
+                case "Stories": // placeholder
+                    ObjectName = _lc.Keys["Stories"];
+                    break;
+            }
+
+            string? currentLocation = BlogEditItem.LocationName;
+
+            currentLocation = _translateLogic.GetTranslation(currentLocation);
+
+            PageTitle = ObjectName + " " + _lc.Keys["For"] + " " + $"{currentLocation}";
+
+            BlogFolderRootPath = BlogHelper.NormalizePath(BlogEditItem.BlogFolder, false);
+
+            BlogFolderServerPath = Path.Combine(WebRootPath, BlogFolderRootPath);
+
+            imagePath = BlogHelper.NormalizePath(BlogEditItem.BlogFolder) + "/";
+
+            var imagePathApi = imagePath.Replace("media/", "");
+
+            saveUrl = $"api/image/saveblog/{imagePathApi}";
+
+
+            if (BlogEditItem.ContentId > 0 && !BlogEditItem.IsNewItem)
+            {
+                PageTitle = @_lc.Keys["Edit"] + " " + PageTitle + $" #{BlogEditItem.ContentId}";    
             }
             else
             {
-                PageTitle = @_lc.Keys["Add"] + " " + PageTitle; ;                
-            }
-
-            BlogFolderRootPath = BlogHelper.NormalizePath(BlogEditItem.BlogFolder, false);
-            BlogFolderServerPath  = Path.Combine(WebRootPath,BlogFolderRootPath);
-            // Audit Image Files
-            BlogEditItem.OptImagesUrl = BlogHelper.AuditBlogFiles(BlogFolderServerPath, BlogEditItem.BlogFolder);
-
-            if(BlogEditItem.MainImageUrl!=null && BlogEditItem.MainImageUrl.Length > 0)
-            {
-                SelectedMainImage = BlogEditItem.MainImageUrl;
+                PageTitle = @_lc.Keys["Add"] + " " + PageTitle; ;
             }
 
 
         }
 
-        private void CheckMainImageToDelete()
-        {
-            isMainImageInDeleteList = false;
 
-            if (BlogEditItem.FileDelete != null && BlogEditItem.FileDelete.Count > 0)
-            {
-                string selectedMainImageFileName = Path.GetFileName(SelectedMainImage);
-                // Check if the main image name exists in the FileDelete list
-                isMainImageInDeleteList = BlogEditItem.FileDelete
-                .Any(url => Path.GetFileName(url).Equals(selectedMainImageFileName, StringComparison.OrdinalIgnoreCase));
-            } // check main image in delete list
-
-        }
 
         private async Task SaveChanges()
         {
@@ -157,51 +159,56 @@ namespace BedBrigade.Client.Components
             if (BlogEditItem != null)
             {
                 Debug.WriteLine($"Request to save blog item: {BlogEditItem.ContentId} - {BlogEditItem.Title}");
-                if (SelectedMainImage != null && SelectedMainImage.Length>0) // Update Main Image
-                {                                  
-                    
-                    if (isMainImageInDeleteList) // main image file should be delete
+
+
+                if (BlogEditItem.IsNewItem)
+                {
+                    // create new & after immediate Update
+                    string oldBlogFolder = $"BlogItemNew_{BlogEditItem.ContentId}";
+                    BlogEditItem.ContentId = 0;
+
+                    var addResult = await _svcContent.CreateAsync(BlogEditItem);
+                    if (addResult.Success && addResult != null)
                     {
-                        // The main image is in the delete list, handle it accordingly
-                        //Debug.WriteLine("The selected main image is marked for deletion!");
-                        BlogEditItem.MainImageUrl = String.Empty;
-                        BlogEditItem.Name = "NA";
+                        BlogEditItem.ContentId = addResult.Data.ContentId;
+                        BlogEditItem.IsNewItem = false;
+                        string newBlogFolder = $"BlogItem_{BlogEditItem.ContentId}";
+                        // replace Folder Name
+                        string newFolderPath = BlogFolderServerPath.Replace(oldBlogFolder, newBlogFolder);
+                        if (Directory.Exists(BlogFolderServerPath) && !Directory.Exists(newFolderPath))
+                        {
+                            Directory.Move(BlogFolderServerPath, newFolderPath);
+                        }
+                        // update Path in BlogEditItem
+                        BlogEditItem.BlogFolder = BlogEditItem.BlogFolder.Replace(oldBlogFolder, newBlogFolder);
+                        // update src in HTML
+                        if (BlogEditItem.ContentHtml != null)
+                        {
+                            BlogEditItem.ContentHtml = BlogEditItem.ContentHtml.Replace(oldBlogFolder, newBlogFolder);
+                        }
+                    }
+                } // create new
+
+                if (BlogEditItem.ContentId > 0)
+                {
+                    var updateResult = await _svcContent.UpdateAsync(BlogEditItem);
+                    if (updateResult.Success)
+                    {
+                        Debug.WriteLine($"Blog saved: {BlogEditItem.ContentId} - {BlogEditItem.Title}");
+                        // Rename Folder temporary foldfer for new item
+                        StateHasChanged();
+                        await OnSave.InvokeAsync(BlogEditItem);
                     }
                     else
                     {
-                        BlogEditItem.MainImageUrl = BlogHelper.NormalizePath(SelectedMainImage);
-                        BlogEditItem.Name = Path.GetFileName(SelectedMainImage);
+                        Debug.WriteLine($"Blog update failed: {BlogEditItem.ContentId} - {BlogEditItem.Title}");
                     }
-                }
 
-                // Delete Files
-                if(BlogEditItem.FileDelete != null && BlogEditItem.FileDelete.Count > 0)
-                {
-                    BlogHelper.DeleteBlogFiles(WebRootPath, BlogEditItem.FileDelete);
-                    // Audit Image Files
-                    BlogEditItem.OptImagesUrl = BlogHelper.AuditBlogFiles(BlogFolderServerPath, BlogEditItem.BlogFolder);
-                    if (isMainImageInDeleteList && BlogEditItem.OptImagesUrl.Any())
-                    {
-                        string newMainImage = BlogEditItem.OptImagesUrl.First();
-                        BlogEditItem.MainImageUrl = newMainImage;
-                        BlogEditItem.Name = Path.GetFileName(newMainImage);
-                    }
-                }
+                } // update
 
-                BlogEditItem.FileDelete.Clear();
-                BlogEditItem.FileUploaded.Clear();
 
-                var updateResult = await _svcContent.UpdateAsync(BlogEditItem);
-                if (updateResult.Success)
-                {
-                    Debug.WriteLine($"Blog saved: {BlogEditItem.ContentId} - {BlogEditItem.Title}");
-                    StateHasChanged();
-                    await OnSave.InvokeAsync(BlogEditItem);
-                }
-                else
-                {
-                    Debug.WriteLine($"Blog save failed: {BlogEditItem.ContentId} - {BlogEditItem.Title}");
-                }                 
+
+
 
             } // save edited data            
         }
@@ -212,7 +219,15 @@ namespace BedBrigade.Client.Components
             if (BlogEditItem.FileUploaded != null && BlogEditItem.FileUploaded.Count > 0)
             {
                 BlogHelper.DeleteBlogFiles(WebRootPath, BlogEditItem.FileUploaded);
-                BlogEditItem.FileUploaded = [];
+                BlogEditItem.FileUploaded.Clear();
+            }
+
+            if (BlogEditItem.IsNewItem)
+            {
+                if (Directory.Exists(BlogFolderServerPath))
+                {
+                    Directory.Delete(BlogFolderServerPath, true);
+                }
             }
 
             await OnCancel.InvokeAsync();
@@ -242,96 +257,115 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        [JSInvokable]
-        public async Task OnBrowserClose()
-        {
-            // Handle browser close event (e.g., save to draft, rollback, etc.)
-            statusMessage = "Edit canceled: Browser closed!";
-            await HandleEditCancellation("Browser Closed");
-        }
-
-
-        [JSInvokable]
-        public async Task OnNavigationBack()
-        {
-            // Handle navigation back event
-            statusMessage = "Edit canceled: Back button used!";
-            await HandleEditCancellation("Back Button Used");
-        }
-
-        public async Task HandleEditCancellation(string reason)
-        {
-            // Your logic to handle unsaved changes
-            Debug.WriteLine($"Edit canceled due to: {reason}");
-            // Example: Save changes or rollback
-            await Task.Delay(200); // Simulate async operation
-        }
-
-      
 
         // IMAGES PROCESSING
+        private void OnImageDelete(AfterImageDeleteEventArgs args)
 
-        private void SelectMainImage(string? fileName)
         {
-            SelectedMainImage = fileName; // Update selected image
-            BlogEditItem.MainImageUrl = BlogHelper.NormalizePath(SelectedMainImage);
-            BlogEditItem.Name = Path.GetFileName(SelectedMainImage);
-            CheckMainImageToDelete();
-            Debug.WriteLine($"Select Image as New Main {SelectedMainImage}");      
+            var delFile = args.Src;
+            if (delFile != null)
+            {
+                var imageFilePath = Path.Combine(WebhostEnvironment.WebRootPath, delFile);
+                Debug.WriteLine("Delete File Full Name: " + imageFilePath);
+                FileDelete(imageFilePath);
+            }
+
+        }//OnImageDelete
+
+        private void FileDelete(string? FilePath)
+        {
+            if (string.IsNullOrEmpty(FilePath))
+            {
+                return;
+            }
+
+            if (File.Exists(FilePath))
+            {
+                File.Delete(FilePath);
+            }
+        }//FileDelete
+
+
+        public void OnImageUploadFailedHandler(ImageFailedEventArgs args)
+        {
+            // Debug.WriteLine($"Image upload Failed: {args.File.Name}");
+            // Debug.WriteLine(args.StatusText);
+
+        }
+
+        public void ValueChangeHandler(Syncfusion.Blazor.RichTextEditor.ChangeEventArgs args)
+        {
+
+            if (!string.IsNullOrEmpty(args.Value))
+            {
+                Debug.WriteLine("ValueChange triggered. Updating HTML...");
+
+                // Ensure images are responsive
+                var modifiedHtml = MakeImagesResponsive(args.Value);
+
+                // Update the content only if modifications were made
+                if (modifiedHtml != args.Value)
+                {
+                    Debug.WriteLine("Modified HTML applied.");
+                    BlogEditItem.ContentHtml = modifiedHtml;
+                }
+            }
+
+        } // RTE Value Changed
+
+
+        public void OnImageUploadSuccessHandler(ImageSuccessEventArgs args)
+        {
+            // Reserved
+        }//OnImageUploadSuccess    
+
+        // Ensures responsive images in the content
+        private string MakeImagesResponsive(string contentHtml)
+        {
+            contentHtml = contentHtml.Replace("height=\"auto\"", "");
+            contentHtml = System.Text.RegularExpressions.Regex.Replace(
+                contentHtml,
+                @"max-width:\s*\d+px",
+                "max-width: 100%"
+            );
+
+            // Ensures height:auto is in the style attribute
+            contentHtml = System.Text.RegularExpressions.Regex.Replace(
+                contentHtml,
+                @"(<img\b[^>]*\bstyle=[""'])([^""']*)[""']",
+                "$1$2; height: auto\""
+            );
+
+            return contentHtml;
         }
 
         private void ShowImagePreview(string imageUrl)
         {
-            PageMode = "Image";            
+            PageMode = "Image";
             selectedImageUrl = imageUrl;
         }
         private void ClosePreview()
         {
-            PageMode = PageEditMode;            
+            PageMode = PageEditMode;
         }
 
-        private void ToggleImageDeletion(Microsoft.AspNetCore.Components.ChangeEventArgs e, string imageUrl)
-        {
-            if ((bool)e.Value) // image selected for deletion
-            {
-                BlogEditItem.FileDelete.Add(imageUrl);                
-            }
-            else
-            {
-                BlogEditItem.FileDelete.Remove(imageUrl);
-            }
-
-            CheckMainImageToDelete();
-
-        }//ToggleImageDeletion
-        public bool GetImageDelStatus(string imageUrl)
-        {
-            if (BlogEditItem.FileDelete.Count > 0)
-            {
-                // Compare file name and check if it's in the deletion list
-                string fileName = Path.GetFileName(imageUrl);
-                return BlogEditItem.FileDelete.Any(file => Path.GetFileName(file) == fileName) ? true : false;
-            }
-            else
-            {
-                return false;
-            }
-        }//GetImageDelStatus
-
-        private async Task OnUploadChange(UploadChangeEventArgs args)
+        private async Task OnUploadMainImage(UploadChangeEventArgs args)
         {
 
             var SavePath = BlogFolderServerPath;
+            // Check File Folder
+            if (!string.IsNullOrEmpty(SavePath))
+            {
+                if (!Directory.Exists(SavePath))
+                {
+                    Directory.CreateDirectory(SavePath);
+                }
+            }
+
             var FileBaseUrl = BlogHelper.NormalizePath(BlogEditItem.BlogFolder); // not full path - only URL
-            
+
             // Define the maximum file size allowed (2 GB)
             long maxFileSize = (long)BlogModuleFileSize;
-
-
-            if (BlogEditItem.OptImagesUrl == null)
-            {
-                BlogEditItem.OptImagesUrl = new List<string>();
-            }
 
 
             if (args.Files != null && args.Files.Count > 0)
@@ -340,7 +374,7 @@ namespace BedBrigade.Client.Components
                 {
                     string NormilizedFileName = BlogHelper.SanitizeFileName(file.FileInfo.Name);
                     string newFileName = Path.Combine(SavePath, NormilizedFileName);
-                    Debug.WriteLine($"Uploaded file: {newFileName}");
+                    Debug.WriteLine($"Uploaded Main Image file: {newFileName}");
 
                     try
                     {
@@ -351,56 +385,24 @@ namespace BedBrigade.Client.Components
                         fileStream.Close();
 
                         // Normalize path
-                        string relativePath = FileBaseUrl += "/" + NormilizedFileName;
-                        Debug.WriteLine($"Relative file: {relativePath}");
+                        string relativePath = FileBaseUrl + "/" + NormilizedFileName;
+                        Debug.WriteLine($"Relative Path to Main Image file: {relativePath}");
+                        BlogEditItem.MainImageUrl = relativePath;
+                        BlogEditItem.Name = NormilizedFileName;
 
-                        // Store temporarily only new files
-                        if (!BlogEditItem.FileUploaded.Contains(relativePath) && !BlogEditItem.OptImagesUrl.Contains(relativePath))
-                        {
-                            BlogEditItem.FileUploaded.Add(relativePath); // current User session new uploaded files (without overriden)
-                        }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error saving file {file.FileInfo.Name}: {ex.Message}");
+                        Debug.WriteLine($"Error saving Main Image file {file.FileInfo.Name}: {ex.Message}");
                     }
                 }// File Loop
             }
 
-            UpdateBlogFiles();
-                        
+
+
         } // File Uploads
 
-        private void UpdateBlogFiles()
-        {
-            var intAddCount = 0;
-            // Update the Blog Item File list only once after all files are processed
-            if (BlogEditItem.FileUploaded.Count > 0)
-            {
 
-                foreach (var newFile in BlogEditItem.FileUploaded)
-                {
-                    Debug.WriteLine($"The added uploaded file: {newFile}");
-                    if (!BlogEditItem.OptImagesUrl.Contains(newFile))
-                    {
-                        intAddCount++;
-                        BlogEditItem.OptImagesUrl.Add(newFile);
-                    }
-                }
-
-                Debug.WriteLine("Final Image List:");
-                foreach (var img in BlogEditItem.OptImagesUrl)
-                {
-                    Debug.WriteLine(img);
-                }
-
-                if (intAddCount > 0) // new files were added to Blog Item file list
-                {
-                    StateHasChanged(); // Refresh UI
-                }
-
-            }
-        } //  UpdateBlogFiles()
 
     } // BlogEdit Class
 

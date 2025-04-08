@@ -1,54 +1,24 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
-using Microsoft.AspNetCore.Components;
-using BedBrigade.Common.Enums;
-using BedBrigade.Common.EnumModels;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using KellermanSoftware.NetEmailValidation;
-using System.Data;
-using BedBrigade.Data;
-using System.Data.Entity.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.IO.Compression;
-using System.Data.SqlClient;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
-using System.Collections.Generic;
-using Microsoft.JSInterop.Infrastructure;
-using BedBrigade.Common.Constants;
-using Syncfusion.Blazor.Inputs;
-using System.Linq;
-using Microsoft.JSInterop;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
-using static BedBrigade.Common.Logic.BlogHelper;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Routing;
-using Syncfusion.Blazor.Grids;
-using System.Text.RegularExpressions;
-using System.ComponentModel;
-using Syncfusion.Blazor.RichTextEditor;
-using Microsoft.AspNetCore.Components.Forms;
-using Bogus.DataSets;
-using Syncfusion.Blazor.DropDowns;
-using Microsoft.Identity.Client;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Syncfusion.Blazor.Notifications;
-using Syncfusion.Blazor.InPlaceEditor.Internal;
-using static System.Net.WebRequestMethods;
-using System;
-using System.Collections;
-using System.Security.Claims;
+using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Notifications;
+using System.Data;
+using System.Diagnostics;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+
 
 
 
 namespace BedBrigade.Client.Components
 {
-    public partial class BlogGrid: ComponentBase
+    public partial class BlogGrid : ComponentBase
     {
 
         [Inject] private IContentDataService? _svcContent { get; set; }
@@ -74,44 +44,55 @@ namespace BedBrigade.Client.Components
         // Filtered list for Grid
         private List<BlogData> FilteredBlogList = new List<BlogData>();
         public List<Location>? Locations { get; private set; }
-                       
+
         private SfGrid<BlogData>? MyGrid;
-      
+
         private BlogData? CurrentBlog;
-               
+
         private string MainImageUrl { set; get; } = string.Empty;
         private int MaxContentSize = 150;
-       
-        private string? ModalImageUrl;     
+
+        private string? ModalImageUrl;
         private bool ShowEditModal = false;
         private bool ShowModal = false;
         private bool IsConfirmationModal = false;
-                                   
+
 
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
-               
-        private int SelectedLocationId = 1;
-        
-        private string WebRootPath => WebhostEnvironment.WebRootPath;
-        private Location userLocation { set; get; } = new Location();
 
-        private bool isNational = false;   
+        private int SelectedLocationId = 1;
+
+        private string WebRootPath => WebhostEnvironment.WebRootPath;
+        private Location userLocation { set; get; } = new Location();       
+        private bool isNational = false;
         public string PageMode = "Grid"; // other values: View, Edit
 
         private bool isEditing = true;
+        private bool isAddInProgress = false;
+        private string NewBlogTempPath = string.Empty;
+        private int tempContentId = 0;
 
         protected override async Task OnInitializedAsync()
         {
             CurrentContentType = (BedBrigade.Common.Enums.ContentType)Enum.Parse(typeof(BedBrigade.Common.Enums.ContentType), ContentTypeName);
 
             await LoadUserData();
-            await LoadGridData();           
+            await LoadGridData();
             ApplyFilter();
 
         }//OnInit
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // Register the JS event on initial render
+                await JSRuntime.InvokeVoidAsync("addBeforeUnloadHandler", DotNetObjectReference.Create(this));
+            }
+        }
 
         private async Task LoadUserData()
         {
@@ -122,6 +103,8 @@ namespace BedBrigade.Client.Components
             }
 
             Identity = _svcAuth.CurrentUser;
+
+
             if (Identity.IsInRole(RoleNames.NationalAdmin))
             {
                 isNational = true;
@@ -130,38 +113,38 @@ namespace BedBrigade.Client.Components
             else
             {
                 SelectedLocationId = await _svcUser.GetUserLocationId();
-
-                var userLocationResult = await _svcLocation.GetByIdAsync(SelectedLocationId);
-                if (userLocationResult.Success && userLocationResult.Data != null)
-                {
-                    userLocation = userLocationResult.Data;
-                    Debug.WriteLine($"User Location Name: {userLocation.Name}");
-
-                }
             }
+
+            var userLocationResult = await _svcLocation.GetByIdAsync(SelectedLocationId);
+            if (userLocationResult.Success && userLocationResult.Data != null)
+            {
+                userLocation = userLocationResult.Data;
+                Debug.WriteLine($"User Location Name: {userLocation.Name}");
+            }
+
         }// Load User Data
 
-     
+
 
         private async Task LoadGridData()
-        {         
-                            
+        {
+
 
             var contentResult = await _svcContent.GetAllAsync();
             if (contentResult != null && contentResult.Success)
             {
                 lstContent = contentResult.Data.ToList();
-                if (lstContent != null && lstContent.Count > 0)               
+                if (lstContent != null && lstContent.Count > 0)
                 {
                     lstContent = lstContent.Where(c => c.ContentType.ToString() == ContentTypeName).OrderByDescending(c => c.UpdateDate).ToList();
-                    lstBlogData = BlogHelper.GetBlogDataList(lstContent, Locations);                                 
+                    lstBlogData = BlogHelper.GetBlogDataList(lstContent, Locations);
                 }
                 else
                 {
                     lstBlogData = new List<BlogData>();
                 }
-                
-            }         
+
+            }
 
         } // Load Content             
 
@@ -184,6 +167,7 @@ namespace BedBrigade.Client.Components
 
         public void ActionBeginHandler(ActionEventArgs<BlogData> args)
         {
+            isAddInProgress = false;
             Debug.WriteLine($"Action begin: {args.RequestType}");
 
             var ModifiedBlogItem = args.Data; // Store the item to delete or save
@@ -191,22 +175,28 @@ namespace BedBrigade.Client.Components
             switch (args.RequestType)
             {
                 case Syncfusion.Blazor.Grids.Action.Add: // Add new blog item
-
                     // cancel default editing
                     args.Cancel = true;
-                    Debug.WriteLine("Add New Blog Item");
-                    
+
+                    Debug.WriteLine($"Add blog for location: {userLocation.LocationId} - {userLocation.Name}");
+
+
+                    tempContentId = BlogHelper.GenerateTempContentId();
+                    Debug.WriteLine("Add New Blog Item ");
+                    isAddInProgress = true;
                     CurrentBlog = new BlogData();
-                    CurrentBlog.ContentId = 0;
+                    CurrentBlog.IsNewItem = true;
+                    CurrentBlog.ContentId = tempContentId; // should be replaced after save to real new ContentId
                     CurrentBlog.LocationId = userLocation.LocationId;
                     CurrentBlog.LocationName = userLocation.Name;
                     CurrentBlog.LocationRoute = userLocation.Route;
-                    CurrentBlog.MainImageUrl = string.Empty;
-                    CurrentBlog.OptImagesUrl = new List<string>();
-                    CurrentBlog.BlogFolder = BlogHelper.GetBlogLocationFolder(userLocation.Route, userLocation.Name);
+                    CurrentBlog.MainImageUrl = Defaults.ErrorImagePath;
+                    CurrentBlog.Name = "NA"; // Main Image File - default not 
+                    NewBlogTempPath = $"media{userLocation.Route}/pages/{ContentTypeName}/BlogItemNew_{tempContentId}";
+                    CurrentBlog.BlogFolder = NewBlogTempPath;
                     CurrentBlog.ContentType = CurrentContentType;
-                    CurrentBlog.Title = $"Enter New {ContentTypeName} Item Title...";
-                    CurrentBlog.ContentHtml = "Enter Blog Content Here...";
+                    CurrentBlog.Title = $"Enter {ContentTypeName} Item Title...";
+                    CurrentBlog.ContentHtml = "Enter Content Here...";
 
                     PageMode = "Edit"; // display edit component
                     OpenCustomModal();
@@ -216,14 +206,18 @@ namespace BedBrigade.Client.Components
                     Debug.WriteLine($"Begin Edit Blog Item : {ModifiedBlogItem.ContentId} - {ModifiedBlogItem.Title}");
                     // cancel default editing
                     args.Cancel = true;
-                    PageMode="Edit"; // display edit component
+                    PageMode = "Edit"; // display edit component
                     OpenCustomModal();
                     break;
-              
+
                 case Syncfusion.Blazor.Grids.Action.Delete: // delete current blog item
                     Debug.WriteLine("Grid Record will be deleted");
-                    _= DeleteBlogAsync(ModifiedBlogItem);
-                    break;             
+                    _ = DeleteBlogAsync(ModifiedBlogItem);
+                    break;
+
+                case Syncfusion.Blazor.Grids.Action.Cancel: // cancel by page closing
+                    Debug.WriteLine($"Grid event - Cancel editing: {ModifiedBlogItem.ContentId}"); // 0 - should be new?
+                    break;
 
             }// Request Type
 
@@ -246,8 +240,8 @@ namespace BedBrigade.Client.Components
 
 
         public async Task DeleteBlogAsync(BlogData? blogDelete)
-        {           
-            if(blogDelete == null){ return; }
+        {
+            if (blogDelete == null) { return; }
             Debug.WriteLine($"Request to delete Blog Item: {blogDelete.ContentId} - {blogDelete.Title}");
 
             if (blogDelete.BlogFolder != null)
@@ -282,7 +276,7 @@ namespace BedBrigade.Client.Components
                 {
                     Debug.WriteLine($"Blog {blogDelete.ContentId} deleted.");
                     // clear uploaded file list
-                   
+
                     _toastService.Success($"{ContentTypeName} #{blogDelete.ContentId}", "Blog Content deleted");
                     FilteredBlogList.Remove(blogDelete);
                     await MyGrid.CloseEditAsync();
@@ -300,26 +294,24 @@ namespace BedBrigade.Client.Components
             }
 
         } // Delete Blog       
-              
+
 
 
         public void GetSelectedRecords(RowSelectEventArgs<BlogData> args)
         {
-            
-            CurrentBlog = args.Data;              
+
+            CurrentBlog = args.Data;
             //Debug.WriteLine($"Selected Blog: {CurrentBlog.Title}");
         }
-           
-       
+
+
         private void ApplyFilter()
         {
             FilteredBlogList = lstBlogData
                 .Where(b => b.LocationId == SelectedLocationId)
                 .ToList();
-                StateHasChanged();
+            StateHasChanged();
             // Set Current Use Location
-
-
         }
 
         private void OnLocationChange(ChangeEventArgs<int, Location> args)
@@ -331,21 +323,25 @@ namespace BedBrigade.Client.Components
                 SelectedLocationId = args.Value;
                 userLocation = args.ItemData;
                 ApplyFilter();
-            }      
-            
+            }
+
 
 
         } // Location Filter Changed
 
-       
-        
+
+
         private async Task OnEditSave(BlogData updatedItem)
         {
             // Update record in list
             var index = FilteredBlogList.FindIndex(b => b.ContentId == updatedItem.ContentId);
-            if (index >= 0)
+            if (index >= 0) // item found
             {
                 FilteredBlogList[index] = updatedItem;
+            }
+            else // new item
+            {
+                FilteredBlogList.Add(updatedItem);
             }
             // refresh Record in Grid?
             await MyGrid.SetRowDataAsync(updatedItem.ContentId, updatedItem);
@@ -374,11 +370,11 @@ namespace BedBrigade.Client.Components
         }
         private void CloseCustomModal()
         {
-            ShowEditModal = false;          
+            ShowEditModal = false;
         }
         private void OpenCustomModal()
         {
-            ShowEditModal = true;          
+            ShowEditModal = true;
         }
         private void OnBackgroundClick()
         {
@@ -388,6 +384,44 @@ namespace BedBrigade.Client.Components
                 //await CloseCustomModal();
             }
         }
+
+        public void Dispose()
+        {
+            CancelNewItem();
+        }
+
+        // Called when the browser or tab is about to close
+        [JSInvokable]
+        public Task OnBrowserClosing()
+        {
+            CancelNewItem();
+            return Task.CompletedTask;
+        }
+
+        private void CancelNewItem()
+        {
+            Debug.WriteLine("Grid Page - Browser closed");
+
+            if (PageMode == "Edit" && isAddInProgress)
+            {
+                Debug.WriteLine("Grid Page - Cancel Adding by Browser close");
+                // check & delete temp folder
+                var tempFolderPath = Path.Combine(WebRootPath, NewBlogTempPath);
+                if (Directory.Exists(tempFolderPath))
+                {
+                    Directory.Delete(tempFolderPath, true);
+                    Debug.WriteLine($"Temporary Folder deleted: {tempFolderPath}");
+                }
+                else
+                {
+                    Debug.WriteLine($"No Temporary Folder to delete");
+                }
+
+            }
+
+        }//CancelNewItem()
+
+
 
     } // BlogGrid class
 }// namespace

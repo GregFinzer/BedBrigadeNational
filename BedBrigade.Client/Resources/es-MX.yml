@@ -15,10 +15,6 @@ BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está comple
 BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
 BlogBackToCards: Volver a la vista de cartas
 BlogEditDragDrop: Arrastra y suelta los archivos aquí o usa el botón "Browse..." para seleccionar archivos.
-BlogEditFileDelete: archivo(s) seleccionado(s) para eliminar
-BlogEditMainImage: ¡La imagen principal está marcada para eliminación!
-BlogEditPageInstruction: Instrucciones - Haz clic en una imagen para establecerla como la imagen principal. Usa la casilla de verificación para marcar imágenes para eliminación. Haz clic en el icono de ojo para previsualizar una imagen en pantalla completa.
-BlogEditPageWarning: Si sales de la página sin usar el botón de cancelar, los archivos cargados se guardarán y se podrán eliminar más tarde si es necesario."
 BlogImageFolders: Carpetas de blogs
 BlogCardColumns: Número o columnas
 BlogCardPaging: Paginación de la vista de tarjeta
@@ -120,6 +116,7 @@ EventType: Tipo de evento
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FindABedBrigade: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
+For: para
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
@@ -128,9 +125,8 @@ GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
 ImageFileFormat: Formatos permitidos
-Image: Imagen
+ImageMain: Imagen Principal
 ImagePreview: Vista previa de imagen
-Images: Imágenes
 InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
 InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
