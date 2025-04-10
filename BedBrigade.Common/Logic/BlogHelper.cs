@@ -1,26 +1,30 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
-using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 using System.Diagnostics;
-using System.Text.Json;
-using System.ComponentModel;
-using System.Security.Principal;
-using System.Security.Claims;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BedBrigade.Common.Logic
 {
 
-public static class BlogHelper
+    public static class BlogHelper
     {
         private static readonly string[] RouterFolders = { "leftImageRotator", "middleImageRotator", "rightImageRotator" };
-        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+        private const string PeriodMonth = "month";
+        private const string PeriodPeriod = "period";
+        private static readonly string[] AllowedExtensions = new[]
+                {
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".gif",
+                    ".webp"
+                }.Select(ext => new string(ext.Where(c => !char.IsWhiteSpace(c)).ToArray()))
+                .ToArray();
+
+
 
         public static readonly Dictionary<string, string> ValidContentTypes = new()
         {
@@ -28,31 +32,11 @@ public static class BlogHelper
             { "new", "News" },      // Corrects "new" → "News"
             { "stories", "Stories" },
             { "story", "Stories" }  // Corrects "story" → "Stories"
-        };        
-    
-        public static string FormatDateForRazor(DateTime? date)
-        {
-            if (date.HasValue)
-            {
-                DateTime actualDate = date.Value;
-
-                // Extract the month name and format it as Dynamic{MonthName}
-                string monthKey = $"Dynamic{actualDate.ToString("MMMM", CultureInfo.InvariantCulture)}";
-
-                // Return the month key and the day and year
-                string day = actualDate.Day.ToString();
-                string year = actualDate.Year.ToString();
-
-                // Return just the month key, day, and year
-                return $"{monthKey}| {day}, {year}";
-            }
-
-            // Return a default value (or empty string) if the DateTime is null
-            return "N/A"; // Default value if the date is null
-        }// FormatDateForRazor
+        };             
 
         public static string GetFormattedDate(DateTime? theDate, string part)
         {
+
             // Check if theDate is null
             if (!theDate.HasValue)
             {
@@ -64,9 +48,9 @@ public static class BlogHelper
 
             switch (part.ToLower())
             {
-                case "month":
+                case PeriodMonth:
                     return CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(myDate.Month);
-                case "period":
+                case PeriodPeriod:
                     return $"{myDate:dd}, {myDate:yyyy}";
                 default:
                     throw new ArgumentException("Invalid part. Use 'Month' or 'Period'.");
@@ -105,7 +89,7 @@ public static class BlogHelper
 
                 myBlogData = lstContentData.Select(s =>
                 {
-                   
+
 
                     // Try to get the location from the dictionary
                     Location? myLocation = locationLookup.TryGetValue(s.LocationId, out var loc) ? loc : null;
@@ -138,7 +122,11 @@ public static class BlogHelper
                         ContentHtml = s.ContentHtml,
                         MainImageUrl = mainImageUrl, // Set the main image URL
                         OptImagesUrl = optImagesUrls,   // Set the optional image URLs 
-                        BlogFolder = BlogFolderPath.Replace("//", "/")
+                        BlogFolder = BlogFolderPath.Replace("//", "/"),
+                        CreatedDateMonth = GetFormattedDate(s.CreateDate, PeriodMonth),
+                        CreatedDatePeriod = GetFormattedDate(s.CreateDate, PeriodPeriod),
+                        UpdatedDateMonth = GetFormattedDate(s.UpdateDate ?? s.CreateDate, PeriodMonth),
+                        UpdatedDatePeriod = GetFormattedDate(s.UpdateDate ?? s.CreateDate, PeriodPeriod)
 
                     };
                 }).OrderByDescending(b => b.CreateDate).ToList();
@@ -215,32 +203,6 @@ public static class BlogHelper
 
             return (relatedUrl);
         }
-
-        public static List<string> GetBlogItemAdditionalFiles(int contentId, string LocationRoute, string? ContentTypeName)
-        {
-
-            string locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
-            string imageFolderPath = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}/BlogItem_{contentId}");
-            string relatedUrl = GetRelativePathFromWebRoot(imageFolderPath);
-
-            List<string>? FileUrls = new();
-            if (Directory.Exists(imageFolderPath))
-            {
-                // Get all files in the directory
-                string[] filesArray = Directory.GetFiles(imageFolderPath);
-
-                // Add a prefix to each file name
-                var prefix = relatedUrl + "/";
-                string[] prefixedFilesArray = Array.ConvertAll(filesArray, file => prefix + Path.GetFileName(file));
-
-                // Convert the array to a List<string>
-                FileUrls = new List<string>(prefixedFilesArray);
-            }
-
-            return (FileUrls);
-        }//GetBlogItemAdditionalFiles
-
-
         public static string GetRelativePathFromWebRoot(string fullPath)
         {
             const string webRootKeyword = "wwwroot";
@@ -301,63 +263,107 @@ public static class BlogHelper
         } // Blog Data
 
 
-        public static (string MainImageUrl, List<string> OptImagesUrls) GetBlogImages(string sourceFileName, string fullUrlPathToParentFolder, string[] AllowedExtensions)
+        public static (string MainImageUrl, List<string> OptImagesUrls) GetBlogImages(string? sourceFileName, string fullUrlPathToParentFolder, string[] AllowedExtensions)
         {
-
             var optImagesUrls = new List<string>();
+            var mainImageUrl = Defaults.ErrorImagePath;
+            fullUrlPathToParentFolder = NormalizePath(fullUrlPathToParentFolder);
 
-            // Validate file name and extension
-            bool isValidFileName = !string.IsNullOrWhiteSpace(sourceFileName) &&
-                                   !Path.GetInvalidFileNameChars().Any(sourceFileName.Contains) &&
-                                   AllowedExtensions.Contains(Path.GetExtension(sourceFileName), StringComparer.OrdinalIgnoreCase);
-
-            // Combine folder and file paths
-            fullUrlPathToParentFolder=NormalizePath(fullUrlPathToParentFolder);
-            string folderPath = ConvertToPhysicalPath(fullUrlPathToParentFolder);
-           // Debug.WriteLine("Blog Folder: " + folderPath);
-            string filePath = Path.Combine(folderPath, sourceFileName);
-            //Debug.WriteLine("Check Main File:" + filePath);
-
-            string mainImageUrl = Defaults.ErrorImagePath;
-
-            try
+            if (string.IsNullOrWhiteSpace(sourceFileName))
             {
-                // Ensure the folder exists
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                // Collect all files with allowed extensions in the folder
-                var files = Directory.GetFiles(folderPath)
-                                      .Where(file => AllowedExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
-                                      .OrderBy(File.GetCreationTime)
-                                      .Select(file => Path.Combine(fullUrlPathToParentFolder, Path.GetFileName(file)))
-                                      .ToList();
-
-                // Determine the main image
-                if (isValidFileName && File.Exists(filePath))
-                {
-                    mainImageUrl = $"{fullUrlPathToParentFolder}/{sourceFileName}";
-                }
-                else if (files.Any())
-                {
-                    mainImageUrl = files[0]; // Use the first file in the folder as the main image
-                }
-
-                // Populate optional images (excluding the main image)
-                string mainFileName = Path.GetFileName(mainImageUrl);
-                optImagesUrls.AddRange(files.Where(file => !file.Equals(mainFileName, StringComparison.OrdinalIgnoreCase)));
+                return (mainImageUrl, optImagesUrls);
             }
-            catch
-            {
-                // In case of exceptions, main image is NoImageFound, and optional images are empty
 
-                optImagesUrls.Clear();
+            sourceFileName = sourceFileName.Trim();
+
+            bool isValidFileName = IsValidFileName(sourceFileName);
+
+            //var fileExt = Path.GetExtension(sourceFileName);
+            if (isValidFileName) // main file
+            {
+                Debug.WriteLine($"GetBlogImages. File Valid Name {sourceFileName}: {isValidFileName.ToString()}");
+                // Combine folder and file paths
+
+                string folderPath = ConvertToPhysicalPath(fullUrlPathToParentFolder);
+
+                Debug.WriteLine("GetBlogImages. Blog Folder: " + folderPath);
+
+                if (Directory.Exists(folderPath))
+                {
+
+                    string filePath = Path.Combine(folderPath, sourceFileName);
+                    Debug.WriteLine("GetBlogImages. Check Main Image File:" + filePath);
+                    // Check if the specified file exists   
+                    if (File.Exists(filePath))
+                    {
+                        mainImageUrl = $"{fullUrlPathToParentFolder}/{sourceFileName}";
+                        Debug.WriteLine("GetBlogImages. Main Image URL: " + mainImageUrl);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("GetBlogImages. Main Image File not found: " + filePath);
+                        mainImageUrl = GetBlogReplacementMainImage(fullUrlPathToParentFolder);
+                        Debug.WriteLine("GetBlogImages. Replaced Main Image URL: " + mainImageUrl);
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("GetBlogImages. Main Image Folder not found: " + folderPath);
+                }
+            }
+            else
+            {
+                Debug.WriteLine("GetBlogImages. File Invalid Name: " + sourceFileName);
+                mainImageUrl = GetBlogReplacementMainImage(fullUrlPathToParentFolder);
+                // add Replacement URL to OptImages 
+                optImagesUrls.Add(mainImageUrl);
+                Debug.WriteLine("GetBlogImages. Replaced Main Image URL: " + mainImageUrl);
             }
 
             return (mainImageUrl, optImagesUrls);
         } // Get Blog Images
+
+        public static string GetBlogReplacementMainImage(string fullUrlPathToParentFolder)
+        { // return the first image in the folder
+            var BlogFolderPath = ConvertToPhysicalPath(fullUrlPathToParentFolder);
+            string? mainImageUrl = Defaults.ErrorImagePath;
+            if (Directory.Exists(BlogFolderPath))
+            {
+                var files = Directory.GetFiles(BlogFolderPath);
+                if (files.Length > 0)
+                {
+                    // Sort files by creation date (ascending order)
+                    var firstFile = files
+                        .Select(file => new FileInfo(file))
+                        .OrderBy(fileInfo => fileInfo.CreationTime)
+                        .FirstOrDefault();
+                    if (firstFile != null)
+                    {
+                        var replacementFileName = Path.GetFileName(firstFile.FullName);
+                        mainImageUrl = $"{fullUrlPathToParentFolder}/{replacementFileName}";
+                    }
+                }
+            }
+            return mainImageUrl;
+        }
+
+
+        public static bool IsValidFileName(string sourceFileName)
+        {
+            bool IsValid = false;
+
+            string? fileExt = Path.GetExtension(sourceFileName)?.ToLowerInvariant();
+            HashSet<string> AllowedExtensionHash = new(".jpg|.jpeg|.png|.gif|.webp".Split('|'), StringComparer.OrdinalIgnoreCase);
+            if (fileExt != null && fileExt.Length > 0)
+            {
+                IsValid = !string.IsNullOrWhiteSpace(sourceFileName)
+                    && !Path.GetInvalidFileNameChars().Any(sourceFileName.Contains)
+                    && AllowedExtensionHash.Contains(fileExt);
+            }
+
+            return (IsValid);
+
+        }//IsValidFileNam
 
         public static string ConvertToPhysicalPath(string relativePath)
         {
@@ -478,7 +484,7 @@ public static class BlogHelper
             }
         }
 
-        public static string NormalizePath(string inputPath, bool isUrl = true)
+        public static string NormalizePath(string? inputPath, bool isUrl = true)
         {
             if (string.IsNullOrWhiteSpace(inputPath))
             {
@@ -501,41 +507,36 @@ public static class BlogHelper
             }
         }
 
-       
-        public static BlogData CloneBlog(BlogData BlogOriginal)
+        public static BlogData CloneBlog(BlogData original)
         {
-            return JsonSerializer.Deserialize<BlogData>(JsonSerializer.Serialize(BlogOriginal));
-        } // Clone Blog
-        public static List<string> AuditBlogFiles(string folderPath, string baseUrl)
-        {
-            List<string> fileUrls = new List<string>();
-           
-            // Check if the directory exists
-            if (Directory.Exists(folderPath))
+            return new BlogData
             {
-                // Get all files from the directory
-                string[] files = Directory.GetFiles(folderPath);
+                // Base class: Content
+                ContentId = original.ContentId,
+                LocationId = original.LocationId,
+                ContentType = original.ContentType,
+                Title = original.Title,
+                Name = original.Name,
+                ContentHtml = original.ContentHtml,
+                UploadedFiles = original.UploadedFiles,
 
-                foreach (string file in files)
-                {
-                    // Get the file name and convert to URL format
-                    string fileName = Path.GetFileName(file);
-
-                    // Create the URL by combining the base URL and file name
-                    string fileUrl = $"{baseUrl.TrimEnd('/')}/{fileName}";
-
-                    // Add the URL to the list
-                    fileUrls.Add(fileUrl);
-                }
-            }
-            else
-            {
-                Debug.WriteLine($"Directory not found: {folderPath}");
-            }
-
-            return fileUrls;
+                // BlogData fields
+                LocationRoute = original.LocationRoute,
+                LocationName = original.LocationName,
+                BlogFolder = original.BlogFolder,
+                MainImageUrl = original.MainImageUrl,
+                MainImageThumbnail = original.MainImageThumbnail,
+                OptImagesUrl = original.OptImagesUrl != null ? new List<string>(original.OptImagesUrl) : [],
+                FileUploaded = original.FileUploaded != null ? new List<string>(original.FileUploaded) : [],
+                FileDelete = original.FileDelete != null ? new List<string>(original.FileDelete) : [],
+                CreatedDateMonth = original.CreatedDateMonth,
+                CreatedDatePeriod = original.CreatedDatePeriod,
+                UpdatedDateMonth = original.UpdatedDateMonth,
+                UpdatedDatePeriod = original.UpdatedDatePeriod,
+                IsNewItem = original.IsNewItem
+            };
         }
-        // 
+
         public static void DeleteBlogFiles(string wwwrootPath, List<string> fileList)
         {
             foreach (var fileUrl in fileList)
@@ -573,8 +574,151 @@ public static class BlogHelper
 
             return fileName;
         }
-     
 
+        public static string GenerateBlogHtml(BlogData CurrentBlog, bool IsPdf = false)
+        {
+            StringBuilder sb = new StringBuilder();
+            string divClose = "</div>";
+            string divOpen = "<div class=\"";                      
+
+            //sb.AppendLine("<!-- Blog Content Display Area -->");
+
+            // Top content row
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-6 jd-flex justify-content-center align-items-left\">");
+            sb.AppendLine($"        <h4>{CurrentBlog.LocationName}</h4>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divOpen}col-md-6 jd-flex justify-content-center align-items-right\">");
+
+            // Placeholder for translation logic
+            string contentCreateMonth = CurrentBlog.CreatedDateMonth;
+            string contentUpdatedMonth = CurrentBlog.UpdatedDateMonth;
+
+            sb.AppendLine("        <h6 style=\"text-align: right; font-size: small; color: green\">");
+            sb.AppendLine("            <i>");
+            sb.AppendLine($"                Posted on {contentCreateMonth} {CurrentBlog.CreatedDatePeriod} | ");
+            sb.AppendLine($"                Last modified on {contentUpdatedMonth} {CurrentBlog.UpdatedDatePeriod}");
+            sb.AppendLine("            </i>");
+            sb.AppendLine("        </h6>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            // Title row
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-12 jd-flex justify-content-center align-items-left\">");
+            sb.AppendLine($"        <h4>{CurrentBlog.Title}</h4>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+
+            var mainImageUrl = CurrentBlog.MainImageUrl;
+            bool isMainImageExist = true;
+            if (CurrentBlog.OptImagesUrl != null && CurrentBlog.OptImagesUrl.Count > 0)
+            {
+                isMainImageExist = !CurrentBlog.OptImagesUrl.Contains(mainImageUrl);
+            }
+
+            if (isMainImageExist)
+            { // show user created main image
+
+                // Main Blog Image
+                sb.AppendLine($"{divOpen}row mb-2\">");
+                sb.AppendLine($"{divOpen}col-md-12 jd-flex justify-content-center align-items-center\">");
+                sb.AppendLine($"        <img src=\"{CurrentBlog.MainImageUrl}\" alt=\"{CurrentBlog.Title}\" class=\"detail-image\" />");
+                sb.AppendLine($"        <span style=\"font-size: smaller; display: none\">{CurrentBlog.MainImageUrl}</span>");
+                sb.AppendLine($"{divClose}");
+                sb.AppendLine($"{divClose}");
+            }
+
+            // Blog Content (HTML)
+            sb.AppendLine($"{divOpen}row mb-2\">");
+            sb.AppendLine($"{divOpen}col-md-12\">");
+            sb.AppendLine("        <p style=\"width: 100%\">");
+            sb.AppendLine(SanitizeHtml(CurrentBlog.ContentHtml));
+            sb.AppendLine("        </p>");
+            sb.AppendLine($"{divClose}");
+            sb.AppendLine($"{divClose}");
+                     
+
+            return sb.ToString();
+        } // Get Blog Html
+
+        public static string SanitizeHtml(string? html)
+        {
+            if (string.IsNullOrWhiteSpace(html))
+                return string.Empty;
+
+            // Remove empty <p>, <div>, <br>, and other empty tags
+            html = System.Text.RegularExpressions.Regex.Replace(html, @"<(\w+)[^>]*>\s*</\1>", string.Empty);
+
+            // Trim spaces and line breaks
+            return html.Trim();
+        }
+
+        public static string TruncateHtmlText(string? html, int maxLength)
+        {
+            if (String.IsNullOrEmpty(html))
+            {
+                return String.Empty;
+            }
+
+
+            // Step 1: Remove HTML tags
+            string plainText = Regex.Replace(html, "<.*?>", string.Empty);
+
+            if (plainText.Length <= maxLength)
+            {
+                // If the text is already shorter than maxLength, return as-is
+                return plainText;
+            }
+
+            // Step 2: Truncate without cutting off in the middle of words
+            string truncated = plainText.Substring(0, maxLength);
+
+            int lastSpaceIndex = truncated.LastIndexOf(' ');
+            if (lastSpaceIndex > 0)
+            {
+                // Trim to the last complete word
+                truncated = truncated.Substring(0, lastSpaceIndex);
+            }
+
+            // Step 3: Add "..." to indicate the text has been cut
+            return $"{truncated}...";
+        } // Truncate HTML
+
+        public static string AddBaseUrlToRelativeImages(string htmlContent, string baseUrl)
+        {
+            // Regex to match <img src="..."> or <img src='...'>
+            string pattern = @"(<img\s+[^>]*src\s*=\s*[""'])([^""'http][^""]+)([""'])";
+
+            // Add base URL to relative paths
+            string updatedHtml = Regex.Replace(htmlContent, pattern, m =>
+            {
+                string originalSrc = m.Groups[2].Value;
+
+                // Check if it's a relative URL (not starting with http:// or https://)
+                if (!originalSrc.StartsWith("http://") && !originalSrc.StartsWith("https://"))
+                {
+                    string absoluteUrl = $"{baseUrl.TrimEnd('/')}/{originalSrc.TrimStart('/')}";
+                    return $"{m.Groups[1].Value}{absoluteUrl}{m.Groups[3].Value}";
+                }
+
+                // Return the original URL if it's already absolute
+                return m.Value;
+            });
+
+            return updatedHtml;
+        }
+
+        public static int GenerateTempContentId()
+        {
+            // Get the current UTC timestamp in seconds
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            // Reduce the value to fit within int range (0 to 2,147,483,647)
+            int tempContentId = (int)(timestamp % int.MaxValue);
+
+            return tempContentId;
+        }
 
     } // BlogHelper Class
 } // namespace

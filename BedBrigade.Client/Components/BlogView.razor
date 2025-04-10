@@ -4,6 +4,10 @@
 @using Syncfusion.Blazor.Navigations
 @using Syncfusion.Blazor.RichTextEditor
 @using BedBrigade.Common.Logic
+@using BedBrigade.SpeakIt;
+@using System.IO
+@using System.Diagnostics
+
 @namespace BedBrigade.Client.Components
 @inject IJSRuntime JSRuntime
 
@@ -23,7 +27,7 @@
 
 
                 <div class="col-md-6 text-end">
-
+                    <button class="btn btn-secondary" @onclick="PrintHtml"><i class="fas fa-print"></i></button>
                     <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MovePrev)"><i class="fas fa-chevron-circle-left"></i>&nbsp;@_lc.Keys["Previous"]</button>
                     <button class="btn btn-primary" style="width: 180px" @onclick="() => Navigate(MoveNext)">@_lc.Keys["Next"]&nbsp;<i class="fas fa-chevron-circle-right"></i></button>                                        
 
@@ -34,71 +38,16 @@
         case "Grid":
             <div class="row mb-2">
                 <div class="col-md-12 text-end">
-                    <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)">@_lc.Keys["Close"]</button>
+                    <button class="btn btn-secondary" @onclick="PrintHtml"><i class="fas fa-print"></i></button>
+                    <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-times-circle"></i>&nbsp;@_lc.Keys["Close"]</button>
+
                 </div>
             </div>
             break;
     }
 
+    @((MarkupString)BlogHtmlDisplay);                     
 
-    @if(ParentFrame == "Card"){
-
-
-    }
-
-    <!-- Blog Content Display Area -->
-    <!-- top content row -->
-
-    <div class="row mb-2">
-
-        <div class="col-md-6 jd-flex justify-content-center align-items-left">
-            <h4>@CurrentBlog.Title</h4>
-        </div>
-        <div class="col-md-6 jd-flex justify-content-center align-items-right">
-
-            <!-- blog dates -->
-
-
-
-        </div>
-
-    </div>
-
-    <!-- Main Blog Image -->
-
-    <div class="row mb-2">
-        <div class="col-md-12 jd-flex justify-content-center align-items-center">
-            <img src="@CurrentBlog.MainImageUrl" alt="@CurrentBlog.Title" class="detail-image" />
-            <span style="font-size: smaller; display: none">@CurrentBlog.MainImageUrl</span>
-        </div>
-    </div>
-
-    <!-- Blog Content (HTML) -->
-
-    <div class="row mb-2">
-        <div class="col-md-12">
-            <p style="width: 100%">
-                @((MarkupString)(SanitizeHtml(!string.IsNullOrEmpty(CurrentBlog?.ContentHtml) ? CurrentBlog.ContentHtml : string.Empty)))
-            </p>
-        </div>
-    </div>
-
-    <!-- Additional Images -->
-    @if (CurrentBlog.OptImagesUrl != null & CurrentBlog.OptImagesUrl.Count > 0)
-    {
-        foreach (var extraImageUrl in CurrentBlog.OptImagesUrl)
-        {
-            if (extraImageUrl.Replace("\\", "/") != CurrentBlog.MainImageUrl.Replace("\\", "/"))
-            {
-                <div class="row mb-2">
-                    <div class="col-md-12 jd-flex justify-content-center align-items-center">
-                        <img src="@extraImageUrl" alt="@CurrentBlog.Title" class="detail-image" />
-                        <span style="font-size: smaller; display: none">@extraImageUrl</span>
-                    </div>
-                </div>
-            }
-        }
-    }
 
     <!-- bottom navigation row -->
     @if (ParentFrame == "Card")
@@ -120,19 +69,21 @@
     }
     else
     {
-       <div class="row d-flex align-items-stretch mb-3">
+        <div class="row d-flex align-items-stretch mb-3">
             <div class="col-md-12 jd-flex justify-content-left align-items-left">
-                <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)">@_lc.Keys["Close"]</button>
+                <button class="btn btn-secondary" @onclick="() => OnClose.InvokeAsync(CurrentBlog)"><i class="fas fa-times-circle"></i>&nbsp;@_lc.Keys["Close"]</button>
             </div>
-       </div>
+        </div>
     }
 
 </div>
 
-@code{
-    
 
-    [Inject] private ILanguageContainerService _lc { get; set; }
+@code{
+
+    [Inject] private NavigationManager? Navigation { get; set; }
+    [Inject] private ILanguageContainerService? _lc { get; set; }
+    [Inject] private ITranslateLogic? _translateLogic { get; set; }
 
     [Parameter]
     public BlogData CurrentBlog { get; set; } = default!;
@@ -145,38 +96,71 @@
 
     [Parameter]
     public string? ParentFrame { get; set; }  
-      
 
     private string MoveNext = "Next";
     private string MovePrev = "Previous";
+    private string BlogHtmlDisplay = String.Empty;
+    private string BlogHtmlPrint = String.Empty;
+    private string baseUri = String.Empty;
 
     protected override void OnInitialized()
     {
+        baseUri = Navigation.BaseUri;
         _lc.InitLocalizedComponent(this);
+        BlogHtmlDisplay = BlogHelper.GenerateBlogHtml(CurrentBlog);
+        BlogHtmlPrint = BlogHelper.AddBaseUrlToRelativeImages(BlogHtmlDisplay, baseUri);
     }
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        // Additional logic if needed
+    }
+
+
 
     private void Navigate(string direction)
+    {  
+        //Debug.WriteLine($"Blog View Page - Requested Navigate: {direction}");
+        try
+        {
+            OnNavigate.InvokeAsync(direction);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error in View Page Navigate: {ex.Message}");
+        }
+    
+    } // Navigate
+      
+   
+    private async Task PrintHtml()
     {
-        OnNavigate.InvokeAsync(direction);
+        // Send the full HTML string to JavaScript for printing
+        await JSRuntime.InvokeVoidAsync("printHtmlContent", BlogHtmlPrint);
     }
 
-    private string SanitizeHtml(string html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-            return string.Empty;
-
-        // Remove empty <p>, <div>, <br>, and other empty tags
-        html = System.Text.RegularExpressions.Regex.Replace(html, @"<(\w+)[^>]*>\s*</\1>", string.Empty);
-
-        // Trim spaces and line breaks
-        return html.Trim();
-    }
 }
 
 
-<style>
+<script>
 
-  
+
+     function printHtmlContent(htmlContent) {
+        var newWindow = window.open('', '_blank');
+        newWindow.document.write(htmlContent);
+        newWindow.document.close();
+        newWindow.focus();
+        setTimeout(function () {
+            newWindow.print();
+            newWindow.close();
+        }, 500); // Allow time for content to load before printing
+    }
+
+</script>
+
+
+<style>
+         
     .detail-image {
         width: auto; /* Maintain the original width */
         height: auto; /* Maintain the original height */

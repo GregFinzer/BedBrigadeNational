@@ -1,16 +1,8 @@
-﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
-using BedBrigade.Common.Logic;
-using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Models;
 using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.JSInterop;
-using Syncfusion.Blazor.Kanban.Internal;
-using Syncfusion.Blazor.RichTextEditor;
 using System.Diagnostics;
-using static BedBrigade.Common.Logic.BlogHelper;
 
 namespace BedBrigade.Client.Components
 {
@@ -25,10 +17,10 @@ namespace BedBrigade.Client.Components
         // Parameters
 
         [Parameter] public Location? CurrentLocation { get; set; }  // requested Location     
-      
+
         [Parameter] public string? ContentTypeName { get; set; } // News, Stories
 
-      
+
         // all variables are retired
         [Parameter] public bool IsPaging { get; set; } = true;
         [Parameter] public int Columns { get; set; } = 3;
@@ -48,10 +40,10 @@ namespace BedBrigade.Client.Components
         private List<ElementReference> selectedCardRefs = new();
 
         private int _pageSize => (IsPaging && BlogItemList.Count > (Columns * Rows)) ? Columns * Rows : BlogItemList.Count;
-             
-        private bool ComputedPaging => IsPaging && BlogItemList.Count > _pageSize;             
 
-        private IEnumerable<BlogData> CurrentPageData => ComputedPaging ? BlogItemList.Skip(_currentPage * _pageSize).Take(_pageSize) : BlogItemList; 
+        private bool ComputedPaging => IsPaging && BlogItemList.Count > _pageSize;
+
+        private IEnumerable<BlogData> CurrentPageData => ComputedPaging ? BlogItemList.Skip(_currentPage * _pageSize).Take(_pageSize) : BlogItemList;
 
         private int TotalPages => ComputedPaging ? (int)Math.Ceiling((double)BlogItemList.Count / _pageSize) : 1; // work
 
@@ -60,9 +52,9 @@ namespace BedBrigade.Client.Components
 
         private bool showDetails = false;
 
-    
+
         protected override void OnParametersSet()
-        {          
+        {
             ResetCardReferences();
         } // Param
 
@@ -96,7 +88,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-      
+
         // Pagination methods
         private void PreviousPage()
         {
@@ -120,12 +112,12 @@ namespace BedBrigade.Client.Components
 
             if (CurrentCard != null)
             {
-               // Debug.WriteLine($"Opening details for: {CurrentCard.Title}");
+                // Debug.WriteLine($"Opening details for: {CurrentCard.Title}");
 
                 ActiveCard = CurrentCard;
                 //ActiveCard = card;
-               // Debug.WriteLine("Selected Card: " + ActiveCard.ContentId.ToString());
-              //  Debug.WriteLine("CurrentPage: " + _currentPage.ToString());
+                // Debug.WriteLine("Selected Card: " + ActiveCard.ContentId.ToString());
+                //  Debug.WriteLine("CurrentPage: " + _currentPage.ToString());
                 showDetails = true;
             }
             _ = ScrollToTop();
@@ -136,7 +128,7 @@ namespace BedBrigade.Client.Components
             if (closedCard != null)
             {
                 ActiveCard = closedCard;
-                
+
                 // Debug.WriteLine("Returned Card: " + ActiveCard.ContentId.ToString());
 
                 int activeIndex = BlogItemList.IndexOf(closedCard);
@@ -152,36 +144,52 @@ namespace BedBrigade.Client.Components
             }
 
             //ActiveCard = null; // Clear ActiveCard after use
-            showDetails = false;            
+            showDetails = false;
             StateHasChanged();
         }
 
         private void NavigateDetail(string direction)
         {
+
+            // Debug.WriteLine($"BlogCards - NavigateDetail: {direction}");
+            //  Debug.WriteLine($"BlogCards - Current Active Card: {ActiveCard?.Title}");
+
             if (ActiveCard == null) return;
 
-            int currentIndex = BlogItemList.IndexOf(ActiveCard);
-
-            if (direction == "Next" && currentIndex < BlogItemList.Count - 1)
+            try
             {
-                ActiveCard = BlogItemList[currentIndex + 1];
+
+                int currentIndex = BlogItemList.IndexOf(ActiveCard);
+
+                if (direction == "Next" && currentIndex < BlogItemList.Count - 1)
+                {
+                    ActiveCard = BlogItemList[currentIndex + 1];
+                }
+                else if (direction == "Previous" && currentIndex > 0)
+                {
+                    ActiveCard = BlogItemList[currentIndex - 1];
+                }
+
+                // Update the ActiveCard reference
+                // Debug.WriteLine($"BlogCards - New Active Card: {ActiveCard?.Title}");
+
+                if (TotalPages > 1)
+                {
+                    // Sync CurrentPage to the ActiveCard's position
+                    _currentPage = (BlogItemList.IndexOf(ActiveCard) / _pageSize) + 1;
+
+                    // Ensure CurrentPage does not exceed TotalPages
+                    _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
+                }
+
+
+                StateHasChanged();
+
             }
-            else if (direction == "Previous" && currentIndex > 0)
+            catch (Exception ex)
             {
-                ActiveCard = BlogItemList[currentIndex - 1];
+                Debug.WriteLine($"BlogCards - Error in NavigateDetail: {ex.Message}");
             }
-
-            if (TotalPages > 1)
-            {
-                // Sync CurrentPage to the ActiveCard's position
-                _currentPage = (BlogItemList.IndexOf(ActiveCard) / _pageSize) + 1;
-
-                // Ensure CurrentPage does not exceed TotalPages
-                _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
-            }
-                     
-
-            StateHasChanged();
         }
 
 
@@ -191,4 +199,4 @@ namespace BedBrigade.Client.Components
         }
 
     } // partial class
-    }// namespace
+}// namespace
