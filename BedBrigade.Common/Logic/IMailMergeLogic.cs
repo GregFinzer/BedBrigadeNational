@@ -11,5 +11,8 @@ public interface IMailMergeLogic
     StringBuilder ReplaceBedRequestFields(BedRequest entity, StringBuilder sb);
     StringBuilder ReplaceScheduleFields(Schedule entity, StringBuilder sb);
     StringBuilder ReplaceVolunteerFields(Volunteer volunteer, Schedule schedule, StringBuilder sb);
+    StringBuilder ReplaceBaseUrl(StringBuilder sb, string baseUrl);
+    StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName);
+    StringBuilder ReplaceEmailForQuery(StringBuilder sb, string email);
 }
 

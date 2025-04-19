@@ -104,14 +104,16 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
 
         private async void ScheduleChangeEvent(ChangeEventArgs<int, Common.Models.Schedule> args)
         {
-            Model.CurrentNewsletterId = args.Value;
+            Model.CurrentScheduleId = args.Value;
             await BuildPlan();
             StateHasChanged();
         }
 
         private async void NewsletterChangeEvent(ChangeEventArgs<int, Common.Models.Newsletter> args)
         {
-            Model.CurrentScheduleId = args.Value;
+            Model.CurrentNewsletterId = args.Value;
+            @@@HERE
+            ///BuildNewsletterBody
             await BuildPlan();
             StateHasChanged();
         }

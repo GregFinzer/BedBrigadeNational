@@ -22,7 +22,7 @@ namespace BedBrigade.Data.Services
         private readonly ILocationDataService _locationDataService;
         private readonly IScheduleDataService _scheduleDataService;
         private readonly ISubscriptionDataService _subscriptionDataService;
-
+        private readonly INewsletterDataService _newsletterDataService;
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -33,7 +33,8 @@ namespace BedBrigade.Data.Services
             IConfigurationDataService configurationDataService,
             ILocationDataService locationDataService,
             IScheduleDataService scheduleDataService,
-            ISubscriptionDataService subscriptionDataService) : base(contextFactory, cachingService, authService)
+            ISubscriptionDataService subscriptionDataService,
+            INewsletterDataService newsletterDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -45,6 +46,7 @@ namespace BedBrigade.Data.Services
             _locationDataService = locationDataService;
             _scheduleDataService = scheduleDataService;
             _subscriptionDataService = subscriptionDataService;
+            _newsletterDataService = newsletterDataService;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -244,6 +246,7 @@ namespace BedBrigade.Data.Services
                 string liveEmailMessage = await IsLiveEmail() ? "Email is LIVE." : "Email is NOT live, it is logged.";
                 string locationName = await GetLocationName(parms.LocationId);
                 string eventName = await GetEventName(parms.ScheduleId);
+                string newsletterName = await GetNewsletterName(parms.NewsletterId);
                 string message;
                 if (parms.Option == EmailRecipientOption.Everyone || parms.Option == EmailRecipientOption.BedBrigadeLeadersNationwide)
                 {
@@ -252,6 +255,14 @@ namespace BedBrigade.Data.Services
                 else if (parms.Option.ToString().Contains("Event"))
                 {
                     message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)} {locationName} for the event {eventName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                }
+                else if (parms.Option == EmailRecipientOption.Newsletter)
+                {
+                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)} {newsletterName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                }
+                else if (parms.Option == EmailRecipientOption.Myself)
+                {
+                    message = $"{emailCount} email will be sent to you. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
                 }
                 else
                 {
@@ -324,6 +335,16 @@ namespace BedBrigade.Data.Services
             {
                 return new ServiceResponse<string>($"Failed to queue bulk emails: {ex.Message}", false);
             }
+        }
+
+        private async Task<string> GetNewsletterName(int newsletterId)
+        {
+            if (newsletterId == 0)
+            {
+                return string.Empty;
+            }
+
+            return (await _newsletterDataService.GetByIdAsync(newsletterId)).Data.Name;
         }
 
         private async Task<string> GetEventName(int scheduleId)

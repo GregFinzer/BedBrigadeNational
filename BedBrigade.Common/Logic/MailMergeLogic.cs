@@ -2,6 +2,7 @@
 using BedBrigade.Common.Exceptions;
 using BedBrigade.Common.Models;
 using System.Text;
+using System.Web;
 
 namespace BedBrigade.Common.Logic;
 
@@ -56,6 +57,9 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Location.MailingState%%",
         "%%Location.MailingPostalCode%%",
         "%%Location.Route%%",
+        "%%BaseUrl%%",
+        "%%NewsletterNameForQuery%%",
+        "%%EmailForQuery%%"
     };
 
     public void CheckForInvalidMergeFields(string template)
@@ -106,6 +110,26 @@ public class MailMergeLogic : IMailMergeLogic
     private bool IsValidMergeField(string mergeField)
     {
         return _validMergeFields.Contains(mergeField);
+    }
+
+    public StringBuilder ReplaceBaseUrl(StringBuilder sb, string baseUrl)
+    {
+        baseUrl = baseUrl.TrimEnd('/');
+        sb = sb.Replace("%%BaseUrl%%", baseUrl);
+        return sb;
+    }
+
+    public StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName)
+    {
+        sb = sb.Replace("%%NewsletterNameForQuery%%", HttpUtility.UrlEncode(newsletterName));
+        return sb;
+    }
+
+    public StringBuilder ReplaceEmailForQuery(StringBuilder sb, string email)
+    {
+        
+        sb = sb.Replace("%%EmailForQuery%%", HttpUtility.UrlEncode(email));
+        return sb;
     }
 
     public StringBuilder ReplaceVolunteerFields(Volunteer volunteer, Schedule schedule, StringBuilder sb)

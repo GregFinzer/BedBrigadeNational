@@ -129,5 +129,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<Subscription>>($"Found {GetEntityName()} with newsletterId of {newsletterId}", true, result);
             }
         }
+
+
     }
 }

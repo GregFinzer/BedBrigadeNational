@@ -5,4 +5,4 @@
 %%Location.MailingCity%%, %%Location.MailingState%% %%Location.MailingPostalCode%%
 
 Unsubscribe
-%%Newsletter.Unsubscribe%%
+%%BaseUrl%%/UnsubscribeFromNewsletter?locationId=%%Location.Id%%&newsletterName=%%newsletterNameForQuery%%&email=%%emailForQuery%%
