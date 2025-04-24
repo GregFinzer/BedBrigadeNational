@@ -47,6 +47,7 @@ public class MailMergeLogic : IMailMergeLogic
         "%%User.Role%%",
         "%%User.Email%%",
         "%%User.Phone%%",
+        "%%Location.LocationId%%",
         "%%Location.Name%%",
         "%%Location.BuildAddress%%",
         "%%Location.BuildCity%%",
@@ -121,14 +122,14 @@ public class MailMergeLogic : IMailMergeLogic
 
     public StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName)
     {
-        sb = sb.Replace("%%NewsletterNameForQuery%%", HttpUtility.UrlEncode(newsletterName));
+        sb = sb.Replace("%%NewsletterNameForQuery%%", Uri.EscapeDataString(newsletterName));
         return sb;
     }
 
     public StringBuilder ReplaceEmailForQuery(StringBuilder sb, string email)
     {
         
-        sb = sb.Replace("%%EmailForQuery%%", HttpUtility.UrlEncode(email));
+        sb = sb.Replace("%%EmailForQuery%%", Uri.EscapeDataString(email));
         return sb;
     }
 
@@ -202,6 +203,7 @@ public class MailMergeLogic : IMailMergeLogic
 
     public StringBuilder ReplaceLocationFields(Location location, StringBuilder sb)
     {
+        sb = sb.Replace("%%Location.LocationId%%", location.LocationId.ToString());
         sb = sb.Replace("%%Location.Name%%", location.Name);
 
         sb = sb.Replace("%%Location.BuildAddress%%", location.BuildAddress);

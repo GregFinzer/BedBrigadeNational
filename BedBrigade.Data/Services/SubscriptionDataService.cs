@@ -50,7 +50,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<string>>> GetEmailsByNewsletterAsync(int newsletterId)
         {
-            string cacheKey = _cachingService.BuildCacheKey("GetEmailsByNewsletterAsync", newsletterId);
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(),$"GetEmailsByNewsletterAsync({newsletterId})");
             var cachedEmails = _cachingService.Get<List<string>>(cacheKey);
             if (cachedEmails != null)
             {
@@ -111,7 +111,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<List<Subscription>>> GetSubscriptionsByNewsletterAsync(int newsletterId)
         {
-            string cacheKey = _cachingService.BuildCacheKey("GetSubscriptionsByNewsletterAsync", newsletterId);
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetSubscriptionsByNewsletterAsync({newsletterId})");
             var cachedSubscriptions = _cachingService.Get<List<Subscription>>(cacheKey);
             if (cachedSubscriptions != null)
             {

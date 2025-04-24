@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Constants;
+﻿using System.Text;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -18,7 +19,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
         [Inject] private IEmailQueueDataService _svcEmailQueueDataService { get; set; }
         [Inject] private INewsletterDataService _svcNewsletterDataService { get; set; }
-
+        [Inject] private IContentDataService _svcContentDataService { get; set; }
+        [Inject] private IMailMergeLogic _mailMergeLogic { get; set; }
+        [Inject] private NavigationManager _navigationManager { get; set; }
         public BulkEmailModel Model { get; set; } = new();
         private bool isSuccess;
         private bool isFailure;
@@ -32,6 +35,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
             Model.Body = (await _svcUserDataService.GetEmailSignature(user.UserName)).Data;
             Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId)).Data;
+            Model.Newsletters = (await _svcNewsletterDataService.GetAllForLocationAsync(user.LocationId)).Data;
             Model.CurrentLocationId = user.LocationId;
             isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
 
@@ -112,10 +116,33 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         private async void NewsletterChangeEvent(ChangeEventArgs<int, Common.Models.Newsletter> args)
         {
             Model.CurrentNewsletterId = args.Value;
-            @@@HERE
-            ///BuildNewsletterBody
+            await BuildNewsletterBody();
             await BuildPlan();
             StateHasChanged();
+        }
+
+        private async Task BuildNewsletterBody()
+        {
+            var contentResult =
+                await _svcContentDataService.GetByLocationAndContentType(Model.CurrentLocationId,
+                    ContentType.NewsletterForm);
+
+            var locationResult = await _svcLocationDataService.GetByIdAsync(Model.CurrentLocationId);
+
+            var newsletterResult = await _svcNewsletterDataService.GetByIdAsync(Model.CurrentNewsletterId);
+
+            if (contentResult.Success && locationResult.Success && newsletterResult.Success)
+            {
+                StringBuilder sb = new StringBuilder(contentResult.Data.ContentHtml);
+                sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
+                sb = _mailMergeLogic.ReplaceBaseUrl(sb, _navigationManager.BaseUri);
+                sb = _mailMergeLogic.ReplaceNewsletterNameForQuery(sb, newsletterResult.Data.Name);
+                Model.Body = sb.ToString();
+            }
+            else
+            {
+                Model.Body = string.Empty;
+            }
         }
 
         private async void EmailRecipientChangeEvent(ChangeEventArgs<EmailRecipientOption, EnumNameValue<EmailRecipientOption>> args)
