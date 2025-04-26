@@ -243,6 +243,7 @@ namespace BedBrigade.Client.Components
                         case ContentType.EmailTaxForm:
                         case ContentType.BedRequestConfirmationForm:
                         case ContentType.SignUpEmailConfirmationForm:
+                        case ContentType.NewsletterForm:
                             CurrentValues = args.Data;
                             await SetLocationName();
                             TextDialogHeading = "Edit " + EnumHelper.GetEnumDescription(args.Data.ContentType);

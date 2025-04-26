@@ -211,6 +211,7 @@ public class SendSmsLogic : ISendSmsLogic
             message.Body = sb.ToString().Trim();
         }
     }
+
     private async Task<ServiceResponse<bool>> LogSmsMessage(SmsQueue message)
     {
         StringBuilder sb = new StringBuilder();

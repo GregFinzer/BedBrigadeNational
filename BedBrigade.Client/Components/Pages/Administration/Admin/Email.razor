@@ -45,6 +45,17 @@ else
                     </SfDropDownList>
                 </div>
             }
+            
+            @if (Model.ShowNewsletterDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="newsletter" class="formlabel">Newsletter</label>
+                    <SfDropDownList ID="newsletter" TValue="int" TItem="Newsletter" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a newsletter" DataSource="@Model.Newsletters">
+                        <DropDownListFieldSettings Value="NewsletterId" Text="Name"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Newsletter" ValueChange="NewsletterChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
 
             <div class="form-group mb-3">
                 <label for="subject">Subject:</label>

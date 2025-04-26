@@ -12,7 +12,12 @@ namespace BedBrigade.Common.Models
         public List<EnumNameValue<EmailRecipientOption>> EmailRecipientOptions { get; set; }
         public EmailRecipientOption CurrentEmailRecipientOption { get; set; }
         public List<Schedule>? Schedules { get; set; }
+
+        public List<Newsletter>? Newsletters { get; set; }
+
         public int CurrentScheduleId { get; set; }
+
+        public int CurrentNewsletterId { get; set; }
 
         [Required(ErrorMessage = "Subject is required.")]
         [MaxLength(100)]
@@ -25,5 +30,7 @@ namespace BedBrigade.Common.Models
         public bool ShowEventDropdown { get; set; }
 
         public bool ShowLocationDropdown { get; set; }
+
+        public bool ShowNewsletterDropdown { get; set; }
     }
 }

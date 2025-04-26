@@ -2,6 +2,7 @@
 using BedBrigade.Common.Exceptions;
 using BedBrigade.Common.Models;
 using System.Text;
+using System.Web;
 
 namespace BedBrigade.Common.Logic;
 
@@ -46,6 +47,7 @@ public class MailMergeLogic : IMailMergeLogic
         "%%User.Role%%",
         "%%User.Email%%",
         "%%User.Phone%%",
+        "%%Location.LocationId%%",
         "%%Location.Name%%",
         "%%Location.BuildAddress%%",
         "%%Location.BuildCity%%",
@@ -56,6 +58,9 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Location.MailingState%%",
         "%%Location.MailingPostalCode%%",
         "%%Location.Route%%",
+        "%%BaseUrl%%",
+        "%%NewsletterNameForQuery%%",
+        "%%EmailForQuery%%"
     };
 
     public void CheckForInvalidMergeFields(string template)
@@ -106,6 +111,26 @@ public class MailMergeLogic : IMailMergeLogic
     private bool IsValidMergeField(string mergeField)
     {
         return _validMergeFields.Contains(mergeField);
+    }
+
+    public StringBuilder ReplaceBaseUrl(StringBuilder sb, string baseUrl)
+    {
+        baseUrl = baseUrl.TrimEnd('/');
+        sb = sb.Replace("%%BaseUrl%%", baseUrl);
+        return sb;
+    }
+
+    public StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName)
+    {
+        sb = sb.Replace("%%NewsletterNameForQuery%%", HttpUtility.UrlEncode(newsletterName));
+        return sb;
+    }
+
+    public string ReplaceEmailForQuery(string body, string email)
+    {
+        
+        body = body.Replace("%%EmailForQuery%%", HttpUtility.UrlEncode(email));
+        return body;
     }
 
     public StringBuilder ReplaceVolunteerFields(Volunteer volunteer, Schedule schedule, StringBuilder sb)
@@ -178,6 +203,7 @@ public class MailMergeLogic : IMailMergeLogic
 
     public StringBuilder ReplaceLocationFields(Location location, StringBuilder sb)
     {
+        sb = sb.Replace("%%Location.LocationId%%", location.LocationId.ToString());
         sb = sb.Replace("%%Location.Name%%", location.Name);
 
         sb = sb.Replace("%%Location.BuildAddress%%", location.BuildAddress);

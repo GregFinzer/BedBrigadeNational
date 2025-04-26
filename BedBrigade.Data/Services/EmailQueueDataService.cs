@@ -21,7 +21,9 @@ namespace BedBrigade.Data.Services
         private readonly IConfigurationDataService _configurationDataService;
         private readonly ILocationDataService _locationDataService;
         private readonly IScheduleDataService _scheduleDataService;
-
+        private readonly ISubscriptionDataService _subscriptionDataService;
+        private readonly INewsletterDataService _newsletterDataService;
+        private readonly IMailMergeLogic _mailMergeLogic;
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -31,7 +33,10 @@ namespace BedBrigade.Data.Services
             IUserDataService userDataService,
             IConfigurationDataService configurationDataService,
             ILocationDataService locationDataService,
-            IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
+            IScheduleDataService scheduleDataService,
+            ISubscriptionDataService subscriptionDataService,
+            INewsletterDataService newsletterDataService,
+            IMailMergeLogic mailMergeLogic) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -42,6 +47,9 @@ namespace BedBrigade.Data.Services
             _configurationDataService = configurationDataService;
             _locationDataService = locationDataService;
             _scheduleDataService = scheduleDataService;
+            _subscriptionDataService = subscriptionDataService;
+            _newsletterDataService = newsletterDataService;
+            _mailMergeLogic = mailMergeLogic;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -231,28 +239,37 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, EmailRecipientOption option, int scheduleId)
+        public async Task<ServiceResponse<string>> GetSendPlanMessage(EmailsToSendParms parms)
         {
             try
             {
                 int queueCount = await GetQueueCount();
-                int emailCount = (await GetEmailsToSend(locationId, option, scheduleId)).Data.Count;
+                int emailCount = (await GetEmailsToSend(parms)).Data.Count;
                 string estimatedTime = await GetEstimatedTime(queueCount, emailCount);
                 string liveEmailMessage = await IsLiveEmail() ? "Email is LIVE." : "Email is NOT live, it is logged.";
-                string locationName = await GetLocationName(locationId);
-                string eventName = await GetEventName(scheduleId);
+                string locationName = await GetLocationName(parms.LocationId);
+                string eventName = await GetEventName(parms.ScheduleId);
+                string newsletterName = await GetNewsletterName(parms.NewsletterId);
                 string message;
-                if (option == EmailRecipientOption.Everyone || option == EmailRecipientOption.BedBrigadeLeadersNationwide)
+                if (parms.Option == EmailRecipientOption.Everyone || parms.Option == EmailRecipientOption.BedBrigadeLeadersNationwide)
                 {
-                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(option)}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
                 }
-                else if (option.ToString().Contains("Event"))
+                else if (parms.Option.ToString().Contains("Event"))
                 {
-                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(option)} {locationName} for the event {eventName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)} {locationName} for the event {eventName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                }
+                else if (parms.Option == EmailRecipientOption.Newsletter)
+                {
+                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)} {newsletterName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                }
+                else if (parms.Option == EmailRecipientOption.Myself)
+                {
+                    message = $"{emailCount} email will be sent to you. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
                 }
                 else
                 {
-                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(option)} {locationName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
+                    message = $"{emailCount} emails will be sent to {EnumHelper.GetEnumDescription(parms.Option)} {locationName}. There are currently {queueCount} other emails in the queue. It will take an estimated {estimatedTime} to send. {liveEmailMessage}";
                 }
 
                 return new ServiceResponse<string>("Created plan message", true, message);
@@ -262,6 +279,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>($"Could not GetSendPlanMessage {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
             }
         }
+
 
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
@@ -303,6 +321,7 @@ namespace BedBrigade.Data.Services
                 foreach (var emailQueue in emailQueueList)
                 {
                     emailQueue.SetCreateAndUpdateUser(userName);
+                    emailQueue.Body = _mailMergeLogic.ReplaceEmailForQuery( emailQueue.Body, emailQueue.ToAddress);
                 }
 
                 using (var ctx = _contextFactory.CreateDbContext())
@@ -320,6 +339,16 @@ namespace BedBrigade.Data.Services
             {
                 return new ServiceResponse<string>($"Failed to queue bulk emails: {ex.Message}", false);
             }
+        }
+
+        private async Task<string> GetNewsletterName(int newsletterId)
+        {
+            if (newsletterId == 0)
+            {
+                return string.Empty;
+            }
+
+            return (await _newsletterDataService.GetByIdAsync(newsletterId)).Data.Name;
         }
 
         private async Task<string> GetEventName(int scheduleId)
@@ -362,37 +391,39 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<List<string>>> GetEmailsToSend(int locationId, EmailRecipientOption option, int scheduleId)
+        public async Task<ServiceResponse<List<string>>> GetEmailsToSend(EmailsToSendParms parms)
         {
             const string message = "Built Email List";
-            switch (option)
+            switch (parms.Option)
             {
                 case EmailRecipientOption.Myself:
                     return new ServiceResponse<List<string>>(message, true, (await GetMyself()));
                 case EmailRecipientOption.Everyone:
                     return new ServiceResponse<List<string>>(message, true, (await GetEveryone()));
                 case EmailRecipientOption.VolunteersForLocation:
-                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsForLocation:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.ContactUsForLocation:
-                    return new ServiceResponse<List<string>>(message, true, (await _contactUsDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _contactUsDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.BedBrigadeLeadersNationwide:
                     return new ServiceResponse<List<string>>(message, true, (await _userDataService.GetDistinctEmail()).Data);
                 case EmailRecipientOption.BedBrigadeLeadersForLocation:
-                    return new ServiceResponse<List<string>>(message, true, (await _userDataService.GetDistinctEmailByLocation(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _userDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.VolunteersWithDeliveryVehicles:
-                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsWithDeliveryVehicles(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsWithDeliveryVehicles(parms.LocationId)).Data);
                 case EmailRecipientOption.VolunteersForAnEvent:
-                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsForASchedule(scheduleId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsForASchedule(parms.ScheduleId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveNotRecievedABed:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForNotReceivedABed(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForNotReceivedABed(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveRecievedABed:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForReceivedABed(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForReceivedABed(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsForAnEvent:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(locationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(parms.LocationId)).Data);
+                case EmailRecipientOption.Newsletter:
+                    return new ServiceResponse<List<string>>(message, true, (await _subscriptionDataService.GetEmailsByNewsletterAsync(parms.NewsletterId)).Data);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(option), option, $"Unsupported Option: {option}");
+                    throw new ArgumentOutOfRangeException(nameof(parms.Option), parms.Option, $"Unsupported Option: {parms.Option}");
             }
         }
 

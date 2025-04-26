@@ -1,0 +1,8 @@
+﻿Enter your newsletter here.
+
+%%Location.Name%%
+%%Location.MailingAddress%%
+%%Location.MailingCity%%, %%Location.MailingState%% %%Location.MailingPostalCode%%
+
+Unsubscribe
+%%BaseUrl%%/UnsubscribeFromNewsletter?locationId=%%Location.LocationId%%&newsletterName=%%NewsletterNameForQuery%%&email=%%EmailForQuery%%

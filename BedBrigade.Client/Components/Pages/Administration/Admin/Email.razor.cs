@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Constants;
+﻿using System.Text;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -17,7 +18,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         [Inject] private ILocationDataService _svcLocationDataService { get; set; }
         [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
         [Inject] private IEmailQueueDataService _svcEmailQueueDataService { get; set; }
-        
+        [Inject] private INewsletterDataService _svcNewsletterDataService { get; set; }
+        [Inject] private IContentDataService _svcContentDataService { get; set; }
+        [Inject] private IMailMergeLogic _mailMergeLogic { get; set; }
+        [Inject] private NavigationManager _navigationManager { get; set; }
         public BulkEmailModel Model { get; set; } = new();
         private bool isSuccess;
         private bool isFailure;
@@ -31,6 +35,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
             Model.Body = (await _svcUserDataService.GetEmailSignature(user.UserName)).Data;
             Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId)).Data;
+            Model.Newsletters = (await _svcNewsletterDataService.GetAllForLocationAsync(user.LocationId)).Data;
             Model.CurrentLocationId = user.LocationId;
             isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
 
@@ -46,6 +51,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             Model.CurrentEmailRecipientOption = EmailRecipientOption.Myself;
             Model.ShowLocationDropdown = false;
             Model.ShowEventDropdown = false;
+            Model.ShowNewsletterDropdown = false;
             await BuildPlan();
         }
 
@@ -57,7 +63,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
 
         private async Task HandleValidSubmit()
         {
-            var emails = await _svcEmailQueueDataService.GetEmailsToSend(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId);
+            EmailsToSendParms parms = new()
+            {
+                LocationId = Model.CurrentLocationId,
+                Option = Model.CurrentEmailRecipientOption,
+                ScheduleId = Model.CurrentScheduleId,
+                NewsletterId = Model.CurrentNewsletterId
+            };
+            var emails = await _svcEmailQueueDataService.GetEmailsToSend(parms);
             var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
             if (result.Success)
             {
@@ -73,14 +86,23 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         {
             Model.CurrentLocationId = args.Value;
             Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(Model.CurrentLocationId)).Data;
+            Model.Newsletters = (await _svcNewsletterDataService.GetAllForLocationAsync(Model.CurrentLocationId)).Data;
             Model.CurrentScheduleId = 0;
+            Model.CurrentNewsletterId = 0;
             await BuildPlan();
             StateHasChanged();
         }
 
         private async Task BuildPlan()
         {
-            message = (await _svcEmailQueueDataService.GetSendPlanMessage(Model.CurrentLocationId, Model.CurrentEmailRecipientOption, Model.CurrentScheduleId)).Data;
+            EmailsToSendParms parms = new()
+            {
+                LocationId = Model.CurrentLocationId,
+                Option = Model.CurrentEmailRecipientOption,
+                ScheduleId = Model.CurrentScheduleId,
+                NewsletterId = Model.CurrentNewsletterId
+            };
+            message = (await _svcEmailQueueDataService.GetSendPlanMessage(parms)).Data;
             showPlan = true;
         }
 
@@ -91,12 +113,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             StateHasChanged();
         }
 
+        private async void NewsletterChangeEvent(ChangeEventArgs<int, Common.Models.Newsletter> args)
+        {
+            Model.CurrentNewsletterId = args.Value;
+            await BuildNewsletterBody();
+            await BuildPlan();
+            StateHasChanged();
+        }
+
+        private async Task BuildNewsletterBody()
+        {
+            var contentResult =
+                await _svcContentDataService.GetByLocationAndContentType(Model.CurrentLocationId,
+                    ContentType.NewsletterForm);
+
+            var locationResult = await _svcLocationDataService.GetByIdAsync(Model.CurrentLocationId);
+
+            var newsletterResult = await _svcNewsletterDataService.GetByIdAsync(Model.CurrentNewsletterId);
+
+            if (contentResult.Success && locationResult.Success && newsletterResult.Success)
+            {
+                StringBuilder sb = new StringBuilder(contentResult.Data.ContentHtml);
+                sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
+                sb = _mailMergeLogic.ReplaceBaseUrl(sb, _navigationManager.BaseUri);
+                sb = _mailMergeLogic.ReplaceNewsletterNameForQuery(sb, newsletterResult.Data.Name);
+                Model.Body = sb.ToString();
+            }
+            else
+            {
+                Model.Body = string.Empty;
+            }
+        }
+
         private async void EmailRecipientChangeEvent(ChangeEventArgs<EmailRecipientOption, EnumNameValue<EmailRecipientOption>> args)
         {
             Model.CurrentEmailRecipientOption = args.Value;
             Model.ShowEventDropdown = Model.CurrentEmailRecipientOption.ToString().Contains("Event");
             Model.ShowLocationDropdown = isNationalAdmin && (Model.CurrentEmailRecipientOption.ToString().Contains("Location")
                 || Model.CurrentEmailRecipientOption.ToString().Contains("Event"));
+            Model.ShowNewsletterDropdown = Model.CurrentEmailRecipientOption.ToString().Contains("Newsletter");
             await BuildPlan();
             StateHasChanged();
         }
