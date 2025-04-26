@@ -122,15 +122,15 @@ public class MailMergeLogic : IMailMergeLogic
 
     public StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName)
     {
-        sb = sb.Replace("%%NewsletterNameForQuery%%", Uri.EscapeDataString(newsletterName));
+        sb = sb.Replace("%%NewsletterNameForQuery%%", HttpUtility.UrlEncode(newsletterName));
         return sb;
     }
 
-    public StringBuilder ReplaceEmailForQuery(StringBuilder sb, string email)
+    public string ReplaceEmailForQuery(string body, string email)
     {
         
-        sb = sb.Replace("%%EmailForQuery%%", Uri.EscapeDataString(email));
-        return sb;
+        body = body.Replace("%%EmailForQuery%%", HttpUtility.UrlEncode(email));
+        return body;
     }
 
     public StringBuilder ReplaceVolunteerFields(Volunteer volunteer, Schedule schedule, StringBuilder sb)

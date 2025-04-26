@@ -23,6 +23,7 @@ namespace BedBrigade.Data.Services
         private readonly IScheduleDataService _scheduleDataService;
         private readonly ISubscriptionDataService _subscriptionDataService;
         private readonly INewsletterDataService _newsletterDataService;
+        private readonly IMailMergeLogic _mailMergeLogic;
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -34,7 +35,8 @@ namespace BedBrigade.Data.Services
             ILocationDataService locationDataService,
             IScheduleDataService scheduleDataService,
             ISubscriptionDataService subscriptionDataService,
-            INewsletterDataService newsletterDataService) : base(contextFactory, cachingService, authService)
+            INewsletterDataService newsletterDataService,
+            IMailMergeLogic mailMergeLogic) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -47,6 +49,7 @@ namespace BedBrigade.Data.Services
             _scheduleDataService = scheduleDataService;
             _subscriptionDataService = subscriptionDataService;
             _newsletterDataService = newsletterDataService;
+            _mailMergeLogic = mailMergeLogic;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -318,6 +321,7 @@ namespace BedBrigade.Data.Services
                 foreach (var emailQueue in emailQueueList)
                 {
                     emailQueue.SetCreateAndUpdateUser(userName);
+                    emailQueue.Body = _mailMergeLogic.ReplaceEmailForQuery( emailQueue.Body, emailQueue.ToAddress);
                 }
 
                 using (var ctx = _contextFactory.CreateDbContext())
