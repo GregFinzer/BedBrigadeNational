@@ -70,10 +70,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Grove City History  :heavy_check_mark:
     * Grove City Partners  :heavy_check_mark:
     * Grove City Assembly Instructions  :heavy_check_mark:
-    * Polaris Location Home Page
-    * Polaris About Us Page
-    * Polaris Assembly Instructions Page
+    * Polaris Location Home Page :heavy_check_mark:
+    * Polaris About Us Page :heavy_check_mark:
     * Polaris Donations Page
+    * Polaris History :heavy_check_mark:
 
     
 * Manage Locations
@@ -113,23 +113,23 @@ One thing you will notice about the following project plan is the lack of due da
     * Delete User :heavy_check_mark:
     
 * Stories
-    * Grove City Sample Story
-    * Polaris Sample Story
-    * List of Stories
-    * Story Detail
-    * Manage Stories
-    * Add Story
-    * Edit Story
-    * Delete Story
+    * Grove City Sample Story :heavy_check_mark:
+    * Polaris Sample Story :heavy_check_mark:
+    * List of Stories :heavy_check_mark:
+    * Story Detail :heavy_check_mark:
+    * Manage Stories :heavy_check_mark:
+    * Add Story :heavy_check_mark:
+    * Edit Story :heavy_check_mark:
+    * Delete Story :heavy_check_mark:
     
 * News
-    * National News Sample Story 
-    * List of News
-    * News Detail
-    * Manage News
-    * Add News
-    * Edit News
-    * Delete News
+    * National News Sample Story :heavy_check_mark:
+    * List of News :heavy_check_mark:
+    * News Detail :heavy_check_mark:
+    * Manage News :heavy_check_mark:
+    * Add News :heavy_check_mark:
+    * Edit News :heavy_check_mark:
+    * Delete News :heavy_check_mark:
     
     
 * Tech Debt
@@ -227,7 +227,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Apply String Localization :heavy_check_mark:
     * Fix Publish :heavy_check_mark:
     * Shutdown Background Services :heavy_check_mark:
-
+    * Laptop Admin Dialogs :heavy_check_mark:
+    * Generated Next Events :heavy_check_mark:
+    * Generated Carousel :heavy_check_mark:
+    
 * Address
     * Location Latitude & Longitude :heavy_check_mark:
     * Geolocation of Address :heavy_check_mark:
@@ -244,11 +247,10 @@ One thing you will notice about the following project plan is the lack of due da
     * Edit Donations Page
 
  * Newsletter
-    * Create Newsletter Tables
-    * Manage Newsletters
-    * Volunteer Subscribe to Newsletter
-    * Subscribe/Unsubscribe to Newsletter Page
-    * Ability to Send Newsletters
+    * Create Newsletter Tables :heavy_check_mark:
+    * Manage Newsletters :heavy_check_mark:
+    * Subscribe/Unsubscribe to Newsletter Page :heavy_check_mark:
+    * Ability to Send Newsletters :heavy_check_mark:
     
 * SMS
     * Add LocationId to Configuration with a default of National :heavy_check_mark:
