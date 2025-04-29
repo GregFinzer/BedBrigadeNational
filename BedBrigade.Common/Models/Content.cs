@@ -25,8 +25,12 @@ namespace BedBrigade.Common.Models
 		[MaxLength(255)]
 		public String Name { get; set; } = string.Empty;
 
+		[MaxLength(1024)]
+		public string? MainImagePath { get; set; }
+
         //No MaxLength attribute will default to nvarchar(max)
         public String? ContentHtml { get; set; } = string.Empty;
+
         //No MaxLength attribute will default to nvarchar(max)
         public string? UploadedFiles { get; set; } // JSON list of file names
 
