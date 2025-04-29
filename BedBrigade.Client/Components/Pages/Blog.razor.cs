@@ -32,13 +32,10 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter]
         public string? LocationRoute { get; set; }
 
-        [Parameter]
-        public string? ContentType { get; set; }
-
         // Parameters for Banner Rotator
 
         public string? RotatorTitle { get; set; }
-        private string Key => $"{LocationId}-{ContentType}";
+
         public int LocationId { get; set; }
         public string? ImagePath { get; set; }
 
@@ -67,7 +64,7 @@ namespace BedBrigade.Client.Components.Pages
         private bool IsShowBlogs = true;
         public bool IsShowBanner = false;
         public bool IsBlogData = false;
-        private bool IsTestMode = false;
+
         private bool IsCardSettings = false;
 
 
@@ -93,48 +90,49 @@ namespace BedBrigade.Client.Components.Pages
         private string? BlogModuleOptions { get; set; }
         private string? BlogModuleImagesExt { get; set; }
 
-
+        private string? BlogType { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-
             _lc.InitLocalizedComponent(this);
-            SetValidContentType();
+            SetBlogType();
+
             await LoadConfiguration();
 
-            if (IsTestMode) // ===== RUN TEST DATA GENERATIOIN ===========
-            {
-                // await CheckTestData();
-                // Run the validation and get the result
-                //HandleTestMode();
-
-            } // Test Mode only     
 
             await CheckParameters();
 
             // Validate and prepare Banner Folders
-            if (LocationRoute != null && ContentType != null)
+            if (LocationRoute != null)
             {
                 if (LocationRoute.ToLower() != "national")
                 {
-                    ValidateAndPrepareBannerFolders(LocationRoute, ContentType, _environment.WebRootPath);
+                    ValidateAndPrepareBannerFolders(LocationRoute, BlogType, _environment.WebRootPath);
                 }
             }
 
             await base.OnInitializedAsync();
 
-        }// Init       
+        }
 
-        private void SetValidContentType()
+        private void SetBlogType()
         {
-            if (!string.IsNullOrWhiteSpace(ContentType))
-            {
-                string lowerInput = ContentType.ToLower();
-                ContentType = BlogHelper.ValidContentTypes.TryGetValue(lowerInput, out string? correctedValue)
-                ? correctedValue
-                    : StringUtil.ProperCase(ContentType);
-            }
-        } // SetValidContentType
+            string baseUri = _navigationManager.BaseUri;
+            baseUri = baseUri.TrimEnd('/');
+            BlogType = StringUtil.GetLastWord(baseUri, "/");
+        }
+        // Init       
+
+        //private void SetValidContentType()
+        //{
+        //    if (!string.IsNullOrWhiteSpace(ContentType))
+        //    {
+        //        string lowerInput = ContentType.ToLower();
+        //        ContentType = BlogHelper.ValidContentTypes.TryGetValue(lowerInput, out string? correctedValue)
+        //        ? correctedValue
+        //            : StringUtil.ProperCase(ContentType);
+        //    }
+        //} // SetValidContentType
 
         private async Task LoadConfiguration()
         {
@@ -143,7 +141,6 @@ namespace BedBrigade.Client.Components.Pages
             {
 
                 blogConfig = new BlogConfiguration(BlogModuleOptions);
-                IsTestMode = blogConfig.TestMode;
                 IsCardSettings = blogConfig.CardSettings;
                 IsShowBanner = blogConfig.ShowBanner;
 
@@ -167,7 +164,6 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnParametersSetAsync()
         {
-            SetValidContentType();
             await CheckParameters();
             ChildKey = Guid.NewGuid().ToString();
             StateHasChanged();
@@ -190,25 +186,25 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
 
-            if (ContentType != null && ContentType.Length > 0 && BlogHelper.IsValidContentType(ContentType))
+            if (!String.IsNullOrEmpty(BlogType))
             {
                 bBlogTypeStatus = true;
-                ImagePath = $"pages/{ContentType}";
+                ImagePath = $"{BlogType}";
                 // check path & images existing
-                var LocationBlogFolder = $"{LocationRoute}/pages/{ContentType}";
+                var LocationBlogFolder = $"{LocationRoute}/{BlogType}";
                 var BlogFolderPath = FileUtil.GetMediaDirectory(LocationBlogFolder);
 
             }
             else
             {
                 ErrorMessage = BootstrapHelper.GetBootstrapMessage("warning", $"Unknown Requested Blog Type.<br />Please contact system administrator.");
-                ContentType = "";
+                BlogType = "";
                 return;
             }
 
             if (bLocationStatus && bBlogTypeStatus) // Show Banner only for correct location & type, if allowed
             {
-                RotatorTitle = $"{LocationName} {ContentType}";
+                RotatorTitle = $"{LocationName} {BlogType}";
                 IsShowBanner = blogConfig.ShowBanner;
             }
             else
@@ -216,7 +212,7 @@ namespace BedBrigade.Client.Components.Pages
                 IsShowBanner = false;
             }
 
-            string newMessage = _lc.Keys["BlogNoData", new { LocationName = LocationName, ContentType = ContentType }];
+            string newMessage = _lc.Keys["BlogNoData", new { LocationName = LocationName, ContentType = BlogType }];
             NoDataMessage = (MarkupString)newMessage;
 
             StateHasChanged();
@@ -252,6 +248,7 @@ namespace BedBrigade.Client.Components.Pages
 
         } // Load Location
 
+        //TODO:  Performance Violation of filtering in memory
         private async Task LoadContent()
         {
 
@@ -263,10 +260,10 @@ namespace BedBrigade.Client.Components.Pages
                 {
 
                     // Filter to Current Location & Type
-                    lstContents = lstContents.Where(c => c.LocationId == LocationId && c.ContentType.ToString() == ContentType).ToList();
+                    lstContents = lstContents.Where(c => c.LocationId == LocationId && c.ContentType.ToString() == BlogType).ToList();
                     if (lstContents != null && lstContents.Count > 0) // Data Found for current Location/Type
                     {
-                        _cards = BlogHelper.GetBlogItemsDataList(lstContents, LocationRoute, LocationName, ContentType, AllowedExtensions);
+                        _cards = BlogHelper.GetBlogItemsDataList(lstContents, LocationRoute, LocationName, BlogType, AllowedExtensions);
                         IsBlogData = true; // otherwise cannot show Blog Cards                        
                     }
                     else
@@ -282,63 +279,63 @@ namespace BedBrigade.Client.Components.Pages
 
         // TEST DATA AREA - START ==============================================================================
 
-        private void HandleTestMode()
-        {
-            connectionString = _configuration.GetConnectionString("DefaultConnection");
-            webRootPath = _environment.WebRootPath;
+        //private void HandleTestMode()
+        //{
+        //    connectionString = _configuration.GetConnectionString("DefaultConnection");
+        //    webRootPath = _environment.WebRootPath;
 
-            // Validate and create test data if needed
-            var validationResult = BlogTest.ValidateAndCreateTestData(connectionString, webRootPath, ResetAction);
+        //    // Validate and create test data if needed
+        //    var validationResult = BlogTest.ValidateAndCreateTestData(connectionString, webRootPath, ResetAction);
 
-            if (validationResult != null)
-            {
-                BlogContentCount = validationResult.BlogCount;
-                ImageFolderCount = validationResult.FolderCount;
-                UnzippedImagesCount = validationResult.ImageCount;
-                TestBarClass = validationResult.TestBarStyleClass;
+        //    if (validationResult != null)
+        //    {
+        //        BlogContentCount = validationResult.BlogCount;
+        //        ImageFolderCount = validationResult.FolderCount;
+        //        UnzippedImagesCount = validationResult.ImageCount;
+        //        TestBarClass = validationResult.TestBarStyleClass;
 
-            }
+        //    }
 
-        } // Handle Test Mode
+        //} // Handle Test Mode
 
 
-        private async Task ResetTestData()
-        {
-            bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to reset the test data?");
+        //private async Task ResetTestData()
+        //{
+        //    bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to reset the test data?");
 
-            if (isConfirmed)
-            {
-                ResetAction = "reset";
-                Debug.WriteLine($"Request Reset Test Data; current URL: {_navigationManager.Uri.ToString()}");
-                // Proceed with resetting the test data
-                HandleTestMode();  // Call the method that resets the data                
-                await ReloadPage();
-            }
+        //    if (isConfirmed)
+        //    {
+        //        ResetAction = "reset";
+        //        Debug.WriteLine($"Request Reset Test Data; current URL: {_navigationManager.Uri.ToString()}");
+        //        // Proceed with resetting the test data
+        //        HandleTestMode();  // Call the method that resets the data                
+        //        await ReloadPage();
+        //    }
 
-        }// Reset Test Data
+        //}// Reset Test Data
 
-        private async Task ClearTestData()
-        {
-            bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to delete the test data?");
+        //private async Task ClearTestData()
+        //{
+        //    bool isConfirmed = await JS.InvokeAsync<bool>("confirmReset", "Are you sure you want to delete the test data?");
 
-            if (isConfirmed)
-            {
-                ResetAction = "clear";
-                Debug.WriteLine($"Request Clear Test Data; current URL: {_navigationManager.Uri.ToString()}");
-                // Proceed with resetting the test data
-                HandleTestMode();  // Call the method that resets the data
-                await ReloadPage();
-            }
-        } // Clear Test Data
+        //    if (isConfirmed)
+        //    {
+        //        ResetAction = "clear";
+        //        Debug.WriteLine($"Request Clear Test Data; current URL: {_navigationManager.Uri.ToString()}");
+        //        // Proceed with resetting the test data
+        //        HandleTestMode();  // Call the method that resets the data
+        //        await ReloadPage();
+        //    }
+        //} // Clear Test Data
 
-        private async Task ReloadPage()
-        {
-            //_navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
-            //await JS.InvokeVoidAsync("reloadPage");
-            await JS.InvokeVoidAsync("eval", "window.location.href = window.location.href");
-        }// Reload Page                                 
+        //private async Task ReloadPage()
+        //{
+        //    //_navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
+        //    //await JS.InvokeVoidAsync("reloadPage");
+        //    await JS.InvokeVoidAsync("eval", "window.location.href = window.location.href");
+        //}// Reload Page                                 
 
-        // TEST DATA AREA - END  ==============================================================================
+        //// TEST DATA AREA - END  ==============================================================================
 
 
     } // class Blog

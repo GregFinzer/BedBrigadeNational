@@ -1,4 +1,5 @@
-@page "/{LocationRoute}/Blog/{ContentType}"
+@page "/{LocationRoute}/Stories"
+@page "/{LocationRoute}/News"
 @using System.Diagnostics
 @using BedBrigade.Client.Components
 @using Syncfusion.Blazor.Spinner
@@ -82,7 +83,7 @@ else
 
             <BlogCards @key="@ChildKey"
                        CurrentLocation="@myLocation"
-                       ContentTypeName="@ContentType"
+                       ContentTypeName="@BlogType"
                        BlogItemList="@_cards"                      
                        IsPaging="@IsCardPaging"
                        Rows="@NumberOfRows"
@@ -101,49 +102,6 @@ else
     }
 }
 
-<!-- TEST MODE --------------------------------->
-
-@if(IsTestMode)
-{
-
-<div class="row" >
-    <div class="col-sm">
-        <div class="spin-row">
-            <SfSpinner Size="40"  Type="SpinnerType.Bootstrap5" @bind-Visible="@SpinnerVisible"></SfSpinner>
-        </div>
-    </div>
-</div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <hr />
-        </div>
-    </div>
-
- 
-  <div class="@TestBarClass" >
-                        <div class="col-md-2 d-flex justify-content-center  align-items-center">
-                            <h3>@_lc.Keys["BlogTestMode"]</h3>
-                        </div>
-                        <div class="col-md-3 d-flex justify-content-center  align-items-center">
-                            @_lc.Keys["BlogContentRecords"]:&nbsp;@BlogContentCount
-                        </div>                     
-                        <div class="col-md-3 d-flex justify-content-center  align-items-center">
-                            @_lc.Keys["BlogImageFolders"]:&nbsp;@ImageFolderCount
-                        </div>
-                        <div class="col-md-3 d-flex justify-content-center  align-items-center">
-                            @_lc.Keys["BlogTestImages"]:&nbsp;@UnzippedImagesCount
-                        </div>
-                         <div class="col-md-1 d-flex justify-content-center  align-items-center">
-                            <button class="btn btn-warning" @onclick="ResetTestData"><i class="fas fa-sync"></i></button>&nbsp;
-                            <button class="btn btn-danger" @onclick="ClearTestData"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-    </div>    
-   
-   @FolderMessage
-
-}
-<!-- TEST MODE --------------------------------------------->
 
 <script>
         function reloadPage() {

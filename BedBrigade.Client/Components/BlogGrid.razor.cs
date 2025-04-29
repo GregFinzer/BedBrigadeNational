@@ -129,7 +129,7 @@ namespace BedBrigade.Client.Components
         private async Task LoadGridData()
         {
 
-
+            //TODO:  This is a performance violation filtering in memory
             var contentResult = await _svcContent.GetAllAsync();
             if (contentResult != null && contentResult.Success)
             {
@@ -191,12 +191,12 @@ namespace BedBrigade.Client.Components
                     CurrentBlog.LocationName = userLocation.Name;
                     CurrentBlog.LocationRoute = userLocation.Route;
                     CurrentBlog.MainImageUrl = Defaults.ErrorImagePath;
-                    CurrentBlog.Name = "NA"; // Main Image File - default not 
-                    NewBlogTempPath = $"media{userLocation.Route}/pages/{ContentTypeName}/BlogItemNew_{tempContentId}";
+                    CurrentBlog.MainImageFileName = "NA"; // Main Image File - default not 
+                    NewBlogTempPath = $"media{userLocation.Route}/{ContentTypeName}/BlogItemNew_{tempContentId}";
                     CurrentBlog.BlogFolder = NewBlogTempPath;
                     CurrentBlog.ContentType = CurrentContentType;
-                    CurrentBlog.Title = $"Enter {ContentTypeName} Item Title...";
-                    CurrentBlog.ContentHtml = "Enter Content Here...";
+                    CurrentBlog.Title = string.Empty;
+                    CurrentBlog.ContentHtml = string.Empty;
 
                     PageMode = "Edit"; // display edit component
                     OpenCustomModal();

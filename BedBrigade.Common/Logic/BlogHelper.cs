@@ -57,26 +57,8 @@ namespace BedBrigade.Common.Logic
             }
         }
 
-        public static bool IsValidContentType(string? contentTypeName)
-        {
-            if (!string.IsNullOrWhiteSpace(contentTypeName))
-            {
-                contentTypeName = StringUtil.ProperCase(contentTypeName);
-            }
 
-            return Enum.TryParse(contentTypeName, out ContentType _);
-        }//IsValidContentType
 
-        public static int CountImageFiles(string folderPath, string[] imageExtensions)
-        {
-            if (!Directory.Exists(folderPath))
-                return 0; // Return 0 if folder doesn't exist
-
-            //string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
-
-            return Directory.EnumerateFiles(folderPath)
-                .Count(file => imageExtensions.Contains(Path.GetExtension(file).ToLower()));
-        }
 
         public static List<BlogData> GetBlogDataList(List<Content> lstContentData, List<Location> lstLocations)
         {
@@ -96,8 +78,8 @@ namespace BedBrigade.Common.Logic
                     string locationRoute = myLocation?.Route ?? string.Empty;
                     string locationName = myLocation?.Name ?? string.Empty;
 
-                    string BlogFolderPath = $"media/{locationRoute}/pages/{s.ContentType.ToString()}/BlogItem_{s.ContentId}";
-                    var (mainImageUrl, optImagesUrls) = BlogHelper.GetBlogImages(s.Name, BlogFolderPath, AllowedExtensions);
+                    string BlogFolderPath = $"media/{locationRoute}/{s.ContentType.ToString()}/{s.Name}";
+                    var (mainImageUrl, optImagesUrls) = BlogHelper.GetBlogImages(s.MainImageFileName, BlogFolderPath, AllowedExtensions);
 
                     // Handle null Enum.GetName cases
                     string ContentTypeName = Enum.GetName(typeof(ContentType), s.ContentType) ?? "Unknown";
@@ -110,9 +92,9 @@ namespace BedBrigade.Common.Logic
                         LocationName = locationName,
                         ContentType = s.ContentType,
                         Title = StringUtil.IsNull(s.Title, ""),
-                        Name = StringUtil.IsNull(
-                            !string.IsNullOrEmpty(s.Name)
-                                ? s.Name
+                        MainImageFileName = StringUtil.IsNull(
+                            !string.IsNullOrEmpty(s.MainImageFileName)
+                                ? s.MainImageFileName
                                 : (!string.IsNullOrEmpty(mainImageUrl)
                                     ? Path.GetFileName(new Uri(mainImageUrl).LocalPath)
                                     : ""),
@@ -135,87 +117,7 @@ namespace BedBrigade.Common.Logic
             return myBlogData;
         }// Blog Data List
 
-        public static string GetCardMainImageUrl(string sourceFileName, int contentId, string LocationRoute, string? ContentTypeName)
-        {
-            var locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
-            string fullPathToParentFolder = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}/BlogItem_{contentId}");
-            string? imageFileUrl = Defaults.ErrorImagePath;
 
-            // Step 1: Validate file name and extension
-            if (string.IsNullOrWhiteSpace(sourceFileName) ||
-                Path.GetInvalidFileNameChars().Any(sourceFileName.Contains) ||
-                !AllowedExtensions.Contains(Path.GetExtension(sourceFileName), StringComparer.OrdinalIgnoreCase))
-            {
-                return imageFileUrl;
-            }
-
-            // Combine folder and file path
-            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fullPathToParentFolder.Replace("/", Path.DirectorySeparatorChar.ToString()));
-            string filePath = Path.Combine(folderPath, sourceFileName);
-
-            try
-            {
-                // Step 2: Check if folder exists
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                    return imageFileUrl;
-                }
-
-                // Step 3: Check if the specified file exists
-                if (File.Exists(filePath))
-                {
-                    imageFileUrl = GetRelativePathFromWebRoot(filePath);
-                    return imageFileUrl;
-                }
-
-                // Step 4: Check if there are other files in the folder with allowed extensions
-                var files = Directory.GetFiles(folderPath)
-                                      .Where(file => AllowedExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
-                                      .OrderBy(File.GetCreationTime)
-                                      .Select(Path.GetFileName)
-                                      .ToArray();
-
-                if (files.Length > 0)
-                {
-                    filePath = Path.Combine(folderPath, files[0]);
-                    imageFileUrl = GetRelativePathFromWebRoot(filePath);
-                    return imageFileUrl;
-                }
-
-                // No files found, return NoImageFound URL
-                return imageFileUrl;
-            }
-            catch
-            {
-                // Handle any exceptions (e.g., permissions issues) and return NoImageFound URL
-                return imageFileUrl;
-            }
-
-        } // Get Card Main Image Url
-
-
-        public static string GetBlogLocationFolder(string LocationRoute, string? ContentTypeName)
-        {
-            string locationMediaDirectory = FileUtil.GetMediaDirectory(LocationRoute);
-            string imageFolderPath = Path.Combine(locationMediaDirectory, $"Pages/{ContentTypeName}");
-            string relatedUrl = GetRelativePathFromWebRoot(imageFolderPath);
-
-            return (relatedUrl);
-        }
-        public static string GetRelativePathFromWebRoot(string fullPath)
-        {
-            const string webRootKeyword = "wwwroot";
-            int index = fullPath.IndexOf(webRootKeyword, StringComparison.OrdinalIgnoreCase);
-
-            if (index >= 0)
-            {
-                // Extract the part after "wwwroot"
-                return fullPath.Substring(index + webRootKeyword.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            }
-
-            throw new ArgumentException("The fullPath does not contain 'wwwroot'.");
-        } // Relative URL
 
         public static List<BlogData> GetBlogItemsDataList(List<Content>? lstContentData, string? LocationRoute, string? LocationName, string? ContentType, string[] AllowedExtensions)
         {
@@ -231,10 +133,10 @@ namespace BedBrigade.Common.Logic
                 {
 
                     //  folder path for images
-                    string BlogFolderPath = $"media/{LocationRoute}/pages/{ContentType}/BlogItem_{s.ContentId}";
+                    string BlogFolderPath = $"media/{LocationRoute}/{ContentType}/{s.Name}";
 
                     // Use the new utility function to get main image and optional images
-                    var (mainImageUrl, optImagesUrls) = BlogHelper.GetBlogImages(s.Name, BlogFolderPath, AllowedExtensions);
+                    var (mainImageUrl, optImagesUrls) = BlogHelper.GetBlogImages(s.MainImageFileName, BlogFolderPath, AllowedExtensions);
 
                     return new BlogData
                     {
@@ -244,7 +146,7 @@ namespace BedBrigade.Common.Logic
                         LocationName = LocationName,
                         ContentType = s.ContentType,
                         Title = StringUtil.IsNull(s.Title, ""),
-                        Name = StringUtil.IsNull(s.Name, ""),
+                        MainImageFileName = StringUtil.IsNull(s.MainImageFileName, ""),
                         CreateDate = s.CreateDate,
                         UpdateDate = s.UpdateDate ?? s.CreateDate,
                         ContentHtml = s.ContentHtml,
@@ -379,7 +281,6 @@ namespace BedBrigade.Common.Logic
 
         public class BlogConfiguration
         {
-            public bool TestMode { get; set; }
             public bool ShowBanner { get; set; }
             public bool CardSettings { get; set; }
             public bool CardPaging { get; set; }
@@ -517,6 +418,7 @@ namespace BedBrigade.Common.Logic
                 ContentType = original.ContentType,
                 Title = original.Title,
                 Name = original.Name,
+                MainImageFileName = original.MainImageFileName,
                 ContentHtml = original.ContentHtml,
                 UploadedFiles = original.UploadedFiles,
 

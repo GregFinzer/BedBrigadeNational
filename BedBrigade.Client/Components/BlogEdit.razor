@@ -51,11 +51,18 @@
                             <div class="card-body">
                                 <div>
                                     <label style="font-weight: bold">@_lc.Keys["Title"]:</label>
-                                    <input @bind="BlogEditItem.Title" class="form-control" maxlength="255" />
+                                    <input @bind="BlogEditItem.Title" class="form-control" maxlength="255" @oninput="UpdateName" />
                                 </div>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => BlogEditItem.Title)"></ValidationMessage>
-                                </div>                          
+                                </div>     
+                                <div>
+                                    <label style="font-weight: bold">@_lc.Keys["Name"]:</label>
+                                    <input @bind="BlogEditItem.Name" class="form-control" maxlength="255" @oninput="FilterName" placeholder="Alphanumeric and dashes only" title="Alphanumeric and dashes only" />
+                                </div>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => BlogEditItem.Name)"></ValidationMessage>
+                                </div>     
                                 <div>
                                     <label for="BlogItemContent" style="font-weight: bold">@_lc.Keys["Content"]:</label>
                                     <SfRichTextEditor @ref="RteObj"

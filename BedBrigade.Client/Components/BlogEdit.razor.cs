@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.RichTextEditor;
 using System.Diagnostics;
+using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 
 namespace BedBrigade.Client.Components
 {
@@ -172,7 +173,7 @@ namespace BedBrigade.Client.Components
                     {
                         BlogEditItem.ContentId = addResult.Data.ContentId;
                         BlogEditItem.IsNewItem = false;
-                        string newBlogFolder = $"BlogItem_{BlogEditItem.ContentId}";
+                        string newBlogFolder = BlogEditItem.Name;
                         // replace Folder Name
                         string newFolderPath = BlogFolderServerPath.Replace(oldBlogFolder, newBlogFolder);
                         if (Directory.Exists(BlogFolderServerPath) && !Directory.Exists(newFolderPath))
@@ -288,8 +289,8 @@ namespace BedBrigade.Client.Components
 
         public void OnImageUploadFailedHandler(ImageFailedEventArgs args)
         {
-            // Debug.WriteLine($"Image upload Failed: {args.File.Name}");
-            // Debug.WriteLine(args.StatusText);
+            Debug.WriteLine($"Image upload Failed: {args.File.Name}");
+            Debug.WriteLine(args.StatusText);
 
         }
 
@@ -351,58 +352,79 @@ namespace BedBrigade.Client.Components
 
         private async Task OnUploadMainImage(UploadChangeEventArgs args)
         {
-
-            var SavePath = BlogFolderServerPath;
-            // Check File Folder
-            if (!string.IsNullOrEmpty(SavePath))
+            try
             {
-                if (!Directory.Exists(SavePath))
+
+
+                var SavePath = BlogFolderServerPath;
+                // Check File Folder
+                if (!string.IsNullOrEmpty(SavePath))
                 {
-                    Directory.CreateDirectory(SavePath);
+                    if (!Directory.Exists(SavePath))
+                    {
+                        Directory.CreateDirectory(SavePath);
+                    }
                 }
-            }
 
-            var FileBaseUrl = BlogHelper.NormalizePath(BlogEditItem.BlogFolder); // not full path - only URL
+                var FileBaseUrl = BlogHelper.NormalizePath(BlogEditItem.BlogFolder); // not full path - only URL
 
-            // Define the maximum file size allowed (2 GB)
-            long maxFileSize = (long)BlogModuleFileSize;
+                // Define the maximum file size allowed (2 GB)
+                long maxFileSize = (long)BlogModuleFileSize;
 
 
-            if (args.Files != null && args.Files.Count > 0)
-            {
-                foreach (var file in args.Files)
+                if (args.Files != null && args.Files.Count > 0)
                 {
-                    string NormilizedFileName = BlogHelper.SanitizeFileName(file.FileInfo.Name);
-                    string newFileName = Path.Combine(SavePath, NormilizedFileName);
-                    Debug.WriteLine($"Uploaded Main Image file: {newFileName}");
-
-                    try
+                    foreach (var file in args.Files)
                     {
-                        using var stream = file.File.OpenReadStream(maxAllowedSize: maxFileSize);
-                        using var fileStream = new FileStream(newFileName, FileMode.Create, FileAccess.Write);
-                        await stream.CopyToAsync(fileStream);
-                        stream.Close();
-                        fileStream.Close();
+                        string NormilizedFileName = BlogHelper.SanitizeFileName(file.FileInfo.Name);
+                        string newFileName = Path.Combine(SavePath, NormilizedFileName);
+                        Debug.WriteLine($"Uploaded Main Image file: {newFileName}");
 
-                        // Normalize path
-                        string relativePath = FileBaseUrl + "/" + NormilizedFileName;
-                        Debug.WriteLine($"Relative Path to Main Image file: {relativePath}");
-                        BlogEditItem.MainImageUrl = relativePath;
-                        BlogEditItem.Name = NormilizedFileName;
+                        try
+                        {
+                            using var stream = file.File.OpenReadStream(maxAllowedSize: maxFileSize);
+                            using var fileStream = new FileStream(newFileName, FileMode.Create, FileAccess.Write);
+                            await stream.CopyToAsync(fileStream);
+                            stream.Close();
+                            fileStream.Close();
 
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error saving Main Image file {file.FileInfo.Name}: {ex.Message}");
-                    }
-                }// File Loop
+                            // Normalize path
+                            string relativePath = FileBaseUrl + "/" + NormilizedFileName;
+                            Debug.WriteLine($"Relative Path to Main Image file: {relativePath}");
+                            BlogEditItem.MainImageUrl = relativePath;
+                            BlogEditItem.MainImageFileName = NormilizedFileName;
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error saving Main Image file {file.FileInfo.Name}: {ex.Message}");
+                        }
+                    } // File Loop
+                }
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
 
+        private void UpdateName(ChangeEventArgs e)
+        {
+            string pageTitle = e.Value.ToString();
+            string pageName = pageTitle.Replace(' ', '-');
+            pageName = StringUtil.FilterAlphanumericAndDash(pageName);
+            BlogEditItem.Name = pageName;
+        }
 
-
-        } // File Uploads
-
-
+        private void FilterName(ChangeEventArgs e)
+        {
+            string pageName = e.Value.ToString();
+            pageName = pageName.Replace(" ", "-");
+            pageName = StringUtil.FilterAlphanumericAndDash(pageName);
+            BlogEditItem.Name = pageName;
+        }
 
     } // BlogEdit Class
 

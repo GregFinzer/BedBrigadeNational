@@ -335,6 +335,18 @@ namespace BedBrigade.Common.Logic
             return sb.ToString();
         }
 
+        public static string GetLastWord(string sentence, string delimiter)
+        {
+            if (String.IsNullOrEmpty(sentence))
+                return string.Empty;
+
+            string[] words = sentence.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (words.Length == 0)
+                return string.Empty;
+
+            return words[words.Length - 1];
+        }
     } // class
 
 

@@ -1,4 +1,5 @@
 ﻿@using BedBrigade.Client.Services
+@using Serilog
 
 @code
 {
@@ -15,8 +16,16 @@
     {
         if (!AuthService.IsLoggedIn)
         {
-            string returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-            NavigationManager.NavigateTo($"/login?returnUrl={returnUrl}", true);
+            try
+            {
+                string returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                NavigationManager.NavigateTo($"/login?returnUrl={returnUrl}", true);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warning(ex.ToString());
+                return;
+            }
         }
 
         if (!string.IsNullOrEmpty(Roles) && !AuthService.UserHasRole(Roles))
