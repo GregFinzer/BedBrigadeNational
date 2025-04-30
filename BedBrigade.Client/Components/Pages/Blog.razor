@@ -1,130 +1,74 @@
-@page "/{LocationRoute}/Stories"
+﻿@page "/{LocationRoute}/Stories"
 @page "/{LocationRoute}/News"
-@using System.Diagnostics
-@using BedBrigade.Client.Components
-@using Syncfusion.Blazor.Spinner
-@using Syncfusion.Blazor.Buttons
 
-
-
-@if (IsShowBanner)
+@if (BlogItems == null)
 {
-    <RotatorContainer @key="@ImagePath" RotatorTitle="@RotatorTitle" ImagePath="@ImagePath" LocationId="@LocationId" />
+    <p><em>Loading…</em></p>
 }
-
-
-@if (!string.IsNullOrWhiteSpace(ErrorMessage.Value))
+else if (!BlogItems.Any())
 {
-    <div class="alert alert-warning text-center mt-4">       
-        <p>@ErrorMessage</p>
-    </div>
+    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="@BlogType" LocationId="@LocationId.Value" />
+    <p><em>No @BlogType found.</em></p>
 }
 else
 {
-    @if(IsBlogData)
-    {
-        @if (IsCardSettings)
-        {
-            <div class="row mt-3">
-                <SfAccordion>
-                    <AccordionItems>
-                        <AccordionItem>
-                            <HeaderTemplate>
-                                <div><b><i class="fas fa-cogs"></i>&nbsp;@_lc.Keys["BlogCardViewSettings"]</b></div>
-                            </HeaderTemplate>
-                            <ContentTemplate>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="form-group d-flex align-items-center">
-                                            <label for="chkBanner" class="formlabel">@_lc.Keys["BlogShowBanner"]</label>&nbsp;
-                                            <SfCheckBox @bind-Checked="IsShowBanner">
-                                            </SfCheckBox>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="form-group d-flex align-items-center">
-                                            <label for="chkPaging" class="formlabel">@_lc.Keys["BlogCardPaging"]</label>&nbsp;
-                                            <SfCheckBox @bind-Checked="IsCardPaging">
-                                            </SfCheckBox>
-                                        </div>
-                                    </div>
-                                    @if (IsCardPaging)
-                                    {
-                                        <div class="col">
-                                            <div class="form-group d-flex align-items-center">
-                                                <label for="txtRows" class="formlabel">@_lc.Keys["BlogCardRows"]</label>&nbsp;
-                                                <SfNumericTextBox ID="txtRows" TValue="int" Min="1" Max="20" @bind-Value="NumberOfRows" Width="150px"></SfNumericTextBox>
-                                            </div>
-                                        </div>
-                                    }
-                                        <div class="col">
-                                            <div class="form-group d-flex align-items-center">
-                                                <label for="txtColumns" class="formlabel">@_lc.Keys["BlogCardColumns"]</label>&nbsp;
-                                                <SfNumericTextBox ID="txtColumns" TValue="int" Min="1" Max="4" @bind-Value="NumberOfColumns" Width="150px"></SfNumericTextBox>
-                                            </div>
-                                        </div>
-                                   
-                                    <div class="col">
-                                        <div class="form-group d-flex align-items-center">
-                                            <label for="txtContSize" class="formlabel">@_lc.Keys["BlogCardTextSize"]</label>&nbsp;
-                                            <SfNumericTextBox ID="txtContSize" TValue="int" Min="150" Max="400" @bind-Value="MaxTextSize" ShowSpinButton="false" Width="100px"></SfNumericTextBox>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ContentTemplate>
-                        </AccordionItem>
-                    </AccordionItems>
-                </SfAccordion>
-            </div>
+    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="@BlogType" LocationId="@LocationId.Value" />
 
-        } <!-- Settings -->
- 
-        <div class="row mt-3">
-
-            <BlogCards @key="@ChildKey"
-                       CurrentLocation="@myLocation"
-                       ContentTypeName="@BlogType"
-                       BlogItemList="@_cards"                      
-                       IsPaging="@IsCardPaging"
-                       Rows="@NumberOfRows"
-                       Columns="@NumberOfColumns"
-                       MaxContentSize="@MaxTextSize" />
-
+    <div class="blog-wrapper">
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-4 g-4">
+            @foreach (var item in BlogItems)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        @if (!string.IsNullOrEmpty(item.MainImageFileName))
+                        {
+                            <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{item.MainImageFileName}")"
+                                 class="card-img-top"
+                                 alt="@item.Title" />
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">
+                                <a href="@($"/{LocationRoute}/{BlogType}/{item.Name}")">
+                                    @item.Title
+                                </a>
+                            </h5>
+                            <p class="card-text flex-grow-1">
+                                @item.Description
+                            </p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small>
+                                @item.UpdateDateLocal?.ToString("M/d/yyyy h:mm tt")
+                                by @item.UpdateUser
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-    }
-    else
-    {
-        <div class="d-flex justify-content-center">
-            <div class="alert alert-primary text-center" role="alert">
-               <p>@NoDataMessage</p>
-            </div>
-        </div>
-    }
+    </div>
 }
 
-
-<script>
-        function reloadPage() {
-            window.location.replace(window.location.href);
-        }
-       function confirmReset(message) {
-        return confirm(message);  // Return true if confirmed, false otherwise
-        }
-</script>
-
 <style>
-
-    .container {
-        display: inline-flex;
-        width: auto;
-        padding: 0;
+    a {
+        color: #0e9241;
     }
 
-    .content {
-       
-        margin-left: 10px;
+    /* 10% horizontal margin around the card grid */
+    .blog-wrapper {
+        margin: 0 10%;
     }
 
+    @@media screen and (max-width: 576px) {
+        .blog-wrapper {
+            margin: 0 5px;
+        }
+    }
 
+        /* cap all card images at 400px tall and crop if needed */
+    .blog-wrapper .card-img-top {
+            height: 400px;
+            width: 100%;
+            object-fit: cover;
+        }
 </style>
- 

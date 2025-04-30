@@ -1,5 +1,4 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 
@@ -45,6 +44,8 @@ public class ContentDataService : Repository<Content>, IContentDataService
             {
                 return Task.FromResult(new ServiceResponse<Content>($"Could not find {GetEntityName()} with locationId of {locationId} and a name of {name}", false, null));
             }
+
+            _timezoneDataService.FillLocalDates(result);
 
             _cachingService.Set(cacheKey, result);
             return Task.FromResult(new ServiceResponse<Content>($"Found {GetEntityName()} with locationId of {locationId} and a name of {name}", true, result));
@@ -116,6 +117,60 @@ public class ContentDataService : Repository<Content>, IContentDataService
     public async Task<ServiceResponse<Content>> GetByLocationAndContentType(int locationId, ContentType contentType)
     {
         return await GetAsync(contentType.ToString(), locationId);
+    }
+
+    public async Task<ServiceResponse<List<BlogItemNew>>> GetBlogItems(int locationId, ContentType contentType)
+    {
+        const int truncationLength = 188;
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBlogItems({locationId}, {contentType}");
+        var cachedContent = _cachingService.Get<List<BlogItemNew>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<BlogItemNew>>($"Found {GetEntityName()} in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Content>();
+            var result = await dbSet.Where(c => c.ContentType == contentType && c.LocationId == locationId).ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResponse<List<BlogItemNew>>($"Could not find {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", false, null);
+            }
+
+            _timezoneDataService.FillLocalDates(result);
+
+            List<BlogItemNew> blogItems = new List<BlogItemNew>();
+
+            foreach (var item in result)
+            {
+                blogItems.Add(new BlogItemNew
+                {
+                    ContentId = item.ContentId,
+                    LocationId = item.LocationId,
+                    ContentType = item.ContentType,
+                    ContentHtml = item.ContentHtml,
+                    Name = item.Name,
+                    Title = item.Title,
+                    MainImageFileName = item.MainImageFileName,
+                    CreateDate = item.CreateDate,
+                    CreateDateLocal = item.CreateDateLocal,
+                    CreateUser = item.CreateUser,
+                    UpdateDate = item.UpdateDate,
+                    MachineName = item.MachineName,
+                    UpdateDateLocal = item.UpdateDateLocal,
+                    UpdateUser = item.UpdateUser,
+                    Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(item.ContentHtml), truncationLength),
+                });
+            }
+
+            _cachingService.Set(cacheKey, blogItems);
+            return new ServiceResponse<List<BlogItemNew>>($"Found {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", true, blogItems);
+        }
+
     }
 }
 

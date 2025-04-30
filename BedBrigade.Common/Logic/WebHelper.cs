@@ -5,6 +5,8 @@ namespace BedBrigade.Common.Logic
 {
     public static class WebHelper
     {
+        private static Regex _stripHtmlRegex = new Regex("<[^>]+>", RegexOptions.IgnoreCase| RegexOptions.Compiled);
+
         public static bool IsProduction()
         {
             string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -32,12 +34,11 @@ namespace BedBrigade.Common.Logic
 
         public static string StripHTML(string HTMLText, bool decode = true)
         {
-            Regex reg = new Regex("<[^>]+>", RegexOptions.IgnoreCase);
             string stripped = string.Empty;
             try
             {
                 if (HTMLText != null)
-                    stripped = reg.Replace(HTMLText, "");
+                    stripped = _stripHtmlRegex.Replace(HTMLText, "");
             }
             catch (Exception ex)
             {
