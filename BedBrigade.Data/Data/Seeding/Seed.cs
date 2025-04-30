@@ -918,7 +918,7 @@ public static class Seed
          new()
         {
             ConfigurationKey = ConfigNames.BlogModuleOptions,
-            ConfigurationValue = "TestMode:false|ShowBanner:true|CardSettings:false|CardPaging:true|CardColumns:4|CardRows:4|CardTextSize:150",
+            ConfigurationValue = "ShowBanner:true|CardSettings:false|CardPaging:true|CardColumns:4|CardRows:4|CardTextSize:150",
             Section = ConfigSection.Media,
             LocationId = Defaults.NationalLocationId
         },
