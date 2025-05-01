@@ -481,7 +481,7 @@ namespace BedBrigade.Client.Components
             var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
             string deliveryChecklist = string.Empty;
 
-            var deliveryChecklistResult = await _svcContent.GetByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
+            var deliveryChecklistResult = await _svcContent.GetSingleByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
 
             if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
             {

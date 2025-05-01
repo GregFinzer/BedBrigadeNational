@@ -1,24 +1,22 @@
-using Microsoft.AspNetCore.Components;
-
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
-using BedBrigade.Data.Services;
-using Action = Syncfusion.Blazor.Grids.Action;
-
-using Serilog;
-using BedBrigade.Common.Logic;
+﻿using System.Security.Claims;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Serilog;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
+using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 
 
-namespace BedBrigade.Client.Components
+namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
-    public partial class PagesGrid : ComponentBase
+    public partial class ManagePages : ComponentBase
     {
         [Inject] private IContentDataService? _svcContent { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
@@ -45,33 +43,30 @@ namespace BedBrigade.Client.Components
         protected List<string>? ContextMenu;
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
-        protected string? HeaderTitle { get; set; }
-        protected string? ButtonTitle { get; private set; }
-        public string EditTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
         protected SfToast? ToastObj { get; set; }
         protected string? ToastTitle { get; set; }
         protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
         protected string? RecordText { get; set; } = "Loading Pages ...";
-        protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public List<Location> Locations { get; private set; }
-        private string? saveUrl { get; set; }
-        public string imagePath { get; private set; }
+
+
+        [Parameter]
+        public string? ContentTypeString { get; set; }
+
         public List<ContentTypeEnumItem> ContentTypes { get; private set; }
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
-        private bool AddContentVisible;
 
         // text editor
 
-        private SfDialog DialogInstance;
         private string EditableText;
         private bool ShowDialog = false;
         private string CurrentLocationName { get; set; }
         private string TextDialogHeading { get; set; }
+
+        private ContentType _contentType;
+        private string _subdirectory;
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -81,10 +76,14 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
+            _contentType = Enum.Parse<ContentType>(ContentTypeString);
+
+            _subdirectory = BlogTypes.ValidBlogTypes.Contains(_contentType) ? _contentType.ToString() : "pages";
+
             Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Pages Page");
+            Log.Information($"{userName} went to the Manage Pages with a Content Type of {_contentType}" );
 
             if (Identity.HasRole(RoleNames.CanManagePages))
             {
@@ -98,26 +97,8 @@ namespace BedBrigade.Client.Components
             }
             content = new Content();
 
-            //TODO:  Refactor
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
-            if (isNationalAdmin)
-            {
-                var allResult = await _svcContent.GetAllAsync();
+            await LoadData();
 
-                if (allResult.Success)
-                {
-                    Pages = allResult.Data.ToList();
-                }
-            }
-            else
-            {
-                int userLocationId = await _svcUser.GetUserLocationId();
-                var contactUsResult = await _svcContent.GetAllForLocationAsync(userLocationId);
-                if (contactUsResult.Success)
-                {
-                    Pages = contactUsResult.Data.ToList();
-                }
-            }
 
             var locResult = await _svcLocation.GetAllAsync();
             if (locResult.Success)
@@ -126,6 +107,48 @@ namespace BedBrigade.Client.Components
             }
 
             ContentTypes = EnumHelper.GetContentTypeItems();
+        }
+
+        private async Task LoadData()
+        {
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
+            {
+                if (BlogTypes.ValidBlogTypes.Contains(_contentType))
+                {
+                    var contentTypeResult = await _svcContent.GetByContentType(_contentType);
+                    if (contentTypeResult.Success)
+                    {
+                        Pages = contentTypeResult.Data.ToList();
+                        return;
+                    }
+                }
+
+                var allResult = await _svcContent.GetAllExceptBlogTypes();
+
+                if (allResult.Success)
+                {
+                    Pages = allResult.Data.ToList();
+                    return;
+                }
+            }
+
+            int userLocationId = await _svcUser.GetUserLocationId();
+            if (BlogTypes.ValidBlogTypes.Contains(_contentType))
+            {
+                var locationContentTypeResult = await _svcContent.GetByLocationContentType(userLocationId, _contentType);
+                if (locationContentTypeResult.Success)
+                {
+                    Pages = locationContentTypeResult.Data.ToList();
+                    return;
+                }
+            }
+                
+            var locationResult = await _svcContent.GetForLocationExceptBlogTypes(userLocationId);
+            if (locationResult.Success)
+            {
+                Pages = locationResult.Data.ToList();
+            }
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -170,7 +193,7 @@ namespace BedBrigade.Client.Components
 
         private async Task SaveGridPersistence()
         {
-            _state = await Grid.GetPersistData();
+            _state = await Grid.GetPersistDataAsync();
             string userName = await _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Pages, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
@@ -188,7 +211,7 @@ namespace BedBrigade.Client.Components
 
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
+                await Grid.ResetPersistDataAsync();
                 await SaveGridPersistence();
                 return;
             }
@@ -209,7 +232,7 @@ namespace BedBrigade.Client.Components
             }
 
             if (args.Item.Text == "Rename")
-            { 
+            {
                 await RenamePage();
                 return;
             }
@@ -233,7 +256,7 @@ namespace BedBrigade.Client.Components
                     args.Cancel = true;
                     break;
 
-                case Action.BeginEdit:  
+                case Action.BeginEdit:
                     switch (args.Data.ContentType)
                     {
                         case ContentType.DeliveryCheckList:
@@ -251,8 +274,8 @@ namespace BedBrigade.Client.Components
                     }
 
                     break;
-            } 
-        } 
+            }
+        }
 
         private async Task Delete(ActionEventArgs<Content> args)
         {
@@ -270,7 +293,7 @@ namespace BedBrigade.Client.Components
                     {
                         ToastContent = "Delete Successful!";
                         var locationRoute = Locations.Find(l => l.LocationId == rec.LocationId).Route;
-                        var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/pages/{rec.Name}";
+                        var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/{_subdirectory}/{rec.Name}";
                         FileUtil.DeleteDirectory(folderPath);
                         Log.Information($"Deleted Page Folder at {folderPath}");
                     }
@@ -281,7 +304,7 @@ namespace BedBrigade.Client.Components
                     }
 
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     args.Cancel = true;
                     reason = ex.Message;
@@ -296,8 +319,13 @@ namespace BedBrigade.Client.Components
 
         private async Task Add(ActionEventArgs<Content> args)
         {
+            if (BlogTypes.ValidBlogTypes.Contains(_contentType))
+            {
+                _navigationManager.NavigateTo($"/administration/admintasks/addpage/{_contentType}");
+                return;
+            }
             _navigationManager.NavigateTo($"/administration/admintasks/addpage/Body");
-       }
+        }
 
 
         private async Task BeginEdit(ActionEventArgs<Content> args)
@@ -341,38 +369,39 @@ namespace BedBrigade.Client.Components
 
         protected async Task PdfExport()
         {
-            PdfExportProperties ExportProperties = new PdfExportProperties
+            PdfExportProperties exportProperties = new PdfExportProperties
             {
                 FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
-            await Grid.PdfExport(ExportProperties);
+            await Grid.ExportToPdfAsync(exportProperties);
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            ExcelExportProperties exportProperties = new ExcelExportProperties
             {
-                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".xlsx",
+                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".xlsx"
 
             };
 
-            await Grid.ExcelExport();
+            await Grid.ExportToExcelAsync(exportProperties);
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            ExcelExportProperties exportProperties = new ExcelExportProperties
             {
                 FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".csv",
 
             };
 
-            await Grid.CsvExport(ExportProperties);
+            await Grid.ExportToCsvAsync(exportProperties);
         }
 
         // Text EDitor
 
-        private void OpenTextDialog()        {          
-            
+        private void OpenTextDialog()
+        {
+
             EditableText = StringUtil.IsNull(CurrentValues.ContentHtml, "");
             ShowDialog = true;
         }
@@ -381,7 +410,7 @@ namespace BedBrigade.Client.Components
         {
             // Save the edited text back to the database
             CurrentValues.ContentHtml = EditableText;
-            await UpdatePageContent(CurrentValues);        
+            await UpdatePageContent(CurrentValues);
             ShowDialog = false;
         }
         private async Task SetLocationName()
@@ -389,7 +418,7 @@ namespace BedBrigade.Client.Components
             var locationResult = await _svcLocation.GetByIdAsync(CurrentValues.LocationId);
             if (locationResult.Success && locationResult.Data != null)
             {
-               CurrentLocationName = locationResult.Data.Name;                
+                CurrentLocationName = locationResult.Data.Name;
             }
         } // Get Location
 
@@ -401,11 +430,12 @@ namespace BedBrigade.Client.Components
 
         private async Task UpdatePageContent(Content newContent)
         {
-           
-           
+
+
             //Update Content  Record
             var updateResult = await _svcContent.UpdateAsync(newContent);
-            if (updateResult.Success)            {             
+            if (updateResult.Success)
+            {
 
                 _toastService.Success("Delivery Check List Saved", $"Content saved for location {CurrentLocationName}"); // VS 8/25/2024              
                 StateHasChanged();

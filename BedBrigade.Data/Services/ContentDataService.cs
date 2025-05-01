@@ -1,7 +1,7 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -52,6 +52,114 @@ public class ContentDataService : Repository<Content>, IContentDataService
         }
     }
 
+    public async Task<ServiceResponse<List<Content>>> GetAllExceptBlogTypes()
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetAllExceptBlogTypes");
+        var cachedContent = _cachingService.Get<List<Content>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Content>>($"Found {cachedContent.Count()} {GetEntityName()} in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Content>();
+            var result = await dbSet.Where(c => !BlogTypes.ValidBlogTypes.Contains(c.ContentType)).ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResponse<List<Content>>($"Could not find {GetEntityName()} for GetAllExceptBlogTypes", false, null);
+            }
+
+            _timezoneDataService.FillLocalDates(result);
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<Content>>($"Found {result.Count()} {GetEntityName()}", true, result);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Content>>> GetForLocationExceptBlogTypes(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetForLocationExceptBlogTypes({locationId})");
+        var cachedContent = _cachingService.Get<List<Content>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Content>>($"Found {cachedContent.Count()} {GetEntityName()} in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Content>();
+            var result = await dbSet.Where(c => c.LocationId == locationId && !BlogTypes.ValidBlogTypes.Contains(c.ContentType)).ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResponse<List<Content>>($"Could not find {GetEntityName()} for GetForLocationExceptBlogTypes", false, null);
+            }
+
+            _timezoneDataService.FillLocalDates(result);
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<Content>>($"Found {result.Count()} {GetEntityName()}", true, result);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Content>>> GetByContentType(ContentType contentType)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetByContentType({contentType})");
+        var cachedContent = _cachingService.Get<List<Content>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Content>>($"Found {cachedContent.Count()} {GetEntityName()} in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Content>();
+            var result = await dbSet.Where(c => c.ContentType == contentType).ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResponse<List<Content>>($"Could not find {GetEntityName()} for GetByContentType", false, null);
+            }
+
+            _timezoneDataService.FillLocalDates(result);
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<Content>>($"Found {result.Count()} {GetEntityName()}", true, result);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Content>>> GetByLocationContentType(int locationId, ContentType contentType)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetByLocationContentType({locationId}, {contentType})");
+        var cachedContent = _cachingService.Get<List<Content>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Content>>($"Found {cachedContent.Count()} {GetEntityName()} in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<Content>();
+            var result = await dbSet.Where(c => c.LocationId == locationId && c.ContentType == contentType).ToListAsync();
+
+            if (result == null)
+            {
+                return new ServiceResponse<List<Content>>($"Could not find {GetEntityName()} for GetByLocationContentType", false, null);
+            }
+
+            _timezoneDataService.FillLocalDates(result);
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<Content>>($"Found {result.Count()} {GetEntityName()}", true, result);
+        }
+    }
+
     public override async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
         var result = await base.GetAllAsync();
@@ -64,16 +172,16 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return result;
     }
 
-    public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
-    {
-        var contentResult = await _commonService.GetAllForLocationAsync(this, locationId);
+    //public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
+    //{
+    //    var contentResult = await _commonService.GetAllForLocationAsync(this, locationId);
 
-        if (contentResult.Success && contentResult.Data != null)
-        {
-            _timezoneDataService.FillLocalDates(contentResult.Data);
-        }
-        return contentResult;
-    }
+    //    if (contentResult.Success && contentResult.Data != null)
+    //    {
+    //        _timezoneDataService.FillLocalDates(contentResult.Data);
+    //    }
+    //    return contentResult;
+    //}
 
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
     {
@@ -114,40 +222,42 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return input.Replace("e-rte-image", "").Replace("e-imginline", "");
     }
 
-    public async Task<ServiceResponse<Content>> GetByLocationAndContentType(int locationId, ContentType contentType)
+    public async Task<ServiceResponse<Content>> GetSingleByLocationAndContentType(int locationId, ContentType contentType)
     {
         return await GetAsync(contentType.ToString(), locationId);
     }
 
-    public async Task<ServiceResponse<List<BlogItemNew>>> GetBlogItems(int locationId, ContentType contentType)
+    public async Task<ServiceResponse<List<BlogItem>>> GetBlogItems(int locationId, ContentType contentType)
     {
         const int truncationLength = 188;
 
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBlogItems({locationId}, {contentType}");
-        var cachedContent = _cachingService.Get<List<BlogItemNew>>(cacheKey);
+        var cachedContent = _cachingService.Get<List<BlogItem>>(cacheKey);
 
         if (cachedContent != null)
         {
-            return new ServiceResponse<List<BlogItemNew>>($"Found {GetEntityName()} in cache", true, cachedContent);
+            return new ServiceResponse<List<BlogItem>>($"Found {GetEntityName()} in cache", true, cachedContent);
         }
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<Content>();
-            var result = await dbSet.Where(c => c.ContentType == contentType && c.LocationId == locationId).ToListAsync();
+            var result = await dbSet.Where(c => c.ContentType == contentType && c.LocationId == locationId)
+                .OrderByDescending(o => o.UpdateDate)
+                .ToListAsync();
 
             if (result == null)
             {
-                return new ServiceResponse<List<BlogItemNew>>($"Could not find {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", false, null);
+                return new ServiceResponse<List<BlogItem>>($"Could not find {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", false, null);
             }
 
             _timezoneDataService.FillLocalDates(result);
 
-            List<BlogItemNew> blogItems = new List<BlogItemNew>();
+            List<BlogItem> blogItems = new List<BlogItem>();
 
             foreach (var item in result)
             {
-                blogItems.Add(new BlogItemNew
+                blogItems.Add(new BlogItem
                 {
                     ContentId = item.ContentId,
                     LocationId = item.LocationId,
@@ -168,7 +278,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
             }
 
             _cachingService.Set(cacheKey, blogItems);
-            return new ServiceResponse<List<BlogItemNew>>($"Found {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", true, blogItems);
+            return new ServiceResponse<List<BlogItem>>($"Found {GetEntityName()} with locationId of {locationId} and a contentType of {contentType}", true, blogItems);
         }
 
     }

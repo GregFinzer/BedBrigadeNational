@@ -1,6 +1,6 @@
 ﻿namespace BedBrigade.Common.Models
 {
-    public class BlogItemNew : Content
+    public class BlogItem : Content
     {
         public string Description { get; set; } = string.Empty;
     }

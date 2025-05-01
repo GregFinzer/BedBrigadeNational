@@ -22,7 +22,7 @@ namespace BedBrigade.Client.Components.Pages
 
         public string BlogType { get; set; }
 
-        private List<BlogItemNew>? BlogItems;
+        private List<BlogItem>? BlogItems;
 
         protected override async Task OnInitializedAsync()
         {
@@ -30,7 +30,7 @@ namespace BedBrigade.Client.Components.Pages
             uri = uri.TrimEnd('/');
             BlogType = StringUtil.GetLastWord(uri, "/");
 
-            BlogItems = new List<BlogItemNew>();
+            BlogItems = new List<BlogItem>();
             ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
             if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
             {

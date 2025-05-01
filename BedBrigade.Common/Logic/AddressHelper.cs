@@ -1,9 +1,4 @@
 ﻿using BedBrigade.Common.EnumModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BedBrigade.Common.Logic
 {
@@ -11,7 +6,7 @@ namespace BedBrigade.Common.Logic
     {
         public static List<UsState> GetStateList()
         {
-            List<UsState>? StateList = new List<UsState>
+            List<UsState> StateList = new List<UsState>
                 {
                     new UsState {StateCode = "AL", StateName = "Alabama",ZipCodeMin = 35004, ZipCodeMax = 36925},
                     new UsState {StateCode = "AK", StateName = "Alaska",ZipCodeMin = 99501,ZipCodeMax = 99950},

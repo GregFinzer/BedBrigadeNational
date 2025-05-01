@@ -65,13 +65,5 @@
         public const string SmsAccountSid = "SmsAccountSid";
         public const string SmsAuthToken = "SmsAuthToken";
         public const string SmsMissedMessageMinutes = "SmsMissedMessageMinutes";
-
-        // Blog Module
-
-        public const string BlogModuleOptions = "BlogModuleOptions";
-        public const string BlogModuleImages = "BlogModuleImages";
-
-
-
     }
 }

@@ -23,9 +23,15 @@ public partial class AddPage : ComponentBase
     
     public AddPageModel Model { get; set; } = new();
 
+    public string? Title { get; set; }
+    public ContentType SelectedContentType { get; set; }
+    public string SingularName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        SelectedContentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
+        SingularName = Pluralization.MakeSingular(SelectedContentType.ToString());
+        Title = $"Add {SingularName}";
         Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
         var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
         Model.CurrentLocationId = user.LocationId;
@@ -54,16 +60,13 @@ public partial class AddPage : ComponentBase
 
         if (result.Success)
         {
-            ErrorMessage = "A page with that name already exists for this location.";
+            ErrorMessage = $"A {SingularName} with that name already exists for this location.";
             return;
         }
 
-
-        ContentType contentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
-
         Content content;
 
-        if (contentType == ContentType.Body)
+        if (SelectedContentType == ContentType.Body)
         {
             var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
 
@@ -78,7 +81,7 @@ public partial class AddPage : ComponentBase
                 Name = Model.PageName,
                 LocationId = Model.CurrentLocationId,
                 ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-                ContentType = contentType,
+                ContentType = SelectedContentType,
                 Title = Model.PageTitle
             };
         }
@@ -89,7 +92,7 @@ public partial class AddPage : ComponentBase
                 Name = Model.PageName,
                 LocationId = Model.CurrentLocationId,
                 ContentHtml = string.Empty,
-                ContentType = contentType,
+                ContentType = SelectedContentType,
                 Title = Model.PageTitle
             };
         }
@@ -109,6 +112,6 @@ public partial class AddPage : ComponentBase
 
     private void HandleCancel()
     {
-        _navigationManager.NavigateTo("/administration/manage/pages");
+        _navigationManager.NavigateTo($"/administration/manage/pages/{SelectedContentType.ToString()}");
     }
 }
