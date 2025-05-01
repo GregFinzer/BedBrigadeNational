@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Syncfusion.Blazor.Kanban.Internal;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Linq;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
@@ -26,6 +28,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ICachingService _svcCaching { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
+        [Inject] private HttpClient Http { get; set; }
+
         [Parameter] public string LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
@@ -39,8 +43,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         public string FolderPath { get; set; }
         private string LocationName { get; set; } = "";
         private string LocationRoute { get; set; } = "";
-        private string saveUrl { get; set; }
-        private string imagePath { get; set; }
+        private string SaveUrl { get; set; }
+        private string ImagePath { get; set; }
         private List<string> AllowedTypes = new()
         {
             ".jpg",
@@ -49,7 +53,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             ".jpeg",
             ".webp"
         };
-        private string contentRootPath = string.Empty;
+        private string _contentRootPath = string.Empty;
         private int _maxFileSize;
 
         private string _mediaFolder;
@@ -117,7 +121,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
 
             await SetLocationName(locationId);
-            contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
+            _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
 
             ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, locationId);
 
@@ -172,9 +176,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
-                LocationRoute = locationResult.Data.Route;
-                imagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                saveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
+                LocationRoute = locationResult.Data.Route.TrimStart('/');
+                ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
+                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
             }
         }
 
@@ -234,7 +238,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = contentRootPath + $"\\{_subdirectory}\\{ContentName}\\{itemValue}";
+            FolderPath = _contentRootPath + $"\\{_subdirectory}\\{ContentName}\\{itemValue}";
             FolderPath = FolderPath.TrimEnd('\\');
             await OpenDialog();
         }
@@ -264,5 +268,46 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             // setting maximum height to the Dialog
             args.MaxHeight = "90%";
         }
+
+        private async Task OnInputFileChange(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+            var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+
+            if (!AllowedTypes.Contains(ext))
+            {
+                _toastService.Error("Invalid file type",
+                    $"Allowed: {string.Join(", ", AllowedTypes)}");
+                return;
+            }
+
+            try
+            {
+                // build multipart form
+                var content = new MultipartFormDataContent();
+                var stream = file.OpenReadStream(_maxFileSize);
+                content.Add(new StreamContent(stream), "file", file.Name);
+
+                // POST to your SaveUrl (set in SetLocationName)
+                var resp = await Http.PostAsync(SaveUrl, content);
+                if (resp.IsSuccessStatusCode)
+                {
+                    Content.MainImageFileName = file.Name;
+                    _toastService.Success("Upload successful",
+                        $"Image '{file.Name}' uploaded.");
+                    StateHasChanged();
+                }
+                else
+                {
+                    _toastService.Error("Upload failed",
+                        $"{resp.StatusCode}: {resp.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _toastService.Error("Upload error", ex.Message);
+            }
+        }
+
     }
 }
