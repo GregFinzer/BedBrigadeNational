@@ -1,0 +1,58 @@
+﻿@page "/{LocationRoute}/Stories/{Name}"
+@page "/{LocationRoute}/News/{Name}"
+
+<div class="container blog-container">
+    @if (ContentItem == null)
+    {
+        <p class="text-center"><em>Loading…</em></p>
+    }
+    else
+    {
+        <a class="btn btn-primary mb-3" href="@($"/{LocationRoute}/{BlogType}")">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+        </a>
+
+        <div class="card mb-4">
+            @if (!string.IsNullOrEmpty(ContentItem.MainImageFileName))
+            {
+                <img
+                    src="@($"media/{LocationRoute}/{BlogType}/{Name}/{ContentItem.MainImageFileName}")"
+                    class="card-img-top"
+                    alt="@ContentItem.Title" />
+            }
+
+            <div class="card-body">
+                <h1 class="card-title mb-2">@ContentItem.Title</h1>
+                <p class="text-muted mb-4">
+                    @ContentItem.UpdateDateLocal?.ToString("M/d/yyyy h:mm tt") 
+                    by @ContentItem.UpdateUser
+                </p>
+
+                <div class="card-text">
+                    @((MarkupString)ContentItem.ContentHtml)
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-primary mt-3" href="@($"/{LocationRoute}/{BlogType}")">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+        </a>
+    }
+</div>
+
+<style>
+    /* 20px top, 0 bottom; 10% left/right normally */
+    .blog-container {
+        margin: 20px 10% 0 10%;
+    }
+
+    /* phones: remove left/right margins */
+    @@media (max-width: 576px) {
+        .blog-container
+
+    {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    }
+</style>

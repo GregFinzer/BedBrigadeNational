@@ -30,6 +30,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IJSRuntime? JSRuntime { get; set; }
+        [Inject] private NavigationManager? NavigationManager { get; set; }
 
         [Parameter] public string? ContentTypeName { get; set; }
 
@@ -178,28 +179,7 @@ namespace BedBrigade.Client.Components
                     // cancel default editing
                     args.Cancel = true;
 
-                    Debug.WriteLine($"Add blog for location: {userLocation.LocationId} - {userLocation.Name}");
-
-
-                    tempContentId = BlogHelper.GenerateTempContentId();
-                    Debug.WriteLine("Add New Blog Item ");
-                    isAddInProgress = true;
-                    CurrentBlog = new BlogData();
-                    CurrentBlog.IsNewItem = true;
-                    CurrentBlog.ContentId = tempContentId; // should be replaced after save to real new ContentId
-                    CurrentBlog.LocationId = userLocation.LocationId;
-                    CurrentBlog.LocationName = userLocation.Name;
-                    CurrentBlog.LocationRoute = userLocation.Route;
-                    CurrentBlog.MainImageUrl = Defaults.ErrorImagePath;
-                    CurrentBlog.MainImageFileName = "NA"; // Main Image File - default not 
-                    NewBlogTempPath = $"media{userLocation.Route}/{ContentTypeName}/BlogItemNew_{tempContentId}";
-                    CurrentBlog.BlogFolder = NewBlogTempPath;
-                    CurrentBlog.ContentType = CurrentContentType;
-                    CurrentBlog.Title = string.Empty;
-                    CurrentBlog.ContentHtml = string.Empty;
-
-                    PageMode = "Edit"; // display edit component
-                    OpenCustomModal();
+                    NavigationManager.NavigateTo($"/administration/admintasks/addpage/{ContentTypeName}");
                     break;
 
                 case Syncfusion.Blazor.Grids.Action.BeginEdit:

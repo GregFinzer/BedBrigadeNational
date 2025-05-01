@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -14,6 +15,9 @@ public partial class AddPage : ComponentBase
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ITemplateDataService _svcTemplateDataService { get; set; }
     [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
+
+    [Parameter]
+    public string ContentTypeString { get; set; }
 
     public string ErrorMessage { get; set; }
     
@@ -54,22 +58,41 @@ public partial class AddPage : ComponentBase
             return;
         }
 
-        var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
 
-        if (!pageTemplate.Success)
+        ContentType contentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
+
+        Content content;
+
+        if (contentType == ContentType.Body)
         {
-            ErrorMessage = pageTemplate.Message;
-            return;
+            var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
+
+            if (!pageTemplate.Success)
+            {
+                ErrorMessage = pageTemplate.Message;
+                return;
+            }
+
+            content = new Content
+            {
+                Name = Model.PageName,
+                LocationId = Model.CurrentLocationId,
+                ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
+                ContentType = contentType,
+                Title = Model.PageTitle
+            };
         }
-
-        var content = new Content
+        else
         {
-            Name = Model.PageName,
-            LocationId = Model.CurrentLocationId,
-            ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-            ContentType = BedBrigade.Common.Enums.ContentType.Body,
-            Title = Model.PageTitle
-        };
+            content = new Content
+            {
+                Name = Model.PageName,
+                LocationId = Model.CurrentLocationId,
+                ContentHtml = string.Empty,
+                ContentType = contentType,
+                Title = Model.PageTitle
+            };
+        }
 
         var createResponse = await _svcContentDataService.CreateAsync(content);
 

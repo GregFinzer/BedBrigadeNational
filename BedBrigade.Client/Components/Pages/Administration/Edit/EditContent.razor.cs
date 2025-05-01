@@ -45,7 +45,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         {
             ".jpg",
             ".png",
-            ".gif"
+            ".gif",
+            ".jpeg",
+            ".webp"
         };
         private string contentRootPath = string.Empty;
         private int _maxFileSize;
@@ -88,6 +90,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         };
 
+        private string _subdirectory;
 
         protected override async Task OnInitializedAsync()
         {
@@ -120,8 +123,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                Body = await ProcessHtml(contentResult.Data.ContentHtml, locationId);
                 Content = contentResult.Data;
+                if (Content.ContentType == ContentType.Body || Content.ContentType == ContentType.Header || Content.ContentType == ContentType.Footer)
+                {
+                    _subdirectory = "pages";
+                }
+                else
+                {
+                    _subdirectory = Content.ContentType.ToString();
+                }
+
+                Body = await ProcessHtml(Content.ContentHtml);
+                
                 Content.UpdateDate = DateTime.UtcNow;
                 Content.UpdateUser =  Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 ImageButtonList = GetImageButtonList(Body);
@@ -160,14 +173,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             {
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route;
-                imagePath = $"media/{LocationRoute}/pages/{ContentName}/"; // VS 8/25/2024
-                saveUrl = $"api/image/save/{locationId}/pages/{ContentName}";
+                imagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
+                saveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
             }
         }
 
-        private async Task<string?> ProcessHtml(string? html, int locationId)
+        private async Task<string?> ProcessHtml(string? html)
         {
-            string path = $"{LocationRoute}/pages/{ContentName}"; // VS 8/25/2024
+            string path = $"{LocationRoute}/{_subdirectory}/{ContentName}"; // VS 8/25/2024
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
@@ -192,7 +205,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
                 _toastService.Success("Content Saved", 
                     $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024
-                _navigationManager.NavigateTo("/administration/manage/pages");
+                NavigateToManagePages();
             }
             else
             {
@@ -202,14 +215,26 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             
         }
 
+        private void NavigateToManagePages()
+        {
+            if (_subdirectory == "pages")
+            {
+                _navigationManager.NavigateTo("/administration/manage/pages");
+            }
+            else
+            {
+                _navigationManager.NavigateTo($"/administration/manage/blogpost/{Content.ContentType.ToString()}");
+            }
+        }
+
         private async Task HandleCancelClick()
         {
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            NavigateToManagePages();
         }
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = contentRootPath + $"\\pages\\{ContentName}\\{itemValue}";
+            FolderPath = contentRootPath + $"\\{_subdirectory}\\{ContentName}\\{itemValue}";
             FolderPath = FolderPath.TrimEnd('\\');
             await OpenDialog();
         }
@@ -229,7 +254,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 return;
             }
             _svcCaching.ClearAll();
-            Body = await ProcessHtml(Body, locationId);
+            Body = await ProcessHtml(Body);
             await this.RteObj.RefreshUIAsync();
             StateHasChanged();
         }

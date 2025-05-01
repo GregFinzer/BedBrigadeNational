@@ -12,11 +12,8 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Syncfusion.Blazor.Popups;
-using Microsoft.AspNetCore.Http.HttpResults;
 using ContentType = BedBrigade.Common.Enums.ContentType;
-using BedBrigade.Client.Services;
 
 
 namespace BedBrigade.Client.Components
@@ -299,7 +296,7 @@ namespace BedBrigade.Client.Components
 
         private async Task Add(ActionEventArgs<Content> args)
         {
-            _navigationManager.NavigateTo($"/administration/admintasks/addpage");
+            _navigationManager.NavigateTo($"/administration/admintasks/addpage/Body");
        }
 
 
