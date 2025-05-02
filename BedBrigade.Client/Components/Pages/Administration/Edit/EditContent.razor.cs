@@ -97,6 +97,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         };
 
         private string _subdirectory;
+        private string FileButtonText =>
+            string.IsNullOrEmpty(Content?.MainImageFileName)
+                ? "Choose file"
+                : "Replace file";
+        private InputFile _fileInput;
+        private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
 
         protected override async Task OnInitializedAsync()
         {
@@ -286,12 +292,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     return;
                 }
 
-                string path = ImagePath + file.Name;
+                string fileName = file.Name;
+                string path = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName, fileName);
                 using (FileStream fs = System.IO.File.Create(path))
                     await file.OpenReadStream().CopyToAsync(fs);
 
-                Content.MainImageFileName = file.Name;
-                _toastService.Success("Upload succeeded", file.Name);
+                Content.MainImageFileName = fileName;
+                _toastService.Success("Upload succeeded", fileName);
                 StateHasChanged();
             }
             catch (Exception ex)

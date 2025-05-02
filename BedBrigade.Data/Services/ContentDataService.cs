@@ -203,6 +203,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                 entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
                 entity.UpdateDate = DateTime.UtcNow;
                 entity.UpdateUser = content.UpdateUser;
+                entity.MainImageFileName = content.MainImageFileName;
                 context.Entry(entity).State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());

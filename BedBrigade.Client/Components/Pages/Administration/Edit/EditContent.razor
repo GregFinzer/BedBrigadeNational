@@ -40,8 +40,23 @@ else
             {
                 <div class="mb-3">
                     <label class="form-label">Upload Main Image</label>
-                    <InputFile OnChange="OnInputFileChange"
-                               accept=".gif,.jpg,.jpeg,.png,.webp" />
+                    <!-- Hidden native file input -->
+                    <InputFile id="@_fileInputId"
+                               @ref="_fileInput"
+                               OnChange="OnInputFileChange"
+                               accept=".gif,.jpg,.jpeg,.png,.webp"
+                               style="display:none" />
+                    
+                    <!-- Label that looks like a button -->
+                    <label class="btn btn-primary" for="@_fileInputId">
+                        @FileButtonText
+                    </label>
+
+                    @* Show the currently-selected file name *@
+                    @if (!string.IsNullOrEmpty(Content?.MainImageFileName))
+                    {
+                        <span class="ms-2">@Content.MainImageFileName</span>
+                    }
                     @if (!string.IsNullOrEmpty(Content.MainImageFileName))
                     {
                         <div class="mt-2">
