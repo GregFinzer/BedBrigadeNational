@@ -39,6 +39,51 @@ public static class SeedContentsLogic
             await SeedBedRequestConfirmationForm(context, locations);
             await SeedSignUpEmailConfirmationForm(context, locations);
             await SeedSignUpSmsConfirmationForm(context, locations);
+            await SeedNewsletterForm(context, locations);
+        }
+    }
+
+    private static async Task SeedNewsletterForm(DataContext context, List<Location> locations)
+    {
+        // Do not seed National - remove it from list
+        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        if (National != null)
+        {
+            locations.Remove(National);
+        }
+
+        Log.Logger.Information("SeedNewsletterForm Started");
+
+        string name = ContentType.NewsletterForm.ToString();
+
+        if (!await context.Content.AnyAsync(c => c.Name == name))
+        {
+            string seedText;
+
+            foreach (var location in locations)
+            {
+                seedText = WebHelper.GetHtml("NewsletterForm.txt");
+
+                var content = new Content
+                {
+                    LocationId = location.LocationId!,
+                    ContentType = ContentType.NewsletterForm,
+                    Name = name,
+                    ContentHtml = seedText,
+                    Title = StringUtil.InsertSpaces(name)
+                };
+                SeedRoutines.SetMaintFields(content);
+                context.Content.Add(content); // add row to Contents table 
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in SeedNewsletterForm content {ex.Message}");
+            }
         }
     }
 

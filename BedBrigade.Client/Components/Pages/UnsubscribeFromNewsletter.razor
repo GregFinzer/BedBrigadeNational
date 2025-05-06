@@ -1,5 +1,4 @@
 ﻿@page "/UnsubscribeFromNewsletter"
-@page "/UnsubscribeFromNewsletter/{locationId:int?}/{newsletterName?}/{email?}"
 
 @using System.ComponentModel.DataAnnotations
 @using BedBrigade.Common.Models
@@ -7,6 +6,7 @@
 @inject INewsletterDataService NewsletterDataService
 @inject ILocationDataService LocationDataService
 @inject ILanguageContainerService _lc
+@inject NavigationManager NavigationManager
 
 <div class="container mt-4">
     <h3 class="mb-4">@_lc.Keys["UnsubscribeFromNewsletter"]</h3>
@@ -59,18 +59,17 @@
 </div>
 
 @code {
-    // These parameters can be provided via the URL query string
     [Parameter]
-    [SupplyParameterFromQuery]
+    [SupplyParameterFromQuery(Name = "locationId")]
     public int? locationId { get; set; }
 
     [Parameter]
-    [SupplyParameterFromQuery]
-    public string? newsletterName { get; set; }
+    [SupplyParameterFromQuery(Name = "newsletterName")]
+    public string newsletterName { get; set; }
 
     [Parameter]
-    [SupplyParameterFromQuery]
-    public string? email { get; set; }
+    [SupplyParameterFromQuery(Name = "email")]
+    public string email { get; set; }
 
     private bool isProcessing = false;
     private string? unsubscribeMessage;
@@ -95,7 +94,7 @@
         if (allParametersProvided)
         {
             isProcessing = true;
-            var response = await SubscriptionDataService.Unsubscribe(locationId.Value, newsletterName!, email!);
+            var response = await SubscriptionDataService.Unsubscribe(Convert.ToInt32(locationId), newsletterName!, email!);
             if (response.Success)
             {
                 unsubscribeMessage = "You have been unsubscribed successfully.";

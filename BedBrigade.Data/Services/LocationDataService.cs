@@ -68,6 +68,9 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
             await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
+            await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
+            await CreateContent(location, ContentType.SignUpSmsConfirmationForm, "SignUpSmsConfirmationForm.txt", "SignUpSmsConfirmationForm");
+            await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
             return result;
         }
         catch (Exception ex)

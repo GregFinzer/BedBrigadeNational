@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace BedBrigade.Common.Enums
 {
@@ -26,6 +21,8 @@ namespace BedBrigade.Common.Enums
         Everyone,
         [Description("Contact Us Requests for Location")]
         ContactUsForLocation,
+        [Description("Newsletter")]
+        Newsletter,
         [Description("Volunteers for Location")]
         VolunteersForLocation,
         [Description("Volunteers With Delivery Vehicles for Location")]

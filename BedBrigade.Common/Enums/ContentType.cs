@@ -20,5 +20,7 @@ public enum ContentType
     SignUpSmsConfirmationForm = 9,
     Reserved = 10,
     News = 11,
-    Stories = 12
+    Stories = 12,
+    [Description("Newsletter Form")]
+    NewsletterForm = 13,
 }
