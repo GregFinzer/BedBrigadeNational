@@ -39,32 +39,23 @@ else
                  || Content?.ContentType == ContentType.News)
             {
                 <div class="mb-3">
-                    <label class="form-label">Upload Main Image</label>
+                    @if (!string.IsNullOrEmpty(Content.MainImageFileName))
+                    {
+                        <img src="@($"{ImagePath}/{Content.MainImageFileName}")"
+                             class="img-thumbnail"
+                             style="max-height:200px;" />
+                    }
                     <!-- Hidden native file input -->
                     <InputFile id="@_fileInputId"
                                @ref="_fileInput"
                                OnChange="OnInputFileChange"
                                accept=".gif,.jpg,.jpeg,.png,.webp"
-                               style="display:none" />
-                    
+                               style="display:none"/>
+
                     <!-- Label that looks like a button -->
                     <label class="btn btn-primary" for="@_fileInputId">
                         @FileButtonText
                     </label>
-
-                    @* Show the currently-selected file name *@
-                    @if (!string.IsNullOrEmpty(Content?.MainImageFileName))
-                    {
-                        <span class="ms-2">@Content.MainImageFileName</span>
-                    }
-                    @if (!string.IsNullOrEmpty(Content.MainImageFileName))
-                    {
-                        <div class="mt-2">
-                            <img src="@($"{ImagePath}/{Content.MainImageFileName}")"
-                                 class="img-thumbnail"
-                                 style="max-height:200px;" />
-                        </div>
-                    }
                 </div>
             }
             <div class="rte-container">

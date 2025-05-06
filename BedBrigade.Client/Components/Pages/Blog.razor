@@ -1,14 +1,15 @@
 ﻿@page "/{LocationRoute}/Stories"
 @page "/{LocationRoute}/News"
+@using System.Dynamic
 
 @if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
 {
-    <p><em>Loading…</em></p>
+    <p><em>@_lc.Keys["Loading"]</em></p>
 }
 else if (!BlogItems.Any())
 {
     <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="@BlogType" LocationId="@LocationId.Value" />
-    <p><em>No @BlogType found.</em></p>
+    <p><em>@_lc.Keys["BlogNoData"]</em></p>
 }
 else
 {
@@ -22,7 +23,7 @@ else
                     <div class="card h-100">
                         @if (!string.IsNullOrEmpty(item.MainImageFileName))
                         {
-                            <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{item.MainImageFileName}")"
+                            <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{ImageUtil.GetThumbnailFileName(item.MainImageFileName)}")"
                                  class="card-img-top"
                                  alt="@item.Title" />
                         }

@@ -12,6 +12,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _nav { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter]
         public string LocationRoute { get; set; } = default!;
@@ -24,8 +25,11 @@ namespace BedBrigade.Client.Components.Pages
 
         private List<BlogItem>? BlogItems;
 
+        public string LocationName { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             string uri = _nav.Uri;
             uri = uri.TrimEnd('/');
             BlogType = StringUtil.GetLastWord(uri, "/");
@@ -35,6 +39,7 @@ namespace BedBrigade.Client.Components.Pages
             if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
             {
                 LocationId = locationResponse.Data.LocationId;
+                LocationName = locationResponse.Data.Name;
                 RotatorTitle = $"{locationResponse.Data.Name} {BlogType}";
 
                 ContentType contentType = Enum.Parse<ContentType>(BlogType, true);
@@ -46,5 +51,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
         }
+
+
     }
 }

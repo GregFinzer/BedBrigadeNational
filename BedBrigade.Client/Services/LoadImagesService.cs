@@ -109,13 +109,13 @@ namespace BedBrigade.Client.Services
         public string GetRotatedImage(string path, string area)
         {
             var images = GetImagesForArea(path, area);
-            ImageRotatorLogic rotatorLogic = new ImageRotatorLogic();
+            ImageUtil rotatorLogic = new ImageUtil();
             return rotatorLogic.ComputeImageToDisplay(images);
         }
 
         public string GetRotatedImage(List<string> images)
         {
-            ImageRotatorLogic rotatorLogic = new ImageRotatorLogic();
+            ImageUtil rotatorLogic = new ImageUtil();
             return rotatorLogic.ComputeImageToDisplay(images);
         }
 

@@ -10,6 +10,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _nav { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
 
         [Parameter]
         public string? LocationRoute { get; set; }
@@ -19,10 +20,12 @@ namespace BedBrigade.Client.Components.Pages
         public string? BlogType { get; set; }
 
         private Content? ContentItem;
+        public string? ErrorMessage { get; set; }
 
 
         protected override async Task OnInitializedAsync()
         {
+            _lc.InitLocalizedComponent(this);
             string url = _nav.Uri;
             BlogType = StringUtil.GetNextToLastWord(url, "/");
 
@@ -40,8 +43,12 @@ namespace BedBrigade.Client.Components.Pages
                 }
                 else
                 {
-                    // TODO: handle not-found or error (e.g. show a message or redirect)
+                    ErrorMessage=  $"{Pluralization.MakeSingular(BlogType)} not found: {Name} ";
                 }
+            }
+            else
+            {
+                ErrorMessage = $"Location not found: {LocationRoute}";
             }
         }
     }

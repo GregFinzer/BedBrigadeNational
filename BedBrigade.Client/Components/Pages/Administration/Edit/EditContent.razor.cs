@@ -99,8 +99,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private string _subdirectory;
         private string FileButtonText =>
             string.IsNullOrEmpty(Content?.MainImageFileName)
-                ? "Choose file"
-                : "Replace file";
+                ? "Upload Main Image"
+                : "Replace Main Image";
         private InputFile _fileInput;
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
 
@@ -296,6 +296,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 string path = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName, fileName);
                 using (FileStream fs = System.IO.File.Create(path))
                     await file.OpenReadStream().CopyToAsync(fs);
+
+                // Create a thumbnail
+                string thumbnailPath = Path.Combine(FileUtil.ExtractPath(path),  ImageUtil.GetThumbnailFileName(path));
+                ImageUtil.CreateThumbnail(path, thumbnailPath, 600, 75);
 
                 Content.MainImageFileName = fileName;
                 _toastService.Success("Upload succeeded", fileName);
