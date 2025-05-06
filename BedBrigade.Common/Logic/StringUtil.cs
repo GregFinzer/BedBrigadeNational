@@ -335,6 +335,48 @@ namespace BedBrigade.Common.Logic
             return sb.ToString();
         }
 
+        public static string GetLastWord(string sentence, string delimiter)
+        {
+            if (String.IsNullOrEmpty(sentence))
+                return string.Empty;
+
+            string[] words = sentence.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (words.Length == 0)
+                return string.Empty;
+
+            return words[words.Length - 1];
+        }
+
+        public static string GetNextToLastWord(string sentence, string delimiter)
+        {
+            if (String.IsNullOrEmpty(sentence))
+                return string.Empty;
+            string[] words = sentence.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length < 2)
+                return string.Empty;
+            return words[words.Length - 2];
+        }
+
+        public static string TruncateTextToLastWord(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text) || maxLength <= 0)
+            {
+                return text;
+            }
+            if (text.Length <= maxLength)
+            {
+                return text;
+            }
+            // Find the last space before the max length
+            int lastSpaceIndex = text.LastIndexOf(' ', maxLength);
+            if (lastSpaceIndex == -1)
+            {
+                return text.Substring(0, maxLength) + "...";
+            }
+            return text.Substring(0, lastSpaceIndex) + "...";
+
+        }
     } // class
 
 

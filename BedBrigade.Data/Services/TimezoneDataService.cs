@@ -84,6 +84,13 @@ public class TimezoneDataService : ITimezoneDataService
             item.MessageDate = ConvertUtcToTimeZone(item.MessageDate, timeZoneId);
         }
     }
+
+    public void FillLocalDates<T>(T item) where T : BaseEntity
+    {
+        string timeZoneId = GetUserTimeZoneId();
+        item.CreateDateLocal = ConvertUtcToTimeZone(item.CreateDate, timeZoneId);
+        item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
+    }
 }
 
 

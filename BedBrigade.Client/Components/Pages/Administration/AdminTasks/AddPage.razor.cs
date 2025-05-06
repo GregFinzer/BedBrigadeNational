@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -15,13 +16,22 @@ public partial class AddPage : ComponentBase
     [Inject] private ITemplateDataService _svcTemplateDataService { get; set; }
     [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
 
+    [Parameter]
+    public string ContentTypeString { get; set; }
+
     public string ErrorMessage { get; set; }
     
     public AddPageModel Model { get; set; } = new();
 
+    public string? Title { get; set; }
+    public ContentType SelectedContentType { get; set; }
+    public string SingularName { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        SelectedContentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
+        SingularName = Pluralization.MakeSingular(SelectedContentType.ToString());
+        Title = $"Add {SingularName}";
         Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
         var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
         Model.CurrentLocationId = user.LocationId;
@@ -50,26 +60,42 @@ public partial class AddPage : ComponentBase
 
         if (result.Success)
         {
-            ErrorMessage = "A page with that name already exists for this location.";
+            ErrorMessage = $"A {SingularName} with that name already exists for this location.";
             return;
         }
 
-        var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
+        Content content;
 
-        if (!pageTemplate.Success)
+        if (SelectedContentType == ContentType.Body)
         {
-            ErrorMessage = pageTemplate.Message;
-            return;
+            var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
+
+            if (!pageTemplate.Success)
+            {
+                ErrorMessage = pageTemplate.Message;
+                return;
+            }
+
+            content = new Content
+            {
+                Name = Model.PageName,
+                LocationId = Model.CurrentLocationId,
+                ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
+                ContentType = SelectedContentType,
+                Title = Model.PageTitle
+            };
         }
-
-        var content = new Content
+        else
         {
-            Name = Model.PageName,
-            LocationId = Model.CurrentLocationId,
-            ContentHtml = pageTemplate.Data.ContentHtml.Replace("%PageTitle%", Model.PageTitle),
-            ContentType = BedBrigade.Common.Enums.ContentType.Body,
-            Title = Model.PageTitle
-        };
+            content = new Content
+            {
+                Name = Model.PageName,
+                LocationId = Model.CurrentLocationId,
+                ContentHtml = string.Empty,
+                ContentType = SelectedContentType,
+                Title = Model.PageTitle
+            };
+        }
 
         var createResponse = await _svcContentDataService.CreateAsync(content);
 
@@ -86,6 +112,6 @@ public partial class AddPage : ComponentBase
 
     private void HandleCancel()
     {
-        _navigationManager.NavigateTo("/administration/manage/pages");
+        _navigationManager.NavigateTo($"/administration/manage/pages/{SelectedContentType.ToString()}");
     }
 }

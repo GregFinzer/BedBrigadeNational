@@ -1,5 +1,5 @@
 ﻿@layout Layout.AdminLayout
-@page "/administration/admintasks/addpage"
+@page "/administration/admintasks/addpage/{ContentTypeString}"
 @using BedBrigade.Common.Constants
 @using BedBrigade.Common.Models
 @using Syncfusion.Blazor.DropDowns
@@ -12,7 +12,7 @@
 else
 {
     <div class="container my-5 ">
-        <h1>Add Page</h1>
+        <h1>@Title</h1>
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator/>
             @if (Model.IsNationalAdmin)

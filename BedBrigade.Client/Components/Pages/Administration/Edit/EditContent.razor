@@ -1,5 +1,6 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/edit/editcontent/{LocationId}/{ContentName}"
+@using ContentType = BedBrigade.Common.Enums.ContentType
 <CheckAuth Roles=@RoleNames.CanManagePages></CheckAuth>
 
 <style>
@@ -33,9 +34,33 @@ else
         <p>&nbsp;</p>
         <EditForm Model="Content">
             <DataAnnotationsValidator />
+            @* only show when editing Stories or News *@
+            @if (Content?.ContentType == ContentType.Stories
+                 || Content?.ContentType == ContentType.News)
+            {
+                <div class="mb-3">
+                    @if (!string.IsNullOrEmpty(Content.MainImageFileName))
+                    {
+                        <img src="@($"{ImagePath}/{Content.MainImageFileName}")"
+                             class="img-thumbnail"
+                             style="max-height:200px;" />
+                    }
+                    <!-- Hidden native file input -->
+                    <InputFile id="@_fileInputId"
+                               @ref="_fileInput"
+                               OnChange="OnInputFileChange"
+                               accept=".gif,.jpg,.jpeg,.png,.webp"
+                               style="display:none"/>
+
+                    <!-- Label that looks like a button -->
+                    <label class="btn btn-primary" for="@_fileInputId">
+                        @FileButtonText
+                    </label>
+                </div>
+            }
             <div class="rte-container">
                 <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
-                    <RichTextEditorImageSettings SaveUrl="@saveUrl" Path=@imagePath AllowedTypes="AllowedTypes" />
+                    <RichTextEditorImageSettings SaveUrl="@SaveUrl" Path=@ImagePath AllowedTypes="AllowedTypes" />
                     <RichTextEditorEvents/>
                     <RichTextEditorToolbarSettings Items="@Tools">
                         <RichTextEditorCustomToolbarItems>

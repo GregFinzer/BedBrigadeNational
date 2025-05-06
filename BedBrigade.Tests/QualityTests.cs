@@ -21,6 +21,8 @@ namespace BedBrigade.Tests
             //This has duplicate strings but it is okay since roles have multiple similar permissions
             _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
 
+            //This has duplicate strings but it is okay since it is a regex replacement
+            _qualityLogic.Config.FilesToExclude.Add("Pluralization.cs");
 
             _solutionPath = TestHelper.GetSolutionPath();
         }

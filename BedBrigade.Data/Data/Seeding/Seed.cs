@@ -915,20 +915,6 @@ public static class Seed
             Section = ConfigSection.Sms,
             LocationId = Defaults.RockCityPolarisLocationId
         },
-         new()
-        {
-            ConfigurationKey = ConfigNames.BlogModuleOptions,
-            ConfigurationValue = "TestMode:false|ShowBanner:true|CardSettings:false|CardPaging:true|CardColumns:4|CardRows:4|CardTextSize:150",
-            Section = ConfigSection.Media,
-            LocationId = Defaults.NationalLocationId
-        },
-        new()
-        {
-            ConfigurationKey = ConfigNames.BlogModuleImages,
-            ConfigurationValue = ".jpg, .jpeg, .png, .gif, .webp", // images, allowed in Blog 
-            Section = ConfigSection.Media,
-            LocationId = Defaults.NationalLocationId
-        },
         new()
         {
             ConfigurationKey = ConfigNames.SmsMissedMessageMinutes,

@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Syncfusion.Blazor.Kanban.Internal;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Linq;
+using System.Net.Http.Headers;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
@@ -26,6 +30,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ICachingService _svcCaching { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
+        [Inject] private HttpClient Http { get; set; }
+
         [Parameter] public string LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
@@ -39,15 +45,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         public string FolderPath { get; set; }
         private string LocationName { get; set; } = "";
         private string LocationRoute { get; set; } = "";
-        private string saveUrl { get; set; }
-        private string imagePath { get; set; }
+        private string SaveUrl { get; set; }
+        private string ImagePath { get; set; }
         private List<string> AllowedTypes = new()
         {
             ".jpg",
             ".png",
-            ".gif"
+            ".gif",
+            ".jpeg",
+            ".webp"
         };
-        private string contentRootPath = string.Empty;
+        private string _contentRootPath = string.Empty;
         private int _maxFileSize;
 
         private string _mediaFolder;
@@ -88,12 +96,19 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         };
 
+        private string _subdirectory;
+        private string FileButtonText =>
+            string.IsNullOrEmpty(Content?.MainImageFileName)
+                ? "Upload Main Image"
+                : "Replace Main Image";
+        private InputFile _fileInput;
+        private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
 
         protected override async Task OnInitializedAsync()
         {
             Refreshed = false;
             Identity = _svcAuth.CurrentUser;
-            WorkTitle = $"Editing {ContentName}";
+            
 
             int locationId;
 
@@ -113,15 +128,26 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
             _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
 
-            await SetLocationName(locationId);
-            contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
-
             ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, locationId);
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                Body = await ProcessHtml(contentResult.Data.ContentHtml, locationId);
                 Content = contentResult.Data;
+                WorkTitle = $"Editing {Content.Title}";
+
+                if (BlogTypes.ValidBlogTypes.Contains(Content.ContentType))
+                {
+                    _subdirectory = Content.ContentType.ToString();
+                }
+                else
+                {
+                    _subdirectory = "pages";
+                }
+                await SetLocationName(locationId);
+                _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
+
+                Body = await ProcessHtml(Content.ContentHtml);
+                
                 Content.UpdateDate = DateTime.UtcNow;
                 Content.UpdateUser =  Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 ImageButtonList = GetImageButtonList(Body);
@@ -159,15 +185,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             if (locationResult.Success && locationResult.Data != null)
             {
                 LocationName = locationResult.Data.Name;
-                LocationRoute = locationResult.Data.Route;
-                imagePath = $"media/{LocationRoute}/pages/{ContentName}/"; // VS 8/25/2024
-                saveUrl = $"api/image/save/{locationId}/pages/{ContentName}";
+                LocationRoute = locationResult.Data.Route.TrimStart('/');
+                ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
+                SaveUrl =  $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
             }
         }
 
-        private async Task<string?> ProcessHtml(string? html, int locationId)
+        private async Task<string?> ProcessHtml(string? html)
         {
-            string path = $"{LocationRoute}/pages/{ContentName}"; // VS 8/25/2024
+            string path = $"{LocationRoute}/{_subdirectory}/{ContentName}"; // VS 8/25/2024
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
@@ -192,7 +218,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
                 _toastService.Success("Content Saved", 
                     $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024
-                _navigationManager.NavigateTo("/administration/manage/pages");
+                NavigateToManagePages();
             }
             else
             {
@@ -202,14 +228,19 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             
         }
 
+        private void NavigateToManagePages()
+        {
+            _navigationManager.NavigateTo($"/administration/manage/pages/{Content.ContentType.ToString()}");
+        }
+
         private async Task HandleCancelClick()
         {
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            NavigateToManagePages();
         }
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = contentRootPath + $"\\pages\\{ContentName}\\{itemValue}";
+            FolderPath = _contentRootPath + $"\\{_subdirectory}\\{ContentName}\\{itemValue}";
             FolderPath = FolderPath.TrimEnd('\\');
             await OpenDialog();
         }
@@ -229,7 +260,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 return;
             }
             _svcCaching.ClearAll();
-            Body = await ProcessHtml(Body, locationId);
+            Body = await ProcessHtml(Body);
             await this.RteObj.RefreshUIAsync();
             StateHasChanged();
         }
@@ -239,5 +270,48 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             // setting maximum height to the Dialog
             args.MaxHeight = "90%";
         }
+
+        private async Task OnInputFileChange(InputFileChangeEventArgs e)
+        {
+            try
+            {
+                var file = e.File;
+                var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+
+                if (!AllowedTypes.Contains(ext))
+                {
+                    _toastService.Error("Invalid file type",
+                        $"Only: {string.Join(", ", AllowedTypes)}");
+                    return;
+                }
+
+                if (file.Size > _maxFileSize)
+                {
+                    _toastService.Error("File too large",
+                        $"Max size is {_maxFileSize / (1024 * 1024)} MB");
+                    return;
+                }
+
+                string fileName = file.Name;
+                string path = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName, fileName);
+                using (FileStream fs = System.IO.File.Create(path))
+                    await file.OpenReadStream().CopyToAsync(fs);
+
+                // Create a thumbnail
+                string thumbnailPath = Path.Combine(FileUtil.ExtractPath(path),  ImageUtil.GetThumbnailFileName(path));
+                ImageUtil.CreateThumbnail(path, thumbnailPath, 600, 75);
+
+                Content.MainImageFileName = fileName;
+                _toastService.Success("Upload succeeded", fileName);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                // always catch *everything* so nothing bubbles out
+                Console.Error.WriteLine($"Upload error: {ex}");
+                _toastService.Error("Upload error", ex.Message);
+            }
+        }
+
     }
 }

@@ -40,7 +40,7 @@ public class SendSmsLogic : ISendSmsLogic
     public async Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp)
     {
         ServiceResponse<Content> templateResult =
-            await _contentDataService.GetByLocationAndContentType(signUp.LocationId,
+            await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId,
                 ContentType.SignUpSmsConfirmationForm);
 
         if (!templateResult.Success)

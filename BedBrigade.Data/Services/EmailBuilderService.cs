@@ -63,7 +63,7 @@ namespace BedBrigade.Data.Services
                     return new ServiceResponse<bool>("Location not found " + donationsForEmail.First().LocationId, false);
                 }
 
-                var templateResult = await _contentDataService.GetByLocationAndContentType(location.Data.LocationId, ContentType.EmailTaxForm);
+                var templateResult = await _contentDataService.GetSingleByLocationAndContentType(location.Data.LocationId, ContentType.EmailTaxForm);
 
                 if (!templateResult.Success || templateResult.Data == null)
                 {
@@ -137,7 +137,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp)
         {
-            ServiceResponse<Content> templateResult = await _contentDataService.GetByLocationAndContentType(signUp.LocationId, ContentType.SignUpEmailConfirmationForm);
+            ServiceResponse<Content> templateResult = await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId, ContentType.SignUpEmailConfirmationForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
@@ -246,7 +246,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> SendBedRequestConfirmationEmail(BedRequest entity)
         {
-            var templateResult = await _contentDataService.GetByLocationAndContentType(entity.LocationId, ContentType.BedRequestConfirmationForm);
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(entity.LocationId, ContentType.BedRequestConfirmationForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {

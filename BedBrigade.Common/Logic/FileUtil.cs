@@ -252,5 +252,25 @@ namespace BedBrigade.Common.Logic
 
             return files.Any(file => File.GetLastWriteTime(file).Date == today);
         }
+
+        /// <summary>
+        /// Extract the path from a path ending in a filename 
+        /// </summary>
+        /// <param name="fullPath">A fully qualified path ending in a filename</param>
+        /// <returns>The extacted path</returns>
+        public static string ExtractPath(string fullPath)
+        {
+            if (fullPath.Length == 0)
+                throw new ArgumentNullException("fullPath");
+
+            //Account for already in form of path
+            if (Path.GetFileName(fullPath).Length == 0
+                || Path.GetExtension(fullPath).Length == 0)
+            {
+                return fullPath;
+            }
+
+            return Path.GetDirectoryName(fullPath);
+        }
     }
 }

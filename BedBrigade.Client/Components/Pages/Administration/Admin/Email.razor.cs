@@ -124,7 +124,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         private async Task BuildNewsletterBody()
         {
             var contentResult =
-                await _svcContentDataService.GetByLocationAndContentType(Model.CurrentLocationId,
+                await _svcContentDataService.GetSingleByLocationAndContentType(Model.CurrentLocationId,
                     ContentType.NewsletterForm);
 
             var locationResult = await _svcLocationDataService.GetByIdAsync(Model.CurrentLocationId);
