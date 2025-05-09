@@ -19,7 +19,7 @@ namespace BedBrigade.Common.Logic
             return environment == "Development";
         }
 
-        public static string GetHtml(string fileName)
+        public static string GetSeedingFile(string fileName)
         {
             string filePath = $"{FileUtil.GetSeedingDirectory()}/SeedHtml/{fileName}";
 

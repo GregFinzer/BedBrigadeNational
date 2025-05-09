@@ -67,6 +67,11 @@ namespace BedBrigade.Common.Logic
 
         } // Format Date
 
+        public static DateTime AddTimeToExistingDate(DateTime existingDate, DateTime timeToAdd)
+        {
+            return existingDate.AddHours(timeToAdd.Hour).AddMinutes(timeToAdd.Minute).AddSeconds(timeToAdd.Second).
+                AddMilliseconds(timeToAdd.Millisecond);
+        }
 
     } // class
 } // namespace
