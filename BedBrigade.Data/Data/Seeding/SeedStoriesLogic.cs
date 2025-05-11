@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using KellermanSoftware.CsvReports;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using CsvReader = BedBrigade.Common.Logic.CsvReader;
 
 namespace BedBrigade.Data.Data.Seeding
 {
@@ -17,7 +13,7 @@ namespace BedBrigade.Data.Data.Seeding
     {
         public static async Task SeedStories(IDbContextFactory<DataContext> _contextFactory)
         {
-
+            Log.Logger.Information("SeedStories Started");
             using (var context = _contextFactory.CreateDbContext())
             {
                 if ((await context.Content.AnyAsync(c => c.ContentType == ContentType.Stories)))
@@ -25,8 +21,9 @@ namespace BedBrigade.Data.Data.Seeding
                     return;
                 }
 
-                CsvReader csvReader = LibraryFactory.CreateCsvReader();
-                List<Dictionary<string, string>> stories = csvReader.CsvFileToDictionary(WebHelper.GetSeedingFile("StoriesData.csv"));
+                CsvReader csvReader = new CsvReader();
+                string path = Path.Combine(FileUtil.GetSeedingDirectory(), "SeedHtml", "StoriesData.csv");
+                List<Dictionary<string, string>> stories = csvReader.CsvFileToDictionary(path);
                 DateTime currentTime = DateTime.UtcNow;
 
                 foreach (var storyContent in stories)
@@ -50,7 +47,7 @@ namespace BedBrigade.Data.Data.Seeding
         private static void CreateThumbnail(Dictionary<string, string> storyContent)
         {
             string mainImageFileName = storyContent["MainImage"];
-            string directory = Path.Combine(FileUtil.GetSeedingDirectory(), "grove-city", "Stories",
+            string directory = Path.Combine(FileUtil.GetSeedingDirectory(), "SeedImages", "grove-city", "Stories",
                 storyContent["Name"]);
             string source = Path.Combine(directory, mainImageFileName);
             string destination = Path.Combine(directory, ImageUtil.GetThumbnailFileName(source));
@@ -98,7 +95,7 @@ namespace BedBrigade.Data.Data.Seeding
 
                 foreach (var image in images)
                 {
-                    string imagePath = $"media/grove-city/Stories/{storyContent["Name"]}/image";
+                    string imagePath = $"media/grove-city/Stories/{storyContent["Name"]}/{image}";
 
                     sb.AppendLine($"<img src=\"{imagePath}\">");
                     sb.AppendLine("<br />");

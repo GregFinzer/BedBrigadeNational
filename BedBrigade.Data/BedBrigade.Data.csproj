@@ -11,7 +11,6 @@
     <PackageReference Include="BetterAddressParser" Version="1.18.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="Bogus" Version="35.6.0" />
-    <PackageReference Include="CSVReports" Version="3.19.0" />
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.64" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />

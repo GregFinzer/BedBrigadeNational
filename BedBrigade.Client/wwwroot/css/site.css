@@ -12,6 +12,10 @@ a, .btn-link {
     color: #0071c1;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
 
 .btn-primary {
     background-color: #ffce0a !important;

@@ -1,5 +1,4 @@
 ﻿using KellermanSoftware.AddressParser;
-using KellermanSoftware.CsvReports;
 using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using KellermanSoftware.NetEmailValidation;
@@ -36,10 +35,6 @@ namespace BedBrigade.Common.Logic
             return validation;
         }
 
-        public static CsvReader CreateCsvReader()
-        {
-            CsvReader reader = new CsvReader(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
-            return reader;
-        }
+
     }
 }

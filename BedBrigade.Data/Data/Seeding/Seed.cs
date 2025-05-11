@@ -7,6 +7,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using Bogus;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -136,6 +137,7 @@ public static class Seed
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
         await SeedSchedules(contextFactory);
+        await SeedStoriesLogic.SeedStories(contextFactory);
         await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
         await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
         await SeedSpokenLanguages(contextFactory);
