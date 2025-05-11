@@ -62,7 +62,7 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                seedText = WebHelper.GetHtml("NewsletterForm.txt");
+                seedText = WebHelper.GetSeedingFile("NewsletterForm.txt");
 
                 var content = new Content
                 {
@@ -106,7 +106,7 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                seedText = WebHelper.GetHtml("SignUpSmsConfirmationForm.txt");
+                seedText = WebHelper.GetSeedingFile("SignUpSmsConfirmationForm.txt");
 
                 var content = new Content
                 {
@@ -150,7 +150,7 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                seedText = WebHelper.GetHtml("SignUpEmailConfirmationForm.txt");
+                seedText = WebHelper.GetSeedingFile("SignUpEmailConfirmationForm.txt");
 
                 var content = new Content
                 {
@@ -182,7 +182,7 @@ public static class SeedContentsLogic
         var name = "Donations";
         if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == (int) LocationNumber.National))
         {
-            var seedHtml = WebHelper.GetHtml("Donations.html");
+            var seedHtml = WebHelper.GetSeedingFile("Donations.html");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
@@ -263,7 +263,7 @@ public static class SeedContentsLogic
             return;
         }
 
-        string seedHtml = WebHelper.GetHtml(seedHtmlName);
+        string seedHtml = WebHelper.GetSeedingFile(seedHtmlName);
 
         if (contentType != ContentType.DeliveryCheckList)
         {
@@ -335,11 +335,11 @@ public static class SeedContentsLogic
             string seedHtml;
             if (location.LocationId == (int)LocationNumber.National)
             {
-                seedHtml = WebHelper.GetHtml("Header.html");
+                seedHtml = WebHelper.GetSeedingFile("Header.html");
             }
             else
             {
-                seedHtml = WebHelper.GetHtml("LocationHeader.html");
+                seedHtml = WebHelper.GetSeedingFile("LocationHeader.html");
             }
 
             seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
@@ -394,11 +394,11 @@ public static class SeedContentsLogic
             string seedHtml;
             if (location.LocationId == (int)LocationNumber.National)
             {
-                seedHtml = WebHelper.GetHtml($"Footer.html");
+                seedHtml = WebHelper.GetSeedingFile($"Footer.html");
             }
             else
             {
-                seedHtml = WebHelper.GetHtml("LocationFooter.html");
+                seedHtml = WebHelper.GetSeedingFile("LocationFooter.html");
             }
 
             seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
@@ -449,19 +449,19 @@ public static class SeedContentsLogic
                 switch (location.LocationId)
                 {
                     case (int)LocationNumber.National:
-                        seedHtml = WebHelper.GetHtml("Home.html");
+                        seedHtml = WebHelper.GetSeedingFile("Home.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade");
                         break;
                     case (int)LocationNumber.GroveCity:
-                        seedHtml = WebHelper.GetHtml("LocationHome.html");
+                        seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
                         break;
                     case (int)LocationNumber.RockCityPolaris:
-                        seedHtml = WebHelper.GetHtml("LocationHome.html");
+                        seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
                         break;
                     default:
-                        seedHtml = WebHelper.GetHtml("LocationHome.html");
+                        seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus",
                             $"The Bed Brigade of {location.Name}");
                         break;
@@ -506,7 +506,7 @@ public static class SeedContentsLogic
         var name = "History";
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
-            var seedHtml = WebHelper.GetHtml("History.html");
+            var seedHtml = WebHelper.GetSeedingFile("History.html");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
@@ -538,7 +538,7 @@ public static class SeedContentsLogic
         var name = "Locations";
         if (!await context.Content.AnyAsync(c => c.Name == name))
         {
-            var seedHtml = WebHelper.GetHtml("Locations.html");
+            var seedHtml = WebHelper.GetSeedingFile("Locations.html");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
@@ -606,11 +606,11 @@ public static class SeedContentsLogic
 
                 if (location.LocationId == (int)LocationNumber.National)
                 {
-                    seedHtml = WebHelper.GetHtml("AboutUs.html");
+                    seedHtml = WebHelper.GetSeedingFile("AboutUs.html");
                 }
                 else
                 {
-                    seedHtml = WebHelper.GetHtml("LocationAboutUs.html");
+                    seedHtml = WebHelper.GetSeedingFile("LocationAboutUs.html");
                 }
 
                 seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
@@ -681,7 +681,7 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
 
-                seedHtml = WebHelper.GetHtml("DeliveryCheckList.txt"); // plane text
+                seedHtml = WebHelper.GetSeedingFile("DeliveryCheckList.txt"); // plane text
 
                 var content = new Content
                 {
@@ -726,7 +726,7 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
 
-                seedHtml = WebHelper.GetHtml("EmailTaxForm.txt"); 
+                seedHtml = WebHelper.GetSeedingFile("EmailTaxForm.txt"); 
 
                 var content = new Content
                 {
@@ -758,7 +758,7 @@ public static class SeedContentsLogic
         var name = "ThreeRotatorPageTemplate";
         if (!await context.Templates.AnyAsync(c => c.Name == name))
         {
-            var seedHtml = WebHelper.GetHtml("ThreeRotatorPageTemplate.html");
+            var seedHtml = WebHelper.GetSeedingFile("ThreeRotatorPageTemplate.html");
 
             var content = new Template
             {
@@ -799,7 +799,7 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                seedText = WebHelper.GetHtml("BedRequestConfirmationForm.txt");
+                seedText = WebHelper.GetSeedingFile("BedRequestConfirmationForm.txt");
 
                 var content = new Content
                 {
