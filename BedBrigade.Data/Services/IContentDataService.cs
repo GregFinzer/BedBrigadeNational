@@ -9,6 +9,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<Content>> GetSingleByLocationAndContentType(int locationId, ContentType contentType);
         Task<ServiceResponse<List<BlogItem>>> GetBlogItems(int locationId, ContentType contentType);
         Task<ServiceResponse<List<BlogItem>>> GetTopBlogItems(int locationId, ContentType contentType);
+        Task<ServiceResponse<List<BlogItem>>> GetOlderBlogItems(int locationId, ContentType contentType);
         Task<ServiceResponse<List<Content>>> GetAllExceptBlogTypes();
         Task<ServiceResponse<List<Content>>> GetForLocationExceptBlogTypes(int locationId);
         Task<ServiceResponse<List<Content>>> GetByContentType(ContentType contentType);

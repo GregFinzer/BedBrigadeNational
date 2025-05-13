@@ -1,6 +1,7 @@
 ﻿@page "/{LocationRoute}/Stories"
+@page "/{LocationRoute}/Stories/older"
 @page "/{LocationRoute}/News"
-@using System.Dynamic
+@page "/{LocationRoute}/News/older"
 
 @if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
 {
@@ -20,7 +21,7 @@ else
             @foreach (var item in BlogItems)
             {
                 <div class="col">
-                    <div class="card h-100">
+                    <div class="card h-100 wow slideInUp">
                         @if (!string.IsNullOrEmpty(item.MainImageFileName))
                         {
                             <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{ImageUtil.GetThumbnailFileName(item.MainImageFileName)}")"
@@ -47,7 +48,29 @@ else
                 </div>
             }
         </div>
+       
+        @if (!Older)
+        {
+            @if (BlogItems.Count() == Defaults.MaxTopBlogItems)
+            {
+                <p class="mt-5">
+                    <a href="#" @onclick="GoToOlder" @onclick:preventDefault="true">
+                        View Older
+                    </a>
+                </p>
+            }
+        }
+        else
+        {
+            <p class="mt-5">
+                <a href="#" @onclick="GoToNewer" @onclick:preventDefault="true">
+                    View Newer
+                </a>
+            </p>
+        }
     </div>
+
+
 }
 
 <style>

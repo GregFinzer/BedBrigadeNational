@@ -17,6 +17,7 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter]
         public string LocationRoute { get; set; } = default!;
 
+
         public int? LocationId { get; set; }
 
         public string RotatorTitle { get; set; }
@@ -26,13 +27,14 @@ namespace BedBrigade.Client.Components.Pages
         private List<BlogItem>? BlogItems;
 
         public string LocationName { get; set; }
+        public bool Older { get; set; }
+        public string Uri { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
-            string uri = _nav.Uri;
-            uri = uri.TrimEnd('/');
-            BlogType = StringUtil.GetLastWord(uri, "/");
+
+            SetParameters();
 
             BlogItems = new List<BlogItem>();
             ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
@@ -44,14 +46,49 @@ namespace BedBrigade.Client.Components.Pages
 
                 ContentType contentType = Enum.Parse<ContentType>(BlogType, true);
 
-                var contentResponse = await _svcContent.GetBlogItems(LocationId.Value, contentType);
-                if (contentResponse.Success && contentResponse.Data is not null)
+                if (Older)
                 {
-                    BlogItems = contentResponse.Data;
+                    var contentResponse = await _svcContent.GetOlderBlogItems(LocationId.Value, contentType);
+                    if (contentResponse.Success && contentResponse.Data is not null)
+                    {
+                        BlogItems = contentResponse.Data;
+                    }
+                }
+                else
+                {
+                    var contentResponse = await _svcContent.GetTopBlogItems(LocationId.Value, contentType);
+                    if (contentResponse.Success && contentResponse.Data is not null)
+                    {
+                        BlogItems = contentResponse.Data;
+                    }
                 }
             }
         }
+        void GoToOlder()
+        {
+            _nav.NavigateTo($"{Uri}/older", forceLoad: true);
+        }
 
+        void GoToNewer()
+        {
+            string newUrl = StringUtil.TakeOffEnd(Uri, "older");
+            _nav.NavigateTo(newUrl, forceLoad: true);
+        }
 
+        private void SetParameters()
+        {
+            Uri = _nav.Uri;
+            Uri = Uri.TrimEnd('/');
+            Older = Uri.EndsWith("/older", StringComparison.InvariantCultureIgnoreCase);
+
+            if (Older)
+            {
+                BlogType = StringUtil.GetNextToLastWord(Uri, "/");
+            }
+            else
+            {
+                BlogType = StringUtil.GetLastWord(Uri, "/");
+            }
+        }
     }
 }
