@@ -172,16 +172,6 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return result;
     }
 
-    //public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
-    //{
-    //    var contentResult = await _commonService.GetAllForLocationAsync(this, locationId);
-
-    //    if (contentResult.Success && contentResult.Data != null)
-    //    {
-    //        _timezoneDataService.FillLocalDates(contentResult.Data);
-    //    }
-    //    return contentResult;
-    //}
 
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
     {
@@ -228,6 +218,18 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return await GetAsync(contentType.ToString(), locationId);
     }
 
+    public async Task<ServiceResponse<List<BlogItem>>> GetTopBlogItems(int locationId, ContentType contentType)
+    {
+        const int itemsToReturn = 12;
+        var result = await GetBlogItems(locationId, contentType);
+        if (result.Success && result.Data != null)
+        {
+            var topBlogItems = result.Data.OrderByDescending(o => o.UpdateDate).Take(itemsToReturn).ToList();
+            return new ServiceResponse<List<BlogItem>>($"Found {topBlogItems.Count()} {GetEntityName()}", true, topBlogItems);
+        }
+
+        return result;
+    }
     public async Task<ServiceResponse<List<BlogItem>>> GetBlogItems(int locationId, ContentType contentType)
     {
         const int truncationLength = 188;
