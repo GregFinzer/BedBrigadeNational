@@ -46,6 +46,24 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Calendar", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Inventory", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
 
+                //Grove City Stories
+                await SeedContentTranslation(context, "Andrew-and-John", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Jayce", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Jasmine-and-Makayla", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Maddox", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Jasawn-and-Javian", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Capital-University-Kappa-Sigma-Fraternity", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Eagle-Scout-Project-Builds-Beds-for-Refugees", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "A-New-Bed-and-Teddy-Bear-for-William", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Ana-Ulise-and-Ivon-receive-new-beds", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Ohio-Christian-University-Womens-Volleyball-Serve-Day\r\n", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "LifePoint-Womens-Bible-Study", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "The-Naz-100-Bed-Blitz", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Grace-Fellowship-Build", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Advent-Lutheran-Serves", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Covenant-Church-Serves", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Meta-Church-Builds-Beds-for-The-Lord", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+
                 //Rock City Polaris Pages
                 await SeedContentTranslation(context, "Header", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Footer", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
