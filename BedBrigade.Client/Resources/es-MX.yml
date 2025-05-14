@@ -277,6 +277,8 @@ UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
 VehicleTypeColon: 'Tipo de vehículo:'
+ViewNewer: Ver más reciente
+ViewOlder: Ver más antiguo
 Volunteer: Voluntario
 VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!

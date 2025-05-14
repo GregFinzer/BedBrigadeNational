@@ -3,6 +3,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.SpeakIt;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using CsvReader = BedBrigade.Common.Logic.CsvReader;
@@ -11,6 +12,8 @@ namespace BedBrigade.Data.Data.Seeding
 {
     public static class SeedStoriesLogic
     {
+        private static TranslateLogic _translateLogic = new TranslateLogic(null);
+
         public static async Task SeedStories(IDbContextFactory<DataContext> _contextFactory)
         {
             Log.Logger.Information("SeedStories Started");
@@ -102,7 +105,7 @@ namespace BedBrigade.Data.Data.Seeding
                 }
             }
 
-            return sb.ToString();
+            return _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(sb.ToString());
         }
     }
 }

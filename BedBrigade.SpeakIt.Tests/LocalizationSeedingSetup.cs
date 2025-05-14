@@ -35,9 +35,32 @@ History of Bed Brigade
 Home
 Inventory
 Locations
-Partners";
+Partners
+Andrew and John
+Jayce
+Jasmine and Makayla
+Jasawn and Javion
+Maddox
+Capital University - Kappa Sigma Fraternity
+Eagle Scout Project Builds Beds for Refugees
+A New Bed and Teddy Bear for William
+Ana, Ulise and Ivon receive new beds
+Ohio Christian University Women's Volleyball Serve Day
+LifePoint Women's Bible Study
+The Naz 100 Bed Blitz
+Grace Fellowship Build
+Advent Lutheran Serves
+Covenant Church Serves
+Meta Church Builds Beds for The Lord
+National Stories
+National News
+Grove City Bed Brigade Stories
+Grove City Bed Brigade News
+Rock City Polaris Bed Brigade Stories
+Rock City Polaris Bed Brigade News
+";
 
-            string[] titleArray = titles.Split('\r','\n',StringSplitOptions.RemoveEmptyEntries);
+            string[] titleArray = titles.Split(new char[] {'\r','\n'},StringSplitOptions.RemoveEmptyEntries);
             foreach (string title in titleArray)
             {
                 string trimmed = title.Trim();

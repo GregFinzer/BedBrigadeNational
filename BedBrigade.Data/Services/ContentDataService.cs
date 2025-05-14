@@ -12,6 +12,8 @@ public class ContentDataService : Repository<Content>, IContentDataService
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICommonService _commonService;
     private readonly ITimezoneDataService _timezoneDataService;
+    
+    
 
     public ContentDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -172,16 +174,6 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return result;
     }
 
-    //public async Task<ServiceResponse<List<Content>>> GetAllForLocationAsync(int locationId)
-    //{
-    //    var contentResult = await _commonService.GetAllForLocationAsync(this, locationId);
-
-    //    if (contentResult.Success && contentResult.Data != null)
-    //    {
-    //        _timezoneDataService.FillLocalDates(contentResult.Data);
-    //    }
-    //    return contentResult;
-    //}
 
     public override Task<ServiceResponse<Content>> CreateAsync(Content entity)
     {
@@ -228,9 +220,33 @@ public class ContentDataService : Repository<Content>, IContentDataService
         return await GetAsync(contentType.ToString(), locationId);
     }
 
+    public async Task<ServiceResponse<List<BlogItem>>> GetTopBlogItems(int locationId, ContentType contentType)
+    {
+        var result = await GetBlogItems(locationId, contentType);
+        if (result.Success && result.Data != null)
+        {
+            var topBlogItems = result.Data.OrderByDescending(o => o.UpdateDate).Take(Defaults.MaxTopBlogItems).ToList();
+            return new ServiceResponse<List<BlogItem>>($"Found {topBlogItems.Count()} {GetEntityName()}", true, topBlogItems);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResponse<List<BlogItem>>> GetOlderBlogItems(int locationId, ContentType contentType)
+    {
+        var result = await GetBlogItems(locationId, contentType);
+        if (result.Success && result.Data != null)
+        {
+            var topBlogItems = result.Data.OrderByDescending(o => o.UpdateDate).Skip(Defaults.MaxTopBlogItems).ToList();
+            return new ServiceResponse<List<BlogItem>>($"Found {topBlogItems.Count()} {GetEntityName()}", true, topBlogItems);
+        }
+
+        return result;
+    }
+
     public async Task<ServiceResponse<List<BlogItem>>> GetBlogItems(int locationId, ContentType contentType)
     {
-        const int truncationLength = 188;
+        
 
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBlogItems({locationId}, {contentType}");
         var cachedContent = _cachingService.Get<List<BlogItem>>(cacheKey);
@@ -266,6 +282,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                     ContentHtml = item.ContentHtml,
                     Name = item.Name,
                     Title = item.Title,
+                    TitleTranslated = item.Title,
                     MainImageFileName = item.MainImageFileName,
                     CreateDate = item.CreateDate,
                     CreateDateLocal = item.CreateDateLocal,
@@ -274,7 +291,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                     MachineName = item.MachineName,
                     UpdateDateLocal = item.UpdateDateLocal,
                     UpdateUser = item.UpdateUser,
-                    Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(item.ContentHtml), truncationLength),
+                    Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(item.ContentHtml), Defaults.TruncationLength),
                 });
             }
 

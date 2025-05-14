@@ -18,7 +18,7 @@ namespace BedBrigade.Common.Models
         public ContentType ContentType { get; set; } = ContentType.Body;
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(1024)]
         public String Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Culture is required")]
@@ -26,7 +26,7 @@ namespace BedBrigade.Common.Models
         public string Culture { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Name is required")]
-        [MaxLength(30)]
+        [MaxLength(1024)]
         public String Name { get; set; } = string.Empty;
 
         //No MaxLength attribute will default to nvarchar(max)

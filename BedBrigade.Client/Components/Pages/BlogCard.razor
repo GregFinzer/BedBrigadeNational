@@ -19,13 +19,7 @@
         </a>
 
         <div class="card mb-4">
-            @if (!string.IsNullOrEmpty(ContentItem.MainImageFileName))
-            {
-                <img
-                    src="@($"media/{LocationRoute}/{BlogType}/{Name}/{ContentItem.MainImageFileName}")"
-                    class="card-img-top"
-                    alt="@ContentItem.Title"/>
-            }
+
 
             <div class="card-body">
                 <h1 class="card-title mb-2">@ContentItem.Title</h1>
@@ -33,8 +27,17 @@
                     @ContentItem.UpdateDateLocal?.ToString("M/d/yyyy h:mm tt")
                     by @ContentItem.UpdateUser
                 </p>
+                
+                @if (!string.IsNullOrEmpty(ContentItem.MainImageFileName))
+                {
+                    <img
+                        src="@($"media/{LocationRoute}/{BlogType}/{Name}/{ContentItem.MainImageFileName}")"
+                        class="card-img-top"
+                        alt="@ContentItem.Title"/>
+                }
 
                 <div class="card-text">
+                    <p></p>
                     @((MarkupString)ContentItem.ContentHtml)
                 </div>
             </div>

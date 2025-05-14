@@ -377,6 +377,22 @@ namespace BedBrigade.Common.Logic
             return text.Substring(0, lastSpaceIndex) + "...";
 
         }
+
+        /// <summary>
+        /// Take a string off the end of another string.  Example:  1,2,3,
+        /// </summary>
+        /// <param name="value">The base string</param>
+        /// <param name="takeOff">What to take off</param>
+        /// <returns>The resulting string</returns>
+        public static string TakeOffEnd(string value, string takeOff)
+        {
+            string sReturn = value;
+
+            if (value.Length > 0 && value.EndsWith(takeOff))
+                sReturn = value.Substring(0, value.Length - takeOff.Length);
+
+            return sReturn;
+        }
     } // class
 
 
