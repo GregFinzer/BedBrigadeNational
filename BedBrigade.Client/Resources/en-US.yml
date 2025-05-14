@@ -275,6 +275,8 @@ UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
 VehicleTypeColon: 'Vehicle Type:'
+ViewNewer: View Newer
+ViewOlder: View Older
 Volunteer: Volunteer
 VolunteerForAnotherEvent: Volunteer for Another Event
 VolunteerFormNotCompleted: The Volunteer Form is not completed!

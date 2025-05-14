@@ -54,8 +54,8 @@ else
             @if (BlogItems.Count() == Defaults.MaxTopBlogItems)
             {
                 <p class="mt-5">
-                    <a href="#" @onclick="GoToOlder" @onclick:preventDefault="true">
-                        View Older
+                    <a href="#" @onclick="GoToOlder" @onclick:preventDefault="true" class="btn btn-primary">
+                        @_lc.Keys["ViewOlder"]
                     </a>
                 </p>
             }
@@ -63,8 +63,8 @@ else
         else
         {
             <p class="mt-5">
-                <a href="#" @onclick="GoToNewer" @onclick:preventDefault="true">
-                    View Newer
+                <a href="#" @onclick="GoToNewer" @onclick:preventDefault="true" class="btn btn-primary">
+                    @_lc.Keys["ViewNewer"]
                 </a>
             </p>
         }
