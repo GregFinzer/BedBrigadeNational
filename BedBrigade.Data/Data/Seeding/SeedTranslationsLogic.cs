@@ -56,7 +56,7 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Eagle-Scout-Project-Builds-Beds-for-Refugees", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "A-New-Bed-and-Teddy-Bear-for-William", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Ana-Ulise-and-Ivon-receive-new-beds", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Ohio-Christian-University-Womens-Volleyball-Serve-Day\r\n", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Ohio-Christian-University-Womens-Volleyball-Serve-Day", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "LifePoint-Womens-Bible-Study", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "The-Naz-100-Bed-Blitz", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Grace-Fellowship-Build", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);

@@ -4,6 +4,9 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Location = BedBrigade.Common.Models.Location;
+using System.Globalization;
+using BedBrigade.Common.Constants;
+
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -13,6 +16,9 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private NavigationManager _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private ILanguageService _svcLanguage { get; set; }
+        [Inject] private ITranslationDataService _translateLogic { get; set; }
+        [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Parameter]
         public string LocationRoute { get; set; } = default!;
@@ -42,7 +48,7 @@ namespace BedBrigade.Client.Components.Pages
             {
                 LocationId = locationResponse.Data.LocationId;
                 LocationName = locationResponse.Data.Name;
-                RotatorTitle = $"{locationResponse.Data.Name} {BlogType}";
+                RotatorTitle = $"{locationResponse.Data.Name} {StringUtil.ProperCase(BlogType)}";
 
                 ContentType contentType = Enum.Parse<ContentType>(BlogType, true);
 
@@ -63,7 +69,71 @@ namespace BedBrigade.Client.Components.Pages
                     }
                 }
             }
+
+            _svcLanguage.LanguageChanged += OnLanguageChanged;
         }
+
+        private async Task OnLanguageChanged(CultureInfo arg)
+        {
+            await TranslatePageTitle();
+            await TranslateTitles();
+            await TranslateDescriptions();
+            StateHasChanged();
+        }
+
+        private async Task TranslatePageTitle()
+        {
+            RotatorTitle = $"{LocationName} {StringUtil.ProperCase(BlogType)}";
+
+            if (_svcLanguage.CurrentCulture.Name != Defaults.DefaultLanguage)
+            {
+                RotatorTitle = await _translateLogic.GetTranslation(RotatorTitle, _svcLanguage.CurrentCulture.Name);
+            }
+        }
+
+        private async Task TranslateDescriptions()
+        {
+            if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+            {
+                foreach (var blogItem in BlogItems)
+                {
+                    blogItem.Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(blogItem.ContentHtml),
+                        Defaults.TruncationLength);
+                }
+
+                return;
+            }
+
+            foreach (var blogItem in BlogItems)
+            {
+                var contentResult = await _svcContentTranslation.GetAsync(blogItem.Name, LocationId.Value, _svcLanguage.CurrentCulture.Name);
+
+                if (contentResult.Success && contentResult.Data != null)
+                {
+                    blogItem.Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(contentResult.Data.ContentHtml),
+                        Defaults.TruncationLength);
+                }
+            }
+        }
+
+        private async Task TranslateTitles()
+        {
+            if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+            {
+                foreach (var blogItem in BlogItems)
+                {
+                    blogItem.TitleTranslated = blogItem.Title;
+                }
+
+                return;
+            }
+
+            foreach (var blogItem in BlogItems)
+            {
+                blogItem.TitleTranslated = await _translateLogic.GetTranslation(blogItem.Title, _svcLanguage.CurrentCulture.Name);
+            }
+        }
+
         void GoToOlder()
         {
             _nav.NavigateTo($"{Uri}/older", forceLoad: true);

@@ -246,7 +246,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
 
     public async Task<ServiceResponse<List<BlogItem>>> GetBlogItems(int locationId, ContentType contentType)
     {
-        const int truncationLength = 188;
+        
 
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBlogItems({locationId}, {contentType}");
         var cachedContent = _cachingService.Get<List<BlogItem>>(cacheKey);
@@ -282,6 +282,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                     ContentHtml = item.ContentHtml,
                     Name = item.Name,
                     Title = item.Title,
+                    TitleTranslated = item.Title,
                     MainImageFileName = item.MainImageFileName,
                     CreateDate = item.CreateDate,
                     CreateDateLocal = item.CreateDateLocal,
@@ -290,7 +291,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
                     MachineName = item.MachineName,
                     UpdateDateLocal = item.UpdateDateLocal,
                     UpdateUser = item.UpdateUser,
-                    Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(item.ContentHtml), truncationLength),
+                    Description = StringUtil.TruncateTextToLastWord(WebHelper.StripHTML(item.ContentHtml), Defaults.TruncationLength),
                 });
             }
 

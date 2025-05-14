@@ -26,12 +26,12 @@ else
                         {
                             <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{ImageUtil.GetThumbnailFileName(item.MainImageFileName)}")"
                                  class="card-img-top"
-                                 alt="@item.Title" />
+                                 alt="@item.TitleTranslated" />
                         }
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">
                                 <a href="@($"/{LocationRoute}/{BlogType}/{item.Name}")">
-                                    @item.Title
+                                    @item.TitleTranslated
                                 </a>
                             </h5>
                             <p class="card-text flex-grow-1">
