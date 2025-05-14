@@ -1,0 +1,54 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Watch Blazor App",
+      "type": "coreclr",
+      "request": "launch",
+
+      // instead of pointing at a DLL, call the dotnet CLI directly
+      "program": "dotnet",
+      "args": [
+        "watch",
+        "run",
+        "--launch-profile",
+        "https"
+      ],
+
+      // run from your Blazor Client project folder so watch finds the .csproj
+      "cwd": "${workspaceFolder}/BedBrigade.Client",
+
+      // show output in the integrated terminal so serverReadyAction can see it
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+
+      // open your browser when Kestrel reports “Now listening on: https://…”
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    },
+        {
+      "name": "Launch Blazor App (HTTPS)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet: build",
+      "program": "${workspaceFolder}/BedBrigade.Client/bin/Debug/net8.0/BedBrigade.Client.dll",
+      "cwd": "${workspaceFolder}/BedBrigade.Client",
+      "launchSettingsFilePath": "${workspaceFolder}/BedBrigade.Client/Properties/launchSettings.json",
+      "launchSettingsProfile": "https",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "pattern": "listening on port ([0-9]+)",
+        "uriFormat": "https://localhost:7234",
+        "action": "openExternally"
+      }
+    }
+  ]
+}

@@ -28,7 +28,7 @@ namespace BedBrigade.Client
 
         public static void LoadConfiguration(WebApplicationBuilder builder)
         {
-            if (Debugger.IsAttached)
+            if (Debugger.IsAttached || FileUtil.IsVSCodeInstalledOnWindows())
             {
                 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
             }
