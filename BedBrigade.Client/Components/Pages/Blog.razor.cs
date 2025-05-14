@@ -6,6 +6,9 @@ using BedBrigade.Data.Services;
 using Location = BedBrigade.Common.Models.Location;
 using System.Globalization;
 using BedBrigade.Common.Constants;
+using BedBrigade.Client.Services;
+using BedBrigade.Data.Data.Seeding;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 
 namespace BedBrigade.Client.Components.Pages
@@ -19,6 +22,8 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
+        private string previousLocation = SeedConstants.SeedNationalName;
 
         [Parameter]
         public string LocationRoute { get; set; } = default!;
@@ -42,6 +47,13 @@ namespace BedBrigade.Client.Components.Pages
 
             SetParameters();
 
+            await LoadData();
+
+            _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
+
+        private async Task LoadData()
+        {
             BlogItems = new List<BlogItem>();
             ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
             if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
@@ -69,8 +81,15 @@ namespace BedBrigade.Client.Components.Pages
                     }
                 }
             }
+        }
 
-            _svcLanguage.LanguageChanged += OnLanguageChanged;
+        protected override void OnParametersSet()
+        {
+            if (LocationRoute != previousLocation)
+            {
+                previousLocation = LocationRoute;
+                _locationState.Location = LocationRoute;
+            }
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)

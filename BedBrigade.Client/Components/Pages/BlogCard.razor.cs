@@ -4,6 +4,8 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using System.Globalization;
 using BedBrigade.Common.Constants;
+using BedBrigade.Client.Services;
+using BedBrigade.Data.Data.Seeding;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -16,6 +18,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
 
         [Parameter]
         public string? LocationRoute { get; set; }
@@ -27,6 +30,8 @@ namespace BedBrigade.Client.Components.Pages
         private Content? ContentItem;
         public string? ErrorMessage { get; set; }
         public int? LocationId { get; set; }
+        public string LocationName { get; set; }
+        private string previousLocation = SeedConstants.SeedNationalName;
 
         protected override async Task OnInitializedAsync()
         {
@@ -38,6 +43,7 @@ namespace BedBrigade.Client.Components.Pages
             if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
             {
                 LocationId = locationResponse.Data.LocationId;
+                LocationName = locationResponse.Data.Name;
                 await LoadContent();
             }
             else
@@ -46,6 +52,15 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             _svcLanguage.LanguageChanged += OnLanguageChanged;
+        }
+
+        protected override void OnParametersSet()
+        {
+            if (LocationRoute != previousLocation)
+            {
+                previousLocation = LocationRoute;
+                _locationState.Location = LocationRoute;
+            }
         }
 
         public void Dispose()
