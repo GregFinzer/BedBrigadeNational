@@ -10,7 +10,7 @@ using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components.Pages
 {
-    public partial class Blog : ComponentBase
+    public partial class Blog : ComponentBase, IDisposable
     {
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
@@ -79,6 +79,11 @@ namespace BedBrigade.Client.Components.Pages
             await TranslateTitles();
             await TranslateDescriptions();
             StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            _svcLanguage.LanguageChanged -= OnLanguageChanged;
         }
 
         private async Task TranslatePageTitle()
