@@ -5,7 +5,7 @@
       "name": "Watch Blazor App",
       "type": "coreclr",
       "request": "launch",
-
+      "preLaunchTask": "Open URL",
       // instead of pointing at a DLL, call the dotnet CLI directly
       "program": "dotnet",
       "args": [
@@ -24,13 +24,7 @@
 
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-
-      // open your browser when Kestrel reports “Now listening on: https://…”
-      "serverReadyAction": {
-        "action": "openExternally",
-        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-      }
+      }  
     },
         {
       "name": "Launch Blazor App (HTTPS)",
