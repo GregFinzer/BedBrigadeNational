@@ -34,6 +34,9 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Donations", Defaults.NationalLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "History", Defaults.NationalLocationId, "es-MX", translationsDictionary);
 
+                //National News
+                await SeedContentTranslation(context, "Bed-Brigade-Featured-on-Spectrum-1-News", Defaults.NationalLocationId, "es-MX", translationsDictionary);
+
                 //Grove City Pages
                 await SeedContentTranslation(context, "Header", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Footer", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
@@ -63,6 +66,11 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Advent-Lutheran-Serves", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Covenant-Church-Serves", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Meta-Church-Builds-Beds-for-The-Lord", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+
+                //Grove City News
+                await SeedContentTranslation(context, "2020-Community-Leadership-Award", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "New-Bed-Brigade-Columbus-Website", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Meet-The-President", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
 
                 //Rock City Polaris Pages
                 await SeedContentTranslation(context, "Header", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);

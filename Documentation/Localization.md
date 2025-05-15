@@ -122,26 +122,35 @@ protected override void OnInitialized()
         }
     
         await SeedContentItem(context, ContentType.Header, location, "Header", "GroveCityHeader.html");
-        await SeedContentItem(context, ContentType.Home, location, "Home", "GroveCityHome.html");
-        await SeedContentItem(context, ContentType.Body, location, "AboutUs", "GroveCityAboutUs.html");
-        await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
-        await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
-        await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
-        await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
-        await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
-        await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
     ```    
-3. In BedBrigade.SpeakIt.Tests.LocalizationSeedingSetup remove the ignore for the Setup and run the test.
-4. Check and see if BedBrigade.Data\Data\Seeding\SeedTranslations\en-US.yml was modified locally.  
-5.  Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
-6.  Translate to es-MX
-7.  Download the file and replace the existing es-MX file in BedBrigade.Data\Data\Seeding\SeedTranslations
-8.  In SeedTranslationsLogic class in the SeedContentTranslations method, add the file to translate.
-9.  Delete all the records in the ContentTranslations table and the Translations table.
-10.  Upload the en-US.yml and es-MX.yml files to the
+3.  Modify the SeedContentTranslations.  Example: 
+
+    ```C#
+        public static async Task SeedContentTranslations(IDbContextFactory<DataContext> _contextFactory)
+        {
+            using (DataContext context = _contextFactory.CreateDbContext())
+            {
+                if (await context.ContentTranslations.AnyAsync()) return;
+
+                List<Translation> translations = await context.Translations.ToListAsync();
+                Dictionary<string, List<Translation>> translationsDictionary = _translateLogic.TranslationsToDictionary(translations);
+
+                //National News
+                await SeedContentTranslation(context, "Bed-Brigade-Featured-on-Spectrum-1-News", Defaults.NationalLocationId, "es-MX", translationsDictionary);
+             }
+        }
+    ```       
+4. In BedBrigade.SpeakIt.Tests.LocalizationSeedingSetup remove the ignore for the Setup and run the test.
+5. Check and see if BedBrigade.Data\Data\Seeding\SeedTranslations\en-US.yml was modified locally.  
+6.  Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
+7.  Translate to es-MX
+8.  Download the file and replace the existing es-MX file in BedBrigade.Data\Data\Seeding\SeedTranslations
+9.  In SeedTranslationsLogic class in the SeedContentTranslations method, add the file to translate.
+10.  Delete all the records in the ContentTranslations table and the Translations table.
+11.  Upload the en-US.yml and es-MX.yml files to the
 Data\Seeding\SeedTranslations folder on Development using FTP
-11.  Perform a deployment
+12.  Perform a deployment
 
 ## Adding a New Language like French, Chinese etc.
 1.  Go to this site:  https://akmultilanguages.azurewebsites.net/TranslateApplication
