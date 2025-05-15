@@ -1,7 +1,5 @@
-﻿@page "/{LocationRoute}/Stories"
-@page "/{LocationRoute}/Stories/older"
-@page "/{LocationRoute}/News"
-@page "/{LocationRoute}/News/older"
+﻿@page "/{LocationRoute}/Blog/{BlogType}"
+@page "/{LocationRoute}/Blog/{BlogType}/{Filter}"
 
 @if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
 {
@@ -30,7 +28,7 @@ else
                         }
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">
-                                <a href="@($"/{LocationRoute}/{BlogType}/{item.Name}")">
+                                <a href="@($"/{LocationRoute}/BlogItem/{BlogType}/{item.Name}/{Filter}")">
                                     @item.TitleTranslated
                                 </a>
                             </h5>

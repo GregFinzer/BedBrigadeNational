@@ -1,5 +1,5 @@
-﻿@page "/{LocationRoute}/Stories/{Name}"
-@page "/{LocationRoute}/News/{Name}"
+﻿@page "/{LocationRoute}/BlogItem/{BlogType}/{Name}"
+@page "/{LocationRoute}/BlogItem/{BlogType}/{Name}/{Filter}"
 
 <div class="container blog-container">
     @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -14,7 +14,7 @@
     }
     else
     {
-        <a class="btn btn-primary mb-3" href="@($"/{LocationRoute}/{BlogType}")">
+        <a class="btn btn-primary mb-3" href="@BackUrl">
             <i class="fa fa-arrow-left" aria-hidden="true"></i> @_lc.Keys["Back"]
         </a>
 
@@ -42,7 +42,7 @@
                 </div>
             </div>
         </div>
-        <a class="btn btn-primary mt-3" href="@($"/{LocationRoute}/{BlogType}")">
+        <a class="btn btn-primary mt-3" href="@BackUrl">
             <i class="fa fa-arrow-left" aria-hidden="true"></i> @_lc.Keys["Back"]
         </a>
     }

@@ -9,6 +9,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Client.Services;
 using BedBrigade.Data.Data.Seeding;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Threading.Tasks;
 
 
 namespace BedBrigade.Client.Components.Pages
@@ -23,7 +24,8 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
-        private string previousLocation = SeedConstants.SeedNationalName;
+        private string? previousLocation;
+        private string? previousBlogType;
 
         [Parameter]
         public string LocationRoute { get; set; } = default!;
@@ -33,7 +35,11 @@ namespace BedBrigade.Client.Components.Pages
 
         public string RotatorTitle { get; set; }
 
+        [Parameter]
         public string BlogType { get; set; }
+
+        [Parameter]
+        public string? Filter { get; set; }
 
         private List<BlogItem>? BlogItems;
 
@@ -83,12 +89,27 @@ namespace BedBrigade.Client.Components.Pages
             }
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
-            if (LocationRoute != previousLocation)
+            _locationState.Location = LocationRoute;
+
+            //Set to current values first time through
+            if (String.IsNullOrEmpty(previousLocation) || String.IsNullOrEmpty(previousBlogType))
             {
                 previousLocation = LocationRoute;
-                _locationState.Location = LocationRoute;
+                previousBlogType = BlogType;
+                return;
+            }   
+
+            bool anythingChanged = LocationRoute != previousLocation || BlogType != previousBlogType;
+
+            if (anythingChanged)
+            {
+                previousLocation = LocationRoute;
+                previousBlogType = BlogType;
+
+                await LoadData();
+                StateHasChanged();
             }
         }
 
@@ -160,29 +181,19 @@ namespace BedBrigade.Client.Components.Pages
 
         void GoToOlder()
         {
-            _nav.NavigateTo($"{Uri}/older", forceLoad: true);
+            _nav.NavigateTo($"/{LocationRoute}/Blog/{BlogType}/older", forceLoad: true);
         }
 
         void GoToNewer()
         {
-            string newUrl = StringUtil.TakeOffEnd(Uri, "older");
-            _nav.NavigateTo(newUrl, forceLoad: true);
+            _nav.NavigateTo($"/{LocationRoute}/Blog/{BlogType}", forceLoad: true);
         }
 
         private void SetParameters()
         {
             Uri = _nav.Uri;
             Uri = Uri.TrimEnd('/');
-            Older = Uri.EndsWith("/older", StringComparison.InvariantCultureIgnoreCase);
-
-            if (Older)
-            {
-                BlogType = StringUtil.GetNextToLastWord(Uri, "/");
-            }
-            else
-            {
-                BlogType = StringUtil.GetLastWord(Uri, "/");
-            }
+            Older = (Filter ?? string.Empty).ToLower() == "older";
         }
     }
 }

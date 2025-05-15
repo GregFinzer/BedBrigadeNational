@@ -25,19 +25,23 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter]
         public string? Name { get; set; }
 
+        [Parameter]
         public string? BlogType { get; set; }
+
+        [Parameter]
+        public string? Filter { get; set; }
 
         private Content? ContentItem;
         public string? ErrorMessage { get; set; }
         public int? LocationId { get; set; }
         public string LocationName { get; set; }
         private string previousLocation = SeedConstants.SeedNationalName;
+        public string? BackUrl { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
             string url = _nav.Uri;
-            BlogType = StringUtil.GetNextToLastWord(url, "/");
 
             ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
             if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
@@ -51,16 +55,21 @@ namespace BedBrigade.Client.Components.Pages
                 ErrorMessage = $"Location not found: {LocationRoute}";
             }
 
+            if (string.IsNullOrEmpty(Filter))
+            {
+                BackUrl = $"/{LocationRoute}/Blog/{BlogType}";
+            }
+            else
+            {
+                BackUrl = $"/{LocationRoute}/Blog/{BlogType}/{Filter}";
+            }
+            
             _svcLanguage.LanguageChanged += OnLanguageChanged;
         }
 
         protected override void OnParametersSet()
         {
-            if (LocationRoute != previousLocation)
-            {
-                previousLocation = LocationRoute;
-                _locationState.Location = LocationRoute;
-            }
+            _locationState.Location = LocationRoute;
         }
 
         public void Dispose()
