@@ -1,0 +1,28 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build"
+		},
+		{
+			"label": "Open URL",
+			"type": "shell",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"command": "xdg-open https://localhost:7234", // for Linux
+			"windows": {
+				"command": "start https://localhost:7234"
+			},
+			"osx": {
+				"command": "open https://localhost:7234"
+			}
+		}
+	]
+}

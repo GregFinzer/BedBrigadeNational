@@ -58,6 +58,10 @@ Grove City Bed Brigade Stories
 Grove City Bed Brigade News
 Rock City Polaris Bed Brigade Stories
 Rock City Polaris Bed Brigade News
+New Bed Brigade Columbus Website
+Meet The President
+2020 Community Leadership Award
+Bed Brigade Featured on Spectrum 1 News
 ";
 
             string[] titleArray = titles.Split(new char[] {'\r','\n'},StringSplitOptions.RemoveEmptyEntries);

@@ -138,6 +138,7 @@ public static class Seed
         await SeedBedRequests(contextFactory);
         await SeedSchedules(contextFactory);
         await SeedStoriesLogic.SeedStories(contextFactory);
+        await SeedNewsLogic.SeedNews(contextFactory);
         await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
         await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
         await SeedSpokenLanguages(contextFactory);

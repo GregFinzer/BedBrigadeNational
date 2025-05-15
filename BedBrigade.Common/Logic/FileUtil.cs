@@ -272,5 +272,23 @@ namespace BedBrigade.Common.Logic
 
             return Path.GetDirectoryName(fullPath);
         }
+
+        public static bool IsVSCodeInstalledOnWindows()
+        {
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                return false;
+            }
+
+            var programDirs = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)
+            };
+
+            return programDirs
+                .Select(p => Path.Combine(p, "Microsoft VS Code", "Code.exe"))
+                .Any(File.Exists);
+        }
     }
 }
