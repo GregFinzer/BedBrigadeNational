@@ -116,7 +116,10 @@ namespace BedBrigade.SpeakIt
         public string IntelligentReplace(string input, string search, string replace)
         {
             //Basically we don't want to replace the search string if it is part of a URL, or an HTML attribute
-            string pattern = $"(?<leftChar>[\\s\">])(?<content>{Regex.Escape(search)})(?<rightChar>[\\s\"<])";
+            //Examples:
+            // <a href="https://bedbrigade.org/Donate">Donate</a>
+            // &nbsp;Pillow/Bible&nbsp;
+            string pattern = $"(?<leftChar>[;\\s\">])(?<content>{Regex.Escape(search)})(?<rightChar>[\\&\\s\"<])";
             Regex regex = new Regex(pattern, RegexOptions.Multiline);
 
             MatchCollection matches = regex.Matches(input);
