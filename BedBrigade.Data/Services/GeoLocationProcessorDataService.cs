@@ -2,6 +2,7 @@
 using System.Text.Json;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using RestSharp;
 using Serilog;
@@ -124,23 +125,73 @@ namespace BedBrigade.Data.Services
         {
             if (item.TableName == TableNames.BedRequests.ToString())
             {
-                BedRequest bedRequest = (await _bedRequestDataService.GetByIdAsync(item.TableId)).Data;
+                var bedRequestResult = await _bedRequestDataService.GetByIdAsync(item.TableId);
+
+                if (bedRequestResult.Success == false || bedRequestResult.Data == null)
+                {
+                    Log.Error($"BedRequest not found for ID: {item.TableId}");
+                    return;
+                }  
+                
+                BedRequest bedRequest = bedRequestResult.Data;
 
                 if (item.Status == GeoLocationStatus.Processed.ToString())
                 {
                     bedRequest.Latitude = item.Latitude;
                     bedRequest.Longitude = item.Longitude;
                 }
+                else if (PopulateGeoLocationFromZipCode(bedRequest))
+                {
+                    bedRequest.Notes = ((bedRequest.Notes ?? "") +
+                                       " Geolocation: Possible invalid address. Verify the address with the recipient.").Trim();
+                }
                 else
                 {
                     bedRequest.Notes = ((bedRequest.Notes ?? "") +
-                                       " Could not find Geolocation. Verify the address with the recipient.").Trim();
+                                       " Geolocation: Possible invalid zipcode. Verify the address with the recipient.").Trim();
                 }
 
                 await _bedRequestDataService.UpdateAsync(bedRequest);
             }
         }
 
+        public bool PopulateGeoLocationFromZipCode(BedRequest bedRequest)
+        {
+            var addressParser = LibraryFactory.CreateAddressParser();
+
+            if (!addressParser.IsValidZipCode(bedRequest.PostalCode))
+            {
+                bedRequest.Latitude = null;
+                bedRequest.Longitude = null;
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    var zipCodeInfo = addressParser.GetInfoForZipCode(bedRequest.PostalCode);
+
+                    if (zipCodeInfo == null)
+                    {
+                        bedRequest.Latitude = null;
+                        bedRequest.Longitude = null;
+                        return false;
+                    }
+                    else
+                    {
+                        bedRequest.Latitude = zipCodeInfo.Latitude;
+                        bedRequest.Longitude = zipCodeInfo.Longitude;
+                        return true;
+                    }
+                }
+                catch (Exception)
+                {
+                    bedRequest.Latitude = null;
+                    bedRequest.Longitude = null;
+                    return false;
+                }
+            }
+        }
 
         public void PopulateGeoLocation(string jsonString, GeoLocationQueue geoLocation)
         {
