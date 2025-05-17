@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
@@ -12,15 +13,19 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly ICommonService _commonService;
     private readonly ILocationDataService _locationDataService;
 
+    private readonly IGeoLocationQueueDataService _geoLocationQueueDataService;
+
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         IAuthService authService,
         ICommonService commonService,
-        ILocationDataService locationDataService) : base(contextFactory, cachingService, authService)
+        ILocationDataService locationDataService,
+        IGeoLocationQueueDataService geoLocationQueueDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
         _locationDataService = locationDataService;
+        _geoLocationQueueDataService = geoLocationQueueDataService;
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -32,10 +37,45 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public override async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest entity)
     {
+        var previousBedRequest = await GetByIdAsync(entity.BedRequestId);
+
+        if (!previousBedRequest.Success || previousBedRequest.Data == null)
+        {
+            return new ServiceResponse<BedRequest>($"BedRequest with BedRequestId {entity.BedRequestId} not found", false, null);
+        }
+
+        bool addressChanged = previousBedRequest.Data.Street != entity.Street
+                               || previousBedRequest.Data.City != entity.City
+                               || previousBedRequest.Data.State != entity.State
+                               || previousBedRequest.Data.PostalCode != entity.PostalCode;
+
         var result = await base.UpdateAsync(entity);
         _cachingService.ClearScheduleRelated();
+
+        if (addressChanged)
+        {
+            await QueueForGeoLocation(entity);
+        }
+
         return result;
     }
+
+    private async Task QueueForGeoLocation(BedRequest bedRequest)
+    {
+        GeoLocationQueue item = new GeoLocationQueue();
+        item.Street = bedRequest.Street;
+        item.City = bedRequest.City;
+        item.State = bedRequest.State;
+        item.PostalCode = bedRequest.PostalCode;
+        item.CountryCode = Defaults.CountryCode;
+        item.TableName = TableNames.BedRequests.ToString();
+        item.TableId = bedRequest.BedRequestId;
+        item.QueueDate = DateTime.UtcNow;
+        item.Priority = 1;
+        item.Status = GeoLocationStatus.Queued.ToString();
+        await _geoLocationQueueDataService.CreateAsync(item);
+    }
+
 
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
