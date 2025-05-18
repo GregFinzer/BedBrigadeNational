@@ -55,8 +55,8 @@ public static class Seed
             BuildState= "OH",
             BuildPostalCode= "43123",
             IsActive = true,
-            Latitude = 39.879740M,
-            Longitude = -83.042570M,
+            Latitude = 39.882527M,
+            Longitude = -83.042266M,
             TimeZoneId = Defaults.DefaultTimeZoneId
 
         },
@@ -72,8 +72,8 @@ public static class Seed
             BuildState = "OH",
             BuildPostalCode = "43201",
             IsActive = true,
-            Latitude = 39.986740M,
-            Longitude = -83.000680M,
+            Latitude = 39.986799M,
+            Longitude = -83.0006655M,
             TimeZoneId = Defaults.DefaultTimeZoneId
         }
 
