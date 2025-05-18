@@ -44,15 +44,17 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<BedRequest>($"BedRequest with BedRequestId {entity.BedRequestId} not found", false, null);
         }
 
-        bool addressChanged = previousBedRequest.Data.Street != entity.Street
-                               || previousBedRequest.Data.City != entity.City
-                               || previousBedRequest.Data.State != entity.State
-                               || previousBedRequest.Data.PostalCode != entity.PostalCode;
+        bool geoLocationUpdateNeeded = !entity.Latitude.HasValue
+                                       || !entity.Longitude.HasValue
+                                       || previousBedRequest.Data.Street != entity.Street
+                                       || previousBedRequest.Data.City != entity.City
+                                       || previousBedRequest.Data.State != entity.State
+                                       || previousBedRequest.Data.PostalCode != entity.PostalCode;
 
         var result = await base.UpdateAsync(entity);
         _cachingService.ClearScheduleRelated();
 
-        if (addressChanged)
+        if (geoLocationUpdateNeeded)
         {
             await QueueForGeoLocation(entity);
         }
@@ -215,7 +217,13 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         foreach (var bedRequest in bedRequests)
         {
             bedRequest.Distance = 0;
-            if (location.MailingPostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
+
+            if (location.Latitude.HasValue && location.Longitude.HasValue && bedRequest.Latitude.HasValue && bedRequest.Longitude.HasValue)
+            {
+                bedRequest.Distance = CalculateDistance((double)location.Latitude.Value, (double)location.Longitude.Value,
+                    (double)bedRequest.Latitude.Value, (double)bedRequest.Longitude.Value);
+            }
+            else if (location.MailingPostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
             {
                 try
                 {
@@ -230,6 +238,20 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
     }
+
+    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        double R = 3956; // miles
+        double dLat = (lat2 - lat1) * Math.PI / 180;
+        double dLon = (lon2 - lon1) * Math.PI / 180;
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        double d = R * c;
+        return d;
+    }
+
     public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
     {
         return await _commonService.GetDistinctPhone(this);
