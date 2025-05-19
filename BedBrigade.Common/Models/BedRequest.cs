@@ -65,12 +65,13 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     {
         get { return EnumHelper.GetEnumDescription(Status); }
     }
-
-    public Int32? TeamNumber { get; set; }
+    
+    [MaxLength(50, ErrorMessage = "Team has a maximum length of 50 characters")]
+    public String? Team { get; set; }
 
     public DateTime? DeliveryDate { get; set; }
 
-    [MaxLength(4000, ErrorMessage = "Notes has a maximum length of 4000")] 
+    [MaxLength(4000, ErrorMessage = "Notes has a maximum length of 4000")]
     public String? Notes { get; set; } = string.Empty;
 
     [MaxLength(50)]

@@ -57,7 +57,7 @@ namespace BedBrigade.Tests
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 2,
                     AgesGender = "G/5 B/7",
-                    TeamNumber = 1,
+                    Team = "1",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
                 },
@@ -71,7 +71,7 @@ namespace BedBrigade.Tests
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 3,
                     AgesGender = "Self G/5 B/7",
-                    TeamNumber = 1,
+                    Team = "1",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
                 },
@@ -85,7 +85,7 @@ namespace BedBrigade.Tests
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 2,
                     AgesGender = "G/5 B/7",
-                    TeamNumber = 2,
+                    Team = "2",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
                 },
@@ -99,7 +99,7 @@ namespace BedBrigade.Tests
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 3,
                     AgesGender = "Self G/5 B/7",
-                    TeamNumber = 2,
+                    Team = "2",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
                 }

@@ -87,14 +87,14 @@ namespace BedBrigade.Data.Services
         private void OutputBedRequests(IWorksheet worksheet, List<BedRequest> bedRequests)
         {
             int row = 3;
-            int? currentTeamNumber = null;
+            string? currentTeam = null;
             bool isWhiteBackground = false;
 
             foreach (BedRequest bedRequest in bedRequests)
             {
-                if (currentTeamNumber != bedRequest.TeamNumber)
+                if (currentTeam != bedRequest.Team)
                 {
-                    currentTeamNumber = bedRequest.TeamNumber;
+                    currentTeam = bedRequest.Team;
                     isWhiteBackground = !isWhiteBackground;
                 }
 
@@ -105,7 +105,7 @@ namespace BedBrigade.Data.Services
                 worksheet.Range[row, 5].Text = bedRequest.CreateDate.Value.ToShortDateString();
                 worksheet.Range[row, 6].Text = bedRequest.NumberOfBeds.ToString();
                 worksheet.Range[row, 7].Text = bedRequest.AgesGender;
-                worksheet.Range[row, 8].Text = bedRequest.TeamNumber.ToString();
+                worksheet.Range[row, 8].Text = bedRequest.Team;
                 worksheet.Range[row, 9].Text = bedRequest.Notes;
 
                 ApplyBedRequestCellFormatting(worksheet, isWhiteBackground, row);

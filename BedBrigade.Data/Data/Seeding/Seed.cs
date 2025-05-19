@@ -1335,7 +1335,7 @@ public static class Seed
                         PostalCode = new Random().Next(43001, 43086).ToString(),
                         NumberOfBeds = new Random().Next(1, 4),
                         Status = (BedRequestStatus)new Random().Next(1, 4),
-                        TeamNumber = new Random().Next(1, 5),
+                        Team = (new Random().Next(1, 5)).ToString(),
                         DeliveryDate = DateTime.UtcNow.AddDays(new Random().Next(10)),
                         Notes = string.Empty
                     };

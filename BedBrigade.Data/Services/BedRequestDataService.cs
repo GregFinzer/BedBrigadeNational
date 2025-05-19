@@ -208,7 +208,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         if (!locationResult.Success || locationResult.Data == null || !Validation.IsValidZipCode(locationResult.Data.MailingPostalCode))
         {
-            return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.PostalCode).ToList();
+            return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
         }
 
         var location = locationResult.Data;
@@ -236,7 +236,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
         }
 
-        return bedRequests.OrderBy(o => o.TeamNumber).ThenBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+        return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
     }
 
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)

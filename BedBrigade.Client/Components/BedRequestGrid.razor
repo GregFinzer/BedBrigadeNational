@@ -195,7 +195,7 @@ else
                                                         <SfDatePicker @bind-Value=@BedRequest.DeliveryDate Enabled="true" Placeholder="@_lc.Keys["DeliveryDate"]" FloatLabelType="FloatLabelType.Auto" />
                                                     </div>
                                                     <div class="form-group">
-                                                        <SfNumericTextBox @bind-Value=@BedRequest.TeamNumber Min="1" Max="99" Enabled="true" Placeholder="@_lc.Keys["Team"]" FloatLabelType="FloatLabelType.Auto" />
+                                                        <SfTextBox @bind-Value=@BedRequest.Team MaxLength="50" Enabled="true" Placeholder="@_lc.Keys["Team"]" FloatLabelType="FloatLabelType.Auto" />
                                                     </div>
  
                                                 </div>
@@ -267,9 +267,9 @@ else
                             <GridColumn Field=@nameof(BedRequest.CreateDate) Format="d" ShowColumnMenu="false" HeaderText="Added to List" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.StatusString) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.AgesGender) ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.AgesGender) ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />                           
                             <GridColumn Field=@nameof(BedRequest.DeliveryDate) Format="d" ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.TeamNumber) ShowColumnMenu="false" HeaderText="Team #" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.Team) ShowColumnMenu="false" HeaderText="Team" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) ShowColumnMenu="false" HeaderText="Primary Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />

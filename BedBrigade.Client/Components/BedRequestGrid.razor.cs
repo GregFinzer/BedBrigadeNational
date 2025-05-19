@@ -557,7 +557,7 @@ namespace BedBrigade.Client.Components
                 return false;
             }
 
-            if (scheduledBedRequestResult.Data.Any(o => !o.TeamNumber.HasValue))
+            if (scheduledBedRequestResult.Data.Any(o => String.IsNullOrEmpty(o.Team)))
             {
                 DialogHeader = "Set team number";
                 DialogContent = "Please set the team number for all scheduled rows.";
