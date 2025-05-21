@@ -88,6 +88,7 @@ namespace BedBrigade.Client.Components
         private bool IsDialogVisible { get; set; } = false;
         private string DialogHeader { get; set; } = string.Empty;
         private string DialogContent { get; set; } = string.Empty;
+        
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -201,7 +202,7 @@ namespace BedBrigade.Client.Components
         {
             if (Identity.HasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Sort Waiting Closest" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
             else
@@ -254,7 +255,7 @@ namespace BedBrigade.Client.Components
 
         private async Task SaveGridPersistence()
         {
-            _state = await Grid.GetPersistData();
+            _state = await Grid.GetPersistDataAsync();
             string userName = await _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
@@ -270,7 +271,7 @@ namespace BedBrigade.Client.Components
             switch (args.Item.Text)
             {
                 case "Reset":
-                    await Grid.ResetPersistData();
+                    await Grid.ResetPersistDataAsync();
                     await SaveGridPersistence();
                     break;
                 case "Pdf Export":
@@ -285,7 +286,36 @@ namespace BedBrigade.Client.Components
                 case "Download Delivery Sheet":
                     DownloadDeliverySheet();
                     break;
+                case "Sort Waiting Closest":
+                    await SortClosest();
+                    break;
             }
+        }
+
+        private async Task SortClosest()
+        {
+            List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+
+            if (!selectedBedRequests.Any())
+            {
+                DialogHeader = "Select Row";
+                DialogContent = "Please select an address row you would like to sort closest.";
+                IsDialogVisible = true;
+                return;
+            }
+
+            BedRequests = _svcBedRequest.SortBedRequestClosestToAddress(BedRequests, selectedBedRequests.First().BedRequestId);
+            await Grid.Refresh();
+
+            // Clear existing sorts before applying new ones
+            await Grid.ClearSortingAsync();
+
+            // Sort first by Distance, then by CreateDate
+            await Grid.SortColumnsAsync(new List<SortColumn>
+            {
+                new SortColumn { Field = "Distance", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending },
+                new SortColumn { Field = "CreateDate", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending }
+            });
         }
 
         public async Task OnActionBegin(ActionEventArgs<BedRequest> args)
@@ -557,7 +587,7 @@ namespace BedBrigade.Client.Components
                 return false;
             }
 
-            if (scheduledBedRequestResult.Data.Any(o => !o.TeamNumber.HasValue))
+            if (scheduledBedRequestResult.Data.Any(o => String.IsNullOrEmpty(o.Team)))
             {
                 DialogHeader = "Set team number";
                 DialogContent = "Please set the team number for all scheduled rows.";
@@ -584,6 +614,7 @@ namespace BedBrigade.Client.Components
                 }
             }
         }
+
 
     }
 }

@@ -145,6 +145,7 @@ MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longit
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
+MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
 Message: Mensaje
 MilesAway: Km
 Name: Nombre
