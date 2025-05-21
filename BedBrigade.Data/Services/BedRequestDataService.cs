@@ -2,6 +2,7 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using KellermanSoftware.AddressParser;
 using Microsoft.EntityFrameworkCore;
 
 namespace BedBrigade.Data.Services;
@@ -199,6 +200,77 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             result = await SortScheduledBedRequests(locationId, result);
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
+    }
+
+    public List<BedRequest> SortBedRequestClosestToAddress(List<BedRequest> bedRequests, int bedRequestId)
+    {
+        var addressParser = LibraryFactory.CreateAddressParser();
+        var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
+
+        if (targetBedRequest == null)
+            return bedRequests;
+
+        var (targetLatitude, targetLongitude) = GetTargetCoordinates(targetBedRequest, addressParser);
+        if (targetLatitude == null || targetLongitude == null)
+            return bedRequests;
+
+        foreach (var bedRequest in bedRequests)
+        {
+            SetDistance(bedRequest, targetBedRequest, targetLatitude.Value, targetLongitude.Value, addressParser);
+        }
+
+        return bedRequests.OrderBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+    }
+
+    private (double? Latitude, double? Longitude) GetTargetCoordinates(BedRequest request, AddressParser addressParser)
+    {
+        if (request.Latitude.HasValue && request.Longitude.HasValue)
+            return ((double) request.Latitude.Value, (double) request.Longitude.Value);
+
+        try
+        {
+            var zipInfo = addressParser.GetInfoForZipCode(request.PostalCode);
+            if (zipInfo?.Latitude != null && zipInfo?.Longitude != null)
+            {
+                return ((double)zipInfo.Latitude.Value, (double)zipInfo.Longitude.Value);
+            }
+        }
+        catch
+        {
+            // Swallow and fall through
+        }
+        return (null, null);
+    }
+
+    private void SetDistance(BedRequest request, BedRequest target, double targetLatitude, double targetLongitude, AddressParser addressParser)
+    {
+        const double defaultDistance = 999;
+        request.Distance = defaultDistance;
+
+        if (request.BedRequestId == target.BedRequestId)
+        {
+            request.Distance = -1;
+            return;
+        }
+
+        if (request.Status != BedRequestStatus.Waiting)
+            return;
+
+        if (request.Latitude.HasValue && request.Longitude.HasValue)
+        {
+            request.Distance = CalculateDistance(targetLatitude, targetLongitude, (double)request.Latitude.Value, (double)request.Longitude.Value);
+        }
+        else if (Validation.IsValidZipCode(request.PostalCode))
+        {
+            try
+            {
+                request.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(target.PostalCode, request.PostalCode);
+            }
+            catch
+            {
+                // Leave default distance
+            }
         }
     }
 

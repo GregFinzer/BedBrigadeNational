@@ -39,8 +39,7 @@ else
                             OnLoad=@OnLoad
                             OnToolbarClick=@OnToolBarClick
                             OnActionBegin=@OnActionBegin
-                            TValue="BedRequest"
-                        />
+                            TValue="BedRequest" />
                         <GridTemplates>
                             <EmptyRecordTemplate>
                                 <span>@RecordText</span>
@@ -275,6 +274,7 @@ else
                             <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Format="N10" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Format="N10" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
                    </div>

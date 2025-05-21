@@ -19,5 +19,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<string>>> PhonesForNotReceivedABed(int locationId);
         Task<ServiceResponse<List<string>>> PhonesForReceivedABed(int locationId);
         Task<ServiceResponse<List<string>>> PhonesForSchedule(int locationId);
+        List<BedRequest> SortBedRequestClosestToAddress(List<BedRequest> bedRequests, int bedRequestId);
     }
 }
