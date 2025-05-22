@@ -14,6 +14,9 @@ namespace BedBrigade.Common.Models
 		[ForeignKey("LocationId"), Required]
 		public Int32 LocationId { get; set; }
 
+        [ForeignKey("DonationCampaignId"), Required]
+        public Int32 DonationCampaignId { get; set; }
+
         [Required(ErrorMessage = "Email Address is required")]
         [MaxLength(255)]
         public String? Email { get; set; } = string.Empty;

@@ -191,6 +191,7 @@ RequestABedFor: Request a Bed for Another Person
 RequiredAgesGender: Please indicate the age and gender of children
 RequiredAmount: Amount is required
 RequiredBody: Body is required.
+RequiredCampaignName: Campaign Name is required
 RequiredCity: City is required
 RequiredConfirmPassword: Confirm Password is required
 RequiredContent: Content is required

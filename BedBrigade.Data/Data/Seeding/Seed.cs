@@ -134,6 +134,7 @@ public static class Seed
         await SeedUser(contextFactory);
         await SeedVolunteersFor(contextFactory);
         await SeedVolunteers(contextFactory);
+        await SeedDonationCampaign(contextFactory);
         await SeedDonations(contextFactory);
         await SeedBedRequests(contextFactory);
         await SeedSchedules(contextFactory);
@@ -1231,6 +1232,38 @@ public static class Seed
         }
     }
 
+    public static async Task SeedDonationCampaign(IDbContextFactory<DataContext> contextFactory)
+    {
+        Log.Logger.Information("SeedDonationCampaign Started");
+        using (var context = contextFactory.CreateDbContext())
+        {
+            if (await context.DonationCampaigns.AnyAsync()) return;
+            try
+            {
+                var locations = await context.Locations.ToListAsync();
+
+                foreach (var location in locations) 
+                {
+                    DonationCampaign donationCampaign = new()
+                    {
+                        CampaignName = Defaults.DefaultDonationCampaignName,
+                        LocationId = location.LocationId,
+                        StartDate = DateTime.UtcNow
+                    };
+                    SeedRoutines.SetMaintFields(donationCampaign);
+                    await context.DonationCampaigns.AddAsync(donationCampaign);
+                }
+
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding donation campaign {ex.Message}");
+                throw;
+            }
+        }
+    }
+
     private static async Task SeedDonations(IDbContextFactory<DataContext> contextFactory)
     {
         if (WebHelper.IsProduction())
@@ -1249,6 +1282,7 @@ public static class Seed
 
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
+                List<DonationCampaign> donationCampaigns = await context.DonationCampaigns.ToListAsync();
                 var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
                 if (item != null)
                 {
@@ -1264,6 +1298,7 @@ public static class Seed
                     Donation donation = new()
                     {
                         LocationId = location.LocationId,
+                        DonationCampaignId = donationCampaigns.First(o => o.LocationId == location.LocationId).DonationCampaignId,
                         Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
                         Amount = new decimal(new Random().NextDouble() * 1000),
                         TransactionId = new Random().Next(233999, 293737).ToString(),

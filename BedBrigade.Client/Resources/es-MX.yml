@@ -193,6 +193,7 @@ RequestABedFor: Solicitar una cama para otra persona
 RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
 RequiredAmount: La cantidad es requerida
 RequiredBody: Se requiere cuerpo.
+RequiredCampaignName: El nombre de la campaña es obligatorio
 RequiredCity: Se requiere ciudad
 RequiredConfirmPassword: Confirmar que la contraseña es obligatoria
 RequiredContent: El contenido es obligatorio

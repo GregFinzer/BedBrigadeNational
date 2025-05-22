@@ -163,7 +163,6 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ICommonService, CommonService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddScoped<IUserDataService, UserDataService>();
-            builder.Services.AddScoped<IDonationDataService, DonationDataService>();
             builder.Services.AddScoped<ILocationDataService, LocationDataService>();
             builder.Services.AddScoped<IVolunteerDataService, VolunteerDataService>();
             builder.Services.AddScoped<IConfigurationDataService, ConfigurationDataService>();
@@ -198,6 +197,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ITimezoneDataService, TimezoneDataService>();
             builder.Services.AddScoped<INewsletterDataService, NewsletterDataService>();
             builder.Services.AddScoped<ISubscriptionDataService, SubscriptionDataService>();
+            builder.Services.AddScoped<IDonationCampaignDataService, DonationCampaignDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
