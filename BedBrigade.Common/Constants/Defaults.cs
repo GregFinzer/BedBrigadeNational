@@ -21,6 +21,7 @@
         public const int BulkHighPriority = 3;
         public const string CountryCode = "US";
         public const string DefaultTimeZoneId = "Eastern Standard Time";
+        public const string DefaultDonationCampaignName = "General";
 
         //The reason why I have chosen 12 is because each row is four bootstrap columns 
         public const int MaxTopBlogItems = 12;

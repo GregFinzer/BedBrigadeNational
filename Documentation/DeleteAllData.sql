@@ -7,6 +7,8 @@ drop table if exists ContactUs
 go
 drop table if exists Content
 go
+drop table if exists DonationCampaigns
+go
 drop table if exists Donations
 go
 drop table if exists EmailQueue

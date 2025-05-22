@@ -14,18 +14,21 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     private readonly IConfigurationDataService _configurationDataService;
     private readonly IContentDataService _contentDataService;
     private readonly ILanguageContainerService _lc;
+    private readonly IDonationCampaignDataService _donationCampaignDataService;
 
     public LocationDataService(IDbContextFactory<DataContext> contextFactory,
         ICachingService cachingService,
         IAuthService authService,
         IConfigurationDataService configurationDataService,
         IContentDataService contentDataService,
-        ILanguageContainerService languageContainerService) : base(contextFactory, cachingService, authService)
+        ILanguageContainerService languageContainerService,
+        IDonationCampaignDataService donationCampaignDataService) : base(contextFactory, cachingService, authService)
     {
         _configurationDataService = configurationDataService;
         _contentDataService = contentDataService;
         _authService = authService;
         _lc = languageContainerService;
+        _donationCampaignDataService = donationCampaignDataService;
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -48,11 +51,11 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
             var result = await base.CreateAsync(entity);
 
-            if (!result.Success)
+            if (!result.Success || result.Data == null)
                 return result;
 
             var location = result.Data;
-
+            await CreateGeneralDonationCampaign(location);
             FileUtil.CreateLocationMediaDirectory(location);
             await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
             await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
@@ -64,7 +67,6 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
             await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
-            // add Delivery Check List - new 9/6/2024
             await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
             await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
@@ -75,9 +77,20 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            throw;
+            return new ServiceResponse<Location>("Error creating location: " + ex.Message);
         }
+    }
+
+    private async Task CreateGeneralDonationCampaign(Location location)
+    {
+        DonationCampaign donationCampaign = new()
+        {
+            CampaignName = Defaults.DefaultDonationCampaignName,
+            LocationId = location.LocationId,
+            StartDate = DateTime.UtcNow
+        };
+
+        await _donationCampaignDataService.CreateAsync(donationCampaign);
     }
 
     public async Task CreateContent(Location location, ContentType contentType, string templateName, string name)
