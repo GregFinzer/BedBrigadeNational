@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Components
     public partial class DonationGrid : ComponentBase
     {
         [Inject] private IDonationDataService? _svcDonation { get; set; }
+        [Inject] private IDonationCampaignDataService? _svcDonationCampaign { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
@@ -43,6 +44,7 @@ namespace BedBrigade.Client.Components
         private ClaimsPrincipal? Identity { get; set; }
         protected List<Donation>? Donations { get; set; }
         protected List<Location>? Locations { get; set; }
+        protected List<DonationCampaign>? DonationCampaigns { get; set; } 
         protected SfGrid<Donation>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<object>? ContextMenu;
@@ -75,6 +77,28 @@ namespace BedBrigade.Client.Components
             SetupAccess();
             await LoadDonations();
             await LoadLocations();
+            await LoadDonationCampaigns();
+        }
+
+        private async Task LoadDonationCampaigns()
+        {
+            var result = await _svcDonationCampaign.GetAllAsync();
+            if (result.Success)
+            {
+                DonationCampaigns = result.Data.ToList();
+                var item = DonationCampaigns.Single(r => r.LocationId == (int)LocationNumber.National);
+                if (item != null)
+                {
+                    DonationCampaigns.Remove(item);
+                }
+            }
+
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (!isNationalAdmin)
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                DonationCampaigns = DonationCampaigns.Where(o => o.LocationId == userLocationId).ToList();
+            }
         }
 
         private void LoadNotSent()
@@ -112,6 +136,13 @@ namespace BedBrigade.Client.Components
                 {
                     Locations.Remove(item);
                 }
+            }
+
+            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            if (!isNationalAdmin)
+            {
+                int userLocationId = await _svcUser.GetUserLocationId();
+                Locations = Locations.Where(o => o.LocationId == userLocationId).ToList();
             }
         }
 
