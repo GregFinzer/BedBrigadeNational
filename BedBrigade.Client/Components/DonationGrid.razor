@@ -7,7 +7,7 @@
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 @using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
 
-@if (Donations == null || Locations == null)
+@if (Donations == null || Locations == null || DonationCampaigns == null)
 {
     <Spinner />
 }
@@ -90,6 +90,13 @@ else
                                     }
 
                                     <div class="row">
+                                        <div class="col-md-12">
+                                            <SfDropDownList TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@donation.DonationCampaignId Enabled="true" Placeholder="@_lc.Keys["SelectACampaign"]" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="CampaignName" Value="DonationCampaignId" />
+                                            </SfDropDownList> 
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <SfTextBox ID="name" @bind-Value=@donation.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto"/>
                                         </div>
@@ -118,6 +125,22 @@ else
                                             <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="@_lc.Keys["TaxFormSent"]"/>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.PaymentProcessor Enabled="true" Placeholder="@_lc.Keys["PaymentProcessor"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.PaymentStatus Enabled="true" Placeholder="@_lc.Keys["PaymentStatus"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
                                 }
                             </Template>
                         </GridEditSettings>
@@ -131,6 +154,11 @@ else
                             <GridColumn Field=@nameof(Donation.TaxFormSent) ShowColumnMenu="false" HeaderText="Tax Form Sent" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" AutoFit="true"/>
                             <GridColumn Field=@nameof(Donation.DonationDate) ShowColumnMenu="false" HeaderText="Donation Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" Format="MM/dd/yyyy" />
                             <GridColumn Field=@nameof(Donation.Amount) ShowColumnMenu="false" HeaderText="Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"/>
+                            <GridColumn Field=@nameof(Donation.Gross) ShowColumnMenu="false" HeaderText="Gross" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.PaymentProcessor) ShowColumnMenu="false" HeaderText="Payment Processor" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.PaymentStatus) ShowColumnMenu="false" HeaderText="Payment Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.Currency) ShowColumnMenu="false" HeaderText="Currency" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(Donation.DonationCampaignId) ForeignDataSource=@DonationCampaigns ForeignKeyField="DonationCampaignId" ForeignKeyValue="CampaignName" ShowColumnMenu="false" HeaderText="Donation Campaign" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
 

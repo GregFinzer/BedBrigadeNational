@@ -1,4 +1,3 @@
-using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -40,9 +39,22 @@ namespace BedBrigade.Common.Models
         [Required]
 		public Boolean TaxFormSent { get; set; }
 
-		[NotMapped]
+        [MaxLength(80)]
+        public string? PaymentProcessor { get; set; }
+
+        [MaxLength(50)]
+        public string? PaymentStatus { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public Decimal? Gross { get; set; }
+
+        [MaxLength(50)]
+        public string? Currency { get; set; }
+
+        [NotMapped]
 		public string FullName 
-		{ get
+		{ 
+            get
 			{
 				return $"{FirstName} {LastName}";
 			}
