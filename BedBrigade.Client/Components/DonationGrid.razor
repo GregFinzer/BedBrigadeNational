@@ -91,7 +91,7 @@ else
 
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <SfDropDownList TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@donation.DonationCampaignId Enabled="true" Placeholder="Select Campaign" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@donation.DonationCampaignId Enabled="true" Placeholder="@_lc.Keys["SelectACampaign"]" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="CampaignName" Value="DonationCampaignId" />
                                             </SfDropDownList> 
                                         </div>
@@ -127,18 +127,18 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.PaymentProcessor Enabled="true" Placeholder="Payment Processor" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.PaymentProcessor Enabled="true" Placeholder="@_lc.Keys["PaymentProcessor"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.PaymentStatus Enabled="true" Placeholder="Payment Status" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.PaymentStatus Enabled="true" Placeholder="@_lc.Keys["PaymentStatus"]s" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="Gross" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
+                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
                                         </div>
                                         <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="Currency" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
                                 }

@@ -35,6 +35,7 @@ ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
+Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
 DeliveryDate: Fecha de entrega
@@ -104,6 +105,7 @@ FirstName: Nombre
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
+Gross: Bruto
 Group: Grupo
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
@@ -174,6 +176,8 @@ OrganizerPhone: Teléfono del organizador
 OtherLanguagesSpoken: Otros idiomas hablados
 PageNext: Página siguiente
 PagePrevious: Página anterior
+PaymentProcessor: Procesador de pagos
+PaymentStatus: Estado de pago
 Password: Contraseña
 Phone: Teléfono
 PhoneColon: 'Teléfono:'
@@ -232,6 +236,7 @@ Scheduling: Planificación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
+SelectACampaign: Seleccione una campaña
 SelectAGridFilter: Seleccionar un filtro de cuadrícula
 SelectALocation: Seleccione una ubicación
 SelectANewsletter: Seleccione un boletín
