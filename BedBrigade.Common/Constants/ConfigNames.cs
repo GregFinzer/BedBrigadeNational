@@ -65,5 +65,10 @@
         public const string SmsAccountSid = "SmsAccountSid";
         public const string SmsAuthToken = "SmsAuthToken";
         public const string SmsMissedMessageMinutes = "SmsMissedMessageMinutes";
+
+        //Payments
+        public const string StripePublishableKey = "StripePublishableKey";
+        public const string StripeSecretKey = "StripeSecretKey";
+        public const string SessionEncryptionKey = "SessionEncryptionKey";
     }
 }

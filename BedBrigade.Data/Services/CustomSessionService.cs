@@ -1,6 +1,6 @@
 ﻿using Blazored.SessionStorage;
 
-namespace BedBrigade.Client.Services
+namespace BedBrigade.Data.Services
 {
     /// <summary>
     /// A service to manage the browser session storage using Blazored.SessionStorage

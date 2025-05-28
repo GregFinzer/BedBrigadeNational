@@ -925,7 +925,26 @@ public static class Seed
             ConfigurationValue = "30", 
             Section = ConfigSection.Sms,
             LocationId = Defaults.NationalLocationId
-        }
+        },
+        //Payments
+        new()
+        {
+            ConfigurationKey = ConfigNames.StripePublishableKey,
+            ConfigurationValue = string.Empty,
+            Section = ConfigSection.Payments
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.StripeSecretKey,
+            ConfigurationValue = string.Empty,
+            Section = ConfigSection.Payments
+        },
+        new()
+        {
+            ConfigurationKey = ConfigNames.SessionEncryptionKey,
+            ConfigurationValue = string.Empty,
+            Section = ConfigSection.Payments
+        },
     ];
 
 

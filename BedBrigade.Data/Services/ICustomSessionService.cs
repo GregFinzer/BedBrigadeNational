@@ -1,4 +1,4 @@
-﻿namespace BedBrigade.Client.Services
+﻿namespace BedBrigade.Data.Services
 {
     public interface ICustomSessionService
     {
