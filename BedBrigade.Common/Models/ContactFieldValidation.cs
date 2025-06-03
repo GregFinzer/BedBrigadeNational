@@ -27,6 +27,31 @@ namespace BedBrigade.Common.Models
 
         }
 
-    } //    
+    }
+
+    internal class PhoneInputValidation : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            string StatusMessage = String.Empty;
+            string phone = String.Empty;
+
+            if (value != null && value.ToString().Trim().Length > 0)
+            {
+                phone = value.ToString().Trim();
+                var phoneValid = Validation.IsValidPhoneNumber(phone);
+
+                if (!phoneValid) 
+                {
+                    StatusMessage = "Invalid Phone Number";
+                    return new ValidationResult(StatusMessage, new[] { validationContext.MemberName });
+                }
+            }
+
+            return null;
+
+        }
+
+    }
 
 }

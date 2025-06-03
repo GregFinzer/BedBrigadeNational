@@ -28,5 +28,20 @@ namespace BedBrigade.Data.Services
         {
             await _sessionService.RemoveItemAsync(key);
         }
+
+        public async Task ContainKeyAsync(string key)
+        {
+            await _sessionService.ContainKeyAsync(key);
+        }
+
+        public async Task SetItemAsync<T>(string key, T value)
+        {
+            await _sessionService.SetItemAsync(key, value);
+        }
+
+        public async Task<T> GetItemAsync<T>(string key)
+        {
+            return await _sessionService.GetItemAsync<T>(key);
+        }
     }
 }

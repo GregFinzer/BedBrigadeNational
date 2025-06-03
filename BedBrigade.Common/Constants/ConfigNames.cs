@@ -70,5 +70,8 @@
         public const string StripePublishableKey = "StripePublishableKey";
         public const string StripeSecretKey = "StripeSecretKey";
         public const string SessionEncryptionKey = "SessionEncryptionKey";
+        public const string StripeAccountId = "StripeAccountId";
+        public const string StripeDonationAmounts = "StripeDonationAmounts";
+        public const string StripeSubscriptionAmounts = "StripeSubscriptionAmounts";
     }
 }

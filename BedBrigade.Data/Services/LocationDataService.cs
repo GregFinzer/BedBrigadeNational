@@ -5,6 +5,8 @@ using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Data.Seeding;
+using Serilog;
 
 namespace BedBrigade.Data.Services;
 
@@ -73,11 +75,27 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
             await CreateContent(location, ContentType.SignUpSmsConfirmationForm, "SignUpSmsConfirmationForm.txt", "SignUpSmsConfirmationForm");
             await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
+            await CreateConfig(location);
             return result;
         }
         catch (Exception ex)
         {
             return new ServiceResponse<Location>("Error creating location: " + ex.Message);
+        }
+    }
+
+    private async Task CreateConfig(Location location)
+    {
+        List<Configuration> configurations = SeedConfigLogic.LocationSpecificConfigurations(location.LocationId);
+
+        foreach (var config in configurations)
+        {
+            config.LocationId = location.LocationId;
+            var result = await _configurationDataService.CreateAsync(config);
+            if (!result.Success)
+            {
+                Log.Error("Error creating configuration for location {LocationName}: {Message}", location.Name, result.Message);
+            }
         }
     }
 

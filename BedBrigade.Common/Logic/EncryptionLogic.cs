@@ -1,4 +1,5 @@
 using System;
+using KellermanSoftware.NetEncryptionLibrary;
 
 namespace BedBrigade.Common.Logic;
 
