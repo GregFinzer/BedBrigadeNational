@@ -104,7 +104,7 @@ namespace BedBrigade.Data.Services
             var service = new SessionService();
             var session = await service.CreateAsync(options, requestOptions);
 
-            return new ServiceResponse<string>(session.Url, true);
+            return new ServiceResponse<string>("Valid", true, session.Url);
         }
 
         private async Task<ServiceResponse<string>> GetStripeSecretKeyAsync()
@@ -113,7 +113,7 @@ namespace BedBrigade.Data.Services
                 .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeSecretKey);
             if (string.IsNullOrEmpty(key))
                 return new ServiceResponse<string>("Stripe secret key is not configured.", false);
-            return new ServiceResponse<string>(key, true);
+            return new ServiceResponse<string>("Valid", true, key);
         }
 
         private async Task<ServiceResponse<PaymentSession>> GetAndValidatePaymentSessionAsync()
@@ -198,6 +198,7 @@ namespace BedBrigade.Data.Services
             return new SessionCreateOptions
             {
                 CustomerEmail = paymentSession.Email,
+                ClientReferenceId = paymentSession.PaymentSessionId.ToString(),
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = lineItems,
                 Mode = paymentSession.SubscriptionAmount.HasValue
@@ -229,7 +230,7 @@ namespace BedBrigade.Data.Services
             if (!paymentSession.DonationAmount.HasValue
                 && !paymentSession.SubscriptionAmount.HasValue)
                 return new ServiceResponse<bool>(
-                    "Donation amount or subscription amount must be greater than zero.", false);
+                    "Donation amount or subscription amount must be provided.", false);
 
             if (paymentSession.DonationAmount <= 0
                 && paymentSession.SubscriptionAmount <= 0)

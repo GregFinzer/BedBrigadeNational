@@ -18,16 +18,16 @@ public class PaymentSession
     public string? LastName { get; set; }
 
     [Required(ErrorMessage = "Email is required")]
-    [EmailInputValidation]
     [MaxLength(255)]
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "Phone Number is required")]
     [MinLength(10, ErrorMessage = "Please enter a valid phone number.")]
-    [PhoneInputValidation]
     public string? PhoneNumber { get; set; }
 
     public int? LocationId { get; set; }
+
+    [Required(ErrorMessage = "Campaign is required")]
     public int? DonationCampaignId { get; set; }
 
     public decimal? DonationAmount { get; set; }

@@ -1,0 +1,151 @@
+﻿@page "/{LocationRoute:nonfile}/donations"
+@using System.Globalization
+@using BedBrigade.Common.Models
+
+@if (PaymentSession == null 
+     || DonationAmounts == null 
+     || SubscriptionAmounts == null 
+     || DonationCampaigns == null 
+     || String.IsNullOrEmpty(RotatorTitle) 
+     || !LocationId.HasValue)
+{
+    <p><em>@_lc.Keys["Loading"]</em></p>
+}
+else
+{
+    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="pages/Donations" LocationId="@LocationId.Value" />
+
+    <div class="container-fluid">
+        <EditForm EditContext="@EC">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["ContactInformation"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
+                                <SfTextBox ID="firstname" @bind-Value="PaymentSession.FirstName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => PaymentSession.FirstName)"></ValidationMessage>
+                                </div>
+
+                            </div>
+                            <div class="form-group ">
+                                <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
+                                <SfTextBox ID="lastname" @bind-Value="PaymentSession.LastName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => PaymentSession.LastName)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
+                                <SfTextBox ID="email" @bind-Value="PaymentSession.Email"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => PaymentSession.Email)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
+                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="PaymentSession.PhoneNumber"></SfMaskedTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => PaymentSession.PhoneNumber)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Donation Amount</div>
+                        <div class="card-body">
+                            @foreach (var amount in DonationAmounts)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           id="amount-@amount"
+                                           name="donationAmount"
+                                           value="@amount"
+                                           @onchange="@(() =>
+                                                      {
+                                                          PaymentSession.DonationAmount = amount;
+                                                          PaymentSession.SubscriptionAmount = null;
+                                                      })"
+                                           checked="@(PaymentSession.DonationAmount == amount)" />
+                                    <label class="form-check-label" for="amount-@amount">
+                                        One Time Donation of @amount.ToString("C", CultureInfo.CurrentCulture)
+                                    </label>
+                                </div>
+                            }
+                            @foreach (var amount in SubscriptionAmounts)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           id="monthlyAmount-@amount"
+                                           name="donationAmount"
+                                           value="@amount"
+                                           @onchange="@(() =>
+                                                      {
+                                                          PaymentSession.SubscriptionAmount = amount;
+                                                          PaymentSession.DonationAmount = null;
+                                                      })"
+                                           checked="@(PaymentSession.SubscriptionAmount == amount)" />
+                                    <label class="form-check-label" for="monthlyAmount-@amount">
+                                        Monthly Donation of @amount.ToString("C", CultureInfo.CurrentCulture)
+                                    </label>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Campaign</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="campaign" class="formlabel required">Campaign</label>
+                                <SfDropDownList TValue="int?" ID="campaign" TItem="DonationCampaign" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a Campaign" DataSource="@DonationCampaigns" @bind-Value="PaymentSession.DonationCampaignId">
+                                    <DropDownListFieldSettings Value="DonationCampaignId" Text="CampaignName"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="int?" TItem="DonationCampaign"></DropDownListEvents>
+                                    <div style="font-size: smaller">
+                                        <ValidationMessage For="@(() => PaymentSession.DonationCampaignId)"></ValidationMessage>
+                                    </div>
+                                </SfDropDownList>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div>
+                        <div id="myValidationMessage" class="alert alert-danger" role="alert" style="display: @MyValidationDisplay">
+                            @MyValidationMessage
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3" style="text-align: center">
+                    <ReCAPTCHA @ref="reCAPTCHAComponent" OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-3" style="text-align: center">
+                    <button class="btn btn-primary" @onclick="(SubmitRequest)">
+                        Continue <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+                <div class="col-md-9">
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}

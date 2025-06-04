@@ -11,7 +11,8 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly IAuthService _authService;
 
-    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, IAuthService authService) : base(contextFactory, cachingService, authService)
+    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
+        IAuthService authService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -29,7 +30,9 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         var cachedContent = _cachingService.Get<List<Configuration>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<Configuration>>($"Found {cachedContent.Count} records in cache", true, cachedContent); ;
+            return new ServiceResponse<List<Configuration>>($"Found {cachedContent.Count} records in cache", true,
+                cachedContent);
+        ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -46,12 +49,14 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         {
             return new ServiceResponse<Configuration>("Configuration.GetByIdAsync id is null", false);
         }
+
         var response = await base.GetAllAsync();
 
         if (!response.Success || response.Data == null)
             return new ServiceResponse<Configuration>(response.Message, false);
 
-        Configuration result = response.Data.FirstOrDefault(o => o.ConfigurationKey == id.ToString() && o.LocationId == Defaults.NationalLocationId);
+        Configuration result = response.Data.FirstOrDefault(o =>
+            o.ConfigurationKey == id.ToString() && o.LocationId == Defaults.NationalLocationId);
 
         if (result == null)
         {
@@ -65,7 +70,8 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
+        var config =
+            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
             ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
@@ -87,7 +93,8 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
+        var config =
+            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
             ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
@@ -109,7 +116,8 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
+        var config =
+            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
             ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
@@ -126,12 +134,28 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         List<Configuration> configs = (await GetAllAsync(section)).Data;
 
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
+        var config =
+            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
 
         if (config == null)
             ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
 
         return config.ConfigurationValue.ToLower() == "true" || config.ConfigurationValue.ToLower() == "yes";
+    }
+
+    public async Task<List<decimal>> GetAmounts(ConfigSection section, string key, int locationId)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == locationId);
+        if (config == null)
+            ThrowKeyNotFound(section, key, locationId);
+        var amounts = config.ConfigurationValue.Split('|', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s =>
+                decimal.TryParse(s.Trim(), out decimal value)
+                    ? value
+                    : throw new FormatException($"Invalid decimal value: {s}"))
+            .ToList();
+        return amounts;
     }
 }
 

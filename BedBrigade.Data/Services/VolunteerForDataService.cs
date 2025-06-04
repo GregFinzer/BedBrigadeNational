@@ -1,5 +1,4 @@
-﻿using BedBrigade.Client.Services;
-using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Models;
 
 using Microsoft.EntityFrameworkCore;
 
