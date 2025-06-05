@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components;
 using System.Globalization;
 using BedBrigade.Common.Enums;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Net;
 using BedBrigade.SpeakIt;
 using Microsoft.JSInterop;
 
@@ -69,11 +68,9 @@ public partial class Donations : ComponentBase, IDisposable
             if (donationCampaignsResponse.Success && donationCampaignsResponse.Data != null)
             {
                 DonationCampaigns = donationCampaignsResponse.Data;
-
-
             }
 
-            PaymentSession = await _customSessionService.GetItemAsync<PaymentSession>(Defaults.PaymentSessionKey) ?? new PaymentSession();
+            PaymentSession = new PaymentSession();
             PaymentSession.LocationId = LocationId.Value;
 
             if (DonationCampaigns != null && DonationCampaigns.Count == 1)
@@ -174,6 +171,7 @@ public partial class Donations : ComponentBase, IDisposable
         {
             await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
             var urlResponse = await _paymentService.GetStripeDepositUrl();
+            await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
 
             if (urlResponse.Success && !string.IsNullOrEmpty(urlResponse.Data))
             {

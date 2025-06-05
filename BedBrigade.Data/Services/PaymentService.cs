@@ -6,6 +6,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using KellermanSoftware.NetEmailValidation;
 using Microsoft.AspNetCore.Components;
 using Stripe;
 using Stripe.Checkout;
@@ -59,7 +60,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<string>> GetStripeDepositUrl()
+        public async Task<ServiceResponse<string>> GetStripeDepositUrl(PaymentSession paymentSession)
         {
             const string donationConfirmationPage = "donation-confirmation";
             const string donationCancellationPage = "donation-cancellation";
@@ -70,11 +71,11 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>(secretKeyResponse.Message, false);
             StripeConfiguration.ApiKey = secretKeyResponse.Data!;
 
-            // Retrieve and validate PaymentSession
-            ServiceResponse<PaymentSession> sessionResponse = await GetAndValidatePaymentSessionAsync();
-            if (!sessionResponse.Success || sessionResponse.Data == null )
-                return new ServiceResponse<string>(sessionResponse.Message, false);
-            PaymentSession paymentSession = sessionResponse.Data!;
+            // Validate PaymentSession
+            string validationResult = ValidatePaymentSession(paymentSession);
+
+            if (!string.IsNullOrEmpty(validationResult))
+                return new ServiceResponse<string>(validationResult, false);
 
             // Retrieve and validate Location
             ServiceResponse<Location> locationResponse = await _locationDataService
@@ -86,14 +87,14 @@ namespace BedBrigade.Data.Services
             // Build RequestOptions (StripeAccount per location)
             RequestOptions requestOptions = await BuildRequestOptionsAsync(paymentSession.LocationId.Value);
 
-            // Build line items (one–time vs. subscription)
+            // Build line items (oneï¿½time vs. subscription)
             List<SessionLineItemOptions> lineItems = BuildLineItems(paymentSession);
 
             // Create encrypted session ID
             string sessionId = await CreateSessionId(paymentSession);
 
             // Build SessionCreateOptions
-            var options = BuildSessionCreateOptions(
+            SessionCreateOptions options = BuildSessionCreateOptions(
                 paymentSession,
                 lineItems,
                 sessionId,
@@ -101,45 +102,40 @@ namespace BedBrigade.Data.Services
                 donationCancellationPage);
 
             // Call Stripe to create the Checkout Session
-            var service = new SessionService();
-            var session = await service.CreateAsync(options, requestOptions);
+            SessionService service = new SessionService();
+            Session? session = await service.CreateAsync(options, requestOptions);
+
+            if (session == null || string.IsNullOrEmpty(session.Url))
+            {
+                return new ServiceResponse<string>("Failed to create Stripe session.", false);
+            }
+
+            paymentSession.StripeSessionId = session.Id;
 
             return new ServiceResponse<string>("Valid", true, session.Url);
         }
 
         private async Task<ServiceResponse<string>> GetStripeSecretKeyAsync()
         {
-            var key = await _configurationDataService
+            string key = await _configurationDataService
                 .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeSecretKey);
             if (string.IsNullOrEmpty(key))
                 return new ServiceResponse<string>("Stripe secret key is not configured.", false);
             return new ServiceResponse<string>("Valid", true, key);
         }
 
-        private async Task<ServiceResponse<PaymentSession>> GetAndValidatePaymentSessionAsync()
-        {
-            var paymentSession = await _customSessionService
-                .GetItemAsync<PaymentSession>(Defaults.PaymentSessionKey);
-            if (paymentSession == null)
-                return new ServiceResponse<PaymentSession>("Payment session is not initialized.", false);
 
-            var validationResult = ValidatePaymentSession(paymentSession);
-            if (!validationResult.Success)
-                return new ServiceResponse<PaymentSession>(validationResult.Message, false);
-
-            return new ServiceResponse<PaymentSession>("Valid", true, paymentSession);
-        }
 
         private async Task<RequestOptions> BuildRequestOptionsAsync(int locationId)
         {
-            var accountId = await _configurationDataService
+            string accountId = await _configurationDataService
                 .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeAccountId, locationId);
             return new RequestOptions { StripeAccount = accountId };
         }
 
         private List<SessionLineItemOptions> BuildLineItems(PaymentSession paymentSession)
         {
-            var items = new List<SessionLineItemOptions>();
+            List<SessionLineItemOptions> items = new List<SessionLineItemOptions>();
 
             if (paymentSession.SubscriptionAmount.HasValue
                 && paymentSession.SubscriptionAmount.Value > 0)
@@ -190,7 +186,7 @@ namespace BedBrigade.Data.Services
             string successPage,
             string cancelPage)
         {
-            var successUrl = new UriBuilder($"{GetBaseDomain()}/{successPage}")
+            string successUrl = new UriBuilder($"{GetBaseDomain()}/{successPage}")
             {
                 Query = $"sessionid={HttpUtility.UrlEncode(sessionId)}"
             }.ToString();
@@ -210,34 +206,74 @@ namespace BedBrigade.Data.Services
             };
         }
 
-        private ServiceResponse<bool> ValidatePaymentSession(PaymentSession paymentSession)
+        private string ValidatePaymentSession(PaymentSession paymentSession)
         {
             if (!paymentSession.LocationId.HasValue)
-                return new ServiceResponse<bool>("Location ID is required.", false);
+                return "Location ID is required.";
 
-            if (string.IsNullOrEmpty(paymentSession.FirstName)
-                || string.IsNullOrEmpty(paymentSession.LastName))
-                return new ServiceResponse<bool>("First name and last name are required.", false);
+            if (string.IsNullOrEmpty(paymentSession.FirstName))
+                return "First Name is required.";
 
-            var emailCheck = Validation.IsValidEmail(paymentSession.Email);
+            if (string.IsNullOrEmpty(paymentSession.LastName))
+                return "Last Name is required.";
+
+            Result emailCheck = Validation.IsValidEmail(paymentSession.Email);
             if (!emailCheck.IsValid)
-                return new ServiceResponse<bool>(emailCheck.UserMessage, false);
+                return emailCheck.UserMessage;
 
             if (string.IsNullOrEmpty(paymentSession.PhoneNumber)
                 || !Validation.IsValidPhoneNumber(paymentSession.PhoneNumber))
-                return new ServiceResponse<bool>("A valid phone number is required.", false);
+                return "A valid phone number is required.";
 
             if (!paymentSession.DonationAmount.HasValue
                 && !paymentSession.SubscriptionAmount.HasValue)
-                return new ServiceResponse<bool>(
-                    "Donation amount or subscription amount must be provided.", false);
+                return "Donation amount or subscription amount must be provided.";
 
             if (paymentSession.DonationAmount <= 0
                 && paymentSession.SubscriptionAmount <= 0)
-                return new ServiceResponse<bool>(
-                    "Donation amount or subscription amount must be greater than zero.", false);
+                return "Donation amount or subscription amount must be greater than zero.";
 
-            return new ServiceResponse<bool>(string.Empty, true);
+            return string.Empty;
+        }
+
+        public async Task<ServiceResponse<(decimal gross, decimal fee)>> GetStripeTransactionDetails(string sessionId)
+        {
+            try
+            {
+                SessionService service = new SessionService();
+                Session? session = await service.GetAsync(sessionId);
+                
+                if (session == null)
+                    return new ServiceResponse<(decimal gross, decimal fee)>("Session not found", false);
+
+                // Get payment intent to access the charges
+                PaymentIntentService paymentIntentService = new PaymentIntentService();
+                PaymentIntent? paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
+                
+                if (paymentIntent == null || paymentIntent.LatestChargeId == null)
+                    return new ServiceResponse<(decimal gross, decimal fee)>("Payment details not found", false);
+
+                ChargeService chargeService = new ChargeService();
+                Charge? charge = await chargeService.GetAsync(paymentIntent.LatestChargeId);
+
+                decimal gross = charge.Amount / 100M; // Stripe amounts are in cents
+                decimal fee = charge.ApplicationFeeAmount ?? 0 / 100M;
+
+                return new ServiceResponse<(decimal gross, decimal fee)>("Success", true, (gross, fee));
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<(decimal gross, decimal fee)>($"Error getting transaction details: {ex.Message}", false);
+            }
+        }
+
+        public async Task<Session?> GetStripeSession(string sessionId)
+        {
+            if (string.IsNullOrEmpty(sessionId))
+                return null;
+
+            SessionService service = new SessionService();
+            return await service.GetAsync(sessionId);
         }
     }
 }

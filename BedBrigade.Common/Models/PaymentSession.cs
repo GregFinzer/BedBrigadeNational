@@ -34,4 +34,6 @@ public class PaymentSession
     public decimal? SubscriptionAmount { get; set; }
 
     public bool IsSaved { get; set; } = false;
+
+    public string? StripeSessionId { get; set; }
 }
