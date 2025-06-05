@@ -13,7 +13,7 @@
 }
 else
 {
-    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="pages/Donations" LocationId="@LocationId.Value" />
+    @((MarkupString)BodyContent)
 
     <div class="container-fluid">
         <EditForm EditContext="@EC">
@@ -138,12 +138,10 @@ else
             </div>
             <br />
             <div class="row">
-                <div class="col-md-3" style="text-align: center">
+                <div class="col-md-12" style="text-align: left">
                     <button class="btn btn-primary" @onclick="(SubmitRequest)">
                         Continue <i class="fas fa-arrow-right ms-2"></i>
                     </button>
-                </div>
-                <div class="col-md-9">
                 </div>
             </div>
         </EditForm>

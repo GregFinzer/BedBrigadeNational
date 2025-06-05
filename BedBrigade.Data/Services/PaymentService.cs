@@ -19,17 +19,19 @@ namespace BedBrigade.Data.Services
         private readonly ICustomSessionService _customSessionService;
         private readonly NavigationManager _navigationManager;
         private readonly ILocationDataService _locationDataService;
-
+        private readonly IDonationDataService _donationDataService;
         public PaymentService(
             IConfigurationDataService configurationDataService,
             ICustomSessionService customSessionService,
             NavigationManager navigationManager,
-            ILocationDataService locationDataService)
+            ILocationDataService locationDataService, 
+            IDonationDataService donationDataService)
         {
             _configurationDataService = configurationDataService;
             _customSessionService = customSessionService;
             _navigationManager = navigationManager;
             _locationDataService = locationDataService;
+            _donationDataService = donationDataService;
         }
 
         private string GetBaseDomain()
@@ -240,24 +242,29 @@ namespace BedBrigade.Data.Services
         {
             try
             {
-                SessionService service = new SessionService();
-                Session? session = await service.GetAsync(sessionId);
-                
+                var sessionService = new SessionService();
+                var session = await sessionService.GetAsync(sessionId);
                 if (session == null)
                     return new ServiceResponse<(decimal gross, decimal fee)>("Session not found", false);
 
-                // Get payment intent to access the charges
-                PaymentIntentService paymentIntentService = new PaymentIntentService();
-                PaymentIntent? paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
-                
-                if (paymentIntent == null || paymentIntent.LatestChargeId == null)
+                var paymentIntentService = new PaymentIntentService();
+                var paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
+                if (paymentIntent == null || string.IsNullOrEmpty(paymentIntent.LatestChargeId))
                     return new ServiceResponse<(decimal gross, decimal fee)>("Payment details not found", false);
 
-                ChargeService chargeService = new ChargeService();
-                Charge? charge = await chargeService.GetAsync(paymentIntent.LatestChargeId);
+                var chargeService = new ChargeService();
+                var charge = await chargeService.GetAsync(paymentIntent.LatestChargeId);
+                if (charge == null || string.IsNullOrEmpty(charge.BalanceTransactionId))
+                    return new ServiceResponse<(decimal gross, decimal fee)>("Charge or balance transaction not found", false);
 
-                decimal gross = charge.Amount / 100M; // Stripe amounts are in cents
-                decimal fee = charge.ApplicationFeeAmount ?? 0 / 100M;
+                decimal gross = charge.Amount / 100M;
+
+                var balanceTransactionService = new BalanceTransactionService();
+                var balanceTransaction = await balanceTransactionService.GetAsync(charge.BalanceTransactionId);
+                if (balanceTransaction == null)
+                    return new ServiceResponse<(decimal gross, decimal fee)>("Balance transaction not found", false);
+
+                decimal fee = balanceTransaction.Fee / 100M;
 
                 return new ServiceResponse<(decimal gross, decimal fee)>("Success", true, (gross, fee));
             }
@@ -267,6 +274,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
+
         public async Task<Session?> GetStripeSession(string sessionId)
         {
             if (string.IsNullOrEmpty(sessionId))
@@ -274,6 +282,30 @@ namespace BedBrigade.Data.Services
 
             SessionService service = new SessionService();
             return await service.GetAsync(sessionId);
+        }
+
+        public async Task<ServiceResponse<Donation>> CreateDonationRecordFromPaymentSession(PaymentSession paymentSession, Session stripeSession, decimal fee)
+        {
+            decimal gross = paymentSession.DonationAmount ?? paymentSession.SubscriptionAmount ?? 0;
+
+            Donation donation = new Donation
+            {
+                LocationId = paymentSession.LocationId.Value,
+                DonationCampaignId = paymentSession.DonationCampaignId.Value,
+                Email = paymentSession.Email,
+                TransactionFee = fee,
+                TransactionId = stripeSession.PaymentIntentId,
+                FirstName = paymentSession.FirstName,
+                LastName = paymentSession.LastName,
+                DonationDate = DateTime.UtcNow,
+                TaxFormSent = false,
+                PaymentProcessor = "Stripe",
+                PaymentStatus = stripeSession.PaymentStatus,
+                Gross = gross,
+                Currency = stripeSession.Currency?.ToUpper()
+            };
+
+            return await _donationDataService.CreateAsync(donation);
         }
     }
 }

@@ -8,6 +8,8 @@ using BedBrigade.Common.Enums;
 using Microsoft.AspNetCore.Components.Forms;
 using BedBrigade.SpeakIt;
 using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -24,7 +26,10 @@ public partial class Donations : ComponentBase, IDisposable
     [Inject] private IDonationCampaignDataService _donationCampaignService { get; set; }
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private IPaymentService _paymentService { get; set; }
-
+    [Inject] private IContentDataService _contentDataService { get; set; }
+    [Inject] private ILoadImagesService _loadImagesService { get; set; }
+    [Inject] private ICarouselService _carouselService { get; set; }
+    [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
     [Parameter] public string LocationRoute { get; set; } = default!;
     public int? LocationId { get; set; }
     public string LocationName { get; set; }
@@ -41,6 +46,8 @@ public partial class Donations : ComponentBase, IDisposable
     private ReCAPTCHA? reCAPTCHAComponent;
     private bool ValidReCAPTCHA = false;
     private ValidationMessageStore _validationMessageStore;
+    public string BodyContent { get; set; } = string.Empty;
+    public string PreviousBodyContent { get; set; } = string.Empty;
     protected override async Task OnInitializedAsync()
     {
         _lc.InitLocalizedComponent(this);
@@ -57,6 +64,7 @@ public partial class Donations : ComponentBase, IDisposable
             LocationName = locationResponse.Data.Name;
             RotatorTitle = $"{locationResponse.Data.Name} {DonationName}";
 
+            await LoadBodyContent();
             DonationAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeDonationAmounts,
                 LocationId.Value);
 
@@ -81,6 +89,61 @@ public partial class Donations : ComponentBase, IDisposable
             EC = new EditContext(PaymentSession);
             _validationMessageStore = new ValidationMessageStore(EC);
         }
+    }
+
+    private async Task LoadBodyContent()
+    {
+        if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+        {
+            await LoadDefaultContent();
+        }
+        else
+        {
+            await LoadContentByLanguage();
+        }
+    }
+
+    private async Task LoadDefaultContent()
+    {
+        var contentResult = await _contentDataService.GetAsync("Donations", LocationId.Value);
+        if (contentResult.Success)
+        {
+            var path = $"/{LocationRoute}/pages/Donations";
+            string html = await ReplaceHtmlControls(path, contentResult.Data.ContentHtml);
+
+            if (html != PreviousBodyContent)
+            {
+                PreviousBodyContent = html;
+                BodyContent = html;
+            }
+        }
+    }
+
+    private async Task LoadContentByLanguage()
+    {
+        var contentResult = await _svcContentTranslation.GetAsync("Donations", LocationId.Value, _svcLanguage.CurrentCulture.Name);
+        if (contentResult.Success)
+        {
+            var path = $"/{LocationRoute}/pages/Donations";
+            string html = await ReplaceHtmlControls(path, contentResult.Data.ContentHtml);
+
+            if (html != PreviousBodyContent)
+            {
+                PreviousBodyContent = html;
+                BodyContent = html;
+            }
+
+            return;
+        }
+
+        await LoadDefaultContent();
+    }
+
+    private async Task<string> ReplaceHtmlControls(string path, string html)
+    {
+        html = _loadImagesService.SetImagesForHtml(path, html);
+        html = _carouselService.ReplaceCarousel(html);
+        return html;
     }
 
     private async Task OnLanguageChanged(CultureInfo arg)

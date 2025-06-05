@@ -870,12 +870,16 @@ public static class Seed
                     var faker = new Faker();
                     var firstName = faker.Name.FirstName();
                     var lastName = faker.Name.LastName();
+                    var gross = new decimal(new Random().NextDouble() * 1000);
+                    var fee = Math.Round(gross * .03m, 2);
+
                     Donation donation = new()
                     {
                         LocationId = location.LocationId,
                         DonationCampaignId = donationCampaigns.First(o => o.LocationId == location.LocationId).DonationCampaignId,
                         Email = $"{firstName.ToLower()}.{lastName.ToLower()}@" + EmailProviders[new Random().Next(EmailProviders.Count - 1)],
-                        Amount = new decimal(new Random().NextDouble() * 1000),
+                        Gross = gross,
+                        TransactionFee = fee,
                         TransactionId = new Random().Next(233999, 293737).ToString(),
                         FirstName = firstName,
                         LastName = lastName,

@@ -111,7 +111,7 @@ namespace BedBrigade.Data.Services
         {
             StringBuilder sb = new(template, template.Length * 2);
             sb = sb.Replace("%%Donation.FullName%%", donations.First().FullName);
-            sb = sb.Replace("%%Donation.TotalAmount%%", donations.Sum(d => d.Amount).ToString("C"));
+            sb = sb.Replace("%%Donation.TotalAmount%%", donations.Sum(d => d.Gross ?? 0).ToString("C"));
 
             if (donations.First().DonationDate.HasValue)
                 sb = sb.Replace("%%Donation.Year%%", donations.First().DonationDate.Value.Year.ToString());
@@ -129,7 +129,7 @@ namespace BedBrigade.Data.Services
             StringBuilder itemizedDonations = new();
             foreach (var donation in donations)
             {
-                itemizedDonations.AppendLine($"{donation.DonationDate?.ToString("yyyy-MM-dd")} {donation.Amount.ToString("C")}");
+                itemizedDonations.AppendLine($"{donation.DonationDate?.ToString("yyyy-MM-dd")} {(donation.Gross ?? 0).ToString("C")}");
             }
             sb = sb.Replace("%%ItemizedDonations%%", itemizedDonations.ToString());
             return sb;

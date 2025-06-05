@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
@@ -26,8 +27,8 @@ public partial class DonationConfirmation : ComponentBase
 
         try
         {
-            var uri = new Uri(_navigationManager.Uri);
-            var query = HttpUtility.ParseQueryString(uri.Query);
+            Uri uri = new Uri(_navigationManager.Uri);
+            NameValueCollection query = HttpUtility.ParseQueryString(uri.Query);
             EncryptedSessionId = query["sessionid"];
         }
         catch (Exception ex)
@@ -44,7 +45,7 @@ public partial class DonationConfirmation : ComponentBase
         try
         {
             // Get payment session from local storage
-            var paymentSession = await _customSessionService.GetItemAsync<PaymentSession>(Defaults.PaymentSessionKey);
+            PaymentSession? paymentSession = await _customSessionService.GetItemAsync<PaymentSession>(Defaults.PaymentSessionKey);
             if (paymentSession == null)
             {
                 ErrorMessage = "Payment Session Not Found";
@@ -58,16 +59,26 @@ public partial class DonationConfirmation : ComponentBase
             }
 
 
-            var stripeSession = await _paymentService.GetStripeSession(paymentSession.StripeSessionId);
+            Session? stripeSession = await _paymentService.GetStripeSession(paymentSession.StripeSessionId);
             if (stripeSession == null)
             {
                 ErrorMessage = "Stripe session not found";
                 return;
             }
 
-            var transactionDetails = await _paymentService.GetStripeTransactionDetails(stripeSession.Id);
+            ServiceResponse<(decimal gross, decimal fee)> transactionDetails = await _paymentService.GetStripeTransactionDetails(stripeSession.Id);
             Amount = transactionDetails.Data.gross;
             TransactionId = stripeSession.PaymentIntentId;
+            var createRecordResult =
+                await _paymentService.CreateDonationRecordFromPaymentSession(paymentSession, stripeSession,
+                    transactionDetails.Data.fee);
+
+            if (!createRecordResult.Success)
+            {
+                ErrorMessage = createRecordResult.Message;
+            }
+
+            await _customSessionService.RemoveItemAsync(Defaults.PaymentSessionKey);
             StateHasChanged();
         }
         catch (Exception ex)
@@ -76,4 +87,6 @@ public partial class DonationConfirmation : ComponentBase
         }
 
     }
+
+
 }

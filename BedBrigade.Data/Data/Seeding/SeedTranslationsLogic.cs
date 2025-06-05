@@ -31,7 +31,7 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "Footer", Defaults.NationalLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Home", Defaults.NationalLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "AboutUs", Defaults.NationalLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Donations", Defaults.NationalLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "GeneralDonations", Defaults.NationalLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "History", Defaults.NationalLocationId, "es-MX", translationsDictionary);
 
                 //National News
