@@ -169,8 +169,7 @@ public partial class Donations : ComponentBase, IDisposable
 
         if (isValid)
         {
-            await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
-            var urlResponse = await _paymentService.GetStripeDepositUrl();
+            var urlResponse = await _paymentService.GetStripeDepositUrl(PaymentSession);
             await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
 
             if (urlResponse.Success && !string.IsNullOrEmpty(urlResponse.Data))

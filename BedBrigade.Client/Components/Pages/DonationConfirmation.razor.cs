@@ -68,8 +68,7 @@ public partial class DonationConfirmation : ComponentBase
             var transactionDetails = await _paymentService.GetStripeTransactionDetails(stripeSession.Id);
             Amount = transactionDetails.Data.gross;
             TransactionId = stripeSession.PaymentIntentId;
-
-
+            StateHasChanged();
         }
         catch (Exception ex)
         {
