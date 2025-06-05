@@ -18,36 +18,17 @@ public partial class DonationConfirmation : ComponentBase
     protected string? ErrorMessage { get; set; }
     protected decimal? Amount { get; set; }
     protected string? TransactionId { get; set; }
+    protected string? EncryptedSessionId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _lc.InitLocalizedComponent(this);
-        
+
         try
         {
             var uri = new Uri(_navigationManager.Uri);
             var query = HttpUtility.ParseQueryString(uri.Query);
-            var sessionId = query["sessionid"];
-
-            // Get transaction details from Stripe
-            var stripeSession = await _paymentService.GetStripeSession(sessionId);
-            if (stripeSession == null)
-            {
-                //TODO:  Localize
-                ErrorMessage = "Stripe Session Not Found";
-                return;
-            }
-
-            var transactionDetails = await _paymentService.GetStripeTransactionDetails(stripeSession.Id);
-            if (!transactionDetails.Success)
-            {
-                ErrorMessage = transactionDetails.Message;
-                return;
-            }
-
-            // Calculate final amount
-            Amount = transactionDetails.Data.gross - transactionDetails.Data.fee;
-            TransactionId = stripeSession.PaymentIntentId;
+            EncryptedSessionId = query["sessionid"];
         }
         catch (Exception ex)
         {
@@ -55,5 +36,45 @@ public partial class DonationConfirmation : ComponentBase
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || string.IsNullOrEmpty(EncryptedSessionId))
+            return;
 
+        try
+        {
+            // Get payment session from local storage
+            var paymentSession = await _customSessionService.GetItemAsync<PaymentSession>(Defaults.PaymentSessionKey);
+            if (paymentSession == null)
+            {
+                ErrorMessage = "Payment Session Not Found";
+                return;
+            }
+
+            if (!await _paymentService.VerifySessionId(paymentSession, EncryptedSessionId))
+            {
+                ErrorMessage = "Invalid Session";
+                return;
+            }
+
+
+            var stripeSession = await _paymentService.GetStripeSession(paymentSession.StripeSessionId);
+            if (stripeSession == null)
+            {
+                ErrorMessage = "Stripe session not found";
+                return;
+            }
+
+            var transactionDetails = await _paymentService.GetStripeTransactionDetails(stripeSession.Id);
+            Amount = transactionDetails.Data.gross;
+            TransactionId = stripeSession.PaymentIntentId;
+
+
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error processing donation: {ex.Message}";
+        }
+
+    }
 }
