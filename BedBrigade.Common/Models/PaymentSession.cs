@@ -17,7 +17,7 @@ public class PaymentSession
     [MaxLength(50)]
     public string? LastName { get; set; }
 
-    [Required(ErrorMessage = "Email is required")]
+    [Required(ErrorMessage = "Email Address is required")]
     [MaxLength(255)]
     public string? Email { get; set; }
 

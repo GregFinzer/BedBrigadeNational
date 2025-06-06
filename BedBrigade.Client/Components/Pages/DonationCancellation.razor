@@ -1,4 +1,4 @@
-﻿@page "/donation-cancellation"
+@page "/donation-cancellation"
 
 <PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["DonationCancellation"]}")</PageTitle>
 <RotatorContainer RotatorTitle="Payment Cancelled" ImagePath="pages/Donate" LocationId="1" />
@@ -6,9 +6,9 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 text-center">
-            <h2>Payment Cancelled</h2>
-            <p class="lead">Your donation has been cancelled.</p>
-            <a href="/" class="btn btn-primary mt-4">Return Home</a>
+            <h2>@_lc.Keys["PaymentCancelled"]</h2>
+            <p class="lead">@_lc.Keys["YourDonationHasBeenCancelled"]</p>
+            <a href="/" class="btn btn-primary mt-4">@_lc.Keys["ReturnHome"]</a>
         </div>
     </div>
 </div>

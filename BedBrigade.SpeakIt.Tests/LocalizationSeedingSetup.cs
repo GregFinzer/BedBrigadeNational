@@ -10,8 +10,8 @@ namespace BedBrigade.SpeakIt.Tests
         private TranslateLogic _translateLogic = new TranslateLogic(null);
         private Dictionary<string, string> _localizableStrings = new Dictionary<string, string>();
 
-        [Test, Ignore("This test should be ignored except locally")]
-        //[Test]
+        //[Test, Ignore("This test should be ignored except locally")]
+        [Test]
         public void Setup()
         {
             if (TestHelper.IsRunningUnderGitHubActions())

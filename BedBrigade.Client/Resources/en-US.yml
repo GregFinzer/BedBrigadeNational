@@ -3,7 +3,7 @@ Active: Active
 Add: Add
 Address: Address
 AgesGender: Ages / Gender
-Amount: Amount
+AmountColon: 'Amount:'
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 Back: Back
 BedBrigadeLocationEvents: Bed Brigade Location Events
@@ -19,6 +19,7 @@ BuildAddress: Build Address
 BuildCity: Build City
 BuildPostalCode: Build Postal Code
 BuildState: Build State
+Campaign: Campaign
 Cancel: Cancel
 ChangePassword: Change Password
 ChooseADate: Choose a Date
@@ -35,6 +36,7 @@ ContactMessage: Contact Message
 ContactUs: Contact Us
 ContactUsFormNotCompleted: The Contact Us Form is not completed!
 ContactUsFormSubmitted: Thank you for contacting us. We will get back to you as soon as possible.
+Continue: Continue
 Currency: Currency
 DateColon: 'Date:'
 DeliveryAddress: Delivery Address
@@ -45,9 +47,11 @@ DeliveryVehicleNone: I do not have a delivery vehicle
 DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
 DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
-DonationDate: Donation Date
+DonationAmount: Donation Amount
 DonationCancellation: Donation Cancellation
 DonationConfirmation: Donation Confirmation
+DonationDate: Donation Date
+DonationDetails: Donation Details
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)
@@ -177,6 +181,7 @@ OrganizerName: Organizer Name
 OrganizerPhone: Organizer Phone
 OtherLanguagesSpoken: Other Languages Spoken
 Password: Password
+PaymentCancelled: Payment Cancelled
 PaymentProcessor: Payment Processor
 PaymentStatus: Payment Status
 Phone: Phone
@@ -204,6 +209,7 @@ RequiredContent: Content is required
 RequiredContentId: Content ID is required
 RequiredContentType: Content Type is required
 RequiredCulture: Culture is required
+RequiredDonationCampaignId: Campaign is required
 RequiredEmail: Email Address is required
 RequiredFileUse: File Use is required
 RequiredFirstName: First Name is required
@@ -218,6 +224,7 @@ RequiredPageName: Page Name is required
 RequiredPageTitle: Page Title is required
 RequiredPassword: Password is required
 RequiredPhone: Phone Number is required
+RequiredPhoneNumber: Phone Number is required
 RequiredPostalCode: Postal Code (Zip Code) is required
 RequiredPrimaryLanguage: Please select your Primary Language
 RequiredQueueDate: Queue Date is required
@@ -226,8 +233,10 @@ RequiredSpeakEnglish: Please select your English ability level
 RequiredStatus: Status is required
 RequiredStreet: Street Address is required
 RequiredSubject: Subject is required.
+RequiredTransactionFee: Transaction Fee is required
 RequiredTranslationId: Translation ID is required
 RequiredUserId: User Id is required
+ReturnHome: Return Home
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
@@ -239,8 +248,8 @@ SearchBedBrigadeLocations: Search Bed Brigade Locations
 SelectACampaign: Select a Campaign
 SelectAGridFilter: Select a grid filter
 SelectALocation: Select a Location
-SelectANewsletter: Select a Newsletter
 SelectAnEvent: Select an event
+SelectANewsletter: Select a Newsletter
 SelectAnUpcomingEvent: Select an upcoming event and register to join us in either delivering or building beds!
 SelectAState: Select a state
 SelectAVolunteer: Select a Volunteer
@@ -271,8 +280,12 @@ SubscribeToOurText: Subscribe to our Text List?
 TaxFormSent: Tax Form Sent
 Team: Team
 ThankYou: Thank you!
+ThankYouForMakingADifferenceInTheLifeOfAChild: Thank you for making a difference in the life of a child.
+ThankYouForYourDonation: Thank You For Your Donation!
 TheBedBrigade: The Bed Brigade
+TransactionFees: Transaction Fees
 TransactionId: Transaction ID
+TransactionIdColon: 'Transaction ID:'
 Unauthorized: Unauthorized
 Unsubscribe: Unsubscribe
 UnsubscribeFromNewsletter: Unsubscribe from Newsletter
@@ -303,6 +316,7 @@ VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
+YourDonationHasBeenCancelled: Your donation has been cancelled.
 YourEmail: Your Email
 YouWereTryingTo: 'You were trying to access the page: '
 ZipCode: Zip Code

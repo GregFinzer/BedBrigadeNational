@@ -1,4 +1,4 @@
-﻿@page "/{LocationRoute:nonfile}/donations"
+@page "/{LocationRoute:nonfile}/donations"
 @using System.Globalization
 @using BedBrigade.Common.Models
 
@@ -56,7 +56,7 @@ else
                 </div>
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-header">Donation Amount</div>
+                        <div class="card-header">@_lc.Keys["DonationAmount"]</div>
                         <div class="card-body">
                             @foreach (var amount in DonationAmounts)
                             {
@@ -102,11 +102,11 @@ else
                 </div>
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-header">Campaign</div>
+                        <div class="card-header">@_lc.Keys["Campaign"]</div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="campaign" class="formlabel required">Campaign</label>
-                                <SfDropDownList TValue="int?" ID="campaign" TItem="DonationCampaign" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a Campaign" DataSource="@DonationCampaigns" @bind-Value="PaymentSession.DonationCampaignId">
+                                <label for="campaign" class="formlabel required">@_lc.Keys["Campaign"]</label>
+                                <SfDropDownList TValue="int?" ID="campaign" TItem="DonationCampaign" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectACampaign"]" DataSource="@DonationCampaigns" @bind-Value="PaymentSession.DonationCampaignId">
                                     <DropDownListFieldSettings Value="DonationCampaignId" Text="CampaignName"></DropDownListFieldSettings>
                                     <DropDownListEvents TValue="int?" TItem="DonationCampaign"></DropDownListEvents>
                                     <div style="font-size: smaller">
@@ -140,7 +140,7 @@ else
             <div class="row">
                 <div class="col-md-12" style="text-align: left">
                     <button class="btn btn-primary" @onclick="(SubmitRequest)">
-                        Continue <i class="fas fa-arrow-right ms-2"></i>
+                        @_lc.Keys["Continue"] <i class="fas fa-arrow-right ms-2"></i>
                     </button>
                 </div>
             </div>

@@ -8,17 +8,17 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8 text-center">
-                <h2>Thank You For Your Donation!</h2>
-                <p class="lead">Thank you for making a difference in the life of a child.</p>
+                <h2>@_lc.Keys["ThankYouForYourDonation"]</h2>
+                <p class="lead">@_lc.Keys["ThankYouForMakingADifferenceInTheLifeOfAChild"]</p>
                 <div class="card mt-4">
                     <div class="card-body">
-                        <h5 class="card-title">Donation Details</h5>
-                        <p><strong>Amount:</strong> @Amount?.ToString("C")</p>
-                        <p><strong>Date:</strong> @DateTime.Now.ToShortDateString()</p>
-                        <p><strong>Transaction ID:</strong> @TransactionId</p>
+                        <h5 class="card-title">@_lc.Keys["DonationDetails"]</h5>
+                        <p><strong>@_lc.Keys["AmountColon"]</strong> @Amount?.ToString("C")</p>
+                        <p><strong>@_lc.Keys["DateColon"]</strong> @DateTime.Now.ToShortDateString()</p>
+                        <p><strong>@_lc.Keys["TransactionIdColon"]</strong> @TransactionId</p>
                     </div>
                 </div>
-                <a href="/" class="btn btn-primary mt-4">Return Home</a>
+                <a href="/" class="btn btn-primary mt-4">@_lc.Keys["ReturnHome"]</a>
             </div>
         </div>
     </div>
@@ -29,6 +29,6 @@ else
         <div class="alert alert-danger" role="alert">
             @ErrorMessage
         </div>
-        <a href="/" class="btn btn-primary">Return Home</a>
+        <a href="/" class="btn btn-primary">@_lc.Keys["ReturnHome"]</a>
     </div>
 }
