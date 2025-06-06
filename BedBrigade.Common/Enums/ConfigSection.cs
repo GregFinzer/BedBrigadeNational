@@ -7,4 +7,5 @@ public enum ConfigSection
     Email = 3,
     GeoLocation = 4,
     Sms = 5,
+    Payments = 6,
 }

@@ -2,6 +2,7 @@
 using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using KellermanSoftware.NetEmailValidation;
+using KellermanSoftware.NetEncryptionLibrary;
 using KellermanSoftware.StaticCodeAnalysis;
 
 namespace BedBrigade.Common.Logic
@@ -35,6 +36,10 @@ namespace BedBrigade.Common.Logic
             return validation;
         }
 
-
+        public static Encryption CreateEncryption()
+        {
+            Encryption encryption = new Encryption(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+            return encryption;
+        }
     }
 }

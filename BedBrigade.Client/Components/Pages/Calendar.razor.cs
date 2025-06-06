@@ -104,60 +104,6 @@ namespace BedBrigade.Client.Components.Pages
             
         } // Init
 
-        private async Task LoadScheduleData()
-        {
-
-            ServiceResponse<List<Schedule>> recordResult;
-
-            try
-            {
-               
-                 recordResult = await _svcSchedule.GetAllAsync();
-               
-
-                if (recordResult.Success)
-                {
-                    lstSchedules = recordResult!.Data;
-                    Debug.WriteLine("Loaded events: " + lstSchedules.Count.ToString());
-                    //DataSource = await TransferEventToAppointment();
-                }
-                else
-                {
-                    ErrorMessage = "Could not retrieve schedule. " + recordResult.Message;
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = "Could not retrieve schedule. " + ex.Message;
-            }
-
-
-        }
-
-        private async Task<Location> GetLocation(int LocationId)
-        {
-            Location currentLocation = new Location();
-
-            try
-            {
-
-                var myLocation = await _svcLocation.GetByIdAsync(LocationId);
-
-                if (myLocation.Success && myLocation.Data != null)
-                {
-                    currentLocation = myLocation.Data;
-
-                }
-
-
-
-            }
-
-            catch (Exception ex) { }
-
-            return currentLocation;
-
-        } // Get Location
 
         private List<AppointmentData> GetCalendarAppointments(List<Schedule> BBEvents)
         {

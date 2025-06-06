@@ -159,7 +159,7 @@
         [Required(ErrorMessage = "Newsletter name is required.")]
         public string? NewsletterName { get; set; }
 
-        [Required(ErrorMessage = "Email is required.")]
+        [Required(ErrorMessage = "Email Address is required.")]
         [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string? Email { get; set; }
     }

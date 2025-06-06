@@ -3,7 +3,7 @@ Active: Activo
 Add: Agregar
 Address: Dirección
 AgesGender: Edades / Género
-Amount: Importe
+AmountColon: 'Importe:'
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
@@ -19,6 +19,7 @@ BuildAddress: Dirección de compilación
 BuildCity: Construir ciudad
 BuildPostalCode: Construir código postal
 BuildState: Estado de compilación
+Campaign: Campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
 ChooseADate: Escoge una fecha
@@ -35,6 +36,7 @@ ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
+Contunue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
@@ -45,7 +47,12 @@ DeliveryVehicleNone: No tengo un vehículo de reparto
 DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
 DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
+DonationCancellation: Cancelación de Donación
+DonationConfirmation: Confirmación de Donación
+DonationAmount: Importe de la donación
+DonationFormNotCompleted: El formulario de donación no está completo
 DonationDate: Fecha de donación
+DonationDetails: Detalles de la donación
 Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
 DurationHours: Duración (horas)
@@ -150,6 +157,7 @@ MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 car
 MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
 Message: Mensaje
 MilesAway: Km
+MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
@@ -167,6 +175,7 @@ NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
 Ok: De acuerdo
+OneTimeDonationOf: 'Donación única de'
 OrganizationOrGroup: Organización o grupo
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
@@ -176,6 +185,7 @@ OrganizerPhone: Teléfono del organizador
 OtherLanguagesSpoken: Otros idiomas hablados
 PageNext: Página siguiente
 PagePrevious: Página anterior
+PaymentCancelled: Pago Cancelado
 PaymentProcessor: Procesador de pagos
 PaymentStatus: Estado de pago
 Password: Contraseña
@@ -204,6 +214,8 @@ RequiredContent: El contenido es obligatorio
 RequiredContentId: Se requiere Content ID
 RequiredContentType: El tipo de contenido es obligatorio
 RequiredCulture: La cultura es necesaria
+RequiredDonationAmount: Se requiere el importe de la donación
+RequiredDonationCampaignId: Se requiere el ID de la campaña de donación
 RequiredEmail: Se requiere una dirección de correo electrónico
 RequiredFileUse: Se requiere el uso de archivos
 RequiredFirstName: El nombre de pila es obligatorio
@@ -226,8 +238,10 @@ RequiredSpeakEnglish: Por favor, selecciona tu nivel de inglés
 RequiredStatus: El estado es obligatorio
 RequiredStreet: Se requiere la dirección postal
 RequiredSubject: El asunto es obligatorio.
+RequiredTransactionFee: La tarifa de transacción es obligatoria
 RequiredTranslationId: Se requiere el ID de traducción
 RequiredUserId: Se requiere un ID de usuario
+ReturnHome: Volver a casa
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
@@ -238,8 +252,8 @@ Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
 SelectACampaign: Seleccione una campaña
 SelectAGridFilter: Seleccionar un filtro de cuadrícula
-SelectALocation: Seleccione una ubicación
 SelectANewsletter: Seleccione un boletín
+SelectALocation: Seleccione una ubicación
 SelectAnEvent: Seleccione un evento
 SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse a nosotros en la entrega o construcción de camas!
 SelectAState: Seleccione un estado
@@ -271,8 +285,12 @@ SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
 Team: 'Equipo #'
 ThankYou: ¡Gracias!
+ThankYouForMakingADifferenceInTheLifeOfAChild: ¡Gracias por hacer una diferencia en la vida de un niño! 
+ThankYouForYourDonation: ¡Gracias por su donación!
 TheBedBrigade: La Brigada de la Cama
+TransactionFees: Tarifas de transacción
 TransactionId: ID de transacción
+TransactionIdColon: 'ID de transacción:'
 Unauthorized: Desautorizado
 Unsubscribe: Darse de baja
 UnsubscribeFromNewsletter: Darse de baja del boletín
@@ -304,5 +322,6 @@ VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
 YourEmail: Tu correo electrónico
+YourDonationHasBeenCancelled: Su donación ha sido cancelada.
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
 ZipCode: Código postal

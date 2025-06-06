@@ -26,6 +26,7 @@
 		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
 		<PackageReference Include="NetCachingLibrary" Version="3.18.0" />
 		<PackageReference Include="NetEmailValidation" Version="4.19.0" />
+		<PackageReference Include="NetEncryptionLibrary" Version="5.16.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
 		<PackageReference Include="StaticCodeAnalysis" Version="1.21.0" />
 	</ItemGroup>

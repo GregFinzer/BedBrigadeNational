@@ -22,7 +22,7 @@ namespace BedBrigade.Common.Models
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
-        public Decimal Amount { get; set; }
+        public Decimal? TransactionFee { get; set; }
 
 		[MaxLength(255)]
 		public String? TransactionId { get; set; } = string.Empty;
@@ -52,21 +52,12 @@ namespace BedBrigade.Common.Models
         public string? Currency { get; set; }
 
         [NotMapped]
-		public string FullName 
-		{ 
-            get
-			{
-				return $"{FirstName} {LastName}";
-			}
-		}
+		public string FullName => $"{FirstName} {LastName}";
 
         [NotMapped]
-        public string NameAndDate
-        {
-			get
-            {
-                return $"{FullName} - {DonationDate?.ToString("yyyy-MM-dd")}";
-            }
-        }
-	}
+        public string NameAndDate => $"{FullName} - {DonationDate?.ToString("yyyy-MM-dd")}";
+
+        [NotMapped]
+        public decimal NetAmount => Gross.HasValue ? Math.Max(0, Gross.Value - TransactionFee ?? 0) : 0;
+    }
 }

@@ -2,7 +2,6 @@
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
-using BedBrigade.Client.Services;
 
 namespace BedBrigade.Data.Services;
 

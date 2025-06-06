@@ -179,10 +179,10 @@ public static class SeedContentsLogic
     {
         Log.Logger.Information("SeedNationalDonations Started");
 
-        var name = "Donations";
+        var name = "Donate";
         if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == (int) LocationNumber.National))
         {
-            var seedHtml = WebHelper.GetSeedingFile("Donations.html");
+            var seedHtml = WebHelper.GetSeedingFile("Donate.html");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
@@ -191,7 +191,7 @@ public static class SeedContentsLogic
                 ContentType = ContentType.Body,
                 Name = name,
                 ContentHtml = seedHtml,
-                Title = name
+                Title = "General Donations"
             };
 
             SeedRoutines.SetMaintFields(content);

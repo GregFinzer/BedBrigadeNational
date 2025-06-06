@@ -61,7 +61,7 @@ else
                                     var caption = (context as CaptionTemplateContext);
                                     //<div>@caption.Field - @caption.ForeignKey (@caption.Key)</div>
                                     var locations = Donations.Where(d => d.LocationId.ToString() == caption.Key); //.Sum(s => s.Amount);
-                                    var locTotal = locations.Sum(s => s.Amount);
+                                    var locTotal = locations.Sum(s => s.NetAmount);
                                     //var locName = Locations.FirstOrDefault(l => l.LocationId == donation.LocationId).Name;
                                     <div class="row">
                                         <div class="fw-bold col-md-10">@caption.ForeignKey</div>
@@ -110,11 +110,11 @@ else
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        <div class="col-md-6">
+                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.Amount Enabled="true" Placeholder="@_lc.Keys["Amount"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2"/>
+                                            <SfNumericTextBox @bind-Value=@donation.TransactionFee Enabled="true" Placeholder="@_lc.Keys["TransactionFees"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -134,8 +134,8 @@ else
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" FloatLabelType="FloatLabelType.Auto"/>
                                         </div>
                                         <div class="col-md-6">
                                             <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" FloatLabelType="FloatLabelType.Auto" />
@@ -153,8 +153,9 @@ else
                             <GridForeignColumn Field=@nameof(Donation.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
                             <GridColumn Field=@nameof(Donation.TaxFormSent) ShowColumnMenu="false" HeaderText="Tax Form Sent" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" AutoFit="true"/>
                             <GridColumn Field=@nameof(Donation.DonationDate) ShowColumnMenu="false" HeaderText="Donation Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" Format="MM/dd/yyyy" />
-                            <GridColumn Field=@nameof(Donation.Amount) ShowColumnMenu="false" HeaderText="Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"/>
-                            <GridColumn Field=@nameof(Donation.Gross) ShowColumnMenu="false" HeaderText="Gross" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.Gross) ShowColumnMenu="false" HeaderText="Gross" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"/>
+                            <GridColumn Field=@nameof(Donation.TransactionFee) ShowColumnMenu="false" HeaderText="Transaction Fees" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.NetAmount) ShowColumnMenu="false" HeaderText="Net Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="$#####.##" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
                             <GridColumn Field=@nameof(Donation.PaymentProcessor) ShowColumnMenu="false" HeaderText="Payment Processor" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(Donation.PaymentStatus) ShowColumnMenu="false" HeaderText="Payment Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(Donation.Currency) ShowColumnMenu="false" HeaderText="Currency" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />

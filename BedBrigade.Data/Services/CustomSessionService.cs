@@ -1,6 +1,6 @@
 ﻿using Blazored.SessionStorage;
 
-namespace BedBrigade.Client.Services
+namespace BedBrigade.Data.Services
 {
     /// <summary>
     /// A service to manage the browser session storage using Blazored.SessionStorage
@@ -27,6 +27,21 @@ namespace BedBrigade.Client.Services
         public async Task RemoveItemAsync(string key)
         {
             await _sessionService.RemoveItemAsync(key);
+        }
+
+        public async Task ContainKeyAsync(string key)
+        {
+            await _sessionService.ContainKeyAsync(key);
+        }
+
+        public async Task SetItemAsync<T>(string key, T value)
+        {
+            await _sessionService.SetItemAsync(key, value);
+        }
+
+        public async Task<T> GetItemAsync<T>(string key)
+        {
+            return await _sessionService.GetItemAsync<T>(key);
         }
     }
 }
