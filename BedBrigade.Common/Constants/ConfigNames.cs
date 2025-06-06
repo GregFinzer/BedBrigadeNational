@@ -73,5 +73,6 @@
         public const string StripeAccountId = "StripeAccountId";
         public const string StripeDonationAmounts = "StripeDonationAmounts";
         public const string StripeSubscriptionAmounts = "StripeSubscriptionAmounts";
+        public const string StripeWebhookSecret = "StripeWebhookSecret";
     }
 }

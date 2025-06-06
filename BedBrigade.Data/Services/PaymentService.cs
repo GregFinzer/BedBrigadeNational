@@ -8,6 +8,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.NetEmailValidation;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 using Stripe;
 using Stripe.Checkout;
 
@@ -191,9 +192,9 @@ namespace BedBrigade.Data.Services
             string successUrl = new UriBuilder($"{GetBaseDomain()}/{successPage}")
             {
                 Query = $"sessionid={HttpUtility.UrlEncode(sessionId)}"
-            }.ToString();
-
-            return new SessionCreateOptions
+            }.ToString();            
+            
+            SessionCreateOptions options = new SessionCreateOptions
             {
                 CustomerEmail = paymentSession.Email,
                 ClientReferenceId = paymentSession.PaymentSessionId.ToString(),
@@ -204,8 +205,17 @@ namespace BedBrigade.Data.Services
                     ? "subscription"
                     : "payment",
                 SuccessUrl = successUrl,
-                CancelUrl = $"{GetBaseDomain()}/{cancelPage}"
+                CancelUrl = $"{GetBaseDomain()}/{cancelPage}",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "FirstName", paymentSession.FirstName },
+                    { "LastName", paymentSession.LastName },
+                    { "LocationId", paymentSession.LocationId.ToString() },
+                    { "DonationCampaignId", paymentSession.DonationCampaignId.ToString() }
+                }
             };
+
+            return options;
         }
 
         private string ValidatePaymentSession(PaymentSession paymentSession)
@@ -282,6 +292,88 @@ namespace BedBrigade.Data.Services
 
             SessionService service = new SessionService();
             return await service.GetAsync(sessionId);
+        }
+
+        public async Task<ServiceResponse<Donation>> HandleWebhook(Event stripeEvent)
+        {
+            try
+            {
+                if (stripeEvent.Type != EventTypes.InvoicePaymentSucceeded)
+                    return new ServiceResponse<Donation>($"Ignoring event type: {stripeEvent.Type}", true);
+
+                Invoice? invoice = stripeEvent.Data.Object as Invoice;
+
+                if (invoice == null)
+                {
+                    Log.Error("CreateDonationRecordFromSubscription Invalid invoice data");
+                    return new ServiceResponse<Donation>("Invalid invoice data", false);
+                }
+
+                if (invoice.Payments == null 
+                    || invoice.Payments.FirstOrDefault()?.Payment?.PaymentIntentId == null
+                    || String.IsNullOrEmpty(invoice.Payments.First().Payment.PaymentIntentId))
+                {
+                    Log.Error("CreateDonationRecordFromSubscription No payments found in invoice");
+                    return new ServiceResponse<Donation>("No payments found in invoice", false);
+                }
+                string paymentIntentId =  invoice.Payments.First().Payment.PaymentIntentId;
+                PaymentIntent? paymentIntent = await new PaymentIntentService().GetAsync(paymentIntentId);
+                if (paymentIntent == null || string.IsNullOrEmpty(paymentIntent.LatestChargeId))
+                {
+                    Log.Error("CreateDonationRecordFromSubscription Payment intent not found or no charge ID");
+                    return new ServiceResponse<Donation>("Payment intent not found or no charge ID", false);
+                }
+
+                Charge? charge = await new ChargeService().GetAsync(paymentIntent.LatestChargeId);
+
+                if (charge == null || string.IsNullOrEmpty(charge.BalanceTransactionId))
+                {
+                    Log.Error("CreateDonationRecordFromSubscription Charge not found or no balance transaction ID");
+                    return new ServiceResponse<Donation>("Charge not found or no balance transaction ID", false);
+                }
+
+                BalanceTransaction? balanceTransaction = await new BalanceTransactionService().GetAsync(charge.BalanceTransactionId);
+                if (balanceTransaction == null)
+                {
+                    Log.Error("CreateDonationRecordFromSubscription Balance transaction not found");
+                    return new ServiceResponse<Donation>("Balance transaction not found", false);
+                }
+
+                return await CreateDonationRecordFromSubscription(charge, balanceTransaction, invoice, paymentIntent);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error in CreateDonationRecordFromSubscription");
+                return new ServiceResponse<Donation>("Error in CreateDonationRecordFromSubscription: " + ex.Message);
+            }
+        }
+
+        private async Task<ServiceResponse<Donation>> CreateDonationRecordFromSubscription(Charge charge, BalanceTransaction balanceTransaction, Invoice invoice, PaymentIntent paymentIntent)
+        {
+            decimal gross = charge.Amount / 100M;
+            decimal fee = balanceTransaction.Fee / 100M;
+
+            // Create new donation record
+            var donation = new Donation
+            {
+                TransactionId = paymentIntent.Id,
+                Email = invoice.CustomerEmail,
+                DonationDate = DateTime.UtcNow,
+                PaymentProcessor = "Stripe",
+                PaymentStatus = paymentIntent.Status,
+                TransactionFee = fee,
+                Gross = gross,
+                Currency = invoice.Currency?.ToUpper(),
+                // Get customer details from metadata if available
+                FirstName = invoice.Metadata.GetValueOrDefault("FirstName"),
+                LastName = invoice.Metadata.GetValueOrDefault("LastName"),
+                LocationId = int.Parse(invoice.Metadata.GetValueOrDefault("LocationId", "1")),
+                DonationCampaignId = int.Parse(invoice.Metadata.GetValueOrDefault("DonationCampaignId", "1"))
+            };
+
+            var donationResponse = await _donationDataService.CreateAsync(donation);
+            Log.Information($"Created donation record for subscription payment: {paymentIntent.Id}");
+            return donationResponse;
         }
 
         public async Task<ServiceResponse<Donation>> CreateDonationRecordFromPaymentSession(PaymentSession paymentSession, Session stripeSession, decimal fee)

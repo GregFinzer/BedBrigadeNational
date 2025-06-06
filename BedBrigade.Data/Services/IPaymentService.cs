@@ -1,4 +1,5 @@
 using BedBrigade.Common.Models;
+using Stripe;
 using Stripe.Checkout;
 
 namespace BedBrigade.Data.Services
@@ -11,5 +12,7 @@ namespace BedBrigade.Data.Services
         Task<Session?> GetStripeSession(string sessionId);
         Task<ServiceResponse<Donation>> CreateDonationRecordFromPaymentSession(PaymentSession paymentSession,
             Session stripeSession, decimal fee);
+
+        Task<ServiceResponse<Donation>> HandleWebhook(Event stripeEvent);
     }
 }

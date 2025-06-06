@@ -442,6 +442,13 @@ namespace BedBrigade.Data.Data.Seeding
                     ConfigurationValue = string.Empty,
                     Section = ConfigSection.Payments,
                     LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.StripeWebhookSecret,
+                    ConfigurationValue = string.Empty,
+                    Section = ConfigSection.Payments,
+                    LocationId = Defaults.NationalLocationId
                 }
             };
 
