@@ -73,7 +73,7 @@ else
                                                       })"
                                            checked="@(PaymentSession.DonationAmount == amount)" />
                                     <label class="form-check-label" for="amount-@amount">
-                                        One Time Donation of @amount.ToString("C", CultureInfo.CurrentCulture)
+                                        @_lc.Keys["OneTimeDonationOf"] @amount.ToString("C", CultureInfo.CurrentCulture)
                                     </label>
                                 </div>
                             }
@@ -92,7 +92,7 @@ else
                                                       })"
                                            checked="@(PaymentSession.SubscriptionAmount == amount)" />
                                     <label class="form-check-label" for="monthlyAmount-@amount">
-                                        Monthly Donation of @amount.ToString("C", CultureInfo.CurrentCulture)
+                                        @_lc.Keys["MonthlyDonationOf"]  @amount.ToString("C", CultureInfo.CurrentCulture)
                                     </label>
                                 </div>
                             }

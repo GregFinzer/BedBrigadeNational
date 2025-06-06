@@ -50,6 +50,7 @@ DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas
 DonationCancellation: Cancelación de Donación
 DonationConfirmation: Confirmación de Donación
 DonationAmount: Importe de la donación
+DonationFormNotCompleted: El formulario de donación no está completo
 DonationDate: Fecha de donación
 DonationDetails: Detalles de la donación
 Donations: Donaciones
@@ -156,6 +157,7 @@ MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 car
 MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
 Message: Mensaje
 MilesAway: Km
+MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
@@ -173,6 +175,7 @@ NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
 Ok: De acuerdo
+OneTimeDonationOf: 'Donación única de'
 OrganizationOrGroup: Organización o grupo
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
@@ -211,6 +214,7 @@ RequiredContent: El contenido es obligatorio
 RequiredContentId: Se requiere Content ID
 RequiredContentType: El tipo de contenido es obligatorio
 RequiredCulture: La cultura es necesaria
+RequiredDonationAmount: Se requiere el importe de la donación
 RequiredDonationCampaignId: Se requiere el ID de la campaña de donación
 RequiredEmail: Se requiere una dirección de correo electrónico
 RequiredFileUse: Se requiere el uso de archivos

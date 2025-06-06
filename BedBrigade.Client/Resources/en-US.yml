@@ -52,6 +52,7 @@ DonationCancellation: Donation Cancellation
 DonationConfirmation: Donation Confirmation
 DonationDate: Donation Date
 DonationDetails: Donation Details
+DonationFormNotCompleted: The Donation Form is not completed
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)
@@ -156,6 +157,7 @@ MaxLengthTableName50: Table Name has a maximum length of 50 characters
 MaxLengthTeam50: Team has a maximum length of 50 characters
 Message: Message
 MilesAway: miles away
+MonthlyDonationOf: Monthly Donation of
 Name: Name
 NameColon: 'Name:'
 NationalPathColon: 'National Path:'
@@ -173,6 +175,7 @@ NoUpcomingBuildsScheduled: No upcoming builds scheduled.
 NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
 Ok: OK
+OneTimeDonationOf: One Time Donation of
 OrganizationOrGroup: Organization or Group
 Organizer: Organizer
 OrganizerColon: 'Organizer:'
@@ -209,6 +212,7 @@ RequiredContent: Content is required
 RequiredContentId: Content ID is required
 RequiredContentType: Content Type is required
 RequiredCulture: Culture is required
+RequiredDonationAmount: Donation Amount is required
 RequiredDonationCampaignId: Campaign is required
 RequiredEmail: Email Address is required
 RequiredFileUse: File Use is required

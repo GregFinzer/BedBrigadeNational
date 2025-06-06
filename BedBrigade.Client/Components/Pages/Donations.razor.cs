@@ -8,7 +8,6 @@ using BedBrigade.Common.Enums;
 using Microsoft.AspNetCore.Components.Forms;
 using BedBrigade.SpeakIt;
 using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages;
@@ -151,6 +150,7 @@ public partial class Donations : ComponentBase, IDisposable
     private async Task OnLanguageChanged(CultureInfo arg)
     {
         await TranslatePageTitle();
+        await LoadBodyContent();
         StateHasChanged();
     }
 
@@ -179,8 +179,7 @@ public partial class Donations : ComponentBase, IDisposable
     {
         ClearValidationMessage();
         bool formIsValid = true;
-        //TODO:  Add key for DonationFormNotCompleted
-        string formNotCompleted = "Donation Form not completed";
+        string formNotCompleted = _lc.Keys["DonationFormNotCompleted"];
         formIsValid = ValidationLocalization.ValidateModel(PaymentSession, _validationMessageStore, _lc);
 
         if (!formIsValid)
@@ -208,8 +207,7 @@ public partial class Donations : ComponentBase, IDisposable
 
         if (!PaymentSession.DonationAmount.HasValue && !PaymentSession.SubscriptionAmount.HasValue)
         {
-            //TODO:  Add key for this message
-            await ShowValidationMessage("Donation Amount is required");
+            await ShowValidationMessage(_lc.Keys["RequiredDonationAmount"]);
             return false;
         }
 
