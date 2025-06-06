@@ -30,6 +30,7 @@ public partial class Donations : ComponentBase, IDisposable
     [Inject] private ILoadImagesService _loadImagesService { get; set; }
     [Inject] private ICarouselService _carouselService { get; set; }
     [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
+    [Inject] private ILocationState _locationState { get; set; }
     [Parameter] public string LocationRoute { get; set; } = default!;
     public int? LocationId { get; set; }
     public string LocationName { get; set; }
@@ -52,6 +53,7 @@ public partial class Donations : ComponentBase, IDisposable
     {
         _lc.InitLocalizedComponent(this);
         await LoadData();
+        _locationState.Location = LocationRoute;
         _svcLanguage.LanguageChanged += OnLanguageChanged;
     }
 
