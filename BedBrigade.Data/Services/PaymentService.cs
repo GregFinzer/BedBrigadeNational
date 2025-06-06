@@ -182,41 +182,7 @@ namespace BedBrigade.Data.Services
             return items;
         }
 
-        private SessionCreateOptions BuildSessionCreateOptions(
-            PaymentSession paymentSession,
-            List<SessionLineItemOptions> lineItems,
-            string sessionId,
-            string successPage,
-            string cancelPage)
-        {
-            string successUrl = new UriBuilder($"{GetBaseDomain()}/{successPage}")
-            {
-                Query = $"sessionid={HttpUtility.UrlEncode(sessionId)}"
-            }.ToString();            
-            
-            SessionCreateOptions options = new SessionCreateOptions
-            {
-                CustomerEmail = paymentSession.Email,
-                ClientReferenceId = paymentSession.PaymentSessionId.ToString(),
-                PaymentMethodTypes = new List<string> { "card" },
-                LineItems = lineItems,
-                Mode = paymentSession.SubscriptionAmount.HasValue
-                       && paymentSession.SubscriptionAmount.Value > 0
-                    ? "subscription"
-                    : "payment",
-                SuccessUrl = successUrl,
-                CancelUrl = $"{GetBaseDomain()}/{cancelPage}",
-                Metadata = new Dictionary<string, string>
-                {
-                    { "FirstName", paymentSession.FirstName },
-                    { "LastName", paymentSession.LastName },
-                    { "LocationId", paymentSession.LocationId.ToString() },
-                    { "DonationCampaignId", paymentSession.DonationCampaignId.ToString() }
-                }
-            };
 
-            return options;
-        }
 
         private string ValidatePaymentSession(PaymentSession paymentSession)
         {
@@ -398,6 +364,43 @@ namespace BedBrigade.Data.Services
             };
 
             return await _donationDataService.CreateAsync(donation);
+        }
+
+        private SessionCreateOptions BuildSessionCreateOptions(
+            PaymentSession paymentSession,
+            List<SessionLineItemOptions> lineItems,
+            string sessionId,
+            string successPage,
+            string cancelPage)
+        {
+            var urlBuilder = new UriBuilder($"{GetBaseDomain()}/{successPage}")
+            {
+                Query = $"sessionid={HttpUtility.UrlEncode(sessionId)}"
+            };
+
+            string successUrl = urlBuilder.ToString();
+            SessionCreateOptions options = new SessionCreateOptions
+            {
+                CustomerEmail = paymentSession.Email,
+                ClientReferenceId = paymentSession.PaymentSessionId.ToString(),
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = lineItems,
+                Mode = paymentSession.SubscriptionAmount.HasValue
+                       && paymentSession.SubscriptionAmount.Value > 0
+                    ? "subscription"
+                    : "payment",
+                SuccessUrl = successUrl,
+                CancelUrl = $"{GetBaseDomain()}/{cancelPage}",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "FirstName", paymentSession.FirstName },
+                    { "LastName", paymentSession.LastName },
+                    { "LocationId", paymentSession.LocationId.ToString() },
+                    { "DonationCampaignId", paymentSession.DonationCampaignId.ToString() }
+                }
+            };
+
+            return options;
         }
     }
 }

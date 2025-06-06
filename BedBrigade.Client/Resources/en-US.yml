@@ -46,6 +46,8 @@ DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress
 DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationDate: Donation Date
+DonationCancellation: Donation Cancellation
+DonationConfirmation: Donation Confirmation
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)

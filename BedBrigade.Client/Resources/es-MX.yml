@@ -45,6 +45,8 @@ DeliveryVehicleNone: No tengo un vehículo de reparto
 DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
 DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
+DonationCancellation: Cancelación de Donación
+DonationConfirmation: Confirmación de Donación 
 DonationDate: Fecha de donación
 Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
