@@ -33,6 +33,8 @@ public partial class Index : ComponentBase, IDisposable
     private const string DefaultLocation = SeedConstants.SeedNationalName;
     private const string DefaultPageName = "Home";
 
+    private string _currentLocation = string.Empty;
+    private string _currentPageName = string.Empty;
     private string _previousLocation = string.Empty;
     private string _previousPageName = string.Empty;
     private string _previousBodyContent = null;
@@ -41,17 +43,39 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        string location = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
-        string pageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
-        await LoadLocationPage(location, pageName);
+        PopulateCurrentLocationAndPageName();
+        await LoadLocationPage(_currentLocation, _currentPageName);
         _svcLanguage.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void PopulateCurrentLocationAndPageName()
+    {
+        if (string.IsNullOrEmpty(LocationRoute) && string.IsNullOrEmpty(PageName))
+        {
+            _currentLocation = DefaultLocation;
+            _currentPageName = DefaultPageName;
+        }
+        else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
+        {
+            _currentLocation = LocationRoute;
+            _currentPageName = PageName;
+        }
+        else if (!string.IsNullOrEmpty(LocationRoute))
+        {
+            _currentLocation = DefaultLocation;
+            _currentPageName = LocationRoute;
+        }
+        else
+        {
+            _currentLocation = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
+            _currentPageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
+        }
     }
 
     private async Task OnLanguageChanged(CultureInfo arg)
     {
-        string location = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
-        string pageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
-        await LoadLocationPage(location, pageName);
+        PopulateCurrentLocationAndPageName();
+        await LoadLocationPage(_currentLocation, _currentPageName);
         StateHasChanged();
     }
 
@@ -62,14 +86,13 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        string location = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
-        string pageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
+        PopulateCurrentLocationAndPageName();
 
-        _locationState.Location = location;
+        _locationState.Location = _currentLocation;
 
-        if (_previousLocation.ToLower() != location.ToLower() || _previousPageName.ToLower() != pageName.ToLower())
+        if (_previousLocation.ToLower() != _currentLocation.ToLower() || _previousPageName.ToLower() != _currentPageName.ToLower())
         {
-            await LoadLocationPage(location, pageName);
+            await LoadLocationPage(_currentLocation, _currentPageName);
         }
     }
 
