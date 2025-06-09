@@ -246,7 +246,7 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Home, location, "Home", "RockCityPolarisHome.html");
         await SeedContentItem(context, ContentType.Body, location, "AboutUs", "RockCityPolarisAboutUs.html");
         await SeedContentItem(context, ContentType.Body, location, "History", "RockCityPolarisHistory.html");
-        //await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
+        await SeedContentItem(context, ContentType.Body, location, "Donations", "RockCityPolarisDonations.html");
         //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
         //await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
         //await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
@@ -652,9 +652,10 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            //We don't take donations at the national level
+            //We have different pages for National, Grove City and Rock City Polaris
             if (location.LocationId == (int)LocationNumber.National
-                || location.LocationId == (int)LocationNumber.GroveCity)
+                || location.LocationId == (int)LocationNumber.GroveCity
+                || location.LocationId == (int) LocationNumber.RockCityPolaris)
                 continue;
 
             await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");
