@@ -628,7 +628,7 @@
 
 .rockp-dhero {
     position: relative;
-    /* pan background vertically to 30% so the head shows */
+    /* pan background vertically so the head shows */
     background: url('/media/rock-city-polaris/Pages/Donations/BoyOnBed.jpeg') center 40% / cover no-repeat;
     height: 60vh;
     display: flex;
@@ -651,7 +651,8 @@
         width: 100%;
         padding: 0 1rem;
     }
-
+        /*All this ridiculousness was copied from the original Rock City Polaris Donation Page just for an white line */
+        /*An HR won't work because of the transparancy */
         .rockp-dhero .rockp-dhero-content h1::after {
             background-color: #fff;
             block-size: .3125rem;

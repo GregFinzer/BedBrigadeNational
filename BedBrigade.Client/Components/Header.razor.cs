@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Security.Claims;
-using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;

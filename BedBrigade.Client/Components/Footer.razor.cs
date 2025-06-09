@@ -5,7 +5,6 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Serilog;
 
 namespace BedBrigade.Client.Components
@@ -21,7 +20,6 @@ namespace BedBrigade.Client.Components
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
         [Inject] private ILanguageService _svcLanguage { get; set; }
-        private string PreviousLocation { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -71,7 +69,6 @@ namespace BedBrigade.Client.Components
             if (contentResult.Success)
             {
                 footerContent = contentResult.Data.ContentHtml;
-                PreviousLocation = locationName;
             }
             else
             {
@@ -86,7 +83,6 @@ namespace BedBrigade.Client.Components
             if (contentResult.Success)
             {
                 footerContent = contentResult.Data.ContentHtml;
-                PreviousLocation = locationName;
             }
             else
             {

@@ -1,8 +1,8 @@
 @page "/sorry"
-@page "/sorry/{mylocation}"
-@page "/sorry/{mylocation}/{mypageName}"
-@page "/{mylocation}/sorry/"
-@page "/{mylocation}/sorry/{mypageName}"
+@page "/sorry/{mylocation:nonfile}"
+@page "/sorry/{mylocation:nonfile}/{mypageName:nonfile}"
+@page "/{mylocation:nonfile}/sorry/"
+@page "/{mylocation:nonfile}/sorry/{mypageName:nonfile}"
 
 @using Serilog
 <PageTitle>@_lc.Keys["Sorry"]</PageTitle>
