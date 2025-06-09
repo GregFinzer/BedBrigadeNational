@@ -621,3 +621,83 @@
     }
 }
 
+/*************************************************************
+    Donation Page
+  (All classes prefixed with rockp-)
+**************************************************************/
+
+.rockp-dhero {
+    position: relative;
+    /* pan background vertically to 30% so the head shows */
+    background: url('/media/rock-city-polaris/Pages/Donations/BoyOnBed.jpeg') center 40% / cover no-repeat;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+    .rockp-dhero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(13, 110, 253, 0.6);
+        z-index: 0;
+    }
+
+    .rockp-dhero .rockp-dhero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+        .rockp-dhero .rockp-dhero-content h1::after {
+            background-color: #fff;
+            block-size: .3125rem;
+            border-radius: 9999px;
+            content: "";
+            display: block;
+            inline-size: 4.375rem;
+            inset-block-start: calc(25% + 1.75rem);
+            inset-inline-start: 50%;
+            position: absolute;
+            transform: translate(-50%);
+        }
+
+@media (max-width: 767px) {
+    .rockp-dhero .rockp-dhero-content h1::after {
+        inset-block-start: calc(35% + 1rem);
+    }
+}
+
+@media (max-width: 626px) {
+    .rockp-dhero .rockp-dhero-content h1::after {
+        inset-block-start: calc(25% + 1rem);
+    }
+}
+
+.rockp-dhero p {
+    font-weight: 500;
+    color: #fff;
+}
+
+.rockp-secure-donation {
+    display: inline-flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    margin-top: 1.5rem;
+}
+
+    .rockp-secure-donation .fa-lock {
+        color: #28a745;
+        margin-right: 0.5rem;
+    }
+
+    .rockp-secure-donation span {
+        color: #212529;
+        font-weight: 500;
+    }
+
