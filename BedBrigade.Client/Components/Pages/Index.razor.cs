@@ -43,27 +43,45 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        PopulateCurrentLocationAndPageName();
+        await PopulateCurrentLocationAndPageName();
         await LoadLocationPage(_currentLocation, _currentPageName);
         _svcLanguage.LanguageChanged += OnLanguageChanged;
     }
 
-    private void PopulateCurrentLocationAndPageName()
+    private async Task PopulateCurrentLocationAndPageName()
     {
+        //No route, this is /
         if (string.IsNullOrEmpty(LocationRoute) && string.IsNullOrEmpty(PageName))
         {
             _currentLocation = DefaultLocation;
             _currentPageName = DefaultPageName;
         }
+        //Both the Location and Page are populated
+        //Example:  /grove-city/donations
         else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
         {
             _currentLocation = LocationRoute;
             _currentPageName = PageName;
         }
-        else if (!string.IsNullOrEmpty(LocationRoute))
+        else if (string.IsNullOrEmpty(PageName))
         {
-            _currentLocation = DefaultLocation;
-            _currentPageName = LocationRoute;
+            var locationsResponse = await _svcLocation.GetAllAsync();
+
+            //This is a location home page
+            //Example: /grove-city
+            if (locationsResponse.Success && locationsResponse.Data != null &&
+                locationsResponse.Data.Any(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower()))
+            {
+                _currentLocation = LocationRoute;
+                _currentPageName = DefaultPageName;
+            }
+            //This is a national level page
+            //Example:  /AboutUs
+            else
+            {
+                _currentLocation = DefaultLocation;
+                _currentPageName = LocationRoute;
+            }
         }
         else
         {
@@ -72,9 +90,10 @@ public partial class Index : ComponentBase, IDisposable
         }
     }
 
+
     private async Task OnLanguageChanged(CultureInfo arg)
     {
-        PopulateCurrentLocationAndPageName();
+        await PopulateCurrentLocationAndPageName();
         await LoadLocationPage(_currentLocation, _currentPageName);
         StateHasChanged();
     }
@@ -86,7 +105,7 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        PopulateCurrentLocationAndPageName();
+        await PopulateCurrentLocationAndPageName();
 
         _locationState.Location = _currentLocation;
 

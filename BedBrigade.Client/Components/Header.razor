@@ -1,6 +1,5 @@
 @if (Cultures != null && SelectedCulture != null)
-{
-    <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange">
+{    <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange" data-location="@_locationState.Location">
         @foreach (var culture in Cultures)
         {
             <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
@@ -42,10 +41,30 @@
 
     @@media screen and (max-width: 767px) {
         #languageSelect {
-            top: 20px;
-            right: 50%;
+            top: 75px;
+            right: 10px;
             font-size: 1.5em;
         }
     }
+
+    @@media screen and (max-width: 566px) {
+        #languageSelect {
+            top: 17px;
+            right: 100px;
+            font-size: 1.5em;
+        }
+
+        #languageSelect[data-location="rock-city-polaris"] {
+            top: 35px;
+        }
+    }
+
+    @@media screen and (max-width: 500px) {
+        #locationName {
+            left: 120px;
+            position: absolute;
+        }
+    }
+
 </style>
 
