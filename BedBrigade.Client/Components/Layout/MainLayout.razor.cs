@@ -9,7 +9,6 @@ namespace BedBrigade.Client.Components.Layout
 {
     public partial class MainLayout : LayoutComponentBase, IDisposable
     {
-        [Inject] Microsoft.Extensions.Hosting.IHostingEnvironment _env { get; set; }
         [Inject] private IAuthService AuthService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
