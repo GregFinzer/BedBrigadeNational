@@ -15,12 +15,20 @@
                 <span class="card-title-mobile">@_lc.Keys["EnterYourZipCode"]</span>
             </h5>
             <p class="card-text"><i>@_lc.Keys["5CharactersContainingOnly"]</i></p>
-            <div class="d-flex justify-content-center">
-                <InputText id="postalCode" class="form-control" @bind-Value="PostalCode" Placeholder="@_lc.Keys["ZipCode"]" style="width:200px" />
-
-            </div>
+            <p>
+                <SfMaskedTextBox @ref="maskObj"
+                                 Mask="00000"
+                                 Value="@PostalCode"
+                                 Created="OnCreateInput"
+                                 Placeholder="@_lc.Keys["ZipCode"]"
+                                 OnInput="ZipCodeInputChange"
+                                 @onkeyup="@HandleKeyDown"
+                                 Width="200px">
+                </SfMaskedTextBox>
+            </p>
             <div class="widget-body">
-                <button id="search" type="button" class="btn btn-primary" @onclick="(() => HandleSearchClick())">@_lc.Keys["Search"]</button>
+                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">@_lc.Keys["SearchBedBrigadeLocations"]</button>
+                <button id="search" type="button" class="btn btn-primary btn-mobile" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">@_lc.Keys["Search"]</button>
             </div>
         </div>
     </div>
