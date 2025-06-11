@@ -1,11 +1,14 @@
+using BedBrigade.Client.Components.Pages.Administration.Manage;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
-using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BedBrigade.Client.Components
 {
@@ -23,8 +26,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
-
-        SfMaskedTextBox maskObj;
+        [Inject] private IJSRuntime JSRuntime { get; set; }
 
         public int ddlValue { get; set; } = 0;
 
@@ -39,7 +41,6 @@ namespace BedBrigade.Client.Components
         private string strAlertType = "alert alert-danger";
         private bool PostalCodeSuccess = false;
         private string SearchDisplay = "";
-        private bool SubmitDisabled = true;
         private bool IsSearching = false;
 
         protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
@@ -50,6 +51,14 @@ namespace BedBrigade.Client.Components
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await SetZipBoxFocus();
+            }
         }
 
         public async Task ChangeLocation(ChangeEventArgs<int, LocationDistance> args)
@@ -80,16 +89,12 @@ namespace BedBrigade.Client.Components
             }
         }
         
-        public async Task OnCreateInput()
-        {
-            await SetZipBoxFocus();
-        }
+
 
 
         public async Task SetZipBoxFocus()
         {
-            await maskObj.FocusAsync();
-            SubmitDisabled = true;
+            await JSRuntime.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "postalCode");
         }
 
         async Task CallLocationChanged()
@@ -213,20 +218,7 @@ namespace BedBrigade.Client.Components
 
         } // Search Result
 
-        private void ZipCodeInputChange(ChangeEventArgs e)
-        {
-            PostalCode = String.Empty;
-            SubmitDisabled = true;
-            if (e.Value != null && e.Value.ToString().Length == 5)
-            {
-                var isNumber = e.Value.ToString().All(c => Char.IsNumber(c));
-                if (isNumber)
-                {
-                    PostalCode = e.Value.ToString();
-                    SubmitDisabled = false;
-                }
-            }
-        }
+
 
     }
 
