@@ -1,8 +1,6 @@
+using System.Collections;
 using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-
-//using Org.BouncyCastle.Asn1.Cms;
-//using Org.BouncyCastle.Asn1.X509;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -10,7 +8,6 @@ using System.Linq;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
-
 using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
@@ -60,6 +57,7 @@ namespace BedBrigade.Client.Components
         public bool TaxIsVisible { get; private set; }
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "400px" };
         private Donation Donation = new Donation();
+        protected decimal FilteredSum { get; set; }
 
         /// <summary>
         /// Setup the Donation Grid component
@@ -80,6 +78,34 @@ namespace BedBrigade.Client.Components
             await LoadDonationCampaigns();
         }
 
+        private async Task UpdateFilteredSum()
+        {
+            var groups = (IEnumerable)await Grid.GetFilteredRecordsAsync();
+            FilteredSum = 0;
+            foreach (var groupObject in groups)
+            {
+                var groupProperties = groupObject.GetType().GetProperties();
+                var itemsProperty = groupProperties.FirstOrDefault(p => p.Name == "Items");
+
+                if (itemsProperty != null)
+                {
+                    var items = (IEnumerable<Donation>)itemsProperty.GetValue(groupObject);
+                    if (items != null)
+                    {
+                        FilteredSum += items.Sum(d => d.NetAmount);
+                    }
+                }
+            }
+            StateHasChanged();
+        }
+
+        public async Task OnActionComplete(ActionEventArgs<Donation> args)
+        {
+            if (args.RequestType == Action.Filtering || args.RequestType == Action.Refresh)
+            {
+                await UpdateFilteredSum();
+            }
+        }
         private async Task LoadDonationCampaigns()
         {
             var result = await _svcDonationCampaign.GetAllAsync();
@@ -385,7 +411,7 @@ namespace BedBrigade.Client.Components
             await Grid.Refresh();
         }
 
-        protected void DataBound()
+        protected async void DataBound()
         {
             if (Donations.Count == 0) RecordText = "No Donation records found";
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
@@ -393,8 +419,11 @@ namespace BedBrigade.Client.Components
                 NoPaging = true;
             }
             else
+            {
                 NoPaging = false;
+            }
 
+            await UpdateFilteredSum();
         }
 
         protected async Task PdfExport()
