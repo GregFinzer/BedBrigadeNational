@@ -69,7 +69,8 @@ else
                 </SfRichTextEditor>
             </div>
             <div>
-                <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveClick())">Save</button>
+                <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveOnlyClick())">Save Only</button>
+                <button id="saveAndClose" type="button" class="btn btn-primary" @onclick="(() => HandleSaveAndCloseClick())">Save and Close</button>
                 <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
             </div>
         </EditForm>

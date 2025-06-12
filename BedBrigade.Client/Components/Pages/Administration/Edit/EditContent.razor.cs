@@ -200,8 +200,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             return html;
         }
 
-
-        private async Task HandleSaveClick()
+        private async Task<bool> HandleSaveOnlyClick()
         {
             Content.ContentHtml = await RteObj.GetXhtmlAsync();
 
@@ -216,16 +215,25 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
                 await _svcTranslationProcessorDataService.QueueContentTranslation(updateResult.Data);
 
-                _toastService.Success("Content Saved", 
-                    $"Content saved for location {LocationRoute} with name of {ContentName}"); // VS 8/25/2024
-                NavigateToManagePages();
+                _toastService.Success("Content Saved",
+                    $"Content saved for location {LocationRoute} with name of {ContentName}");
+
+                return true;
             }
             else
             {
                 _toastService.Error("Error",
                     $"Could not save Content for location {LocationRoute} with name of {ContentName}");
+                return false;
             }
-            
+
+        }
+        private async Task HandleSaveAndCloseClick()
+        {
+            if (await HandleSaveOnlyClick())
+            {
+                NavigateToManagePages();
+            }
         }
 
         private void NavigateToManagePages()
