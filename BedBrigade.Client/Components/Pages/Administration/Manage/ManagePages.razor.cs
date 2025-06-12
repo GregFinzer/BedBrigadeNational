@@ -76,6 +76,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            await InitializeAndLoad();
+        }
+
+        private async Task InitializeAndLoad()
+        {
             _contentType = Enum.Parse<ContentType>(ContentTypeString);
 
             _subdirectory = BlogTypes.ValidBlogTypes.Contains(_contentType) ? _contentType.ToString() : "pages";
@@ -83,7 +92,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             Identity = _svcAuth.CurrentUser;
 
             var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Pages with a Content Type of {_contentType}" );
+            Log.Information($"{userName} went to the Manage Pages with a Content Type of {_contentType}");
 
             if (Identity.HasRole(RoleNames.CanManagePages))
             {
@@ -99,11 +108,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
             await LoadData();
 
-
-            var locResult = await _svcLocation.GetAllAsync();
-            if (locResult.Success)
+            if (Locations == null)
             {
-                Locations = locResult.Data;
+                var locResult = await _svcLocation.GetAllAsync();
+                if (locResult.Success)
+                {
+                    Locations = locResult.Data;
+                }
             }
 
             ContentTypes = EnumHelper.GetContentTypeItems();
