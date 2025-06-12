@@ -6,6 +6,7 @@ using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Components.Pages.Administration.Manage;
+using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components
 {
@@ -22,6 +23,7 @@ namespace BedBrigade.Client.Components
 
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private IJSRuntime JS { get; set; }
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
 
         SfMaskedTextBox maskObj;
@@ -208,6 +210,10 @@ namespace BedBrigade.Client.Components
                 if (containsAsterisk) {
                     strDisplayNotActive = "";
                 }
+
+                // Scroll to search results
+                await JS.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "searchResultDisplay");
+
 
             } // Locations Found
 
