@@ -1,10 +1,14 @@
 @if (Cultures != null && SelectedCulture != null)
-{    <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange" data-location="@_locationState.Location">
-        @foreach (var culture in Cultures)
-        {
-            <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
-        }
-    </select>
+{    
+    <div class="language-wrapper">
+        <i class="fas fa-globe"></i>
+        <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange" data-location="@_locationState.Location">
+            @foreach (var culture in Cultures)
+            {
+                <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
+            }
+        </select>
+    </div>    
 }
 
 @((MarkupString)headerContent) 
@@ -25,46 +29,78 @@
             content: '';
         }
 
-        #languageSelect {
-        z-index: 1500;
+    #locationName {
+        font-family: "Stencil Std";
+        font-size: 24px;
+    }
+
+    .language-wrapper {
         position: fixed;
+        z-index: 1500;
         top: 35px;
         right: 10px;
-        }
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        border-radius: 4px;
+    }
 
-    @@media screen and (max-width: 1500px)
-    {
-        #languageSelect {
+    .language-wrapper .fa-globe {
+        color: #3498db;
+        font-size: 1.2em;
+        display: inline-block;
+    }
+
+    #languageSelect {
+        font-size: 1em;
+        border: 1px solid #e0e0e0;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    @@media screen and (max-width: 1500px) {
+        .language-wrapper {
             top: 60px;
         }
     }
 
     @@media screen and (max-width: 767px) {
-        #languageSelect {
+        .language-wrapper {
             top: 75px;
             right: 10px;
-            font-size: 1.5em;
         }
     }
-
-    @@media screen and (max-width: 566px) {
-        #languageSelect {
-            top: 17px;
-            right: 100px;
-            font-size: 1.5em;
+    
+    @@media screen and (max-width: 615px) {
+        .language-wrapper {
+            top: auto;
+            bottom: 0px;
+            right: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        #languageSelect[data-location="rock-city-polaris"] {
-            top: 35px;
+        #languageSelect {
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
     }
 
     @@media screen and (max-width: 500px) {
         #locationName {
-            left: 120px;
+            font-size: 20px;
+            top: 20px;
+            left: 125px;
             position: absolute;
         }
     }
 
-</style>
+    @@media screen and (max-width: 400px) {
+        #locationName {
+            font-size: 16px;
+        }
+    }
 
+</style>
+ 
