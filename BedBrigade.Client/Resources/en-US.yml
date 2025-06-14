@@ -14,7 +14,7 @@ BedRequest: Bed Request
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormSubmitted: Thank you for summitting your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.
-BlogNoData: There are no&nbsp;<b>{BlogType}</b> available for <b>{LocationName}</b> at this time.<br/>Please check back later for updates!
+BlogNoData: There are no items available at this time. Please check back later for updates!
 BuildAddress: Build Address
 BuildCity: Build City
 BuildPostalCode: Build Postal Code
