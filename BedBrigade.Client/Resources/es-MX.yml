@@ -14,7 +14,7 @@ BedRequest: Solicitud de cama
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
-BlogNoData: No hay&nbsp;<b>{BlogType}</b> disponibles sobre <b>{LocationName}</b> en este momento.<br/>Vuelva más tarde para ver las novedades.
+BlogNoData: No hay artículos disponibles en este momento. ¡Vuelva más tarde para ver las actualizaciones!
 BuildAddress: Dirección de compilación
 BuildCity: Construir ciudad
 BuildPostalCode: Construir código postal
