@@ -4,23 +4,20 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using System.Diagnostics;
-using AKSoftware.Localization.MultiLanguages;
-using AKSoftware.Localization.MultiLanguages.Blazor;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using BedBrigade.SpeakIt;
 using Serilog;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Syncfusion.Blazor.DropDowns;
+using System.Globalization;
+using System;
 
 
 namespace BedBrigade.Client.Components.Pages
 {
-    public partial class BedRequest : ComponentBase
+    public partial class BedRequest : ComponentBase, IDisposable
     {
         #region Declaration
 
@@ -33,10 +30,13 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private IGeoLocationQueueDataService? _svcGeoLocation { get; set; }
+        [Inject] private ILanguageService _svcLanguage { get; set; }
+        [Inject] private ITranslationDataService _translateLogic { get; set; }
+
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
         protected List<string>? lstPrimaryLanguage;
-        protected List<string>? lstSpeakEnglish;
+        protected List<DisplayTextValue>? lstSpeakEnglish;
 
         private SearchLocation? SearchLocation;
 
@@ -111,7 +111,19 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
             await LoadConfiguration();
+            _svcLanguage.LanguageChanged += OnLanguageChanged;
             base.OnInitialized();
+        }
+
+        private async Task OnLanguageChanged(CultureInfo arg)
+        {
+            await TranslateSpeakEnglish();
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            _svcLanguage.LanguageChanged -= OnLanguageChanged;
         }
 
         private async Task LoadConfiguration()
@@ -123,10 +135,34 @@ namespace BedBrigade.Client.Components.Pages
                 string delimitedString = dctConfiguration[ConfigNames.PrimaryLanguage].ToString();
                 lstPrimaryLanguage = new List<string>(delimitedString.Split(';'));
                 delimitedString = dctConfiguration[ConfigNames.SpeakEnglish].ToString();
-                lstSpeakEnglish = new List<string>(delimitedString.Split(';'));
-
+                string[] values = delimitedString.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                lstSpeakEnglish = new List<DisplayTextValue>();
+                foreach (var value in values)
+                {
+                    lstSpeakEnglish.Add(new DisplayTextValue
+                    {
+                        Value = value,
+                        DisplayText = value 
+                    });
+                }
+                await TranslateSpeakEnglish();
             }
         } // Configuration
+
+        private async Task TranslateSpeakEnglish()
+        {
+            foreach (var displayTextValue in lstSpeakEnglish)
+            {
+                if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                {
+                    displayTextValue.DisplayText = displayTextValue.Value;
+                }
+                else
+                {
+                    displayTextValue.DisplayText = await _translateLogic.GetTranslation(displayTextValue.Value, _lc.CurrentCulture.Name);
+                }
+            }
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -291,7 +327,7 @@ namespace BedBrigade.Client.Components.Pages
             return string.Empty;
 
         }
-        public void OnLanguageChange(ChangeEventArgs<string, string> args)
+        public async Task OnPrimaryLanguageChange(ChangeEventArgs<string, string> args)
         {
             DisplaySpeakEnglish = DisplayNone;
             if (args.Value != null)

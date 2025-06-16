@@ -1,4 +1,5 @@
 @page "/request-bed"
+@using BedBrigade.Common.Models
 <PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["RequestABed"]}")</PageTitle>
 <RotatorContainer RotatorTitle="@_lc.Keys["RequestABed"]" ImagePath="pages/RequestBed" LocationId="1" />
 
@@ -125,7 +126,7 @@
                          <div class="form-group">
                             <label for="PL" class="formlabel required">@_lc.Keys["PrimaryLanguageCaption"]</label>
                             <SfDropDownList ID="PL" TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value="@newRequest.PrimaryLanguage" Enabled="true" Placeholder="@_lc.Keys["PrimaryLanguagePlaceholder"]">
-                                <DropDownListEvents TValue="string" TItem="string" ValueChange="OnLanguageChange"></DropDownListEvents>
+                                <DropDownListEvents TValue="string" TItem="string" ValueChange="OnPrimaryLanguageChange"></DropDownListEvents>
                             </SfDropDownList>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.PrimaryLanguage)"></ValidationMessage>
@@ -133,7 +134,8 @@
                         </div>
                         <div class="form-group" style="display: @DisplaySpeakEnglish" >
                             <label for="SE" class="formlabel required">@_lc.Keys["SpeakEnglishCaption"]</label>
-                            <SfDropDownList ID="SE" TItem="string" TValue="string" DataSource=@lstSpeakEnglish @bind-Value=@newRequest.SpeakEnglish Enabled="true" Placeholder="@_lc.Keys["SpeakEnglishPlaceholder"]">
+                            <SfDropDownList ID="SE" TValue="string" TItem="DisplayTextValue" DataSource=@lstSpeakEnglish @bind-Value=@newRequest.SpeakEnglish Enabled="true" Placeholder="@_lc.Keys["SpeakEnglishPlaceholder"]">
+                                <DropDownListFieldSettings Value="Value" Text="DisplayText"></DropDownListFieldSettings>
                             </SfDropDownList>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.SpeakEnglish)"></ValidationMessage>
