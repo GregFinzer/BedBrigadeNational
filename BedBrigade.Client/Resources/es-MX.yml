@@ -36,7 +36,7 @@ ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
-Contunue: Continuar
+Continue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
@@ -56,6 +56,7 @@ DonationDetails: Detalles de la donación
 Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
 DurationHours: Duración (horas)
+DynamicALittle: Un poco
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
 DynamicAugust: Agosto
@@ -80,6 +81,7 @@ DynamicMarchBedBuild: Construcción de cama de marzo
 DynamicMay: Mayo
 DynamicMayBedBuild: Construcción de camas de mayo
 DynamicMonday: Lunes
+DynamicNo: No
 DynamicNovember: Noviembre
 DynamicNovemberBedBuild: Construcción de cama de noviembre
 DynamicOctober: Octubre
@@ -92,6 +94,7 @@ DynamicSunday: Domingo
 DynamicThursday: Jueves
 DynamicTuesday: Martes
 DynamicWednesday: Miércoles
+DynamicYes: Sí
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 EnterYourZipCode: Ingresa tu código postal
@@ -157,7 +160,7 @@ MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
 MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
 Message: Mensaje
-MilesAway: Km
+MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 NameColon: 'Nombre:'

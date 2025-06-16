@@ -56,6 +56,7 @@ DonationFormNotCompleted: The Donation Form is not completed
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)
+DynamicALittle: A little
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
 DynamicAugust: August
@@ -80,6 +81,7 @@ DynamicMarchBedBuild: March Bed Build
 DynamicMay: May
 DynamicMayBedBuild: May Bed Build
 DynamicMonday: Monday
+DynamicNo: No
 DynamicNovember: November
 DynamicNovemberBedBuild: November Bed Build
 DynamicOctober: October
@@ -92,6 +94,7 @@ DynamicSunday: Sunday
 DynamicThursday: Thursday
 DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
+DynamicYes: Yes
 Email: Email
 EmailColon: 'Email:'
 EnterYourZipCode: Enter your Zip code

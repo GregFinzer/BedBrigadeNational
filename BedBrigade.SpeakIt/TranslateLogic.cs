@@ -94,7 +94,15 @@ namespace BedBrigade.SpeakIt
                 string hash = ComputeSHA512Hash(parseResult.LocalizableString);
 
                 if (!translations.ContainsKey(hash))
+                {
+                    string cleanedUp = parseResult.LocalizableString.Replace("  ", " ");
+                    hash = ComputeSHA512Hash(cleanedUp);
+                }
+                
+                if (!translations.ContainsKey(hash))
+                {
                     continue;
+                }
 
                 var source = translations[hash].FirstOrDefault(o =>
                     o.Culture == "en-US" && StringUtil.CleanUpSpacesAndLineFeeds(o.Content) == StringUtil.CleanUpSpacesAndLineFeeds(parseResult.LocalizableString));
