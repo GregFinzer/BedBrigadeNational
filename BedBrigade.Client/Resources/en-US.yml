@@ -2,6 +2,7 @@
 Active: Active
 Add: Add
 Address: Address
+ALittle: A little
 AgesGender: Ages / Gender
 AmountColon: 'Amount:'
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
@@ -164,6 +165,7 @@ NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 Newsletter: Newsletter
+No: No
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
@@ -321,6 +323,7 @@ VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
+Yes: Yes
 YourDonationHasBeenCancelled: Your donation has been cancelled.
 YourEmail: Your Email
 YouWereTryingTo: 'You were trying to access the page: '

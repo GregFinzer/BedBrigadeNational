@@ -7,10 +7,6 @@ using Location = BedBrigade.Common.Models.Location;
 using System.Globalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Client.Services;
-using BedBrigade.Data.Data.Seeding;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Threading.Tasks;
-
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -54,7 +50,7 @@ namespace BedBrigade.Client.Components.Pages
             SetParameters();
 
             await LoadData();
-
+            await PerformTranslations();
             _svcLanguage.LanguageChanged += OnLanguageChanged;
         }
 
@@ -109,21 +105,27 @@ namespace BedBrigade.Client.Components.Pages
                 previousBlogType = BlogType;
 
                 await LoadData();
+                await PerformTranslations();
                 StateHasChanged();
             }
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)
         {
-            await TranslatePageTitle();
-            await TranslateTitles();
-            await TranslateDescriptions();
+            await PerformTranslations();
             StateHasChanged();
         }
 
         public void Dispose()
         {
             _svcLanguage.LanguageChanged -= OnLanguageChanged;
+        }
+
+        private async Task PerformTranslations()
+        {
+            await TranslatePageTitle();
+            await TranslateTitles();
+            await TranslateDescriptions();
         }
 
         private async Task TranslatePageTitle()

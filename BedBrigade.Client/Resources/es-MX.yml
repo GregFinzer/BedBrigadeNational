@@ -3,6 +3,7 @@ Active: Activo
 Add: Agregar
 Address: Dirección
 AgesGender: Edades / Género
+ALittle: Un poco
 AmountColon: 'Importe:'
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
@@ -36,7 +37,7 @@ ContactMessage: Mensaje de contacto
 ContactUs: Contáctenos
 ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
 ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
-Contunue: Continuar
+Continue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
@@ -157,13 +158,14 @@ MaxLengthStreet40: La dirección tiene una longitud máxima de 40 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
 MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
 Message: Mensaje
-MilesAway: Km
+MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 Newsletter: Boletín
+No: No
 NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
@@ -322,6 +324,7 @@ VolunteersRegisteredColon: 'Voluntarios registrados:'
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
+Yes: Sí
 YourEmail: Tu correo electrónico
 YourDonationHasBeenCancelled: Su donación ha sido cancelada.
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
