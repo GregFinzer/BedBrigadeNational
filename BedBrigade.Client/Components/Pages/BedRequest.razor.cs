@@ -159,7 +159,10 @@ namespace BedBrigade.Client.Components.Pages
                 }
                 else
                 {
-                    displayTextValue.DisplayText = await _translateLogic.GetTranslation(displayTextValue.Value, _lc.CurrentCulture.Name);
+                    displayTextValue.DisplayText = await _translateLogic.GetTranslation("Dynamic" + displayTextValue.Value, _lc.CurrentCulture.Name);
+
+                    if (displayTextValue.DisplayText.Contains("Dynamic"))
+                        displayTextValue.DisplayText = displayTextValue.Value; 
                 }
             }
         }

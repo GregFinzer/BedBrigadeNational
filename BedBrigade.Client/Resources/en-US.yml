@@ -2,7 +2,6 @@
 Active: Active
 Add: Add
 Address: Address
-ALittle: A little
 AgesGender: Ages / Gender
 AmountColon: 'Amount:'
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
@@ -57,6 +56,7 @@ DonationFormNotCompleted: The Donation Form is not completed
 Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)
+DynamicALittle: A little
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
 DynamicAugust: August
@@ -81,6 +81,7 @@ DynamicMarchBedBuild: March Bed Build
 DynamicMay: May
 DynamicMayBedBuild: May Bed Build
 DynamicMonday: Monday
+DynamicNo: No
 DynamicNovember: November
 DynamicNovemberBedBuild: November Bed Build
 DynamicOctober: October
@@ -93,6 +94,7 @@ DynamicSunday: Sunday
 DynamicThursday: Thursday
 DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
+DynamicYes: Yes
 Email: Email
 EmailColon: 'Email:'
 EnterYourZipCode: Enter your Zip code
@@ -165,7 +167,6 @@ NameColon: 'Name:'
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 Newsletter: Newsletter
-No: No
 NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
@@ -323,7 +324,6 @@ VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
-Yes: Yes
 YourDonationHasBeenCancelled: Your donation has been cancelled.
 YourEmail: Your Email
 YouWereTryingTo: 'You were trying to access the page: '

@@ -3,7 +3,6 @@ Active: Activo
 Add: Agregar
 Address: Dirección
 AgesGender: Edades / Género
-ALittle: Un poco
 AmountColon: 'Importe:'
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
@@ -57,6 +56,7 @@ DonationDetails: Detalles de la donación
 Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
 DurationHours: Duración (horas)
+DynamicALittle: Un poco
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
 DynamicAugust: Agosto
@@ -81,6 +81,7 @@ DynamicMarchBedBuild: Construcción de cama de marzo
 DynamicMay: Mayo
 DynamicMayBedBuild: Construcción de camas de mayo
 DynamicMonday: Lunes
+DynamicNo: No
 DynamicNovember: Noviembre
 DynamicNovemberBedBuild: Construcción de cama de noviembre
 DynamicOctober: Octubre
@@ -93,6 +94,7 @@ DynamicSunday: Domingo
 DynamicThursday: Jueves
 DynamicTuesday: Martes
 DynamicWednesday: Miércoles
+DynamicYes: Sí
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 EnterYourZipCode: Ingresa tu código postal
@@ -165,7 +167,6 @@ NameColon: 'Nombre:'
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 Newsletter: Boletín
-No: No
 NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
@@ -324,7 +325,6 @@ VolunteersRegisteredColon: 'Voluntarios registrados:'
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
-Yes: Sí
 YourEmail: Tu correo electrónico
 YourDonationHasBeenCancelled: Su donación ha sido cancelada.
 YouWereTryingTo: 'Estabas intentando acceder a la página: '
