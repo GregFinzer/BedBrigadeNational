@@ -39,6 +39,7 @@ namespace BedBrigade.Data
         public virtual DbSet<Subscription> Subscriptions { get; set; }
 
         public virtual DbSet<DonationCampaign> DonationCampaigns { get; set; }
+        public virtual DbSet<ContentHistory> ContentHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

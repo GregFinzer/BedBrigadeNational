@@ -10,21 +10,20 @@ public class ContentDataService : Repository<Content>, IContentDataService
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly ICommonService _commonService;
     private readonly ITimezoneDataService _timezoneDataService;
-    
-    
+    private readonly IContentHistoryDataService _contentHistoryDataService;
+
 
     public ContentDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService,
-        ICommonService commonService,
-        ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
+        ITimezoneDataService timezoneDataService,
+        IContentHistoryDataService contentHistoryDataService) : base(contextFactory, cachingService, authService)
     {
         _cachingService = cachingService;
         _contextFactory = contextFactory;
-        _commonService = commonService;
         _timezoneDataService = timezoneDataService;
+        _contentHistoryDataService = contentHistoryDataService;
     }
 
     public Task<ServiceResponse<Content>> GetAsync(string name, int locationId)
@@ -189,6 +188,12 @@ public class ContentDataService : Repository<Content>, IContentDataService
 
             if (entity != null)
             {
+                var contentHistoryResult = await CreateContentHistoryRecord(entity, content);
+                if (!contentHistoryResult.Success)
+                {
+                    return new ServiceResponse<Content>($"Could not create content history record: {contentHistoryResult.Message}", false);
+                }
+
                 entity.Name = content.Name;
                 entity.Title = content.Title;
                 entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
@@ -203,6 +208,28 @@ public class ContentDataService : Repository<Content>, IContentDataService
             }
             return new ServiceResponse<Content>($"Content with key {content.ContentId} was not updated.");
         }
+    }
+
+    private async Task<ServiceResponse<ContentHistory>> CreateContentHistoryRecord(Content previousRecord,
+        Content newRecord)
+    {
+        if (previousRecord.ContentHtml == newRecord.ContentHtml
+            && previousRecord.Title == newRecord.Title
+            && previousRecord.Name == newRecord.Name
+            && previousRecord.MainImageFileName == newRecord.MainImageFileName)
+            return new ServiceResponse<ContentHistory>("No changes", true);
+
+        var contentHistory = new ContentHistory
+        {
+            ContentId = previousRecord.ContentId,
+            LocationId = previousRecord.LocationId,
+            ContentType = previousRecord.ContentType,
+            Title = previousRecord.Title,
+            Name = previousRecord.Name,
+            MainImageFileName = previousRecord.MainImageFileName,
+            ContentHtml = previousRecord.ContentHtml
+        };
+        return await _contentHistoryDataService.CreateAsync(contentHistory);
     }
 
     private string RemoveSyncFusionClasses(string? input)
