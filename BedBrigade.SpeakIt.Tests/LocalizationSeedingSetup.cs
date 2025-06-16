@@ -105,7 +105,7 @@ Bed Brigade Featured on Spectrum 1 News
             string[] files = Directory.GetFiles(htmlPath, "*.html");
             foreach (string file in files)
             {
-                //if (file.Contains("RockCityPolarisAboutUs.html"))
+                //if (file.Contains("New-Bed-Brigade-Columbus-Website.html"))
                 //    Console.WriteLine("Here");
 
                 string text = File.ReadAllText(file);
