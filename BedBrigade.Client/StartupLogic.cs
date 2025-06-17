@@ -105,12 +105,6 @@ namespace BedBrigade.Client
 
             builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 
-            //Possible fix for AT&T Mobile Data Proxy Issue
-            builder.Services.Configure<HttpConnectionDispatcherOptions>(options =>
-            {
-                options.Transports = HttpTransportType.LongPolling;
-            });
-
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
