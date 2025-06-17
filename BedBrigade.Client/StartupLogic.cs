@@ -239,19 +239,7 @@ namespace BedBrigade.Client
             });
 
             app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode()
-                .Add(convention =>
-                {
-                    // Pull out the connection options metadata
-                    var httpOptions = convention.Metadata
-                        .OfType<HttpConnectionDispatcherOptions>()
-                        .FirstOrDefault();
-                    if (httpOptions != null)
-                    {
-                        // Only allow WebSockets (no SSE or Long Polling)
-                        httpOptions.Transports = HttpTransportType.WebSockets;
-                    }
-                });
+                .AddInteractiveServerRenderMode();
 
             return app;
         }
