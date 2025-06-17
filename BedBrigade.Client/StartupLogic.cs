@@ -1,23 +1,24 @@
-﻿using System.Configuration;
+﻿using AKSoftware.Localization.MultiLanguages;
+using AKSoftware.Localization.MultiLanguages.Providers;
 using BedBrigade.Client.Components;
 using BedBrigade.Client.Services;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data;
 using BedBrigade.Data.Seeding;
 using BedBrigade.Data.Services;
-using Blazored.SessionStorage;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Syncfusion.Blazor;
-using System.Diagnostics;
-using BedBrigade.Common.Constants;
-using AKSoftware.Localization.MultiLanguages.Providers;
-using AKSoftware.Localization.MultiLanguages;
-using System.Reflection;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Syncfusion.Blazor;
+using System.Configuration;
+using System.Diagnostics;
+using System.Reflection;
 
 
 namespace BedBrigade.Client
@@ -103,6 +104,13 @@ namespace BedBrigade.Client
             });
 
             builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+
+            //Possible fix for AT&T Mobile Data Proxy Issue
+            builder.Services.Configure<HttpConnectionDispatcherOptions>(options =>
+            {
+                options.Transports = HttpTransportType.LongPolling;
+            });
+
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
