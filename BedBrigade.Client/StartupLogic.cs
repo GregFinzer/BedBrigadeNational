@@ -17,6 +17,7 @@ using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Hosting;
 
 
@@ -230,7 +231,19 @@ namespace BedBrigade.Client
             });
 
             app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+                .AddInteractiveServerRenderMode()
+                .Add(convention =>
+                {
+                    // Pull out the connection options metadata
+                    var httpOptions = convention.Metadata
+                        .OfType<HttpConnectionDispatcherOptions>()
+                        .FirstOrDefault();
+                    if (httpOptions != null)
+                    {
+                        // Only allow WebSockets (no SSE or Long Polling)
+                        httpOptions.Transports = HttpTransportType.WebSockets;
+                    }
+                });
 
             return app;
         }
