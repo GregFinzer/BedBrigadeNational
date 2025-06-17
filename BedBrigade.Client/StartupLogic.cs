@@ -19,6 +19,7 @@ using Syncfusion.Blazor;
 using System.Configuration;
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.AspNetCore.ResponseCompression;
 
 
 namespace BedBrigade.Client
@@ -103,6 +104,14 @@ namespace BedBrigade.Client
                 e.MaximumReceiveMessageSize = 1024000;
             });
 
+            //Possible fix for AT&T Mobile Data
+            builder.Services.AddResponseCompression(options =>
+            {
+                // Exclude SSE so it's never compressed
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes
+                    .Except(new[] { "text/event-stream" });
+            });
+            
             builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             //services cors
@@ -221,6 +230,9 @@ namespace BedBrigade.Client
 
             app.UseDefaultFiles();
             app.UseHttpsRedirection();
+
+            //Possible fix for AT&T Mobile Data            
+            app.UseResponseCompression();
 
             app.UseStaticFiles();
             app.UseRouting();
