@@ -4,6 +4,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks;
 
@@ -32,10 +33,39 @@ public partial class AddPage : ComponentBase
         SelectedContentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
         SingularName = Pluralization.MakeSingular(SelectedContentType.ToString());
         Title = $"Add {SingularName}";
-        Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
-        var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
-        Model.CurrentLocationId = user.LocationId;
-        Model.IsNationalAdmin = Model.CurrentLocationId == Defaults.NationalLocationId;
+        await LoadLocations();
+        var user = await GetCurrentUser();
+
+        if (user != null)
+        {
+            Model.CurrentLocationId = user.LocationId;
+            Model.IsNationalAdmin = Model.CurrentLocationId == Defaults.NationalLocationId;
+        }
+    }
+
+    private async Task<User?> GetCurrentUser()
+    {
+        var userResult = await _svcUserDataService.GetCurrentLoggedInUser();
+
+        if (!userResult.Success || userResult.Data == null)
+        {
+            Log.Error(userResult.Message);
+            ErrorMessage = "Failed to load user data: " + userResult.Message;
+            return null;
+        }
+        return userResult.Data;
+    }
+
+    private async Task LoadLocations()
+    {
+        var locationsResult = await _svcLocationDataService.GetAllAsync();
+        if (!locationsResult.Success && locationsResult.Data != null)
+        {
+            Log.Error(locationsResult.Message);
+            ErrorMessage = "Failed to load locations: " + locationsResult.Message;
+            return;
+        }
+        Model.Locations = locationsResult.Data;
     }
 
     private void UpdatePageName(ChangeEventArgs e)
@@ -70,8 +100,9 @@ public partial class AddPage : ComponentBase
         {
             var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
 
-            if (!pageTemplate.Success)
+            if (!pageTemplate.Success || pageTemplate.Data == null)
             {
+                Log.Error("Could not find default page template: " + pageTemplate.Message);
                 ErrorMessage = pageTemplate.Message;
                 return;
             }
@@ -106,6 +137,7 @@ public partial class AddPage : ComponentBase
         }
         else
         {
+            Log.Error("Could not add page: " + createResponse.Message);
             ErrorMessage = createResponse.Message;
         }
     }

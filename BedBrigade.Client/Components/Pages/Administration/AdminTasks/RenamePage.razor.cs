@@ -3,6 +3,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks;
 
@@ -14,30 +15,51 @@ public partial class RenamePage : ComponentBase
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ToastService _toastService { get; set; }
     [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
-    [Parameter] public string LocationId { get; set; }
+    [Parameter] public int LocationId { get; set; }
     [Parameter] public string ContentName { get; set; }
     public string ErrorMessage { get; set; }
-    public Content _originalContent;
-    private int _originalLocationId;
+    public Content? _originalContent;
     private string _locationRoute;
     public RenamePageModel Model { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-        int _originalLocationId;
+        _originalContent =  await GetOriginalContent();
+        _locationRoute = await GetLocationRoute();
 
-        if (!int.TryParse(LocationId, out _originalLocationId))
+        if (_originalContent != null)
         {
-            _toastService.Error("Error",
-                $"Could not parse location as integer: {LocationId}");
-            return;
+            Model.PageTitle = _originalContent.Title;
+            Model.PageName = _originalContent.Name;
+        }
+    }
+
+    private async Task<string> GetLocationRoute()
+    {
+        var locationResponse = await _svcLocationDataService.GetByIdAsync(LocationId);
+
+        if (!locationResponse.Success || locationResponse.Data == null)
+        {
+            Log.Error(locationResponse.Message);
+            ErrorMessage = "Failed to load location data: " + locationResponse.Message;
+            return string.Empty;
         }
 
-        _originalContent =  (await _svcContentDataService.GetAsync(ContentName, _originalLocationId)).Data;
-        _locationRoute = (await _svcLocationDataService.GetByIdAsync(_originalLocationId)).Data.Route;
-        Model.PageTitle = _originalContent.Title;
-        Model.PageName = _originalContent.Name;
+        return locationResponse.Data.Route;
+    }
+
+    private async Task<Content?> GetOriginalContent()
+    {
+        var contentResponse = await _svcContentDataService.GetAsync(ContentName, LocationId);
+        if (!contentResponse.Success || contentResponse.Data == null)
+        {
+            Log.Error(contentResponse.Message);
+            ErrorMessage = "Failed to load content data: " + contentResponse.Message;
+            return null;
+        }
+
+        return contentResponse.Data;
     }
 
     private void UpdatePageName(ChangeEventArgs e)
@@ -69,7 +91,7 @@ public partial class RenamePage : ComponentBase
         }
 
         // If the name has changed, check if the new name is available
-        var result = await _svcContentDataService.GetAsync(Model.PageName, _originalLocationId);
+        var result = await _svcContentDataService.GetAsync(Model.PageName, LocationId);
 
         if (result.Success)
         {
@@ -110,7 +132,7 @@ public partial class RenamePage : ComponentBase
             _toastService.Success("Content Saved",
                 $"Page updated " +
                 $"for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
         }
         else
         {
@@ -130,7 +152,7 @@ public partial class RenamePage : ComponentBase
         {
             _toastService.Success("Content Saved",
                 $"Page updated for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
         }
         else
         {
@@ -140,6 +162,11 @@ public partial class RenamePage : ComponentBase
 
     private void HandleCancel()
     {
-        _navigationManager.NavigateTo("/administration/manage/pages");
+        if (_originalContent == null)
+        {
+            _navigationManager.NavigateTo("/administration/manage/pages/body");
+            return;
+        }
+        _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
     }
 }

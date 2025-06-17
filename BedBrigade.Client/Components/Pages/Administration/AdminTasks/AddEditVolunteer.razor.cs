@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-
 using System.Security.Claims;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
@@ -61,6 +60,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
             else
             {
+                Log.Error($"Error loading locations: {result.Message}");
                 _toastService.Error(ErrorTitle, result.Message);
             }
         } 
@@ -77,6 +77,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 }
                 else
                 {
+                    Log.Error($"Error loading volunteer with ID {VolunteerId}: {result.Message}");
                     _toastService.Error(ErrorTitle, result.Message);
                 }
             }
@@ -91,7 +92,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (IsValid() && await SaveVolunteer())
             {
-                _navigationManager.NavigateTo("/administration/manage/volunteers");
+                _navigationManager?.NavigateTo("/administration/manage/volunteers");
             }
         }
 
@@ -127,6 +128,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     return true;
                 }
 
+                Log.Error("Could not update volunteer " + updateResult.Message);
                 _toastService.Error(ErrorTitle, updateResult.Message);
                 return false;
             }

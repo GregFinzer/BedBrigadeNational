@@ -7,6 +7,7 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 using Syncfusion.Blazor.DropDowns;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Admin
@@ -31,21 +32,23 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
 
         protected override async Task OnInitializedAsync()
         {
-            Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
-            var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
-            Model.Body = (await _svcUserDataService.GetEmailSignature(user.UserName)).Data;
-            Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId)).Data;
-            Model.Newsletters = (await _svcNewsletterDataService.GetAllForLocationAsync(user.LocationId)).Data;
-            Model.CurrentLocationId = user.LocationId;
-            isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
+            await LoadLocations();
+            User? user = await GetCurrentUser();
+            await GetEmailSignature(user);
+            await LoadSchedules(user);
+            await LoadNewsletters(user);
+            Model.EmailRecipientOptions = EnumHelper.GetEnumNameValues<EmailRecipientOption>().Where(x => x.Value != EmailRecipientOption.Everyone).ToList();
 
-            if (isNationalAdmin)
+            if (user != null)
             {
-                Model.EmailRecipientOptions = EnumHelper.GetEnumNameValues<EmailRecipientOption>();
-            }
-            else
-            {
-                Model.EmailRecipientOptions = EnumHelper.GetEnumNameValues<EmailRecipientOption>().Where(x => x.Value != EmailRecipientOption.Everyone).ToList();
+                Model.CurrentLocationId = user.LocationId;
+
+                isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
+
+                if (isNationalAdmin)
+                {
+                    Model.EmailRecipientOptions = EnumHelper.GetEnumNameValues<EmailRecipientOption>();
+                }
             }
             
             Model.CurrentEmailRecipientOption = EmailRecipientOption.Myself;
@@ -53,6 +56,80 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
             Model.ShowEventDropdown = false;
             Model.ShowNewsletterDropdown = false;
             await BuildPlan();
+        }
+
+        private async Task LoadNewsletters(User? user)
+        {
+            if (user != null)
+            {
+                var newslettersResponse = await _svcNewsletterDataService.GetAllForLocationAsync(user.LocationId);
+                if (!newslettersResponse.Success || newslettersResponse.Data == null)
+                {
+                    Log.Error(newslettersResponse.Message);
+                    ShowFailure("Failed to load newsletters: " + newslettersResponse.Message);
+                    return;
+                }
+                Model.Newsletters = newslettersResponse.Data;
+            }
+        }
+
+        private async Task LoadSchedules(User? user)
+        {
+            if (user != null)
+            {
+                var scheduleResponse = await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId);
+
+                if (!scheduleResponse.Success || scheduleResponse.Data == null)
+                {
+                    Log.Error(scheduleResponse.Message);
+                    ShowFailure("Failed to load schedules: " + scheduleResponse.Message);
+                    return;
+                }
+
+                Model.Schedules = scheduleResponse.Data;
+            }
+        }
+
+        private async Task GetEmailSignature(User? user)
+        {
+            if (user != null)
+            {
+                var signatureResult = await _svcUserDataService.GetEmailSignature(user.UserName);
+
+                if (!signatureResult.Success)
+                {
+                    Log.Error(signatureResult.Message);
+                    ShowFailure("Failed to load email signature: " + signatureResult.Message);
+                    return;
+                }
+
+                Model.Body = signatureResult.Data;
+            }
+        }
+
+        private async Task<User?> GetCurrentUser()
+        {
+            var userResult = await _svcUserDataService.GetCurrentLoggedInUser();
+            
+            if (!userResult.Success || userResult.Data == null)
+            {
+                Log.Error(userResult.Message);
+                ShowFailure("Failed to load user data: " + userResult.Message);
+                return null;
+            }
+            return userResult.Data;
+        }
+
+        private async Task LoadLocations()
+        {
+            var locationsResult = await _svcLocationDataService.GetAllAsync();
+            if (!locationsResult.Success && locationsResult.Data != null)
+            {
+                Log.Error(locationsResult.Message);
+                ShowFailure("Failed to load locations: " + locationsResult.Message);
+                return;
+            }
+            Model.Locations = locationsResult.Data;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
