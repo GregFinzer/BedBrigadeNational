@@ -17,7 +17,6 @@ using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Hosting;
 
 
@@ -104,14 +103,6 @@ namespace BedBrigade.Client
             });
 
             builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
-
-            // Configure SignalR to only use WebSockets, fix for AT&T Mobile Data
-            builder.Services.Configure<HttpConnectionDispatcherOptions>(options =>
-            {
-                // refuse SSE and long polling—only WebSockets
-                options.Transports = HttpTransportType.WebSockets;
-            });
-
             //services cors
             builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
