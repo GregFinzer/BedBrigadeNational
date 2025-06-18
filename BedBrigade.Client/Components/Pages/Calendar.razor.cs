@@ -1,15 +1,11 @@
 ﻿using BedBrigade.Common.Logic;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics;
 using BedBrigade.Common.Models;
 using BedBrigade.Client.Services;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Schedule;
-using static BedBrigade.Common.Logic.AddressHelper;
 using System.Text;
-using System.IO;
-using BedBrigade.SpeakIt;
-using Microsoft.JSInterop;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -21,88 +17,59 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
         [Inject]  private ILocationState? _locationState { get; set; }
-        [Inject] private IContentTranslationDataService? _svcContentTranslation { get; set; }
 
-        [Inject] private IJSRuntime _js { get; set; }
-   
-        [Inject] private ILanguageService _svcLanguage { get; set; }
-
-        [Inject] private ITranslationDataService? _translateLogic { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-
+        [Inject] private ILanguageContainerService _lc { get; set; }
         [Parameter] public string? LocationRoute { get; set; }
       
 
         public View CurrentView { get; set; } = View.Month;
-        private int CurrentYear;
-        private ServiceResponse<List<Schedule>>? recordResult;
+        private ServiceResponse<List<Schedule>>? scheduleResult;
 
         public DateTime CurrentDate { get; private set; }
 
-        // private DateTime CurrentDate { get; set; }
-
         protected List<Schedule>? lstSchedules { get; set; }
-        protected List<Location>? lstLocations;
         private List<AppointmentData> dataSource = new List<AppointmentData>();
-        private string ErrorMessage = String.Empty;
         private bool IsDisplayCalendar = false;
         private MarkupString EventsAlert = BootstrapHelper.GetBootstrapMessage("warning", "Sorry, there are no scheduled volunteer events in the selected location.<br/>Please select another location or try again later.", "", false);
 
         protected override async Task OnInitializedAsync()
         {
-            
-            CurrentYear = DateTime.Today.Year;
-            CurrentDate = DateTime.Today;
-
-            if (LocationRoute != null && LocationRoute.Length > 0)
+            try
             {
+                _lc.InitLocalizedComponent(this);
+                CurrentDate = DateTime.Today;
+
                 var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
 
-                if (locationResponse!=null && locationResponse.Success)
-                {                   
-
+                if (locationResponse.Success && locationResponse.Data != null)
+                {
                     _locationState.Location = LocationRoute;
-                    recordResult = await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
+                    scheduleResult = await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
+
+                    if (scheduleResult.Success && scheduleResult.Data != null)
+                    {
+                        lstSchedules = scheduleResult.Data;
+                        IsDisplayCalendar = true;
+                        dataSource = GetCalendarAppointments(lstSchedules);
+                    }
+                    else
+                    {
+                        Log.Error("Calendar OnInitializedAsync " + scheduleResult.Message);
+                        _toastService.Error("Error", scheduleResult.Message);
+                    }
                 }
                 else
                 {
                     _navigationManager.NavigateTo($"/Sorry/{LocationRoute}/calendar");
                 }
-
-            }
-            else // all events
-            {
-                recordResult = await _svcSchedule.GetAllAsync();
-            }                     
-
-            try
-            {            
-                if (recordResult!=null && recordResult.Success)
-                {
-                    lstSchedules = recordResult!.Data;
-                    if (lstSchedules!=null && lstSchedules.Count > 0)
-                    {
-                        IsDisplayCalendar = true;
-                        dataSource = GetCalendarAppointments(lstSchedules);
-                    }
-                    //Debug.WriteLine("Loaded events: " + lstSchedules.Count.ToString());
-                 
-                }
-                else
-                {
-                    //ErrorMessage = "Could not retrieve schedule. " + recordResult.Message;
-                    _toastService.Error("Error", recordResult.Message);
-                    return;
-                }
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Calendar OnInitializedAsync");
                 _toastService.Error("Error", ex.Message);
-                return;
-            }                     
-            
-        } // Init
+            }
+        } 
 
 
         private List<AppointmentData> GetCalendarAppointments(List<Schedule> BBEvents)

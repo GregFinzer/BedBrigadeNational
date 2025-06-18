@@ -19,6 +19,7 @@ BuildAddress: Build Address
 BuildCity: Build City
 BuildPostalCode: Build Postal Code
 BuildState: Build State
+Calendar: Calendar
 Campaign: Campaign
 Cancel: Cancel
 ChangePassword: Change Password
@@ -99,6 +100,7 @@ Email: Email
 EmailColon: 'Email:'
 EnterYourZipCode: Enter your Zip code
 Event: Event
+Events: Events
 EventDate: Event Date
 EventDateTime: Event Date & Time
 EventDetails: Event Details

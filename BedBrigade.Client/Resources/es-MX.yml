@@ -19,6 +19,7 @@ BuildAddress: Dirección de compilación
 BuildCity: Construir ciudad
 BuildPostalCode: Construir código postal
 BuildState: Estado de compilación
+Calendar: Calendario
 Campaign: Campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
@@ -99,6 +100,7 @@ Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 EnterYourZipCode: Ingresa tu código postal
 Event: Evento
+Events: Eventos
 EventDate: Fecha del evento
 EventDateTime: Fecha y hora del evento
 EventDetails: Detalles del evento
