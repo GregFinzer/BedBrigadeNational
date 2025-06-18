@@ -122,7 +122,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task LoadData()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
                 if (BlogTypes.ValidBlogTypes.Contains(_contentType))
@@ -144,7 +144,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
             }
 
-            int userLocationId = await _svcUser.GetUserLocationId();
+            int userLocationId = _svcUser.GetUserLocationId();
             if (BlogTypes.ValidBlogTypes.Contains(_contentType))
             {
                 var locationContentTypeResult = await _svcContent.GetByLocationContentType(userLocationId, _contentType);
@@ -184,7 +184,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Pages };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -205,7 +205,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistDataAsync();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Pages, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)

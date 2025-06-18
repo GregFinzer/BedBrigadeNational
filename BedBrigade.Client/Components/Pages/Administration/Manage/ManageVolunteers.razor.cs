@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -190,7 +190,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)

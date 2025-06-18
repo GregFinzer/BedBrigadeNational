@@ -127,7 +127,7 @@ public partial class SignUpGrid : ComponentBase
     /// <returns></returns>
     protected async Task OnLoad()
     {
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol };
         var result = await _svcUserPersist.GetGridPersistence(persist);
         if (result.Success && result.Data != null)
@@ -148,7 +148,7 @@ public partial class SignUpGrid : ComponentBase
     private async Task SaveGridPersistence()
     {
         string state = await Grid.GetPersistData();
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);
         if (!result.Success)
@@ -192,9 +192,9 @@ public partial class SignUpGrid : ComponentBase
     private async Task LoadUserData()
     {
         Identity = _svcAuth.CurrentUser;
-        userLocationId = await _svcUser.GetUserLocationId();
-        userName = await _svcUser.GetUserName();
-        userRole = await _svcUser.GetUserRole();
+        userLocationId =  _svcUser.GetUserLocationId();
+        userName = _svcUser.GetUserName();
+        userRole = _svcUser.GetUserRole();
         Log.Information($"{userName} went to the Manage Sign Up Page");
 
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()

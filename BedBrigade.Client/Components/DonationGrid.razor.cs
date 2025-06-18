@@ -119,10 +119,10 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (!isNationalAdmin)
             {
-                int userLocationId = await _svcUser.GetUserLocationId();
+                int userLocationId = _svcUser.GetUserLocationId();
                 DonationCampaigns = DonationCampaigns.Where(o => o.LocationId == userLocationId).ToList();
             }
         }
@@ -164,17 +164,17 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (!isNationalAdmin)
             {
-                int userLocationId = await _svcUser.GetUserLocationId();
+                int userLocationId = _svcUser.GetUserLocationId();
                 Locations = Locations.Where(o => o.LocationId == userLocationId).ToList();
             }
         }
 
         private async Task LoadDonations()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
                 var allResult = await _svcDonation.GetAllAsync();
@@ -186,7 +186,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                int userLocationId = await _svcUser.GetUserLocationId();
+                int userLocationId = _svcUser.GetUserLocationId();
                 var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
                 if (contactUsResult.Success)
                 {
@@ -236,7 +236,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Donation };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -257,7 +257,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Donation, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)

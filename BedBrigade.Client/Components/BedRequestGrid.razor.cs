@@ -113,7 +113,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadBedRequests()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
 
             //Get all records when an admin
             if (isNationalAdmin)
@@ -129,7 +129,7 @@ namespace BedBrigade.Client.Components
                 return;
             }
 
-            var locationId = await _svcUser.GetUserLocationId();
+            var locationId = _svcUser.GetUserLocationId();
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
             if (userLocationResult.Success && userLocationResult.Data != null)
@@ -235,7 +235,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -256,7 +256,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistDataAsync();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -505,7 +505,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                selectedLocation = await _svcUser.GetUserLocationId();
+                selectedLocation = _svcUser.GetUserLocationId();
             }
 
             var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
@@ -553,7 +553,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                selectedLocation = await _svcUser.GetUserLocationId();
+                selectedLocation = _svcUser.GetUserLocationId();
             }
 
             var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);

@@ -5,17 +5,17 @@ namespace BedBrigade.Data.Services
     public interface IRepository<TEntity> where TEntity : class
     {
         //Get stuff out of the identity
-        Task<string?> GetUserEmail();
+        string? GetUserEmail();
 
-        Task<string?> GetUserName();
+        string GetUserName();
 
         string GetEntityName();
 
-        Task<int> GetUserLocationId();
+        int GetUserLocationId();
 
-        Task<string?> GetUserRole();
+        string? GetUserRole();
 
-        Task<bool> IsUserNationalAdmin();
+        bool IsUserNationalAdmin();
 
         //Entity Framework Wrappers
         Task<ServiceResponse<List<TEntity>>> GetAllAsync();

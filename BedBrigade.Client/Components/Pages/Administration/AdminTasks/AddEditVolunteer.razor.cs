@@ -22,7 +22,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IVolunteerDataService _volunteerDataService { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-        private ClaimsPrincipal? Identity { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -36,12 +36,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected override async Task OnInitializedAsync()
         {
-            Identity = _svcAuth.CurrentUser;
+            Log.Information($"{_svcAuth.UserName} went to the Add/Edit Volunteer Page");
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Add/Edit Volunteer Page");
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin))
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
+            if (isNationalAdmin)
             {
                 CanSetLocation = true;
             }

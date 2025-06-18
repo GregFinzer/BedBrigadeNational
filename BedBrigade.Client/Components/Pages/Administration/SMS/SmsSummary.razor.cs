@@ -107,7 +107,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
         }
         else
         {
-            CurrentLocationId = await _svcUser.GetUserLocationId();
+            CurrentLocationId = _svcUser.GetUserLocationId();
         }
 
 

@@ -95,7 +95,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContacts()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
 
             if (isNationalAdmin)
             {
@@ -108,7 +108,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                int userLocationId = await _svcUser.GetUserLocationId();
+                int userLocationId = _svcUser.GetUserLocationId();
                 var contactUsResult = await _svcContactUs.GetAllForLocationAsync(userLocationId);
                 if (contactUsResult.Success)
                 {
@@ -161,7 +161,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.ContactUs };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -182,7 +182,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.ContactUs, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)

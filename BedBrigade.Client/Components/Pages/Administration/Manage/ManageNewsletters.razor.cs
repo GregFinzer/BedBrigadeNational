@@ -57,7 +57,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
             ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
 
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
 
             //Get all records when an admin
             if (isNationalAdmin)
@@ -71,7 +71,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
             else
             {
-                var locationId = await _svcUser.GetUserLocationId();
+                var locationId = _svcUser.GetUserLocationId();
                 var result = await _svcNewsletter.GetAllForLocationAsync(locationId);
                 if (result.Success)
                 {
@@ -99,7 +99,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -120,7 +120,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)

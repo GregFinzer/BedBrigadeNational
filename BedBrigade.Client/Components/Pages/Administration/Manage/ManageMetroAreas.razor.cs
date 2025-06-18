@@ -319,7 +319,7 @@ public partial class ManageMetroAreas : ComponentBase
     /// <returns></returns>
     protected async Task OnLoad()
     {
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas };
         var result = await _svcUserPersist.GetGridPersistence(persist);
         if (result.Success && result.Data != null)
@@ -340,7 +340,7 @@ public partial class ManageMetroAreas : ComponentBase
     private async Task SaveGridPersistence()
     {
         string state = await Grid.GetPersistData();
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);
         if (!result.Success)

@@ -248,7 +248,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     //This is overridden because we don't want to log the SmsQueue entity
     public override async Task<ServiceResponse<SmsQueue>> CreateAsync(SmsQueue entity)
     {
-        string userName = await GetUserName();
+        string userName = GetUserName();
         entity.SetCreateAndUpdateUser(userName);
 
         try
@@ -272,7 +272,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     public override async Task<ServiceResponse<SmsQueue>> UpdateAsync(SmsQueue entity)
     {
 
-        string userName = await GetUserName();
+        string userName = GetUserName();
         entity.SetUpdateUser(userName);
 
         try
@@ -484,7 +484,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<List<string>> GetMyself()
     {
-        var phone = await GetUserPhone();
+        var phone = GetUserPhone();
         return new List<string> { phone };
     }
 
@@ -528,7 +528,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 LocationId = locationId
             }).ToList();
 
-            string userName = await GetUserName();
+            string userName = GetUserName();
 
             foreach (var smsQueue in smsQueueList)
             {

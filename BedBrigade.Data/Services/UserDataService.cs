@@ -34,7 +34,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
         {
-            return await GetByIdAsync(await GetUserName());
+            return await GetByIdAsync(GetUserName());
         }
 
         public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync(int locationId)

@@ -1,10 +1,10 @@
 ﻿@layout Layout.AdminLayout
 @page "/administration/admin/serverinfo"
 
-@using System;
 @using System.Diagnostics;
 @using System.Runtime.InteropServices;
 @using System.Management;
+@using Serilog
 
 @if (WebHelper.IsProduction())
 {
@@ -22,6 +22,22 @@
     </tr>
     </thead>
     <tbody>
+    <tr>
+        <th scope="row">Current Server Time</th>
+        <td>@ServerTime</td>
+    </tr>
+    <tr>
+        <th scope="row">Timezone</th>
+        <td>@Timezone</td>
+    </tr>
+    <tr>
+        <th scope="row">Server Name</th>
+        <td>@ServerName</td>
+    </tr>
+        <tr>
+            <th scope="row">OS Version</th>
+            <td>@OsVersion</td>
+        </tr>
     <tr>
         <th scope="row">Processor Architecture</th>
         <td>@ProcessorArchitecture</td>
@@ -50,10 +66,7 @@
         <th scope="row">Free Memory</th>
         <td>@FreeMemory GB</td>
     </tr>
-    <tr>
-        <th scope="row">Timezone</th>
-        <td>@Timezone</td>
-    </tr>
+
     </tbody>
 </table>
 
@@ -62,6 +75,7 @@
 <button class="btn btn-primary" @onclick="ClearCache">Clear Cache</button>
 
 @code {
+    [Inject] private IAuthService? _svcAuth { get; set; }
     private string ProcessorArchitecture { get; set; }
     private string ProcessorName { get; set; }
     private int ProcessorCount { get; set; }
@@ -70,11 +84,15 @@
     private double FreeMemory { get; set; }
     private float CpuUtilization { get; set; }
     private string Timezone { get; set; }
+    private string ServerTime { get; set; }
+    private string ServerName { get; set; }
+    private string OsVersion { get; set; }
     [Inject] private ICachingService _cachingService { get; set; }
     [Inject] private ToastService _toastService { get; set; }
 
     protected override void OnInitialized()
     {
+        Log.Information($"{_svcAuth.UserName} went to the Server Information Page");
         ProcessorArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
         ProcessorName = GetProcessorName();
         ProcessorCount = Environment.ProcessorCount;
@@ -83,6 +101,9 @@
         FreeMemory = GetFreeMemory();
         CpuUtilization = GetCpuUtilization();
         Timezone = TimeZoneInfo.Local.DisplayName;
+        ServerTime = DateTime.Now.ToString();
+        ServerName = System.Environment.MachineName;
+        OsVersion = Environment.OSVersion.VersionString;
     }
 
     private string GetProcessorName()

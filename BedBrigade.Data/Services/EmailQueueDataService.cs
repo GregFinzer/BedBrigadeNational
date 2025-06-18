@@ -196,7 +196,7 @@ namespace BedBrigade.Data.Services
         //This is overridden because we don't want to log the EmailQueue entity
         public override async Task<ServiceResponse<EmailQueue>> CreateAsync(EmailQueue entity)
         {
-            string userName = await GetUserName();
+            string userName = GetUserName();
             entity.SetCreateAndUpdateUser(userName);
             
             try
@@ -219,7 +219,7 @@ namespace BedBrigade.Data.Services
         public override async Task<ServiceResponse<EmailQueue>> UpdateAsync(EmailQueue entity)
         {
 
-            string userName = await GetUserName();
+            string userName = GetUserName();
             entity.SetUpdateUser(userName);
 
             try
@@ -316,7 +316,7 @@ namespace BedBrigade.Data.Services
                     Priority = Defaults.BulkLowPriority
                 }).ToList();
 
-                string userName = await GetUserName();
+                string userName = GetUserName();
 
                 foreach (var emailQueue in emailQueueList)
                 {
@@ -450,7 +450,7 @@ namespace BedBrigade.Data.Services
 
         private async Task<List<string>> GetMyself()
         {
-            var user = await GetUserEmail();
+            var user = GetUserEmail();
             return new List<string> { user };
         }
 

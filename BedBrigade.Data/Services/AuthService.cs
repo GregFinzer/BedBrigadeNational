@@ -138,6 +138,16 @@ namespace BedBrigade.Data.Services
 
         public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
 
+        public bool IsNationalAdmin
+        {
+            get
+            {
+                string roleName = UserRole ?? string.Empty;
+
+                return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
+            }
+        }
+
         public async Task LogoutAsync()
         {
             //Update the Blazor Server State for the user to an anonymous user

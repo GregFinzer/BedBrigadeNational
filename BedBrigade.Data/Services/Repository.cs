@@ -24,27 +24,27 @@ namespace BedBrigade.Data.Services
         }
 
         //This is the email address stored in the User.Identity.Name
-        public async Task<string?> GetUserEmail()
+        public string GetUserEmail()
         {
             return _authService.Email;
         }
-        public async Task<string?> GetUserPhone()
+        public string GetUserPhone()
         {
             return _authService.Phone;
         }
 
         //This is the user name stored in the nameidentifier
-        public async Task<string?> GetUserName()
+        public string GetUserName()
         {
             return _authService.UserName;
         }
 
-        public async Task<string?> GetUserRole()
+        public string? GetUserRole()
         {
             return _authService.UserRole;
         }
 
-        public async Task<int> GetUserLocationId()
+        public int GetUserLocationId()
         {
             return _authService.LocationId;
         }
@@ -54,9 +54,9 @@ namespace BedBrigade.Data.Services
             return typeof(TEntity).Name;
         }
 
-        public async Task<bool> IsUserNationalAdmin()
+        public bool IsUserNationalAdmin()
         {
-            string roleName = await GetUserRole() ?? string.Empty;
+            string roleName = GetUserRole() ?? string.Empty;
 
             return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
         }
@@ -127,7 +127,7 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity)
         {
-            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
+            string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
             entity.SetCreateAndUpdateUser(userName);
             
             try
@@ -151,7 +151,7 @@ namespace BedBrigade.Data.Services
         public virtual async Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity)
         {
 
-            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
+            string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
             entity.SetUpdateUser(userName);
 
             try
@@ -177,7 +177,7 @@ namespace BedBrigade.Data.Services
 
         public virtual async Task<ServiceResponse<bool>> DeleteAsync(object id)
         {
-            string userName = await GetUserName() ?? Defaults.DefaultUserNameAndEmail;
+            string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
 
             try
             {
