@@ -23,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -45,10 +46,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
+
 
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
         public bool NoPaging { get; private set; }
@@ -56,21 +54,26 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadUserData();
-            await LoadLocations();
-            await LoadVolunteerData();
-            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
-
-        } // Async Init
+            try
+            {
+                await LoadUserData();
+                await LoadLocations();
+                await LoadVolunteerData();
+                lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ManageVolunteers component");
+                ErrorMessage = "An error occurred while initializing the page: " + ex.Message;
+            }
+        } 
 
 
         private async Task LoadUserData()
         {
             Identity = _svcAuth.CurrentUser;
-
-            userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
-
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
+            userLocationId = _svcAuth.LocationId;
+            userName = _svcAuth.UserName;
             Log.Information($"{userName} went to the Manage Volunteers Page");
 
             if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
@@ -84,8 +87,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
+            if (Identity.IsInRole(RoleNames.NationalAdmin)) 
             {
                 userRole = RoleNames.NationalAdmin;
                 isLocationAdmin = false;
@@ -103,9 +105,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     userRole = RoleNames.LocationAuthor;
                     isLocationAdmin = true;
                 }
-
-
-
             } // Get User Data
         } // User Data
 
@@ -227,6 +226,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
             if (volunteer != null)
             {
+                args.Cancel = true; 
                 _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
             }
         }
@@ -245,6 +245,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     break;
 
                 case Action.Add:
+                    args.Cancel = true; 
                     Add();
                     break;
 
@@ -261,19 +262,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             foreach (var rec in records)
             {
                 var deleteResult = await _svcVolunteer.DeleteAsync(rec.VolunteerId);
-                ToastTitle = "Delete Volunteer";
+
                 if (deleteResult.Success)
                 {
-                    ToastContent = "Delete Successful!";
+                    _toastService.Success("Success", $"Volunteer {rec.FirstName} {rec.LastName} deleted successfully.");
                 }
                 else
                 {
-                    ToastContent = $"Unable to Delete. Volunteer is in use.";
+                    Log.Error($"Failed to delete Volunteer {rec.FirstName} {rec.LastName}: {deleteResult.Message}");
+                    _toastService.Error("Error", $"Failed to delete Volunteer {rec.FirstName} {rec.LastName}: {deleteResult.Message}");
                     args.Cancel = true;
                 }
-                ToastTimeout = 4000;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
             }
         }
 
@@ -281,12 +280,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}");
         }
-
-
-
-
-
-
 
         protected void DataBound()
         {

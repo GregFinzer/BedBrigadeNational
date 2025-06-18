@@ -8,8 +8,6 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using Syncfusion.Blazor.Popups;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 
@@ -43,9 +41,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected List<string>? ContextMenu;
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
         protected int ToastTimeout { get; set; } = 3000;
         protected string? RecordText { get; set; } = "Loading Pages ...";
         public bool NoPaging { get; private set; }
@@ -85,39 +80,50 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task InitializeAndLoad()
         {
-            _contentType = Enum.Parse<ContentType>(ContentTypeString);
-
-            _subdirectory = BlogTypes.ValidBlogTypes.Contains(_contentType) ? _contentType.ToString() : "pages";
-
-            Identity = _svcAuth.CurrentUser;
-
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Pages with a Content Type of {_contentType}");
-
-            if (Identity.HasRole(RoleNames.CanManagePages))
+            try
             {
-                ToolBar = new List<string> { "Add", "Edit", "Rename", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Rename", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            content = new Content();
+                Log.Information($"{_svcAuth.UserName} went to the Manage Pages with a Content Type of {ContentTypeString}");
+                _contentType = Enum.Parse<ContentType>(ContentTypeString);
 
-            await LoadData();
+                _subdirectory = BlogTypes.ValidBlogTypes.Contains(_contentType) ? _contentType.ToString() : "pages";
 
-            if (Locations == null)
-            {
-                var locResult = await _svcLocation.GetAllAsync();
-                if (locResult.Success)
+                Identity = _svcAuth.CurrentUser;
+
+                if (Identity.HasRole(RoleNames.CanManagePages))
                 {
-                    Locations = locResult.Data;
+                    ToolBar = new List<string> { "Add", "Edit", "Rename", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                    ContextMenu = new List<string> { "Edit", "Rename", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
                 }
-            }
+                else
+                {
+                    ToolBar = new List<string> { "Search", "Reset" };
+                    ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }
+                content = new Content();
 
-            ContentTypes = EnumHelper.GetContentTypeItems();
+                await LoadData();
+
+                if (Locations == null)
+                {
+                    var locResult = await _svcLocation.GetAllAsync();
+                    if (locResult.Success && locResult.Data != null)
+                    {
+                        Locations = locResult.Data;
+                    }
+                    else
+                    {
+                        Log.Error($"ManagePages, Error loading locations: {locResult.Message}");
+                        _toastService.Error("Error", $"Could not load locations: {locResult.Message}");
+                    }
+                }
+
+                ContentTypes = EnumHelper.GetContentTypeItems();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ManagePages component");
+                _toastService.Error("Error", $"An error occurred while initializing the page: {ex.Message}");
+            }
         }
 
         private async Task LoadData()
@@ -128,7 +134,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 if (BlogTypes.ValidBlogTypes.Contains(_contentType))
                 {
                     var contentTypeResult = await _svcContent.GetByContentType(_contentType);
-                    if (contentTypeResult.Success)
+                    if (contentTypeResult.Success && contentTypeResult.Data != null)
                     {
                         Pages = contentTypeResult.Data.ToList();
                         return;
@@ -137,7 +143,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
                 var allResult = await _svcContent.GetAllExceptBlogTypes();
 
-                if (allResult.Success)
+                if (allResult.Success && allResult.Data != null)
                 {
                     Pages = allResult.Data.ToList();
                     return;
@@ -148,7 +154,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (BlogTypes.ValidBlogTypes.Contains(_contentType))
             {
                 var locationContentTypeResult = await _svcContent.GetByLocationContentType(userLocationId, _contentType);
-                if (locationContentTypeResult.Success)
+                if (locationContentTypeResult.Success && locationContentTypeResult.Data != null)
                 {
                     Pages = locationContentTypeResult.Data.ToList();
                     return;
@@ -156,9 +162,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
                 
             var locationResult = await _svcContent.GetForLocationExceptBlogTypes(userLocationId);
-            if (locationResult.Success)
+            if (locationResult.Success && locationResult.Data != null)
             {
                 Pages = locationResult.Data.ToList();
+            }
+            else
+            {
+                Log.Error($"ManagePages, Error loading pages for location {userLocationId}: {locationResult.Message}");
+                _toastService.Error("Error", $"Could not load pages: {locationResult.Message}");
             }
         }
 
@@ -291,11 +302,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task Delete(ActionEventArgs<Content> args)
         {
-            string reason = string.Empty;
             List<Content> records = await Grid.GetSelectedRecordsAsync();
-            ToastTitle = "Delete Page";
             ToastTimeout = 6000;
-            ToastContent = $"Unable to Delete. {reason}";
             foreach (var rec in records)
             {
                 try
@@ -303,7 +311,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     var deleteResult = await _svcContent.DeleteAsync(rec.ContentId);
                     if (deleteResult.Success)
                     {
-                        ToastContent = "Delete Successful!";
+                        _toastService.Success("Success", $"Page {rec.Name} deleted successfully.");
                         var locationRoute = Locations.Find(l => l.LocationId == rec.LocationId).Route;
                         var folderPath = $"{_svcEnv.ContentRootPath}/wwwroot/media{locationRoute}/{_subdirectory}/{rec.Name}";
                         FileUtil.DeleteDirectory(folderPath);
@@ -311,6 +319,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     }
                     else
                     {
+                        Log.Error("ManagePages, Could not delete: " + deleteResult.Message);
+                        _toastService.Error("Error", $"Could not delete page {rec.Name}: {deleteResult.Message}");
                         args.Cancel = true;
                         return;
                     }
@@ -318,14 +328,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex, "ManagePages, Could not delete");
+                    _toastService.Error("Error", $"Could not delete page {rec.Name}: {ex.Message}");
                     args.Cancel = true;
-                    reason = ex.Message;
-                    Log.Information($"Error: {reason}");
                     return;
                 }
-
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
             }
         }
 
