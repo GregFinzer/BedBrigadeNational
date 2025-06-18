@@ -1,14 +1,8 @@
-﻿using System.Drawing;
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using System.Security.Claims;
-using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Serilog;
-using Microsoft.AspNetCore.Components.Forms;
-using System.Net;
-using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -23,6 +17,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
+        
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -36,16 +31,24 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected override async Task OnInitializedAsync()
         {
-            Log.Information($"{_svcAuth.UserName} went to the Add/Edit Volunteer Page");
-
-            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
-            if (isNationalAdmin)
+            try
             {
-                CanSetLocation = true;
-            }
+                Log.Information($"{_svcAuth.UserName} went to the Add/Edit Volunteer Page");
 
-            await LoadLocations();
-            await LoadVolunteer();
+                bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
+                if (isNationalAdmin)
+                {
+                    CanSetLocation = true;
+                }
+
+                await LoadLocations();
+                await LoadVolunteer();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing AddEditVolunteer component");
+                _toastService.Error(ErrorTitle, "An error occurred while loading the volunteer data.");
+            }
         }
 
         private async Task LoadLocations()
@@ -58,7 +61,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
             else
             {
-                Log.Error($"Error loading locations: {result.Message}");
+                Log.Error($"AddEditVolunteer, Error loading locations: {result.Message}");
                 _toastService.Error(ErrorTitle, result.Message);
             }
         } 
@@ -75,7 +78,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 }
                 else
                 {
-                    Log.Error($"Error loading volunteer with ID {VolunteerId}: {result.Message}");
+                    Log.Error($"AddEditVolunteer, Error loading volunteer with ID {VolunteerId}: {result.Message}");
                     _toastService.Error(ErrorTitle, result.Message);
                 }
             }
@@ -126,7 +129,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     return true;
                 }
 
-                Log.Error("Could not update volunteer " + updateResult.Message);
+                Log.Error("AddEditVolunteer, Could not update volunteer " + updateResult.Message);
                 _toastService.Error(ErrorTitle, updateResult.Message);
                 return false;
             }

@@ -130,6 +130,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                 var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
                 if (result.Success)
                 {
+                    Log.Information($"{_svcAuth.UserName} queued some Bulk Emails");
                     ShowSuccess("Email successfully queued.");
                 }
                 else
