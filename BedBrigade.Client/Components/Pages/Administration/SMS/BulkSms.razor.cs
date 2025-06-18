@@ -1,11 +1,11 @@
-﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.EnumModels;
+﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 using Syncfusion.Blazor.DropDowns;
 
 namespace BedBrigade.Client.Components.Pages.Administration.SMS;
@@ -17,38 +17,71 @@ public partial class BulkSms : ComponentBase
     [Inject] private ILocationDataService _svcLocationDataService { get; set; }
     [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
     [Inject] private ISmsQueueDataService _svcSmsQueueDataService { get; set; }
-
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
     public BulkSmsModel Model { get; set; } = new();
     private bool isSuccess;
     private bool isFailure;
     private bool showPlan;
     private string message;
-    private bool isNationalAdmin;
-    private User user;
 
     protected override async Task OnInitializedAsync()
     {
-        Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
-        user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
-        Model.Body = string.Empty;
-        Model.Schedules = (await _svcScheduleDataService.GetFutureSchedulesByLocationId(user.LocationId)).Data;
-        Model.CurrentLocationId = user.LocationId;
-        isNationalAdmin = user.LocationId == Defaults.NationalLocationId;
-
-        if (isNationalAdmin)
+        try
         {
-            Model.SmsRecipientOptions = EnumHelper.GetEnumNameValues<SmsRecipientOption>();
+            Log.Information($"{_svcAuth.UserName} went to the Bulk SMS Page");
+            await LoadLocations();
+            Model.Body = string.Empty;
+            await LoadSchedules();
+            Model.CurrentLocationId = _svcAuth.LocationId;
+
+            if (_svcAuth.IsNationalAdmin)
+            {
+                Model.SmsRecipientOptions = EnumHelper.GetEnumNameValues<SmsRecipientOption>();
+            }
+            else
+            {
+                Model.SmsRecipientOptions = EnumHelper.GetEnumNameValues<SmsRecipientOption>()
+                    .Where(x => x.Value != SmsRecipientOption.Everyone).ToList();
+            }
+
+            Model.CurrentSmsRecipientOption = SmsRecipientOption.Myself;
+            Model.ShowLocationDropdown = false;
+            Model.ShowEventDropdown = false;
+            await BuildPlan();
         }
-        else
+        catch (Exception ex)
         {
-            Model.SmsRecipientOptions = EnumHelper.GetEnumNameValues<SmsRecipientOption>()
-                .Where(x => x.Value != SmsRecipientOption.Everyone).ToList();
+            Log.Error(ex, "Bulk SMS OnInitializedAsync");
+            _toastService.Error("Error", $"An error occurred while initializing the page: {ex.Message}");
+        }
+    }
+
+    private async Task LoadSchedules()
+    {
+        var scheduleResponse = await _svcScheduleDataService.GetAvailableSchedulesByLocationId(_svcAuth.LocationId);
+
+        if (!scheduleResponse.Success || scheduleResponse.Data == null)
+        {
+            Log.Error("Error loading schedules: {Message}", scheduleResponse.Message);
+            _toastService.Error("Error", $"An error occurred while loading schedules: {scheduleResponse.Message}");
+            return;
+        }
+        Model.Schedules = scheduleResponse.Data;
+    }
+
+    private async Task LoadLocations()
+    {
+        var locationResponse = await _svcLocationDataService.GetAllAsync();
+
+        if (!locationResponse.Success || locationResponse.Data == null)
+        {
+            Log.Error("Error loading locations: {Message}", locationResponse.Message);
+            _toastService.Error("Error", $"An error occurred while loading locations: {locationResponse.Message}");
+            return;
         }
 
-        Model.CurrentSmsRecipientOption = SmsRecipientOption.Myself;
-        Model.ShowLocationDropdown = false;
-        Model.ShowEventDropdown = false;
-        await BuildPlan();
+        Model.Locations = locationResponse.Data;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -64,6 +97,7 @@ public partial class BulkSms : ComponentBase
         var result = await _svcSmsQueueDataService.QueueBulkSms(Model.CurrentLocationId, phoneNumbersToSend.Data, Model.Body);
         if (result.Success)
         {
+            Log.Information($"{_svcAuth.UserName} Bulk SMS successfully queued some messages");
             ShowSuccess("Text Messages successfully queued.");
         }
         else
@@ -100,13 +134,13 @@ public partial class BulkSms : ComponentBase
     {
         Model.CurrentSmsRecipientOption = args.Value;
         Model.ShowEventDropdown = Model.CurrentSmsRecipientOption.ToString().Contains("Event");
-        Model.ShowLocationDropdown = isNationalAdmin &&
+        Model.ShowLocationDropdown = _svcAuth.IsNationalAdmin &&
                                      (Model.CurrentSmsRecipientOption.ToString().Contains("Location")
                                       || Model.CurrentSmsRecipientOption.ToString().Contains("Event"));
 
         if (!Model.ShowLocationDropdown)
         {
-            Model.CurrentLocationId = user.LocationId;
+            Model.CurrentLocationId = _svcAuth.LocationId;
         }
         await BuildPlan();
         StateHasChanged();
