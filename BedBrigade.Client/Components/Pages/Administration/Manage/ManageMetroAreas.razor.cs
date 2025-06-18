@@ -1,17 +1,9 @@
-﻿using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
-
+﻿using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
-
-using static BedBrigade.Common.Logic.Extensions;
-using ContentType = BedBrigade.Common.Enums.ContentType;
 using BedBrigade.Data.Services;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
-using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using Serilog;
 
@@ -23,7 +15,7 @@ public partial class ManageMetroAreas : ComponentBase
     [Inject] private IUserDataService? _svcUser { get; set; }
     [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
-
+    [Inject] private ToastService _toastService { get; set; }
     [Parameter] public string? Id { get; set; }
 
 
@@ -39,15 +31,10 @@ public partial class ManageMetroAreas : ComponentBase
     protected string? _state { get; set; }
     protected string? HeaderTitle { get; set; }
     protected string? ButtonTitle { get; private set; }
-    protected string? addNeedDisplay { get; private set; }
-    protected string? editNeedDisplay { get; private set; }
-    protected SfToast? ToastObj { get; set; }
-    protected string? ToastTitle { get; set; }
-    protected string? ToastContent { get; set; }
+
     protected int ToastTimeout { get; set; } = 1000;
 
     protected string? RecordText { get; set; } = "Loading Metro Areas ...";
-    protected string? Hide { get; private set; } = "true";
     public bool NoPaging { get; private set; }
 
     protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
@@ -59,8 +46,9 @@ public partial class ManageMetroAreas : ComponentBase
     /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
-        Identity = _svcAuth.CurrentUser;
-        if (Identity.IsInRole(RoleNames.NationalAdmin))
+        Log.Information($"{_svcAuth.UserName} went to the ManageMetroAreas Page");
+
+        if (_svcAuth.IsNationalAdmin)
         {
             ToolBar = new List<string>
                 { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search" };
@@ -80,7 +68,7 @@ public partial class ManageMetroAreas : ComponentBase
         }
 
         var result = await _svcMetroArea.GetAllAsync();
-        if (result.Success)
+        if (result.Success && result.Data != null)
         {
             MetroAreas = result.Data.ToList();
         }
@@ -90,7 +78,7 @@ public partial class ManageMetroAreas : ComponentBase
     {
         if (!firstRender)
         {
-            if (Identity.IsInRole(RoleNames.NationalAdmin))
+            if (_svcAuth.IsNationalAdmin)
             {
                 Grid.EditSettings.AllowEditOnDblClick = true;
                 Grid.EditSettings.AllowDeleting = true;
@@ -159,11 +147,8 @@ public partial class ManageMetroAreas : ComponentBase
 
     private async Task Delete(ActionEventArgs<MetroArea> args)
     {
-        string reason = string.Empty;
         List<MetroArea> records = await Grid.GetSelectedRecordsAsync();
-        ToastTitle = "Delete Metro Area";
         ToastTimeout = 6000;
-        ToastContent = $"Unable to Delete. {reason}";
         foreach (var rec in records)
         {
             try
@@ -171,24 +156,22 @@ public partial class ManageMetroAreas : ComponentBase
                 var deleteResult = await _svcMetroArea.DeleteAsync(rec.MetroAreaId);
                 if (deleteResult.Success)
                 {
-                    ToastContent = "Delete Successful!";
+                    _toastService.Success("Delete Metro Area", $"Metro Area {rec.Name} deleted successfully!");
                 }
                 else
                 {
+                    Log.Error($"Unable to delete Metro Area {rec.Name}. " + deleteResult.Message);
+                    _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
                     args.Cancel = true;
+                    break;
                 }
-
             }
             catch (Exception ex)
             {
                 args.Cancel = true;
-                reason = ex.Message;
-
+                Log.Error(ex, $"Unable to delete Metro Area {rec.Name}!");
+                _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
             }
-
-            await ToastObj.ShowAsync(new ToastModel
-                { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
         }
     }
 
@@ -219,36 +202,29 @@ public partial class ManageMetroAreas : ComponentBase
     {
         var result = await _svcMetroArea.CreateAsync(metroArea);
 
-        ToastTitle = "Create Metro Area";
-
         if (result.Success)
         {
-            ToastContent = "Metro Area Created Successfully!";
-            await ToastObj.ShowAsync(new ToastModel
-                { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+            _toastService.Success("Create Metro Area", "Metro Area Created Successfully!");
         }
         else
         {
-            ToastContent = result.Message;
-            await ToastObj.ShowAsync(new ToastModel
-                { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+            Log.Error("Unable to create Metro Area!" + result.Message);
+            _toastService.Error("Create Metro Area", "Unable to create Metro Area!");
         }
     }
 
     private async Task UpdateMetroAreaAsync(MetroArea metroArea)
     {
         var updateResult = await _svcMetroArea.UpdateAsync(metroArea);
-        ToastTitle = "Update Metro Area";
         if (updateResult.Success)
         {
-            ToastContent = "Metro Area Updated Successfully!";
+            _toastService.Success("Update Metro Area", "Metro Area Updated Successfully!");
         }
         else
         {
-            ToastContent = "Unable to update Metro Area!";
+            Log.Error("Unable to update Metro Area!" + updateResult.Message);
+            _toastService.Error("Update Metro Area", "Unable to update Metro Area!");
         }
-
-        await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
     }
 
 
