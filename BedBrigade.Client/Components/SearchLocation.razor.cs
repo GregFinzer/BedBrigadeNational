@@ -5,7 +5,6 @@ using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components
@@ -29,8 +28,6 @@ namespace BedBrigade.Client.Components
         SfMaskedTextBox maskObj;
 
         public int ddlValue { get; set; } = 0;
-
-        public string InputID = "input-id";
 
         private string? PostalCode { get; set; } = string.Empty;
         private string PostalCodeResult { get; set; } = string.Empty;

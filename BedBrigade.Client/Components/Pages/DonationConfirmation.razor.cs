@@ -4,6 +4,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using System.Web;
+using Serilog;
 using Stripe.Checkout;
 
 namespace BedBrigade.Client.Components.Pages;
@@ -84,6 +85,7 @@ public partial class DonationConfirmation : ComponentBase
         catch (Exception ex)
         {
             ErrorMessage = $"Error processing donation: {ex.Message}";
+            Log.Error(ex, "Error processing donation in DonationConfirmation component");
         }
 
     }
