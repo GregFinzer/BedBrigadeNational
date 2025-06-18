@@ -22,6 +22,8 @@ public partial class SmsDetails : ComponentBase, IDisposable
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+    [Inject]
+    public SmsQueueBackgroundService SmsQueueBackgroundService { get; set; }
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private ISmsState _smsState { get; set; }
     [Inject] private IAuthService? _svcAuth { get; set; }
@@ -127,6 +129,7 @@ public partial class SmsDetails : ComponentBase, IDisposable
             var response = await SendSmsLogic.SendTextMessage(locationId, phone, newMessage);
             if (response.Success)
             {
+                SmsQueueBackgroundService.SendNow();
                 newMessage = string.Empty;
                 // Refresh the conversation
                 await LoadMessages();

@@ -38,7 +38,7 @@ public class SmsQueueBackgroundService : BackgroundService
     private int _smsMaxPerChunk;
     private bool _smsUseFileMock;
     private bool _isStopping;
-    
+    private bool _sendNow;
     #endregion
 
     public SmsQueueBackgroundService(IServiceProvider serviceProvider,
@@ -52,6 +52,11 @@ public class SmsQueueBackgroundService : BackgroundService
     public void StopService()
     {
         _isStopping = true;
+    }
+
+    public void SendNow()
+    {
+        _sendNow = true;
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -94,7 +99,7 @@ public class SmsQueueBackgroundService : BackgroundService
                 }
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+            await WaitLoop(cancellationToken);
         }
     }
 
@@ -102,6 +107,23 @@ public class SmsQueueBackgroundService : BackgroundService
     #endregion
 
     #region Private Methods
+
+    private async Task WaitLoop(CancellationToken cancellationToken)
+    {
+        for (int i=0; i < 60; i++)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            if (_isStopping)
+                return;
+            if (_sendNow)
+            {
+                _sendNow = false;
+                return;
+            }
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+        }
+    }
 
     private async Task CheckMissedMessages(CancellationToken cancellationToken)
     {
