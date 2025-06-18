@@ -6,6 +6,7 @@ using System.Globalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Client.Services;
 using BedBrigade.Data.Data.Seeding;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -19,7 +20,6 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
-
         [Parameter]
         public string? LocationRoute { get; set; }
         [Parameter]
@@ -35,36 +35,43 @@ namespace BedBrigade.Client.Components.Pages
         public string? ErrorMessage { get; set; }
         public int? LocationId { get; set; }
         public string LocationName { get; set; }
-        private string previousLocation = SeedConstants.SeedNationalName;
+
         public string? BackUrl { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            string url = _nav.Uri;
+            try
+            {
+                _lc.InitLocalizedComponent(this);
 
-            ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
-            if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
-            {
-                LocationId = locationResponse.Data.LocationId;
-                LocationName = locationResponse.Data.Name;
-                await LoadContent();
-            }
-            else
-            {
-                ErrorMessage = $"Location not found: {LocationRoute}";
-            }
+                ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
+                if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
+                {
+                    LocationId = locationResponse.Data.LocationId;
+                    LocationName = locationResponse.Data.Name;
+                    await LoadContent();
+                }
+                else
+                {
+                    ErrorMessage = $"Location not found: {LocationRoute}";
+                }
 
-            if (string.IsNullOrEmpty(Filter))
-            {
-                BackUrl = $"/{LocationRoute}/Blog/{BlogType}";
+                if (string.IsNullOrEmpty(Filter))
+                {
+                    BackUrl = $"/{LocationRoute}/Blog/{BlogType}";
+                }
+                else
+                {
+                    BackUrl = $"/{LocationRoute}/Blog/{BlogType}/{Filter}";
+                }
+
+                _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
-            else
+            catch (Exception ex)
             {
-                BackUrl = $"/{LocationRoute}/Blog/{BlogType}/{Filter}";
+                ErrorMessage = $"An error occurred while loading the blog card: {ex.Message}";
+                Log.Error(ex, "BlogCard OnInitializedAsync");
             }
-            
-            _svcLanguage.LanguageChanged += OnLanguageChanged;
         }
 
         protected override void OnParametersSet()

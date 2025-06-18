@@ -12,8 +12,6 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Syncfusion.Blazor.DropDowns;
 using System.Globalization;
-using System;
-
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -44,7 +42,6 @@ namespace BedBrigade.Client.Components.Pages
         private const string AlertDanger = "alert alert-danger";
 
         private string DisplayForm = DisplayNone;
-        private string DisplayAddressMessage = DisplayNone;
         private string DisplaySearch = DisplayNone;
         private string DisplaySpeakEnglish = DisplayNone;
 
@@ -53,18 +50,12 @@ namespace BedBrigade.Client.Components.Pages
         private string ResultMessage = string.Empty;
         private string ResultDisplay = DisplayNone;
 
-        private ReCAPTCHA? reCAPTCHAComponent;
         private bool ValidReCAPTCHA = false;
-        private bool ServerVerificatiing = false;
         
-        private bool isAddressCorrect = false;
         private string? _locationQueryParm;
 
         private string MyValidationMessage = string.Empty;
         private string MyValidationDisplay = DisplayNone;
-      
-
-        private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
         private EditContext? EC { get; set; }
 
 
@@ -74,10 +65,6 @@ namespace BedBrigade.Client.Components.Pages
             { "rows", "4" },
         };
 
-        protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
-        {
-           { "font-weight", "bold" },
-        };
 
         protected Dictionary<string, object> htmlattributeSize = new Dictionary<string, object>()
         {
@@ -92,27 +79,36 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            newRequest = new Common.Models.NewBedRequest();
-            EC = new EditContext(newRequest);
-            _validationMessageStore = new ValidationMessageStore(EC);
-
-            if (!string.IsNullOrEmpty(PreloadLocation))
+            try
             {
-                _locationQueryParm = PreloadLocation;
-            }
-            else
-            {
-                var uri = _nav.ToAbsoluteUri(_nav.Uri);
+                _lc.InitLocalizedComponent(this);
+                newRequest = new Common.Models.NewBedRequest();
+                EC = new EditContext(newRequest);
+                _validationMessageStore = new ValidationMessageStore(EC);
 
-                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+                if (!string.IsNullOrEmpty(PreloadLocation))
                 {
-                    _locationQueryParm = locationQueryParm;
+                    _locationQueryParm = PreloadLocation;
                 }
+                else
+                {
+                    var uri = _nav.ToAbsoluteUri(_nav.Uri);
+
+                    if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+                    {
+                        _locationQueryParm = locationQueryParm;
+                    }
+                }
+                await LoadConfiguration();
+                _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
-            await LoadConfiguration();
-            _svcLanguage.LanguageChanged += OnLanguageChanged;
-            base.OnInitialized();
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing BedRequest component");
+                ResultMessage = "Error initializing BedRequest component";
+                AlertType = AlertDanger;
+                ResultDisplay = "";
+            }
         }
 
         private async Task OnLanguageChanged(CultureInfo arg)

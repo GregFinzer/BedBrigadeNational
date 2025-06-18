@@ -618,7 +618,7 @@ span.field-validation-error {
 }
 
 .request-img-rotate {
-  margin: 0 0 80px;
+  margin: 0 0 10px;
   overflow: hidden;
   position: relative;
   border-bottom: 15px solid #0e9249;
