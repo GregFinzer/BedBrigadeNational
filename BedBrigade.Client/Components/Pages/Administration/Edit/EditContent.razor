@@ -1,5 +1,5 @@
 ﻿@layout Layout.AdminLayout
-@page "/administration/edit/editcontent/{LocationId}/{ContentName}"
+@page "/administration/edit/editcontent/{LocationId:int}/{ContentName}"
 @using ContentType = BedBrigade.Common.Enums.ContentType
 <CheckAuth Roles=@RoleNames.CanManagePages></CheckAuth>
 

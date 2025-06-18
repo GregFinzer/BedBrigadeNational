@@ -63,7 +63,22 @@ namespace BedBrigade.Data.Services
                 return null;
             }
         }
-        
+
+        public string? UserRoute
+        {
+            get
+            {
+                if (CurrentUser != null
+                    && CurrentUser.Identity != null
+                    && CurrentUser.Identity.IsAuthenticated)
+                {
+                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == "UserRoute")?.Value;
+                }
+
+                return null;
+            }
+        }
+
         public string UserName
         {
             get

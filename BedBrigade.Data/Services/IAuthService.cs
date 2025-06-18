@@ -10,6 +10,7 @@ namespace BedBrigade.Data.Services
         string UserName { get; }
         string Email { get; }
         string? UserRole { get; }
+        string? UserRoute { get; }
         string TimeZoneId { get; }
         string Phone { get; }
         bool IsNationalAdmin { get; }
