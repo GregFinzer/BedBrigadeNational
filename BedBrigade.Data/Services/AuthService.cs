@@ -229,8 +229,13 @@ namespace BedBrigade.Data.Services
         }
 
 
-        public async Task Login(ClaimsPrincipal user)
+        public async Task Login(ClaimsPrincipal? user)
         {
+            if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                throw new ArgumentException("User must be authenticated to login.");
+            }
+
             //Update the Blazor Server State for the user
             CurrentUser = user;
 

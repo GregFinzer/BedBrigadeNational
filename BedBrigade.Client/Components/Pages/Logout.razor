@@ -1,21 +1,36 @@
 ﻿@page "/logout"
-@using BedBrigade.Client.Services
-@using Microsoft.AspNetCore.Authentication
+@using Serilog
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
 
 @code {
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private IAuthService AuthService { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthService.IsLoggedIn)
+        try
         {
-            await AuthService.LogoutAsync();
-            NavigationManager.NavigateTo("/");
+            if (AuthService.IsLoggedIn)
+            {
+                await AuthService.LogoutAsync();
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            NavigationManager.NavigateTo("/");
+            Log.Logger.Error(ex, $"Logout.OnInitializedAsync");
+            ErrorMessage = "An error occurred while trying to log out. Please try again later.";
         }
     }
 

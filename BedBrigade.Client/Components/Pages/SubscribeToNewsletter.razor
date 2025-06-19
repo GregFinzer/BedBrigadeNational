@@ -1,6 +1,7 @@
 ﻿@page "/SubscribeToNewsletter"
 @layout Layout.NoHeaderFooterLayout
 @using System.ComponentModel.DataAnnotations
+@using Serilog
 @inject ISubscriptionDataService SubscriptionDataService
 @inject ILanguageContainerService _lc
 
@@ -43,17 +44,33 @@
 
     private async Task HandleSubmit()
     {
-        if (locationId == 0)
-            message = "locationId is required.";
+        try
+        {
+            if (locationId == 0)
+                message = "locationId is required.";
 
-        if (string.IsNullOrEmpty(newsletterName))
-            message = "newsletterName is required.";
+            if (string.IsNullOrEmpty(newsletterName))
+                message = "newsletterName is required.";
 
-        // Call the subscription service using the query parameter values and the email from the form.
-        var result = await SubscriptionDataService.Subscribe(locationId, newsletterName, subscriptionModel.Email);
-        message = result.Success 
-            ? "Thank you for subscribing!" 
-            : $"There was an error processing your subscription. Please try again. {result.Message}";
+            // Call the subscription service using the query parameter values and the email from the form.
+            var result = await SubscriptionDataService.Subscribe(locationId, newsletterName, subscriptionModel.Email);
+
+            if (result.Success)
+            {
+                message = "Thank you for subscribing!";
+            }
+            else
+            {
+                message = $"There was an error processing your subscription. Please try again. {result.Message}";
+                Log.Error("SubscribeToNewsletter.HandleSubmit: " + result.Message);
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            message = $"There was an error processing your subscription. Please try again. {ex.Message}";
+            Log.Error(ex, "SubscribeToNewsletter.HandleSubmit");
+        }
     }
 
     public class SubscriptionModel

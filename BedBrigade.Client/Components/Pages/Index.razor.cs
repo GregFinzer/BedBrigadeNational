@@ -10,7 +10,6 @@ using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Client.Components.Pages;
 
-
 public partial class Index : ComponentBase, IDisposable
 {
     [Inject] private ILocationDataService _svcLocation { get; set; }
@@ -26,6 +25,7 @@ public partial class Index : ComponentBase, IDisposable
     [Inject] private ILanguageService _svcLanguage { get; set; }
 
     [Inject] private ITranslationDataService _translateLogic { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
 
     [Parameter] public string? LocationRoute { get; set; }
     [Parameter] public string? PageName { get; set; }
@@ -40,53 +40,74 @@ public partial class Index : ComponentBase, IDisposable
     private string _previousBodyContent = null;
     private string _bodyContent = string.Empty;
     private string _currentPageTitle = string.Empty;
+    private const string ErrorTitle = "Error";
+    private const string ErrorMessage = "An error occurred while loading the page. Please try again later.";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
+    {
+        _svcLanguage.LanguageChanged += OnLanguageChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         await PopulateCurrentLocationAndPageName();
-        await LoadLocationPage(_currentLocation, _currentPageName);
-        _svcLanguage.LanguageChanged += OnLanguageChanged;
+
+        _locationState.Location = _currentLocation;
+
+        if (_previousLocation.ToLower() != _currentLocation.ToLower() ||
+            _previousPageName.ToLower() != _currentPageName.ToLower())
+        {
+            await LoadLocationPage(_currentLocation, _currentPageName);
+        }
     }
 
     private async Task PopulateCurrentLocationAndPageName()
     {
-        //No route, this is /
-        if (string.IsNullOrEmpty(LocationRoute) && string.IsNullOrEmpty(PageName))
+        try
         {
-            _currentLocation = DefaultLocation;
-            _currentPageName = DefaultPageName;
-        }
-        //Both the Location and Page are populated
-        //Example:  /grove-city/donations
-        else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
-        {
-            _currentLocation = LocationRoute;
-            _currentPageName = PageName;
-        }
-        else if (string.IsNullOrEmpty(PageName))
-        {
-            var locationsResponse = await _svcLocation.GetAllAsync();
-
-            //This is a location home page
-            //Example: /grove-city
-            if (locationsResponse.Success && locationsResponse.Data != null &&
-                locationsResponse.Data.Any(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower()))
-            {
-                _currentLocation = LocationRoute;
-                _currentPageName = DefaultPageName;
-            }
-            //This is a national level page
-            //Example:  /AboutUs
-            else
+            //No route, this is /
+            if (string.IsNullOrEmpty(LocationRoute) && string.IsNullOrEmpty(PageName))
             {
                 _currentLocation = DefaultLocation;
-                _currentPageName = LocationRoute;
+                _currentPageName = DefaultPageName;
+            }
+            //Both the Location and Page are populated
+            //Example:  /grove-city/donations
+            else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
+            {
+                _currentLocation = LocationRoute;
+                _currentPageName = PageName;
+            }
+            else if (string.IsNullOrEmpty(PageName))
+            {
+                var locationsResponse = await _svcLocation.GetAllAsync();
+
+                //This is a location home page
+                //Example: /grove-city
+                if (locationsResponse.Success && locationsResponse.Data != null &&
+                    locationsResponse.Data.Any(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower()))
+                {
+                    _currentLocation = LocationRoute;
+                    _currentPageName = DefaultPageName;
+                }
+                //This is a national level page
+                //Example:  /AboutUs
+                else
+                {
+                    _currentLocation = DefaultLocation;
+                    _currentPageName = LocationRoute;
+                }
+            }
+            else
+            {
+                _currentLocation = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
+                _currentPageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
             }
         }
-        else
+        catch (Exception ex)
         {
-            _currentLocation = string.IsNullOrEmpty(LocationRoute) ? DefaultLocation : LocationRoute;
-            _currentPageName = string.IsNullOrEmpty(PageName) ? DefaultPageName : PageName;
+            Log.Logger.Error(ex, $"Index.PopulateCurrentLocationAndPageName");
+            _toastService.Error(ErrorTitle, ErrorMessage);
         }
     }
 
@@ -103,17 +124,7 @@ public partial class Index : ComponentBase, IDisposable
         _svcLanguage.LanguageChanged -= OnLanguageChanged;
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        await PopulateCurrentLocationAndPageName();
 
-        _locationState.Location = _currentLocation;
-
-        if (_previousLocation.ToLower() != _currentLocation.ToLower() || _previousPageName.ToLower() != _currentPageName.ToLower())
-        {
-            await LoadLocationPage(_currentLocation, _currentPageName);
-        }
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -157,10 +168,9 @@ public partial class Index : ComponentBase, IDisposable
                 _navigationManager.NavigateTo(sorryPageUrl, true);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Log.Logger.Error(ex, $"LoadLocationPage: {ex.Message}");
-            throw;
+            //Eat the exception and redirect to the sorry page
         }
     }
 
@@ -218,7 +228,7 @@ public partial class Index : ComponentBase, IDisposable
         ServiceResponse<Location> locationResponse)
     {
         var contentResult = await _svcContent.GetAsync(pageName, locationResponse.Data.LocationId);
-        if (contentResult.Success)
+        if (contentResult.Success && contentResult.Data != null)
         {
             var path = $"/{location}/pages/{pageName}";
             string html = await ReplaceHtmlControls(path, locationResponse, contentResult.Data.ContentHtml);
@@ -255,8 +265,5 @@ public partial class Index : ComponentBase, IDisposable
         html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
         return html;
     }
-
-
-
 } 
 

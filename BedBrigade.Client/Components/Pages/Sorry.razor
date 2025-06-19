@@ -61,26 +61,32 @@ else
     } // init
 
     private async void CheckLocationStatus(string location)
-    {        
-        // location can be not active or not exists
-        var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
-        if (locationResponse.Message.ToLower().Contains("not found"))
+    {
+        try
         {
-            IsLocationActive = false;
-            HomeUrl = $"/"; // return to national home
-        }
-        else
-        {
-            if (locationResponse.Success && locationResponse.Data != null)
+            // location can be not active or not exists
+            var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+            if (locationResponse.Message.ToLower().Contains("not found"))
             {
-                IsLocationActive = locationResponse.Data.IsActive;
-                if (!IsLocationActive)
+                IsLocationActive = false;
+                HomeUrl = $"/"; // return to national home
+            }
+            else
+            {
+                if (locationResponse.Success && locationResponse.Data != null)
                 {
-                    HomeUrl = $"/"; // return to national home
+                    IsLocationActive = locationResponse.Data.IsActive;
+                    if (!IsLocationActive)
+                    {
+                        HomeUrl = $"/"; // return to national home
+                    }
                 }
             }
         }
-
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"Sorry.CheckLocationStatus");
+        }
     } // location status
 
 }

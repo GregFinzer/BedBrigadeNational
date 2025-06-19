@@ -17,7 +17,7 @@ namespace BedBrigade.Data.Services
 
         Task<bool> GetStateFromTokenAsync();
         Task LogoutAsync(); 
-        Task Login(ClaimsPrincipal user);
+        Task Login(ClaimsPrincipal? user);
 
         event Func<ClaimsPrincipal, Task> AuthChanged;
         Task NotifyAuthChangedAsync();
