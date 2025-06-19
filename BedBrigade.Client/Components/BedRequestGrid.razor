@@ -60,7 +60,7 @@ else
                                     BedRequest BedRequest = (context as BedRequest)!;
                                     if(BedRequest.LocationId == (int) LocationNumber.National)
                                     {
-                                        BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+                                        BedRequest.LocationId = _svcAuth.LocationId;
 
                                     }
                                      <div class="row">

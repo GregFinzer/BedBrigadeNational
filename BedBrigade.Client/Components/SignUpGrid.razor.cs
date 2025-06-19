@@ -54,7 +54,6 @@ public partial class SignUpGrid : ComponentBase
 
     // variables
 
-    private ClaimsPrincipal? Identity { get; set; }
     protected string? RecordText { get; set; } = "Loading Schedules ...";
     public bool DataStatus = true;
 
@@ -191,7 +190,6 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        Identity = _svcAuth.CurrentUser;
         userLocationId =  _svcUser.GetUserLocationId();
         userName = _svcUser.GetUserName();
         userRole = _svcUser.GetUserRole();
@@ -206,7 +204,6 @@ public partial class SignUpGrid : ComponentBase
             Text = CaptionDelete, Id = "delete", TooltipText = "Delete Volunteer from selected Event",
             PrefixIcon = "e-delete"
         });
-        //Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel() { Text = "Print", Id = "print", TooltipText = "Print Grid Data" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
             { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
@@ -219,16 +216,10 @@ public partial class SignUpGrid : ComponentBase
     {
         get
         {
-            if (Identity == null)
-            {
-                return false;
-            }
-
-            return Identity.IsInRole(RoleNames.LocationAdmin)
-                   || Identity.IsInRole(RoleNames.LocationAuthor)
-                   || Identity.IsInRole(RoleNames.LocationScheduler);
+            return _svcAuth.UserHasRole(RoleNames.CanManageSchedule);
         }
     }
+
     private async Task LoadLocations()
     {
         var dataLocations = await _svcLocation!.GetAllAsync();

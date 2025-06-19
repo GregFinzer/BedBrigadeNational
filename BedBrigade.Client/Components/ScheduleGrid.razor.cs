@@ -27,7 +27,6 @@ namespace BedBrigade.Client.Components
         [Inject] private ILanguageContainerService _lc { get; set; }
 
         protected SfGrid<Schedule>? Grid { get; set; }
-        private ClaimsPrincipal? Identity { get; set; }
         protected List<Schedule>? lstSchedules { get; set; }
         protected List<Location>? lstLocations;
 
@@ -101,11 +100,9 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadUserData()
         {
-            Identity = _svcAuth.CurrentUser;
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Schedules Page");
+            Log.Information($"{_svcAuth.UserName} went to the Manage Schedules Page");
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 //ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -118,24 +115,24 @@ namespace BedBrigade.Client.Components
 
 
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
+            if (_svcAuth.IsNationalAdmin) // not perfect! for initial testing
             {
                 userRole = RoleNames.NationalAdmin;
             }
             else // Location User
             {
-                if (Identity.IsInRole(RoleNames.LocationAdmin))
+                if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
                 {
                     userRole = RoleNames.LocationAdmin;
                     isLocationAdmin = true;
                 }
 
-                if (Identity.IsInRole(RoleNames.LocationAuthor))
+                if (_svcAuth.UserHasRole(RoleNames.LocationAuthor))
                 {
                     userRole = RoleNames.LocationAuthor;
                     isLocationAdmin = true;
                 }
-                if (Identity.IsInRole(RoleNames.LocationScheduler))
+                if (_svcAuth.UserHasRole(RoleNames.LocationScheduler))
                 {
                     userRole = RoleNames.LocationScheduler;
                     isLocationAdmin = true;
@@ -175,7 +172,7 @@ namespace BedBrigade.Client.Components
             try 
             {
                 ServiceResponse<List<Schedule>> recordResult;
-                if (Identity.IsInRole(RoleNames.NationalAdmin))
+                if (_svcAuth.IsNationalAdmin)
                 {
                     recordResult = await _svcSchedule.GetAllAsync(); 
                 }

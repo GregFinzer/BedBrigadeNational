@@ -36,7 +36,7 @@ namespace BedBrigade.Client.Components
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected List<Location>? Locations { get; set; }
         protected List<MetroArea>? MetroAreas { get; set; }
         protected List<TimeZoneItem> TimeZones { get; set; }
@@ -67,8 +67,7 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
-            if (Identity.IsInRole(RoleNames.NationalAdmin))
+            if (_svcAuth.IsNationalAdmin)
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -105,7 +104,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.NationalAdmin))
+                if (_svcAuth.IsNationalAdmin)
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;

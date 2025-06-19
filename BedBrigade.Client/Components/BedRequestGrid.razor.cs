@@ -39,7 +39,7 @@ namespace BedBrigade.Client.Components
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected List<BedRequest>? BedRequests { get; set; }
         protected List<Location>? Locations { get; set; }
         protected SfGrid<BedRequest>? Grid { get; set; }
@@ -85,10 +85,7 @@ namespace BedBrigade.Client.Components
             try
             {
                 _lc.InitLocalizedComponent(this);
-                Identity = _svcAuth.CurrentUser;
-                var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
-                               Defaults.DefaultUserNameAndEmail;
-                Log.Information($"{userName} went to the Manage Bed Requests Page");
+                Log.Information($"{_svcAuth.UserName} went to the Manage Bed Requests Page");
 
                 SetupToolbar();
                 await LoadConfiguration();
@@ -193,7 +190,7 @@ namespace BedBrigade.Client.Components
 
         private void SetupToolbar()
         {
-            if (Identity.HasRole(RoleNames.CanManageBedRequests))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Sort Waiting Closest" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -209,7 +206,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
+                if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -362,8 +359,8 @@ namespace BedBrigade.Client.Components
         private void Add()
         {
             HeaderTitle = @_lc.Keys["Add"]+" "+ @_lc.Keys["BedRequest"];
-            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"]; 
-            BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
+            BedRequest.LocationId = _svcAuth.LocationId;
             BedRequest.PrimaryLanguage = "English";
         }
 

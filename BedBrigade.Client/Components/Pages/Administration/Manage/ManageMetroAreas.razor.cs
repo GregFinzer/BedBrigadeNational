@@ -23,7 +23,6 @@ public partial class ManageMetroAreas : ComponentBase
     private const string PrevPage = "PrevPage";
     private const string NextPage = "NextPage";
     private const string FirstPage = "First";
-    private ClaimsPrincipal? Identity { get; set; }
     protected List<MetroArea>? MetroAreas { get; set; }
     protected SfGrid<MetroArea>? Grid { get; set; }
     protected List<string>? ToolBar;

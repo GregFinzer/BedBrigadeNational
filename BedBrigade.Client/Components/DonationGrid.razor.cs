@@ -1,20 +1,13 @@
 using System.Collections;
-using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Linq;
-using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
-using static System.Net.Mime.MediaTypeNames;
 using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
-using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components
 {
@@ -27,7 +20,6 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-        [Inject] private NavigationManager? _navManager { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Parameter] public string? Id { get; set; }
@@ -38,7 +30,7 @@ namespace BedBrigade.Client.Components
         private const string FirstPage = "First";
         private const string SendTaxForm = "Send Tax Form";
 
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected List<Donation>? Donations { get; set; }
         protected List<Location>? Locations { get; set; }
         protected List<DonationCampaign>? DonationCampaigns { get; set; } 
@@ -48,11 +40,10 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
+
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? RecordText { get; set; } = "Loading Donations ...";
-        protected string? Hide { get; private set; } = "true";
+
         public bool NoPaging { get; private set; }
         public bool TaxIsVisible { get; private set; }
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "400px" };
@@ -66,16 +57,33 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
+            try
+            {
+                _lc.InitLocalizedComponent(this);
+                Log.Information($"{_svcAuth.UserName} went to the Manage Donations Page");
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Donations Page");
+                SetupAccess();
+                await LoadDonations();
+                await LoadLocations();
+                await LoadDonationCampaigns();
 
-            SetupAccess();
-            await LoadDonations();
-            await LoadLocations();
-            await LoadDonationCampaigns();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing DonationGrid component");
+                _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
+            }
+            finally
+            {
+                if (Donations != null && Donations.Count > 0)
+                {
+                    RecordText = $"{Donations.Count} Donation records found";
+                }
+                else
+                {
+                    RecordText = "No Donation records found";
+                }
+            }
         }
 
         private async Task UpdateFilteredSum()
@@ -109,7 +117,7 @@ namespace BedBrigade.Client.Components
         private async Task LoadDonationCampaigns()
         {
             var result = await _svcDonationCampaign.GetAllAsync();
-            if (result.Success)
+            if (result.Success && result.Data != null)
             {
                 DonationCampaigns = result.Data.ToList();
                 var item = DonationCampaigns.Single(r => r.LocationId == (int)LocationNumber.National);
@@ -117,6 +125,12 @@ namespace BedBrigade.Client.Components
                 {
                     DonationCampaigns.Remove(item);
                 }
+            }
+            else
+            {
+                Log.Error($"Error loading donation campaigns: {result.Message}");
+                _toastService.Error("Error loading donation campaigns", "An error occurred while loading donation campaigns. Please try again later.");
+                DonationCampaigns = new List<DonationCampaign>();
             }
 
             bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
@@ -138,7 +152,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
+                if (_svcAuth.UserHasRole(RoleNames.CanManageDonations))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -154,7 +168,7 @@ namespace BedBrigade.Client.Components
         private async Task LoadLocations()
         {
             var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
+            if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data.ToList();
                 var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
@@ -162,6 +176,12 @@ namespace BedBrigade.Client.Components
                 {
                     Locations.Remove(item);
                 }
+            }
+            else
+            {
+                Log.Error($"Error loading locations: {locationResult.Message}");
+                _toastService.Error("Error loading locations", "An error occurred while loading locations. Please try again later.");
+                Locations = new List<Location>();
             }
 
             bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
@@ -179,25 +199,37 @@ namespace BedBrigade.Client.Components
             {
                 var allResult = await _svcDonation.GetAllAsync();
 
-                if (allResult.Success)
+                if (allResult.Success && allResult.Data != null)
                 {
                     Donations = allResult.Data.ToList();
+                }
+                else
+                {
+                    Log.Error($"Error loading donations: {allResult.Message}");
+                    _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
+                    Donations = new List<Donation>();
                 }
             }
             else
             {
                 int userLocationId = _svcUser.GetUserLocationId();
                 var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
-                if (contactUsResult.Success)
+                if (contactUsResult.Success && contactUsResult.Data != null)
                 {
                     Donations = contactUsResult.Data.ToList();
+                }
+                else
+                {
+                    Log.Error($"Error loading donations for location {userLocationId}: {contactUsResult.Message}");
+                    _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
+                    Donations = new List<Donation>();
                 }
             }
         }
 
         private void SetupAccess()
         {
-            if (Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationTreasurer))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageDonations))
             {
                 ToolBar = new List<string> { SendTaxForm, "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<object> {"Edit", 
@@ -339,7 +371,7 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Add Donation";
             ButtonTitle = "Add";
-            Donation.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+            Donation.LocationId = _svcAuth.LocationId;
         }
 
         protected async Task Cancel()

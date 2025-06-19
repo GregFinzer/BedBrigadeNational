@@ -87,7 +87,7 @@ else
                                     Donation donation = (context as Donation)!;
                                     if (donation.LocationId == (int)LocationNumber.National || donation.LocationId == 0)
                                     {
-                                        donation.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+                                        donation.LocationId = _svcAuth.LocationId;
                                     }
 
                                     <div class="row">

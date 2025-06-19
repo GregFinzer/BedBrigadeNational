@@ -32,7 +32,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
         protected List<Content>? Pages { get; set; }
         protected Content content { get; set; }
         protected Content CurrentValues { get; set; }
@@ -87,9 +86,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
                 _subdirectory = BlogTypes.ValidBlogTypes.Contains(_contentType) ? _contentType.ToString() : "pages";
 
-                Identity = _svcAuth.CurrentUser;
-
-                if (Identity.HasRole(RoleNames.CanManagePages))
+                if (_svcAuth.UserHasRole(RoleNames.CanManagePages))
                 {
                     ToolBar = new List<string> { "Add", "Edit", "Rename", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                     ContextMenu = new List<string> { "Edit", "Rename", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -177,7 +174,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             if (!firstRender)
             {
-                if (Identity.HasRole(RoleNames.CanManagePages))
+                if (_svcAuth.UserHasRole(RoleNames.CanManagePages))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;

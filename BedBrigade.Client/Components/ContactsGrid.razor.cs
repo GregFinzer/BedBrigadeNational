@@ -1,13 +1,10 @@
-using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -24,14 +21,13 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
-
+        [Inject] private ToastService _toastService { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
         protected List<ContactUs>? Contacts { get; set; }
         protected List<Location>? Locations { get; set; }
         protected SfGrid<ContactUs>? Grid { get; set; }
@@ -42,16 +38,9 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
         protected bool OnlyRead { get; set; } = false;
 
         protected string? RecordText { get; set; } = "Loading Contacts ...";
-        protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public List<EnumNameValue<ContactUsStatus>> ContactUsStatuses { get; private set; }
 
@@ -64,28 +53,32 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
+            try
+            {
+                _lc.InitLocalizedComponent(this);
+                Log.Information($"{_svcAuth.UserName} went to the Manage Contact Page");
 
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ??
-                           Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Contact Page");
+                SetupToolbar();
 
-            SetupToolbar();
+                await LoadContacts();
+                await LoadLocations();
 
-            await LoadContacts();
-            await LoadLocations();
-
-            ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
+                ContactUsStatuses = EnumHelper.GetEnumNameValues<ContactUsStatus>();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ContactsGrid component");
+                _toastService.Error("Error",ex.Message);
+            }
         }
 
         private async Task LoadLocations()
         {
             var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
+            if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.FirstOrDefault(r => r.LocationId == (int)LocationNumber.National);
                 if (item != null)
                 {
                     Locations.Remove(item);
@@ -101,7 +94,7 @@ namespace BedBrigade.Client.Components
             {
                 var allResult = await _svcContactUs.GetAllAsync();
 
-                if (allResult.Success)
+                if (allResult.Success && allResult.Data != null)
                 {
                     Contacts = allResult.Data.ToList();
                 }
@@ -119,7 +112,7 @@ namespace BedBrigade.Client.Components
 
         private void SetupToolbar()
         {
-            if (Identity.HasRole(RoleNames.CanManageContacts))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
             {
                 ToolBar = new List<string>
                     { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
@@ -127,7 +120,7 @@ namespace BedBrigade.Client.Components
                 {
                     "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
                     "SortDescending"
-                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }; 
             }
             else
             {
@@ -135,7 +128,7 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string>
                 {
                     FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
-                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }; 
             }
         }
 
@@ -143,7 +136,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
+                if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -247,23 +240,33 @@ namespace BedBrigade.Client.Components
 
         private async Task Delete(ActionEventArgs<ContactUs> args)
         {
-            List<ContactUs> records = await Grid.GetSelectedRecordsAsync();
-            foreach (var rec in records)
+            try
             {
-                var deleteResult = await _svcContactUs.DeleteAsync(rec.ContactUsId);
-                ToastTitle = "Delete ContactUs";
-                if (deleteResult.Success)
+                List<ContactUs> records = await Grid.GetSelectedRecordsAsync();
+                foreach (var rec in records)
                 {
-                    ToastContent = "Delete Successful!";
+                    var deleteResult = await _svcContactUs.DeleteAsync(rec.ContactUsId);
+                    if (deleteResult.Success)
+                    {
+                        _toastService.Success("Delete ContactUs",
+                            $"ContactUs {rec.FirstName} + {rec.LastName} deleted successfully.");
+                    }
+                    else
+                    {
+                        Log.Error(
+                            $"Unable to delete ContactUs {rec.FirstName} + {rec.LastName}. Error: {deleteResult.Message}");
+                        _toastService.Error("Delete ContactUs",
+                            $"Unable to delete ContactUs {rec.FirstName} + {rec.LastName}. Error: {deleteResult.Message}");
+                        args.Cancel = true;
+                    }
                 }
-                else
-                {
-                    ToastContent = $"Unable to Delete. ContactUs is in use.";
-                    args.Cancel = true;
-                }
-                ToastTimeout = 6000;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error deleting ContactUs record");
+                _toastService.Error("Delete ContactUs", ex.Message);
+                args.Cancel = true;
             }
         }
 
@@ -271,49 +274,62 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = "Add ContactUs";
             ButtonTitle = "Add ContactUs";
-            ContactUs.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+            ContactUs.LocationId = _svcAuth.LocationId;
         }
 
 
         private async Task Save(ActionEventArgs<ContactUs> args)
         {
-            ContactUs contactUs = args.Data;
-            contactUs.Phone = contactUs.Phone.FormatPhoneNumber();
-            if (contactUs.ContactUsId != 0)
+            try
             {
-                //Update ContactUs Record
-                var updateResult = await _svcContactUs.UpdateAsync(contactUs);
-                ToastTitle = "Update ContactUs";
-                if (updateResult.Success)
-                {
-                    ToastContent = "ContactUs Updated Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to update ContactUs!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-            }
-            else
-            {
-                // new ContactUs
-                var result = await _svcContactUs.CreateAsync(contactUs);
-                if (result.Success)
-                {
-                    contactUs = result.Data;
-                }
-                ToastTitle = "Create ContactUs";
+                ContactUs contactUs = args.Data;
+                contactUs.Phone = contactUs.Phone.FormatPhoneNumber();
                 if (contactUs.ContactUsId != 0)
                 {
-                    ToastContent = "ContactUs Created Successfully!";
+                    //Update ContactUs Record
+                    var updateResult = await _svcContactUs.UpdateAsync(contactUs);
+                    if (updateResult.Success)
+                    {
+                        _toastService.Success("Update ContactUs",
+                            $"ContactUs {contactUs.FirstName} {contactUs.LastName} updated successfully.");
+                    }
+                    else
+                    {
+                        Log.Error(
+                            $"Unable to update ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {updateResult.Message}");
+                        _toastService.Error("Update ContactUs",
+                            $"Unable to update ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {updateResult.Message}");
+                        args.Cancel = true;
+                    }
                 }
                 else
                 {
-                    ToastContent = "Unable to save ContactUs!";
+                    // new ContactUs
+                    var result = await _svcContactUs.CreateAsync(contactUs);
+                    if (result.Success)
+                    {
+                        _toastService.Success("Add ContactUs",
+                            $"ContactUs {contactUs.FirstName} {contactUs.LastName} added successfully.");
+                    }
+                    else
+                    {
+                        Log.Error(
+                            $"Unable to add ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {result.Message}");
+                        _toastService.Error("Add ContactUs",
+                            $"Unable to add ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {result.Message}");
+                        args.Cancel = true;
+                    }
                 }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+
+                await Grid.Refresh();
+
             }
-            await Grid.Refresh();
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error saving ContactUs record");
+                _toastService.Error("Error with Save ContactUs", ex.Message);
+                args.Cancel = true;
+            }
         }
 
         private void BeginEdit()

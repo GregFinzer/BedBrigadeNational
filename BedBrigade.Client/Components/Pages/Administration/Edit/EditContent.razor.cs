@@ -33,7 +33,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private string? Body { get; set; }
         private Content? Content { get; set; }
         private Dictionary<string, string>? ImageButtonList { get; set; } = null;
-        private ClaimsPrincipal? Identity { get; set; }
+
         private bool Refreshed { get; set; }
         SfDialog MediaDialog;
         public string FolderPath { get; set; }
@@ -104,7 +104,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             {
                 Log.Information($"{_svcAuth.UserName} went to the EditContent Page for location id {LocationId} for content name {ContentName}");
                 Refreshed = false;
-                Identity = _svcAuth.CurrentUser;
 
                 _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
                 _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
@@ -136,7 +135,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     Body = await ProcessHtml(Content.ContentHtml);
 
                     Content.UpdateDate = DateTime.UtcNow;
-                    Content.UpdateUser = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                    Content.UpdateUser = _svcAuth.UserName;
                     ImageButtonList = GetImageButtonList(Body);
                 }
                 else
