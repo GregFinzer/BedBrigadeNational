@@ -5,6 +5,7 @@ using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -25,38 +26,47 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
-
-            if (!locationResponse.Success)
+            try
             {
-                _navigationManager.NavigateTo($"/Sorry/{LocationRoute}/events");
+                _lc.InitLocalizedComponent(this);
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
+
+                if (!locationResponse.Success)
+                {
+                    _navigationManager.NavigateTo($"/Sorry/{LocationRoute}/events");
+                }
+
+                var allEventsResponse =
+                    await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
+
+                if (!allEventsResponse.Success)
+                {
+                    _toastService.Error("Error", allEventsResponse.Message);
+                    return;
+                }
+
+                _locationState.Location = LocationRoute;
+
+                // Filter and sort events by date
+                DeliveryEvents = allEventsResponse.Data
+                    .Where(e => e.EventType == EventType.Delivery &&
+                                e.EventStatus == EventStatus.Scheduled
+                                && e.EventDateScheduled < DateTime.Now.AddMonths(7))
+                    .OrderBy(e => e.EventDateScheduled)
+                    .ToList();
+
+                BuildEvents = allEventsResponse.Data
+                    .Where(e => e.EventType == EventType.Build &&
+                                e.EventStatus == EventStatus.Scheduled
+                                && e.EventDateScheduled < DateTime.Now.AddMonths(7))
+                    .OrderBy(e => e.EventDateScheduled)
+                    .ToList();
             }
-
-            var allEventsResponse = await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
-
-            if (!allEventsResponse.Success)
+            catch (Exception ex)
             {
-                _toastService.Error("Error", allEventsResponse.Message);
-                return;
+                Log.Logger.Error(ex, $"UpcomingEvents.OnInitializedAsync");
+                _toastService.Error("Error", "An error occurred while loading upcoming events.");
             }
-
-            _locationState.Location = LocationRoute;
-
-            // Filter and sort events by date
-            DeliveryEvents = allEventsResponse.Data
-                .Where(e => e.EventType == EventType.Delivery &&
-                            e.EventStatus == EventStatus.Scheduled
-                            && e.EventDateScheduled < DateTime.Now.AddMonths(7))
-                .OrderBy(e => e.EventDateScheduled)
-                .ToList();
-
-            BuildEvents = allEventsResponse.Data
-                .Where(e => e.EventType == EventType.Build &&
-                            e.EventStatus == EventStatus.Scheduled
-                            && e.EventDateScheduled < DateTime.Now.AddMonths(7))
-                .OrderBy(e => e.EventDateScheduled)
-                .ToList();
         }
 
         private async Task ScrollToBuilds()
