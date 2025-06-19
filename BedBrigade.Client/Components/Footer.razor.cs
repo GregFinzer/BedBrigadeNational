@@ -15,7 +15,6 @@ namespace BedBrigade.Client.Components
         private string footerContent = string.Empty;
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] NavigationManager _nm { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
 
@@ -42,23 +41,30 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
-            var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
+            try
+            {
+                string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
+                var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
-            if (!locationResult.Success)
-            {
-                Log.Logger.Error($"Error loading Footer location: {locationResult.Message}");
-            }
-            else
-            {
-                if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                if (!locationResult.Success && locationResult.Data != null)
                 {
-                    await LoadDefaultContent(locationResult, locationName);
+                    Log.Logger.Error($"Error loading Footer location: {locationResult.Message}");
                 }
                 else
                 {
-                    await LoadContentByLanguage(locationResult, locationName);
+                    if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                    {
+                        await LoadDefaultContent(locationResult, locationName);
+                    }
+                    else
+                    {
+                        await LoadContentByLanguage(locationResult, locationName);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error loading Footer content");
             }
         }
 
@@ -80,7 +86,7 @@ namespace BedBrigade.Client.Components
         {
             var contentResult = await _svcContent.GetAsync("Footer", locationResult.Data.LocationId);
 
-            if (contentResult.Success)
+            if (contentResult.Success && contentResult.Data != null)
             {
                 footerContent = contentResult.Data.ContentHtml;
             }
