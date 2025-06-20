@@ -1,17 +1,9 @@
-using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
-
-using static BedBrigade.Common.Logic.Extensions;
-using ContentType = BedBrigade.Common.Enums.ContentType;
 using BedBrigade.Data.Services;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
-using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using Serilog;
 
@@ -20,17 +12,14 @@ namespace BedBrigade.Client.Components
     public partial class LocationGrid : ComponentBase
     {
         [Inject] private ILocationDataService? _svcLocation { get; set; }
-        [Inject] private IContentDataService? _svcContent { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-
+        [Inject] private ToastService _toastService { get; set; }
         [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ITimezoneDataService _svcTimeZone { get; set; }
         [Parameter] public string? Id { get; set; }
-
-        List<string> PageNames = new List<string> { "AboutUs", "Assembly", "Contact", "Donate", "History", "Locations", "News", "Partners", "RequestBed", "Stories", "Volunteer" };
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
@@ -46,13 +35,6 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 1000;
-
         protected string? RecordText { get; set; } = "Loading Locations ...";
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
@@ -67,6 +49,22 @@ namespace BedBrigade.Client.Components
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
+            try
+            {
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                Locations= new List<Location>();
+                MetroAreas = new List<MetroArea>();
+                Log.Error(ex, "Error loading data in LocationGrid component");
+                RecordText = "Unable to load locations. " + ex.Message;
+                _toastService.Error("Error loading data", ex.Message);
+            }
+        }
+
+        private async Task LoadData()
+        {
             if (_svcAuth.IsNationalAdmin)
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
@@ -78,25 +76,35 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-            var result = await _svcLocation.GetAllAsync();
-            if (result.Success)
+            ServiceResponse<List<Location>> result = await _svcLocation.GetAllAsync();
+            if (result.Success && result.Data != null)
             {
                 Locations = result.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.FirstOrDefault(r => r.LocationId == (int)LocationNumber.National);
                 if (item != null)
                 {
                     Locations.Remove(item);
-
                 }
             }
+            else
+            {
+                Locations = new List<Location>();
+                RecordText = "Unable to load locations. " + result.Message;
+                _toastService.Error("Error loading data", result.Message);
+            }
 
-            var metroResult = await _svcMetroArea.GetAllAsync();
-            if (metroResult.Success)
+            ServiceResponse<List<MetroArea>> metroResult = await _svcMetroArea.GetAllAsync();
+            if (metroResult.Success && metroResult.Data != null)
             {
                 MetroAreas = metroResult.Data.ToList();
             }
+            else
+            {
+                MetroAreas = new List<MetroArea>();
+                RecordText = "Unable to load metro areas. " + metroResult.Message;
+                _toastService.Error("Error loading data", metroResult.Message);
+            }
 
-            
             TimeZones = _svcTimeZone.GetTimeZones();
         }
 
@@ -209,11 +217,7 @@ namespace BedBrigade.Client.Components
 
         private async Task Delete(ActionEventArgs<Location> args)
         {
-            string reason = string.Empty;
             List<Location> records = await Grid.GetSelectedRecordsAsync();
-            ToastTitle = "Delete Location";
-            ToastTimeout = 6000;
-            ToastContent = $"Unable to Delete. {reason}";
             foreach (var rec in records)
             {
                 try
@@ -222,23 +226,23 @@ namespace BedBrigade.Client.Components
                     var deleteResult = await _svcLocation.DeleteAsync(rec.LocationId);
                     if (deleteResult.Success)
                     {
-                        ToastContent = "Delete Successful!";
+                        _toastService.Success("Delete Location", $"Location {rec.Name} deleted successfully.");
                     }
                     else
                     {
+                        Log.Error($"Unable to delete location {rec.Name}. Reason: {deleteResult.Message}");
+                        _toastService.Error("Delete Location", $"Unable to delete location {rec.Name}. Reason: {deleteResult.Message}");
                         args.Cancel = true;
+                        break;
                     }
-
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex, $"Error deleting location {rec.Name}");
+                    _toastService.Error("Delete Location", $"Error deleting location {rec.Name}: {ex.Message}");
                     args.Cancel = true;
-                    reason = ex.Message;
-
+                    break;
                 }
-
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
             }
         }
 
@@ -250,19 +254,27 @@ namespace BedBrigade.Client.Components
 
         private async Task Save(ActionEventArgs<Location> args)
         {
-            Location Location = args.Data;
-            if (Location.LocationId != 0)
+            try
             {
-                //Update Location Record
-                await UpdateLocationAsync(Location);
-            }
-            else
-            {
-                await AddNewLocationAsync(Location);
-            }
+                Location Location = args.Data;
+                if (Location.LocationId != 0)
+                {
+                    //Update Location Record
+                    await UpdateLocationAsync(Location);
+                }
+                else
+                {
+                    await AddNewLocationAsync(Location);
+                }
 
-            await Grid.CallStateHasChangedAsync();
-            await Grid.Refresh();
+                await Grid.CallStateHasChangedAsync();
+                await Grid.Refresh();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error saving location");
+                _toastService.Error("Error", "An error occurred while saving the location: " + ex.Message);
+            }
         }
 
         private async Task AddNewLocationAsync(Location Location)
@@ -272,35 +284,29 @@ namespace BedBrigade.Client.Components
             // new Location
             var result = await _svcLocation.CreateAsync(Location);
 
-            ToastTitle = "Create Location";
-
             if (result.Success)
             {
-                ToastContent = "Location Created Successfully!";
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                _toastService.Success("Add Location Success", "Location added successfully.");
             }
             else
             {
-                ToastContent = result.Message;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                Log.Error($"Unable to add location {Location.Name}. Reason: {result.Message}");
+                _toastService.Error("Add Location Error", $"Unable to add location {Location.Name}. Reason: {result.Message}");
             }
-
-
         }
 
         private async Task UpdateLocationAsync(Location Location)
         {
             var updateResult = await _svcLocation.UpdateAsync(Location);
-            ToastTitle = "Update Location";
             if (updateResult.Success)
             {
-                ToastContent = "Location Updated Successfully!";
+                _toastService.Success("Update Location", "Location updated successfully.");
             }
             else
             {
-                ToastContent = "Unable to update location!";
+                Log.Error($"Unable to update location {Location.Name}. Reason: {updateResult.Message}");
+                _toastService.Error("Update Location", $"Unable to update location {Location.Name}. Reason: {updateResult.Message}");
             }
-            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
 
@@ -314,12 +320,12 @@ namespace BedBrigade.Client.Components
         protected async Task Save(Location location)
         {
             location.Route.ToLower();
-            await Grid.EndEdit();
+            await Grid.EndEditAsync();
         }
 
         protected async Task Cancel()
         {
-            await Grid.CloseEdit();
+            await Grid.CloseEditAsync();
         }
 
         protected void DataBound()
@@ -341,7 +347,7 @@ namespace BedBrigade.Client.Components
                 FileName = "Location" + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
-            await Grid.PdfExport(ExportProperties);
+            await Grid.ExportToPdfAsync(ExportProperties);
         }
         protected async Task ExcelExport()
         {

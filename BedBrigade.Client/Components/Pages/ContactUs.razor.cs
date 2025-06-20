@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Serilog;
+using Syncfusion.Blazor.Inputs;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -43,7 +44,7 @@ namespace BedBrigade.Client.Components.Pages
             { "rows", "4" },
         };
 
-
+        public required SfMaskedTextBox phoneTextBox;
 
         [Parameter] public string PreloadLocation { get; set; }
 
@@ -232,6 +233,11 @@ namespace BedBrigade.Client.Components.Pages
             }
         } // update database
 
-        #endregion        
+        #endregion
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
+
     }
 }

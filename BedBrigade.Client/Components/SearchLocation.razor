@@ -15,7 +15,7 @@
                 <span class="card-title-mobile">@_lc.Keys["EnterYourZipCode"]</span>
             </h5>
             <p class="card-text"><i>@_lc.Keys["5CharactersContainingOnly"]</i></p>
-            <p>
+            <p>                
                 <SfMaskedTextBox @ref="maskObj"
                                  Mask="00000"
                                  Value="@PostalCode"
@@ -23,6 +23,7 @@
                                  Placeholder="@_lc.Keys["ZipCode"]"
                                  OnInput="ZipCodeInputChange"
                                  @onkeyup="@HandleKeyDown"
+                                 Focus="HandleMaskFocus"
                                  Width="200px">
                 </SfMaskedTextBox>
             </p>

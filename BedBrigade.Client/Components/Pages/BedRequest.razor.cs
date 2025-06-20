@@ -1,17 +1,18 @@
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.JSInterop;
 using Serilog;
-using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
-using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
-using BedBrigade.Common.Models;
 using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Inputs;
 using System.Globalization;
+using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -74,6 +75,8 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter] public string PreloadLocation { get; set; }
         private ValidationMessageStore _validationMessageStore;
         private string AlertType = AlertDanger;
+        public required SfMaskedTextBox phoneTextBox;
+        public required SfMaskedTextBox zipTextBox;
         #endregion
         #region Initialization
 
@@ -484,6 +487,13 @@ namespace BedBrigade.Client.Components.Pages
         }
 
         #endregion
-
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
+        public async Task HandleZipMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", zipTextBox.ID, 0);
+        }
     }
 }

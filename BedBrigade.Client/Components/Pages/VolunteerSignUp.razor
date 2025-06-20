@@ -154,7 +154,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
-                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="newVolunteer.Phone"></SfMaskedTextBox>
+                                <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="newVolunteer.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.Phone)"></ValidationMessage>
                                 </div>

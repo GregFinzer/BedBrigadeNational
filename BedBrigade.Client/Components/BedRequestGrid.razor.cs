@@ -1,17 +1,18 @@
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Grids;
-using System.Security.Claims;
-using BedBrigade.Data.Services;
-using Serilog;
-using Action = Syncfusion.Blazor.Grids.Action;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
 using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using ContentType = BedBrigade.Common.Enums.ContentType;
+using Serilog;
 using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
+using System.Security.Claims;
+using Action = Syncfusion.Blazor.Grids.Action;
+using ContentType = BedBrigade.Common.Enums.ContentType;
 
 namespace BedBrigade.Client.Components
 {
@@ -73,7 +74,8 @@ namespace BedBrigade.Client.Components
         private bool IsDialogVisible { get; set; } = false;
         private string DialogHeader { get; set; } = string.Empty;
         private string DialogContent { get; set; } = string.Empty;
-
+        public required SfMaskedTextBox zipTextBox;
+        public required SfMaskedTextBox phoneTextBox;
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -617,8 +619,15 @@ namespace BedBrigade.Client.Components
                 }
             }
         }
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
 
-
+        public async Task HandleZipMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", zipTextBox.ID, 0);
+        }
     }
 }
 

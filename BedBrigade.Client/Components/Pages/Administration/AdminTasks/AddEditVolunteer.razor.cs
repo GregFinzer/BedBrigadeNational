@@ -1,8 +1,10 @@
-﻿using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components;
-using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Serilog;
+using Syncfusion.Blazor.Inputs;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -17,7 +19,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
-        
+        [Inject] private IJSRuntime JS { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -27,7 +29,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             { "rows", "5" },
         };
-        
+        public required SfMaskedTextBox phoneTextBox;
 
         protected override async Task OnInitializedAsync()
         {
@@ -155,6 +157,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private void HandleCancel()
         {
             _navigationManager.NavigateTo("/administration/manage/volunteers");
+        }
+
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
         }
     }
 }

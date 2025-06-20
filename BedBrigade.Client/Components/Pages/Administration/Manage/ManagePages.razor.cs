@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -40,7 +39,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected List<string>? ContextMenu;
         protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
         protected string? RecordText { get; set; } = "Loading Pages ...";
         public bool NoPaging { get; private set; }
         public List<Location> Locations { get; private set; }
@@ -110,7 +108,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     else
                     {
                         Log.Error($"ManagePages, Error loading locations: {locResult.Message}");
-                        _toastService.Error("Error", $"Could not load locations: {locResult.Message}");
+                        _toastService.Error("Error Loading Locations", $"Could not load locations: {locResult.Message}");
                     }
                 }
 
@@ -119,7 +117,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             catch (Exception ex)
             {
                 Log.Error(ex, "Error initializing ManagePages component");
-                _toastService.Error("Error", $"An error occurred while initializing the page: {ex.Message}");
+                _toastService.Error("Error Initializing", $"An error occurred while initializing the page: {ex.Message}");
             }
         }
 
@@ -166,7 +164,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             else
             {
                 Log.Error($"ManagePages, Error loading pages for location {userLocationId}: {locationResult.Message}");
-                _toastService.Error("Error", $"Could not load pages: {locationResult.Message}");
+                _toastService.Error("Error Loading Pages", $"Could not load pages: {locationResult.Message}");
             }
         }
 
@@ -300,7 +298,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task Delete(ActionEventArgs<Content> args)
         {
             List<Content> records = await Grid.GetSelectedRecordsAsync();
-            ToastTimeout = 6000;
             foreach (var rec in records)
             {
                 try
@@ -317,7 +314,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     else
                     {
                         Log.Error("ManagePages, Could not delete: " + deleteResult.Message);
-                        _toastService.Error("Error", $"Could not delete page {rec.Name}: {deleteResult.Message}");
+                        _toastService.Error("Error Deleting", $"Could not delete page {rec.Name}: {deleteResult.Message}");
                         args.Cancel = true;
                         return;
                     }
@@ -326,7 +323,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 catch (Exception ex)
                 {
                     Log.Error(ex, "ManagePages, Could not delete");
-                    _toastService.Error("Error", $"Could not delete page {rec.Name}: {ex.Message}");
+                    _toastService.Error("Error Deleting", $"Could not delete page {rec.Name}: {ex.Message}");
                     args.Cancel = true;
                     return;
                 }
@@ -446,21 +443,19 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task UpdatePageContent(Content newContent)
         {
-
-
             //Update Content  Record
             var updateResult = await _svcContent.UpdateAsync(newContent);
             if (updateResult.Success)
             {
 
-                _toastService.Success("Delivery Check List Saved", $"Content saved for location {CurrentLocationName}"); // VS 8/25/2024              
+                _toastService.Success("Content Updated", $"Content saved for location {CurrentLocationName}"); // VS 8/25/2024              
                 StateHasChanged();
                 await Grid.CloseEditAsync();
                 await Grid.SetRowDataAsync(newContent.ContentId, newContent);
             }
             else
             {
-                _toastService.Error("Error", $"Could not save content for location {CurrentLocationName}");
+                _toastService.Error("Error Updating", $"Could not update content for location {CurrentLocationName}");
             }
 
         }

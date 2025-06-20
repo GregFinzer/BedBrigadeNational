@@ -31,8 +31,6 @@ public partial class ManageMetroAreas : ComponentBase
     protected string? HeaderTitle { get; set; }
     protected string? ButtonTitle { get; private set; }
 
-    protected int ToastTimeout { get; set; } = 1000;
-
     protected string? RecordText { get; set; } = "Loading Metro Areas ...";
     public bool NoPaging { get; private set; }
 
@@ -147,7 +145,6 @@ public partial class ManageMetroAreas : ComponentBase
     private async Task Delete(ActionEventArgs<MetroArea> args)
     {
         List<MetroArea> records = await Grid.GetSelectedRecordsAsync();
-        ToastTimeout = 6000;
         foreach (var rec in records)
         {
             try

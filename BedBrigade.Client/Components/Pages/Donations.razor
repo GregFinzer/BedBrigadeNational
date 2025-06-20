@@ -46,7 +46,7 @@ else
                             </div>
                             <div class="form-group">
                                 <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
-                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="PaymentSession.PhoneNumber"></SfMaskedTextBox>
+                                <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="PaymentSession.PhoneNumber" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => PaymentSession.PhoneNumber)"></ValidationMessage>
                                 </div>

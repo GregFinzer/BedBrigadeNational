@@ -1,7 +1,9 @@
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -21,9 +23,32 @@ namespace BedBrigade.Client.Components
         
         protected override async Task OnInitializedAsync()
         {
+            try
+            {
+                await LoadImagesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error loading images in ImageRotator component");
+                isLoading = false;
+                imagesFound = false;
+            }
+        }
+
+        private async Task LoadImagesAsync()
+        {
             _lc.InitLocalizedComponent(this);
-            var location = await _svcLocation.GetByIdAsync(Convert.ToInt32(mylocation));
-            var locationImageList = _svcLoadImages.GetImagesForArea($"{location.Data.Route}/{myPath}",myId);
+            ServiceResponse<Location> locationResult = await _svcLocation.GetByIdAsync(Convert.ToInt32(mylocation));
+
+            if (!locationResult.Success || locationResult.Data == null)
+            {
+                Log.Error("Failed to load location with ID {LocationId}: {Message}", mylocation, locationResult.Message);
+                isLoading = false;
+                imagesFound = false;
+                return;
+            }
+
+            List<string> locationImageList = _svcLoadImages.GetImagesForArea($"{locationResult.Data.Route}/{myPath}", myId);
 
             if (locationImageList.Count > 0)
             {
@@ -32,7 +57,7 @@ namespace BedBrigade.Client.Components
                 isLoading = false;
                 return;
             }
-            var nationalImageList = _svcLoadImages.GetImagesForArea($"{Defaults.NationalRoute}/{myPath}", myId);
+            List<string> nationalImageList = _svcLoadImages.GetImagesForArea($"{Defaults.NationalRoute}/{myPath}", myId);
 
             if (nationalImageList.Count > 0)
             {
@@ -42,8 +67,8 @@ namespace BedBrigade.Client.Components
                 return;
             }
 
-            locationPath = _svcLoadImages.GetDirectoryForPathAndArea("{location.Data.Route}/{myPath}", myId);
-            nationalPath = _svcLoadImages.GetDirectoryForPathAndArea("{Constants.NationalRoute}/{myPath}", myId);
+            locationPath = _svcLoadImages.GetDirectoryForPathAndArea($"{locationResult.Data.Route}/{myPath}", myId);
+            nationalPath = _svcLoadImages.GetDirectoryForPathAndArea($"{Defaults.NationalRoute}/{myPath}", myId);
             imagesFound = false;
             isLoading = false;
         }

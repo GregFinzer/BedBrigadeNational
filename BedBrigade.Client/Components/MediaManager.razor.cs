@@ -3,6 +3,7 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -10,6 +11,7 @@ namespace BedBrigade.Client.Components
     {
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILocationDataService LocationDataService { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
         private int _currentId = 1;
         
         private List<FolderItem> Folders = new List<FolderItem>();
@@ -62,12 +64,28 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            await CommonInit();
+            try
+            {
+                await CommonInit();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing MediaManager component");
+                _toastService.Error("Error", "Error initializing MediaManager component");
+            }
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            await CommonInit();
+            try
+            {
+                await CommonInit();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error OnParametersSetAsync MediaManager component");
+                _toastService.Error("Error", "Error OnParametersSetAsync MediaManager component");
+            }
         }
 
         private async Task CommonInit()
@@ -247,6 +265,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to create new folder: {FolderName}", NewFolderName);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to create folder: {ex.Message}");
             }
@@ -291,6 +310,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to delete folder: {FolderPath}", CurrentFolderPath);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to delete folder: {ex.Message}");
             }
@@ -348,6 +368,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to rename folder: {CurrentFolderPath} to {NewFolderName}", CurrentFolderPath, newFolderName);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to rename folder: {ex.Message}");
             }
@@ -414,6 +435,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to upload files to {CurrentFolderPath}", CurrentFolderPath);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to upload: {ex.Message}");
             }
@@ -471,6 +493,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to rename file: {OldFilePath} to {NewFileName}", file.Name, newFileName);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to rename file: {ex.Message}");
             }
@@ -509,6 +532,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to delete files in {CurrentFolderPath}", CurrentFolderPath);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to delete files: {ex.Message}");
             }
@@ -524,6 +548,7 @@ namespace BedBrigade.Client.Components
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Failed to refresh content in MediaManager component");
                 MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to refresh content: {ex.Message}");
             }
@@ -644,6 +669,8 @@ namespace BedBrigade.Client.Components
                     catch (Exception ex)
                     {
                         string operation = String.IsNullOrEmpty(CopySourceFolder) ? "move" : "copy";
+                        Log.Error(ex, "Failed to {Operation} file '{FileName}' from '{SourcePath}' to '{TargetPath}'",
+                            operation, file.Name, sourcePath, targetPath);
                         await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                             $"Failed to {operation} file '{file.Name}': {ex.Message}");
                     }
@@ -657,8 +684,5 @@ namespace BedBrigade.Client.Components
                 StateHasChanged();
             }
         }
-
-
-
     }
 }

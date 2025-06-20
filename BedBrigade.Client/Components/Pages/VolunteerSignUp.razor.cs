@@ -1,14 +1,15 @@
-using Syncfusion.Blazor.DropDowns;
-using Microsoft.AspNetCore.Components;
-using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components.Forms;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
-using Serilog;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
-using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Serilog;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Inputs;
+using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -76,7 +77,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
         private string[] SelectedLanguages { get; set; } = [];
-
+        public required SfMaskedTextBox phoneTextBox;
         #endregion
 
         #region Initialization
@@ -521,9 +522,13 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        } 
+        }
 
         #endregion
 
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
     }
 }

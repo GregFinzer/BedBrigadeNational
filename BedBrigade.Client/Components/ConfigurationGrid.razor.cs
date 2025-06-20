@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -272,11 +269,11 @@ namespace BedBrigade.Client.Components
                     var updateResult = await _svcConfiguration.UpdateAsync(Configuration);
                     if (updateResult.Success)
                     {
-                        _toastService.Success("Update Configuration", "Configuration Updated Successfully!");
+                        _toastService.Success("Update Configuration Success", "Configuration Updated Successfully!");
                     }
                     else
                     {
-                        _toastService.Error("Update Configuration", "Unable to update configuration!");
+                        _toastService.Error("Update Configuration Error", "Unable to update configuration!");
                     }
                 }
                 else
@@ -285,11 +282,11 @@ namespace BedBrigade.Client.Components
                     var createResult = await _svcConfiguration.CreateAsync(Configuration);
                     if (createResult.Success)
                     {
-                        _toastService.Success("Add Configuration", "Configuration Added Successfully!");
+                        _toastService.Success("Add Configuration Success", "Configuration Added Successfully!");
                     }
                     else
                     {
-                        _toastService.Error("Add Configuration", "Unable to add configuration!");
+                        _toastService.Error("Add Configuration Error", "Unable to add configuration!");
                     }
                 }
 

@@ -77,7 +77,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfMaskedTextBox @ref="phoneTextBox" Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" Focus="HandlePhoneMaskFocus" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfTextBox @bind-Value=@contactUs.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />

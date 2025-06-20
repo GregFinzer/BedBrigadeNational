@@ -1,15 +1,16 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components;
-using System.Globalization;
-using BedBrigade.Common.Enums;
-using Microsoft.AspNetCore.Components.Forms;
 using BedBrigade.SpeakIt;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using BedBrigade.Client.Services;
 using Serilog;
+using Syncfusion.Blazor.Inputs;
+using System.Globalization;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -31,6 +32,7 @@ public partial class Donations : ComponentBase, IDisposable
     [Inject] private ICarouselService _carouselService { get; set; }
     [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
     [Inject] private ILocationState _locationState { get; set; }
+    
     [Parameter] public string LocationRoute { get; set; } = default!;
     public int? LocationId { get; set; }
     public string LocationName { get; set; }
@@ -49,6 +51,7 @@ public partial class Donations : ComponentBase, IDisposable
     private ValidationMessageStore _validationMessageStore;
     public string BodyContent { get; set; } = string.Empty;
     public string PreviousBodyContent { get; set; } = string.Empty;
+    public required SfMaskedTextBox phoneTextBox;
     protected override async Task OnInitializedAsync()
     {
         _lc.InitLocalizedComponent(this);
@@ -276,4 +279,10 @@ public partial class Donations : ComponentBase, IDisposable
     }
 
     #endregion
+
+    public async Task HandlePhoneMaskFocus()
+    {
+        await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+    }
+
 }

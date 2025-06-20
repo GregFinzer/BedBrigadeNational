@@ -1,7 +1,6 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.RichTextEditor;
-using System.Security.Claims;
 using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Popups;
@@ -140,14 +139,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 }
                 else
                 {
-                    _toastService.Error("Error",
+                    _toastService.Error("Error Loading Location Content",
                         $"Could not load Content for location {LocationId} with name of {ContentName}");
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error initializing EditContent component");
-                _toastService.Error("Error", $"An error occurred while initializing the page: {ex.Message}");
+                _toastService.Error("Error Loading Location Content", $"An error occurred while initializing the page: {ex.Message}");
             }
         }
 
@@ -218,14 +217,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     return true;
                 }
 
-                _toastService.Error("Error",
+                _toastService.Error("Save Error",
                     $"Could not save Content for location {LocationRoute} with name of {ContentName}");
                 return false;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "EditContent, Error saving content");
-                _toastService.Error("Error", $"An error occurred while saving the content: {ex.Message}");
+                _toastService.Error("Save Error", $"An error occurred while saving the content: {ex.Message}");
                 return false;
             }
         }

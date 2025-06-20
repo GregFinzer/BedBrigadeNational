@@ -68,7 +68,7 @@ else
 
                             <div class="form-group mb-3">
                                 <label for="phone">Phone</label>
-                                <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="Model.Phone"></SfMaskedTextBox>
+                                <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="Model.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => Model.Phone)"></ValidationMessage>
                                 </div>

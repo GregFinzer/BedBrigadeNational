@@ -1,8 +1,8 @@
 ﻿@using Syncfusion.Blazor.Notifications; 
   
 <SfToast @ref="ToastOptions.ToastObj" ShowProgressBar="true" ShowCloseButton="true"
-         CssClass="@ToastOptions.CssClass" Icon="@ToastOptions.Icon">
-    <ToastPosition X="45%" Y="Center"></ToastPosition>
+         CssClass="@ToastOptions.CssClass" Icon="@ToastOptions.Icon" Timeout="@ToastOptions.Timeout" >
+    <ToastPosition X="45%" Y="0"></ToastPosition>
     <ToastTemplates>
         <Title>
             @ToastOptions.Title
@@ -29,7 +29,8 @@
                 this.ToastOptions.Title = options.Title; 
                 this.ToastOptions.Content = options.Content; 
                 this.ToastOptions.CssClass = options.CssClass; 
-                this.ToastOptions.Icon = options.Icon;     
+                this.ToastOptions.Icon = options.Icon;   
+                this.ToastOptions.Timeout = options.Timeout;
                 this.StateHasChanged(); 
                 await Task.Delay(500); 
                 await this.ToastOptions.ToastObj.ShowAsync(); 

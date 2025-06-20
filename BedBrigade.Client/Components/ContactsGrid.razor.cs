@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
-using BedBrigade.Data.Services;
-using Serilog;
-using Action = Syncfusion.Blazor.Grids.Action;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
-using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Serilog;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
+using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
 {
@@ -22,6 +22,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private IJSRuntime JS { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -45,7 +46,7 @@ namespace BedBrigade.Client.Components
         public List<EnumNameValue<ContactUsStatus>> ContactUsStatuses { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
-
+        public required SfMaskedTextBox phoneTextBox;
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -308,14 +309,14 @@ namespace BedBrigade.Client.Components
                     var result = await _svcContactUs.CreateAsync(contactUs);
                     if (result.Success)
                     {
-                        _toastService.Success("Add ContactUs",
+                        _toastService.Success("Add ContactUs Success",
                             $"ContactUs {contactUs.FirstName} {contactUs.LastName} added successfully.");
                     }
                     else
                     {
                         Log.Error(
                             $"Unable to add ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {result.Message}");
-                        _toastService.Error("Add ContactUs",
+                        _toastService.Error("Add ContactUs Error",
                             $"Unable to add ContactUs {contactUs.FirstName} {contactUs.LastName}. Error: {result.Message}");
                         args.Cancel = true;
                     }
@@ -390,6 +391,10 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.CsvExport(ExportProperties);
             }
+        }
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
         }
 
 

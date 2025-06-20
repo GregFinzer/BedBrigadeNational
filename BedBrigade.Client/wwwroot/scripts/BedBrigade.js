@@ -111,6 +111,13 @@ window.SetGetValue = {
 }
 
 window.BedBrigadeUtil = {
+    SelectMaskedText: function (elementId, position) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.focus();
+            element.setSelectionRange(position, position);
+        }
+    },
     InitializeJarallax: function (imgPosition = 'top') {
         jarallax(document.querySelectorAll('.jarallax'), {
             speed: 0.2,

@@ -49,7 +49,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             else
             {
                 Log.Error("ManageNewsletters, Could not load locations: " + locationResult.Message);
-                _toastService?.Error("Error", "Could not load locations: " + locationResult.Message);
+                _toastService?.Error("Error Loading Locations", "Could not load locations: " + locationResult.Message);
             }
 
             ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
@@ -69,7 +69,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 else
                 {
                     Log.Error("ManageNewsletters, Could not load newsletters: " + result.Message);
-                    _toastService?.Error("Error", "Could not load newsletters: " + result.Message);
+                    _toastService?.Error("Error Loading Newsletters", "Could not load newsletters: " + result.Message);
                 }
             }
             else
@@ -83,7 +83,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 else
                 {
                     Log.Error("ManageNewsletters, Could not load newsletters for location: " + result.Message);
-                    _toastService?.Error("Error", "Could not load newsletters for location: " + result.Message);
+                    _toastService?.Error("Error Loading Newsletters", "Could not load newsletters for location: " + result.Message);
                 }
             }
         }
@@ -210,7 +210,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 else
                 {
                     Log.Error($"Error deleting newsletter {rec.Name}: {deleteResult.Message}");
-                    _toastService.Success("Error", $"Newsletter could not be deleted: " + rec.Name);
+                    _toastService.Success("Error Deleting", $"Newsletter could not be deleted: " + rec.Name);
                     args.Cancel = true;
                 }
             }
@@ -237,7 +237,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 else
                 {
                     Log.Error($"Error updating newsletter {newsletter.Name}: {updateResult.Message}");
-                    _toastService.Error("Error", $"Could not update newsletter: " + newsletter.Name);
+                    _toastService.Error("Error Updating", $"Could not update newsletter: " + newsletter.Name);
                 }
             }
             else
@@ -252,7 +252,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 else
                 {
                     Log.Error($"Error adding newsletter {newsletter.Name}: {createResult.Message}");
-                    _toastService.Error("Error", $"Could not add newsletter: " + newsletter.Name);
+                    _toastService.Error("Error Adding", $"Could not add newsletter: " + newsletter.Name);
                 }
             }
         }
