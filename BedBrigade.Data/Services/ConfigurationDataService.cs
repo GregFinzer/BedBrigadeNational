@@ -2,6 +2,7 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BedBrigade.Data.Services;
 
@@ -157,6 +158,34 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
             .ToList();
         return amounts;
     }
+
+    public override async Task<ServiceResponse<Configuration>> UpdateAsync(Configuration entity)
+    {
+        ServiceResponse<Configuration> updateResult;
+
+        if (entity.ConfigurationKey == ConfigNames.IsCachingEnabled)
+        {
+            updateResult = await base.UpdateAsync(entity);
+
+            if (updateResult.Success)
+            {
+                bool previousValue = _cachingService.IsCachingEnabled;
+                _cachingService.IsCachingEnabled = entity.ConfigurationValue.ToLower() == "true"
+                                                   || entity.ConfigurationValue.ToLower() == "yes";
+
+                Log.Information($"Caching enabled went from {previousValue} to {_cachingService.IsCachingEnabled}");
+                _cachingService.ForceClearAll();
+            }
+        }
+        else
+        {
+            updateResult = await base.UpdateAsync(entity);
+        }
+
+        return updateResult;
+    }
+
+
 }
 
 

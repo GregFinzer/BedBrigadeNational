@@ -27,6 +27,7 @@ namespace BedBrigade.Client.Components.Layout
             if (!AuthService.IsLoggedIn)
                 return;
 
+            //TODO:  Change after seed national is grove city
             if (smsQueue.LocationId == AuthService.LocationId
                 || (AuthService.LocationId == Defaults.NationalLocationId
                 && smsQueue.LocationId == Defaults.GroveCityLocationId))

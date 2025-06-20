@@ -84,6 +84,7 @@ namespace BedBrigade.Client.Components
         
         public async Task OnCreateInput()
         {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "cardHeader");
             await SetZipBoxFocus();
         }
 
