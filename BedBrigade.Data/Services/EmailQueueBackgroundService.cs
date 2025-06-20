@@ -84,7 +84,19 @@ namespace BedBrigade.Data.Services
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await WaitLoop(cancellationToken);
+            }
+        }
+
+        private async Task WaitLoop(CancellationToken cancellationToken)
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                if (_isStopping)
+                    return;
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
 

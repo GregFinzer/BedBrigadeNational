@@ -1,8 +1,6 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.Grids;
-using System.Security.Claims;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Navigations;
 using BedBrigade.Common.Logic;
@@ -11,7 +9,6 @@ using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Serilog;
-using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components;
 
@@ -27,7 +24,8 @@ public partial class SignUpGrid : ComponentBase
     [Inject] private IScheduleDataService? _svcSchedule { get; set; }
     [Inject] private ISignUpDataService? _svcSignUp { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
+    [Inject] private ILanguageContainerService _lc { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
 
     // object lists
 
@@ -54,7 +52,6 @@ public partial class SignUpGrid : ComponentBase
 
     // variables
 
-    private ClaimsPrincipal? Identity { get; set; }
     protected string? RecordText { get; set; } = "Loading Schedules ...";
     public bool DataStatus = true;
 
@@ -75,13 +72,10 @@ public partial class SignUpGrid : ComponentBase
 
     public bool ShowEditDialog { get; set; } = false;
     private string ErrorMessage = String.Empty;
-    private string DeleteStatusMessage = String.Empty;
-    private bool DeletePermit = false;
     private string DisplayAddButton = DisplayNone;
     private string DisplayDeleteButton = DisplayNone;
     private string DisplayDataPanel = DisplayNone;
     private string DisplaySearchPanel = DisplayNone;
-    private MarkupString DeleteMessage;
     private string GridDisplay = String.Empty;
 
     private MarkupString DialogMessage;
@@ -103,19 +97,29 @@ public partial class SignUpGrid : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-            _lc.InitLocalizedComponent(this);
-        lstEmptyTables = await SignUpHelper.GetSignUpDataStatusAsync(_svcSchedule, _svcVolunteer);
-        if (lstEmptyTables.Count > 0)
+        try
         {
-            DataStatus = false;
-            GridDisplay = DisplayNone;
-            _ = Task.CompletedTask;
-            return;
-        }
 
-        if (DataStatus)
+            _lc.InitLocalizedComponent(this);
+            lstEmptyTables = await SignUpHelper.GetSignUpDataStatusAsync(_svcSchedule, _svcVolunteer);
+            if (lstEmptyTables.Count > 0)
+            {
+                DataStatus = false;
+                GridDisplay = DisplayNone;
+                _ = Task.CompletedTask;
+                return;
+            }
+
+            if (DataStatus)
+            {
+                await LoadGridData();
+            }
+
+        }
+        catch (Exception ex)
         {
-            await LoadGridData();
+            Log.Error(ex, "Error initializing SignUpGrid component");
+            _toastService.Error("Error", "An error occurred while loading the Sign Up Grid data.");
         }
 
     } // Async Init
@@ -127,7 +131,7 @@ public partial class SignUpGrid : ComponentBase
     /// <returns></returns>
     protected async Task OnLoad()
     {
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol };
         var result = await _svcUserPersist.GetGridPersistence(persist);
         if (result.Success && result.Data != null)
@@ -148,7 +152,7 @@ public partial class SignUpGrid : ComponentBase
     private async Task SaveGridPersistence()
     {
         string state = await Grid.GetPersistData();
-        string userName = await _svcUser.GetUserName();
+        string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);
         if (!result.Success)
@@ -191,10 +195,9 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        Identity = _svcAuth.CurrentUser;
-        userLocationId = await _svcUser.GetUserLocationId();
-        userName = await _svcUser.GetUserName();
-        userRole = await _svcUser.GetUserRole();
+        userLocationId =  _svcUser.GetUserLocationId();
+        userName = _svcUser.GetUserName();
+        userRole = _svcUser.GetUserRole();
         Log.Information($"{userName} went to the Manage Sign Up Page");
 
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
@@ -206,7 +209,6 @@ public partial class SignUpGrid : ComponentBase
             Text = CaptionDelete, Id = "delete", TooltipText = "Delete Volunteer from selected Event",
             PrefixIcon = "e-delete"
         });
-        //Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel() { Text = "Print", Id = "print", TooltipText = "Print Grid Data" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
             { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
@@ -219,23 +221,23 @@ public partial class SignUpGrid : ComponentBase
     {
         get
         {
-            if (Identity == null)
-            {
-                return false;
-            }
-
-            return Identity.IsInRole(RoleNames.LocationAdmin)
-                   || Identity.IsInRole(RoleNames.LocationAuthor)
-                   || Identity.IsInRole(RoleNames.LocationScheduler);
+            return _svcAuth.UserHasRole(RoleNames.CanManageSchedule);
         }
     }
+
     private async Task LoadLocations()
     {
         var dataLocations = await _svcLocation!.GetAllAsync();
-        if (dataLocations.Success) // 
+        if (dataLocations.Success && dataLocations.Data != null) // 
         {
             Locations = dataLocations.Data;
             userLocationName = Locations.FirstOrDefault(e => e.LocationId == userLocationId)?.Name;
+        }
+        else
+        {
+            Log.Error($"SignUpGrid, Error loading locations: {dataLocations.Message}");
+            _toastService.Error("Error", dataLocations.Message);
+            ErrorMessage = "Unable to load Locations. " + dataLocations.Message;
         }
     } 
 
@@ -261,6 +263,7 @@ public partial class SignUpGrid : ComponentBase
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Error loading Volunteers data");
             ErrorMessage = "Volunteer Data: No DB Files. " + ex.Message;
         }
     } // Load Volunteer Data            
@@ -547,6 +550,7 @@ public partial class SignUpGrid : ComponentBase
         }
         catch (Exception ex)
         {
+            //TODO:  Not sure why the exception is eaten
             // ErrorMessage = ex.ToString();
         }
     } // Volunteer Selected
@@ -607,9 +611,6 @@ public partial class SignUpGrid : ComponentBase
         await Grid.ExportToExcelAsync(ExportProperties);
     }
 
-    private string cssClass { get; set; } = "e-outline";
-
-
 
     public class GridFilterOption
     {
@@ -626,5 +627,5 @@ public partial class SignUpGrid : ComponentBase
         new GridFilterOption() { ID = "all", Text = "All Events" },
     };
 
-} // EvolGrid Class
+} 
 

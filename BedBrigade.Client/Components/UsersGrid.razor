@@ -85,7 +85,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="@_lc.Keys["PhoneNumber"]" FloatLabelType="FloatLabelType.Auto"/>
+                                            <SfMaskedTextBox @ref="phoneTextBox" ID="phone" Mask="(000) 000-0000" @bind-Value=@user.Phone Enabled="true" Placeholder="@_lc.Keys["PhoneNumber"]" FloatLabelType="FloatLabelType.Auto" Focus="HandlePhoneMaskFocus" />
                                             <ValidationMessage For="@(() => user.Phone)"/>
                                         </div>
                                         <div class="col-md-6">
@@ -131,9 +131,6 @@ else
         </div>
     </div>
 }
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#UserTarget">
-    <ToastPosition X="Center" Y="Top"></ToastPosition>
-</SfToast>
 
 <SfDialog Target="#target" Width="350px" Height="300px" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@PasswordVisible">
     <DialogTemplates>

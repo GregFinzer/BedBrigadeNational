@@ -29,7 +29,8 @@
                 Title = title,
                 Content = content,
                 CssClass = "e-toast-danger custom-toast",
-                Icon = "e-error toast-icons"
+                Icon = "e-error toast-icons",
+                Timeout = 30000
             });
         }
     }

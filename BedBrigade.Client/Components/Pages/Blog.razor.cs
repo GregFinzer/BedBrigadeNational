@@ -7,6 +7,7 @@ using Location = BedBrigade.Common.Models.Location;
 using System.Globalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Client.Services;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -20,6 +21,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
+        
         private string? previousLocation;
         private string? previousBlogType;
 
@@ -42,23 +44,31 @@ namespace BedBrigade.Client.Components.Pages
         public string LocationName { get; set; }
         public bool Older { get; set; }
         public string Uri { get; set; }
-
+        public string? ErrorMessage { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
+            try
+            {
+                _lc.InitLocalizedComponent(this);
 
-            SetParameters();
+                SetParameters();
 
-            await LoadData();
-            await PerformTranslations();
-            _svcLanguage.LanguageChanged += OnLanguageChanged;
+                await LoadData();
+                await PerformTranslations();
+                _svcLanguage.LanguageChanged += OnLanguageChanged;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"An error occurred while loading the blog: {ex.Message}";
+                Log.Error(ex, "Blog OnInitializedAsync");
+            }
         }
 
         private async Task LoadData()
         {
             BlogItems = new List<BlogItem>();
             ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
-            if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
+            if (locationResponse.Success && locationResponse.Data != null)
             {
                 LocationId = locationResponse.Data.LocationId;
                 LocationName = locationResponse.Data.Name;

@@ -20,7 +20,6 @@ public partial class SmsSummary : ComponentBase, IDisposable
     [Inject] private ISmsState _smsState { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     protected List<SmsQueueSummary>? SummaryList { get; set; }
-    private ClaimsPrincipal? Identity { get; set; }
     private const string LastPage = "LastPage";
     private const string PrevPage = "PrevPage";
     private const string NextPage = "NextPage";
@@ -34,7 +33,6 @@ public partial class SmsSummary : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        Identity = _svcAuth.CurrentUser;
         ContextMenu = new List<string>
         {
             FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
@@ -107,7 +105,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
         }
         else
         {
-            CurrentLocationId = await _svcUser.GetUserLocationId();
+            CurrentLocationId = _svcUser.GetUserLocationId();
         }
 
 

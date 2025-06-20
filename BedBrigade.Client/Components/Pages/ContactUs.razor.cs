@@ -1,4 +1,3 @@
-using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
@@ -6,11 +5,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
-using System.Diagnostics;
-using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Edit;
-using BedBrigade.SpeakIt;
 using Serilog;
+using Syncfusion.Blazor.Inputs;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -18,44 +14,26 @@ namespace BedBrigade.Client.Components.Pages
     public partial class ContactUs :ComponentBase
     {
         #region Declaration
-
-        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
 
         private Common.Models.ContactUs? newRequest;
-        private List<UsState>? StateList = AddressHelper.GetStateList();
-
-        private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
-        private LocationDistance? selectedLocation { get; set; }
         private SearchLocation? SearchLocation;
 
         private const string DisplayNone = "none";
         private const string AlertDanger = "alert alert-danger";
 
         private string DisplayForm = DisplayNone;
-        private string DisplayAddressMessage = DisplayNone;
         private string DisplaySearch = DisplayNone;
-        public int NumericValue { get; set; } = 1;
-
         private string ResultMessage = string.Empty;
 
         private string ResultDisplay = DisplayNone;
         private string AlertType = AlertDanger;
-
-        private ReCAPTCHA? reCAPTCHAComponent;
         private bool ValidReCAPTCHA = false;
-        private bool ServerVerificatiing = false;
-        private bool EditFormStatus = false; // true if not errors
 
-
-        private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
         private EditContext? EC { get; set; }
-
-
-        private string cssClass { get; set; } = "e-outline";
 
         private string MyValidationMessage = string.Empty;
         private string MyValidationDisplay = DisplayNone;
@@ -66,15 +44,7 @@ namespace BedBrigade.Client.Components.Pages
             { "rows", "4" },
         };
 
-        protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
-        {
-           { "font-weight", "bold" },
-        };
-
-        protected Dictionary<string, object> htmlattributeSize = new Dictionary<string, object>()
-        {
-           { "maxlength", "2" },
-        };
+        public required SfMaskedTextBox phoneTextBox;
 
         [Parameter] public string PreloadLocation { get; set; }
 
@@ -104,7 +74,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
             }
 
-            base.OnInitialized();
+
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -221,8 +191,6 @@ namespace BedBrigade.Client.Components.Pages
             newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
             newRequest.Status = ContactUsStatus.ContactRequested;
             await UpdateDatabase();
-
-
         }
 
         private async Task UpdateDatabase()
@@ -265,6 +233,11 @@ namespace BedBrigade.Client.Components.Pages
             }
         } // update database
 
-        #endregion        
+        #endregion
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
+
     }
 }

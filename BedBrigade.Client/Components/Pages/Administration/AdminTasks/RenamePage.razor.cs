@@ -3,6 +3,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks;
 
@@ -14,30 +15,64 @@ public partial class RenamePage : ComponentBase
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ToastService _toastService { get; set; }
     [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
-    [Parameter] public string LocationId { get; set; }
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    [Parameter] public int LocationId { get; set; }
     [Parameter] public string ContentName { get; set; }
     public string ErrorMessage { get; set; }
-    public Content _originalContent;
-    private int _originalLocationId;
+    public Content? _originalContent;
     private string _locationRoute;
+    private string _locationName;
     public RenamePageModel Model { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
     {
-        int _originalLocationId;
-
-        if (!int.TryParse(LocationId, out _originalLocationId))
+        try
         {
-            _toastService.Error("Error",
-                $"Could not parse location as integer: {LocationId}");
-            return;
+            Log.Information($"{_svcAuth.UserName} went to the Rename Page");
+            _originalContent = await GetOriginalContent();
+            _locationRoute = await GetLocationRoute();
+
+            if (_originalContent != null)
+            {
+                Model.PageTitle = _originalContent.Title;
+                Model.PageName = _originalContent.Name;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error initializing RenamePage component");
+            _toastService.Error("Error", "An error occurred while loading the page data.");
+            ErrorMessage = "An error occurred while loading the page data.";
+        }
+    }
+
+    private async Task<string> GetLocationRoute()
+    {
+        var locationResponse = await _svcLocationDataService.GetByIdAsync(LocationId);
+
+        if (!locationResponse.Success || locationResponse.Data == null)
+        {
+            Log.Error("RenamePage, Failed to load location data: " + locationResponse.Message);
+            ErrorMessage = "Failed to load location data: " + locationResponse.Message;
+            return string.Empty;
         }
 
-        _originalContent =  (await _svcContentDataService.GetAsync(ContentName, _originalLocationId)).Data;
-        _locationRoute = (await _svcLocationDataService.GetByIdAsync(_originalLocationId)).Data.Route;
-        Model.PageTitle = _originalContent.Title;
-        Model.PageName = _originalContent.Name;
+        _locationName = locationResponse.Data.Name;
+        return locationResponse.Data.Route;
+    }
+
+    private async Task<Content?> GetOriginalContent()
+    {
+        var contentResponse = await _svcContentDataService.GetAsync(ContentName, LocationId);
+        if (!contentResponse.Success || contentResponse.Data == null)
+        {
+            Log.Error("RenamePage, Failed to load content data: " + contentResponse.Message);
+            ErrorMessage = "Failed to load content data: " + contentResponse.Message;
+            return null;
+        }
+
+        return contentResponse.Data;
     }
 
     private void UpdatePageName(ChangeEventArgs e)
@@ -58,26 +93,32 @@ public partial class RenamePage : ComponentBase
 
     private async Task HandleValidSubmit()
     {
-        ServiceResponse<Content> updateResponse;
-
-        // If the name hasn't changed, just update the title
-        if (_originalContent.Name == Model.PageName)
+        try
         {
-            await JustUpdateTheTitle();
+            // If the name hasn't changed, just update the title
+            if (_originalContent.Name == Model.PageName)
+            {
+                await JustUpdateTheTitle();
 
-            return;
+                return;
+            }
+
+            // If the name has changed, check if the new name is available
+            var result = await _svcContentDataService.GetAsync(Model.PageName, LocationId);
+
+            if (result.Success)
+            {
+                ErrorMessage = "A page with that name already exists for this location.";
+                return;
+            }
+
+            await UpdateTitleAndNameAndRenameDirectory();
         }
-
-        // If the name has changed, check if the new name is available
-        var result = await _svcContentDataService.GetAsync(Model.PageName, _originalLocationId);
-
-        if (result.Success)
+        catch (Exception ex)
         {
-            ErrorMessage = "A page with that name already exists for this location.";
-            return;
+            Log.Error(ex, "Error handling valid submit in RenamePage component");
+            ErrorMessage = "An error occurred while processing your request. Please try again later.";
         }
-
-        await UpdateTitleAndNameAndRenameDirectory();
     }
 
     private async Task UpdateTitleAndNameAndRenameDirectory()
@@ -105,15 +146,18 @@ public partial class RenamePage : ComponentBase
         updateResponse = await _svcContentDataService.UpdateAsync(_originalContent);
         if (updateResponse.Success)
         {
+            Log.Information($"{_svcAuth.UserName} rename page named {_originalContent.Name} to a name of {Model.PageName} for location {_locationName}");
+
             await _svcTranslationProcessorDataService.QueueContentTranslation(updateResponse.Data);
 
             _toastService.Success("Content Saved",
                 $"Page updated " +
                 $"for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
         }
         else
         {
+            Log.Error("RenamePage, Error updating content: " + updateResponse.Message);
             ErrorMessage = updateResponse.Message;
         }
     }
@@ -128,18 +172,25 @@ public partial class RenamePage : ComponentBase
         updateResponse = await _svcContentDataService.UpdateAsync(_originalContent);
         if (updateResponse.Success)
         {
+            Log.Information($"{_svcAuth.UserName} updated the Page Title to {_originalContent.Title} for page named {_originalContent.Name} for location {_locationName}");
             _toastService.Success("Content Saved",
                 $"Page updated for location {_locationRoute.TrimStart('/')} with name of {Model.PageName}");
-            _navigationManager.NavigateTo("/administration/manage/pages");
+            _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
         }
         else
         {
+            Log.Error("RenamePage, Error updating the title: " + updateResponse.Message);
             ErrorMessage = updateResponse.Message;
         }
     }
 
     private void HandleCancel()
     {
-        _navigationManager.NavigateTo("/administration/manage/pages");
+        if (_originalContent == null)
+        {
+            _navigationManager.NavigateTo("/administration/manage/pages/body");
+            return;
+        }
+        _navigationManager.NavigateTo($"/administration/manage/pages/{_originalContent.ContentType}");
     }
 }

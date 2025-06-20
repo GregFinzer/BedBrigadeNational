@@ -1,7 +1,13 @@
 ﻿@page "/{LocationRoute}/Blog/{BlogType}"
 @page "/{LocationRoute}/Blog/{BlogType}/{Filter}"
 
-@if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger text-center mt-5">
+        <strong>@ErrorMessage</strong>
+    </p>
+}
+else if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
 {
     <p><em>@_lc.Keys["Loading"]</em></p>
 }

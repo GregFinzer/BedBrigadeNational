@@ -34,7 +34,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
         {
-            return await GetByIdAsync(await GetUserName());
+            return await GetByIdAsync(GetUserName());
         }
 
         public async Task<ServiceResponse<List<User>>> GetAllForLocationAsync(int locationId)
@@ -55,7 +55,7 @@ namespace BedBrigade.Data.Services
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                var result = context.Roles.ToList();
+                var result = await context.Roles.ToListAsync();
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<Role>>($"Found {result.Count} Roles", true, result);
             }
@@ -98,7 +98,14 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>($"Found Email Signature for id {userName} in cache", true, cachedContent);
 
             var user = await GetByIdAsync(userName);
+
+            if (!user.Success || user.Data == null)
+                return new ServiceResponse<string>($"Could not find {GetEntityName()} with id {userName}", false);
+
             var location = await _locationDataService.GetByIdAsync(user.Data.LocationId);
+
+            if (!location.Success || location.Data == null)
+                return new ServiceResponse<string>($"Could not find Location with id {user.Data.LocationId}", false);
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine();

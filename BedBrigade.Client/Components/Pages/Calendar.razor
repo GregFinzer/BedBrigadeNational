@@ -9,60 +9,28 @@
 <div class="col-lg-12 control-section">
     @{
         if (IsDisplayCalendar)
-        {
+        {            
             <SfSchedule
-            CssClass="customize-schedule" 
-            TValue="AppointmentData" 
-            Width="100%" Height="650px" 
-            Readonly="true" 
-            @bind-SelectedDate="@CurrentDate" 
-            @bind-CurrentView="@CurrentView">
-                <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ></ScheduleEvents>
-                <ScheduleEventSettings DataSource="@dataSource"></ScheduleEventSettings>       
-                <ScheduleViews>
-                    <ScheduleView Option="View.Day">
-                        <EventTemplate>
-                            @{
-                                AppointmentData? evt = (context as AppointmentData);
-                                <EventView EventData="@evt" RequestedView="day" OnHyperlinkClicked="OnHyperlinkClicked"  />
-                            }
-                        </EventTemplate>
-                    </ScheduleView>
-                    <ScheduleView Option="View.Week">
-                        <EventTemplate>
-                            @{
-                                AppointmentData? evt = (context as AppointmentData);
-                                <EventView EventData="@evt" RequestedView="week" OnHyperlinkClicked="OnHyperlinkClicked"  />
-                            }
-                        </EventTemplate>
-                    </ScheduleView>
-                    <ScheduleView Option="View.WorkWeek">
-                        <EventTemplate>
-                            @{
-                                AppointmentData? evt = (context as AppointmentData);
-                                <EventView EventData="@evt" RequestedView="week" OnHyperlinkClicked="OnHyperlinkClicked" />
-                            }
-                        </EventTemplate>
-                    </ScheduleView>
-                    <ScheduleView MaxEventsPerRow="6" Option="View.Month">
-                        <EventTemplate>
-                            @{
-                                AppointmentData? evt = (context as AppointmentData);
-                                <EventView EventData="@evt" RequestedView="month" OnHyperlinkClicked="OnHyperlinkClicked" />
-                            }
-                        </EventTemplate>
-                    </ScheduleView>
-                    <ScheduleView Option="View.Agenda">
-                        <EventTemplate>
-                            @{
-                                AppointmentData? evt = (context as AppointmentData);
-                                <EventView EventData="@evt" RequestedView="agenda" OnHyperlinkClicked="OnHyperlinkClicked" />
-                            }
-                        </EventTemplate>
-                    </ScheduleView>
-                </ScheduleViews>
+                CssClass="customize-schedule" 
+                TValue="AppointmentData" 
+                Width="100%" Height="700px" 
+                Readonly="true"
+                CurrentView="View.Month"
+                ShowHeaderBar="true"
+                @bind-SelectedDate="@CurrentDate">
+                    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ></ScheduleEvents>
+                    <ScheduleEventSettings DataSource="@dataSource"></ScheduleEventSettings>                <ScheduleViews>
+                        <ScheduleView MaxEventsPerRow="6" Option="View.Month">
+                            <EventTemplate>
+                                @{
+                                    AppointmentData? evt = (context as AppointmentData);
+                                    <EventView EventData="@evt" RequestedView="month" OnHyperlinkClicked="OnHyperlinkClicked" />
+                                }
+                            </EventTemplate>
+                        </ScheduleView>
+                    </ScheduleViews>
             </SfSchedule>
-
+            <a href="@($"/{LocationRoute}/Events")" class="btn btn-primary mt-3 ms-3">@_lc["Events"]</a>
         } 
         else
         {
@@ -158,10 +126,20 @@
         white-space: normal;
     }
 
+    .e-schedule .e-month-view {
+        height: 700px !important;
+    }
+
+    .e-schedule .e-month-view .e-work-cells {
+        height: calc((700px - 100px) / 6) !important; /* Subtracting header height and dividing by typical number of weeks */
+    }
+
     .e-schedule .e-month-view .e-appointment {
-        height: 60px;
+        height: auto !important;
+        max-height: calc(((700px - 100px) / 6) - 10px) !important; /* Leaving some padding */
         font-size: smaller;
         padding-left: 5px;
+        margin-left: 12px;
     }
 
     .content-area {
@@ -175,5 +153,17 @@
         width: 800px;
     }
 
+    .control-section {
+        margin-top: 10px;
+    }
 
+    /* Hide the view selector buttons */
+    .e-schedule .e-schedule-toolbar .e-views {
+        display: none !important;
+    }
+
+    /* Ensure the navigation controls stay visible and centered */
+    .e-schedule .e-schedule-toolbar .e-toolbar-items {
+        justify-content: center;
+    }
 </style>

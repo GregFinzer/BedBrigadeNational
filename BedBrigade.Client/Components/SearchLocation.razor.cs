@@ -5,8 +5,8 @@ using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Components.Pages.Administration.Manage;
 using Microsoft.JSInterop;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -19,18 +19,14 @@ namespace BedBrigade.Client.Components
         [Parameter]
         public EventCallback<string> ParentMethod { get; set; }
         [Parameter]
-        public EventCallback<string> LocationChanged { get; set; }
-
-        [Inject] private ILocationDataService? _svcLocation { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
-        [Inject] private IJSRuntime JS { get; set; }
+        public EventCallback<string> LocationChanged { get; set; }        [Inject] private ILocationDataService? _svcLocation { get; set; }
+        [Inject] public required ILanguageContainerService _lc { get; set; }
+        [Inject] public required IJSRuntime JS { get; set; }
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
 
-        SfMaskedTextBox maskObj;
+        public required SfMaskedTextBox maskObj;
 
         public int ddlValue { get; set; } = 0;
-
-        public string InputID = "input-id";
 
         private string? PostalCode { get; set; } = string.Empty;
         private string PostalCodeResult { get; set; } = string.Empty;
@@ -79,6 +75,10 @@ namespace BedBrigade.Client.Components
                 SearchDisplay = DisplayNone;
                 ResultType = "DropDownList";
                 StateHasChanged();
+            }
+            else
+            {
+                Log.Error($"Failed to find location by name: {locationName}. Error: {result.Message}");
             }
         }
         
@@ -232,6 +232,11 @@ namespace BedBrigade.Client.Components
                     SubmitDisabled = false;
                 }
             }
+        }        
+        
+        public async Task HandleMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", maskObj.ID, 0);
         }
 
     }

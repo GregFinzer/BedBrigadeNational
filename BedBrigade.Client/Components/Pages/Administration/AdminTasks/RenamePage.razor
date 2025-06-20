@@ -1,5 +1,5 @@
 ﻿@layout Layout.AdminLayout
-@page "/administration/admintasks/renamePage/{LocationId}/{ContentName}"
+@page "/administration/admintasks/renamePage/{LocationId:int}/{ContentName}"
 @using BedBrigade.Common.Constants
 <CheckAuth Roles=@RoleNames.CanManagePages></CheckAuth>
 

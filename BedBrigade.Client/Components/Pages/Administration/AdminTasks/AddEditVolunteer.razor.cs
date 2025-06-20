@@ -1,15 +1,10 @@
-﻿using System.Drawing;
+﻿using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-
-using System.Security.Claims;
-using BedBrigade.Common.Constants;
-using BedBrigade.Common.Logic;
-using BedBrigade.Common.Models;
+using Microsoft.JSInterop;
 using Serilog;
-using Microsoft.AspNetCore.Components.Forms;
-using System.Net;
-using BedBrigade.Client.Services;
+using Syncfusion.Blazor.Inputs;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -23,7 +18,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IVolunteerDataService _volunteerDataService { get; set; }
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-        private ClaimsPrincipal? Identity { get; set; }
+        [Inject] private IUserDataService? _svcUser { get; set; }
+        [Inject] private IJSRuntime JS { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -33,22 +29,28 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             { "rows", "5" },
         };
-        
+        public required SfMaskedTextBox phoneTextBox;
 
         protected override async Task OnInitializedAsync()
         {
-            Identity = _svcAuth.CurrentUser;
-
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Add/Edit Volunteer Page");
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin))
+            try
             {
-                CanSetLocation = true;
-            }
+                Log.Information($"{_svcAuth.UserName} went to the Add/Edit Volunteer Page");
 
-            await LoadLocations();
-            await LoadVolunteer();
+                bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
+                if (isNationalAdmin)
+                {
+                    CanSetLocation = true;
+                }
+
+                await LoadLocations();
+                await LoadVolunteer();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing AddEditVolunteer component");
+                _toastService.Error(ErrorTitle, "An error occurred while loading the volunteer data.");
+            }
         }
 
         private async Task LoadLocations()
@@ -61,6 +63,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
             else
             {
+                Log.Error($"AddEditVolunteer, Error loading locations: {result.Message}");
                 _toastService.Error(ErrorTitle, result.Message);
             }
         } 
@@ -77,6 +80,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 }
                 else
                 {
+                    Log.Error($"AddEditVolunteer, Error loading volunteer with ID {VolunteerId}: {result.Message}");
                     _toastService.Error(ErrorTitle, result.Message);
                 }
             }
@@ -91,7 +95,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (IsValid() && await SaveVolunteer())
             {
-                _navigationManager.NavigateTo("/administration/manage/volunteers");
+                _navigationManager?.NavigateTo("/administration/manage/volunteers");
             }
         }
 
@@ -127,6 +131,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     return true;
                 }
 
+                Log.Error("AddEditVolunteer, Could not update volunteer " + updateResult.Message);
                 _toastService.Error(ErrorTitle, updateResult.Message);
                 return false;
             }
@@ -152,6 +157,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private void HandleCancel()
         {
             _navigationManager.NavigateTo("/administration/manage/volunteers");
+        }
+
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
         }
     }
 }

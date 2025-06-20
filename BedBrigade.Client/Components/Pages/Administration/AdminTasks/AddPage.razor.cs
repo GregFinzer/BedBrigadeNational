@@ -4,18 +4,19 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks;
 
 public partial class AddPage : ComponentBase
 {
-    [Inject] private IUserDataService _svcUserDataService { get; set; }
     [Inject] private ILocationDataService _svcLocationDataService { get; set; }
     [Inject] private NavigationManager _navigationManager { get; set; }
     [Inject] private IContentDataService _svcContentDataService { get; set; }
     [Inject] private ITemplateDataService _svcTemplateDataService { get; set; }
     [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
-
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
     [Parameter]
     public string ContentTypeString { get; set; }
 
@@ -29,13 +30,36 @@ public partial class AddPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        SelectedContentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
-        SingularName = Pluralization.MakeSingular(SelectedContentType.ToString());
-        Title = $"Add {SingularName}";
-        Model.Locations = (await _svcLocationDataService.GetAllAsync()).Data;
-        var user = (await _svcUserDataService.GetCurrentLoggedInUser()).Data;
-        Model.CurrentLocationId = user.LocationId;
-        Model.IsNationalAdmin = Model.CurrentLocationId == Defaults.NationalLocationId;
+        try
+        {
+            Log.Information($"{_svcAuth.UserName} went to the AddPage Page");
+            SelectedContentType = Enum.Parse<BedBrigade.Common.Enums.ContentType>(ContentTypeString, true);
+            SingularName = Pluralization.MakeSingular(SelectedContentType.ToString());
+            Title = $"Add {SingularName}";
+            await LoadLocations();
+            Model.CurrentLocationId = _svcAuth.LocationId;
+            Model.IsNationalAdmin = _svcAuth.IsNationalAdmin;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error initializing AddPage component");
+            _toastService.Error("Error", "An error occurred while loading the page data.");
+            ErrorMessage = "An error occurred while loading the page data.";
+        }
+    }
+
+
+
+    private async Task LoadLocations()
+    {
+        var locationsResult = await _svcLocationDataService.GetAllAsync();
+        if (!locationsResult.Success && locationsResult.Data != null)
+        {
+            Log.Error("AddPage, Failed to load locations: " +  locationsResult.Message);
+            ErrorMessage = "Failed to load locations: " + locationsResult.Message;
+            return;
+        }
+        Model.Locations = locationsResult.Data;
     }
 
     private void UpdatePageName(ChangeEventArgs e)
@@ -56,24 +80,55 @@ public partial class AddPage : ComponentBase
     
     private async Task HandleValidSubmit()
     {
-        var result = await _svcContentDataService.GetAsync(Model.PageName, Model.CurrentLocationId);
-
-        if (result.Success)
+        try
         {
-            ErrorMessage = $"A {SingularName} with that name already exists for this location.";
-            return;
-        }
+            var result = await _svcContentDataService.GetAsync(Model.PageName, Model.CurrentLocationId);
 
+            if (result.Success)
+            {
+                ErrorMessage = $"A {SingularName} with that name already exists for this location.";
+                return;
+            }
+
+            Content? content = await BuildContent();
+
+            if (content == null)
+                return;
+
+            var createResponse = await _svcContentDataService.CreateAsync(content);
+
+            if (createResponse.Success)
+            {
+                string locationName = Model.Locations.FirstOrDefault(l => l.LocationId == Model.CurrentLocationId)?.Name ?? "Unknown Location";
+                await _svcTranslationProcessorDataService.QueueContentTranslation(createResponse.Data);
+                _navigationManager.NavigateTo($"/administration/edit/editcontent/{Model.CurrentLocationId}/{Model.PageName}");
+            }
+            else
+            {
+                Log.Error("AddPage, Could not add page: " + createResponse.Message);
+                ErrorMessage = createResponse.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error handling valid submit in AddPage component");
+            ErrorMessage = "An error occurred while processing your request. Please try again later.";
+        }
+    }
+
+    private async Task<Content?> BuildContent()
+    {
         Content content;
 
         if (SelectedContentType == ContentType.Body)
         {
             var pageTemplate = await _svcTemplateDataService.GetByNameAsync(Defaults.DefaultPageTemplate);
 
-            if (!pageTemplate.Success)
+            if (!pageTemplate.Success || pageTemplate.Data == null)
             {
+                Log.Error("Could not find default page template: " + pageTemplate.Message);
                 ErrorMessage = pageTemplate.Message;
-                return;
+                return null;
             }
 
             content = new Content
@@ -97,17 +152,7 @@ public partial class AddPage : ComponentBase
             };
         }
 
-        var createResponse = await _svcContentDataService.CreateAsync(content);
-
-        if (createResponse.Success)
-        {
-            await _svcTranslationProcessorDataService.QueueContentTranslation(createResponse.Data);
-            _navigationManager.NavigateTo($"/administration/edit/editcontent/{Model.CurrentLocationId}/{Model.PageName}");
-        }
-        else
-        {
-            ErrorMessage = createResponse.Message;
-        }
+        return content;
     }
 
     private void HandleCancel()

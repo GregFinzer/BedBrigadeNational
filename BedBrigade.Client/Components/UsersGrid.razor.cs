@@ -1,18 +1,15 @@
-using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
-
-using Syncfusion.Blazor.DropDowns;
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
-using BedBrigade.Data.Services;
-using Serilog;
-using Action = Syncfusion.Blazor.Grids.Action;
-
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Serilog;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
+using System.Security.Claims;
+using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
 {
@@ -24,12 +21,12 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private IAuthDataService _svcAuthData { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private ILogger<User> _logger { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
-
+        [Inject] private IJSRuntime JS { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
         private ClaimsPrincipal Identity { get; set; }
         protected SfGrid<User>? Grid { get; set; }
-        protected SfDropDownList<string, Role>? RoleDD { get; set; }
+        
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
         protected string[] groupColumns = new string[] { "LocationId" };
@@ -38,14 +35,9 @@ namespace BedBrigade.Client.Components
         protected string? ButtonTitle { get; private set; }
         protected string? _state { get; set; }
         protected bool AddUser { get; private set; }
-        protected string? UserPassword { get; set; }
         protected bool UserPass { get; private set; }
-        protected SfToast? ToastObj { get; set; }
+
         protected bool NoPaging { get; private set; }
-        protected string? ToastTitle { get; private set; } = string.Empty;
-        protected string? ToastContent { get; private set; } = string.Empty;
-        protected int ToastTimeout { get; private set; } = 3000;
-        protected string ToastWidth { get; private set; } = "300";
         public List<Location>? Locations { get; private set; }
         protected UserRegister userRegister { get; set; } = new UserRegister();
         protected string Password { get; set; } = string.Empty;
@@ -56,67 +48,91 @@ namespace BedBrigade.Client.Components
         public string displayError { get; private set; } = "none;";
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
+        public required SfMaskedTextBox phoneTextBox;
 
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            _logger.LogInformation("Starting User Grid");
-            PasswordVisible = false;
-            
-            Identity = _svcAuth.CurrentUser;
-
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Users Page");
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
+            try
             {
-                ToolBar = new List<string> { "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+
+                _lc.InitLocalizedComponent(this);
+                PasswordVisible = false;
+
+                Identity = _svcAuth.CurrentUser;
+
+                Log.Information($"{_svcAuth.UserName} went to the Manage Users Page");
+
+                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
+                {
+                    ToolBar = new List<string>
+                    {
+                        "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export",
+                        "Search", "Reset"
+                    };
+                    ContextMenu = new List<string>
+                    {
+                        "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit",
+                        "AutoFitAll", "SortAscending", "SortDescending"
+                    }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }
+                else
+                {
+                    ToolBar = new List<string> { "Search" };
+                }
+
+                var getRoles = await _svcUser.GetRolesAsync();
+                if (getRoles.Success)
+                {
+                    Roles = getRoles.Data;
+                }
+
+                //TODO:  Refactor
+                await LoadUsers();
+
+
+                var getLocations = await _svcLocation.GetAllAsync();
+                if (getLocations.Success && getLocations.Data != null)
+                {
+                    Locations = getLocations.Data;
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                ToolBar = new List<string> { "Search" };
+                Log.Error(ex, "Error initializing UsersGrid component");
+                _toastService.Error("Error", "An error occurred while loading the user data.");
             }
-
-            var getRoles = await _svcUser.GetRolesAsync();
-            if (getRoles.Success)
-            {
-                Roles = getRoles.Data;
-            }
-
-            //TODO:  Refactor
-            await LoadUsers();
-
-
-            var getLocations = await _svcLocation.GetAllAsync();
-            if (getLocations.Success)
-            {
-                Locations = getLocations.Data;
-            }
-
-            //Users = result.Success ? result.Data : new ErrorHandler(_logger).ErrorHandlerAsync(this.GetType().Module.Name,result.Message);
-
         }
 
         private async Task LoadUsers()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
                 var allResult = await _svcUser.GetAllAsync();
 
-                if (allResult.Success)
+                if (allResult.Success && allResult.Data != null)
                 {
                     BBUsers = allResult.Data.ToList();
+                }
+                else
+                {
+                    _toastService.Error("Error", "Unable to load users. Please try again later.");
+                    Log.Error($"Error loading users: {allResult.Message}");
                 }
             }
             else
             {
-                int userLocationId = await _svcUser.GetUserLocationId();
+                int userLocationId = _svcUser.GetUserLocationId();
                 var contactUsResult = await _svcUser.GetAllForLocationAsync(userLocationId);
-                if (contactUsResult.Success)
+                if (contactUsResult.Success && contactUsResult.Data != null)
                 {
                     BBUsers = contactUsResult.Data.ToList();
+                }
+                else
+                {
+                    _toastService.Error("Error", "Unable to load users for the current location. Please try again later.");
+                    Log.Error($"Error loading users for location {userLocationId}: {contactUsResult.Message}");
                 }
             }
         }
@@ -127,7 +143,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.User };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -148,7 +164,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.User, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -226,18 +242,18 @@ namespace BedBrigade.Client.Components
             {
                 UserChangePassword changePassword = new UserChangePassword() { UserId = userRegister.user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
                 var result = await _svcAuthData.ChangePassword(changePassword.UserId, changePassword.Password);
-                ToastTitle = "Change Password";
                 if (result.Success)
                 {
-                    ToastContent = $"User password changed successfully!";
+                    _toastService.Success("Change Password", "Password Changed Successfully!");
                     displayError = "none;";
                     PasswordVisible = false;
                 }
                 else
                 {
-                    ToastContent = "Unable to change password!";
+                    Log.Error($"Unable to change password for user {changePassword.UserId}: {result.Message}");
+                    _toastService.Error("Change Password", $"Unable to change password!<br/>Correct the following errors:<br/>{result.Message}");
+                    displayError = "block;";
                 }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
 
             }
             else
@@ -315,36 +331,30 @@ namespace BedBrigade.Client.Components
             userRegister.user = user;
             userRegister.ConfirmPassword = userRegister.Password;
             var registerResult = await _svcAuthData.Register(userRegister.user, userRegister.Password);
-            ToastTitle = "Create User";
+            
             if (registerResult.Success)
             {
-                ToastContent = "User Created Successfully!";
+                _toastService.Success("Add User Success", "User Created Successfully!");
             }
             else
             {
-                ToastContent = $"Unable to create User!<br/>Correct the following errors:<br/>";
-                ToastContent += registerResult.Message + "<br/>";
-                ToastTimeout = 20000;
-                ToastWidth = "400";
-
+                Log.Error($"Unable to add user {user.UserName}: {registerResult.Message}");
+                _toastService.Error("Add User Error", $"Unable to add user! {registerResult.Message}");
             }
-            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
         private async Task UpdateUser(User user)
         {
             var userUpdate = await _svcUser.UpdateAsync(user);
-            ToastTitle = "Update User";
             if (userUpdate.Success)
             {
-                ToastContent = $"User Updated Successfully!";
-
+                _toastService.Success("Update User Success", "User Updated Successfully!");
             }
             else
             {
-                ToastContent = "Unable to update User!";
+                Log.Error($"Unable to update user {user.UserName}: {userUpdate.Message}");
+                _toastService.Error("Update User Error", $"Unable to update user! {userUpdate.Message}");
             }
-            await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
         }
 
         private async Task<Location> GetUserLocation(User user)
@@ -383,11 +393,13 @@ namespace BedBrigade.Client.Components
                 var deleted = await _svcUser.DeleteAsync(rec.UserName);
                 if (deleted.Success)
                 {
-                    ToastTitle = "Delete User";
-                    ToastContent = "Deleted Successful!";
-                    await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                    _toastService.Success("Delete User", $"User {rec.UserName} deleted successfully!");
                 }
-
+                else
+                {
+                    Log.Error($"Unable to delete user {rec.UserName}: {deleted.Message}");
+                    _toastService.Error("Delete User", $"Unable to delete user {rec.UserName}! {deleted.Message}");
+                }
             }
 
             await LoadUsers();
@@ -442,6 +454,9 @@ namespace BedBrigade.Client.Components
 
             await Grid.CsvExport(ExportProperties);
         }
-
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
     }
 }

@@ -1,24 +1,18 @@
-using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
-
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
-using BedBrigade.Data.Services;
-using Serilog;
-using Action = Syncfusion.Blazor.Grids.Action;
-
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
 using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.IO;
-using ContentType = BedBrigade.Common.Enums.ContentType;
-using System.Data.Entity;
+using Serilog;
 using Syncfusion.Blazor.DropDowns;
-using System.Diagnostics;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
+using System.Security.Claims;
+using Action = Syncfusion.Blazor.Grids.Action;
+using ContentType = BedBrigade.Common.Enums.ContentType;
 
 namespace BedBrigade.Client.Components
 {
@@ -30,24 +24,23 @@ namespace BedBrigade.Client.Components
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
-        [Inject] private IHeaderMessageService _headerMessageService { get; set; }
         [Inject] private IDeliverySheetService _svcDeliverySheet { get; set; }
         [Inject] private IContentDataService _svcContent { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
 
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
         private List<UsState>? StateList = AddressHelper.GetStateList();
-        public int NumericValue { get; set; } = 1;
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected List<BedRequest>? BedRequests { get; set; }
         protected List<Location>? Locations { get; set; }
         protected SfGrid<BedRequest>? Grid { get; set; }
@@ -57,20 +50,13 @@ namespace BedBrigade.Client.Components
         protected List<string>? lstSpeakEnglish;
 
         protected BedRequest BedRequest { get; set; } = new BedRequest();
-        protected string[] groupColumns = new string[] { "LocationId" };
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected string? addNeedDisplay { get; private set; }
-        protected string? editNeedDisplay { get; private set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
+
         protected bool OnlyRead { get; set; } = false;
 
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
-        protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
         public bool IsLocationColumnVisible { get; set; } = false;
         public string SpeakEnglishVisibility = "hidden";
@@ -88,7 +74,8 @@ namespace BedBrigade.Client.Components
         private bool IsDialogVisible { get; set; } = false;
         private string DialogHeader { get; set; } = string.Empty;
         private string DialogContent { get; set; } = string.Empty;
-        
+        public required SfMaskedTextBox zipTextBox;
+        public required SfMaskedTextBox phoneTextBox;
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -97,23 +84,28 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Bed Requests Page");
+            try
+            {
+                _lc.InitLocalizedComponent(this);
+                Log.Information($"{_svcAuth.UserName} went to the Manage Bed Requests Page");
 
-            SetupToolbar();
-            await LoadConfiguration();
-            await LoadLocations();
-            await LoadBedRequests();
-            
+                SetupToolbar();
+                await LoadConfiguration();
+                await LoadLocations();
+                await LoadBedRequests();
 
-            BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
+                BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"BedRequestGrid.OnInitializedAsync");
+                _toastService.Error("Error", "An error occurred while initializing the Bed Request Grid.");
+            }
         }
 
         private async Task LoadBedRequests()
         {
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
 
             //Get all records when an admin
             if (isNationalAdmin)
@@ -129,7 +121,7 @@ namespace BedBrigade.Client.Components
                 return;
             }
 
-            var locationId = await _svcUser.GetUserLocationId();
+            var locationId = _svcUser.GetUserLocationId();
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
             if (userLocationResult.Success && userLocationResult.Data != null)
@@ -200,7 +192,7 @@ namespace BedBrigade.Client.Components
 
         private void SetupToolbar()
         {
-            if (Identity.HasRole(RoleNames.CanManageBedRequests))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Sort Waiting Closest" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -216,7 +208,7 @@ namespace BedBrigade.Client.Components
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin) || Identity.IsInRole(RoleNames.LocationScheduler))
+                if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -235,7 +227,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -256,7 +248,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistDataAsync();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -332,6 +324,7 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Add:
+                    BedRequest = args.Data;
                     Add();
                     break;
 
@@ -351,27 +344,26 @@ namespace BedBrigade.Client.Components
             foreach (var rec in records)
             {
                 var deleteResult = await _svcBedRequest.DeleteAsync(rec.BedRequestId);
-                ToastTitle = "Delete BedRequest";
+                
                 if (deleteResult.Success)
                 {
-                    ToastContent = "Delete Successful!";
+                    _toastService.Success("Delete Successful", "The delete was successful");
                 }
                 else
                 {
-                    ToastContent = $"Unable to Delete. BedRequest is in use.";
+                    Log.Error($"Unable to delete BedRequest {rec.BedRequestId} : {deleteResult.Message}");
+                    _toastService.Error("Delete Unsuccessful", "The delete was unsucessful");
                     args.Cancel = true;
                 }
-                ToastTimeout = 6000;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
             }
         }
 
         private void Add()
         {
             HeaderTitle = @_lc.Keys["Add"]+" "+ @_lc.Keys["BedRequest"];
-            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"]; 
-            BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
+            BedRequest.LocationId = _svcAuth.LocationId;
+            BedRequest.PrimaryLanguage = "English";
         }
 
 
@@ -396,16 +388,16 @@ namespace BedBrigade.Client.Components
             {
                 //Update BedRequest Record
                 var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
-                ToastTitle = "Update BedRequest";
+                
                 if (updateResult.Success)
                 {
-                    ToastContent = "BedRequest Updated Successfully!";
+                    _toastService.Success("Update Successful", "The BedRequest was updated successfully");
                 }
                 else
                 {
-                    ToastContent = "Unable to update BedRequest!";
+                    Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
+                    _toastService.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
                 }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             else
             {
@@ -415,16 +407,15 @@ namespace BedBrigade.Client.Components
                 {
                     BedRequest = result.Data;
                 }
-                ToastTitle = "Create BedRequest";
                 if (BedRequest.BedRequestId != 0)
                 {
-                    ToastContent = "BedRequest Created Successfully!";
+                    _toastService.Success("BedRequest Created", "BedRequest Created Successfully!");
                 }
                 else
                 {
-                    ToastContent = "Unable to save BedRequest!";
+                    Log.Error($"Unable to create BedRequest : {result.Message}");
+                    _toastService.Error("BedRequest Not Created", "BedRequest was not created successfully");
                 }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
             }
             await Grid.Refresh();
         }
@@ -492,39 +483,53 @@ namespace BedBrigade.Client.Components
 
         private async void DownloadDeliverySheet()
         {
-            if (!await ValidateScheduled())
+            try
             {
-                return;
-            }
 
-            int selectedLocation;
-            if (IsLocationColumnVisible)
+                if (!await ValidateScheduled())
+                {
+                    return;
+                }
+
+                int selectedLocation;
+                if (IsLocationColumnVisible)
+                {
+                    List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                    selectedLocation = selectedBedRequests.First().LocationId;
+                }
+                else
+                {
+                    selectedLocation = _svcUser.GetUserLocationId();
+                }
+
+                var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+                string deliveryChecklist = string.Empty;
+
+                var deliveryChecklistResult =
+                    await _svcContent.GetSingleByLocationAndContentType(selectedLocation,
+                        ContentType.DeliveryCheckList);
+
+                if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
+                {
+                    deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                }
+
+                var scheduledBedRequestResult =
+                    await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+                string fileName =
+                    _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
+                Stream stream =
+                    _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data, deliveryChecklist);
+                using var streamRef = new DotNetStreamReference(stream: stream);
+
+                await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+
+            }
+            catch (Exception ex)
             {
-                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                selectedLocation = selectedBedRequests.First().LocationId;
+                Log.Error(ex, "Error downloading delivery sheet");
+                _toastService.Error("Error", "There was an error creating the delivery sheet. Please try again later.");
             }
-            else
-            {
-                selectedLocation = await _svcUser.GetUserLocationId();
-            }
-
-            var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
-            string deliveryChecklist = string.Empty;
-
-            var deliveryChecklistResult = await _svcContent.GetSingleByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
-
-            if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
-            {
-                deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
-            }
-
-            var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
-            string fileName = _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
-            Stream stream = _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data, deliveryChecklist);
-            using var streamRef = new DotNetStreamReference(stream: stream);
-
-            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-
         }
 
         private async Task<bool> ValidateScheduled()
@@ -553,7 +558,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                selectedLocation = await _svcUser.GetUserLocationId();
+                selectedLocation = _svcUser.GetUserLocationId();
             }
 
             var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
@@ -614,8 +619,15 @@ namespace BedBrigade.Client.Components
                 }
             }
         }
+        public async Task HandlePhoneMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
 
-
+        public async Task HandleZipMaskFocus()
+        {
+            await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", zipTextBox.ID, 0);
+        }
     }
 }
 

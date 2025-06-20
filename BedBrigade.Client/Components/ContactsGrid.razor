@@ -64,7 +64,7 @@ else
                                     ContactUs contactUs = (context as ContactUs)!;
                                     if(contactUs.LocationId == 0)
                                     {
-                                        contactUs.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+                                        contactUs.LocationId = _svcAuth.LocationId;
 
                                     }
                                     <div class="row">
@@ -77,7 +77,7 @@ else
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <SfMaskedTextBox Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" />
+                                            <SfMaskedTextBox @ref="phoneTextBox" Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" Focus="HandlePhoneMaskFocus" />
                                         </div>
                                         <div class="col-md-6">
                                             <SfTextBox @bind-Value=@contactUs.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto" />
@@ -158,9 +158,6 @@ else
         </div>
     </fieldset>
 }
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
-    <ToastPosition X="Center" Y="Top" ></ToastPosition>
-</SfToast>
 
 @if (NoPaging)
 {
@@ -181,35 +178,6 @@ else
     .e-grid th.e-headercell.e-focus.e-focused {
         box-shadow: none;
     }
-
-
-    .e-toast-container {
-        margin-top: 450px;
-    }
-
-        .e-toast-container .e-toast {
-            border: 1px solid black;
-            border-radius: 25px;
-        }
-            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
-            .e-toast-container .e-toast .e-toast-message .e-toast-title {
-                color: deepskyblue;
-                font-size: 18px;
-                font-weight: bold;
-                text-align: center;
-            }
-            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
-            .e-toast-container .e-toast .e-toast-message .e-toast-content {
-                color: black;
-                font-size: 14px;
-                font-weight: bold;
-                background-color: lightskyblue;
-                padding: 5px;
-                width: 100%;
-                height: 50px;
-                vertical-align: middle;
-                text-align: center;
-            }
 
     .e-dialog .e-dlg-header {
         font-size: 1.75rem;

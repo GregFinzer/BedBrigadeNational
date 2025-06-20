@@ -60,7 +60,7 @@ else
                                     BedRequest BedRequest = (context as BedRequest)!;
                                     if(BedRequest.LocationId == (int) LocationNumber.National)
                                     {
-                                        BedRequest.LocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
+                                        BedRequest.LocationId = _svcAuth.LocationId;
 
                                     }
                                      <div class="row">
@@ -92,7 +92,7 @@ else
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
-                                                    <SfMaskedTextBox Mask='(000) 000-0000' ID="phone" @bind-Value="BedRequest.Phone"></SfMaskedTextBox>
+                                                        <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="BedRequest.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
                                                     <div style="font-size: smaller">
                                                         <ValidationMessage For="@(() => BedRequest.Phone)"></ValidationMessage>
                                                     </div>
@@ -139,7 +139,7 @@ else
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="zip" class="formlabel required">@_lc.Keys["PostalCode"]</label>
-                                                        <SfMaskedTextBox ID="zip" Mask="00000" @bind-Value="@BedRequest.PostalCode"></SfMaskedTextBox>
+                                                        <SfMaskedTextBox @ref="zipTextBox" ID="zip" Mask="00000" @bind-Value="@BedRequest.PostalCode" Focus="HandleZipMaskFocus"></SfMaskedTextBox>
                                                         <div style="font-size: smaller">
                                                             <ValidationMessage For="@(() => BedRequest.PostalCode)"></ValidationMessage>
                                                         </div>
@@ -272,8 +272,6 @@ else
                             <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) ShowColumnMenu="false" HeaderText="Primary Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Format="N10" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Format="N10" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>
@@ -282,9 +280,7 @@ else
             </div>
         </div>
 }
-<SfToast ID="SaveToast" @ref=@ToastObj Title="@ToastTitle" Width="300" Timeout=@ToastTimeout Target="#TheToast" >
-    <ToastPosition X="Center" Y="Top" ></ToastPosition>
-</SfToast>
+
 
 <SfDialog Width="300px" ShowCloseIcon="true" IsModal="true" @bind-Visible="@IsDialogVisible">
     <DialogTemplates>
@@ -315,35 +311,6 @@ else
     .e-grid th.e-headercell.e-focus.e-focused {
         box-shadow: none;
     }
-
-
-    .e-toast-container {
-        margin-top: 450px;
-    }
-
-        .e-toast-container .e-toast {
-            border: 1px solid black;
-            border-radius: 25px;
-        }
-            /*Use the following CSS to customize the default toast’s title properties like font-family, font-size and color.*/
-            .e-toast-container .e-toast .e-toast-message .e-toast-title {
-                color: deepskyblue;
-                font-size: 18px;
-                font-weight: bold;
-                text-align: center;
-            }
-            /*Use the following CSS to customize the default toast’s content properties like font-family, font-size and color.*/
-            .e-toast-container .e-toast .e-toast-message .e-toast-content {
-                color: black;
-                font-size: 14px;
-                font-weight: bold;
-                background-color: lightskyblue;
-                padding: 5px;
-                width: 100%;
-                height: 50px;
-                vertical-align: middle;
-                text-align: center;
-            }
 
     .e-dialog .e-dlg-header {
         font-size: 1.75rem;

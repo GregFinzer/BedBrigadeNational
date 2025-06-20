@@ -2,6 +2,7 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.SMS;
 
@@ -21,9 +22,12 @@ public partial class SmsDetails : ComponentBase, IDisposable
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+    [Inject]
+    public SmsQueueBackgroundService SmsQueueBackgroundService { get; set; }
     [Inject] private IJSRuntime _js { get; set; }
     [Inject] private ISmsState _smsState { get; set; }
-
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
 
     protected List<SmsQueue>? smsMessages;
     protected string newMessage = string.Empty;
@@ -33,8 +37,17 @@ public partial class SmsDetails : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadMessages();
-        _smsState.OnChange += OnSmsStateChange;
+        try
+        {
+            Log.Information($"{_svcAuth.UserName} went to the SMS Details Page");
+            await LoadMessages();
+            _smsState.OnChange += OnSmsStateChange;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "SmsDetails OnInitializedAsync");
+            _toastService.Error("Error", $"An error occurred while loading messages: {ex.Message}");
+        }
     }
 
     private async Task OnSmsStateChange(SmsQueue smsQueue)
@@ -60,7 +73,7 @@ public partial class SmsDetails : ComponentBase, IDisposable
     {
         // Load messages for the specified location and phone
         var response = await SmsQueueDataService.GetMessagesForLocationAndToPhoneNumber(locationId, phone);
-        if (response?.Data != null)
+        if (response.Success && response.Data != null)
         {
             smsMessages = response.Data;
 
@@ -83,6 +96,12 @@ public partial class SmsDetails : ComponentBase, IDisposable
                     ContactInitials = "#";
                 }
             }
+        }
+        else
+        {
+            Log.Error("Failed to load messages for location {LocationId} and phone {Phone}: {Message}",
+                locationId, phone, response.Message);
+            _toastService.Error("Error", $"An error occurred while loading messages: {response.Message}");
         }
 
         if (smsMessages != null && smsMessages.Any(o => !o.IsRead))
@@ -108,13 +127,18 @@ public partial class SmsDetails : ComponentBase, IDisposable
         {
             // Send the message
             var response = await SendSmsLogic.SendTextMessage(locationId, phone, newMessage);
-            if (response != null && response.Success)
+            if (response.Success)
             {
+                SmsQueueBackgroundService.SendNow();
                 newMessage = string.Empty;
                 // Refresh the conversation
                 await LoadMessages();
             }
-            // Optionally handle an error response here
+            else
+            {
+                Log.Error("Failed to send message: {Message}", response.Message);
+                _toastService.Error("Error", $"An error occurred while sending the message: {response.Message}");
+            }
         }
     }
 }

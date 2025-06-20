@@ -1,15 +1,10 @@
-﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
-using System.Security.Claims;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 using BedBrigade.Common.Enums;
-using BedBrigade.Common.EnumModels;
-using Syncfusion.Blazor.Notifications.Internal;
-using Syncfusion.Blazor.Notifications;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage
@@ -25,7 +20,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private ToastService? _toastService { get; set; }
         protected List<Newsletter>? NewsletterRecords { get; set; }
         protected SfGrid<Newsletter>? Grid { get; set; }
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
         private const string LastPage = "LastPage";
@@ -44,23 +39,26 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Newsletters Page");
+            Log.Information($"{_svcAuth.UserName} went to the Manage Newsletters Page");
 
             var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
+            if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data;
+            }
+            else
+            {
+                Log.Error("ManageNewsletters, Could not load locations: " + locationResult.Message);
+                _toastService?.Error("Error Loading Locations", "Could not load locations: " + locationResult.Message);
             }
 
             ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
             ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
 
-            bool isNationalAdmin = await _svcUser.IsUserNationalAdmin();
+            
 
             //Get all records when an admin
-            if (isNationalAdmin)
+            if (_svcAuth.IsNationalAdmin)
             {
                 IsLocationColumnVisible = true;
                 var result = await _svcNewsletter.GetAllAsync();
@@ -68,14 +66,24 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 {
                     NewsletterRecords = result.Data;
                 }
+                else
+                {
+                    Log.Error("ManageNewsletters, Could not load newsletters: " + result.Message);
+                    _toastService?.Error("Error Loading Newsletters", "Could not load newsletters: " + result.Message);
+                }
             }
             else
             {
-                var locationId = await _svcUser.GetUserLocationId();
+                var locationId = _svcUser.GetUserLocationId();
                 var result = await _svcNewsletter.GetAllForLocationAsync(locationId);
                 if (result.Success)
                 {
                     NewsletterRecords = result.Data;
+                }
+                else
+                {
+                    Log.Error("ManageNewsletters, Could not load newsletters for location: " + result.Message);
+                    _toastService?.Error("Error Loading Newsletters", "Could not load newsletters for location: " + result.Message);
                 }
             }
         }
@@ -99,7 +107,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -120,7 +128,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -201,7 +209,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
                 else
                 {
-                    _toastService.Success("Error", $"Newsletter could not be deleted: " + rec.Name);
+                    Log.Error($"Error deleting newsletter {rec.Name}: {deleteResult.Message}");
+                    _toastService.Success("Error Deleting", $"Newsletter could not be deleted: " + rec.Name);
                     args.Cancel = true;
                 }
             }
@@ -217,7 +226,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task Save(ActionEventArgs<Newsletter> args)
         {
             Newsletter newsletter = args.Data;
-            if (newsletter.LocationId == 0 && !AddMode)
+            if (!AddMode)
             {
                 //Update Newsletter Record
                 var updateResult = await _svcNewsletter.UpdateAsync(newsletter);
@@ -227,7 +236,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
                 else
                 {
-                    _toastService.Error("Error", $"Could not update newsletter: " + newsletter.Name);
+                    Log.Error($"Error updating newsletter {newsletter.Name}: {updateResult.Message}");
+                    _toastService.Error("Error Updating", $"Could not update newsletter: " + newsletter.Name);
                 }
             }
             else
@@ -241,7 +251,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
                 else
                 {
-                    _toastService.Error("Error", $"Could not add newsletter: " + newsletter.Name);
+                    Log.Error($"Error adding newsletter {newsletter.Name}: {createResult.Message}");
+                    _toastService.Error("Error Adding", $"Could not add newsletter: " + newsletter.Name);
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<string>> GetManageEntitiesLegendText(string entitiesName)
         {
-            int locationId = await _locationDataService.GetUserLocationId();
+            int locationId = _locationDataService.GetUserLocationId();
             var locationResult = await _locationDataService.GetByIdAsync(locationId);
 
             if (!locationResult.Success || locationResult.Data == null)
@@ -25,7 +25,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>($"Location {locationId} not found");
             }
 
-            bool isNationalAdmin = await _locationDataService.IsUserNationalAdmin();
+            bool isNationalAdmin = _locationDataService.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
                 return new ServiceResponse<string>("Success", true, $"Manage {entitiesName} for All Locations");

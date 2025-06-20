@@ -6,6 +6,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 
 using BedBrigade.Common.Models;
+using Serilog;
 
 namespace BedBrigade.Client.Components
 {
@@ -26,7 +27,6 @@ namespace BedBrigade.Client.Components
 
         private string UniqueId = Guid.NewGuid().ToString();
 
-        private int WidgetId;
 
         public string ResultPrint = String.Empty;
 
@@ -37,11 +37,19 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            try
             {
-                SiteKey = await _svcConfiguration.GetConfigValueAsync(ConfigSection.System, ConfigNames.ReCaptchaSiteKey);
-                await JS.InvokeAsync<object>("My.reCAPTCHA.init");
-                this.WidgetId = await JS.InvokeAsync<int>("My.reCAPTCHA.render", DotNetObjectReference.Create(this), UniqueId, SiteKey);
+                if (firstRender)
+                {
+                    SiteKey = await _svcConfiguration.GetConfigValueAsync(ConfigSection.System, ConfigNames.ReCaptchaSiteKey);
+                    await JS.InvokeAsync<object>("My.reCAPTCHA.init");
+                    await JS.InvokeAsync<int>("My.reCAPTCHA.render", DotNetObjectReference.Create(this), UniqueId, SiteKey);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ReCAPTCHA component");
+                throw;
             }
         }
 
@@ -64,32 +72,35 @@ namespace BedBrigade.Client.Components
                 OnExpired.InvokeAsync(null);
             }
         }
-
-        public ValueTask<string> GetResponseAsync()
-        {
-            return JS.InvokeAsync<string>("My.reCAPTCHA.getResponse", WidgetId);
-        }
                     
         public async Task<(bool Success, string[] ErrorCodes)> Post(string reCAPTCHAResponse)
         {
+            try
+            {
+                var url = "https://www.google.com/recaptcha/api/siteverify";
+                var content = new FormUrlEncodedContent(new Dictionary<string, string?>
+                {
+                    { "secret", SiteKey },
+                    { "response", reCAPTCHAResponse}
+                });
 
-            var url = "https://www.google.com/recaptcha/api/siteverify";
-            var content = new FormUrlEncodedContent(new Dictionary<string, string?>
-            {                
-                { "secret", SiteKey },
-                { "response", reCAPTCHAResponse}
-            });
+                var httpClient = this.HttpClientFactory.CreateClient();
+                var response = await httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
 
-            var httpClient = this.HttpClientFactory.CreateClient();
-            var response = await httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+                var verificationResponse = await response.Content.ReadAsAsync<reCAPTCHAVerificationResponse>();
+                if (verificationResponse.Success) return (Success: true, ErrorCodes: new string[0]);
 
-            var verificationResponse = await response.Content.ReadAsAsync<reCAPTCHAVerificationResponse>();
-            if (verificationResponse.Success) return (Success: true, ErrorCodes: new string[0]);
+                return (
+                    Success: false,
+                    ErrorCodes: verificationResponse.ErrorCodes.Select(err => err.Replace('-', ' ')).ToArray());
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error verifying reCAPTCHA response");
+                return (Success: false, ErrorCodes: new[] { "An error occurred while verifying reCAPTCHA." });
+            }
 
-            return (
-                Success: false,
-                ErrorCodes: verificationResponse.ErrorCodes.Select(err => err.Replace('-', ' ')).ToArray());
         } // post
 
     }

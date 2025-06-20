@@ -37,10 +37,6 @@ namespace BedBrigade.Client.Components
 
         private string headerContent = string.Empty;
         protected string Login = "login";
-        private bool IsAuthenicated { get; set; } = false;
-        private string Menu { get; set; }
-
-        private string PreviousLocation { get; set; }
         private ClaimsPrincipal? User { get; set; }
 
         private string? _selectedCulture;
@@ -119,23 +115,30 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContent()
         {
-            string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
-            var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
+            try
+            {
+                string locationName = _locationState.Location ?? SeedConstants.SeedNationalName;
+                var locationResult = await _svcLocation.GetLocationByRouteAsync($"/{locationName.ToLower()}");
 
-            if (!locationResult.Success)
-            {
-                Log.Logger.Error($"Error loading location: {locationResult.Message}");
-            }
-            else
-            {
-                if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                if (!locationResult.Success && locationResult.Data != null)
                 {
-                    await LoadDefaultContent(locationResult, locationName);
+                    Log.Logger.Error($"Error loading location: {locationResult.Message}");
                 }
                 else
                 {
-                    await LoadContentByLanguage(locationResult, locationName);
+                    if (_svcLanguage.CurrentCulture.Name == Defaults.DefaultLanguage)
+                    {
+                        await LoadDefaultContent(locationResult, locationName);
+                    }
+                    else
+                    {
+                        await LoadContentByLanguage(locationResult, locationName);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Error loading Header content: {ex.Message}");
             }
         }
 
@@ -144,10 +147,9 @@ namespace BedBrigade.Client.Components
             var contentResult = await _svcContentTranslation.GetAsync("Header", locationResult.Data.LocationId,
                 _svcLanguage.CurrentCulture.Name);
 
-            if (contentResult.Success)
+            if (contentResult.Success && contentResult.Data != null)
             {
                 headerContent = contentResult.Data.ContentHtml;
-                PreviousLocation = locationName;
             }
             else
             {
@@ -159,10 +161,9 @@ namespace BedBrigade.Client.Components
         {
             var contentResult = await _svcContent.GetAsync("Header", locationResult.Data.LocationId);
 
-            if (contentResult.Success)
+            if (contentResult.Success && contentResult.Data != null)
             {
                 headerContent = contentResult.Data.ContentHtml;
-                PreviousLocation = locationName;
             }
             else
             {

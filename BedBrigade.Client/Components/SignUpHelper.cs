@@ -6,6 +6,7 @@ using BedBrigade.Common.Models;
 
 namespace BedBrigade.Client.Components
 {
+    //TODO:  This should go in the backend, not on the client side.
     public static class SignUpHelper
     {
 
@@ -13,7 +14,7 @@ namespace BedBrigade.Client.Components
         public static async Task<List<Volunteer>> GetVolunteers(IVolunteerDataService svcVolunteer)
         {
             var dataVolunteer = await svcVolunteer.GetAllAsync(); // get Schedules           
-            if (dataVolunteer.Success && dataVolunteer != null)
+            if (dataVolunteer.Success && dataVolunteer.Data != null)
             {
                 if (dataVolunteer.Data.Count > 0)
                 {

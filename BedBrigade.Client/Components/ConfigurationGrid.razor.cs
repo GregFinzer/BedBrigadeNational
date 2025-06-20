@@ -1,14 +1,8 @@
-using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-
-using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
@@ -24,6 +18,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
 
         [Parameter] public string? Id { get; set; }
 
@@ -31,7 +26,7 @@ namespace BedBrigade.Client.Components
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
+
         protected IEnumerable<Configuration>? ConfigRecs { get; set; }
         protected SfGrid<Configuration>? Grid { get; set; }
         protected List<string>? ToolBar;
@@ -39,10 +34,7 @@ namespace BedBrigade.Client.Components
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 5000;
+
         protected bool NoPaging { get; private set; }
         protected bool AddKey { get; set; } = false;
         protected string? RecordText { get; set; } = "Loading Configuration ...";
@@ -52,6 +44,7 @@ namespace BedBrigade.Client.Components
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
         protected List<Location> Locations { get; set; } = new List<Location>();
+
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -59,42 +52,76 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
-            Identity = _svcAuth.CurrentUser;
-            var userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-            Log.Information($"{userName} went to the Manage Configurations Page");
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin))
+            try
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
 
+                _lc.InitLocalizedComponent(this);
+                Log.Information($"{_svcAuth.UserName} went to the Manage Configurations Page");
+
+                if (_svcAuth.IsNationalAdmin)
+                {
+                    ToolBar = new List<string>
+                    {
+                        "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset"
+                    };
+                    ContextMenu = new List<string>
+                    {
+                        "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll",
+                        "SortAscending", "SortDescending"
+                    }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }
+                else
+                {
+                    ToolBar = new List<string> { "Search", "Reset" };
+                    ContextMenu = new List<string>
+                    {
+                        FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
+                        "SortDescending"
+                    }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                }
+
+                await LoadData();
+
+                ConfigSectionEnumItems = EnumHelper.GetConfigSectionItems();
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ConfigurationGrid component");
+                _toastService.Error("Error initializing Configuration Grid", ex.Message);
+            }
+        }
+
+        private async Task LoadData()
+        {
             var result = await _svcConfiguration.GetAllAsync();
-            if (result.Success)
+            if (result.Success && result.Data != null)
             {
                 ConfigRecs = result.Data.ToList();
             }
-
+            else
+            {
+                Log.Error($"Unable to load configurations: {result.Message}");
+                _toastService.Error("Unable to load configurations", result.Message);
+            }
+                
             var locationResult = await _svcLocation.GetAllAsync();
-            if (locationResult.Success)
+            if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data.ToList();
             }
-
-            ConfigSectionEnumItems = EnumHelper.GetConfigSectionItems();
+            else
+            {
+                Log.Error($"Unable to load locations: {locationResult.Message}");
+                _toastService.Error("Unable to load locations", locationResult.Message);
+            }
         }
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)
             {
-                if (Identity.IsInRole(RoleNames.NationalAdmin))
+                if (_svcAuth.IsNationalAdmin)
                 {
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
@@ -112,7 +139,7 @@ namespace BedBrigade.Client.Components
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -133,7 +160,7 @@ namespace BedBrigade.Client.Components
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -198,22 +225,28 @@ namespace BedBrigade.Client.Components
 
         private async Task Delete(ActionEventArgs<Configuration> args)
         {
-            List<Configuration> records = await Grid.GetSelectedRecordsAsync();
-            foreach (var rec in records)
+            try
             {
-                var deleteResult = await _svcConfiguration.DeleteAsync(rec.ConfigurationId);
-                ToastTitle = "Delete Configuration";
-                if (deleteResult.Success)
+                List<Configuration> records = await Grid.GetSelectedRecordsAsync();
+                foreach (var rec in records)
                 {
-                    ToastContent = "Delete Successful!";
+                    var deleteResult = await _svcConfiguration.DeleteAsync(rec.ConfigurationId);
+                    if (deleteResult.Success)
+                    {
+                        _toastService.Success("Delete Configuration", "Configuration Deleted Successfully!");
+                    }
+                    else
+                    {
+                        _toastService.Error("Delete Configuration", "Unable to delete configuration!");
+                        args.Cancel = true;
+                    }
                 }
-                else
-                {
-                    ToastContent = $"Unable to Delete. Configuration is in use.";
-                    args.Cancel = true;
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error deleting configuration");
+                _toastService.Error("Delete Configuration", "An error occurred while deleting the configuration.");
+                args.Cancel = true;
             }
         }
 
@@ -226,40 +259,42 @@ namespace BedBrigade.Client.Components
 
         private async Task Save(ActionEventArgs<Configuration> args)
         {
-            Configuration Configuration = args.Data;
-            if (!string.IsNullOrEmpty(Configuration.ConfigurationKey) && !AddKey )
+            try
             {
-                //Update Configuration Record
-                var updateResult = await _svcConfiguration.UpdateAsync(Configuration);
-                ToastTitle = "Update Configuration";
-                if (updateResult.Success)
+
+                Configuration Configuration = args.Data;
+                if (!string.IsNullOrEmpty(Configuration.ConfigurationKey) && !AddKey)
                 {
-                    ToastContent = "Configuration Updated Successfully!";
+                    //Update Configuration Record
+                    var updateResult = await _svcConfiguration.UpdateAsync(Configuration);
+                    if (updateResult.Success)
+                    {
+                        _toastService.Success("Update Configuration Success", "Configuration Updated Successfully!");
+                    }
+                    else
+                    {
+                        _toastService.Error("Update Configuration Error", "Unable to update configuration!");
+                    }
                 }
                 else
                 {
-                    ToastContent = "Unable to update Care Need!";
+                    // new Configuration
+                    var createResult = await _svcConfiguration.CreateAsync(Configuration);
+                    if (createResult.Success)
+                    {
+                        _toastService.Success("Add Configuration Success", "Configuration Added Successfully!");
+                    }
+                    else
+                    {
+                        _toastService.Error("Add Configuration Error", "Unable to add configuration!");
+                    }
                 }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+
             }
-            else
+            catch (Exception ex)
             {
-                // new Configuration
-                var createResult = await _svcConfiguration.CreateAsync(Configuration);
-                if (createResult.Success)
-                {
-                    Configuration config = createResult.Data;
-                }
-                ToastTitle = "Create Configuration";
-                if (createResult.Success)
-                {
-                    ToastContent = "Configuration Created Successfully!";
-                }
-                else
-                {
-                    ToastContent = "Unable to save configuration!";
-                }
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
+                Log.Error(ex, "Error saving configuration");
+                _toastService.Error("Save Configuration", "An error occurred while saving the configuration.");
             }
         }
 

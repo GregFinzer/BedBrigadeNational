@@ -63,7 +63,22 @@ namespace BedBrigade.Data.Services
                 return null;
             }
         }
-        
+
+        public string? UserRoute
+        {
+            get
+            {
+                if (CurrentUser != null
+                    && CurrentUser.Identity != null
+                    && CurrentUser.Identity.IsAuthenticated)
+                {
+                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == "UserRoute")?.Value;
+                }
+
+                return null;
+            }
+        }
+
         public string UserName
         {
             get
@@ -138,6 +153,16 @@ namespace BedBrigade.Data.Services
 
         public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
 
+        public bool IsNationalAdmin
+        {
+            get
+            {
+                string roleName = UserRole ?? string.Empty;
+
+                return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
+            }
+        }
+
         public async Task LogoutAsync()
         {
             //Update the Blazor Server State for the user to an anonymous user
@@ -204,8 +229,13 @@ namespace BedBrigade.Data.Services
         }
 
 
-        public async Task Login(ClaimsPrincipal user)
+        public async Task Login(ClaimsPrincipal? user)
         {
+            if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                throw new ArgumentException("User must be authenticated to login.");
+            }
+
             //Update the Blazor Server State for the user
             CurrentUser = user;
 

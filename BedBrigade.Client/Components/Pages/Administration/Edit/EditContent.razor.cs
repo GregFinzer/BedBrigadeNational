@@ -1,20 +1,14 @@
 ﻿using BedBrigade.Client.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.RichTextEditor;
-using System.Security.Claims;
-using BedBrigade.Client.Components;
 using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Popups;
-using Microsoft.AspNetCore.Mvc;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using Syncfusion.Blazor.Kanban.Internal;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Linq;
-using System.Net.Http.Headers;
 using BedBrigade.Common.Constants;
+using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
@@ -30,16 +24,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ICachingService _svcCaching { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
-        [Inject] private HttpClient Http { get; set; }
 
-        [Parameter] public string LocationId { get; set; }
+        [Parameter] public int LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
         private SfRichTextEditor RteObj { get; set; }
         private string? WorkTitle { get; set; }
         private string? Body { get; set; }
         private Content? Content { get; set; }
         private Dictionary<string, string>? ImageButtonList { get; set; } = null;
-        private ClaimsPrincipal? Identity { get; set; }
+
         private bool Refreshed { get; set; }
         SfDialog MediaDialog;
         public string FolderPath { get; set; }
@@ -106,56 +99,54 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         protected override async Task OnInitializedAsync()
         {
-            Refreshed = false;
-            Identity = _svcAuth.CurrentUser;
-            
-
-            int locationId;
-
-            if (!int.TryParse(LocationId, out locationId))
+            try
             {
-                _toastService.Error("Error",
-                    $"Could not parse location as integer: {LocationId}");
-                return;
-            }
+                Log.Information($"{_svcAuth.UserName} went to the EditContent Page for location id {LocationId} for content name {ContentName}");
+                Refreshed = false;
 
-            _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
-            _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
+                _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
+                _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
 
-            string allowedFileExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedFileExtensions");
-            string allowedVideoExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedVideoExtensions");
-            _allowedExtensions.AddRange(allowedFileExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
+                string allowedFileExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedFileExtensions");
+                string allowedVideoExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedVideoExtensions");
+                _allowedExtensions.AddRange(allowedFileExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+                _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+                _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
 
-            ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, locationId);
+                ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, LocationId);
 
-            if (contentResult.Success && contentResult.Data != null)
-            {
-                Content = contentResult.Data;
-                WorkTitle = $"Editing {Content.Title}";
-
-                if (BlogTypes.ValidBlogTypes.Contains(Content.ContentType))
+                if (contentResult.Success && contentResult.Data != null)
                 {
-                    _subdirectory = Content.ContentType.ToString();
+                    Content = contentResult.Data;
+                    WorkTitle = $"Editing {Content.Title}";
+
+                    if (BlogTypes.ValidBlogTypes.Contains(Content.ContentType))
+                    {
+                        _subdirectory = Content.ContentType.ToString();
+                    }
+                    else
+                    {
+                        _subdirectory = "pages";
+                    }
+                    await SetLocationName(LocationId);
+                    _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
+
+                    Body = await ProcessHtml(Content.ContentHtml);
+
+                    Content.UpdateDate = DateTime.UtcNow;
+                    Content.UpdateUser = _svcAuth.UserName;
+                    ImageButtonList = GetImageButtonList(Body);
                 }
                 else
                 {
-                    _subdirectory = "pages";
+                    _toastService.Error("Error Loading Location Content",
+                        $"Could not load Content for location {LocationId} with name of {ContentName}");
                 }
-                await SetLocationName(locationId);
-                _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
-
-                Body = await ProcessHtml(Content.ContentHtml);
-                
-                Content.UpdateDate = DateTime.UtcNow;
-                Content.UpdateUser =  Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                ImageButtonList = GetImageButtonList(Body);
             }
-            else
+            catch (Exception ex)
             {
-                _toastService.Error("Error",
-                    $"Could not load Content for location {LocationId} with name of {ContentName}");
+                Log.Error(ex, "Error initializing EditContent component");
+                _toastService.Error("Error Loading Location Content", $"An error occurred while initializing the page: {ex.Message}");
             }
         }
 
@@ -202,35 +193,42 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task<bool> HandleSaveOnlyClick(bool queueTranslation = false)
         {
-            Content.ContentHtml = await RteObj.GetXhtmlAsync();
-
-            //Update Content  Record
-            var updateResult = await _svcContent.UpdateAsync(Content);
-            if (updateResult.Success)
+            try
             {
-                if (Content.ContentType == ContentType.Header || Content.ContentType == ContentType.Footer)
+                Content.ContentHtml = await RteObj.GetXhtmlAsync();
+
+                //Update Content  Record
+                var updateResult = await _svcContent.UpdateAsync(Content);
+                if (updateResult.Success)
                 {
-                    await _locationState.NotifyStateChangedAsync();
+                    if (Content.ContentType == ContentType.Header || Content.ContentType == ContentType.Footer)
+                    {
+                        await _locationState.NotifyStateChangedAsync();
+                    }
+
+                    if (queueTranslation)
+                    {
+                        await _svcTranslationProcessorDataService.QueueContentTranslation(updateResult.Data);
+                    }
+
+                    _toastService.Success("Content Saved",
+                        $"Content saved for location {LocationRoute} with name of {ContentName}");
+
+                    return true;
                 }
 
-                if (queueTranslation)
-                {
-                    await _svcTranslationProcessorDataService.QueueContentTranslation(updateResult.Data);
-                }
-
-                _toastService.Success("Content Saved",
-                    $"Content saved for location {LocationRoute} with name of {ContentName}");
-
-                return true;
-            }
-            else
-            {
-                _toastService.Error("Error",
+                _toastService.Error("Save Error",
                     $"Could not save Content for location {LocationRoute} with name of {ContentName}");
                 return false;
             }
-
+            catch (Exception ex)
+            {
+                Log.Error(ex, "EditContent, Error saving content");
+                _toastService.Error("Save Error", $"An error occurred while saving the content: {ex.Message}");
+                return false;
+            }
         }
+
         private async Task HandleSaveAndCloseClick()
         {
             if (await HandleSaveOnlyClick(true))
@@ -263,13 +261,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private async Task CloseDialog()
         {
             await this.MediaDialog.HideAsync();
-
-            int locationId;
-
-            if (!int.TryParse(LocationId, out locationId))
-            {
-                return;
-            }
             _svcCaching.ClearAll();
             Body = await ProcessHtml(Body);
             await this.RteObj.RefreshUIAsync();

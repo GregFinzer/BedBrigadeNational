@@ -2,11 +2,11 @@
 
 @using System.ComponentModel.DataAnnotations
 @using BedBrigade.Common.Models
+@using Serilog
 @inject ISubscriptionDataService SubscriptionDataService
 @inject INewsletterDataService NewsletterDataService
 @inject ILocationDataService LocationDataService
 @inject ILanguageContainerService _lc
-@inject NavigationManager NavigationManager
 
 <div class="container mt-4">
     <h3 class="mb-4">@_lc.Keys["UnsubscribeFromNewsletter"]</h3>
@@ -15,9 +15,9 @@
     {
         <p>@_lc.Keys["Processing"]...</p>
     }
-    else if (!string.IsNullOrEmpty(unsubscribeMessage))
+    else if (!string.IsNullOrEmpty(Message))
     {
-        <p>@unsubscribeMessage</p>
+        <p>@Message</p>
     }
     else if (allParametersProvided)
     {
@@ -72,7 +72,7 @@
     public string email { get; set; }
 
     private bool isProcessing = false;
-    private string? unsubscribeMessage;
+    private string? Message { get; set; }
     private bool allParametersProvided =>
         locationId.HasValue && !string.IsNullOrEmpty(newsletterName) && !string.IsNullOrEmpty(email);
 
@@ -90,64 +90,91 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // If all three query parameters are supplied, automatically attempt to unsubscribe.
-        if (allParametersProvided)
+        try
         {
-            isProcessing = true;
-            var response = await SubscriptionDataService.Unsubscribe(Convert.ToInt32(locationId), newsletterName!, email!);
-            if (response.Success)
+            // If all three query parameters are supplied, automatically attempt to unsubscribe.
+            if (allParametersProvided)
             {
-                unsubscribeMessage = "You have been unsubscribed successfully.";
+                isProcessing = true;
+                var response = await SubscriptionDataService.Unsubscribe(Convert.ToInt32(locationId), newsletterName!, email!);
+                if (response.Success)
+                {
+                    Message = "You have been unsubscribed successfully.";
+                }
+                else
+                {
+                    Log.Error("UnsubscribeFromNewsletter.OnParametersSetAsync" + response.Message);
+                    Message = $"Error unsubscribing: {response.Message}";
+                }
+
+                isProcessing = false;
             }
             else
             {
-                unsubscribeMessage = $"Error unsubscribing: {response.Message}";
+                // Load the locations for the dropdown 
+                var locResponse = await LocationDataService.GetAllAsync();
+                if (locResponse.Success)
+                {
+                    locations = locResponse.Data;
+                }
             }
-            isProcessing = false;
         }
-        else
+        catch (Exception ex)
         {
-            // Load the locations for the dropdown 
-            var locResponse = await LocationDataService.GetAllAsync();
-            if (locResponse.Success)
-            {
-                locations = locResponse.Data;
-            }
+            Log.Error(ex, "UnsubscribeFromNewsletter.OnParametersSetAsync");
+            Message = $"Error unsubscribing, please try again later.";
         }
     }
 
     private async Task LocationChanged()
     {
-        // Update the selected location and load the corresponding newsletters.
-        var newsletterResponse = await NewsletterDataService.GetAllForLocationAsync(formModel.LocationId.Value);
-        if (newsletterResponse.Success)
+        try
         {
-            newsletters = newsletterResponse.Data;
+            // Update the selected location and load the corresponding newsletters.
+            var newsletterResponse = await NewsletterDataService.GetAllForLocationAsync(formModel.LocationId.Value);
+            if (newsletterResponse.Success && newsletterResponse.Data != null)
+            {
+                newsletters = newsletterResponse.Data;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "UnsubscribeFromNewsletter.LocationChanged");
+            Message = "Error loading newsletters for the selected location.";
         }
     }
 
     private async Task HandleUnsubscribe()
     {
-        // Validate that all fields have a value before attempting to unsubscribe.
-        if (formModel.LocationId.HasValue &&
-            !string.IsNullOrEmpty(formModel.NewsletterName) &&
-            !string.IsNullOrEmpty(formModel.Email))
+        try
         {
-            isProcessing = true;
-            var response = await SubscriptionDataService.Unsubscribe(formModel.LocationId.Value, formModel.NewsletterName!, formModel.Email!);
-            if (response.Success)
+            // Validate that all fields have a value before attempting to unsubscribe.
+            if (formModel.LocationId.HasValue &&
+                !string.IsNullOrEmpty(formModel.NewsletterName) &&
+                !string.IsNullOrEmpty(formModel.Email))
             {
-                unsubscribeMessage = "You have been unsubscribed successfully.";
+                isProcessing = true;
+                var response = await SubscriptionDataService.Unsubscribe(formModel.LocationId.Value, formModel.NewsletterName!, formModel.Email!);
+                if (response.Success)
+                {
+                    Message = "You have been unsubscribed successfully.";
+                }
+                else
+                {
+                    Message = $"Error unsubscribing: {response.Message}";
+                }
+
+                isProcessing = false;
             }
             else
             {
-                unsubscribeMessage = $"Error unsubscribing: {response.Message}";
+                Message = "Please provide all required fields.";
             }
-            isProcessing = false;
         }
-        else
+        catch (Exception ex)
         {
-            unsubscribeMessage = "Please provide all required fields.";
+            Log.Error(ex, "UnsubscribeFromNewsletter.HandleUnsubscribe");
+            Message = "An error occurred while trying to unsubscribe. Please try again later.";
         }
     }
 

@@ -23,13 +23,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
+        [Inject] private ToastService _toastService { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-        private ClaimsPrincipal? Identity { get; set; }
         protected List<Volunteer>? Volunteers { get; set; }
         public List<VehicleTypeEnumItem>? lstVehicleTypes { get; private set; }
         protected List<Location>? Locations { get; private set; }
@@ -45,10 +45,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
-        protected SfToast? ToastObj { get; set; }
-        protected string? ToastTitle { get; set; }
-        protected string? ToastContent { get; set; }
-        protected int ToastTimeout { get; set; } = 3000;
+
 
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
         public bool NoPaging { get; private set; }
@@ -56,24 +53,28 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadUserData();
-            await LoadLocations();
-            await LoadVolunteerData();
-            lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
-
-        } // Async Init
+            try
+            {
+                await LoadUserData();
+                await LoadLocations();
+                await LoadVolunteerData();
+                lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error initializing ManageVolunteers component");
+                ErrorMessage = "An error occurred while initializing the page: " + ex.Message;
+            }
+        } 
 
 
         private async Task LoadUserData()
         {
-            Identity = _svcAuth.CurrentUser;
-
-            userLocationId = int.Parse(Identity.Claims.FirstOrDefault(c => c.Type == "LocationId").Value);
-
-            userName = Identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
+            userLocationId = _svcAuth.LocationId;
+            userName = _svcAuth.UserName;
             Log.Information($"{userName} went to the Manage Volunteers Page");
 
-            if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
+            if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
@@ -84,28 +85,24 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
             }
 
-
-            if (Identity.IsInRole(RoleNames.NationalAdmin)) // not perfect! for initial testing
+            if (_svcAuth.IsNationalAdmin) 
             {
                 userRole = RoleNames.NationalAdmin;
                 isLocationAdmin = false;
             }
             else // Location User
             {
-                if (Identity.IsInRole(RoleNames.LocationAdmin))
+                if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
                 {
                     userRole = RoleNames.LocationAdmin;
                     isLocationAdmin = true;
                 }
 
-                if (Identity.IsInRole(RoleNames.LocationAuthor))
+                if (_svcAuth.UserHasRole(RoleNames.LocationScheduler))
                 {
-                    userRole = RoleNames.LocationAuthor;
+                    userRole = RoleNames.LocationScheduler;
                     isLocationAdmin = true;
                 }
-
-
-
             } // Get User Data
         } // User Data
 
@@ -168,7 +165,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         /// <returns></returns>
         protected async Task OnLoad()
         {
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer };
             var result = await _svcUserPersist.GetGridPersistence(persist);
             if (result.Success && result.Data != null)
@@ -190,7 +187,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private async Task SaveGridPersistence()
         {
             _state = await Grid.GetPersistData();
-            string userName = await _svcUser.GetUserName();
+            string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
@@ -227,6 +224,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
             if (volunteer != null)
             {
+                args.Cancel = true; 
                 _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
             }
         }
@@ -245,6 +243,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     break;
 
                 case Action.Add:
+                    args.Cancel = true; 
                     Add();
                     break;
 
@@ -261,19 +260,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             foreach (var rec in records)
             {
                 var deleteResult = await _svcVolunteer.DeleteAsync(rec.VolunteerId);
-                ToastTitle = "Delete Volunteer";
+
                 if (deleteResult.Success)
                 {
-                    ToastContent = "Delete Successful!";
+                    _toastService.Success("Success", $"Volunteer {rec.FirstName} {rec.LastName} deleted successfully.");
                 }
                 else
                 {
-                    ToastContent = $"Unable to Delete. Volunteer is in use.";
+                    Log.Error($"Failed to delete Volunteer {rec.FirstName} {rec.LastName}: {deleteResult.Message}");
+                    _toastService.Error("Error", $"Failed to delete Volunteer {rec.FirstName} {rec.LastName}: {deleteResult.Message}");
                     args.Cancel = true;
                 }
-                ToastTimeout = 4000;
-                await ToastObj.ShowAsync(new ToastModel { Title = ToastTitle, Content = ToastContent, Timeout = ToastTimeout });
-
             }
         }
 
@@ -281,12 +278,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}");
         }
-
-
-
-
-
-
 
         protected void DataBound()
         {

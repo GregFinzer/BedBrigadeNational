@@ -9,5 +9,6 @@ namespace BedBrigade.Client.Components
         public string Icon { get; set; }
         public string Content { get; set; }
         public SfToast ToastObj { get; set; }
+        public int Timeout { get; set; } = 6000; 
     }
 }

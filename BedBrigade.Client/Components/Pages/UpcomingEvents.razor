@@ -7,8 +7,9 @@
     <h1 class="text-center mb-4">@_lc.Keys["UpcomingEvents"]</h1>
     <p class="text-center">@_lc.Keys["SelectAnUpcomingEvent"]</p>
     <!-- Skip to Builds link for mobile devices -->
-    <div class="d-md-none text-center mb-3">
-        <button class="btn btn-primary" @onclick="ScrollToBuilds">@_lc.Keys["SkipToBuilds"]</button>
+    <div class="text-center mb-3">
+        <button class="d-md-none btn btn-primary" @onclick="ScrollToBuilds">@_lc.Keys["SkipToBuilds"]</button>
+        <a href="@($"/{LocationRoute}/Calendar")" class="btn btn-primary ms-2">@_lc["Calendar"]</a>
     </div>
     <div class="row">
         <!-- Delivery Events Column -->

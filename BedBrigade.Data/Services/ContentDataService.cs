@@ -3,6 +3,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BedBrigade.Data.Services;
 
@@ -185,7 +186,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
         using (var context = _contextFactory.CreateDbContext())
         {
             var entity = await context.Content.FindAsync(content.ContentId);
-
+            var originalEntity = ObjectUtil.Clone(entity);
             if (entity != null)
             {
                 var contentHistoryResult = await CreateContentHistoryRecord(entity, content);
@@ -199,10 +200,11 @@ public class ContentDataService : Repository<Content>, IContentDataService
                 entity.ContentHtml = StringUtil.RestoreHrefWithJavaScript(entity.ContentHtml, content.ContentHtml);
                 entity.ContentHtml = RemoveSyncFusionClasses(entity.ContentHtml);
                 entity.UpdateDate = DateTime.UtcNow;
-                entity.UpdateUser = content.UpdateUser;
+                entity.UpdateUser = GetUserName();
                 entity.MainImageFileName = content.MainImageFileName;
                 context.Entry(entity).State = EntityState.Modified;
                 await context.SaveChangesAsync();
+                Log.Debug($"{GetUserName()} Updated {GetEntityName()} with ID: {content.ContentId}{Environment.NewLine}{ObjectUtil.Differences(originalEntity, entity)}");
                 _cachingService.ClearByEntityName(GetEntityName());
                 return new ServiceResponse<Content>($"Content record was updated.", true, content);
             }

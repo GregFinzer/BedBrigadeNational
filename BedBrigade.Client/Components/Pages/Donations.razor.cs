@@ -1,14 +1,16 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components;
-using System.Globalization;
-using BedBrigade.Common.Enums;
-using Microsoft.AspNetCore.Components.Forms;
 using BedBrigade.SpeakIt;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using BedBrigade.Client.Services;
+using Serilog;
+using Syncfusion.Blazor.Inputs;
+using System.Globalization;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -30,6 +32,7 @@ public partial class Donations : ComponentBase, IDisposable
     [Inject] private ICarouselService _carouselService { get; set; }
     [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
     [Inject] private ILocationState _locationState { get; set; }
+    
     [Parameter] public string LocationRoute { get; set; } = default!;
     public int? LocationId { get; set; }
     public string LocationName { get; set; }
@@ -43,11 +46,12 @@ public partial class Donations : ComponentBase, IDisposable
     private const string DisplayNone = "none";
     private string MyValidationMessage = string.Empty;
     private string MyValidationDisplay = DisplayNone;
-    private ReCAPTCHA? reCAPTCHAComponent;
+
     private bool ValidReCAPTCHA = false;
     private ValidationMessageStore _validationMessageStore;
     public string BodyContent { get; set; } = string.Empty;
     public string PreviousBodyContent { get; set; } = string.Empty;
+    public required SfMaskedTextBox phoneTextBox;
     protected override async Task OnInitializedAsync()
     {
         _lc.InitLocalizedComponent(this);
@@ -59,7 +63,7 @@ public partial class Donations : ComponentBase, IDisposable
     private async Task LoadData()
     {
         ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
-        if (locationResponse != null && locationResponse.Success && locationResponse.Data != null)
+        if (locationResponse.Success && locationResponse.Data != null)
         {
             LocationId = locationResponse.Data.LocationId;
             LocationName = locationResponse.Data.Name;
@@ -78,6 +82,11 @@ public partial class Donations : ComponentBase, IDisposable
             {
                 DonationCampaigns = donationCampaignsResponse.Data;
             }
+            else
+            {
+                Log.Error($"Donations, No Donation Campaigns Defined for {LocationRoute}");
+                await ShowValidationMessage($"Donations, No Donation Campaigns Defined for {LocationRoute}");
+            }
 
             PaymentSession = new PaymentSession();
             PaymentSession.LocationId = LocationId.Value;
@@ -89,6 +98,11 @@ public partial class Donations : ComponentBase, IDisposable
 
             EC = new EditContext(PaymentSession);
             _validationMessageStore = new ValidationMessageStore(EC);
+        }
+        else
+        {
+            Log.Error($"Donations, Could not load location {LocationRoute}: " + locationResponse.Message);
+            await ShowValidationMessage($"Could not load location {LocationRoute}:" + locationResponse.Message);
         }
     }
 
@@ -117,6 +131,11 @@ public partial class Donations : ComponentBase, IDisposable
                 PreviousBodyContent = html;
                 BodyContent = html;
             }
+        }
+        else
+        {
+            PreviousBodyContent = string.Empty;
+            BodyContent = string.Empty;
         }
     }
 
@@ -233,14 +252,15 @@ public partial class Donations : ComponentBase, IDisposable
         if (isValid)
         {
             var urlResponse = await _paymentService.GetStripeDepositUrl(PaymentSession);
-            await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
 
             if (urlResponse.Success && !string.IsNullOrEmpty(urlResponse.Data))
             {
+                await _customSessionService.SetItemAsync(Defaults.PaymentSessionKey, PaymentSession);
                 _nav.NavigateTo(urlResponse.Data);
             }
             else
             {
+                Log.Error($"Donations, Error getting Stripe URL: {urlResponse.Message}");
                 await ShowValidationMessage(urlResponse.Message);
             }
         }
@@ -259,4 +279,10 @@ public partial class Donations : ComponentBase, IDisposable
     }
 
     #endregion
+
+    public async Task HandlePhoneMaskFocus()
+    {
+        await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+    }
+
 }

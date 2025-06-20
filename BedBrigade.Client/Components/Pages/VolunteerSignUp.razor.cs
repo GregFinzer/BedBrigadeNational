@@ -1,20 +1,15 @@
-using Syncfusion.Blazor.DropDowns;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Components;
-using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components.Forms;
-using BedBrigade.Common.Logic;
 using BedBrigade.Common.Enums;
-using Microsoft.AspNetCore.WebUtilities;
-using Serilog;
-using Microsoft.AspNetCore.Mvc;
-using Azure;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using System.Net;
+using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
-using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Routing;
+using Serilog;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Inputs;
+using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -42,14 +37,11 @@ namespace BedBrigade.Client.Components.Pages
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
 
-        private List<SignUp> VolunteerRegister { get; set; } = new List<SignUp>(); // Volunteer/Events Registration
-
         private SearchLocation? SearchLocation;
 
         private const string DisplayNone = "none";
 
         private string DisplayForm = DisplayNone;
-        private string DisplayAddressMessage = DisplayNone;
         private string DisplaySearch = DisplayNone;
         private string DisplayExId = DisplayNone;
         private string DisplayEventDetail = DisplayNone;
@@ -62,18 +54,12 @@ namespace BedBrigade.Client.Components.Pages
 
 
         private MarkupString FinalMessage;
-        private string SubmitAlertMessage = string.Empty;
         private string ResultDisplay = DisplayNone;
-        
-
-        private ReCAPTCHA? reCAPTCHAComponent;
         private bool ValidReCAPTCHA = false;
-        private bool ServerVerificatiing = false;
-        private bool EditFormStatus = false; // true if not errors
         private int selectedLocation = 0;
         private bool isNewVolunteer = false;
 
-        private bool DisableSubmitButton => !ValidReCAPTCHA || ServerVerificatiing;
+
         private EditContext? EC { get; set; }
 
         private string MyMessage = string.Empty;
@@ -81,20 +67,9 @@ namespace BedBrigade.Client.Components.Pages
         private bool AreSignUpsAvailable = false;
         private SfDropDownList<int, Schedule> ddlSchedule;
 
-        private string cssClass { get; set; } = "e-outline";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
             { "rows", "4" },
-        };
-
-        protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
-        {
-           { "font-weight", "bold" },
-        };
-
-        protected Dictionary<string, object> htmlattributeSize = new Dictionary<string, object>()
-        {
-           { "maxlength", "2" },
         };
 
         [Parameter] public string PreloadLocation { get; set; }
@@ -102,8 +77,9 @@ namespace BedBrigade.Client.Components.Pages
 
         private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
         private string[] SelectedLanguages { get; set; } = [];
-
+        public required SfMaskedTextBox phoneTextBox;
         #endregion
+
         #region Initialization
 
         protected override void OnInitialized()
@@ -116,30 +92,39 @@ namespace BedBrigade.Client.Components.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            try
             {
-                SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
-
-                if (!string.IsNullOrEmpty(LocationRoute))
+                if (firstRender)
                 {
-                    var result = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
+                    SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
 
-                    if (!result.Success)
+                    if (!string.IsNullOrEmpty(LocationRoute))
                     {
-                        _nav.NavigateTo($"/Sorry/{LocationRoute}/Volunteer");
-                        return;
-                    }
+                        var result = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
 
-                    await SearchLocation.ForceLocationByName(LocationRoute);
-                    await HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
-                    DisplayForm = "";
-                    StateHasChanged();
+                        if (!result.Success || result.Data == null)
+                        {
+                            _nav.NavigateTo($"/Sorry/{LocationRoute}/Volunteer");
+                            return;
+                        }
+
+                        await SearchLocation.ForceLocationByName(LocationRoute);
+                        await HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
+                        DisplayForm = "";
+                        StateHasChanged();
+                    }
+                    else
+                    {
+                        DisplaySearch = "";
+                        StateHasChanged();
+                    }
                 }
-                else
-                {
-                    DisplaySearch = "";
-                    StateHasChanged();
-                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"VolunteerSignUp.OnAfterRenderAsync");
+                await ShowMessage("Error loading page, try again later");
             }
         }
 
@@ -215,7 +200,7 @@ namespace BedBrigade.Client.Components.Pages
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error GetLocationEvents: {ex.Message}");
-                await ShowMessage(ex.Message);
+                await ShowMessage("Error getting location events: " + ex.Message);
             }
 
         }//GetLocationEvents
@@ -288,18 +273,7 @@ namespace BedBrigade.Client.Components.Pages
         }
 
 
-        private void OnOtherSpokenLanguagesChanged(MultiSelectChangeEventArgs<string[]> args)
-        {
-            newVolunteer.OtherLanguagesSpoken = string.Join(", ", args.Value);
-        }
-
-
-
-
-
-
         #endregion    
-
 
         #region reCaptcha
 
@@ -315,6 +289,7 @@ namespace BedBrigade.Client.Components.Pages
         }
 
         #endregion
+
         #region SaveVolunteer
 
         private Task RefreshPage()
@@ -398,7 +373,7 @@ namespace BedBrigade.Client.Components.Pages
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error ScheduleVolunteer: {ex.Message}");
-                await ShowMessage(ex.Message);
+                await ShowMessage("Error ScheduleVolunteer: " + ex.Message);
                 return false;
             }
         }
@@ -453,9 +428,8 @@ namespace BedBrigade.Client.Components.Pages
             }
             catch (Exception ex)
             {
-
                 Log.Logger.Error(ex, $"Error UpdateVolunteer: {ex.Message}");
-                await ShowMessage(ex.Message);
+                await ShowMessage("Error UpdateVolunteer: " + ex.Message);
                 return false;
             }
 
@@ -466,41 +440,50 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task CreateFinalMessage()
         {
-            string ResultTitle;
-            string ResultSubTitle = string.Empty;
-            string ResultMessage = string.Empty;
-
-            DisplaySearch = DisplayNone;
-            DisplayForm = DisplayNone;
-
-            var locationResult = await _svcLocation.GetByIdAsync(selectedLocation);
-            string selectedLocationName = locationResult.Data.Name;
-
-            if (isNewVolunteer)
+            try
             {
-                ResultTitle = _lc.Keys["VolunteerSignUpNew", new { fullName = newVolunteer.FullName }] + "<br />";
-                ResultSubTitle = _lc.Keys["VolunteerSignUpNewSubtitle"] + " ";
+                string ResultTitle;
+                string ResultSubTitle = string.Empty;
+                string ResultMessage = string.Empty;
+
+                DisplaySearch = DisplayNone;
+                DisplayForm = DisplayNone;
+
+                var locationResult = await _svcLocation.GetByIdAsync(selectedLocation);
+                string selectedLocationName = locationResult.Data.Name;
+
+                if (isNewVolunteer)
+                {
+                    ResultTitle = _lc.Keys["VolunteerSignUpNew", new { fullName = newVolunteer.FullName }] + "<br />";
+                    ResultSubTitle = _lc.Keys["VolunteerSignUpNewSubtitle"] + " ";
+                }
+                else // new Volunteer
+                {
+                    ResultTitle = _lc.Keys["VolunteerSignUpAgain", new { fullName = newVolunteer.FullName }] + "<br />";
+                    ResultSubTitle = _lc.Keys["VolunteerSignUpAgainSubtitle"] + " ";
+                }
+
+                string startTime = $"{SelectedEvent.EventDateScheduled.ToShortDateString()} {SelectedEvent.EventDateScheduled.ToShortTimeString()}";
+                string endTime = SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString();
+                ResultMessage +=
+                    $"{_lc.Keys["WeReceivedYourRegistration"]} {_translateLogic.GetTranslation(SelectedEvent.EventName)}, ";
+                ResultMessage += $"{_lc.Keys["FromStartTimeToEndTime", new { startTime = startTime, endTime = endTime }]} ";
+                ResultMessage += $"{_lc.Keys["AtBedBrigadeLocation", new { locationName = selectedLocationName }]} <br />";
+                ResultMessage += $"{SelectedEvent.EventNote} <br /><br />";
+                ResultMessage += $"{_lc.Keys["WeLookForwardToSeeingYou"]} <br />";
+
+                ResultMessage += $"{_lc.Keys["ThankYou"]}<br />";
+                ResultMessage += selectedLocationName;
+                ResultDisplay = "";
+                FinalMessage = BootstrapHelper.GetBootstrapJumbotron(ResultTitle, ResultSubTitle, ResultMessage);
+                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollPastImages");
             }
-            else // new Volunteer
+            catch (Exception ex)
             {
-                ResultTitle = _lc.Keys["VolunteerSignUpAgain", new { fullName = newVolunteer.FullName }] + "<br />";
-                ResultSubTitle = _lc.Keys["VolunteerSignUpAgainSubtitle"] + " ";
+                Log.Logger.Error(ex, $"Error CreateFinalMessage: {ex.Message}");
+                await ShowMessage("Error CreateFinalMessage: " + ex.Message);
             }
 
-            string startTime = $"{SelectedEvent.EventDateScheduled.ToShortDateString()} {SelectedEvent.EventDateScheduled.ToShortTimeString()}";
-            string endTime = SelectedEvent.EventDateScheduled.AddHours(SelectedEvent.EventDurationHours).ToShortTimeString();
-            ResultMessage +=
-                $"{_lc.Keys["WeReceivedYourRegistration"]} {_translateLogic.GetTranslation(SelectedEvent.EventName)}, ";
-            ResultMessage += $"{_lc.Keys["FromStartTimeToEndTime", new {startTime = startTime, endTime = endTime}]} ";
-            ResultMessage += $"{_lc.Keys["AtBedBrigadeLocation", new { locationName = selectedLocationName }]} <br />";
-            ResultMessage += $"{SelectedEvent.EventNote} <br /><br />";
-            ResultMessage += $"{_lc.Keys["WeLookForwardToSeeingYou"]} <br />";
-
-            ResultMessage += $"{_lc.Keys["ThankYou"]}<br />";
-            ResultMessage += selectedLocationName;
-            ResultDisplay = "";
-            FinalMessage = BootstrapHelper.GetBootstrapJumbotron(ResultTitle, ResultSubTitle, ResultMessage);
-            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollPastImages");
         } // Create Final Message
 
         private async Task<bool> UpdateScheduleVolunteerCount()
@@ -534,14 +517,18 @@ namespace BedBrigade.Client.Components.Pages
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error UpdateScheduleVolunteerCount: {ex.Message}");
-                await ShowMessage(ex.Message);
+                await ShowMessage("Error UpdateScheduleVolunteerCount: " + ex.Message);
                 return false;
             }
 
             return true;
-        } 
+        }
 
         #endregion
 
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
     }
 }
