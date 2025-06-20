@@ -235,7 +235,7 @@ section.flow {
 
 .delivering-top-section .widget.widget-image .widget-body {
   position: relative;
-  background-image: url(/media/national/pages/home/Layer-8.png);
+  background-image: url(/media/grove-city/pages/home/Layer-8.png);
   background-size: 90%;
   background-position: left top;
   background-repeat: no-repeat;
@@ -618,7 +618,7 @@ span.field-validation-error {
 }
 
 .request-img-rotate {
-  margin: 0 0 10px;
+  margin: 0 0 80px;
   overflow: hidden;
   position: relative;
   border-bottom: 15px solid #0e9249;

@@ -16,7 +16,8 @@ namespace BedBrigade.Data.Services
         {
             MemoryCacheProvider provider = new MemoryCacheProvider();
             //TODO:  Load from config
-            provider.DefaultExpirationInMinutes = 10;
+            provider.DefaultExpirationInMinutes = 15;
+            provider.MaxMegabytes = 256;
             SmartConfig config = LibraryFactory.CreateSmartConfig(provider);
             _cache = new SmartCache(config);
         }
@@ -60,6 +61,11 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            _cache.ClearAll();
+        }
+
+        public void ForceClearAll()
+        {
             _cache.ClearAll();
         }
 

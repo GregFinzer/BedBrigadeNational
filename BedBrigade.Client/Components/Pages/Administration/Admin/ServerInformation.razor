@@ -71,6 +71,7 @@
 </table>
 
 <h3 class="mb-4">Clear Cache</h3>
+<p>Caching Enabled: @_cachingService.IsCachingEnabled</p>
 <p>Click the button below to clear the cache.</p>
 <button class="btn btn-primary" @onclick="ClearCache">Clear Cache</button>
 
@@ -183,7 +184,7 @@
 
     private Task ClearCache()
     {
-        _cachingService.ClearAll();
+        _cachingService.ForceClearAll();
         _toastService.Success("Cache Cleared", "The cache has been cleared.");
         return Task.CompletedTask;
     }
