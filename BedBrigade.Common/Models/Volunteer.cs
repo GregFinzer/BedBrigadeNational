@@ -71,24 +71,24 @@ namespace BedBrigade.Common.Models
             }
         }
 
-        // additional Schedule/Event fields for EvolGrid
+        // additional Schedule/Event fields for SignUpGrid
         [NotMapped]
-        public Int32 RegistrationId { get; set; } = 0;
+        public Int32 SignUpId { get; set; } = 0;
         [NotMapped]
-		public Int32 EventId { get; set; } = 0;
+		public Int32 ScheduleId { get; set; } = 0;
 		[NotMapped]
-		public Int32 EventLocationId { get; set; } = 0;
+		public Int32 ScheduleLocationId { get; set; } = 0;
         [NotMapped]
-        public String? EventLocationName { get; set; } = string.Empty;
+        public String? ScheduleLocationName { get; set; } = string.Empty;
         [NotMapped]
-        public String? EventName { get; set; } = string.Empty;
+        public String? ScheduleEventName { get; set; } = string.Empty;
 		[NotMapped]
-		public DateTime? EventDate { get; set;}
+		public DateTime? ScheduleEventDate { get; set;}
 		[NotMapped]
-        public EventType EventType { get; set; } = EventType.Delivery;
+        public EventType ScheduleEventType { get; set; } = EventType.Delivery;
 
         [NotMapped]
-        public string EvolId
+        public string SignUpGridId
         {
             get
             {

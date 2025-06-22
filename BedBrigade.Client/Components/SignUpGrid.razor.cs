@@ -132,7 +132,7 @@ public partial class SignUpGrid : ComponentBase
     protected async Task OnLoad()
     {
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol };
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp };
         var result = await _svcUserPersist.GetGridPersistence(persist);
         if (result.Success && result.Data != null)
         {
@@ -153,11 +153,11 @@ public partial class SignUpGrid : ComponentBase
     {
         string state = await Grid.GetPersistData();
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol, Data = state };
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);
         if (!result.Success)
         {
-            Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.Evol} : {result.Message}");
+            Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.SignUp} : {result.Message}");
         }
     }
 
@@ -195,7 +195,15 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        userLocationId =  _svcUser.GetUserLocationId();
+        //TODO:  Change to Grove City when we seed National Admin
+        if (_svcAuth.IsNationalAdmin)
+        {
+            userLocationId = Defaults.GroveCityLocationId; // National Admin always uses Grove City
+        }
+        else
+        {
+            userLocationId = _svcUser.GetUserLocationId();
+        }
         userName = _svcUser.GetUserName();
         userRole = _svcUser.GetUserRole();
         Log.Information($"{userName} went to the Manage Sign Up Page");
@@ -270,8 +278,7 @@ public partial class SignUpGrid : ComponentBase
 
     private void PrepareGridData()
     {
-        EventVolunteers = SignUpHelper.GetGridDataSource(SignUps, Schedules, Volunteers, Locations);
-        return;
+        EventVolunteers = SignUpHelper.CombineAllData(SignUps, Schedules, Volunteers, Locations);
     } // Create Grid Data Source
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
@@ -296,14 +303,14 @@ public partial class SignUpGrid : ComponentBase
         {
             if (args.Item.Text.ToString() == CaptionAdd)
             {
-                if (selectedGridObject.EventId > 0) // Existing Schedule/Event ID
+                if (selectedGridObject.ScheduleId > 0) // Existing Schedule/Event ID
                 {
                     bSelectionStatus = true;
                 }
             }
             else // Delete
             {
-                if (selectedGridObject.RegistrationId > 0) // existing Link ID
+                if (selectedGridObject.SignUpId > 0) // existing Link ID
                 {
                     bSelectionStatus = true;
                     displayVolunteerData = "";
@@ -369,7 +376,7 @@ public partial class SignUpGrid : ComponentBase
         }
         else // delete action
         {
-            if (selectedGridObject.EventId > 0 && selectedGridObject.VolunteerId == 0)
+            if (selectedGridObject.ScheduleId > 0 && selectedGridObject.VolunteerId == 0)
             {
                 strMessageText = "No Volunteer to delete.<br />Go to Manage Schedules to delete events";
                 DialogMessage = BootstrapHelper.GetBootstrapMessage(CaptionWarning, strMessageText, "", false);
@@ -427,8 +434,8 @@ public partial class SignUpGrid : ComponentBase
         {
             var newRegistration = new SignUp();
             newRegistration.VolunteerId = newVolunteer.VolunteerId;
-            newRegistration.ScheduleId = selectedGridObject.EventId;
-            newRegistration.LocationId = selectedGridObject.EventLocationId;
+            newRegistration.ScheduleId = selectedGridObject.ScheduleId;
+            newRegistration.LocationId = selectedGridObject.ScheduleLocationId;
             var addResult = await _svcSignUp.CreateAsync(newRegistration);
             if (addResult.Success)
             {
@@ -474,7 +481,7 @@ public partial class SignUpGrid : ComponentBase
         var actionStatus = "error";
         if (selectedGridObject != null)
         {
-            int RegistrationId = selectedGridObject.RegistrationId;
+            int RegistrationId = selectedGridObject.SignUpId;
             if (RegistrationId > 0)
             {
                 var deleteResult = await _svcSignUp.DeleteAsync(RegistrationId);
@@ -482,7 +489,7 @@ public partial class SignUpGrid : ComponentBase
                 {
                     // add Volunteer to Schedule table
                     var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, "Del",
-                        selectedGridObject.EventId, selectedGridObject.VehicleType);
+                        selectedGridObject.ScheduleId, selectedGridObject.VehicleType);
                     if (bUpdateSchedule)
                     {
                         actionStatus = "success";
@@ -563,7 +570,7 @@ public partial class SignUpGrid : ComponentBase
         var AddItem = Toolbaritems.FirstOrDefault(tb => tb.Text == CaptionAdd);
         AddItem.Disabled = false;
         //Enable Delete - if row contains Volunteer Data
-        if (selectedGridObject.RegistrationId > 0)
+        if (selectedGridObject.SignUpId > 0)
         {
             var DelItem = Toolbaritems.FirstOrDefault(tb => tb.Text == "Delete");
             DelItem.Disabled = false;
