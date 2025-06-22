@@ -95,7 +95,7 @@ namespace BedBrigade.Client.Components
             }
 
             return (lstEmptyTables);
-        } // GetEvolDataStatus
+        } 
 
         public static MarkupString GetSignUpDataStatusMessage(List<string> lstEmptyTables)
         {
@@ -122,7 +122,7 @@ namespace BedBrigade.Client.Components
             strHtml=sbHtml.ToString();
             return (MarkupString)strHtml;
 
-        } // Get Evol Data Sttaus
+        } 
 
         public static List<Volunteer> CombineAllData(List<SignUp>? signUps = null, List<Schedule>? schedules = null, List<Volunteer>? volunteers = null, List<Location>? locations = null)
         {

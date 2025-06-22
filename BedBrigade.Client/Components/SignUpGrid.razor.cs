@@ -132,7 +132,7 @@ public partial class SignUpGrid : ComponentBase
     protected async Task OnLoad()
     {
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol };
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp };
         var result = await _svcUserPersist.GetGridPersistence(persist);
         if (result.Success && result.Data != null)
         {
@@ -153,11 +153,11 @@ public partial class SignUpGrid : ComponentBase
     {
         string state = await Grid.GetPersistData();
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Evol, Data = state };
+        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);
         if (!result.Success)
         {
-            Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.Evol} : {result.Message}");
+            Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.SignUp} : {result.Message}");
         }
     }
 
