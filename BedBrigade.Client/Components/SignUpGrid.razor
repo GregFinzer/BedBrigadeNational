@@ -3,7 +3,7 @@
 {   <div class="row"><div class="col">&nbsp;</div></div>
      <div class="row ustify-content-center" >
          <div class="col">
-           @SignUpHelper.GetEvolDataStatusMessage(lstEmptyTables)
+           @SignUpHelper.GetSignUpDataStatusMessage(lstEmptyTables)
          </div>
      </div>
 }
@@ -80,13 +80,13 @@
                                 <GridGroupSettings ShowDropArea="true" EnableLazyLoading="true" />
                                 <GridColumns>
                        
-                                <GridColumn Field=@nameof(Volunteer.EvolId) Visible="@displayId" IsPrimaryKey="true" HeaderText="PRID" TextAlign="TextAlign.Left"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                                <GridColumn Field=@nameof(Volunteer.RegistrationId) Visible="@displayId" HeaderText="Reg ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                                <GridColumn Field=@nameof(Volunteer.EventLocationId) Visible="@displayId" HeaderText="Loc ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.EventLocationName) HeaderText="Location Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
-                                <GridColumn Field=@nameof(Volunteer.EventId)  Visible="@displayId" HeaderText="Event ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.EventName) HeaderText="Event Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
-                        <GridColumn Field=@nameof(Volunteer.EventDate) HeaderText="Event Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                                <GridColumn Field=@nameof(Volunteer.SignUpGridId) Visible="@displayId" IsPrimaryKey="true" HeaderText="PRID" TextAlign="TextAlign.Left"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
+                                <GridColumn Field=@nameof(Volunteer.SignUpId) Visible="@displayId" HeaderText="Reg ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
+                                <GridColumn Field=@nameof(Volunteer.ScheduleLocationId) Visible="@displayId" HeaderText="Loc ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.ScheduleLocationName) HeaderText="Location Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
+                                <GridColumn Field=@nameof(Volunteer.ScheduleId)  Visible="@displayId" HeaderText="Event ID" TextAlign="TextAlign.Right"  AutoFit="true" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.ScheduleEventName) HeaderText="Event Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" AllowSorting="true" />
+                        <GridColumn Field=@nameof(Volunteer.ScheduleEventDate) HeaderText="Event Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
 
                                 <GridColumn Field=@nameof(Volunteer.VolunteerId)  Visible="@displayId" HeaderText="Vol ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
                         <GridColumn Field=@nameof(Volunteer.FullName) HeaderText="Volunteer Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" AllowSorting="true" />
@@ -157,19 +157,19 @@
                                              <table class="table table-striped table-sm">
                                                <tr style="display: @displayId">
                                                     <td style="vertical-align: top" >@_lc.Keys["EventidColon"]</td>
-                                                    <th style="vertical-align: top" >@selectedGridObject.EventId</th>
+                                                    <th style="vertical-align: top" >@selectedGridObject.ScheduleId</th>
                                                 </tr>
                                                 <tr>
                                                     <td style="vertical-align: top" >@_lc.Keys["LocationColon"]</td>
-                                                    <th style="vertical-align: top" >@StringUtil.IsNull(selectedGridObject.EventLocationName,"")</th>
+                                                    <th style="vertical-align: top" >@StringUtil.IsNull(selectedGridObject.ScheduleLocationName,"")</th>
                                                 </tr>
                                                 <tr>
                                                     <td style="vertical-align: top" >@_lc.Keys["NameColon"]</td>
-                                                    <th style="vertical-align: top" >@selectedGridObject.EventName</th>
+                                                    <th style="vertical-align: top" >@selectedGridObject.ScheduleEventName</th>
                                                 </tr>
                                                 <tr>
                                                     <td style="vertical-align: top" >@_lc.Keys["DateColon"]</td>
-                                                    <th style="vertical-align: top" >@DateUtil.GetFormattedDateTime(selectedGridObject.EventDate)</th>
+                                                    <th style="vertical-align: top" >@DateUtil.GetFormattedDateTime(selectedGridObject.ScheduleEventDate)</th>
                                                 </tr>
                                              </table>
                                          </div>
@@ -180,10 +180,10 @@
                                         <div class="card-title" style="text-align: center; background-color: #DEDEDE"><b>@_lc.Keys["Volunteer"]</b></div>
                                          <div class="card-body">
                                                <table class="table table-striped table-sm" style="display: @displayVolunteerData">
-                                                   @if(newVolunteer.RegistrationId>0){
+                                                   @if(newVolunteer.SignUpId>0){
                                                        <tr style="display: @displayId">
                                                             <td style="vertical-align: top" >@_lc.Keys["RegistrationidColon"]</td>
-                                                            <th style="vertical-align: top" >@newVolunteer.RegistrationId</th>
+                                                            <th style="vertical-align: top" >@newVolunteer.SignUpId</th>
                                                         </tr>
                                                    }
                                                 <tr style="display: @displayId">
