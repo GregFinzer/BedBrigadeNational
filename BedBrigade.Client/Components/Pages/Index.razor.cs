@@ -26,6 +26,7 @@ public partial class Index : ComponentBase, IDisposable
 
     [Inject] private ITranslationDataService _translateLogic { get; set; }
     [Inject] private ToastService _toastService { get; set; }
+    [Inject] private IIFrameControlService _iFrameControlService { get; set; }
 
     [Parameter] public string? LocationRoute { get; set; }
     [Parameter] public string? PageName { get; set; }
@@ -263,6 +264,7 @@ public partial class Index : ComponentBase, IDisposable
         html = _loadImagesService.SetImagesForHtml(path, html);
         html = _carouselService.ReplaceCarousel(html);
         html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);
+        html = _iFrameControlService.ReplaceiFrames(html);
         return html;
     }
 } 

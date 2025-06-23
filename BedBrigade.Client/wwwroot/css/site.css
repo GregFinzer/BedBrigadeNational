@@ -312,3 +312,12 @@ img {
     }
 }
 
+.mobile-message {
+    display: none;
+}
+
+@media (max-width: 599px) {
+    .mobile-message {
+        display: block;
+    }
+}
