@@ -9,7 +9,8 @@
 <div class="col-lg-12 control-section">
     @{
         if (IsDisplayCalendar)
-        {            
+        {
+            <div class="mobile-message">Turn your phone sideways for a better view</div>
             <SfSchedule
                 CssClass="customize-schedule" 
                 TValue="AppointmentData" 
@@ -140,6 +141,14 @@
         font-size: smaller;
         padding-left: 5px;
         margin-left: 12px;
+    }
+
+    @@media (max-width: 767px) {
+        .e-schedule .e-month-view .e-appointment
+        {
+            padding-left: 0px;
+            margin-left: 0px;
+        }
     }
 
     .content-area {

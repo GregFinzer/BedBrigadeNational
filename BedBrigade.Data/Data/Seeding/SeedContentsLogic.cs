@@ -225,7 +225,6 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "Donations", "GroveCityDonations.html");
         await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
         await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
-        await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
         await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
         await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
@@ -249,8 +248,6 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "Donations", "RockCityPolarisDonations.html");
         //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
         //await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
-        //await SeedContentItem(context, ContentType.Body, location, "Calendar", "GroveCityCalendar.html");
-        //await SeedContentItem(context, ContentType.Body, location, "Inventory", "GroveCityInventory.html");
     }
 
     private static async Task SeedContentItem(DataContext context,

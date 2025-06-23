@@ -32,7 +32,7 @@ public partial class Donations : ComponentBase, IDisposable
     [Inject] private ICarouselService _carouselService { get; set; }
     [Inject] private IContentTranslationDataService _svcContentTranslation { get; set; }
     [Inject] private ILocationState _locationState { get; set; }
-    
+    [Inject] private IIFrameControlService _iFrameControlService { get; set; }
     [Parameter] public string LocationRoute { get; set; } = default!;
     public int? LocationId { get; set; }
     public string LocationName { get; set; }
@@ -163,6 +163,7 @@ public partial class Donations : ComponentBase, IDisposable
     {
         html = _loadImagesService.SetImagesForHtml(path, html);
         html = _carouselService.ReplaceCarousel(html);
+        html = _iFrameControlService.ReplaceiFrames(html);
         return html;
     }
 
