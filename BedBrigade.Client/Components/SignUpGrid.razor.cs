@@ -195,15 +195,7 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        //TODO:  Change to Grove City when we seed National Admin
-        if (_svcAuth.IsNationalAdmin)
-        {
-            userLocationId = Defaults.GroveCityLocationId; // National Admin always uses Grove City
-        }
-        else
-        {
-            userLocationId = _svcUser.GetUserLocationId();
-        }
+        userLocationId = _svcUser.GetUserLocationId();
         userName = _svcUser.GetUserName();
         userRole = _svcUser.GetUserRole();
         Log.Information($"{userName} went to the Manage Sign Up Page");
