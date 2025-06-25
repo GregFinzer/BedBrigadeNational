@@ -58,7 +58,7 @@ else
                             <Template>
                                 @{
                                     BedRequest BedRequest = (context as BedRequest)!;
-                                    if(BedRequest.LocationId == (int) LocationNumber.National)
+                                    if(BedRequest.LocationId == Defaults.NationalLocationId)
                                     {
                                         BedRequest.LocationId = _svcAuth.LocationId;
 

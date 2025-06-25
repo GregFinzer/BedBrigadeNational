@@ -37,7 +37,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     {
         try
         {
-            var groveCityLocation = await GetByIdAsync((int) LocationNumber.GroveCity);
+            var groveCityLocation = await GetByIdAsync(Defaults.GroveCityLocationId);
 
             if (!groveCityLocation.Success || groveCityLocation.Data == null)
             {

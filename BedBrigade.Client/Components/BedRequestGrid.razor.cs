@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success)
             {
                 Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     Locations.Remove(item);

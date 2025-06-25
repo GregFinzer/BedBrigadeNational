@@ -277,7 +277,7 @@ public static class Seed
 
                 await context.SaveChangesAsync();
 
-                var groveCity = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.GroveCity);
+                var groveCity = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == Defaults.GroveCityLocationId);
                 if (groveCity != null)
                 {
                     groveCity.MetroAreaId = metroArea.MetroAreaId;
@@ -286,7 +286,7 @@ public static class Seed
                     await context.SaveChangesAsync();
                 }
 
-                var rockCityPolaris = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == (int)LocationNumber.RockCityPolaris);
+                var rockCityPolaris = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId);
                 if (rockCityPolaris != null)
                 {
                     rockCityPolaris.MetroAreaId = metroArea.MetroAreaId;
@@ -341,7 +341,7 @@ public static class Seed
 
             Schedule schedule = new Schedule
             {
-                LocationId = (int)LocationNumber.GroveCity,
+                LocationId = Defaults.GroveCityLocationId,
                 EventName = "Build",
                 EventNote =
                     "Come build beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.",
@@ -380,7 +380,7 @@ public static class Seed
 
             Schedule schedule = new Schedule
             {
-                LocationId = (int)LocationNumber.RockCityPolaris,
+                LocationId = Defaults.RockCityPolarisLocationId,
                 EventName = "Build",
                 EventNote =
                     "Come build beds with us at our shop at 171 E. 5th Ave, Columbus, OH.",
@@ -423,7 +423,7 @@ public static class Seed
 
             Schedule schedule = new Schedule
             {
-                LocationId = (int)LocationNumber.RockCityPolaris,
+                LocationId = Defaults.RockCityPolarisLocationId,
                 EventName = "Delivery",
                 EventNote =
                     "Come deliver beds with us from our shop at 171 E. 5th Ave, Columbus, OH.",
@@ -482,7 +482,7 @@ public static class Seed
             // Create the schedule
             Schedule schedule = new Schedule
             {
-                LocationId = (int)LocationNumber.GroveCity,
+                LocationId = Defaults.GroveCityLocationId,
                 EventName = "Delivery",
                 EventNote =
                     "Come deliver beds with us at our shop at 4004 Thistlewood Drive, Grove City. Look for signs.",
@@ -596,7 +596,7 @@ public static class Seed
                     // add the first record in Media table with National Logo
                     context.Media.Add(new Media
                     {
-                        LocationId = (int)LocationNumber.National,
+                        LocationId = Defaults.NationalLocationId,
                         FileName = "logo",
                         MediaType = "png",
                         FilePath = "media/national",
@@ -715,10 +715,10 @@ public static class Seed
                 }
                 break;
             case SeedConstants.SeedGroveCityName:
-                user.LocationId = (int)LocationNumber.GroveCity;
+                user.LocationId = Defaults.GroveCityLocationId;
                 break;
             case SeedConstants.SeedRockCityPolarisName:
-                user.LocationId = (int)LocationNumber.RockCityPolaris;
+                user.LocationId = Defaults.RockCityPolarisLocationId;
                 break;
             default:
                 throw new Exception("Invalid location name: " + user.FirstName);
@@ -776,7 +776,7 @@ public static class Seed
             List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
             List<VolunteerFor> volunteersFor = context.VolunteersFor.ToList();
             List<Location> locations = context.Locations.ToList();
-            var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
+            var item = locations.Single(r => r.LocationId == Defaults.NationalLocationId);
             if (item != null)
             {
                 locations.Remove(item);
@@ -865,7 +865,7 @@ public static class Seed
                 List<string> EmailProviders = new List<string> { "outlook.com", "gmail.com", "yahoo.com", "comcast.com", "cox.com" };
                 List<Location> locations = await context.Locations.ToListAsync();
                 List<DonationCampaign> donationCampaigns = await context.DonationCampaigns.ToListAsync();
-                var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = locations.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     locations.Remove(item);
@@ -931,7 +931,7 @@ public static class Seed
                 List<string> City = new List<string> { "Columbus", "Cleveland", "Cincinnati", "Canton", "Youngston", "Springfield", "Middletown", "Beavercreek" };
                 List<string> StreetName = new List<string> { "E. Bella Ln", "W. Chandler Blvd", "25 St.", "4th Ave.", "G Ave.", "Indian Wells CT.", "N. Arizona" };
                 List<Location> locations = await context.Locations.ToListAsync();
-                var item = locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = locations.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     locations.Remove(item);

@@ -120,7 +120,7 @@ namespace BedBrigade.Client.Components
             if (result.Success && result.Data != null)
             {
                 DonationCampaigns = result.Data.ToList();
-                var item = DonationCampaigns.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = DonationCampaigns.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     DonationCampaigns.Remove(item);
@@ -171,7 +171,7 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     Locations.Remove(item);

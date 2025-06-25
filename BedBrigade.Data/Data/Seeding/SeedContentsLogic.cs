@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Seeding;
@@ -46,7 +47,7 @@ public static class SeedContentsLogic
     private static async Task SeedNewsletterForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);
@@ -90,7 +91,7 @@ public static class SeedContentsLogic
     private static async Task SeedSignUpSmsConfirmationForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);
@@ -134,7 +135,7 @@ public static class SeedContentsLogic
     private static async Task SeedSignUpEmailConfirmationForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);
@@ -180,14 +181,14 @@ public static class SeedContentsLogic
         Log.Logger.Information("SeedNationalDonations Started");
 
         var name = "Donate";
-        if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == (int) LocationNumber.National))
+        if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == Defaults.NationalLocationId))
         {
             var seedHtml = WebHelper.GetSeedingFile("Donate.html");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
 
             var content = new Content
             {
-                LocationId = (int)LocationNumber.National,
+                LocationId = Defaults.NationalLocationId,
                 ContentType = ContentType.Body,
                 Name = name,
                 ContentHtml = seedHtml,
@@ -211,11 +212,11 @@ public static class SeedContentsLogic
     private static async Task SeedGroveCity(DataContext context)
     {
         Log.Logger.Information("SeedGroveCity Started");
-        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == (int)LocationNumber.GroveCity);
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == Defaults.GroveCityLocationId);
 
         if (location == null)
         {
-            Console.WriteLine($"Error cannot find location with id: " + LocationNumber.GroveCity);
+            Console.WriteLine($"Error cannot find location with id: " + Defaults.GroveCityLocationId);
             return;
         }
 
@@ -232,11 +233,11 @@ public static class SeedContentsLogic
     private static async Task SeedRockCityPolaris(DataContext context)
     {
         Log.Logger.Information("SeedRockCityPolaris Started");
-        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == (int)LocationNumber.RockCityPolaris);
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == Defaults.RockCityPolarisLocationId);
 
         if (location == null)
         {
-            Console.WriteLine($"Error cannot find location with id: " + LocationNumber.RockCityPolaris);
+            Console.WriteLine($"Error cannot find location with id: " + Defaults.RockCityPolarisLocationId);
             return;
         }
 
@@ -318,8 +319,8 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            if (location.LocationId == (int)LocationNumber.GroveCity
-                || location.LocationId == (int) LocationNumber.RockCityPolaris)
+            if (location.LocationId == Defaults.GroveCityLocationId
+                || location.LocationId == Defaults.RockCityPolarisLocationId)
             {
                 continue;
             }
@@ -330,7 +331,7 @@ public static class SeedContentsLogic
                 continue;
 
             string seedHtml;
-            if (location.LocationId == (int)LocationNumber.National)
+            if (location.LocationId == Defaults.NationalLocationId)
             {
                 seedHtml = WebHelper.GetSeedingFile("Header.html");
             }
@@ -378,7 +379,7 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            if (location.LocationId == (int)LocationNumber.RockCityPolaris)
+            if (location.LocationId == Defaults.RockCityPolarisLocationId)
             {
                 continue;
             }
@@ -389,7 +390,7 @@ public static class SeedContentsLogic
                 continue;
 
             string seedHtml;
-            if (location.LocationId == (int)LocationNumber.National)
+            if (location.LocationId == Defaults.NationalLocationId)
             {
                 seedHtml = WebHelper.GetSeedingFile($"Footer.html");
             }
@@ -435,8 +436,8 @@ public static class SeedContentsLogic
         {
             foreach (var location in locations)
             {
-                if (location.LocationId == (int)LocationNumber.GroveCity 
-                    || location.LocationId == (int) LocationNumber.RockCityPolaris)
+                if (location.LocationId == Defaults.GroveCityLocationId 
+                    || location.LocationId == Defaults.RockCityPolarisLocationId)
                 {
                     continue;
                 }
@@ -445,15 +446,15 @@ public static class SeedContentsLogic
 
                 switch (location.LocationId)
                 {
-                    case (int)LocationNumber.National:
+                    case Defaults.NationalLocationId:
                         seedHtml = WebHelper.GetSeedingFile("Home.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade");
                         break;
-                    case (int)LocationNumber.GroveCity:
+                    case Defaults.GroveCityLocationId:
                         seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
                         break;
-                    case (int)LocationNumber.RockCityPolaris:
+                    case Defaults.RockCityPolarisLocationId:
                         seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
                         break;
@@ -508,7 +509,7 @@ public static class SeedContentsLogic
 
             var content = new Content
             {
-                LocationId = (int)LocationNumber.National,
+                LocationId = Defaults.NationalLocationId,
                 ContentType = ContentType.Body,
                 Name = name,
                 ContentHtml = seedHtml,
@@ -540,7 +541,7 @@ public static class SeedContentsLogic
 
             var content = new Content
             {
-                LocationId = (int)LocationNumber.National,
+                LocationId = Defaults.NationalLocationId,
                 ContentType = ContentType.Body,
                 Name = name,
                 ContentHtml = seedHtml,
@@ -574,8 +575,8 @@ public static class SeedContentsLogic
         foreach (var location in locations)
         {
             //Do not seed National.  Grove City has it's own
-            if (location.LocationId == (int)LocationNumber.National
-                || location.LocationId == (int)LocationNumber.GroveCity)
+            if (location.LocationId == Defaults.NationalLocationId
+                || location.LocationId == Defaults.GroveCityLocationId)
             {
                 continue;
             }
@@ -595,13 +596,13 @@ public static class SeedContentsLogic
 
             foreach (var location in locations)
             {
-                if (location.LocationId == (int)LocationNumber.GroveCity
-                    || location.LocationId == (int) LocationNumber.RockCityPolaris)
+                if (location.LocationId == Defaults.GroveCityLocationId
+                    || location.LocationId == Defaults.RockCityPolarisLocationId)
                 {
                     continue;
                 }
 
-                if (location.LocationId == (int)LocationNumber.National)
+                if (location.LocationId == Defaults.NationalLocationId)
                 {
                     seedHtml = WebHelper.GetSeedingFile("AboutUs.html");
                 }
@@ -650,9 +651,9 @@ public static class SeedContentsLogic
         foreach (var location in locations)
         {
             //We have different pages for National, Grove City and Rock City Polaris
-            if (location.LocationId == (int)LocationNumber.National
-                || location.LocationId == (int)LocationNumber.GroveCity
-                || location.LocationId == (int) LocationNumber.RockCityPolaris)
+            if (location.LocationId == Defaults.NationalLocationId
+                || location.LocationId == Defaults.GroveCityLocationId
+                || location.LocationId == Defaults.RockCityPolarisLocationId)
                 continue;
 
             await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");
@@ -662,7 +663,7 @@ public static class SeedContentsLogic
     private static async Task SeedDeliveryCheckList(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);
@@ -707,7 +708,7 @@ public static class SeedContentsLogic
     private static async Task SeedTaxForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);
@@ -781,7 +782,7 @@ public static class SeedContentsLogic
     private static async Task SeedBedRequestConfirmationForm(DataContext context, List<Location> locations)
     {
         // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == (int)LocationNumber.National);
+        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
         if (National != null)
         {
             locations.Remove(National);

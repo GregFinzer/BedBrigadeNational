@@ -1,3 +1,4 @@
+using BedBrigade.Common.Constants;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
 using Action = Syncfusion.Blazor.Grids.Action;
@@ -80,7 +81,7 @@ namespace BedBrigade.Client.Components
             if (result.Success && result.Data != null)
             {
                 Locations = result.Data.ToList();
-                var item = Locations.FirstOrDefault(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.FirstOrDefault(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     Locations.Remove(item);

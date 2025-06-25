@@ -85,7 +85,7 @@ else
                             <Template>
                                 @{
                                     Donation donation = (context as Donation)!;
-                                    if (donation.LocationId == (int)LocationNumber.National || donation.LocationId == 0)
+                                    if (donation.LocationId == Defaults.NationalLocationId || donation.LocationId == 0)
                                     {
                                         donation.LocationId = _svcAuth.LocationId;
                                     }

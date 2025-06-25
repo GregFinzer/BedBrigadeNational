@@ -79,7 +79,7 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data.ToList();
-                var item = Locations.FirstOrDefault(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.FirstOrDefault(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     Locations.Remove(item);
