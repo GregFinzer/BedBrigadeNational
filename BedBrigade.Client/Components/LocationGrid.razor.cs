@@ -41,6 +41,7 @@ namespace BedBrigade.Client.Components
         public bool NoPaging { get; private set; }
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "80%", EnableResize = true };
+        public string ManageLocationsMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// Setup the configuration Grid component
@@ -70,11 +71,13 @@ namespace BedBrigade.Client.Components
             {
                 ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageLocationsMessage = "Manage Locations";
             }
             else
             {
                 ToolBar = new List<string> { "Search", "Reset" };
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageLocationsMessage = "View Locations";
             }
 
             ServiceResponse<List<Location>> result = await _svcLocation.GetAllAsync();

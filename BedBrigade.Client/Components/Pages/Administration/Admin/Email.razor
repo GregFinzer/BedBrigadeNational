@@ -11,15 +11,23 @@
 }
 else
 {
+
     <div class="container my-5 ">
-        <h1>Send Bulk Email</h1>
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>Send Bulk Email</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
         <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator/>
-            
+
             <div class="form-group mb-3">
                 <label for="emailRecipientOptionDropdown">To</label>
                 <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
-                    <DropDownListFieldSettings Text="Name" Value="Value" />
+                    <DropDownListFieldSettings Text="Name" Value="Value"/>
                     <DropDownListEvents TValue="EmailRecipientOption" TItem="EnumNameValue<EmailRecipientOption>" ValueChange="EmailRecipientChangeEvent"></DropDownListEvents>
                 </SfDropDownList>
             </div>
@@ -34,7 +42,7 @@ else
                     </SfDropDownList>
                 </div>
             }
-            
+
             @if (Model.ShowEventDropdown)
             {
                 <div class="form-group mb-3">
@@ -45,7 +53,7 @@ else
                     </SfDropDownList>
                 </div>
             }
-            
+
             @if (Model.ShowNewsletterDropdown)
             {
                 <div class="form-group mb-3">
@@ -59,10 +67,10 @@ else
 
             <div class="form-group mb-3">
                 <label for="subject">Subject:</label>
-                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"  />
+                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"/>
                 <div style="font-size: smaller">
                     <ValidationMessage For="@(() => Model.Subject)"></ValidationMessage>
-                </div>  
+                </div>
             </div>
 
             <div class="form-group mb-3">
@@ -70,7 +78,7 @@ else
                 <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="4000"></InputTextArea>
                 <div style="font-size: smaller">
                     <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
-                </div> 
+                </div>
             </div>
 
             @if (showPlan)
@@ -82,7 +90,7 @@ else
 
             <button type="submit" class="btn btn-primary">Submit</button>
         </EditForm>
-        
+
         <p>&nbsp;</p>
 
         @if (isSuccess)

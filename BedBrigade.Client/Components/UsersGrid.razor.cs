@@ -49,7 +49,8 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
         public required SfMaskedTextBox phoneTextBox;
-
+        public string ManageUsersMessage { get; set; } = "Manage Users";
+        private string _userLocationName = string.Empty;
         protected override async Task OnInitializedAsync()
         {
             try
@@ -62,23 +63,6 @@ namespace BedBrigade.Client.Components
 
                 Log.Information($"{_svcAuth.UserName} went to the Manage Users Page");
 
-                if (Identity.IsInRole(RoleNames.NationalAdmin) || Identity.IsInRole(RoleNames.LocationAdmin))
-                {
-                    ToolBar = new List<string>
-                    {
-                        "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export",
-                        "Search", "Reset"
-                    };
-                    ContextMenu = new List<string>
-                    {
-                        "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit",
-                        "AutoFitAll", "SortAscending", "SortDescending"
-                    }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-                }
-                else
-                {
-                    ToolBar = new List<string> { "Search" };
-                }
 
                 var getRoles = await _svcUser.GetRolesAsync();
                 if (getRoles.Success)
@@ -94,13 +78,48 @@ namespace BedBrigade.Client.Components
                 if (getLocations.Success && getLocations.Data != null)
                 {
                     Locations = getLocations.Data;
+                    _userLocationName = Locations.Find(o => o.LocationId == _svcAuth.LocationId).Name;
                 }
+
+                SetupToolbar();
 
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error initializing UsersGrid component");
                 _toastService.Error("Error", "An error occurred while loading the user data.");
+            }
+        }
+
+        private void SetupToolbar()
+        {
+            if (_svcAuth.UserHasRole(RoleNames.CanManageUsers))
+            {
+                ToolBar = new List<string>
+                {
+                    "Add", "Edit", "Password", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export",
+                    "Search", "Reset"
+                };
+                ContextMenu = new List<string>
+                {
+                    "Edit", "Password", "Delete", "FirstPage", "NextPage", "PrevPage", "LastPage", "AutoFit",
+                    "AutoFitAll", "SortAscending", "SortDescending"
+                }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+
+
+                if (_svcAuth.IsNationalAdmin)
+                {
+                    ManageUsersMessage=  $"Manage Users Nationally";
+                }
+                else
+                {
+                    ManageUsersMessage = $"Manage Users for {_userLocationName}";
+                }
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search" };
+                ManageUsersMessage = $"View Users for {_userLocationName}";
             }
         }
 

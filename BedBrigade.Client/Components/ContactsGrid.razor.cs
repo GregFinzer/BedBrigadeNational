@@ -104,7 +104,14 @@ namespace BedBrigade.Client.Components
 
                     if (metroAreaResult.Success && metroAreaResult.Data != null)
                     {
-                        ManageContactsMessage = $"Manage Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                        if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
+                        {
+                            ManageContactsMessage = $"Manage Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                        }
+                        else
+                        {
+                            ManageContactsMessage = $"View Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                        }
                     }
 
                     var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
@@ -127,7 +134,15 @@ namespace BedBrigade.Client.Components
                 if (locationResult.Success)
                 {
                     Contacts = locationResult.Data.ToList();
-                    ManageContactsMessage = $"Manage Bed Requests for {userLocationResult.Data.Name}";
+
+                    if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
+                    {
+                        ManageContactsMessage = $"Manage Contacts for {userLocationResult.Data.Name}";
+                    }
+                    else
+                    {
+                        ManageContactsMessage = $"View Contacts for {userLocationResult.Data.Name}";
+                    }
                 }
             }
         }

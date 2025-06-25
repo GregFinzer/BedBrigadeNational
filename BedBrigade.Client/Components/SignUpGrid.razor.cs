@@ -92,7 +92,7 @@ public partial class SignUpGrid : ComponentBase
     // test variables
 
     public string strHtml = string.Empty;
-    private string testString = string.Empty;
+    
     private List<string> lstEmptyTables = new List<string>();
     public string ManageSignUpsMessage { get; set; }
 
@@ -394,9 +394,6 @@ public partial class SignUpGrid : ComponentBase
 
         lstLocationVolunteers =
             SignUpHelper.GetLocationVolunteersSelector(selectedGridObject, lstVolunteerSelector, SignUps);
-        //strJson = JsonConvert.SerializeObject(lstLocationVolunteers, Formatting.Indented);
-        //strHtml = "<pre>" + strJson + "</pre>";
-
 
 
         if (lstLocationVolunteers.Count > 0)

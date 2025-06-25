@@ -53,6 +53,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 await LoadUserData();
                 await LoadLocations();
                 await LoadVolunteerData();
+                SetupToolbar();
                 lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
             }
             catch (Exception ex)
@@ -60,7 +61,23 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 Log.Error(ex, "Error initializing ManageVolunteers component");
                 ErrorMessage = "An error occurred while initializing the page: " + ex.Message;
             }
-        } 
+        }
+
+        private void SetupToolbar()
+        {
+            if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
+            {
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageVolunteersMessage = $"Manage Volunteers for {userLocationName}";
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageVolunteersMessage = $"View Volunteers for {userLocationName}";
+            }
+        }
 
 
         private async Task LoadUserData()
@@ -68,18 +85,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             userLocationId = _svcAuth.LocationId;
             userName = _svcAuth.UserName;
             Log.Information($"{userName} went to the Manage Volunteers Page");
-
-            if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
-            {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-
             userRole = _svcAuth.UserRole;
         } // User Data
 
@@ -91,10 +96,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (dataLocations.Success) // 
             {
                 Locations = dataLocations.Data;
-                if (Locations != null && Locations.Count > 0)
+                if (Locations != null && Locations.Count > 0 && userLocationId > 0)
                 { // select User Location Name 
                     userLocationName = Locations.Find(e => e.LocationId == userLocationId).Name;
-                    ManageVolunteersMessage = $"Manage Volunteers for {userLocationName}";
                 } // Locations found             
 
             }

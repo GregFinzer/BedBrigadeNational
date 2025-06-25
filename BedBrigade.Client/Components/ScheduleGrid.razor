@@ -8,28 +8,23 @@
 @using BedBrigade.Common.Models
 @using BedBrigade.Common.Logic;
 
-
-<div class="col-lg-12 control-sec">
-    <div class="row"><div class="col">&nbsp;</div></div>
-    <div class="row">
-        <div class="col ms-3">
-            <h2>@ManageScheduleMessage</h2>
-        </div>
-        <div class="col" style="text-align: right">
-            <h5>@_lc.Keys["ShowSchedules"]&nbsp;</h5>
-        </div>
-        <div class="col">
-            <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
-                <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
-                <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
-            </SfDropDownList>
-        </div>
-        <div class="col" style="text-align:right; font-size: small">
-            <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-            <span>[@_lc.Keys["LocationColon"] @userLocationName]</span>
-            <br />@userName
-        </div>
+<div class="row mt-3">
+    <div class="col-md-6 ps-3">
+        <h3>@ManageScheduleMessage</h3>
     </div>
+    <div class="col-md-4 ps-3 ps-md-0">
+        @_lc.Keys["ShowSchedules"]
+        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
+            <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
+            <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>		
+    <div class="col-md-2 ps-3 ps-md-0">
+        <UserInfo />
+    </div>
+</div>
+<div class="col-lg-12 control-sec">
+
     <div class="content-wrapper">
         <div class="row">
             <div style="width: 100%">
