@@ -13,72 +13,78 @@
 }
 else
 {
-    <fieldset>
-        <legend class="ms-3">Manage Metro Areas</legend>
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper">
-                <div class="row">
-                    <SfGrid @ref="Grid" TValue="MetroArea" DataSource=@MetroAreas
-                            ContextMenuItems=@ContextMenu
-                            EnablePersistence="true"
-                            ShowColumnChooser="true"
-                            Toolbar=@ToolBar
-                            AllowPaging="true"
-                            AllowSorting="true"
-                            AllowExcelExport="true"
-                            ShowColumnMenu="true"
-                            AllowFiltering="true"
-                            AllowReordering="true"
-                            AllowResizing="true"
-                            AllowSelection="true"
-                            AllowPdfExport="true"
-                            AllowTextWrap="true"
-                            Width="100%">
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
-                        <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="MetroArea" />
-                        <GridTemplates>
-                            <EmptyRecordTemplate>
-                                <span>@RecordText</span>
-                            </EmptyRecordTemplate>
-                        </GridTemplates>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                            <HeaderTemplate>
-                                @{
-                                    @HeaderTitle
-                                }
-                            </HeaderTemplate>
-                            <FooterTemplate>
-                                <button class="btn btn-primary" @onclick=@(() => Save(context as MetroArea)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                            </FooterTemplate>
-                            <Template>
-                                @{
-                                    MetroArea metroArea = (context as MetroArea)!;
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3 ps-md-0">
+            <h3>@ManageMetroAreasMessage</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo/>
+        </div>
+    </div>
+    <div class="col-md-12 control-sec">
+        <div class="content-wrapper">
+            <div class="row">
+                <SfGrid @ref="Grid" TValue="MetroArea" DataSource=@MetroAreas
+                        ContextMenuItems=@ContextMenu
+                        EnablePersistence="true"
+                        ShowColumnChooser="true"
+                        Toolbar=@ToolBar
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowExcelExport="true"
+                        ShowColumnMenu="true"
+                        AllowFiltering="true"
+                        AllowReordering="true"
+                        AllowResizing="true"
+                        AllowSelection="true"
+                        AllowPdfExport="true"
+                        AllowTextWrap="true"
+                        Width="100%">
+                    <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15"/>
+                    <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="MetroArea"/>
+                    <GridTemplates>
+                        <EmptyRecordTemplate>
+                            <span>@RecordText</span>
+                        </EmptyRecordTemplate>
+                    </GridTemplates>
+                    <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                        <HeaderTemplate>
+                            @{
+                                @HeaderTitle
+                            }
+                        </HeaderTemplate>
+                        <FooterTemplate>
+                            <button class="btn btn-primary" @onclick=@(() => Save(context as MetroArea)) IsPrimary="true">@ButtonTitle</button>
+                            <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                        </FooterTemplate>
+                        <Template>
+                            @{
+                                MetroArea metroArea = (context as MetroArea)!;
 
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <SfTextBox ID="name" @bind-Value=@metroArea.Name Enabled="true" Placeholder="Name" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <SfTextBox ID="name" @bind-Value=@metroArea.Name Enabled="true" Placeholder="Name" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                }
-                            </Template>
-                        </GridEditSettings>
-                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
-                        <GridSortSettings>
-                            <GridSortColumns>
-                                <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
-                            </GridSortColumns>
-                        </GridSortSettings>
-                        <GridColumns>
-                            <GridColumn Field=@nameof(MetroArea.MetroAreaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                        </GridColumns>
-                    </SfGrid>
+                                </div>
+                            }
+                        </Template>
+                    </GridEditSettings>
+                    <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="Name" Direction="SortDirection.Ascending"/>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                    <GridColumns>
+                        <GridColumn Field=@nameof(MetroArea.MetroAreaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
+                        <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
+                    </GridColumns>
+                </SfGrid>
 
-                </div>
             </div>
         </div>
-    </fieldset>
+    </div>
+
 }
 
 

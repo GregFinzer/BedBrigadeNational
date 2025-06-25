@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Syncfusion.Blazor.DropDowns;
 using BedBrigade.Data.Services;
@@ -29,7 +28,6 @@ namespace BedBrigade.Client.Components
         private string userRole = String.Empty;
         private string userName = String.Empty;
         private string userLocationName = String.Empty;
-        public bool isLocationAdmin = false;
         public List<EventStatusEnumItem>? lstEventStatuses { get; private set; }
         public List<EventTypeEnumItem>? lstEventTypes { get; private set; }
         public DateTime ScheduleStartDate { get; set; }
@@ -52,7 +50,7 @@ namespace BedBrigade.Client.Components
         private User? _currentUser = new User();
         private int _selectedLocationId = 0;
         private List<UsState>? StateList = AddressHelper.GetStateList();
-
+        public string ManageScheduleMessage { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -64,6 +62,7 @@ namespace BedBrigade.Client.Components
                 await LoadScheduleData();
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();
+                SetupToolbar();
                 await SetInitialFilter();
             }
             catch (Exception ex)
@@ -73,7 +72,22 @@ namespace BedBrigade.Client.Components
             }
 
 
-        } // Async Init
+        }
+
+        private void SetupToolbar()
+        {
+            if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
+            {
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ManageScheduleMessage = $"Manage Schedules for {userLocationName}";
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+                ManageScheduleMessage = $"View Schedules for {userLocationName}";
+            }
+        }
+        // Async Init
 
         private async Task SetInitialFilter()
         {
@@ -94,48 +108,11 @@ namespace BedBrigade.Client.Components
         {
             Log.Information($"{_svcAuth.UserName} went to the Manage Schedules Page");
 
-            if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
-            {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-            }
+            userRole = _svcAuth.UserRole;
 
-            if (_svcAuth.IsNationalAdmin) 
-            {
-                userRole = RoleNames.NationalAdmin;
-            }
-            else // Location User
-            {
-                if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
-                {
-                    userRole = RoleNames.LocationAdmin;
-                    isLocationAdmin = true;
-                }
-
-                if (_svcAuth.UserHasRole(RoleNames.LocationAuthor))
-                {
-                    userRole = RoleNames.LocationAuthor;
-                    isLocationAdmin = true;
-                }
-                if (_svcAuth.UserHasRole(RoleNames.LocationScheduler))
-                {
-                    userRole = RoleNames.LocationScheduler;
-                    isLocationAdmin = true;
-                }
-
-
-            } // Get User Data
-
-            //TODO:  The seeding of the national admin should be grove city
             _currentUser = (await _svcUser!.GetCurrentLoggedInUser()).Data;
-            if (_currentUser.LocationId == Defaults.NationalLocationId)
-            {
-                _selectedLocationId = Defaults.GroveCityLocationId;
-            }
-            else
+
+            if (_currentUser != null)
             {
                 _selectedLocationId = _currentUser.LocationId;
             }
@@ -148,9 +125,9 @@ namespace BedBrigade.Client.Components
             if (dataLocations.Success && dataLocations.Data != null) // 
             {
                 lstLocations = dataLocations.Data;
-                if (lstLocations != null && lstLocations.Count > 0)
+                if (lstLocations != null && lstLocations.Count > 0 && _svcAuth.LocationId > 0)
                 { // select User Location Name 
-                    userLocationName = lstLocations.Find(e => e.LocationId == _selectedLocationId).Name;                    
+                    userLocationName = lstLocations.Find(e => e.LocationId == _svcAuth.LocationId).Name;
                 } // Locations found             
 
             }
@@ -159,14 +136,7 @@ namespace BedBrigade.Client.Components
         private async Task LoadScheduleData()
         {
             ServiceResponse<List<Schedule>> recordResult;
-            if (_svcAuth.IsNationalAdmin)
-            {
-                recordResult = await _svcSchedule.GetAllAsync();
-            }
-            else
-            {
-                recordResult = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
-            }
+            recordResult = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
 
             if (recordResult.Success && recordResult.Data != null)
             {
@@ -285,15 +255,7 @@ namespace BedBrigade.Client.Components
         {
             HeaderTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"];
             ButtonTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"]; 
-            if (isLocationAdmin)
-            {
-                enabledLocationSelector = false;
-            }
-            else
-            {
-                enabledLocationSelector = true;
-            }   
-
+            enabledLocationSelector = false;
         }
 
         private async Task Save(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)

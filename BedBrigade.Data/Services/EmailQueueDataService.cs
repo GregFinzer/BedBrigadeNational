@@ -363,6 +363,11 @@ namespace BedBrigade.Data.Services
 
         private async Task<string> GetLocationName(int locationId)
         {
+            if (locationId == 0)
+            {
+                return string.Empty;
+            }
+
             return (await _locationDataService.GetByIdAsync(locationId)).Data.Name;
         }
 

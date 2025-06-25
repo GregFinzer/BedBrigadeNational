@@ -10,32 +10,24 @@
 
 @if (DataStatus) 
 {
-            <div class="row"><div class="col">&nbsp;</div></div>
-            <div class="row" style="display: @GridDisplay">
-                <div class="col-md-3" style="white-space: nowrap">
-                    <h3>@_lc.Keys["ManageSignups"]</h3>           
-                </div>     
-                <div class="col-md-4 align-items-center" >
-                    <div class="form-group">
-                    <label for="VolunteerSelector" style="display: inline-block;">@_lc.Keys["FutureScheduled"]</label>
-                    <SfDropDownList id="VolunteerSelector" CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="300px"   >
-                        <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
-                        <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
-                    </SfDropDownList>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    @BootstrapHelper.GetBootstrapMessage("info", "To manage the Build and Delivery schedule please use 'Schedules' page on the Administration Menu.", "", false,"compact")
-                </div>
-                <div class="col-md-2" style="text-align:right; font-size: small">
-                    <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-                    @if (IsLocationAdmin)
-                    {
-                        <span>[@_lc.Keys["LocationColon"]  @userLocationName]</span>
-                    }
-                    <br />@userName
-                </div>
-            </div>
+    <div class="row mt-3">
+        <div class="col-md-6 ps-3">
+            <h3>@ManageSignUpsMessage</h3>
+        </div>
+        <div class="col-md-4 ps-3 ps-md-0">
+            <label for="VolunteerSelector" style="display: inline-block;">@_lc.Keys["FutureScheduled"]</label>
+            <SfDropDownList id="VolunteerSelector" CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="300px"   >
+                <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
+                <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
+            </SfDropDownList>
+        </div>		
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo />
+        </div>
+    </div>
+    <p>
+        @BootstrapHelper.GetBootstrapMessage("info", "To manage the Build and Delivery schedule please use 'Schedules' page on the Administration Menu.", "", false,"compact")
+    </p>
 
           <div class="row" style="display: @GridDisplay">
                     <div class="content-wrapper col-md-12" >               
@@ -117,116 +109,115 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">@DialogTitle</h5>                    
+                            <h5 class="modal-title">@DialogTitle</h5>
                         </div>
                         @AvailabilityMessage
-                         <div class="modal-body"  style="display: @DisplaySearchPanel">               
-                           <SfTab>
-                            <TabItems>
-                                <TabItem>
-                                    <ChildContent>
-                                        <TabHeader Text="Choose"></TabHeader>
-                                    </ChildContent>                           
-                                   <ContentTemplate>
-                                            <SfDropDownList TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SelectAVolunteer"]" DataSource="@lstLocationVolunteers" >
+                        <div class="modal-body" style="display: @DisplaySearchPanel">
+                            <SfTab>
+                                <TabItems>
+                                    <TabItem>
+                                        <ChildContent>
+                                            <TabHeader Text="Choose"></TabHeader>
+                                        </ChildContent>
+                                        <ContentTemplate>
+                                            <SfDropDownList TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SelectAVolunteer"]" DataSource="@lstLocationVolunteers">
                                                 <DropDownListFieldSettings Value="VolunteerId" Text="SearchName"></DropDownListFieldSettings>
-                                                <DropDownListEvents TItem="Volunteer" TValue="string"  ValueChange="OnVolunteerSelect" ></DropDownListEvents>
+                                                <DropDownListEvents TItem="Volunteer" TValue="string" ValueChange="OnVolunteerSelect"></DropDownListEvents>
                                             </SfDropDownList>
-                                    </ContentTemplate>
-                                </TabItem>
-                                <TabItem>
-                                    <ChildContent>
-                                        <TabHeader Text="Search"></TabHeader>
-                                    </ChildContent>
-                                    <ContentTemplate>
-                                         <SfAutoComplete TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SeachAVolunteerBy"]" DataSource="@lstLocationVolunteers" >                      
-                                                <AutoCompleteFieldSettings Value="SearchName" ></AutoCompleteFieldSettings>          
-                                                <AutoCompleteEvents TValue="string" TItem="Volunteer" ValueChange="OnVolunteerSelect" ></AutoCompleteEvents> 
-                                        </SfAutoComplete>      
-                                    </ContentTemplate>
-                                </TabItem>
-                            </TabItems>
+                                        </ContentTemplate>
+                                    </TabItem>
+                                    <TabItem>
+                                        <ChildContent>
+                                            <TabHeader Text="Search"></TabHeader>
+                                        </ChildContent>
+                                        <ContentTemplate>
+                                            <SfAutoComplete TValue="string" TItem="Volunteer" Placeholder="@_lc.Keys["SeachAVolunteerBy"]" DataSource="@lstLocationVolunteers">
+                                                <AutoCompleteFieldSettings Value="SearchName"></AutoCompleteFieldSettings>
+                                                <AutoCompleteEvents TValue="string" TItem="Volunteer" ValueChange="OnVolunteerSelect"></AutoCompleteEvents>
+                                            </SfAutoComplete>
+                                        </ContentTemplate>
+                                    </TabItem>
+                                </TabItems>
                             </SfTab>
                         </div>
-                        <div class="modal-body"  style="display: @DisplayDataPanel">
+                        <div class="modal-body" style="display: @DisplayDataPanel">
                             <div class="row">
-                                <div class="col" >
-                                    <div class="card" >
+                                <div class="col">
+                                    <div class="card">
                                         <div class="card-title" style="text-align: center;  background-color: #DEDEDE"><b>@_lc.Keys["Event"]</b></div>
-                                         <div class="card-body">
-                                             <table class="table table-striped table-sm">
-                                               <tr style="display: @displayId">
-                                                    <td style="vertical-align: top" >@_lc.Keys["EventidColon"]</td>
-                                                    <th style="vertical-align: top" >@selectedGridObject.ScheduleId</th>
+                                        <div class="card-body">
+                                            <table class="table table-striped table-sm">
+                                                <tr style="display: @displayId">
+                                                    <td style="vertical-align: top">@_lc.Keys["EventidColon"]</td>
+                                                    <th style="vertical-align: top">@selectedGridObject.ScheduleId</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["LocationColon"]</td>
-                                                    <th style="vertical-align: top" >@StringUtil.IsNull(selectedGridObject.ScheduleLocationName,"")</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["LocationColon"]</td>
+                                                    <th style="vertical-align: top">@StringUtil.IsNull(selectedGridObject.ScheduleLocationName, "")</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["NameColon"]</td>
-                                                    <th style="vertical-align: top" >@selectedGridObject.ScheduleEventName</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["NameColon"]</td>
+                                                    <th style="vertical-align: top">@selectedGridObject.ScheduleEventName</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["DateColon"]</td>
-                                                    <th style="vertical-align: top" >@DateUtil.GetFormattedDateTime(selectedGridObject.ScheduleEventDate)</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["DateColon"]</td>
+                                                    <th style="vertical-align: top">@DateUtil.GetFormattedDateTime(selectedGridObject.ScheduleEventDate)</th>
                                                 </tr>
-                                             </table>
-                                         </div>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                                 <div class="col" >
-                                    <div class="card" >
+                                <div class="col">
+                                    <div class="card">
                                         <div class="card-title" style="text-align: center; background-color: #DEDEDE"><b>@_lc.Keys["Volunteer"]</b></div>
-                                         <div class="card-body">
-                                               <table class="table table-striped table-sm" style="display: @displayVolunteerData">
-                                                   @if(newVolunteer.SignUpId>0){
-                                                       <tr style="display: @displayId">
-                                                            <td style="vertical-align: top" >@_lc.Keys["RegistrationidColon"]</td>
-                                                            <th style="vertical-align: top" >@newVolunteer.SignUpId</th>
-                                                        </tr>
-                                                   }
+                                        <div class="card-body">
+                                            <table class="table table-striped table-sm" style="display: @displayVolunteerData">
+                                                @if (newVolunteer.SignUpId > 0)
+                                                {
+                                                    <tr style="display: @displayId">
+                                                        <td style="vertical-align: top">@_lc.Keys["RegistrationidColon"]</td>
+                                                        <th style="vertical-align: top">@newVolunteer.SignUpId</th>
+                                                    </tr>
+                                                }
                                                 <tr style="display: @displayId">
-                                                    <td style="vertical-align: top" >@_lc.Keys["VolunteeridColon"]</td>
-                                                    <th style="vertical-align: top" >@newVolunteer.VolunteerId</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["VolunteeridColon"]</td>
+                                                    <th style="vertical-align: top">@newVolunteer.VolunteerId</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["NameColon"]</td>
-                                                    <th style="vertical-align: top" >@newVolunteer.FullName</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["NameColon"]</td>
+                                                    <th style="vertical-align: top">@newVolunteer.FullName</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["PhoneColon"]</td>
-                                                    <th style="vertical-align: top; white-space: nowrap" >@newVolunteer.Phone.FormatPhoneNumber()</th>
+                                                    <td style="vertical-align: top">@_lc.Keys["PhoneColon"]</td>
+                                                    <th style="vertical-align: top; white-space: nowrap">@newVolunteer.Phone.FormatPhoneNumber()</th>
                                                 </tr>
                                                 <tr>
-                                                    <td style="vertical-align: top" >@_lc.Keys["EmailColon"]</td>
-                                                    <th style="vertical-align: top" >@newVolunteer.Email</th>
-                                                 </tr>                                         
-                                                 <tr>
-                                                    <td style="vertical-align: top; white-space: nowrap" >@_lc.Keys["VehicleTypeColon"]</td>      
-                                                    <th style="vertical-align: top" >@EnumHelper.GetEnumDescription(newVolunteer.VehicleType)</th>
-                                                </tr>                                      
-                                             </table>
+                                                    <td style="vertical-align: top">@_lc.Keys["EmailColon"]</td>
+                                                    <th style="vertical-align: top">@newVolunteer.Email</th>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align: top; white-space: nowrap">@_lc.Keys["VehicleTypeColon"]</td>
+                                                    <th style="vertical-align: top">@EnumHelper.GetEnumDescription(newVolunteer.VehicleType)</th>
+                                                </tr>
+                                            </table>
 
-                                         </div>
+                                        </div>
                                     </div>
-                                </div> 
+                                </div>
                             </div>
                         </div>
                         <div class="modal-body">
                             @DialogMessage
                         </div>
                         <div class="modal-footer">
-                            <button type="button"  style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(()=> onConfirmAdd())">@_lc.Keys["Ok"]</button>&nbsp;     
-                             <button type="button"  style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(()=> onConfirmDelete())">@_lc.Keys["Ok"]</button>&nbsp;     
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(()=> this.ShowEditDialog=false)">@CloseButtonCaption</button>                 
+                            <button type="button" style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(() => onConfirmAdd())">@_lc.Keys["Ok"]</button>&nbsp;
+                            <button type="button" style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(() => onConfirmDelete())">@_lc.Keys["Ok"]</button>&nbsp;
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => this.ShowEditDialog = false)">@CloseButtonCaption</button>
                         </div>
                     </div>
                 </div>
             </div>
-            }
+        }
 
 
-@testString
 @ErrorMessage
-@((MarkupString)strHtml)

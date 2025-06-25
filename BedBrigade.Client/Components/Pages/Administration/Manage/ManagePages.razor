@@ -17,14 +17,27 @@
 }
 else
 {
-    <br />
     @if (BlogTypes.ValidBlogTypes.Contains(_contentType))
     {
-        <h3 class="ms-3">Manage @_contentType</h3>
+        <div class="row mt-3">
+            <div class="col-md-10 ps-3">
+                <h3>Manage @_contentType</h3>
+            </div>
+            <div class="col-md-2 ps-3 ps-md-0">
+                <UserInfo />
+            </div>
+        </div>
     }
     else
     {
-        <h3 class="ms-3">Manage Pages</h3>
+        <div class="row mt-3">
+            <div class="col-md-10 ps-3">
+                <h3>Manage Pages</h3>
+            </div>
+            <div class="col-md-2 ps-3 ps-md-0">
+                <UserInfo />
+            </div>
+        </div>
     }
     
     <div class="col-md-12">

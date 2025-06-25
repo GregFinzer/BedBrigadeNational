@@ -92,8 +92,9 @@ public partial class SignUpGrid : ComponentBase
     // test variables
 
     public string strHtml = string.Empty;
-    private string testString = string.Empty;
+    
     private List<string> lstEmptyTables = new List<string>();
+    public string ManageSignUpsMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -195,15 +196,7 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadUserData()
     {
-        //TODO:  Change to Grove City when we seed National Admin
-        if (_svcAuth.IsNationalAdmin)
-        {
-            userLocationId = Defaults.GroveCityLocationId; // National Admin always uses Grove City
-        }
-        else
-        {
-            userLocationId = _svcUser.GetUserLocationId();
-        }
+        userLocationId = _svcUser.GetUserLocationId();
         userName = _svcUser.GetUserName();
         userRole = _svcUser.GetUserRole();
         Log.Information($"{userName} went to the Manage Sign Up Page");
@@ -240,6 +233,7 @@ public partial class SignUpGrid : ComponentBase
         {
             Locations = dataLocations.Data;
             userLocationName = Locations.FirstOrDefault(e => e.LocationId == userLocationId)?.Name;
+            ManageSignUpsMessage = $"Manage Sign-Ups for {userLocationName}";
         }
         else
         {
@@ -400,9 +394,6 @@ public partial class SignUpGrid : ComponentBase
 
         lstLocationVolunteers =
             SignUpHelper.GetLocationVolunteersSelector(selectedGridObject, lstVolunteerSelector, SignUps);
-        //strJson = JsonConvert.SerializeObject(lstLocationVolunteers, Formatting.Indented);
-        //strHtml = "<pre>" + strJson + "</pre>";
-
 
 
         if (lstLocationVolunteers.Count > 0)

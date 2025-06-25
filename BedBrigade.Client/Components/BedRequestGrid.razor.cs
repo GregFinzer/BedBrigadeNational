@@ -105,22 +105,6 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadBedRequests()
         {
-            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
-
-            //Get all records when an admin
-            if (isNationalAdmin)
-            {
-                var allResult = await _svcBedRequest.GetAllAsync();
-
-                if (allResult.Success)
-                {
-                    BedRequests = allResult.Data.ToList();
-                    IsLocationColumnVisible = true;
-                    ManageBedRequestsMessage = "Manage Bed Requests Nationally";
-                }
-                return;
-            }
-
             var locationId = _svcUser.GetUserLocationId();
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
@@ -133,7 +117,16 @@ namespace BedBrigade.Client.Components
 
                     if (metroAreaResult.Success && metroAreaResult.Data != null)
                     {
-                        ManageBedRequestsMessage = $"Manage Bed Requests for the {metroAreaResult.Data.Name} Metro Area";
+                        if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
+                        {
+                            ManageBedRequestsMessage =
+                                $"Manage Bed Requests for the {metroAreaResult.Data.Name} Metro Area";
+                        }
+                        else
+                        {
+                            ManageBedRequestsMessage =
+                                $"View Bed Requests for the {metroAreaResult.Data.Name} Metro Area";
+                        }
                     }
 
                     var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
@@ -157,7 +150,14 @@ namespace BedBrigade.Client.Components
                 if (locationResult.Success)
                 {
                     BedRequests = locationResult.Data.ToList();
-                    ManageBedRequestsMessage = $"Manage Bed Requests for {userLocationResult.Data.Name}";
+                    if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
+                    {
+                        ManageBedRequestsMessage = $"Manage Bed Requests for {userLocationResult.Data.Name}";
+                    }
+                    else
+                    {
+                        ManageBedRequestsMessage = $"View Bed Requests for {userLocationResult.Data.Name}";
+                    }
                 }
             }
         }
@@ -168,7 +168,7 @@ namespace BedBrigade.Client.Components
             if (locationResult.Success)
             {
                 Locations = locationResult.Data.ToList();
-                var item = Locations.Single(r => r.LocationId == (int)LocationNumber.National);
+                var item = Locations.Single(r => r.LocationId == Defaults.NationalLocationId);
                 if (item != null)
                 {
                     Locations.Remove(item);

@@ -46,7 +46,6 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "History", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Assembly-Instructions", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Partners", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Calendar", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Inventory", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
 
                 //Grove City Stories

@@ -10,6 +10,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<ContactUs>> GetByPhone(string phone);
         Task<ServiceResponse<List<string>>> GetDistinctPhone();
         Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation(int locationId);
+        Task<ServiceResponse<List<ContactUs>>> GetAllForLocationList(List<int> locationIds);
 
     }
 }

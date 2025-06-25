@@ -35,7 +35,7 @@ public partial class ManageMetroAreas : ComponentBase
     public bool NoPaging { get; private set; }
 
     protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
-
+    public string ManageMetroAreasMessage { get; set; }
     /// <summary>
     /// Setup the configuration Grid component
     /// Establish the Claims Principal
@@ -54,6 +54,7 @@ public partial class ManageMetroAreas : ComponentBase
                 "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
                 "SortDescending"
             }; 
+            ManageMetroAreasMessage = "Manage Metro Areas";
         }
         else
         {
@@ -62,6 +63,7 @@ public partial class ManageMetroAreas : ComponentBase
             {
                 FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
             }; 
+            ManageMetroAreasMessage = "View Metro Areas";
         }
 
         var result = await _svcMetroArea.GetAllAsync();

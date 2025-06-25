@@ -1,9 +1,6 @@
 ﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
-using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Serilog;
 using BedBrigade.Common.Logic;
@@ -11,7 +8,6 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using BedBrigade.Client.Services;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
@@ -42,7 +38,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         private string userName = String.Empty;
         private string userLocationName = String.Empty;
         private int userLocationId = 0;
-        public bool isLocationAdmin = false;
         private string ErrorMessage = String.Empty;
         protected string? _state { get; set; }
 
@@ -50,7 +45,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected string? RecordText { get; set; } = "Loading Volunteers ...";
         public bool NoPaging { get; private set; }
         private bool ShouldDisplayEmailMessage = false;
-
+        public string ManageVolunteersMessage { get; set; }
         protected override async Task OnInitializedAsync()
         {
             try
@@ -58,6 +53,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 await LoadUserData();
                 await LoadLocations();
                 await LoadVolunteerData();
+                SetupToolbar();
                 lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
             }
             catch (Exception ex)
@@ -65,7 +61,23 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 Log.Error(ex, "Error initializing ManageVolunteers component");
                 ErrorMessage = "An error occurred while initializing the page: " + ex.Message;
             }
-        } 
+        }
+
+        private void SetupToolbar()
+        {
+            if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
+            {
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageVolunteersMessage = $"Manage Volunteers for {userLocationName}";
+            }
+            else
+            {
+                ToolBar = new List<string> { "Search", "Reset" };
+                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ManageVolunteersMessage = $"View Volunteers for {userLocationName}";
+            }
+        }
 
 
         private async Task LoadUserData()
@@ -73,37 +85,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             userLocationId = _svcAuth.LocationId;
             userName = _svcAuth.UserName;
             Log.Information($"{userName} went to the Manage Volunteers Page");
-
-            if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
-            {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-            else
-            {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
-            }
-
-            if (_svcAuth.IsNationalAdmin) 
-            {
-                userRole = RoleNames.NationalAdmin;
-                isLocationAdmin = false;
-            }
-            else // Location User
-            {
-                if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
-                {
-                    userRole = RoleNames.LocationAdmin;
-                    isLocationAdmin = true;
-                }
-
-                if (_svcAuth.UserHasRole(RoleNames.LocationScheduler))
-                {
-                    userRole = RoleNames.LocationScheduler;
-                    isLocationAdmin = true;
-                }
-            } // Get User Data
+            userRole = _svcAuth.UserRole;
         } // User Data
 
 
@@ -114,7 +96,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (dataLocations.Success) // 
             {
                 Locations = dataLocations.Data;
-                if (Locations != null && Locations.Count > 0)
+                if (Locations != null && Locations.Count > 0 && userLocationId > 0)
                 { // select User Location Name 
                     userLocationName = Locations.Find(e => e.LocationId == userLocationId).Name;
                 } // Locations found             
@@ -126,7 +108,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             try // get Volunteer List ===========================================================================================
             {
-                var dataVolunteer = await _svcVolunteer.GetAllAsync(); // get Schedules
+                var dataVolunteer = await _svcVolunteer.GetAllForLocationAsync(_svcAuth.LocationId); // get Schedules
                 Volunteers = new List<Volunteer>();
 
                 if (dataVolunteer.Success && dataVolunteer != null)
@@ -135,13 +117,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     if (dataVolunteer.Data.Count > 0)
                     {
                         Volunteers = dataVolunteer.Data.ToList(); // retrieve existing media records to temp list
-
-                        // Location Filter
-                        if (isLocationAdmin)
-                        {
-                            Volunteers = Volunteers.FindAll(e => e.LocationId == userLocationId); // Location Filter
-                        }
-
                     }
                     else
                     {
