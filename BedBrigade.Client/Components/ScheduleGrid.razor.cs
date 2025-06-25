@@ -129,16 +129,8 @@ namespace BedBrigade.Client.Components
 
             } // Get User Data
 
-            //TODO:  The seeding of the national admin should be grove city
             _currentUser = (await _svcUser!.GetCurrentLoggedInUser()).Data;
-            if (_currentUser.LocationId == Defaults.NationalLocationId)
-            {
-                _selectedLocationId = Defaults.GroveCityLocationId;
-            }
-            else
-            {
-                _selectedLocationId = _currentUser.LocationId;
-            }
+            _selectedLocationId = _currentUser.LocationId;
         } // User Data
 
         private async Task LoadLocations()

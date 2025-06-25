@@ -118,7 +118,7 @@ public static class Seed
             LastName = "Finzer", 
             Role = RoleNames.NationalAdmin, 
             Email="gfinzer@hotmail.com", 
-            LocationId = (int) LocationNumber.National,
+            LocationId = Defaults.GroveCityLocationId,
             Phone = string.Empty
         }
     };
@@ -133,7 +133,7 @@ public static class Seed
         await SeedContentsLogic.SeedContents(contextFactory);
         await SeedMedia(contextFactory);
         await SeedRoles(contextFactory);
-        await SeedUser(contextFactory);
+        await SeedUsers(contextFactory);
         await SeedVolunteersFor(contextFactory);
         await SeedVolunteers(contextFactory);
         await SeedDonationCampaign(contextFactory);
@@ -641,9 +641,9 @@ public static class Seed
             }
         }
     }
-    private static async Task SeedUser(IDbContextFactory<DataContext> _contextFactory)
+    private static async Task SeedUsers(IDbContextFactory<DataContext> _contextFactory)
     {
-        Log.Logger.Information("SeedUser Started");
+        Log.Logger.Information("SeedUsers Started");
         List<User> users;
 
         if (WebHelper.IsProduction())
@@ -705,7 +705,14 @@ public static class Seed
         switch (user.FirstName)
         {
             case SeedConstants.SeedNationalName:
-                user.LocationId = (int)LocationNumber.National;
+                if (user.LastName == "Admin")
+                {
+                    user.LocationId = Defaults.GroveCityLocationId;
+                }
+                else
+                {
+                    user.LocationId = Defaults.NationalLocationId;
+                }
                 break;
             case SeedConstants.SeedGroveCityName:
                 user.LocationId = (int)LocationNumber.GroveCity;

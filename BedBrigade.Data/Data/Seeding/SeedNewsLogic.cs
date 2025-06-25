@@ -135,6 +135,7 @@ namespace BedBrigade.Data.Data.Seeding
                 return;
             }
 
+            //We are currently only seeding for Grove City and National locations for the News
             string locationName = content.LocationId == Defaults.NationalLocationId ? "National" : "Grove-City";
             string directory = Path.Combine(FileUtil.GetSeedingDirectory(), "SeedImages", locationName, "News", content.Name);
             string source = Path.Combine(directory, content.MainImageFileName);
