@@ -1,16 +1,19 @@
 ﻿<div class="user-info">
     <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@UserName&nbsp;
     <br />
-    Role: @UserRole
+    @_lc.Keys["Role"]: @UserRole
 </div>
 
 @code {
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
     public string UserRole { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
-    [Inject] private IAuthService? _svcAuth { get; set; }
 
     protected override void OnInitialized()
     {
+        _lc.InitLocalizedComponent(this);
         UserRole = _svcAuth?.UserRole ?? string.Empty;
         UserName = _svcAuth?.UserName ?? string.Empty;
     }

@@ -8,7 +8,6 @@ AtBedBrigadeLocation: at Bed Brigade location {locationName}
 Back: Back
 BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
-BedBrigadeUsers: Bed Brigade Users
 BedBrigadeWeb: Bed Brigade Web
 BedRequest: Bed Request
 BedRequestDetails: Bed Request Details
@@ -54,7 +53,6 @@ DonationConfirmation: Donation Confirmation
 DonationDate: Donation Date
 DonationDetails: Donation Details
 DonationFormNotCompleted: The Donation Form is not completed
-Donations: Donations
 DoYouAttendChurch: Do you attend church regularly?
 DurationHours: Duration (hours)
 DynamicALittle: A little
@@ -142,8 +140,8 @@ MailingAddress: Mailing Address
 MailingCity: Mailing City
 MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
-ManageSchedule: Manage Schedule
-ManageSignups: Manage Sign-Ups
+ManageConfiguration: Manage Configuration
+ManageDonations: Manage Donations
 MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters

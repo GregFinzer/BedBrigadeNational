@@ -8,7 +8,6 @@ AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
-BedBrigadeUsers: Usuarios de Bed Brigade
 BedBrigadeWeb: Web de la Brigada de Camas
 BedRequest: Solicitud de cama
 BedRequestDetails: Detalles de la solicitud de cama
@@ -54,7 +53,6 @@ DonationAmount: Importe de la donación
 DonationFormNotCompleted: El formulario de donación no está completo
 DonationDate: Fecha de donación
 DonationDetails: Detalles de la donación
-Donations: Donaciones
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
 DurationHours: Duración (horas)
 DynamicALittle: Un poco
@@ -142,8 +140,8 @@ MailingAddress: Dirección postal
 MailingCity: Ciudad de correo
 MailingPostalCode: Código Postal
 MailingState: Estado de envío
-ManageSchedule: Administrar el horario
-ManageSignups: Gestionar las inscripciones
+ManageConfiguration: Administrar la Configuración
+ManageDonations: Administrar Donaciones
 MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
