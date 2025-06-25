@@ -1,3 +1,4 @@
+using BedBrigade.Client.Components.Pages.Administration.Manage;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
@@ -23,6 +24,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IJSRuntime JS { get; set; }
+        [Inject] private IMetroAreaDataService _svcMetroArea { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private const string LastPage = "LastPage";
@@ -47,6 +49,7 @@ namespace BedBrigade.Client.Components
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
         public required SfMaskedTextBox phoneTextBox;
+        public string ManageContactsMessage { get; set; } = "Manage Contacts";
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -89,24 +92,42 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContacts()
         {
-            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
+            var locationId = _svcUser.GetUserLocationId();
 
-            if (isNationalAdmin)
+            var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
+            if (userLocationResult.Success && userLocationResult.Data != null)
             {
-                var allResult = await _svcContactUs.GetAllAsync();
-
-                if (allResult.Success && allResult.Data != null)
+                //If this is a metro user, get all contacts for the metro area
+                if (userLocationResult.Data.IsMetroLocation())
                 {
-                    Contacts = allResult.Data.ToList();
+                    var metroAreaResult = await _svcMetroArea.GetByIdAsync(userLocationResult.Data.MetroAreaId.Value);
+
+                    if (metroAreaResult.Success && metroAreaResult.Data != null)
+                    {
+                        ManageContactsMessage = $"Manage Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                    }
+
+                    var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
+
+                    if (metroLocations.Success && metroLocations.Data != null)
+                    {
+                        var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
+                        var metroAreaBedRequestResult = await _svcContactUs.GetAllForLocationList(metroAreaLocationIds);
+                        if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+                        {
+                            Contacts = metroAreaBedRequestResult.Data.ToList();
+                        }
+                    }
+
+                    return;
                 }
-            }
-            else
-            {
-                int userLocationId = _svcUser.GetUserLocationId();
-                var contactUsResult = await _svcContactUs.GetAllForLocationAsync(userLocationId);
-                if (contactUsResult.Success)
+
+                //Get By Location
+                var locationResult = await _svcContactUs.GetAllForLocationAsync(userLocationResult.Data.LocationId);
+                if (locationResult.Success)
                 {
-                    Contacts = contactUsResult.Data.ToList();
+                    Contacts = locationResult.Data.ToList();
+                    ManageContactsMessage = $"Manage Bed Requests for {userLocationResult.Data.Name}";
                 }
             }
         }

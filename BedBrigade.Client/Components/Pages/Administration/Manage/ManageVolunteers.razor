@@ -17,14 +17,11 @@ else
     <div class="row"><div class="col">&nbsp;</div></div>
     <div class="row">
         <div class="col-md-6 ms-3">
-            <h2>Manage Volunteers</h2>
+            <h2>@ManageVolunteersMessage</h2>
         </div>
         <div class="col-md-6" style="text-align:right; font-size: small">
             <i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp;@userRole&nbsp;
-            @if (isLocationAdmin)
-            {
-                <span>[Location: @userLocationName]</span>
-            }
+            <span>[Location: @userLocationName]</span>
             <br />@userName
         </div>
     </div>
@@ -61,14 +58,12 @@ else
                     <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                     <GridSortSettings>
                         <GridSortColumns>
-                            <GridSortColumn Field="@nameof(Volunteer.LocationId)" Direction="SortDirection.Ascending" />
                             <GridSortColumn Field="@nameof(Volunteer.FullName)" Direction="SortDirection.Ascending" />
                         </GridSortColumns>
                     </GridSortSettings>
                     <GridGroupSettings ShowDropArea="true" EnableLazyLoading="true" />
                     <GridColumns>
                         <GridColumn Field=@nameof(Volunteer.VolunteerId) Visible="false" HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
-                        <GridForeignColumn Field=@nameof(Volunteer.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">

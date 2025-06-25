@@ -105,22 +105,6 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadBedRequests()
         {
-            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
-
-            //Get all records when an admin
-            if (isNationalAdmin)
-            {
-                var allResult = await _svcBedRequest.GetAllAsync();
-
-                if (allResult.Success)
-                {
-                    BedRequests = allResult.Data.ToList();
-                    IsLocationColumnVisible = true;
-                    ManageBedRequestsMessage = "Manage Bed Requests Nationally";
-                }
-                return;
-            }
-
             var locationId = _svcUser.GetUserLocationId();
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);

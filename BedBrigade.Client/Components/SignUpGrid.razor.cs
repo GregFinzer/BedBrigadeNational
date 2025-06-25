@@ -94,6 +94,7 @@ public partial class SignUpGrid : ComponentBase
     public string strHtml = string.Empty;
     private string testString = string.Empty;
     private List<string> lstEmptyTables = new List<string>();
+    public string ManageSignUpsMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -232,6 +233,7 @@ public partial class SignUpGrid : ComponentBase
         {
             Locations = dataLocations.Data;
             userLocationName = Locations.FirstOrDefault(e => e.LocationId == userLocationId)?.Name;
+            ManageSignUpsMessage = $"Manage Sign-Ups for {userLocationName}";
         }
         else
         {
