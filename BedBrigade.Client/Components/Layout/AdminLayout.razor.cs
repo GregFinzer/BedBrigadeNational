@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Constants;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -14,12 +15,22 @@ namespace BedBrigade.Client.Components.Layout
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private ISmsState _smsState { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-
+        [Inject] private ILocationState _locationState { get; set; }
+        [Inject] private ILocationDataService _locationService { get; set; }
         private ErrorBoundary errorBoundary;
 
         protected override async Task OnInitializedAsync()
         {
             _smsState.OnChange += OnSmsStateChange;
+            if (AuthService.IsLoggedIn)
+            {
+                var location = await _locationService.GetByIdAsync(AuthService.LocationId);
+
+                if (location.Success && location.Data != null)
+                {
+                    _locationState.Location = location.Data.Route.TrimStart('/');
+                }
+            }
         }
 
         private async Task OnSmsStateChange(SmsQueue smsQueue)
