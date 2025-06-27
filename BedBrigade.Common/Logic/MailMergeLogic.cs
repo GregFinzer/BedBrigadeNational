@@ -161,9 +161,9 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Schedule.GroupName%%", entity.GroupName);
         sb = sb.Replace("%%Schedule.EventName%%", entity.EventName);
 
-        if (entity.EventName != entity.EventType.ToString() && entity.EventType != EventType.Other)
+        if (entity.EventName != StringUtil.InsertSpaces(entity.EventType.ToString()) && entity.EventType != EventType.Other)
         {
-            sb = sb.Replace("%%Schedule.EventType%%", entity.EventType.ToString());
+            sb = sb.Replace("%%Schedule.EventType%%", StringUtil.InsertSpaces(entity.EventType.ToString()));
         }
         else
         {
