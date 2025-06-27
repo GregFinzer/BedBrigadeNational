@@ -17,7 +17,6 @@ namespace BedBrigade.Data
         public virtual DbSet<Content> Content { get; set; }
         public virtual DbSet<Donation> Donations { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
-        public virtual DbSet<Media> Media { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPersist> UserPersist { get; set; }

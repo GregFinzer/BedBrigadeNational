@@ -63,7 +63,6 @@ public class Location : BaseEntity
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
     public ICollection<Content> Contents { get; set; } = new List<Content>();
     public ICollection<Donation> Donations { get; set; } = new List<Donation>();
-    public ICollection<Media> Media { get; set; } = new List<Media>();
     public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Volunteer> Volunteers { get; set; } = new List<Volunteer>();

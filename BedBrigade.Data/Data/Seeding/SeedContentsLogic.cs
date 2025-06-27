@@ -57,34 +57,36 @@ public static class SeedContentsLogic
 
         string name = ContentType.NewsletterForm.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+        string seedText;
+
+        foreach (var location in locations)
         {
-            string seedText;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-                seedText = WebHelper.GetSeedingFile("NewsletterForm.txt");
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.NewsletterForm,
-                    Name = name,
-                    ContentHtml = seedText,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedText = WebHelper.GetSeedingFile("NewsletterForm.txt");
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in SeedNewsletterForm content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.NewsletterForm,
+                Name = name,
+                ContentHtml = seedText,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
+        }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in SeedNewsletterForm content {ex.Message}");
         }
     }
 
@@ -101,34 +103,37 @@ public static class SeedContentsLogic
 
         string name = ContentType.SignUpSmsConfirmationForm.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+
+        string seedText;
+
+        foreach (var location in locations)
         {
-            string seedText;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-                seedText = WebHelper.GetSeedingFile("SignUpSmsConfirmationForm.txt");
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.SignUpSmsConfirmationForm,
-                    Name = name,
-                    ContentHtml = seedText,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedText = WebHelper.GetSeedingFile("SignUpSmsConfirmationForm.txt");
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in SeedSignUpSmsConfirmationForm content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.SignUpSmsConfirmationForm,
+                Name = name,
+                ContentHtml = seedText,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
+        }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in SeedSignUpSmsConfirmationForm content {ex.Message}");
         }
     }
 
@@ -145,35 +150,38 @@ public static class SeedContentsLogic
 
         string name = ContentType.SignUpEmailConfirmationForm.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+        string seedText;
+
+        foreach (var location in locations)
         {
-            string seedText;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-                seedText = WebHelper.GetSeedingFile("SignUpEmailConfirmationForm.txt");
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.SignUpEmailConfirmationForm,
-                    Name = name,
-                    ContentHtml = seedText,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedText = WebHelper.GetSeedingFile("SignUpEmailConfirmationForm.txt");
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in SeedSignUpEmailConfirmationForm content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.SignUpEmailConfirmationForm,
+                Name = name,
+                ContentHtml = seedText,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
         }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in SeedSignUpEmailConfirmationForm content {ex.Message}");
+        }
+
     }
 
     private static async Task SeedNationalDonations(DataContext context)
@@ -247,8 +255,6 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "AboutUs", "RockCityPolarisAboutUs.html");
         await SeedContentItem(context, ContentType.Body, location, "History", "RockCityPolarisHistory.html");
         await SeedContentItem(context, ContentType.Body, location, "Donations", "RockCityPolarisDonations.html");
-        //await SeedContentItem(context, ContentType.Body, location, "Assembly-Instructions", "GroveCityAssemblyInstructions.html");
-        //await SeedContentItem(context, ContentType.Body, location, "Partners", "GroveCityPartners.html");
     }
 
     private static async Task SeedContentItem(DataContext context,
@@ -304,7 +310,8 @@ public static class SeedContentsLogic
             Directory.CreateDirectory(mediaPath);
         }
 
-        if (Directory.GetFiles(mediaPath, "photosIcon16x16.png", SearchOption.AllDirectories).Length == 0)
+        string logoPath = Path.Combine(mediaPath, "national", "logo.png");
+        if (!File.Exists(logoPath))
         {
             string seedDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
             FileUtil.CopyDirectory($"{seedDirectory}/SeedImages", mediaPath);
@@ -673,36 +680,38 @@ public static class SeedContentsLogic
 
         string name = ContentType.DeliveryCheckList.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+        string seedHtml;
+
+        foreach (var location in locations)
         {
-            string seedHtml;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-
-                seedHtml = WebHelper.GetSeedingFile("DeliveryCheckList.txt"); // plane text
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.DeliveryCheckList,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedHtml = WebHelper.GetSeedingFile("DeliveryCheckList.txt"); // plane text
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.DeliveryCheckList,
+                Name = name,
+                ContentHtml = seedHtml,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
         }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
+        }
+        
     } // Delivery Check List
 
     private static async Task SeedTaxForm(DataContext context, List<Location> locations)
@@ -718,37 +727,39 @@ public static class SeedContentsLogic
 
         string name = ContentType.EmailTaxForm.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+        string seedHtml;
+
+        foreach (var location in locations)
         {
-            string seedHtml;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-
-                seedHtml = WebHelper.GetSeedingFile("EmailTaxForm.txt"); 
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.EmailTaxForm,
-                    Name = name,
-                    ContentHtml = seedHtml,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedHtml = WebHelper.GetSeedingFile("EmailTaxForm.txt");
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in SeedTaxForm content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.EmailTaxForm,
+                Name = name,
+                ContentHtml = seedHtml,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
         }
-    } 
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in SeedTaxForm content {ex.Message}");
+        }
+
+    }
 
     private static async Task SeedThreeRotatorPageTemplate(DataContext context)
     {
@@ -792,35 +803,38 @@ public static class SeedContentsLogic
 
         string name = ContentType.BedRequestConfirmationForm.ToString();
 
-        if (!await context.Content.AnyAsync(c => c.Name == name))
+        string seedText;
+
+        foreach (var location in locations)
         {
-            string seedText;
-
-            foreach (var location in locations)
+            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
             {
-                seedText = WebHelper.GetSeedingFile("BedRequestConfirmationForm.txt");
-
-                var content = new Content
-                {
-                    LocationId = location.LocationId!,
-                    ContentType = ContentType.BedRequestConfirmationForm,
-                    Name = name,
-                    ContentHtml = seedText,
-                    Title = StringUtil.InsertSpaces(name)
-                };
-                SeedRoutines.SetMaintFields(content);
-                context.Content.Add(content); // add row to Contents table 
+                continue; // already seeded
             }
 
-            try
+            seedText = WebHelper.GetSeedingFile("BedRequestConfirmationForm.txt");
+
+            var content = new Content
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Debug($"Error in SeedBedRequestConfirmationForm content {ex.Message}");
-            }
+                LocationId = location.LocationId!,
+                ContentType = ContentType.BedRequestConfirmationForm,
+                Name = name,
+                ContentHtml = seedText,
+                Title = StringUtil.InsertSpaces(name)
+            };
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content); // add row to Contents table 
         }
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Debug($"Error in SeedBedRequestConfirmationForm content {ex.Message}");
+        }
+
     }
 }
 

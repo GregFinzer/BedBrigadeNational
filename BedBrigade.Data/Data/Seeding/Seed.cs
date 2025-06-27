@@ -126,26 +126,31 @@ public static class Seed
 
     public static async Task SeedData(IDbContextFactory<DataContext> contextFactory)
     {
-        await SeedConfigurations(contextFactory);
-        await SeedLocations(contextFactory);
-        await UpdateLocations(contextFactory);
-        await SeedMetroAreas(contextFactory);
-        await SeedContentsLogic.SeedContents(contextFactory);
-        await SeedMedia(contextFactory);
-        await SeedRoles(contextFactory);
-        await SeedUsers(contextFactory);
-        await SeedVolunteersFor(contextFactory);
-        await SeedVolunteers(contextFactory);
-        await SeedDonationCampaign(contextFactory);
-        await SeedDonations(contextFactory);
-        await SeedBedRequests(contextFactory);
-        await SeedSchedules(contextFactory);
-        await SeedStoriesLogic.SeedStories(contextFactory);
-        await SeedNewsLogic.SeedNews(contextFactory);
-        await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
-        await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
-        await SeedSpokenLanguages(contextFactory);
-        await SeedNewsletters(contextFactory);
+        try
+        {
+            await SeedConfigurations(contextFactory);
+            await SeedLocations(contextFactory);
+            await SeedMetroAreas(contextFactory);
+            await SeedContentsLogic.SeedContents(contextFactory);
+            await SeedRoles(contextFactory);
+            await SeedUsers(contextFactory);
+            await SeedVolunteersFor(contextFactory);
+            await SeedVolunteers(contextFactory);
+            await SeedDonationCampaign(contextFactory);
+            await SeedDonations(contextFactory);
+            await SeedBedRequests(contextFactory);
+            await SeedSchedules(contextFactory);
+            await SeedStoriesLogic.SeedStories(contextFactory);
+            await SeedNewsLogic.SeedNews(contextFactory);
+            await SeedTranslationsLogic.SeedTranslationsAsync(contextFactory);
+            await SeedTranslationsLogic.SeedContentTranslations(contextFactory);
+            await SeedSpokenLanguages(contextFactory);
+            await SeedNewsletters(contextFactory);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error during SeedData");
+        }
     }
 
     private static async Task SeedNewsletters(IDbContextFactory<DataContext> contextFactory)
@@ -179,47 +184,8 @@ public static class Seed
         }
     }
 
-    private static async Task UpdateLocations(IDbContextFactory<DataContext> contextFactory)
-    {
-        Log.Logger.Information("UpdateLocations Started");
 
-        using (var context = contextFactory.CreateDbContext())
-        {
-            var existingLocations =
-                await context.Locations.Where(o => o.LocationId > Defaults.NationalLocationId && o.Longitude == null).ToListAsync();
 
-            if (!existingLocations.Any())
-                return;
-
-            try
-            {
-                foreach (var existingLocation in existingLocations)
-                {
-                    var newData = _locations.First(o => o.Name == existingLocation.Name);
-                    existingLocation.Latitude = newData.Latitude;
-                    existingLocation.Longitude = newData.Longitude;
-                    existingLocation.MailingAddress = newData.MailingAddress;
-                    existingLocation.MailingCity = newData.MailingCity;
-                    existingLocation.MailingState = newData.MailingState;
-                    existingLocation.MailingPostalCode = newData.MailingPostalCode;
-
-                    existingLocation.BuildAddress = newData.BuildAddress;
-                    existingLocation.BuildCity = newData.BuildCity;
-                    existingLocation.BuildState = newData.BuildState;
-                    existingLocation.BuildPostalCode = newData.BuildPostalCode;
-
-                    SeedRoutines.SetMaintFields(existingLocation);
-                    context.Locations.Update(existingLocation);
-                }
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Information($"Location seed error: {ex.Message}");
-                throw;
-            }
-        }
-    }
     private static async Task SeedSpokenLanguages(IDbContextFactory<DataContext> contextFactory)
     {
         Log.Logger.Information("SeedSpokenLanguages Started");
@@ -305,16 +271,8 @@ public static class Seed
 
     public static async Task SeedSchedules(IDbContextFactory<DataContext> contextFactory)
     {
-        if (WebHelper.IsProduction())
-        {
-            Log.Logger.Information("Seed Schedules Skipped since we are in Production");
-            return;
-        }
-
         using (DataContext context = contextFactory.CreateDbContext())
         {
-            if (await context.Schedules.AnyAsync()) return;
-
             await SeedGroveCityBuildSchedule(context);
             await SeedGroveCityDeliverySchedule(context);
             await SeedRockCityPolarisBuildSchedule(context);
@@ -325,6 +283,13 @@ public static class Seed
 
     public static async Task SeedGroveCityBuildSchedule(DataContext context)
     {
+        //Grove City does their builds on the first Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.GroveCityLocationId
+                                                  && o.EventType == EventType.Build))
+        {
+            return;
+        }
+
         Log.Logger.Information("SeedGroveCityBuildSchedule Started");
 
         DateTime currentDate = DateTime.Today;
@@ -351,7 +316,11 @@ public static class Seed
                 EventDurationHours = 3,
                 VolunteersMax = 20,
                 VolunteersRegistered = 0,
-                DeliveryVehiclesRegistered = 0
+                DeliveryVehiclesRegistered = 0,
+                Address = "4004 Thistlewood Drive",
+                City = "Grove City",
+                State = "OH",
+                PostalCode = "43123"
             };
 
             SeedRoutines.SetMaintFields(schedule);
@@ -364,6 +333,13 @@ public static class Seed
 
     public static async Task SeedRockCityPolarisBuildSchedule(DataContext context)
     {
+        //Rock City does their builds on the first Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId
+                                                  && o.EventType == EventType.Build))
+        {
+            return;
+        }
+
         Log.Logger.Information("SeedRockCityPolarisBuildSchedule Started");
 
         DateTime currentDate = DateTime.Today;
@@ -406,6 +382,13 @@ public static class Seed
 
     public static async Task SeedRockCityPolarisDeliverySchedule(DataContext context)
     {
+        //Rock City does their deliveries on the second Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId
+                                                  && o.EventType == EventType.Delivery))
+        {
+            return;
+        }
+
         Log.Logger.Information("SeedRockCityPolarisDeliverySchedule Started");
 
         DateTime currentDate = DateTime.Today;
@@ -449,6 +432,13 @@ public static class Seed
 
     public static async Task SeedGroveCityDeliverySchedule(DataContext context)
     {
+        //Grove City does their deliveries the second through the last Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.GroveCityLocationId
+                                                  && o.EventType == EventType.Delivery))
+        {
+            return;
+        }
+
         Log.Logger.Information("SeedGroveCityDeliverySchedule Started");
 
         // Calculate the first Saturday
@@ -490,9 +480,13 @@ public static class Seed
                 EventType = EventType.Delivery,
                 EventDateScheduled = currentSaturday.AddHours(9), // Set the scheduled time
                 EventDurationHours = 3,
-                VolunteersMax = 20,
+                VolunteersMax = 30,
                 VolunteersRegistered = 0,
-                DeliveryVehiclesRegistered = 0
+                DeliveryVehiclesRegistered = 0,
+                Address = "4004 Thistlewood Drive",
+                City = "Grove City",
+                State = "OH",
+                PostalCode = "43123"
             };
 
             SeedRoutines.SetMaintFields(schedule);
@@ -560,13 +554,32 @@ public static class Seed
 
         using (var context = contextFactory.CreateDbContext())
         {
-            if (await context.Locations.AnyAsync()) return;
+            var existingLocations = await context.Locations.ToListAsync();
 
-            try
+            if (existingLocations.Any())
             {
-                SeedRoutines.SetMaintFields(_locations);
+                Log.Logger.Information("Existing Locations found, checking for new ones to add.");
+            }
+            else
+            {
+                Log.Logger.Information("No existing Locations found, adding all.");
+            }
 
-                foreach (var location in _locations)
+            var locationsToAdd = new List<Location>();
+
+            foreach (var newLocation in _locations)
+            {
+                if (!existingLocations.Any(l => l.Name == newLocation.Name || l.Route == newLocation.Route))
+                {
+                    locationsToAdd.Add(newLocation);
+                }
+            }
+
+            if (locationsToAdd.Any())
+            {
+                SeedRoutines.SetMaintFields(locationsToAdd);
+
+                foreach (var location in locationsToAdd)
                 {
                     var loc = location.Route + "/pages";
                     FileUtil.CreateMediaSubDirectory(loc);
@@ -574,53 +587,14 @@ public static class Seed
                     await context.SaveChangesAsync();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Log.Logger.Information($"Location seed error: {ex.Message}");
-                throw;
+                Log.Logger.Information("No new Locations to add.");
             }
         }
     }
 
-    private static async Task SeedMedia(IDbContextFactory<DataContext> contextFactory)
-    {
-        Log.Logger.Information("SeedMedia Started");
 
-        using (var context = contextFactory.CreateDbContext())
-        {
-            try
-            {
-                if (!await context.Media.AnyAsync(m => m.FileName == "Logo")) // table Media does not have site logo
-                {
-                    // var location = await context.Locations.FirstAsync(l => l.Name == _seedLocationNational);
-                    // add the first record in Media table with National Logo
-                    context.Media.Add(new Media
-                    {
-                        LocationId = Defaults.NationalLocationId,
-                        FileName = "logo",
-                        MediaType = "png",
-                        FilePath = "media/national",
-                        FileSize = 9827,
-                        AltText = "Bed Brigade National Logo",
-                        FileStatus = "seed",
-                        FileUse = FileUse.Unknown,
-                        CreateDate = DateTime.UtcNow,
-                        UpdateDate = DateTime.UtcNow,
-                        CreateUser = SeedConstants.SeedUserName,
-                        UpdateUser = SeedConstants.SeedUserName,
-                        MachineName = Environment.MachineName
-                    });
-
-                    await context.SaveChangesAsync();
-                } // add the first media row             
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error seed media: {ex.Message}");
-                throw;
-            }
-        }
-    } // Seed Media
 
     private static async Task SeedRoles(IDbContextFactory<DataContext> _contextFactory)
     {
@@ -739,8 +713,8 @@ public static class Seed
             {
                 new VolunteerFor{Name = "Bed Building" },
                 new VolunteerFor{Name = "Bed Delivery" },
-                new VolunteerFor { Name = "Event Planning" },
-                new VolunteerFor { Name = "New Option" },
+                new VolunteerFor { Name = "Cut" },
+                new VolunteerFor { Name = "Mattress Pickup" },
                 new VolunteerFor { Name = "Other" }
             };
 
@@ -819,13 +793,17 @@ public static class Seed
         Log.Logger.Information("SeedDonationCampaign Started");
         using (var context = contextFactory.CreateDbContext())
         {
-            if (await context.DonationCampaigns.AnyAsync()) return;
             try
             {
                 var locations = await context.Locations.ToListAsync();
 
                 foreach (var location in locations) 
                 {
+                    if (await context.DonationCampaigns.AnyAsync(o => o.LocationId == location.LocationId && o.CampaignName == Defaults.DefaultDonationCampaignName))
+                    {
+                        continue;
+                    }
+
                     DonationCampaign donationCampaign = new()
                     {
                         CampaignName = Defaults.DefaultDonationCampaignName,
