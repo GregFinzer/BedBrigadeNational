@@ -192,7 +192,8 @@ namespace BedBrigade.Client.Components
                             OrganizationOrGroup = v.OrganizationOrGroup,
                             Message = ve.SignUpNote,
                             VehicleType = v.VehicleType,
-                            CreateDate = ve.CreateDate
+                            CreateDate = ve.CreateDate,
+                            NumberOfVolunteers = ve.NumberOfVolunteers,
                         }
                     ).ToList();
             }

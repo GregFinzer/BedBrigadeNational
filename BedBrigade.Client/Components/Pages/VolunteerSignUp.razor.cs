@@ -342,6 +342,7 @@ namespace BedBrigade.Client.Components.Pages
                 newRegister.VolunteerId = newVolunteer.VolunteerId;
                 newRegister.LocationId = selectedLocation;
                 newRegister.SignUpNote = newVolunteer.Message;
+                newRegister.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
                 var createResult = await _svcSignUp.CreateAsync(newRegister);
 
                 if (!createResult.Success)
@@ -498,7 +499,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
 
                 var existingSchedule = existingResult.Data;
-                existingSchedule.VolunteersRegistered += 1;
+                existingSchedule.VolunteersRegistered += newVolunteer.NumberOfVolunteers;
 
                 if (newVolunteer.VehicleType != VehicleType.None)
                 {

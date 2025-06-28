@@ -49,6 +49,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     public String? PostalCode { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "The number of ordered beds is required and must be > 0")]
+    [Range(1, Int32.MaxValue, ErrorMessage = "The number of ordered beds must be greater than 0")]
     public Int32 NumberOfBeds { get; set; }
 
     [MaxLength(255, ErrorMessage = "Ages/Gender has a maximum length of 255 characters")]
