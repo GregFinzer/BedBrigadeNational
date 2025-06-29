@@ -2,20 +2,12 @@
 @page "/{LocationRoute:nonfile}/volunteer"
 @page "/{LocationRoute:nonfile}/volunteer/{ScheduleId:int}"
 @using BedBrigade.Common.Models
-<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["VolunteerRegistration"]}")</PageTitle>
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["Volunteer"]}")</PageTitle>
 
-<RotatorContainer RotatorTitle="@_lc.Keys["VolunteerRegistration"]" ImagePath="pages/Volunteer" LocationId="1" SmallHeaderMobile="true" />
+<RotatorContainer RotatorTitle="@_lc.Keys["Volunteer"]" ImagePath="pages/Volunteer" LocationId="1" SmallHeaderMobile="true" />
 
 
 <div class="container-fluid" style="display: @DisplaySearch">
-
-    <div class="row">
-        <div class="col-md-12" style="text-align: center">
-            <br />
-            <p>@_lc.Keys["IfYouLikeTo"]</p>
-        </div>
-    </div>
-
     <SearchLocation @ref="SearchLocation"
                     Title="@_lc.Keys["FindABedBrigade"]"
                     ResultType="DropDownList"
@@ -24,7 +16,11 @@
 </div>
 
 <div class="container-fluid" style="display: @DisplayForm">
-
+    <div class="row">
+        <div class="col-md-12" style="text-align: center">
+            <p>@_lc.Keys["IfYouLikeTo"]</p>
+        </div>
+    </div>
     <EditForm EditContext="@EC">
         <div class="row">
             

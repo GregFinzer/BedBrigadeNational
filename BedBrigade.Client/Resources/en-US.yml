@@ -110,7 +110,8 @@ EventTime: Event Time
 EventType: Event Type
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FilteredTotalColon: 'Filtered Total:'
-FindABedBrigade: Find a Bed Brigade Near Me
+FindABedBrigade: Find a Bed Brigade
+FindABedBrigadeNearMe: Find a Bed Brigade Near Me
 FirstName: First Name
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}

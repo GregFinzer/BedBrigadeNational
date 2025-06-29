@@ -110,7 +110,8 @@ EventTime: Hora del evento
 EventType: Tipo de evento
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FilteredTotalColon: 'Total Filtrado:'
-FindABedBrigade: Encuentra una brigada de camas cerca de mí
+FindABedBrigade: Encuentra una brigada de camas
+FindABedBrigadeNearMe: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
