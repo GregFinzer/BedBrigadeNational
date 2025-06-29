@@ -103,7 +103,6 @@ EventDate: Event Date
 EventDateTime: Event Date & Time
 EventDetails: Event Details
 EventGroup: Event Group
-EventidColon: 'EventID:'
 EventName: Event Name
 EventNote: Event Note
 EventStatus: Event Status
@@ -178,6 +177,8 @@ NotSent: Not Sent
 NoUpcomingBuildsScheduled: No upcoming builds scheduled.
 NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
+NumberOfVolunteers: Number of Volunteers
+NumberOfVolunteersIncludingYourself: Number of Volunteers (including yourself)
 Ok: OK
 OneTimeDonationOf: One Time Donation of
 OrganizationOrGroup: Organization or Group
@@ -203,7 +204,7 @@ PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
 PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
 Processing: Processing
-RegistrationidColon: 'RegistrationID:'
+RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
 RequiredAgesGender: Please indicate the age and gender of children
@@ -228,6 +229,7 @@ RequiredLocations: Locations is required
 RequiredMessage: Message is required
 RequiredName: Name is required
 RequiredNumberOfBeds: The number of ordered beds is required and must be > 0
+RequiredNumberOfVolunteers: The number of volunteers is required
 RequiredPageName: Page Name is required
 RequiredPageTitle: Page Title is required
 RequiredPassword: Password is required
@@ -311,8 +313,6 @@ ViewOlder: View Older
 Volunteer: Volunteer
 VolunteerForAnotherEvent: Volunteer for Another Event
 VolunteerFormNotCompleted: The Volunteer Form is not completed!
-VolunteeridColon: 'VolunteerID:'
-VolunteerIdColon: 'Volunteer Id:'
 VolunteerInformation: Volunteer Information
 VolunteerInformationContinued: Volunteer Information Continued
 VolunteerRegistration: Volunteer Registration

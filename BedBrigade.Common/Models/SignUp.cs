@@ -21,6 +21,8 @@ namespace BedBrigade.Common.Models
         public Int32 VolunteerId { get; set; }
         public Volunteer Volunteer { get; set; }
 
+        public int NumberOfVolunteers { get; set; } = 1;
+
         [MaxLength(4000)]
 		public String? SignUpNote { get; set; } = string.Empty;
 

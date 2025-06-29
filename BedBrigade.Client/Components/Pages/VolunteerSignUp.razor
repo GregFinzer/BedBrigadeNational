@@ -164,12 +164,15 @@
                                 <SfTextBox ID="email" @bind-Value="newVolunteer.OrganizationOrGroup"></SfTextBox>
                             </div>
                             <div class="form-group">
+                                <label for="numberOfVolunteers" class="formlabel">@_lc.Keys["NumberOfVolunteersIncludingYourself"]</label>
+                                <SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newVolunteer.NumberOfVolunteers"></SfNumericTextBox>
+                            </div>
+                            <div class="form-group">
                                 <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
                                 <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                             </div>
                         </div>
                         <div class="card-footer  text-muted" style="text-align: center; font-size:small; color: GrayText; display: @DisplayExId">
-                            <span>@_lc.Keys["VolunteerIdColon"] @newVolunteer.VolunteerId</span>&nbsp;|&nbsp;
                             <span>
                                 Last Visit: @(newVolunteer.UpdateDate.HasValue ? Convert.ToDateTime(newVolunteer.UpdateDate, System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat) : "")
                             </span>

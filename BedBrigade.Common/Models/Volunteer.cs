@@ -34,8 +34,12 @@ namespace BedBrigade.Common.Models
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
         public String Phone { get; set; } = string.Empty;
 
-        [MaxLength(80, ErrorMessage = "Group has a maximum length of 20")]
+        [MaxLength(80, ErrorMessage = "Group has a maximum length of 80 characters")]
 		public String? OrganizationOrGroup { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Number of Volunteers is required")]
+        [Range(1,100)]
+        public int NumberOfVolunteers { get; set; } = 1;
 
         [MaxLength(4000, ErrorMessage = "Message has a maximum length of 4000 characters")]
 		public String? Message { get; set; } = string.Empty;

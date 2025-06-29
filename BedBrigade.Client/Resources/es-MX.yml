@@ -103,7 +103,6 @@ EventDate: Fecha del evento
 EventDateTime: Fecha y hora del evento
 EventDetails: Detalles del evento
 EventGroup: Grupo de eventos
-EventidColon: 'ID de evento:'
 EventName: Nombre del evento
 EventNote: Nota del evento
 EventStatus: Estado del evento
@@ -178,6 +177,8 @@ NotSent: No enviado
 NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
+NumberOfVolunteers: Número de Voluntarios
+NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
 Ok: De acuerdo
 OneTimeDonationOf: 'Donación única de'
 OrganizationOrGroup: Organización o grupo
@@ -205,7 +206,7 @@ PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se 
 PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
 Processing: Procesando
-RegistrationidColon: 'ID de registro:'
+RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
 RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
@@ -230,6 +231,7 @@ RequiredLocations: Se requieren ubicaciones
 RequiredMessage: El mensaje es obligatorio
 RequiredName: El nombre es obligatorio
 RequiredNumberOfBeds: El número de camas solicitadas es obligatorio y debe ser > 0
+RequiredNumberOfVolunteers: Se requiere el número de voluntarios
 RequiredPageName: El nombre de la página es obligatorio
 RequiredPageTitle: El título de la página es obligatorio
 RequiredPassword: Se requiere contraseña
@@ -312,8 +314,6 @@ ViewOlder: Ver más antiguo
 Volunteer: Voluntario
 VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
-VolunteeridColon: 'Identificación de voluntarios:'
-VolunteerIdColon: 'Identificación del voluntario:'
 VolunteerInformation: Información para voluntarios
 VolunteerInformationContinued: Continuación de la información para voluntarios
 VolunteerRegistration: Registro de Voluntarios
