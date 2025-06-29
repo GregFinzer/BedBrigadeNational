@@ -37,7 +37,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(80, ErrorMessage = "Group has a maximum length of 80 characters")]
 		public String? OrganizationOrGroup { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Number of Volunteers is required and must be greater than zero")]
+        [Required(ErrorMessage = "Number of Volunteers is required")]
         [Range(1,100)]
         public int NumberOfVolunteers { get; set; } = 1;
 

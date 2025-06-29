@@ -270,7 +270,8 @@ namespace BedBrigade.Client.Components
 
         } // Get Location Volunteers
 
-        public static async Task<bool>  UpdateSchedule(IScheduleDataService? svcSchedule, List<Schedule> schedules, string strAction, int intScheduleId, VehicleType carType)
+        public static async Task<bool>  UpdateSchedule(IScheduleDataService? svcSchedule, 
+            List<Schedule> schedules, string strAction, int intScheduleId, VehicleType carType, int numberOfVolunteers)
         {
             var bScheduleUpdated = false;
             var bUpdate = true;
@@ -280,7 +281,7 @@ namespace BedBrigade.Client.Components
                 case "Add":
                     if (mySchedule != null) // update 
                     {
-                        mySchedule.VolunteersRegistered++;
+                        mySchedule.VolunteersRegistered+= numberOfVolunteers;
                         if (carType != VehicleType.None)
                         {
                             mySchedule.DeliveryVehiclesRegistered++;
@@ -292,7 +293,7 @@ namespace BedBrigade.Client.Components
                     {
                         if (mySchedule.VolunteersRegistered > 0)
                         {
-                            mySchedule.VolunteersRegistered--;
+                            mySchedule.VolunteersRegistered-= numberOfVolunteers;
                         }
                         if (carType != VehicleType.None && mySchedule.DeliveryVehiclesRegistered > 0)
                         {

@@ -423,17 +423,21 @@ public partial class SignUpGrid : ComponentBase
         var actionStatus = "error";
         if (selectedGridObject != null && newVolunteer.VolunteerId > 0)
         {
-            var newRegistration = new SignUp();
-            newRegistration.VolunteerId = newVolunteer.VolunteerId;
-            newRegistration.ScheduleId = selectedGridObject.ScheduleId;
-            newRegistration.LocationId = selectedGridObject.ScheduleLocationId;
-            var addResult = await _svcSignUp.CreateAsync(newRegistration);
+            var newSignUp = new SignUp();
+            newSignUp.VolunteerId = newVolunteer.VolunteerId;
+            newSignUp.ScheduleId = selectedGridObject.ScheduleId;
+            newSignUp.LocationId = selectedGridObject.ScheduleLocationId;
+            newSignUp.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            var addResult = await _svcSignUp.CreateAsync(newSignUp);
             if (addResult.Success)
             {
                 // add Volunteer to Schedule table
 
-                var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, CaptionAdd,
-                    newRegistration.ScheduleId, newVolunteer.VehicleType);
+                var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, 
+                    Schedules, CaptionAdd,
+                    newSignUp.ScheduleId, 
+                    newVolunteer.VehicleType,
+                    newVolunteer.NumberOfVolunteers);
                 if (bUpdateSchedule)
                 {
                     actionStatus = "success";
@@ -472,15 +476,16 @@ public partial class SignUpGrid : ComponentBase
         var actionStatus = "error";
         if (selectedGridObject != null)
         {
-            int RegistrationId = selectedGridObject.SignUpId;
-            if (RegistrationId > 0)
+            int signUpId = selectedGridObject.SignUpId;
+            if (signUpId > 0)
             {
-                var deleteResult = await _svcSignUp.DeleteAsync(RegistrationId);
-                if (deleteResult.Success)
+                var existingRecord = await _svcSignUp.GetByIdAsync(signUpId);
+                var deleteResult = await _svcSignUp.DeleteAsync(signUpId);
+                if (existingRecord.Success && deleteResult.Success)
                 {
                     // add Volunteer to Schedule table
                     var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, "Del",
-                        selectedGridObject.ScheduleId, selectedGridObject.VehicleType);
+                        selectedGridObject.ScheduleId, selectedGridObject.VehicleType, existingRecord.Data.NumberOfVolunteers);
                     if (bUpdateSchedule)
                     {
                         actionStatus = "success";
