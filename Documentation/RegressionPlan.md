@@ -19,7 +19,7 @@
 * [ ] Verify after submitting a Bed Request.
     - [ ] The Bed Request will appear in the Manage Bed Requests page.
     - [ ] The user will receive a confirmation email in production within 5 minutes.  In development or local there will be evidence in the log that an email would have been sent.
-    - [ ] The scheduler for the location will receive an email within 5 minutes. In development or local there will be evidence in the log that an email would have been sent.  If there is no scheduler for a location then send to the location admin.
+    - [ ] Version 2, The scheduler for the location will receive an email within 5 minutes. In development or local there will be evidence in the log that an email would have been sent.  If there is no scheduler for a location then send to the location admin.
 
 ### Volunteer
 * [ ] The user is required to fill out required fields.
@@ -30,7 +30,7 @@
     - [ ] The Volunteer will appear in the Manage Volunteer page.
     - [ ] The Volunteer will appear in the Sign Up Page for the event.
     - [ ] The user will receive a confirmation email in production within 5 minutes.  In development or local there will be evidence in the log that an email would have been sent.
-    - [ ] The Location Admin for the location will receive an email within 5 minutes. In development or local there will be evidence in the log that an email would have been sent.    
+    - [ ] Version 2, The Location Admin for the location will receive an email within 5 minutes. In development or local there will be evidence in the log that an email would have been sent.    
     - [ ] There will be a Sign Up Reminder SMS message that is queued in the database. 
 
 ### Contact Us
