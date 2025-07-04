@@ -42,3 +42,8 @@
     - [ ] The Contact Us will appear in the Contact Us page.
     - [ ] The user will receive a confirmation email in production within 5 minutes.  In development or local there will be evidence in the log that an email would have been sent.
     - [ ] The Location Admin will be sent an email in production within 5 minutes.  The reply to should be the email address of the user. In development or local there will be evidence in the log that an email would have been sent.   
+
+### National News 
+* [ ] The user should be able to navigate to the national news page and view the detail of the news.
+### Grove City Stories 
+* [ ] The user should be able to navigate to the Grove City Stories and view the detail of a individual story
