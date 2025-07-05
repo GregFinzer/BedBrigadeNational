@@ -50,6 +50,7 @@ Current Website running in Orchard CMS:  https://www.bedbrigadecolumbus.org/
 * [Localization](Documentation/Localization.md)
 * [Project Plan](Documentation/Project%20Plan.md)
 * [References](Documentation/References.md)
+* [Regression Plan](Documentation/Regression%20Plan.md)
 * [Resources for Learning Blazor 8](Documentation/Resources%20for%20Learning%20Blazor%208.md)
 * [Roles](Documentation/Roles.md)
 * <a href="https://bedbrigade.slack.com" target="_blank">Slack Workspace</a> used for project communication
