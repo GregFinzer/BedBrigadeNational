@@ -78,6 +78,8 @@ namespace BedBrigade.Client.Components.Pages
         private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
         private string[] SelectedLanguages { get; set; } = [];
         public required SfMaskedTextBox phoneTextBox;
+        private int _previousNumberOfVolunteers = 0;
+        private VehicleType? _previousDeliveryVehicle;
         #endregion
 
         #region Initialization
@@ -142,6 +144,10 @@ namespace BedBrigade.Client.Components.Pages
 
         #region Validation & Events
 
+        public async Task HandlePhoneMaskFocus()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
 
         private async Task HandleSelectedValueChanged(string locationIdString)
         {
@@ -337,39 +343,14 @@ namespace BedBrigade.Client.Components.Pages
         {
             try
             {
-                SignUp newRegister = new SignUp();
-                newRegister.ScheduleId = SelectedEvent.ScheduleId;
-                newRegister.VolunteerId = newVolunteer.VolunteerId;
-                newRegister.LocationId = selectedLocation;
-                newRegister.SignUpNote = newVolunteer.Message;
-                newRegister.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
-                var createResult = await _svcSignUp.CreateAsync(newRegister);
+                var existingSignUpResult = await _svcSignUp.GetByVolunteerEmailAndScheduleId(newVolunteer.VolunteerId, SelectedEvent.ScheduleId);
 
-                if (!createResult.Success)
+                if (existingSignUpResult.Success && existingSignUpResult.Data != null)
                 {
-                    await ShowMessage(createResult.Message);
-                    Log.Logger.Error($"Error ScheduleVolunteer: {createResult.Message}");
-                    return false;
+                    return await UpdateExistingSignup(existingSignUpResult.Data);
                 }
 
-                var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(createResult.Data);
-
-                if (!emailResponse.Success)
-                {
-                    await ShowMessage(emailResponse.Message);
-                    Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
-                    return false;
-                }
-
-                var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
-
-                if (!smsResponse.Success)
-                {
-                    await ShowMessage(smsResponse.Message);
-                    Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
-                    return false;
-                }
-                return true;
+                return await CreateNewSignup();
             }
             catch (Exception ex)
             {
@@ -377,6 +358,71 @@ namespace BedBrigade.Client.Components.Pages
                 await ShowMessage("Error ScheduleVolunteer: " + ex.Message);
                 return false;
             }
+        }
+
+        private async Task<bool> UpdateExistingSignup(SignUp signUp)
+        {
+            _previousNumberOfVolunteers = signUp.NumberOfVolunteers;
+            _previousDeliveryVehicle = signUp.VehicleType;
+
+            signUp.SignUpNote = newVolunteer.Message;
+            signUp.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            var updateResult = await _svcSignUp.UpdateAsync(signUp);
+
+            if (!updateResult.Success)
+            {
+                await ShowMessage(updateResult.Message);
+                Log.Logger.Error($"Error ScheduleVolunteer: {updateResult.Message}");
+                return false;
+            }
+
+            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(updateResult.Data);
+
+            if (!emailResponse.Success)
+            {
+                await ShowMessage(emailResponse.Message);
+                Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> CreateNewSignup()
+        {
+            SignUp newRegister = new SignUp();
+            newRegister.ScheduleId = SelectedEvent.ScheduleId;
+            newRegister.VolunteerId = newVolunteer.VolunteerId;
+            newRegister.LocationId = selectedLocation;
+            newRegister.SignUpNote = newVolunteer.Message;
+            newRegister.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            var createResult = await _svcSignUp.CreateAsync(newRegister);
+
+            if (!createResult.Success)
+            {
+                await ShowMessage(createResult.Message);
+                Log.Logger.Error($"Error ScheduleVolunteer: {createResult.Message}");
+                return false;
+            }
+
+            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(createResult.Data);
+
+            if (!emailResponse.Success)
+            {
+                await ShowMessage(emailResponse.Message);
+                Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
+                return false;
+            }
+
+            var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
+
+            if (!smsResponse.Success)
+            {
+                await ShowMessage(smsResponse.Message);
+                Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                return false;
+            }
+            return true;
         }
 
         private async Task<bool> UpdateVolunteer()
@@ -458,6 +504,12 @@ namespace BedBrigade.Client.Components.Pages
                     ResultTitle = _lc.Keys["VolunteerSignUpNew", new { fullName = newVolunteer.FullName }] + "<br />";
                     ResultSubTitle = _lc.Keys["VolunteerSignUpNewSubtitle"] + " ";
                 }
+                else if (_previousNumberOfVolunteers > 0)
+                {
+                    //TODO:  Translate this
+                    ResultTitle = "Sign-up Updated for " + newVolunteer.FullName + "<br />";
+                    ResultSubTitle = "We appreciate you serving with the Bed Brigade." + " ";
+                }
                 else // new Volunteer
                 {
                     ResultTitle = _lc.Keys["VolunteerSignUpAgain", new { fullName = newVolunteer.FullName }] + "<br />";
@@ -499,9 +551,16 @@ namespace BedBrigade.Client.Components.Pages
                 }
 
                 var existingSchedule = existingResult.Data;
-                existingSchedule.VolunteersRegistered += newVolunteer.NumberOfVolunteers;
+                existingSchedule.VolunteersRegistered += newVolunteer.NumberOfVolunteers - _previousNumberOfVolunteers;
 
-                if (newVolunteer.VehicleType != VehicleType.None)
+                if (_previousDeliveryVehicle != null)
+                {
+                    if (_previousDeliveryVehicle != VehicleType.None && newVolunteer.VehicleType == VehicleType.None)
+                    {
+                        existingSchedule.DeliveryVehiclesRegistered -= 1;
+                    }
+                }
+                else if (newVolunteer.VehicleType != VehicleType.None)
                 {
                     existingSchedule.DeliveryVehiclesRegistered += 1;
                 }
@@ -527,9 +586,6 @@ namespace BedBrigade.Client.Components.Pages
 
         #endregion
 
-        public async Task HandlePhoneMaskFocus()
-        {
-            await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
-        }
+
     }
 }

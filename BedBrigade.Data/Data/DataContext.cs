@@ -135,6 +135,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<SignUp>()
                 .HasIndex(o => o.ScheduleId);
+
+            modelBuilder.Entity<SignUp>()
+                .HasIndex(o => o.VolunteerId);
         }
 
         private static void CreateScheduleIndexes(ModelBuilder modelBuilder)
