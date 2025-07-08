@@ -444,6 +444,7 @@ namespace BedBrigade.Client.Components.Pages
                     existingVolunteer.Phone = newVolunteer.Phone;
                     existingVolunteer.OrganizationOrGroup = newVolunteer.OrganizationOrGroup;
                     existingVolunteer.Message = newVolunteer.Message;
+                    existingVolunteer.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
 
                     if (SelectedEvent.EventType == EventType.Delivery)
                     {

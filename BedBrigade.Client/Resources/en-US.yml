@@ -206,6 +206,7 @@ PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
 Processing: Processing
 RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
+RegisterOrUpdate: Register or Update
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
 RequiredAgesGender: Please indicate the age and gender of children
@@ -284,7 +285,6 @@ StateNotMatchZipCode: The state that you have entered does not match the zip cod
 Status: Status
 Street: Street
 SubmitRequest: Submit Request
-SubmitVolunteerRegistration: Submit Volunteer Registration
 Subscribe: Subscribe
 SubscribeToOurEmail: Subscribe to our Email Newsletter?
 SubscribeToOurText: Subscribe to our Text List?
