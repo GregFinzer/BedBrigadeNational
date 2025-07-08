@@ -55,7 +55,7 @@ public partial class SignUpGrid : ComponentBase
     protected string? RecordText { get; set; } = "Loading Schedules ...";
     public bool DataStatus = true;
 
-    // Grid regerences
+    // Grid references
 
     protected SfGrid<Volunteer>? Grid { get; set; }
 
@@ -67,7 +67,7 @@ public partial class SignUpGrid : ComponentBase
     private const string CaptionAdd = "Add";
     private const string CaptionDelete = "Delete";
     private const string RegisterColumn = "SignUpId";
-
+    private const string Reset  = "Reset";
     // Action & Dialog variables
 
     public bool ShowEditDialog { get; set; } = false;
@@ -215,6 +215,9 @@ public partial class SignUpGrid : ComponentBase
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
             { Text = "Excel Export", Id = "excel", TooltipText = "Export Grid Data to Excel" });
 
+        Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
+            { Text = Reset, Id = Reset, TooltipText = Reset });
+
     } // Load User Data
 
 
@@ -273,6 +276,7 @@ public partial class SignUpGrid : ComponentBase
     private void PrepareGridData()
     {
         EventVolunteers = SignUpHelper.CombineAllData(SignUps, Schedules, Volunteers, Locations);
+        EventVolunteers = EventVolunteers.OrderBy(o => o.ScheduleEventDate).ToList();
     } // Create Grid Data Source
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
@@ -280,6 +284,13 @@ public partial class SignUpGrid : ComponentBase
         bool bSelectionStatus = false;
         displayVolunteerData = DisplayNone;
         var strMessageText = String.Empty;
+
+        if (args.Item.Text.ToString() == Reset)
+        {
+            await Grid.ResetPersistDataAsync();
+            await SaveGridPersistence();
+            return;
+        }
 
         if (args.Item.Text.ToString().Contains("PDF"))
         {
@@ -428,6 +439,7 @@ public partial class SignUpGrid : ComponentBase
             newSignUp.ScheduleId = selectedGridObject.ScheduleId;
             newSignUp.LocationId = selectedGridObject.ScheduleLocationId;
             newSignUp.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            newSignUp.VehicleType = newVolunteer.VehicleType;
             var addResult = await _svcSignUp.CreateAsync(newSignUp);
             if (addResult.Success)
             {

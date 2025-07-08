@@ -1,3 +1,4 @@
+using BedBrigade.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,6 +23,7 @@ namespace BedBrigade.Common.Models
         public Volunteer Volunteer { get; set; }
 
         public int NumberOfVolunteers { get; set; } = 1;
+        public VehicleType VehicleType { get; set; } = VehicleType.None;
 
         [MaxLength(4000)]
 		public String? SignUpNote { get; set; } = string.Empty;

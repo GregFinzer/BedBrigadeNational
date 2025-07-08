@@ -152,7 +152,11 @@ namespace BedBrigade.Client.Components
                             ScheduleLocationName = l.Name,
                             ScheduleEventName = e.EventName,
                             ScheduleEventDate = e.EventDateScheduled,
-                            ScheduleEventType = e.EventType
+                            ScheduleEventType = e.EventType,
+                            NumberOfVolunteers = 0,
+                            VehicleType = VehicleType.None,
+                            FirstName = "None",
+                            LastName = string.Empty
                         }
                     ).ToList()
                 );
@@ -191,7 +195,7 @@ namespace BedBrigade.Client.Components
                             Email = v.Email,
                             OrganizationOrGroup = v.OrganizationOrGroup,
                             Message = ve.SignUpNote,
-                            VehicleType = v.VehicleType,
+                            VehicleType = ve.VehicleType,
                             CreateDate = ve.CreateDate,
                             NumberOfVolunteers = ve.NumberOfVolunteers,
                         }

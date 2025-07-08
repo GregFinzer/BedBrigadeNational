@@ -208,6 +208,7 @@ PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
 Processing: Procesando
 RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
+RegisterOrUpdate: Registrarse o Actualizar
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
 RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
@@ -285,7 +286,6 @@ StateNotMatchZipCode: El estado que ha ingresado no coincide con el código post
 Status: Estado
 Street: Calle
 SubmitRequest: Enviar solicitud
-SubmitVolunteerRegistration: Enviar Registro de Voluntarios
 Subscribe: Suscribirse
 SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
 SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
