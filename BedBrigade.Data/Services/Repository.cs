@@ -202,6 +202,11 @@ namespace BedBrigade.Data.Services
             {
                 return new ServiceResponse<bool>($"Could not delete {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false);
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Unexpected error deleting {GetEntityName()} with id {id}");
+                return new ServiceResponse<bool>($"Unexpected error deleting {GetEntityName()} with id {id}: {ex.Message}", false);
+            }
         }
 
         private object GetPrimaryKeyValue<TEntity>(DbContext context, TEntity entity) where TEntity : class

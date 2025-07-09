@@ -24,8 +24,6 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Volunteer.AttendChurch%%",
         "%%Volunteer.OtherLanguagesSpoken%%",
         "%%Volunteer.OrganizationOrGroup%%",
-        "%%Volunteer.Message%%",
-        "%%Volunteer.VehicleType%%",
         "%%Schedule.GroupName%%",
         "%%Schedule.EventName%%",
         "%%Schedule.EventType%%",
@@ -60,7 +58,11 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Location.Route%%",
         "%%BaseUrl%%",
         "%%NewsletterNameForQuery%%",
-        "%%EmailForQuery%%"
+        "%%EmailForQuery%%",
+        "%%CustomMessage%%",
+        "%%SignUp.VehicleType%%",
+        "%%SignUp.SignUpNote%%",
+        "%%SignUp.NumberOfVolunteers%%",
     };
 
     public void CheckForInvalidMergeFields(string template)
@@ -142,17 +144,23 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Volunteer.AttendChurch%%", volunteer.AttendChurch ? "Yes" : "No");
         sb = sb.Replace("%%Volunteer.OtherLanguagesSpoken%%", volunteer.OtherLanguagesSpoken);
         sb = sb.Replace("%%Volunteer.OrganizationOrGroup%%", volunteer.OrganizationOrGroup);
-        sb = sb.Replace("%%Volunteer.Message%%", volunteer.Message);
 
+        return sb;
+    }
+
+    public StringBuilder ReplaceSignUpFields(Schedule schedule, SignUp signUp, StringBuilder sb)
+    {
         if (schedule.EventType == EventType.Delivery)
         {
-            sb = sb.Replace("%%Volunteer.VehicleType%%", volunteer.VehicleType.ToString());
+            sb = sb.Replace("%%SignUp.VehicleType%%", "Vehicle Type: " + signUp.VehicleType.ToString());
         }
         else
         {
-            sb = sb.Replace("%%Volunteer.VehicleType%%", string.Empty);
+            sb = sb.Replace("%%SignUp.VehicleType%%", string.Empty);
         }
 
+        sb = sb.Replace("%%SignUp.NumberOfVolunteers%%", signUp.NumberOfVolunteers.ToString());
+        sb = sb.Replace("%%SignUp.SignUpNote%%", signUp.SignUpNote ?? string.Empty);
         return sb;
     }
 

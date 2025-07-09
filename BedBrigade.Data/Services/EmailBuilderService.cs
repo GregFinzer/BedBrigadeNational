@@ -135,13 +135,13 @@ namespace BedBrigade.Data.Services
             return sb;
         }
 
-        public async Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp)
+        public async Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp, string customMessage)
         {
             ServiceResponse<Content> templateResult = await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId, ContentType.SignUpEmailConfirmationForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
-                return new ServiceResponse<bool>("BedRequestConfirmationForm not found", false);
+                return new ServiceResponse<bool>("SignUpEmailConfirmationForm not found", false);
             }
 
             ServiceResponse<Volunteer> volunteerResult = await _volunteerDataService.GetByIdAsync(signUp.VolunteerId);
@@ -158,21 +158,25 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<bool>($"Schedule not found {signUp.ScheduleId}", false);
             }
 
-            ServiceResponse<string> bodyResult = await BuildSignUpConfirmationBody(signUp, volunteerResult.Data, scheduleResult.Data, templateResult.Data.ContentHtml);
+            ServiceResponse<string> bodyResult = await BuildSignUpConfirmationBody(signUp, 
+                volunteerResult.Data, 
+                scheduleResult.Data, 
+                templateResult.Data.ContentHtml,
+                customMessage);
 
             if (!bodyResult.Success)
             {
                 return new ServiceResponse<bool>(bodyResult.Message, false);
             }
 
-            ServiceResponse<bool> volunteerEmailResult = await EmailVolunteer(volunteerResult.Data, bodyResult.Data);
+            ServiceResponse<bool> volunteerEmailResult = await EmailVolunteer(volunteerResult.Data, bodyResult.Data, customMessage);
 
             if (!volunteerEmailResult.Success)
             {
                 return new ServiceResponse<bool>(volunteerEmailResult.Message, false);
             }
 
-            ServiceResponse<bool> organizerEmailResult = await EmailOrganizer(volunteerResult.Data, scheduleResult.Data, bodyResult.Data);
+            ServiceResponse<bool> organizerEmailResult = await EmailOrganizer(volunteerResult.Data, scheduleResult.Data, bodyResult.Data, customMessage);
 
             if (!organizerEmailResult.Success)
             {
@@ -182,12 +186,12 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<bool>("Successfully queued Sign Up Confirmation Email", true);
         }
 
-        private async Task<ServiceResponse<bool>> EmailVolunteer(Volunteer volunteer, string body)
+        private async Task<ServiceResponse<bool>> EmailVolunteer(Volunteer volunteer, string body, string customMessage)
         {
             EmailQueue emailQueue = new()
             {
                 ToAddress = volunteer.Email,
-                Subject = BuildSignUpConfirmationSubject(volunteer),
+                Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                 Body = body,
                 Priority = Defaults.BulkHighPriority
             };
@@ -201,14 +205,17 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<bool>("Success", true);
         }
 
-        private async Task<ServiceResponse<bool>> EmailOrganizer(Volunteer volunteer, Schedule schedule, string body)
+        private async Task<ServiceResponse<bool>> EmailOrganizer(Volunteer volunteer, 
+            Schedule schedule, 
+            string body,
+            string customMessage)
         {
             if (!String.IsNullOrEmpty(schedule.OrganizerEmail))
             {
                 EmailQueue emailQueue = new()
                 {
                     ToAddress = schedule.OrganizerEmail,
-                    Subject = BuildSignUpConfirmationSubject(volunteer),
+                    Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                     Body = body,
                     Priority = Defaults.BulkHighPriority
                 };
@@ -223,12 +230,17 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<bool>("Success", true);
         }
 
-        private string BuildSignUpConfirmationSubject(Volunteer entity)
+        private string BuildSignUpConfirmationSubject(Volunteer entity, string customMessage)
         {
-            return $"Volunteer Sign Up {entity.FirstName} {entity.LastName}";
+            string lastWord = StringUtil.GetLastWord(customMessage, " ");
+            return $"Volunteer Sign Up {entity.FirstName} {entity.LastName} {lastWord}";
         }
 
-        private async Task<ServiceResponse<string>> BuildSignUpConfirmationBody(SignUp signUp, Volunteer volunteer, Schedule schedule, string template)
+        private async Task<ServiceResponse<string>> BuildSignUpConfirmationBody(SignUp signUp, 
+            Volunteer volunteer, 
+            Schedule schedule, 
+            string template,
+            string customMessage)
         {
             var locationResult = await _locationDataService.GetByIdAsync(signUp.LocationId);
 
@@ -238,9 +250,11 @@ namespace BedBrigade.Data.Services
             }
 
             StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = sb.Replace("%%CustomMessage%%", customMessage);
             sb = _mailMergeLogic.ReplaceVolunteerFields(volunteer, schedule, sb);
             sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);    
             sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
+            sb = _mailMergeLogic.ReplaceSignUpFields(schedule, signUp, sb);
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 

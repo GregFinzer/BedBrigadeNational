@@ -678,6 +678,31 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 false, null);
         }
     }
+
+    public async Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId)
+    {
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                var messagesToDelete = await dbSet.Where(o => o.SignUpId == signUpId).ToListAsync();
+                if (messagesToDelete.Count == 0)
+                {
+                    return new ServiceResponse<bool>($"No messages found for SignUpId {signUpId}", true, false);
+                }
+                dbSet.RemoveRange(messagesToDelete);
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<bool>($"Deleted {messagesToDelete.Count} messages for SignUpId {signUpId}", true, true);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<bool>($"Could not delete messages for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+        }
+
+    }
 }
 
 

@@ -376,7 +376,8 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(updateResult.Data);
+            string customMessage = "This is to confirm that your sign-up was updated.";
+            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(updateResult.Data, customMessage);
 
             if (!emailResponse.Success)
             {
@@ -405,7 +406,8 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(createResult.Data);
+            string customMessage = "This is to confirm that your sign-up was created.";
+            var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(createResult.Data, customMessage);
 
             if (!emailResponse.Success)
             {
@@ -587,6 +589,47 @@ namespace BedBrigade.Client.Components.Pages
 
         #endregion
 
+        #region Unregister Volunteer
 
+        private async Task UnregisterVolunteer()
+        {
+            if (!await IsValid())
+            {
+                return;
+            }
+
+            try
+            {
+                var unregisterResponse = await _svcSignUp.Unregister(newVolunteer.Email, SelectedEvent.ScheduleId);
+
+                if (!unregisterResponse.Success)
+                {
+                    Log.Logger.Error($"Error UnregisterVolunteer: {unregisterResponse.Message}");
+                    await ShowMessage(unregisterResponse.Message);
+                    return;
+                }
+
+                string customMessage = "This is to confirm that your sign-up was removed.";
+                var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(unregisterResponse.Data, customMessage);
+
+                if (!emailResponse.Success)
+                {
+                    await ShowMessage(emailResponse.Message);
+                    Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
+                    return;
+                }
+
+                DisplaySearch = DisplayNone;
+                DisplayForm = DisplayNone;
+                ResultDisplay = "";
+                FinalMessage = BootstrapHelper.GetBootstrapJumbotron("Unregisterd", "You have sucessfully unregistered for the event", string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Error UnregisterVolunteer: {ex.Message}");
+                await ShowMessage("Error UnregisterVolunteer: " + ex.Message);
+            }
+        }
+        #endregion
     }
 }
