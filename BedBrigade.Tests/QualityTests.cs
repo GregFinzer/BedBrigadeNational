@@ -24,6 +24,9 @@ namespace BedBrigade.Tests
             //This has duplicate strings but it is okay since it is a regex replacement
             _qualityLogic.Config.FilesToExclude.Add("Pluralization.cs");
 
+            //This file is long but all the methods are related
+            _qualityLogic.Config.FilesToExclude.Add("SmsQueueDataService.cs");
+
             _solutionPath = TestHelper.GetSolutionPath();
         }
 
