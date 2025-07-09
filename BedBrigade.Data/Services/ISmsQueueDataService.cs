@@ -21,5 +21,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, SmsRecipientOption option, int scheduleId);
 
         Task<ServiceResponse<List<SmsQueue>>> GetOldUnreadMessages();
+        Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId);
     }
 }

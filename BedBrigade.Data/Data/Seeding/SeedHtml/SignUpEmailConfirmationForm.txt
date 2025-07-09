@@ -1,6 +1,6 @@
 ﻿%%Volunteer.FirstName%%,
 
-This is to confirm that you have signed up to volunteer for this event.
+%%CustomMessage%%
 Location:  %%Location.Name%%
 %%Schedule.GroupName%%
 Event Name:  %%Schedule.EventName%% %%Schedule.EventType%%
@@ -19,7 +19,8 @@ Name:  %%Volunteer.FirstName%% %%Volunteer.LastName%%
 %%Volunteer.OrganizationOrGroup%%
 Email:  %%Volunteer.Email%%
 Phone:  %%Volunteer.Phone%%
+Number of Volunteers:  %%SignUp.NumberOfVolunteers%%
 Attend Church Regularly:  %%Volunteer.AttendChurch%%
 Other Languages Spoken: %%Volunteer.OtherLanguagesSpoken%%
-%%Volunteer.VehicleType%%
-%%Volunteer.Message%%
+%%SignUp.VehicleType%%
+%%SignUp.SignUpNote%%

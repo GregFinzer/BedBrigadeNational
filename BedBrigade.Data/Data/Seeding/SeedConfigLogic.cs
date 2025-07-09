@@ -261,7 +261,7 @@ namespace BedBrigade.Data.Data.Seeding
                 new()
                 {
                     ConfigurationKey = ConfigNames.EventCutOffTimeDays,
-                    ConfigurationValue = "4",
+                    ConfigurationValue = "3",
                     Section = ConfigSection.System,
                     LocationId = Defaults.NationalLocationId
                 },
