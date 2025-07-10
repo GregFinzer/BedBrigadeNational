@@ -35,6 +35,7 @@ namespace BedBrigade.Client.Components
         public bool enabledLocationSelector { get; set; } = true;
 
         private const string EventDate = "EventDateScheduled";
+        private const string FutureFilter = "future"; 
         // Edit Form
 
         protected List<string>? ToolBar;
@@ -51,18 +52,20 @@ namespace BedBrigade.Client.Components
         private int _selectedLocationId = 0;
         private List<UsState>? StateList = AddressHelper.GetStateList();
         public string ManageScheduleMessage { get; set; }
+        protected List<GridSortColumn> DefaultSortColumns { get; set; } = new List<GridSortColumn> { new GridSortColumn { Field = EventDate, Direction = SortDirection.Ascending } };
 
         protected override async Task OnInitializedAsync()
         {
             try
             {
                 _lc.InitLocalizedComponent(this);
+                SetupToolbar();
                 await LoadUserData();
                 await LoadLocations();
                 await LoadScheduleData();
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();
-                SetupToolbar();
+                DefaultSortColumns = new List<GridSortColumn> { new GridSortColumn { Field = EventDate, Direction = SortDirection.Ascending } };
                 await SetInitialFilter();
             }
             catch (Exception ex)
@@ -98,8 +101,15 @@ namespace BedBrigade.Client.Components
                     Grid.SelectedRowIndex = 0;
                 }
 
-                await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal",
-                    DateTime.Today); // default grid filter: future events
+                try
+                {
+                    await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal",
+                        DateTime.Today); // default grid filter: future events
+                }
+                catch (Exception)
+                {
+                    //Ignore any filter errors
+                }
             }
         }
 
@@ -172,9 +182,11 @@ namespace BedBrigade.Client.Components
         {
             if (args.Item.Text == "Reset")
             {
-               await Grid.ResetPersistDataAsync();
-               //It is not possible to save the grid state for this grid for some reason
-               return;
+                await Grid.ResetPersistDataAsync();
+                DefaultFilter = FutureFilter; 
+                await SetInitialFilter();
+                //It is not possible to save the grid state for this grid for some reason
+                return;
             }
 
             if (args.Item.Text == "Pdf Export")
@@ -387,7 +399,7 @@ namespace BedBrigade.Client.Components
 
         private List<GridFilterOption> GridDefaultFilter = new List<GridFilterOption>
         {
-            new GridFilterOption() { ID = "future", Text = "In the Future" },
+            new GridFilterOption() { ID = FutureFilter, Text = "In the Future" },
             new GridFilterOption() { ID = "past", Text = "In the Past" },
             new GridFilterOption() { ID = "all", Text = "All Schedules" },
         };
@@ -398,7 +410,7 @@ namespace BedBrigade.Client.Components
 
             switch (args.Value)
             {
-                case "future":
+                case FutureFilter:
                     await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal", DateTime.Today);
                     break;
                 case "past":
