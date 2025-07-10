@@ -47,6 +47,7 @@
                     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
                     </GridFilterSettings>
                     <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
+                    <GridSortSettings Columns="@DefaultSortColumns" />
                     <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
                     <GridEditSettings 
                         AllowAdding="true" 
