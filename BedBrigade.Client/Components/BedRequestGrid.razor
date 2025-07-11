@@ -29,7 +29,7 @@ else
                             AllowPaging="true"
                             AllowSorting="true"
                             AllowExcelExport="true"
-                            ShowColumnMenu="true"
+                            ShowColumnMenu="false"
                             AllowFiltering="true"
                             AllowReordering="true"
                             AllowResizing="true"
@@ -266,8 +266,8 @@ else
                             <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridForeignColumn Field=@nameof(BedRequest.LocationId) Visible=@IsLocationColumnVisible ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.FormattedPhone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.Street) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.FormattedPhone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.Street) ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.PostalCode) ShowColumnMenu="false" HeaderText="Zip" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.CreateDate) Format="d" ShowColumnMenu="false" HeaderText="Added to List" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.NumberOfBeds) ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
@@ -276,8 +276,8 @@ else
                             <GridColumn Field=@nameof(BedRequest.DeliveryDate) Format="d" ShowColumnMenu="false" HeaderText="Delivery Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Team) ShowColumnMenu="false" HeaderText="Team" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Notes) ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) ShowColumnMenu="false" HeaderText="Primary Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AllowGrouping="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) ShowColumnMenu="false" HeaderText="Primary Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(BedRequest.SpeakEnglish) ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
                         </GridColumns>
                     </SfGrid>

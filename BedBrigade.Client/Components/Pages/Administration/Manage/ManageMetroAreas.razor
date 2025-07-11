@@ -32,7 +32,7 @@ else
                         AllowPaging="true"
                         AllowSorting="true"
                         AllowExcelExport="true"
-                        ShowColumnMenu="true"
+                        ShowColumnMenu="false"
                         AllowFiltering="true"
                         AllowReordering="true"
                         AllowResizing="true"
@@ -77,7 +77,7 @@ else
                     </GridSortSettings>
                     <GridColumns>
                         <GridColumn Field=@nameof(MetroArea.MetroAreaId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
-                        <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
+                        <GridColumn Field=@nameof(MetroArea.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                     </GridColumns>
                 </SfGrid>
 

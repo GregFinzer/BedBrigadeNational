@@ -40,7 +40,7 @@ else
                             AllowPaging="true"
                             AllowSorting="true"
                             AllowExcelExport="true"
-                            ShowColumnMenu="true"
+                            ShowColumnMenu="false"
                             AllowFiltering="true"
                             AllowReordering="true"
                             AllowResizing="true"
@@ -124,10 +124,10 @@ else
                         </GridSortSettings>
                         <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true"/>
                         <GridColumns>
-                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
-                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="190px" AutoFit="true"/>
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="120px" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="false" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="290px" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
+                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="190px" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="120px" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="290px" AutoFit="true" />
                             <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
                             <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
                         </GridColumns>

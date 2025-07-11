@@ -59,9 +59,9 @@ namespace BedBrigade.Client.Components
             try
             {
                 _lc.InitLocalizedComponent(this);
-                SetupToolbar();
                 await LoadUserData();
                 await LoadLocations();
+                SetupToolbar();
                 await LoadScheduleData();
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();

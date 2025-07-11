@@ -97,8 +97,8 @@ else
                         <GridColumn Field=@nameof(Configuration.ConfigurationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
                         <GridForeignColumn Field=@nameof(Configuration.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Configuration.SectionDescription) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true"/>
-                        <GridColumn Field=@nameof(Configuration.ConfigurationKey) HeaderText="Key" ShowColumnMenu="false" AllowFiltering="false" ShowInColumnChooser="false"/>
-                        <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Value" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false"/>
+                        <GridColumn Field=@nameof(Configuration.ConfigurationKey) HeaderText="Key" ShowColumnMenu="false" AllowFiltering="true" ShowInColumnChooser="false"/>
+                        <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Value" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true"/>
                     </GridColumns>
                 </SfGrid>
 
