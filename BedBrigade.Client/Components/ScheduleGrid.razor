@@ -33,7 +33,7 @@
                         AllowPaging="true"
                         AllowSorting="true"
                         AllowExcelExport="true"
-                        ShowColumnMenu="true"
+                        ShowColumnMenu="false"
                         AllowFiltering="true"
                         AllowReordering="true"
                         AllowResizing="true"
@@ -217,7 +217,7 @@
           
                     <GridColumns>
                         <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="false" AllowAdding="true" AllowEditing="true" ></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="true" AllowAdding="true" AllowEditing="true" ></GridColumn>
                         <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
                         </GridColumn>

@@ -119,11 +119,11 @@ else
                     <GridGroupSettings Columns=@groupColumns ShowDropArea="false"/>
                     <GridColumns>
                         <GridColumn Field=@nameof(ContactUs.ContactUsId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
-                        <GridColumn Field=@nameof(ContactUs.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
-                        <GridColumn Field=@nameof(ContactUs.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
+                        <GridColumn Field=@nameof(ContactUs.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(ContactUs.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
                         </GridColumn>
                         <GridForeignColumn Field=@nameof(ContactUs.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
-                        <GridColumn Field=@nameof(ContactUs.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true">
+                        <GridColumn Field=@nameof(ContactUs.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
                             <Template>
                                 @{
                                     var request = (context as ContactUs);
