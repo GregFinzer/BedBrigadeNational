@@ -84,6 +84,12 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadDefaultContent(ServiceResponse<Location> locationResult, string locationName)
         {
+            if (locationResult.Data == null)
+            {
+                Log.Logger.Error($"Location not found for {locationName}");
+                return;
+            }
+
             var contentResult = await _svcContent.GetAsync("Footer", locationResult.Data.LocationId);
 
             if (contentResult.Success && contentResult.Data != null)

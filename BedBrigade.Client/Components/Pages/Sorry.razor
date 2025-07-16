@@ -34,6 +34,8 @@ else
 @code {
     [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
+    [Inject] private IAuthService _authService { get; set; }
+    [Inject] private NavigationManager _navigationManager { get; set; }
     [Parameter] public string? mylocation { get; set; }
     [Parameter] public string? mypageName { get; set; }
 
@@ -59,6 +61,23 @@ else
             Log.Logger.Warning($"404 for Page: /sorry");
         }
     } // init
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_authService.IsLoggedIn)
+        {
+            var restoredFromState = await _authService.GetStateFromTokenAsync();
+            if (restoredFromState && _authService.IsNationalAdmin)
+            {
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{mylocation}");
+
+                if (locationResponse.Success && locationResponse.Data != null)
+                {
+                    _navigationManager.NavigateTo($"/{mylocation}/{mypageName}", false);
+                }
+            }
+        }
+    }
 
     private async void CheckLocationStatus(string location)
     {
