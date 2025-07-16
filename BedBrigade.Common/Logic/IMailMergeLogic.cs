@@ -15,5 +15,6 @@ public interface IMailMergeLogic
     StringBuilder ReplaceNewsletterNameForQuery(StringBuilder sb, string newsletterName);
     string ReplaceEmailForQuery(string body, string email);
     StringBuilder ReplaceSignUpFields(Schedule schedule, SignUp signUp, StringBuilder sb);
+    StringBuilder ReplaceContactUsFields(ContactUs contactUs, StringBuilder sb);
 }
 

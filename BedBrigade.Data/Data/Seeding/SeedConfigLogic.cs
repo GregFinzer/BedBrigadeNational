@@ -488,6 +488,13 @@ namespace BedBrigade.Data.Data.Seeding
                     ConfigurationValue = "25|50|100||200|500",
                     Section = ConfigSection.Payments,
                     LocationId = locationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.ContactUsEmails,
+                    ConfigurationValue = "Location Admin",
+                    Section = ConfigSection.Email,
+                    LocationId = locationId
                 }
             };
         }

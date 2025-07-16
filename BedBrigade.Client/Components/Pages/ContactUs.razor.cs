@@ -1,5 +1,6 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -18,6 +19,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
 
         private Common.Models.ContactUs? newRequest;
         private SearchLocation? SearchLocation;
@@ -191,6 +193,20 @@ namespace BedBrigade.Client.Components.Pages
             newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
             newRequest.Status = ContactUsStatus.ContactRequested;
             await UpdateDatabase();
+            await SendConfirmationEmail(newRequest);
+        }
+
+        private async Task SendConfirmationEmail(Common.Models.ContactUs contactUs)
+        {
+            var emailResult = await _svcEmailBuilder.SendContactUsConfirmationEmail(contactUs);
+
+            if (!emailResult.Success)
+            {
+                AlertType = AlertDanger;
+                ResultMessage = emailResult.Message;
+                ResultDisplay = "";
+                await ScrollToResultMessage();
+            }
         }
 
         private async Task UpdateDatabase()
@@ -229,9 +245,15 @@ namespace BedBrigade.Client.Components.Pages
             }
             finally
             {
-                await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 200);
+                await ScrollToResultMessage();
             }
-        } // update database
+        }
+
+        private async Task ScrollToResultMessage()
+        {
+            await _js.InvokeVoidAsync("BedBrigadeUtil.ScrollToElementId", "resultMessage", 200);
+        }
+        // update database
 
         #endregion
         public async Task HandlePhoneMaskFocus()

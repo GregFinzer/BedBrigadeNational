@@ -63,6 +63,11 @@ public class MailMergeLogic : IMailMergeLogic
         "%%SignUp.VehicleType%%",
         "%%SignUp.SignUpNote%%",
         "%%SignUp.NumberOfVolunteers%%",
+        "%%ContactUs.FirstName%%",
+        "%%ContactUs.LastName%%",
+        "%%ContactUs.Phone%%",
+        "%%ContactUs.Email%%",
+        "%%ContactUs.Message%%",
     };
 
     public void CheckForInvalidMergeFields(string template)
@@ -188,6 +193,16 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Schedule.OrganizerName%%", entity.OrganizerName);
         sb = sb.Replace("%%Schedule.OrganizerEmail%%", entity.OrganizerEmail);
         sb = sb.Replace("%%Schedule.OrganizerPhone%%", entity.OrganizerPhone.FormatPhoneNumber());
+        return sb;
+    }
+
+    public StringBuilder ReplaceContactUsFields(ContactUs contactUs, StringBuilder sb)
+    {
+        sb = sb.Replace("%%ContactUs.FirstName%%", contactUs.FirstName);
+        sb = sb.Replace("%%ContactUs.LastName%%", contactUs.LastName);
+        sb = sb.Replace("%%ContactUs.Phone%%", contactUs.Phone.FormatPhoneNumber());
+        sb = sb.Replace("%%ContactUs.Email%%", contactUs.Email);
+        sb = sb.Replace("%%ContactUs.Message%%", contactUs.Message);
         return sb;
     }
 

@@ -23,4 +23,6 @@ public enum ContentType
     Stories = 12,
     [Description("Newsletter Form")]
     NewsletterForm = 13,
+    [Description("Contact Us Confirmation Form")]
+    ContactUsConfirmationForm = 14,
 }
