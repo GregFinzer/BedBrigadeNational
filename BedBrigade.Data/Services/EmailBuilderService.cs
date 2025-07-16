@@ -1,8 +1,9 @@
 ﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.Models;
-using System.Text;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
+using System.Text;
+using Twilio.TwiML.Voice;
 
 
 namespace BedBrigade.Data.Services
@@ -186,6 +187,58 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<bool>("Successfully queued Sign Up Confirmation Email", true);
         }
 
+        public async Task<ServiceResponse<bool>> SendContactUsConfirmationEmail(ContactUs entity)
+        {
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(entity.LocationId, ContentType.ContactUsConfirmationForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("ContactUsConfirmationForm not found", false);
+            }
+
+            var bodyResult = await BuildContactUsConfirmationBody(entity, templateResult.Data.ContentHtml);
+
+            if (!bodyResult.Success || bodyResult.Data == null)
+            {
+                return new ServiceResponse<bool>(bodyResult.Message, false);
+            }
+            
+            string subject = BuildContactUsConfirmationSubject(entity);
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = entity.Email,
+                Subject = subject,
+                Body = bodyResult.Data,
+                Priority = Defaults.BulkHighPriority
+            };
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            ServiceResponse<List<string>> userEmails =
+                await _userDataService.GetEmailsByLocationAndConfigName(entity.LocationId, ConfigNames.ContactUsEmails);
+
+            if (!userEmails.Success || userEmails.Data == null)
+            {
+                return new ServiceResponse<bool>(userEmails.Message, false);
+            }
+
+            if (userEmails.Data.Count > 0)
+            {
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+
+                if (!bulkEmailResponse.Success)
+                {
+                    return new ServiceResponse<bool>(bulkEmailResponse.Message, false);
+                }
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Contact Us Confirmation Email", true);
+        }
+
         private async Task<ServiceResponse<bool>> EmailVolunteer(Volunteer volunteer, string body, string customMessage)
         {
             EmailQueue emailQueue = new()
@@ -319,12 +372,25 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 
+        private async Task<ServiceResponse<string>> BuildContactUsConfirmationBody(ContactUs entity, string template)
+        {
+            var locationResult = await _locationDataService.GetByIdAsync(entity.LocationId);
 
+            if (!locationResult.Success || locationResult.Data == null)
+            {
+                return new ServiceResponse<string>("Location not found", false);
+            }
 
+            StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = _mailMergeLogic.ReplaceContactUsFields(entity, sb);
+            sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
+            return new ServiceResponse<string>("Built Body", true, sb.ToString());
+        }
 
-
-
-
+        private string BuildContactUsConfirmationSubject(ContactUs entity)
+        {
+            return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
+        }
 
     }
 

@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using BedBrigade.Common.Models;
-using System.Data.Common;
 using BedBrigade.Common.Constants;
-using Twilio.TwiML.Voice;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 
 
 namespace BedBrigade.Data.Services
@@ -13,23 +13,23 @@ namespace BedBrigade.Data.Services
     {
         private readonly ICachingService _cachingService;
         private readonly IDbContextFactory<DataContext> _contextFactory;
-        private readonly IAuthService _authService;
         private readonly ICommonService _commonService;
         private readonly ILocationDataService _locationDataService;
         private readonly IUserPersistDataService _userPersistDataService;
-
+        private readonly IConfigurationDataService _configurationDataService;
         public UserDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
             IAuthService authService,
             ICommonService commonService,
             ILocationDataService locationDataService,
-            IUserPersistDataService userPersistDataService) : base(contextFactory, cachingService, authService)
+            IUserPersistDataService userPersistDataService, 
+            IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
-            _authService = authService;
             _commonService = commonService;
             _locationDataService = locationDataService;
             _userPersistDataService = userPersistDataService;
+            _configurationDataService = configurationDataService;
         }
 
         public async Task<ServiceResponse<User>> GetCurrentLoggedInUser()
@@ -179,6 +179,60 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        public async Task<ServiceResponse<List<string>>> GetEmailsByLocationAndConfigName(int locationId, string key)
+        {
+            var userResponse = await GetAllForLocationAsync(locationId);
+            if (!userResponse.Success || userResponse.Data == null)
+            {
+                return new ServiceResponse<List<string>>(userResponse.Message, false);
+            }
 
+            string configResponse;
+
+            try
+            {
+                configResponse = await _configurationDataService.GetConfigValueAsync(ConfigSection.Email, key, locationId);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<List<string>>(ex.Message, false);
+            }
+
+            if (string.IsNullOrEmpty(configResponse))
+            {
+                return new ServiceResponse<List<string>>("Not defined", true, new List<string>());
+            }
+
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), locationId, key, "GetEmailsByLocationAndConfigName");
+            List<string>? cachedContent = _cachingService.Get<List<string>>(cacheKey);
+            if (cachedContent != null)
+            {
+                return new ServiceResponse<List<string>>($"Found {cachedContent.Count} emails in cache for location {locationId} and config key {key}", true, cachedContent);
+            }
+
+            string[] configValues = configResponse.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+            List<string> emails = new List<string>();
+
+            foreach (var configValue in configValues)
+            {
+                string trimmedValue = configValue.Trim();
+                var emailResult = Validation.IsValidEmail(trimmedValue);
+
+                if (emailResult.IsValid)
+                {
+                    emails.Add(trimmedValue);
+                }
+                else
+                {
+                    emails.AddRange(userResponse.Data.Where(o => o.Role == trimmedValue).Select(o => o.Email).ToList());
+                }
+            }
+
+            emails = emails.Distinct().ToList();
+            _cachingService.Set(cacheKey, emails);
+
+            return new ServiceResponse<List<string>>($"Found {emails.Count} emails for location {locationId} and config key {key}", true, emails.Distinct().ToList());
+        }
     }
 }

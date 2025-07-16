@@ -42,6 +42,7 @@
         public const string EmailPassword = "EmailPassword";
         public const string PrimaryLanguage = "PrimaryLanguage";
         public const string SpeakEnglish = "SpeakEnglish";
+        public const string ContactUsEmails = "ContactUsEmails";
 
         //GeoLocation
         public const string GeoLocationUrl = "GeoLocationUrl";

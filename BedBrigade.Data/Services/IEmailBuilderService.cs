@@ -7,5 +7,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations);
         Task<ServiceResponse<bool>> SendBedRequestConfirmationEmail(BedRequest entity);
         Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp, string customMessage);
+        Task<ServiceResponse<bool>> SendContactUsConfirmationEmail(ContactUs contactUs);
     }
 }

@@ -32,157 +32,24 @@ public static class SeedContentsLogic
             await SeedNationalLocations(context);
             await SeedNationalDonations(context);
             await SeedAssemblyInstructions(context, locations);
-            await SeedDeliveryCheckList(context, locations);
-            await SeedTaxForm(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
             await SeedRockCityPolaris(context);
-            await SeedBedRequestConfirmationForm(context, locations);
-            await SeedSignUpEmailConfirmationForm(context, locations);
-            await SeedSignUpSmsConfirmationForm(context, locations);
-            await SeedNewsletterForm(context, locations);
+            await SeedForm(context, locations, ContentType.DeliveryCheckList);
+            await SeedForm(context, locations, ContentType.EmailTaxForm);
+            await SeedForm(context, locations, ContentType.BedRequestConfirmationForm);
+            await SeedForm(context, locations, ContentType.SignUpEmailConfirmationForm);
+            await SeedForm(context, locations, ContentType.SignUpSmsConfirmationForm);
+            await SeedForm(context, locations, ContentType.NewsletterForm);
+            await SeedForm(context, locations, ContentType.ContactUsConfirmationForm);
         }
     }
 
-    private static async Task SeedNewsletterForm(DataContext context, List<Location> locations)
-    {
-        // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
-        if (National != null)
-        {
-            locations.Remove(National);
-        }
-
-        Log.Logger.Information("SeedNewsletterForm Started");
-
-        string name = ContentType.NewsletterForm.ToString();
-
-        string seedText;
-
-        foreach (var location in locations)
-        {
-            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
-            {
-                continue; // already seeded
-            }
-
-            seedText = WebHelper.GetSeedingFile("NewsletterForm.txt");
-
-            var content = new Content
-            {
-                LocationId = location.LocationId!,
-                ContentType = ContentType.NewsletterForm,
-                Name = name,
-                ContentHtml = seedText,
-                Title = StringUtil.InsertSpaces(name)
-            };
-            SeedRoutines.SetMaintFields(content);
-            context.Content.Add(content); // add row to Contents table 
-        }
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Debug($"Error in SeedNewsletterForm content {ex.Message}");
-        }
-    }
-
-    private static async Task SeedSignUpSmsConfirmationForm(DataContext context, List<Location> locations)
-    {
-        // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
-        if (National != null)
-        {
-            locations.Remove(National);
-        }
-
-        Log.Logger.Information("SeedSignUpSmsConfirmationForm Started");
-
-        string name = ContentType.SignUpSmsConfirmationForm.ToString();
 
 
-        string seedText;
 
-        foreach (var location in locations)
-        {
-            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
-            {
-                continue; // already seeded
-            }
 
-            seedText = WebHelper.GetSeedingFile("SignUpSmsConfirmationForm.txt");
 
-            var content = new Content
-            {
-                LocationId = location.LocationId!,
-                ContentType = ContentType.SignUpSmsConfirmationForm,
-                Name = name,
-                ContentHtml = seedText,
-                Title = StringUtil.InsertSpaces(name)
-            };
-            SeedRoutines.SetMaintFields(content);
-            context.Content.Add(content); // add row to Contents table 
-        }
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Debug($"Error in SeedSignUpSmsConfirmationForm content {ex.Message}");
-        }
-    }
-
-    private static async Task SeedSignUpEmailConfirmationForm(DataContext context, List<Location> locations)
-    {
-        // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
-        if (National != null)
-        {
-            locations.Remove(National);
-        }
-
-        Log.Logger.Information("SeedSignUpEmailConfirmationForm Started");
-
-        string name = ContentType.SignUpEmailConfirmationForm.ToString();
-
-        string seedText;
-
-        foreach (var location in locations)
-        {
-            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
-            {
-                continue; // already seeded
-            }
-
-            seedText = WebHelper.GetSeedingFile("SignUpEmailConfirmationForm.txt");
-
-            var content = new Content
-            {
-                LocationId = location.LocationId!,
-                ContentType = ContentType.SignUpEmailConfirmationForm,
-                Name = name,
-                ContentHtml = seedText,
-                Title = StringUtil.InsertSpaces(name)
-            };
-            SeedRoutines.SetMaintFields(content);
-            context.Content.Add(content); // add row to Contents table 
-        }
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Debug($"Error in SeedSignUpEmailConfirmationForm content {ex.Message}");
-        }
-
-    }
 
     private static async Task SeedNationalDonations(DataContext context)
     {
@@ -667,99 +534,9 @@ public static class SeedContentsLogic
         }
     }
 
-    private static async Task SeedDeliveryCheckList(DataContext context, List<Location> locations)
-    {
-        // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
-        if (National != null)
-        {
-            locations.Remove(National);
-        }
 
-        Log.Logger.Information("SeedDeliveryCheckList Started");
 
-        string name = ContentType.DeliveryCheckList.ToString();
 
-        string seedHtml;
-
-        foreach (var location in locations)
-        {
-            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
-            {
-                continue; // already seeded
-            }
-
-            seedHtml = WebHelper.GetSeedingFile("DeliveryCheckList.txt"); // plane text
-
-            var content = new Content
-            {
-                LocationId = location.LocationId!,
-                ContentType = ContentType.DeliveryCheckList,
-                Name = name,
-                ContentHtml = seedHtml,
-                Title = StringUtil.InsertSpaces(name)
-            };
-            SeedRoutines.SetMaintFields(content);
-            context.Content.Add(content); // add row to Contents table 
-        }
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Debug($"Error in DeliveryCheckList content {ex.Message}");
-        }
-        
-    } // Delivery Check List
-
-    private static async Task SeedTaxForm(DataContext context, List<Location> locations)
-    {
-        // Do not seed National - remove it from list
-        var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
-        if (National != null)
-        {
-            locations.Remove(National);
-        }
-
-        Log.Logger.Information("SeedTaxForm Started");
-
-        string name = ContentType.EmailTaxForm.ToString();
-
-        string seedHtml;
-
-        foreach (var location in locations)
-        {
-            if (await context.Content.AnyAsync(c => c.Name == name && c.LocationId == location.LocationId))
-            {
-                continue; // already seeded
-            }
-
-            seedHtml = WebHelper.GetSeedingFile("EmailTaxForm.txt");
-
-            var content = new Content
-            {
-                LocationId = location.LocationId!,
-                ContentType = ContentType.EmailTaxForm,
-                Name = name,
-                ContentHtml = seedHtml,
-                Title = StringUtil.InsertSpaces(name)
-            };
-            SeedRoutines.SetMaintFields(content);
-            context.Content.Add(content); // add row to Contents table 
-        }
-
-        try
-        {
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Debug($"Error in SeedTaxForm content {ex.Message}");
-        }
-
-    }
 
     private static async Task SeedThreeRotatorPageTemplate(DataContext context)
     {
@@ -790,7 +567,7 @@ public static class SeedContentsLogic
         }
     }
 
-    private static async Task SeedBedRequestConfirmationForm(DataContext context, List<Location> locations)
+    private static async Task SeedForm(DataContext context, List<Location> locations, ContentType contentType)
     {
         // Do not seed National - remove it from list
         var National = locations.Find(l => l.LocationId == Defaults.NationalLocationId);
@@ -799,9 +576,9 @@ public static class SeedContentsLogic
             locations.Remove(National);
         }
 
-        Log.Logger.Information("SeedBedRequestConfirmationForm Started");
+        Log.Logger.Information($"SeedForm Started for {contentType}");
 
-        string name = ContentType.BedRequestConfirmationForm.ToString();
+        string name = contentType.ToString();
 
         string seedText;
 
@@ -812,12 +589,14 @@ public static class SeedContentsLogic
                 continue; // already seeded
             }
 
-            seedText = WebHelper.GetSeedingFile("BedRequestConfirmationForm.txt");
+            string fileName = $"{name}.txt";
+
+            seedText = WebHelper.GetSeedingFile(fileName);
 
             var content = new Content
             {
                 LocationId = location.LocationId!,
-                ContentType = ContentType.BedRequestConfirmationForm,
+                ContentType = contentType,
                 Name = name,
                 ContentHtml = seedText,
                 Title = StringUtil.InsertSpaces(name)
@@ -832,7 +611,7 @@ public static class SeedContentsLogic
         }
         catch (Exception ex)
         {
-            Log.Logger.Debug($"Error in SeedBedRequestConfirmationForm content {ex.Message}");
+            Log.Logger.Debug($"Error in SeedForm content for {contentType} {ex.Message}");
         }
 
     }
