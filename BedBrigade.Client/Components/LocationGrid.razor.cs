@@ -26,7 +26,8 @@ namespace BedBrigade.Client.Components
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
-
+        private const string Edit = "Edit";
+        private const string Reset = "Reset";
         protected List<Location>? Locations { get; set; }
         protected List<MetroArea>? MetroAreas { get; set; }
         protected List<TimeZoneItem> TimeZones { get; set; }
@@ -69,19 +70,19 @@ namespace BedBrigade.Client.Components
         {
             if (_svcAuth.IsNationalAdmin)
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ToolBar = new List<string> { "Add", Edit, "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", Reset };
+                ContextMenu = new List<string> { Edit, "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
                 ManageLocationsMessage = "Manage Locations";
             }
             else if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
             {
-                ToolBar = new List<string> { "Edit", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
-                ContextMenu = new List<string> { "Edit", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; 
+                ToolBar = new List<string> { Edit, "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", Reset };
+                ContextMenu = new List<string> { Edit, FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; 
                 ManageLocationsMessage = "Manage Locations";
             }
             else
             {
-                ToolBar = new List<string> { "Search", "Reset" };
+                ToolBar = new List<string> { "Search", Reset };
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
                 ManageLocationsMessage = "View Locations";
             }
@@ -181,7 +182,7 @@ namespace BedBrigade.Client.Components
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
-            if (args.Item.Text == "Reset")
+            if (args.Item.Text == Reset)
             {
                 await Grid.ResetPersistData();
                 await SaveGridPersistence();
