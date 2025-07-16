@@ -73,6 +73,12 @@ namespace BedBrigade.Client.Components
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
                 ManageLocationsMessage = "Manage Locations";
             }
+            else if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
+            {
+                ToolBar = new List<string> { "Edit", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset" };
+                ContextMenu = new List<string> { "Edit", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; 
+                ManageLocationsMessage = "Manage Locations";
+            }
             else
             {
                 ToolBar = new List<string> { "Search", "Reset" };
@@ -121,6 +127,14 @@ namespace BedBrigade.Client.Components
                     Grid.EditSettings.AllowEditOnDblClick = true;
                     Grid.EditSettings.AllowDeleting = true;
                     Grid.EditSettings.AllowAdding = true;
+                    Grid.EditSettings.AllowEditing = true;
+                    StateHasChanged();
+                }
+                else if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
+                {
+                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    Grid.EditSettings.AllowDeleting = false;
+                    Grid.EditSettings.AllowAdding = false;
                     Grid.EditSettings.AllowEditing = true;
                     StateHasChanged();
                 }
@@ -213,6 +227,17 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.BeginEdit:
+                    // Prevent LocationAdmin from editing a row with a LocationId different than their own
+                    if (_svcAuth.UserHasRole(RoleNames.LocationAdmin))
+                    {
+                        var location = args.Data;
+                        if (location != null && location.LocationId != _svcAuth.LocationId)
+                        {
+                            args.Cancel = true;
+                            _toastService.Error("Edit Not Allowed", "Location Admins are not allowed to edit locations other than their own.");
+                            return;
+                        }
+                    }
                     BeginEdit();
                     break;
             }
@@ -299,17 +324,17 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task UpdateLocationAsync(Location Location)
+        private async Task UpdateLocationAsync(Location location)
         {
-            var updateResult = await _svcLocation.UpdateAsync(Location);
+            var updateResult = await _svcLocation.UpdateAsync(location);
             if (updateResult.Success)
             {
                 _toastService.Success("Update Location", "Location updated successfully.");
             }
             else
             {
-                Log.Error($"Unable to update location {Location.Name}. Reason: {updateResult.Message}");
-                _toastService.Error("Update Location", $"Unable to update location {Location.Name}. Reason: {updateResult.Message}");
+                Log.Error($"Unable to update location {location.Name}. Reason: {updateResult.Message}");
+                _toastService.Error("Update Location", $"Unable to update location {location.Name}. Reason: {updateResult.Message}");
             }
         }
 
