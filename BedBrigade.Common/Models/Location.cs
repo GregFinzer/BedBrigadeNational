@@ -57,7 +57,7 @@ public class Location : BaseEntity
     public bool IsActive { get; set; } = false;
 
     [MaxLength(40)]
-    public string TimeZoneId { get; set;  } 
+    public string TimeZoneId { get; set;  } = Defaults.DefaultTimeZoneId;
 
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
