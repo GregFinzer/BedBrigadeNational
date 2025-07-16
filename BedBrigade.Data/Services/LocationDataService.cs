@@ -149,6 +149,11 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
         || l.Route.ToLower() == $"/{routeName}".ToLower());
 
+        if (location != null && !location.IsActive && !_authService.IsNationalAdmin)
+        {
+            return new ServiceResponse<Location>("Not Found");
+        }
+
         if (location != null)
         {
             return new ServiceResponse<Location>($"{routeName} found", true, location);
