@@ -307,12 +307,12 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task AddNewLocationAsync(Location Location)
+        private async Task AddNewLocationAsync(Location location)
         {
-            Location.Route = Location.Route.StartsWith("/") ? Location.Route : "/" + Location.Route; // VS 8/26/2024
+            location.Route = (location.Route.StartsWith("/") ? location.Route : "/" + location.Route).ToLower(); 
 
             // new Location
-            var result = await _svcLocation.CreateAsync(Location);
+            var result = await _svcLocation.CreateAsync(location);
 
             if (result.Success)
             {
@@ -320,13 +320,15 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                Log.Error($"Unable to add location {Location.Name}. Reason: {result.Message}");
-                _toastService.Error("Add Location Error", $"Unable to add location {Location.Name}. Reason: {result.Message}");
+                Log.Error($"Unable to add location {location.Name}. Reason: {result.Message}");
+                _toastService.Error("Add Location Error", $"Unable to add location {location.Name}. Reason: {result.Message}");
             }
         }
 
         private async Task UpdateLocationAsync(Location location)
         {
+            location.Route = (location.Route.StartsWith("/") ? location.Route : "/" + location.Route).ToLower();
+
             var updateResult = await _svcLocation.UpdateAsync(location);
             if (updateResult.Success)
             {
