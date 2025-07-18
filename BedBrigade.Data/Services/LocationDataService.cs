@@ -59,22 +59,40 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             var location = result.Data;
             await CreateGeneralDonationCampaign(location);
             FileUtil.CreateLocationMediaDirectory(location);
+
+            //Header and Footer
             await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
             await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
+
+            //Home Page
             await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); 
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Home");
+
+            //Donations
             await CreateContent(location, ContentType.Body, "LocationDonations.html", "Donations");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Donations");
+
+            //About Us
             await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
+
+            //History
+            await CreateContent(location, ContentType.Body, "LocationHistory.html", "History");
+            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "History");
+
+            //Assembly Instructions
             await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
+
+            //Forms
             await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
             await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
             await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
             await CreateContent(location, ContentType.SignUpSmsConfirmationForm, "SignUpSmsConfirmationForm.txt", "SignUpSmsConfirmationForm");
             await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
+
+            //Config
             await CreateConfig(location);
             return result;
         }
