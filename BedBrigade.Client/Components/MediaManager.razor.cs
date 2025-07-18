@@ -96,7 +96,7 @@ namespace BedBrigade.Client.Components
                 _mediaFolderPath = GetMediaFolderPath();
                 RefreshFolders();
                 RefreshFiles(RootFolder);
-                var locationResult = await LocationDataService.GetAllAsync();
+                var locationResult = await LocationDataService.GetActiveLocations();
                 if (locationResult.Success)
                 {
                     _protectedFolders = locationResult.Data.Select(l => l.Route.TrimStart('/')).ToList();

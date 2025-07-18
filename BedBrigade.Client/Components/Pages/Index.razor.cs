@@ -81,7 +81,7 @@ public partial class Index : ComponentBase, IDisposable
             }
             else if (string.IsNullOrEmpty(PageName))
             {
-                var locationsResponse = await _svcLocation.GetAllAsync();
+                var locationsResponse = await _svcLocation.GetActiveLocations();
 
                 //This is a location home page
                 //Example: /grove-city

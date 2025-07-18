@@ -1,12 +1,13 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
-using Microsoft.EntityFrameworkCore;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using KellermanSoftware.AddressParser;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
+using KellermanSoftware.AddressParser;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Location = BedBrigade.Common.Models.Location;
 
 namespace BedBrigade.Data.Services;
 
@@ -31,6 +32,30 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         _authService = authService;
         _lc = languageContainerService;
         _donationCampaignDataService = donationCampaignDataService;
+    }
+
+    public async Task<ServiceResponse<List<Location>>> GetActiveLocations()
+    {
+        var allResult = await GetAllAsync();
+
+        if (!allResult.Success || allResult.Data == null)
+        {
+            return new ServiceResponse<List<Location>>("Could not get locations: " + allResult.Message);
+        }
+
+        if (!_authService.IsNationalAdmin)
+        {
+            //All users can only see active locations
+            //Location Admins can see their own location even if it is inactive
+            allResult.Data = allResult.Data.Where(o => o.IsActive 
+                                                         || (_authService.UserHasRole(RoleNames.LocationAdmin) && o.LocationId == _authService.LocationId))
+                                                         .ToList();
+
+            return new ServiceResponse<List<Location>>($"Found {allResult.Data.Count} active locations", true,
+                allResult.Data);
+        }
+
+        return new ServiceResponse<List<Location>>(allResult.Message, true, allResult.Data);
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -162,15 +187,10 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
         //There will always be less than 100 locations, so we can cache all of them
-        var allLocations = await GetAllAsync();
+        var activeLocations = await GetActiveLocations();
 
-        var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
+        var location = activeLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
         || l.Route.ToLower() == $"/{routeName}".ToLower());
-
-        if (location != null && !location.IsActive && !_authService.IsNationalAdmin)
-        {
-            return new ServiceResponse<Location>("Not Found");
-        }
 
         if (location != null)
         {
@@ -180,23 +200,15 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         return new ServiceResponse<Location>("Not Found");
     }
 
+    /// <summary>
+    /// The location has to have a build postal code
+    /// </summary>
+    /// <param name="locations"></param>
+    /// <returns></returns>
     public List<Location> GetAvailableLocations(List<Location> locations)
     {
-        bool isAuthenticated = _authService.IsLoggedIn;
-
-       // Debug.WriteLine("User authenticated -  " + isAuthenticated.ToString());
-
-        // Step 1: Filter locations by postal code
-        var filteredLocations = locations.Where(l => !string.IsNullOrEmpty(l.BuildPostalCode)).ToList();
-
-        // Step 2: If user is not authenticated, select only active locations
-        if (!isAuthenticated)
-        {
-            filteredLocations = filteredLocations.Where(l => l.IsActive).ToList();
-        }
-       
-        return filteredLocations;
-    } // get available location
+        return locations.Where(l => !string.IsNullOrEmpty(l.BuildPostalCode)).ToList();
+    } 
 
     public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string postalCode)
     {

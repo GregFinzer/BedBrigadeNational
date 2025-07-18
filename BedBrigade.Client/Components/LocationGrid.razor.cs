@@ -87,7 +87,7 @@ namespace BedBrigade.Client.Components
                 ManageLocationsMessage = "View Locations";
             }
 
-            ServiceResponse<List<Location>> result = await _svcLocation.GetAllAsync();
+            ServiceResponse<List<Location>> result = await _svcLocation.GetActiveLocations();
             if (result.Success && result.Data != null)
             {
                 Locations = result.Data.ToList();
