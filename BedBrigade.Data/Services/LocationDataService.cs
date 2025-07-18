@@ -45,7 +45,12 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
         if (!_authService.IsNationalAdmin)
         {
-            baseResult.Data = baseResult.Data.Where(o => o.IsActive).ToList();
+            //All users can only see active locations
+            //Location Admins can see their own location even if it is inactive
+            baseResult.Data = baseResult.Data.Where(o => o.IsActive 
+                                                         || (_authService.UserHasRole(RoleNames.LocationAdmin) && o.LocationId == _authService.LocationId))
+                                                         .ToList();
+
             return new ServiceResponse<List<Location>>($"Found {baseResult.Data.Count} active locations", true,
                 baseResult.Data);
         }
