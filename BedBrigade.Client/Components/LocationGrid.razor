@@ -106,15 +106,17 @@ else
                                             <SfTextBox @bind-Value=@location.BuildPostalCode Enabled="true" Placeholder="@_lc.Keys["BuildPostalCode"]" FloatLabelType="FloatLabelType.Auto" />
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <SfNumericTextBox TValue="decimal?" Min="-90.000000m" Max="90.000000m" Step="0.000001m" Format="n6" 
-                                                          @bind-Value=@location.Latitude Enabled="true" 
-                                                          Placeholder="@_lc.Keys["Latitude"]" FloatLabelType="FloatLabelType.Auto" />
-                                    </div>
-                                    <div class="col-md-4">
-                                        <SfNumericTextBox TValue="decimal?" Min="-180.000000m" Max="180.000000m" Step="0.000001m" Format="n6" 
-                                                          @bind-Value=@location.Longitude Enabled="true" 
-                                                          Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto" />
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <SfNumericTextBox TValue="decimal?" Min="-90.000000m" Max="90.000000m" Step="0.000001m" Format="n6" 
+                                                              @bind-Value=@location.Latitude Enabled="true" 
+                                                              Placeholder="@_lc.Keys["Latitude"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <SfNumericTextBox TValue="decimal?" Min="-180.000000m" Max="180.000000m" Step="0.000001m" Format="n6" 
+                                                              @bind-Value=@location.Longitude Enabled="true" 
+                                                              Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -197,8 +199,8 @@ else
         border: 2px solid #4CAF50; /* Green border */
         background-color: #f9f9f9; /* Light background */
         color: #333; /* Dark text for readability */
-        padding: 10px;
-        margin: 20px 0;
+        padding: 2px;
+        margin-top: 23px;
         text-align: center;
         vertical-align: middle;
         border-radius: 10px; /* Rounded corners */
