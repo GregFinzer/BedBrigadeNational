@@ -112,7 +112,7 @@
             else
             {
                 // Load the locations for the dropdown 
-                var locResponse = await LocationDataService.GetAllAsync();
+                var locResponse = await LocationDataService.GetActiveLocations();
                 if (locResponse.Success)
                 {
                     locations = locResponse.Data;

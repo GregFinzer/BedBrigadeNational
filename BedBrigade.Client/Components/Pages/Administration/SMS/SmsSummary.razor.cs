@@ -87,7 +87,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
     private async Task LoadLocations()
     {
 
-        var locationResult = await _svcLocation.GetAllAsync();
+        var locationResult = await _svcLocation.GetActiveLocations();
         if (locationResult.Success)
         {
             Locations = locationResult.Data.ToList();

@@ -41,7 +41,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             _lc.InitLocalizedComponent(this);
             Log.Information($"{_svcAuth.UserName} went to the Manage Newsletters Page");
 
-            var locationResult = await _svcLocation.GetAllAsync();
+            var locationResult = await _svcLocation.GetActiveLocations();
             if (locationResult.Success && locationResult.Data != null)
             {
                 Locations = locationResult.Data;

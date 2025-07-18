@@ -74,11 +74,19 @@ namespace BedBrigade.Client.Components
                 await LoadUsers();
 
 
-                var getLocations = await _svcLocation.GetAllAsync();
+                var getLocations = await _svcLocation.GetActiveLocations();
                 if (getLocations.Success && getLocations.Data != null)
                 {
                     Locations = getLocations.Data;
-                    _userLocationName = Locations.Find(o => o.LocationId == _svcAuth.LocationId).Name;
+
+                    if (_svcAuth.LocationId == 0)
+                    {
+                        _userLocationName = "Unknown";
+                    }
+                    else if (_svcAuth.LocationId == -1)
+                    {
+                        _userLocationName = Locations.Find(o => o.LocationId == _svcAuth.LocationId).Name;
+                    }
                 }
 
                 SetupToolbar();

@@ -100,7 +100,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
                 if (Locations == null)
                 {
-                    var locResult = await _svcLocation.GetAllAsync();
+                    var locResult = await _svcLocation.GetActiveLocations();
                     if (locResult.Success && locResult.Data != null)
                     {
                         Locations = locResult.Data;

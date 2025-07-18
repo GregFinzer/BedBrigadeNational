@@ -105,7 +105,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
 
         private async Task LoadLocations()
         {
-            var locationsResult = await _svcLocationDataService.GetAllAsync();
+            var locationsResult = await _svcLocationDataService.GetActiveLocations();
             if (!locationsResult.Success && locationsResult.Data != null)
             {
                 Log.Error("Bulk Email Failed to load locations: " + locationsResult.Message);

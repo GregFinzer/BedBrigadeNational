@@ -72,7 +72,7 @@ public partial class BulkSms : ComponentBase
 
     private async Task LoadLocations()
     {
-        var locationResponse = await _svcLocationDataService.GetAllAsync();
+        var locationResponse = await _svcLocationDataService.GetActiveLocations();
 
         if (!locationResponse.Success || locationResponse.Data == null)
         {

@@ -34,28 +34,28 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         _donationCampaignDataService = donationCampaignDataService;
     }
 
-    public override async Task<ServiceResponse<List<Location>>> GetAllAsync()
+    public async Task<ServiceResponse<List<Location>>> GetActiveLocations()
     {
-        var baseResult = await base.GetAllAsync();
+        var allResult = await GetAllAsync();
 
-        if (!baseResult.Success || baseResult.Data == null)
+        if (!allResult.Success || allResult.Data == null)
         {
-            return new ServiceResponse<List<Location>>("Could not get locations: " + baseResult.Message);
+            return new ServiceResponse<List<Location>>("Could not get locations: " + allResult.Message);
         }
 
         if (!_authService.IsNationalAdmin)
         {
             //All users can only see active locations
             //Location Admins can see their own location even if it is inactive
-            baseResult.Data = baseResult.Data.Where(o => o.IsActive 
+            allResult.Data = allResult.Data.Where(o => o.IsActive 
                                                          || (_authService.UserHasRole(RoleNames.LocationAdmin) && o.LocationId == _authService.LocationId))
                                                          .ToList();
 
-            return new ServiceResponse<List<Location>>($"Found {baseResult.Data.Count} active locations", true,
-                baseResult.Data);
+            return new ServiceResponse<List<Location>>($"Found {allResult.Data.Count} active locations", true,
+                allResult.Data);
         }
 
-        return new ServiceResponse<List<Location>>(baseResult.Message, true, baseResult.Data);
+        return new ServiceResponse<List<Location>>(allResult.Message, true, allResult.Data);
     }
 
     public override async Task<ServiceResponse<Location>> CreateAsync(Location entity)
@@ -187,9 +187,9 @@ public class LocationDataService : Repository<Location>, ILocationDataService
     public async Task<ServiceResponse<Location>> GetLocationByRouteAsync(string routeName)
     {
         //There will always be less than 100 locations, so we can cache all of them
-        var allLocations = await GetAllAsync();
+        var activeLocations = await GetActiveLocations();
 
-        var location = allLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
+        var location = activeLocations.Data.FirstOrDefault(l => l.Route.ToLower() == routeName.ToLower()
         || l.Route.ToLower() == $"/{routeName}".ToLower());
 
         if (location != null)
