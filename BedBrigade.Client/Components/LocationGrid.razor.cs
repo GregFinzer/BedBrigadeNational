@@ -41,7 +41,7 @@ namespace BedBrigade.Client.Components
         protected string? Hide { get; private set; } = "true";
         public bool NoPaging { get; private set; }
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "80%", EnableResize = true };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "600px", EnableResize = true };
         public string ManageLocationsMessage { get; set; } = string.Empty;
 
         /// <summary>
