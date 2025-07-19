@@ -1,8 +1,9 @@
 @page "/sorry"
-@page "/sorry/{mylocation:nonfile}"
-@page "/sorry/{mylocation:nonfile}/{mypageName:nonfile}"
-@page "/{mylocation:nonfile}/sorry/"
-@page "/{mylocation:nonfile}/sorry/{mypageName:nonfile}"
+@page "/sorry/{myLocation:nonfile}"
+@page "/sorry/{myLocation:nonfile}/{myPageName:nonfile}"
+@page "/sorry/{myLocation:nonfile}/{myPageName:nonfile}/{mySubPageName:nonfile}"
+@page "/{myLocation:nonfile}/sorry/"
+@page "/{myLocation:nonfile}/sorry/{myPageName:nonfile}"
 
 @using Serilog
 <PageTitle>@_lc.Keys["Sorry"]</PageTitle>
@@ -12,19 +13,22 @@
 
     <h1 class="text-center mt-5">@_lc.Keys["SorryThePage"] </h1>
 
-
-    @if (mylocation != null && mypageName != null)
+    @if (myLocation != null && myPageName != null && mySubPageName != null)
     {
-        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@mylocation/@mypageName</h2>
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation/@myPageName/@mySubPageName</h2>
     }
-    else if (mylocation != null)
+    else if (myLocation != null && myPageName != null)
     {
-        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@mylocation</h2>
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation/@myPageName</h2>
+    }
+    else if (myLocation != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation</h2>
     }
 }
 else
 {
-    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"]<br />/@mylocation</h1>
+    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"]<br />/@myLocation</h1>
 }
 
 <div class="text-center">
@@ -36,8 +40,9 @@ else
     [Inject] private ILocationDataService _svcLocation { get; set; }
     [Inject] private IAuthService _authService { get; set; }
     [Inject] private NavigationManager _navigationManager { get; set; }
-    [Parameter] public string? mylocation { get; set; }
-    [Parameter] public string? mypageName { get; set; }
+    [Parameter] public string? myLocation { get; set; }
+    [Parameter] public string? myPageName { get; set; }
+    [Parameter] public string? mySubPageName { get; set; }
 
     public string HomeUrl = "/";
     private bool IsLocationActive = true;
@@ -45,16 +50,21 @@ else
     protected override void OnInitialized()
     {
         _lc.InitLocalizedComponent(this);
-        if (mylocation != null && mypageName != null)
+        if (myLocation != null && myPageName != null && mySubPageName != null)
         {
-            HomeUrl = $"/{mylocation}";
-            CheckLocationStatus(mylocation);           
-            Log.Logger.Warning($"404 for Page: /{mylocation}/{mypageName}");
+            HomeUrl = $"/{myLocation}";
+            Log.Logger.Warning($"404 for Page: /{myLocation}/{myPageName}/{mySubPageName}");
+        }
+        else if (myLocation != null && myPageName != null)
+        {
+            HomeUrl = $"/{myLocation}";
+            CheckLocationStatus(myLocation);           
+            Log.Logger.Warning($"404 for Page: /{myLocation}/{myPageName}");
 
         }
-        else if (mylocation != null)
+        else if (myLocation != null)
         {
-            Log.Logger.Warning($"404 for Page: /{mylocation}");
+            Log.Logger.Warning($"404 for Page: /{myLocation}");
         }
         else
         {
@@ -69,11 +79,11 @@ else
             var restoredFromState = await _authService.GetStateFromTokenAsync();
             if (restoredFromState && _authService.IsNationalAdmin)
             {
-                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{mylocation}");
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{myLocation}");
 
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
-                    _navigationManager.NavigateTo($"/{mylocation}/{mypageName}", false);
+                    _navigationManager.NavigateTo($"/{myLocation}/{myPageName}", false);
                 }
             }
         }

@@ -93,6 +93,10 @@ namespace BedBrigade.Client.Components.Pages
                     }
                 }
             }
+            else
+            {
+                _nav.NavigateTo($"/sorry/{LocationRoute}/Blog/{BlogType}");
+            }
         }
 
         protected override async Task OnParametersSetAsync()
