@@ -1,3 +1,4 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -15,11 +16,14 @@ namespace BedBrigade.Client.Components.Pages
     public partial class ContactUs :ComponentBase
     {
         #region Declaration
+        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IContactUsDataService? _svcContactUs { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
+        [Parameter] public string? LocationRoute { get; set; }
 
         private Common.Models.ContactUs? newRequest;
         private SearchLocation? SearchLocation;
@@ -39,7 +43,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private string MyValidationMessage = string.Empty;
         private string MyValidationDisplay = DisplayNone;
-        private string? _locationQueryParm;
+        
 
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
@@ -48,44 +52,39 @@ namespace BedBrigade.Client.Components.Pages
 
         public required SfMaskedTextBox phoneTextBox;
 
-        [Parameter] public string PreloadLocation { get; set; }
-
         private ValidationMessageStore _validationMessageStore;
         #endregion
 
         #region Initialization
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
             
             newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
             _validationMessageStore = new ValidationMessageStore(EC);
-            if (!string.IsNullOrEmpty(PreloadLocation))
-            {
-                _locationQueryParm = PreloadLocation;
-            }
-            else
-            {
-                var uri = _nav.ToAbsoluteUri(_nav.Uri);
+            await SetLocationState();
+        }
 
-                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
+        private async Task SetLocationState()
+        {
+            if (!string.IsNullOrEmpty(LocationRoute))
+            {
+                if (await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}") is { Success: true, Data: { } location })
                 {
-                    _locationQueryParm = locationQueryParm;
+                    _locationState.Location = LocationRoute;
                 }
             }
-
-
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                if (!string.IsNullOrEmpty(_locationQueryParm))
+                if (!string.IsNullOrEmpty(LocationRoute))
                 {
-                    await SearchLocation.ForceLocationByName(_locationQueryParm);
+                    await SearchLocation.ForceLocationByName(LocationRoute);
                     DisplayForm = "";
                     StateHasChanged();
                 }

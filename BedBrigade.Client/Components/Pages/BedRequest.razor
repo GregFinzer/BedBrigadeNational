@@ -1,4 +1,5 @@
 @page "/request-bed"
+@page "/{LocationRoute:nonfile}/request-bed"
 @using BedBrigade.Common.Models
 <PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["RequestABed"]}")</PageTitle>
 <RotatorContainer RotatorTitle="@_lc.Keys["RequestABed"]" ImagePath="pages/RequestBed" LocationId="1" SmallHeaderMobile="true" />
