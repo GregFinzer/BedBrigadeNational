@@ -1,3 +1,4 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
@@ -31,6 +32,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IGeoLocationQueueDataService? _svcGeoLocation { get; set; }
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -53,8 +55,6 @@ namespace BedBrigade.Client.Components.Pages
 
         private bool ValidReCAPTCHA = false;
         
-        private string? _locationQueryParm;
-
         private string MyValidationMessage = string.Empty;
         private string MyValidationDisplay = DisplayNone;
         private EditContext? EC { get; set; }
@@ -72,7 +72,7 @@ namespace BedBrigade.Client.Components.Pages
            { "maxlength", "2" },
         };
 
-        [Parameter] public string PreloadLocation { get; set; }
+        [Parameter] public string? LocationRoute { get; set; }
         private ValidationMessageStore _validationMessageStore;
         private string AlertType = AlertDanger;
         public required SfMaskedTextBox phoneTextBox;
@@ -88,20 +88,7 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest = new Common.Models.NewBedRequest();
                 EC = new EditContext(newRequest);
                 _validationMessageStore = new ValidationMessageStore(EC);
-
-                if (!string.IsNullOrEmpty(PreloadLocation))
-                {
-                    _locationQueryParm = PreloadLocation;
-                }
-                else
-                {
-                    var uri = _nav.ToAbsoluteUri(_nav.Uri);
-
-                    if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("location", out var locationQueryParm))
-                    {
-                        _locationQueryParm = locationQueryParm;
-                    }
-                }
+                await SetLocationState();
                 await LoadConfiguration();
                 _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
@@ -111,6 +98,17 @@ namespace BedBrigade.Client.Components.Pages
                 ResultMessage = "Error initializing BedRequest component";
                 AlertType = AlertDanger;
                 ResultDisplay = "";
+            }
+        }
+
+        private async Task SetLocationState()
+        {
+            if (!string.IsNullOrEmpty(LocationRoute))
+            {
+                if (await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}") is { Success: true, Data: { } location })
+                {
+                    _locationState.Location = LocationRoute;
+                }
             }
         }
 
@@ -170,9 +168,9 @@ namespace BedBrigade.Client.Components.Pages
         {
             if (firstRender)
             {
-                if (!string.IsNullOrEmpty(_locationQueryParm))
+                if (!string.IsNullOrEmpty(LocationRoute))
                 {
-                    await SearchLocation.ForceLocationByName(_locationQueryParm);
+                    await SearchLocation.ForceLocationByName(LocationRoute);
                     DisplayForm = "";
                     StateHasChanged();
                 }
