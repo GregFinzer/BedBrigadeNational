@@ -19,8 +19,9 @@
         {
             if (AuthService.IsLoggedIn)
             {
+                string locationRoute = AuthService.UserRoute.TrimStart('/');
                 await AuthService.LogoutAsync();
-                NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo($"/{locationRoute}");
             }
             else
             {
