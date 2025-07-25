@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250724234957_BedRequestReferenceGroup")]
+    partial class BedRequestReferenceGroup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,8 +103,8 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Reference")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("ScheduleId")
                         .HasColumnType("int");
@@ -123,8 +126,8 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Street")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<string>("Team")
                         .HasMaxLength(50)

@@ -1,5 +1,4 @@
 ﻿using KellermanSoftware.NetEmailValidation;
-using System.Linq.Expressions;
 
 namespace BedBrigade.Common.Logic
 {
@@ -52,6 +51,25 @@ namespace BedBrigade.Common.Logic
 
             var addressParser = LibraryFactory.CreateAddressParser();
             return addressParser.GetInfoForZipCode(zipCode).PrimaryCity;
+        }
+
+        public static List<string> ValidateWithDataAnnotations<T>(T model)
+            where T : class
+        {
+            List<string> errors = new List<string>();
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(model);
+            var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
+                model, validationContext, validationResults, true);
+            if (!isValid)
+            {
+                foreach (var validationResult in validationResults)
+                {
+                    errors.Add(validationResult.ErrorMessage);
+                }
+            }
+
+            return errors;
         }
     }
 }
