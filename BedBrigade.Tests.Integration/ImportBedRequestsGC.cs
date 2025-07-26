@@ -44,6 +44,7 @@ public class ImportBedRequestsGC
             {
                 BedRequest bedRequest = new BedRequest();
                 FillBedRequest(bedRequest, item);
+                AddOrUpdateList(bedRequest, destItems);
             }
             catch (Exception ex)
             {
@@ -52,6 +53,38 @@ public class ImportBedRequestsGC
                 sb.AppendLine($"Item data: {string.Join(", ", item.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 throw new FormatException(sb.ToString(), ex);
             }
+        }
+
+        //Add the items to the database
+        foreach (BedRequest bedRequest in destItems)
+        {
+            context.BedRequests.Add(bedRequest);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private void AddOrUpdateList(BedRequest bedRequest, List<BedRequest> destItems)
+    {
+        string[] keywordsToIgnore = new[] { "social", "worker", "manager", "health" };
+        string[] propertiesToIgnore = new[] { "CreateDate" };
+
+        BedRequest? existing = destItems.FirstOrDefault(o => o.Phone == bedRequest.Phone
+                                                             && o.FirstName == bedRequest.FirstName
+                                                             && o.LastName == bedRequest.LastName
+                                                             && o.Status == BedRequestStatus.Waiting
+                                                             && !keywordsToIgnore.Any(k => (o.Reference ?? string.Empty).ToLower().Contains(k))
+                                                             && !keywordsToIgnore.Any(k => (o.Notes ?? string.Empty) .ToLower().Contains(k))
+                                                             );
+        if (existing != null)
+        {
+            string existingString = ObjectUtil.ObjectToString(existing);
+            string bedRequestString = ObjectUtil.ObjectToString(bedRequest);
+            ObjectUtil.CopyProperties(bedRequest, existing, propertiesToIgnore);
+        }
+        else
+        {
+            destItems.Add(bedRequest);
         }
     }
 
@@ -64,15 +97,24 @@ public class ImportBedRequestsGC
         SetAddress(item, bedRequest);
         SetPostalCode(item, bedRequest);
         bedRequest.CreateDate = ParseDate(item["AddedtoList"]);
+        bedRequest.CreateUser = "Import";
+        bedRequest.UpdateUser = "Import";
+        bedRequest.MachineName = Environment.MachineName;
         _defaultCreateDate = bedRequest.CreateDate.Value; 
         bedRequest.Group = item["OrgDeliver"];
+
+        if (string.IsNullOrWhiteSpace(bedRequest.Group))
+        {
+            bedRequest.Group = "GC";
+        }
+
         bedRequest.NumberOfBeds = int.TryParse(item["#BedsRequested"], out int beds) ? beds : 1;
         bedRequest.Status = Enum.Parse<BedRequestStatus>(item["Status"], true);
         bedRequest.AgesGender = item["Gender/Age"];
         bedRequest.DeliveryDate = ParseDeliveryDate(item["DeliveryDate"]);
         bedRequest.Reference = item["Reference"];
         SetPrimaryLanguage(item, bedRequest);
-        SetLatLong(item, bedRequest);
+        SetLatLong(bedRequest);
         SetTeam(item, bedRequest);
 
         if (bedRequest.Notes.Length > 0)
@@ -81,6 +123,15 @@ public class ImportBedRequestsGC
         }
 
         bedRequest.Notes += item["Notes"];
+
+        if (bedRequest.Notes.ToLower().Contains("pick") && String.IsNullOrEmpty(bedRequest.Reference))
+        {
+            bedRequest.Reference = "Pick Up";
+        }
+        else if (string.IsNullOrWhiteSpace(bedRequest.Reference))
+        {
+            bedRequest.Reference = "Website";
+        }
 
         if (bedRequest.DeliveryDate.HasValue)
         {
@@ -107,7 +158,7 @@ public class ImportBedRequestsGC
 
     private void SetPostalCode(Dictionary<string, string> item, BedRequest bedRequest)
     {
-        if (string.IsNullOrWhiteSpace(bedRequest.PostalCode))
+        if (string.IsNullOrWhiteSpace(item["Zip"]))
         {
             return;
         }
@@ -133,6 +184,10 @@ public class ImportBedRequestsGC
         else if (bedRequest.Street.Contains("165 S Prinston Ave"))
         {
             bedRequest.Street = "165 S Princeton Ave";
+        }
+        else if (bedRequest.Street.Contains("1077 Irongate Ln.  Apt. A"))
+        {
+            bedRequest.Street = "1077 Irongate Ln. Apt. A";
         }
     }
 
@@ -173,19 +228,17 @@ public class ImportBedRequestsGC
             return;
         }
 
-        bedRequest.Team = teamMatch.Groups[1].Value;
+        bedRequest.Team = teamMatch.Groups[2].Value;
     }
 
-    private void SetLatLong(Dictionary<string, string> item, BedRequest bedRequest)
+    private void SetLatLong(BedRequest bedRequest)
     {
-        string zip = item["Zip"];
-
-        if (string.IsNullOrWhiteSpace(zip))
+        if (string.IsNullOrWhiteSpace(bedRequest.PostalCode))
         {
             return;
         }
 
-        ZipCodeInfo? zipInfo = _addressParser.GetInfoForZipCode(zip);
+        ZipCodeInfo? zipInfo = _addressParser.GetInfoForZipCode(bedRequest.PostalCode);
 
         if (zipInfo == null)
         {
@@ -312,6 +365,20 @@ public class ImportBedRequestsGC
 
     private void SetFirstNameLastName(Dictionary<string, string> item, BedRequest bedRequest)
     {
+        if (item["Name"] == "Bebe - The Columbus Dream Center")
+        {
+            bedRequest.FirstName = "Bebe";
+            bedRequest.LastName = "The Columbus Dream Center";
+            return;
+        }
+
+        if (item["Name"] == "Lanija Sales")
+        {
+            bedRequest.FirstName = "Lanija";
+            bedRequest.LastName = "Sales";
+            return;
+        }
+
         List<NameParts> namePartsList = ParseNames(item["Name"]);
         if (namePartsList.Count == 0)
         {
@@ -320,14 +387,27 @@ public class ImportBedRequestsGC
         }
         else if (namePartsList.Count == 1)
         {
-            bedRequest.FirstName = namePartsList[0].FirstName;
-            bedRequest.LastName = namePartsList[0].LastName;
+            if (string.IsNullOrEmpty(namePartsList[0].FirstName))
+            {
+                bedRequest.FirstName = namePartsList[0].LastName;
+            }
+            else
+            {
+                bedRequest.FirstName = namePartsList[0].FirstName;
+                bedRequest.LastName = namePartsList[0].LastName;
+            }
         }
         else
         {
             bedRequest.FirstName = namePartsList[0].FirstName;
             bedRequest.LastName = namePartsList[0].LastName;
             bedRequest.Notes = "Other Names: " + string.Join(", ", namePartsList.Skip(1).Select(n => $"{n.FirstName} {n.LastName}"));
+        }
+
+        if (string.IsNullOrWhiteSpace(bedRequest.FirstName) && string.IsNullOrWhiteSpace(bedRequest.LastName))
+        {
+            bedRequest.FirstName = "Unknown";
+            bedRequest.LastName = item["Name"];
         }
 
         if (string.IsNullOrWhiteSpace(bedRequest.FirstName))

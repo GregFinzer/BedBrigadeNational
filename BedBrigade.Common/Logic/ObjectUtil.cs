@@ -80,7 +80,8 @@ namespace BedBrigade.Common.Logic
         /// <typeparam name="U"></typeparam>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        public static void CopyProperties<TS, TD>(TS source, TD dest)
+        /// <param name="propertiesToIgnore"></param>
+        public static void CopyProperties<TS, TD>(TS source, TD dest, string[]? propertiesToIgnore = null)
             where TD : class
             where TS : class
         {
@@ -111,6 +112,10 @@ namespace BedBrigade.Common.Logic
 
                     //Skip ignored elements
                     if (_elementsToIgnore.Contains(name))
+                        continue;
+
+                    //Skip properties
+                    if (propertiesToIgnore != null && propertiesToIgnore.Contains(name))
                         continue;
 
                     Type tsInfoType = tsInfo.PropertyType;

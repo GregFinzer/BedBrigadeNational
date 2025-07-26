@@ -27,7 +27,7 @@ namespace BedBrigade.Common.Models
         public String Phone { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Street Address is required")]
-        [MaxLength(40, ErrorMessage = "Street Address has a maximum length of 40 characters")]
+        [MaxLength(50, ErrorMessage = "Street Address has a maximum length of 50 characters")]
         public String Street { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "City is required")]
@@ -56,9 +56,13 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "Please select your Primary Language")]       
         public string PrimaryLanguage { get; set; } = string.Empty;
 
-                  
         public string SpeakEnglish { get; set; } = string.Empty;
-        
+
+        [MaxLength(100, ErrorMessage = "Reference has a maximum length of 100 characters")]
+        public string? Reference { get; set; }
+
+        [MaxLength(50, ErrorMessage = "Group has a maximum length of 50 characters")]
+        public string? Group { get; set; } = string.Empty;
 
     }
 }

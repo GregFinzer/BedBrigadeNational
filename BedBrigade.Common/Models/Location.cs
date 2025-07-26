@@ -59,6 +59,9 @@ public class Location : BaseEntity
     [MaxLength(40)]
     public string TimeZoneId { get; set;  } = Defaults.DefaultTimeZoneId;
 
+    [MaxLength(50, ErrorMessage = "Group has a maximum length of 50 characters")]
+    public string? Group { get; set; } = string.Empty;
+
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
     public ICollection<Content> Contents { get; set; } = new List<Content>();
