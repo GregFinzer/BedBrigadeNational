@@ -379,11 +379,39 @@ public class ImportBedRequestsGC
             return;
         }
 
+        if (item["Name"] == "Steven/Libby Cooper")
+        {
+            bedRequest.FirstName = "Steven";
+            bedRequest.LastName = "Cooper";
+            return;
+        }
+
+        if (item["Name"] == "Daniel/Leona McKenzie")
+        {
+            bedRequest.FirstName = "Daniel";
+            bedRequest.LastName = "McKenzie";
+            return;
+        }
+
+        if (item["Name"] == "Jessica/Christopher Smith")
+        {
+            bedRequest.FirstName = "Christopher";
+            bedRequest.LastName = "Smith";
+            return;
+        }
+
+        if (item["Name"] == "Jessica/Lamar")
+        {
+            bedRequest.FirstName = "Lamar";
+            bedRequest.LastName = string.Empty;
+            return;
+        }
+
         List<NameParts> namePartsList = ParseNames(item["Name"]);
         if (namePartsList.Count == 0)
         {
-            bedRequest.FirstName = "Unknown";
-            bedRequest.LastName = "Unknown";
+            bedRequest.FirstName = string.Empty;
+            bedRequest.LastName = string.Empty;
         }
         else if (namePartsList.Count == 1)
         {
@@ -406,18 +434,18 @@ public class ImportBedRequestsGC
 
         if (string.IsNullOrWhiteSpace(bedRequest.FirstName) && string.IsNullOrWhiteSpace(bedRequest.LastName))
         {
-            bedRequest.FirstName = "Unknown";
+            bedRequest.FirstName = string.Empty;
             bedRequest.LastName = item["Name"];
         }
 
         if (string.IsNullOrWhiteSpace(bedRequest.FirstName))
         {
-            bedRequest.FirstName = "Unknown";
+            bedRequest.FirstName = string.Empty;
         }
 
         if (string.IsNullOrWhiteSpace(bedRequest.LastName))
         {
-            bedRequest.LastName = "Unknown";
+            bedRequest.LastName = string.Empty;
         }
     }
 
