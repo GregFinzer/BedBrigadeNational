@@ -13,20 +13,21 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly ICachingService _cachingService;
     private readonly ICommonService _commonService;
     private readonly ILocationDataService _locationDataService;
-
     private readonly IGeoLocationQueueDataService _geoLocationQueueDataService;
+    private readonly ITimezoneDataService _timezoneDataService;
 
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         IAuthService authService,
         ICommonService commonService,
         ILocationDataService locationDataService,
-        IGeoLocationQueueDataService geoLocationQueueDataService) : base(contextFactory, cachingService, authService)
+        IGeoLocationQueueDataService geoLocationQueueDataService, ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
         _locationDataService = locationDataService;
         _geoLocationQueueDataService = geoLocationQueueDataService;
+        _timezoneDataService = timezoneDataService;
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -89,7 +90,16 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId)
     {
-        return await _commonService.GetAllForLocationAsync(this, locationId);
+        var result = await _commonService.GetAllForLocationAsync(this, locationId);
+
+        if (!result.Success || result.Data == null)
+        {
+            return result;
+        }
+
+        _timezoneDataService.FillLocalDates(result.Data);
+
+        return result;
     }
 
 
@@ -180,7 +190,16 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationList(List<int> locationIds)
     {
-        return await _commonService.GetAllForLocationList(this, locationIds);
+        var result = await _commonService.GetAllForLocationList(this, locationIds);
+
+        if (!result.Success || result.Data == null)
+        {
+            return result;
+        }
+
+        _timezoneDataService.FillLocalDates(result.Data);
+
+        return result;
     }
 
     public async Task<ServiceResponse<List<BedRequest>>> GetScheduledBedRequestsForLocation(int locationId)

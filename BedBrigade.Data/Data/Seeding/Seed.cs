@@ -57,8 +57,8 @@ public static class Seed
             IsActive = true,
             Latitude = 39.882527M,
             Longitude = -83.042266M,
-            TimeZoneId = Defaults.DefaultTimeZoneId
-
+            TimeZoneId = Defaults.DefaultTimeZoneId,
+            Group= "GC"
         },
         new Location
         {
@@ -74,7 +74,8 @@ public static class Seed
             IsActive = true,
             Latitude = 39.986799M,
             Longitude = -83.0006655M,
-            TimeZoneId = Defaults.DefaultTimeZoneId
+            TimeZoneId = Defaults.DefaultTimeZoneId,
+            Group = "Polaris"
         }
 
     };

@@ -73,5 +73,17 @@ namespace BedBrigade.Common.Logic
                 AddMilliseconds(timeToAdd.Millisecond);
         }
 
+        public static DateTime GetLastSaturdayOfMonthAndYear(int month, int year)
+        {
+            // Get the last day of the month
+            DateTime lastDayOfMonth = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            // Find the last Saturday of that month
+            while (lastDayOfMonth.DayOfWeek != DayOfWeek.Saturday)
+            {
+                lastDayOfMonth = lastDayOfMonth.AddDays(-1);
+            }
+            return lastDayOfMonth;
+        } 
+
     } // class
 } // namespace

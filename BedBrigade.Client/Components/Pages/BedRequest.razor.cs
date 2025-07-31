@@ -371,6 +371,7 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
                 newRequest.NumberOfBeds = NumericValue;
                 newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
+                newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
                 if (newRequest.PrimaryLanguage == "English")
                 {
                     newRequest.SpeakEnglish = "Yes";
@@ -443,7 +444,7 @@ namespace BedBrigade.Client.Components.Pages
             {
                 //Set it to the primary city name
                 newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
-
+                newRequest.Reference = "Website";
                 Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
                 ObjectUtil.CopyProperties(newRequest, bedRequest);
                 var addResult = await _svcBedRequest.CreateAsync(bedRequest);

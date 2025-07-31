@@ -79,7 +79,9 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.Where(b => locationIds.Contains(b.LocationId)).ToListAsync();
+                var result = await dbSet.Where(b => locationIds.Contains(b.LocationId))
+                    .OrderBy(o => o.CreateDate)
+                    .ToListAsync();
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<TEntity>>($"Found {result.Count()} {repository.GetEntityName()} records with LocationIds {string.Join(",", locationIds)}", true, result);
             }

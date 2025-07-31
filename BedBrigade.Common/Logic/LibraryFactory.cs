@@ -1,4 +1,5 @@
 ﻿using KellermanSoftware.AddressParser;
+using KellermanSoftware.NameParser;
 using KellermanSoftware.NetCachingLibrary;
 using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using KellermanSoftware.NetEmailValidation;
@@ -40,6 +41,12 @@ namespace BedBrigade.Common.Logic
         {
             Encryption encryption = new Encryption(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
             return encryption;
+        }
+
+        public static NameParserLogic CreateNameParser()
+        {
+            NameParserLogic nameParser = new NameParserLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+            return nameParser;
         }
     }
 }

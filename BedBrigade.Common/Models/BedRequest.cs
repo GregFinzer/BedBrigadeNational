@@ -19,10 +19,9 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "First Name is required")]
     [MaxLength(20, ErrorMessage = "First Name has a maximum length of 20 characters")]
     public String? FirstName { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Last Name is required")]
+    
     [MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
-    public String LastName { get; set; } = string.Empty;
+    public String? LastName { get; set; } = string.Empty;
 
     [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
     public String? Email { get; set; } = string.Empty;
@@ -36,7 +35,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
         get { return Phone.FormatPhoneNumber(); }
     }
 
-    [MaxLength(40, ErrorMessage = "Street Address has a maximum length of 40 characters")]
+    [MaxLength(50, ErrorMessage = "Street Address has a maximum length of 50 characters")]
     public String? Street { get; set; } = string.Empty;
 
     [MaxLength(50, ErrorMessage = "City has a maximum length of 50 characters")] 
@@ -91,6 +90,12 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [Column(TypeName = "decimal(18,10)")]
     [Range(-180, 180)]
     public Decimal? Longitude { get; set; }
+
+    [MaxLength(50, ErrorMessage = "Group has a maximum length of 50 characters")]
+    public string? Group { get; set; }
+
+    [MaxLength(100, ErrorMessage = "Reference has a maximum length of 100 characters")]
+    public string? Reference { get; set; }
 
     [NotMapped]
     public string FullName
