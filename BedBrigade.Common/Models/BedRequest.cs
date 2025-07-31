@@ -19,10 +19,9 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "First Name is required")]
     [MaxLength(20, ErrorMessage = "First Name has a maximum length of 20 characters")]
     public String? FirstName { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Last Name is required")]
+    
     [MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
-    public String LastName { get; set; } = string.Empty;
+    public String? LastName { get; set; } = string.Empty;
 
     [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
     public String? Email { get; set; } = string.Empty;

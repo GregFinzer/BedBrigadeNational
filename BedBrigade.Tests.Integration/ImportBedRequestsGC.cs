@@ -25,7 +25,7 @@ public class ImportBedRequestsGC
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
 
-    [Test]
+    [Test, Ignore("Only run manually")]
     public async Task ImportBedRequestsFromGC()
     {
         const string connectionString =
@@ -96,7 +96,7 @@ public class ImportBedRequestsGC
         SetPhone(item, bedRequest);
         SetAddress(item, bedRequest);
         SetPostalCode(item, bedRequest);
-        bedRequest.CreateDate = ParseDate(item["AddedtoList"]);
+        bedRequest.CreateDate = ParseDate(item);
         bedRequest.CreateUser = "Import";
         bedRequest.UpdateUser = "Import";
         bedRequest.MachineName = Environment.MachineName;
@@ -314,8 +314,23 @@ public class ImportBedRequestsGC
         throw new FormatException($"Invalid date format: {dateInput}. Expected formats: MM/dd/yyyy, M/d/yyyy, MM/dd, M/d, etc.");
     }
 
-    private DateTime ParseDate(string dateInput)
+    private DateTime ParseDate(Dictionary<string, string> item)
     {
+        string dateInput = item["AddedtoList"];
+        string address = item["Address"];
+        if (address.Contains("899 Geers Ave Apt D"))
+        {
+            dateInput = "2/8/2023"; // Special case for this address
+        }
+        else if (address.Contains("757 S. Warren Ave"))
+        {
+            dateInput = "7/9/2025"; // Special case for this address
+        }
+        else if (address.Contains("1420 Franklin Ave Apt B"))
+        {
+            dateInput = "11/3/2024"; // Special case for this address
+        }
+
         if (string.IsNullOrWhiteSpace(dateInput))
         {
             return _defaultCreateDate;
@@ -440,7 +455,7 @@ public class ImportBedRequestsGC
 
         if (string.IsNullOrWhiteSpace(bedRequest.FirstName))
         {
-            bedRequest.FirstName = string.Empty;
+            bedRequest.FirstName = "Unknown";
         }
 
         if (string.IsNullOrWhiteSpace(bedRequest.LastName))

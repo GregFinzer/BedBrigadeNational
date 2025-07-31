@@ -42,7 +42,7 @@ namespace BedBrigade.Client.Components
         private const string FirstPage = "First";
 
         protected List<BedRequest>? BedRequests { get; set; }
-        protected List<Location>? Locations { get; set; }
+        protected List<Location>? Locations { get; set; } 
         protected SfGrid<BedRequest>? Grid { get; set; }
         protected List<string>? ToolBar;
         protected List<string>? ContextMenu;
@@ -58,14 +58,13 @@ namespace BedBrigade.Client.Components
 
         protected string? RecordText { get; set; } = "Loading BedRequests ...";
         public bool NoPaging { get; private set; }
-        public bool IsLocationColumnVisible { get; set; } = false;
         public string SpeakEnglishVisibility = "hidden";
 
         public string ManageBedRequestsMessage { get; set; } = "Manage Bed Requests";
 
         public List<BedRequestEnumItem> BedRequestStatuses { get; private set; }
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "200px" };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "75%", MinHeight = "725" };
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
         {
             { "rows", "3" },
@@ -76,7 +75,7 @@ namespace BedBrigade.Client.Components
         private string DialogContent { get; set; } = string.Empty;
         public required SfMaskedTextBox zipTextBox;
         public required SfMaskedTextBox phoneTextBox;
-
+        
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
@@ -138,7 +137,6 @@ namespace BedBrigade.Client.Components
                         if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
                         {
                             BedRequests = metroAreaBedRequestResult.Data.ToList();
-                            IsLocationColumnVisible = true;
                         }
                     }
 
@@ -234,6 +232,19 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.SetPersistDataAsync(result.Data);
             }
+            else
+            {
+                await FilterWaiting(); 
+            }
+        }
+
+        private async Task FilterWaiting()
+        {
+            await Grid.FilterByColumnAsync(
+                nameof(BedRequest.StatusString), // Column field name
+                "equal",                        // Filter operator
+                "Waiting"                     // Filter value
+            );
         }
 
         /// <summary>
@@ -264,6 +275,7 @@ namespace BedBrigade.Client.Components
             {
                 case "Reset":
                     await Grid.ResetPersistDataAsync();
+                    await FilterWaiting();
                     await SaveGridPersistence();
                     break;
                 case "Pdf Export":
@@ -364,6 +376,13 @@ namespace BedBrigade.Client.Components
             ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
             BedRequest.LocationId = _svcAuth.LocationId;
             BedRequest.PrimaryLanguage = "English";
+
+            var location = Locations.FirstOrDefault(o => o.LocationId == _svcAuth.LocationId);
+
+            if (location != null)
+            {
+                BedRequest.Group = location.Group;
+            }
         }
 
 
@@ -491,16 +510,9 @@ namespace BedBrigade.Client.Components
                     return;
                 }
 
-                int selectedLocation;
-                if (IsLocationColumnVisible)
-                {
-                    List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                    selectedLocation = selectedBedRequests.First().LocationId;
-                }
-                else
-                {
-                    selectedLocation = _svcUser.GetUserLocationId();
-                }
+                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                int selectedLocation = selectedBedRequests.First().LocationId;
+                string group = selectedBedRequests.First().Group;
 
                 var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
                 string deliveryChecklist = string.Empty;
@@ -516,10 +528,12 @@ namespace BedBrigade.Client.Components
 
                 var scheduledBedRequestResult =
                     await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+                List<BedRequest> scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+
                 string fileName =
-                    _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequestResult.Data);
+                    _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequests);
                 Stream stream =
-                    _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequestResult.Data, deliveryChecklist);
+                    _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequests, deliveryChecklist);
                 using var streamRef = new DotNetStreamReference(stream: stream);
 
                 await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
@@ -542,24 +556,27 @@ namespace BedBrigade.Client.Components
                 return false;
             }
 
-            int selectedLocation;
-            if (IsLocationColumnVisible)
-            {
-                List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+            List<BedRequest> selectedBedRequests = await Grid.GetSelectedRecordsAsync();
 
-                if (!selectedBedRequests.Any())
-                {
-                    DialogHeader = "Select Row";
-                    DialogContent = "Please select a row in the location you would like to schedule.";
-                    IsDialogVisible = true;
-                    return false;
-                }
-                selectedLocation = selectedBedRequests.First().LocationId;
-            }
-            else
+            if (!selectedBedRequests.Any())
             {
-                selectedLocation = _svcUser.GetUserLocationId();
+                DialogHeader = "Select Row";
+                DialogContent = "Please select a row with the group you would like to schedule.";
+                IsDialogVisible = true;
+                return false;
             }
+
+            string group = selectedBedRequests.First().Group;
+            if (String.IsNullOrEmpty(group))
+            {
+                DialogHeader = "Set Group";
+                DialogContent = "Please edit the selected row and set the Group.";
+                IsDialogVisible = true;
+                return false;
+            }
+
+
+            int selectedLocation = selectedBedRequests.First().LocationId;
 
             var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
 
@@ -571,31 +588,32 @@ namespace BedBrigade.Client.Components
                 return false;
             }
 
-            return ValidateBedRequestData(scheduledBedRequestResult);
+            List<BedRequest> scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+            return ValidateBedRequestData(scheduledBedRequests, group);
         }
 
-        private bool ValidateBedRequestData(ServiceResponse<List<BedRequest>> scheduledBedRequestResult)
+        private bool ValidateBedRequestData(List<BedRequest> scheduledBedRequests, string group)
         {
-            if (!scheduledBedRequestResult.Data.Any())
+            if (!scheduledBedRequests.Any())
             {
                 DialogHeader = "No Bed Requests";
-                DialogContent = "There are no bed requests with a Scheduled status for the selected location to create the Delivery Sheet.";
+                DialogContent = $"There are no bed requests with a Scheduled status for the selected Group \"{group}\" to create the Delivery Sheet.";
                 IsDialogVisible = true;
                 return false;
             }
 
-            if (scheduledBedRequestResult.Data.Any(o => !o.DeliveryDate.HasValue))
+            if (scheduledBedRequests.Any(o => !o.DeliveryDate.HasValue))
             {
                 DialogHeader = "Set delivery date";
-                DialogContent = "Please set the delivery date for all scheduled rows.";
+                DialogContent = $"Please set the delivery date for all Scheduled rows for the selected Group \"{group}\".";
                 IsDialogVisible = true;
                 return false;
             }
 
-            if (scheduledBedRequestResult.Data.Any(o => String.IsNullOrEmpty(o.Team)))
+            if (scheduledBedRequests.Any(o => String.IsNullOrEmpty(o.Team)))
             {
                 DialogHeader = "Set team number";
-                DialogContent = "Please set the team number for all scheduled rows.";
+                DialogContent = $"Please set the team number for all Scheduled rows for the selected Group \"{group}\"";
                 IsDialogVisible = true;
                 return false;
             }
@@ -627,6 +645,20 @@ namespace BedBrigade.Client.Components
         public async Task HandleZipMaskFocus()
         {
             await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", zipTextBox.ID, 0);
+        }
+
+        public void OnLocationChange(ChangeEventArgs<int, Location> args)
+        {
+            if (args.Value != null && args.Value > 0 && BedRequest != null)
+            {
+                var location = Locations.FirstOrDefault(o => o.LocationId == args.Value);
+
+                if (location != null)
+                {
+                    BedRequest.Group = location.Group;
+                    StateHasChanged();
+                }
+            }
         }
     }
 }
