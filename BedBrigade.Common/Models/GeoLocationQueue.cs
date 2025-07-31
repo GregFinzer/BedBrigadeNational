@@ -10,7 +10,7 @@ namespace BedBrigade.Common.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int GeoLocationQueueId { get; set; }
 
-        [MaxLength(40, ErrorMessage = "Street Address has a maximum length of 40 characters")]
+        [MaxLength(50, ErrorMessage = "Street Address has a maximum length of 50 characters")]
         public string Street { get; set; }
 
         [Required]

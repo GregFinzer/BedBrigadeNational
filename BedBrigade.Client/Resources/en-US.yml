@@ -147,6 +147,7 @@ MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
+MaxLengthGroup50: Group has a maximum length of 50 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
@@ -154,9 +155,10 @@ MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
+MaxLengthReference100: Reference has a maximum length of 100 characters
 MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
 MaxLengthState30: State has a maximum length of 30 characters
-MaxLengthStreet40: Street Address has a maximum length of 40 characters
+MaxLengthStreet50: Street Address has a maximum length of 50 characters
 MaxLengthTableName50: Table Name has a maximum length of 50 characters
 MaxLengthTeam50: Team has a maximum length of 50 characters
 Message: Message
