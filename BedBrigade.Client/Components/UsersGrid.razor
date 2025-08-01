@@ -126,7 +126,8 @@ else
                         <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                         <GridSortSettings>
                             <GridSortColumns>
-                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending"/>
+                                <GridSortColumn Field="@nameof(User.LocationId)" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="@nameof(User.FullName)" Direction="SortDirection.Ascending" />
                             </GridSortColumns>
                         </GridSortSettings>
                         <GridGroupSettings Columns=@groupColumns ShowDropArea="true" EnableLazyLoading="true" />

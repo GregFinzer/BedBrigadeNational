@@ -113,6 +113,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<User>()
                 .HasIndex(o => o.Phone);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(o => o.Email);
         }
 
         private static void CreateVolunteerIndexes(ModelBuilder modelBuilder)
