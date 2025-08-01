@@ -367,6 +367,7 @@ namespace BedBrigade.Client.Components.Pages
 
             signUp.SignUpNote = newVolunteer.Message;
             signUp.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            signUp.VehicleType = newVolunteer.VehicleType;
             var updateResult = await _svcSignUp.UpdateAsync(signUp);
 
             if (!updateResult.Success)
@@ -397,6 +398,7 @@ namespace BedBrigade.Client.Components.Pages
             newRegister.LocationId = selectedLocation;
             newRegister.SignUpNote = newVolunteer.Message;
             newRegister.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
+            newRegister.VehicleType = newVolunteer.VehicleType;
             var createResult = await _svcSignUp.CreateAsync(newRegister);
 
             if (!createResult.Success)
