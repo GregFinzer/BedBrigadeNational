@@ -46,10 +46,9 @@ else
                             AllowResizing="true"
                             AllowSelection="true"
                             AllowPdfExport="true"
-                            AllowTextWrap="true"
+                            AllowTextWrap="false"
                             AllowGrouping="true"
                             Width="100%">
-                        <GridTextWrapSettings WrapMode="WrapMode.Header"/>
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15"/>
                         <GridEvents DataBound=@DataBound OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected=@OnRowSelected RowDeselected=@OnRowDeselected OnLoad=@OnLoad Destroyed="@OnDestroyed" TValue="User"/>
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
@@ -122,14 +121,14 @@ else
                                 <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending"/>
                             </GridSortColumns>
                         </GridSortSettings>
-                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false" EnableLazyLoading="true"/>
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="true" EnableLazyLoading="true" />
                         <GridColumns>
                             <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
-                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="190px" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="120px" AutoFit="true" />
-                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" MinWidth="290px" AutoFit="true" />
-                            <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="false" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
-                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" MinWidth="190px" AutoFit="true" />
+                            <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="250px" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="150px" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="300px" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" Width="200px" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" Width="300px" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
                 </div>

@@ -456,30 +456,30 @@ namespace BedBrigade.Client.Components
         {
             PdfExportProperties ExportProperties = new PdfExportProperties
             {
-                FileName = "Status " + DateTime.Now.ToShortDateString() + ".pdf",
+                FileName = "Users " + DateTime.Now.ToShortDateString() + ".pdf",
                 PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
             };
-            await Grid.PdfExport(ExportProperties);
+            await Grid.ExportToPdfAsync(ExportProperties);
         }
         protected async Task ExcelExport()
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Facilities " + DateTime.Now.ToShortDateString() + ".xlsx",
+                FileName = "Users " + DateTime.Now.ToShortDateString() + ".xlsx",
 
             };
 
-            await Grid.ExcelExport();
+            await Grid.ExportToExcelAsync(ExportProperties);
         }
         protected async Task CsvExportAsync()
         {
             ExcelExportProperties ExportProperties = new ExcelExportProperties
             {
-                FileName = "Facilities " + DateTime.Now.ToShortDateString() + ".csv",
+                FileName = "Users " + DateTime.Now.ToShortDateString() + ".csv",
 
             };
 
-            await Grid.CsvExport(ExportProperties);
+            await Grid.ExportToCsvAsync(ExportProperties);
         }
         public async Task HandlePhoneMaskFocus()
         {
