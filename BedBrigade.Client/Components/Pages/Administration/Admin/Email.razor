@@ -25,7 +25,7 @@ else
             <DataAnnotationsValidator/>
 
             <div class="form-group mb-3">
-                <label for="emailRecipientOptionDropdown">To</label>
+                <label for="emailRecipientOptionDropdown" class="formlabel required">To <span class="text-danger">*</span></label>
                 <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
                     <DropDownListFieldSettings Text="Name" Value="Value"/>
                     <DropDownListEvents TValue="EmailRecipientOption" TItem="EnumNameValue<EmailRecipientOption>" ValueChange="EmailRecipientChangeEvent"></DropDownListEvents>
@@ -35,7 +35,7 @@ else
             @if (Model.ShowLocationDropdown)
             {
                 <div class="form-group mb-3">
-                    <label for="locationDropdown">Location</label>
+                    <label for="locationDropdown" class="formlabel required">Location <span class="text-danger">*</span></label>
                     <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Model.Locations" @bind-Value="Model.CurrentLocationId">
                         <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="int" TItem="Location" ValueChange="LocationChangeEvent"></DropDownListEvents>
@@ -46,7 +46,7 @@ else
             @if (Model.ShowEventDropdown)
             {
                 <div class="form-group mb-3">
-                    <label for="events" class="formlabel">Location Available Events&nbsp;(@Model.Schedules.Count)</label>
+                    <label for="events" class="formlabel required">Location Available Events&nbsp;(@Model.Schedules.Count) <span class="text-danger">*</span></label>
                     <SfDropDownList ID="events" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@Model.Schedules">
                         <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ScheduleChangeEvent"></DropDownListEvents>
@@ -57,7 +57,7 @@ else
             @if (Model.ShowNewsletterDropdown)
             {
                 <div class="form-group mb-3">
-                    <label for="newsletter" class="formlabel">Newsletter</label>
+                    <label for="newsletter" class="formlabel required">Newsletter <span class="text-danger">*</span></label>
                     <SfDropDownList ID="newsletter" TValue="int" TItem="Newsletter" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a newsletter" DataSource="@Model.Newsletters">
                         <DropDownListFieldSettings Value="NewsletterId" Text="Name"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="int" TItem="Newsletter" ValueChange="NewsletterChangeEvent"></DropDownListEvents>
@@ -66,7 +66,7 @@ else
             }
 
             <div class="form-group mb-3">
-                <label for="subject">Subject:</label>
+                <label for="subject" lass="formlabel required">Subject <span class="text-danger">*</span></label>
                 <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"/>
                 <div style="font-size: smaller">
                     <ValidationMessage For="@(() => Model.Subject)"></ValidationMessage>
@@ -74,7 +74,7 @@ else
             </div>
 
             <div class="form-group mb-3">
-                <label for="body">Body:</label>
+                <label for="body" class="formlabel required">Body <span class="text-danger">*</span></label>
                 <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="4000"></InputTextArea>
                 <div style="font-size: smaller">
                     <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
