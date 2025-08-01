@@ -454,36 +454,84 @@ namespace BedBrigade.Client.Components
         }
         protected async Task PdfExport()
         {
-            PdfExportProperties ExportProperties = new PdfExportProperties
+            try
             {
-                FileName = "Status " + DateTime.Now.ToShortDateString() + ".pdf",
-                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-            };
-            await Grid.PdfExport(ExportProperties);
+                if (Grid == null)
+                {
+                    return;
+                }
+                PdfExportProperties ExportProperties = new PdfExportProperties
+                {
+                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".pdf",
+                    PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+                };
+                await Grid.ExportToPdfAsync(ExportProperties);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error exporting to PDF");
+                _toastService.Error("Export Error", "An error occurred while exporting to PDF.");
+            }
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            try
             {
-                FileName = "Facilities " + DateTime.Now.ToShortDateString() + ".xlsx",
+                if (Grid == null)
+                {
+                    return;
+                }
+                ExcelExportProperties ExportProperties = new ExcelExportProperties
+                {
+                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".xlsx",
 
-            };
+                };
 
-            await Grid.ExcelExport();
+                await Grid.ExportToExcelAsync(ExportProperties);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error exporting to Excel");
+                _toastService.Error("Export Error", "An error occurred while exporting to Excel.");
+            }
+
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            try
             {
-                FileName = "Facilities " + DateTime.Now.ToShortDateString() + ".csv",
+                if (Grid == null)
+                {
+                    return;
+                }
+                ExcelExportProperties ExportProperties = new ExcelExportProperties
+                {
+                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".csv",
 
-            };
+                };
 
-            await Grid.CsvExport(ExportProperties);
+                await Grid.ExportToCsvAsync(ExportProperties);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error exporting to CSV");
+                _toastService.Error("Export Error", "An error occurred while exporting to CSV.");
+            }
         }
+
         public async Task HandlePhoneMaskFocus()
         {
             await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
+        }
+
+        protected async Task OnActionComplete(ActionEventArgs<User> args)
+        {
+            if (args.RequestType == Action.Sorting ||
+                args.RequestType == Action.Filtering ||
+                args.RequestType == Action.Searching)
+            {
+                await Grid.ExpandAllGroupAsync();
+            }
         }
     }
 }
