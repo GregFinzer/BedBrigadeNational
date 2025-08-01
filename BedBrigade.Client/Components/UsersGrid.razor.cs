@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private NavigationManager _navigationManager { get; set; }
         private ClaimsPrincipal Identity { get; set; }
         protected SfGrid<User>? Grid { get; set; }
         
@@ -340,17 +341,14 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                // new 
-
                 await AddNewUser(user);
-                //args.Cancel = true;
             }
 
+            // Reload the users list first
             await LoadUsers();
 
-
-            await Grid.CallStateHasChangedAsync();
-            await Grid.Refresh();
+            //We have to do this because the Syncfusion grid displays a duplicate row
+            _navigationManager.Refresh(true);
         }
 
         private async Task AddNewUser(User user)
@@ -431,7 +429,6 @@ namespace BedBrigade.Client.Components
 
             await LoadUsers();
 
-            await Grid.CallStateHasChangedAsync();
             await Grid.Refresh();
         }
 

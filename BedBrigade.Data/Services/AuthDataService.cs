@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Data.Common;
 using System.Security;
@@ -15,10 +14,13 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ILocationDataService _locationDataService;
-        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, ILocationDataService locationDataService)
+        private readonly ICachingService _cachingService;
+        public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, 
+            ILocationDataService locationDataService, ICachingService cachingService)
         {
             _contextFactory = dbContextFactory;
             _locationDataService = locationDataService;
+            _cachingService = cachingService;
         }
 
         public async Task<ServiceResponse<ClaimsPrincipal>> Login(string email, string password)
@@ -105,6 +107,7 @@ namespace BedBrigade.Data.Services
                 try
                 {
                     await context.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(nameof(User));
                     return new ServiceResponse<bool>("Updated successfully", true, true);
                 }
                 catch (DbException ex)
@@ -138,6 +141,7 @@ namespace BedBrigade.Data.Services
 
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
+                _cachingService.ClearByEntityName(nameof(User));
 
                 return new ServiceResponse<bool>("Registration successful!", true, true);
             }
@@ -197,6 +201,7 @@ namespace BedBrigade.Data.Services
                 try
                 {
                     await context.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(nameof(User));
                 }
                 catch (Exception ex)
                 {
