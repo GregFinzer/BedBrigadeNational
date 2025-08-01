@@ -124,10 +124,14 @@ namespace BedBrigade.Client.Components
 
         } 
 
-        public static List<Volunteer> CombineAllData(List<SignUp>? signUps = null, List<Schedule>? schedules = null, List<Volunteer>? volunteers = null, List<Location>? locations = null)
+        public static List<Volunteer> CombineAllData(ITimezoneDataService timezoneDataService, 
+            List<SignUp>? signUps = null, 
+            List<Schedule>? schedules = null, 
+            List<Volunteer>? volunteers = null, 
+            List<Location>? locations = null)
         {
             List<Volunteer> eventVolunteers = new List<Volunteer>();
-            List<Volunteer> registeredVolunteers = LoadRegisteredVolunteers(signUps, schedules, volunteers, locations);
+            List<Volunteer> registeredVolunteers = LoadRegisteredVolunteers(timezoneDataService, signUps, schedules, volunteers, locations);
             List<Volunteer> eventsWithoutVolunteers = EventsWithoutVolunteers(signUps, schedules, volunteers, locations, registeredVolunteers);
             eventVolunteers.AddRange(registeredVolunteers);
             eventVolunteers.AddRange(eventsWithoutVolunteers);
@@ -165,8 +169,12 @@ namespace BedBrigade.Client.Components
             return result;
         }
 
-        private static List<Volunteer> LoadRegisteredVolunteers(List<SignUp>? signUps, List<Schedule>? schedules, List<Volunteer>? volunteers, List<Location>? locations)
+        private static List<Volunteer> LoadRegisteredVolunteers(ITimezoneDataService timezoneDataService, List<SignUp>? signUps, 
+            List<Schedule>? schedules, 
+            List<Volunteer>? volunteers, 
+            List<Location>? locations)
         {
+            string timeZone = timezoneDataService.GetUserTimeZoneId();
             List<Volunteer> result = new List<Volunteer>();
 
             if (signUps != null && volunteers != null && signUps.Count > 0)
@@ -196,7 +204,7 @@ namespace BedBrigade.Client.Components
                             OrganizationOrGroup = v.OrganizationOrGroup,
                             Message = ve.SignUpNote,
                             VehicleType = ve.VehicleType,
-                            CreateDate = ve.CreateDate,
+                            CreateDateLocal = timezoneDataService.ConvertUtcToTimeZone(ve.CreateDate, timeZone),
                             NumberOfVolunteers = ve.NumberOfVolunteers,
                         }
                     ).ToList();

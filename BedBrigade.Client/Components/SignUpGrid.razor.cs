@@ -26,6 +26,8 @@ public partial class SignUpGrid : ComponentBase
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
     [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ToastService _toastService { get; set; }
+    [Inject] private ITimezoneDataService _svcTimezone { get; set; }
+
 
     // object lists
 
@@ -275,7 +277,7 @@ public partial class SignUpGrid : ComponentBase
 
     private void PrepareGridData()
     {
-        EventVolunteers = SignUpHelper.CombineAllData(SignUps, Schedules, Volunteers, Locations);
+        EventVolunteers = SignUpHelper.CombineAllData(_svcTimezone, SignUps, Schedules, Volunteers, Locations);
         EventVolunteers = EventVolunteers.OrderBy(o => o.ScheduleEventDate).ToList();
     } // Create Grid Data Source
 
