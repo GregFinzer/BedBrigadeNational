@@ -22,6 +22,17 @@
             });
         }
 
+        public void Warning(string title, string content)
+        {
+            Open(new ToastOptions
+            {
+                Title = title,
+                Content = content,
+                CssClass = "e-toast-warning custom-toast",
+                Icon = "e-success toast-icons"
+            });
+        }
+
         public void Error(string title, string content)
         {
             Open(new ToastOptions

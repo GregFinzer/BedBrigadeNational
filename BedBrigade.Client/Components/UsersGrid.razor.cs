@@ -3,6 +3,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using KellermanSoftware.NetEmailValidation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Serilog;
@@ -254,6 +255,17 @@ namespace BedBrigade.Client.Components
 
         private async Task ChangePasswordAsync()
         {
+            var records = await Grid.GetSelectedRecords();
+            if (records != null && records.Count > 0)
+            {
+                userRegister.user = records[0];
+            }
+            else
+            {
+                _toastService.Warning("Change Password", "Select a row to change the password for a user");
+                return;
+            }
+
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
             displayError = "none;";
             PasswordVisible = true;
@@ -261,10 +273,11 @@ namespace BedBrigade.Client.Components
         private async Task NewPassword()
         {
             var records = await Grid.GetSelectedRecords();
-            if (records != null)
+            if (records != null && records.Count > 0)
             {
                 userRegister.user = records[0];
             }
+
             string passwordChanged = string.Empty;
             if (!string.IsNullOrEmpty(userRegister.Password) && userRegister.Password == userRegister.ConfirmPassword)
             {
