@@ -193,7 +193,7 @@ namespace BedBrigade.SpeakIt
             var value = property.GetValue(model)?.ToString();
             if (value != null && !Regex.IsMatch(value, regularExpressionAttribute.Pattern))
             {
-                string languageKey = $"{DataAttributeParsing.RegularExpressionPrefix}{property.Name}{regularExpressionAttribute.Pattern}";
+                string languageKey = $"{DataAttributeParsing.RegularExpressionPrefix}{property.Name}";
                 string translation = lc.Keys[languageKey];
 
                 if (!string.IsNullOrEmpty(translation) && translation != languageKey)

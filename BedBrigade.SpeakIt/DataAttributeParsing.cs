@@ -77,7 +77,7 @@ namespace BedBrigade.SpeakIt
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private static Regex _regularExpressionWithMessageRegex =
-            new Regex(@"\[RegularExpression\(\s*@?""(?<pattern>.*?)""\s*,\s*ErrorMessage\s*=\s*""(?<content>.*?)""\s*\)\]",
+            new Regex(@"\[RegularExpression\([^,]+,\s*ErrorMessage\s*=\s*""(?<content>.*?)""\s*\)\]",
                 RegexOptions.Compiled | RegexOptions.Multiline);
 
         private const string StringType = "string";
