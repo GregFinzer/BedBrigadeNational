@@ -384,32 +384,39 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected async Task PdfExport()
         {
-            PdfExportProperties exportProperties = new PdfExportProperties
+            if (Grid != null)
             {
-                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".pdf",
-                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-            };
-            await Grid.ExportToPdfAsync(exportProperties);
+                PdfExportProperties exportProperties = new PdfExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Pages", ".pdf"),
+                    PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+                };
+                await Grid.ExportToPdfAsync(exportProperties);
+            }
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties exportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".xlsx"
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Pages", ".xlsx"),
+                };
 
-            };
-
-            await Grid.ExportToExcelAsync(exportProperties);
+                await Grid.ExportToExcelAsync(exportProperties);
+            }
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties exportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = Defaults.PagesDirectory + DateTime.Now.ToShortDateString() + ".csv",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Pages", ".csv"),
+                };
 
-            };
-
-            await Grid.ExportToCsvAsync(exportProperties);
+                await Grid.ExportToCsvAsync(exportProperties);
+            }
         }
 
         // Text EDitor
