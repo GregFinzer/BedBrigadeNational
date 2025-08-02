@@ -351,17 +351,19 @@ namespace BedBrigade.Client.Components
             if (user.PasswordHash != null)
             {
                 await UpdateUser(user);
+                await LoadUsers();
+                Grid.Refresh(true);
+                StateHasChanged();
             }
             else
             {
+                //This cancel is needed or it will show a duplicate user
+                args.Cancel = true;
                 await AddNewUser(user);
+                await LoadUsers();
+                Grid.Refresh(true);
+                StateHasChanged();
             }
-
-            // Reload the users list first
-            await LoadUsers();
-
-            //We have to do this because the Syncfusion grid displays a duplicate row
-            _navigationManager.Refresh(true);
         }
 
         private async Task AddNewUser(User user)
