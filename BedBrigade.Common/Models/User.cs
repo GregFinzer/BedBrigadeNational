@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models;
 
@@ -35,6 +36,9 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(14)]
     [Required(ErrorMessage = "Phone Number is required")]
     public String? Phone { get; set; } = string.Empty;
+
+    [NotMapped]
+    public String? FormattedPhone => Phone.FormatPhoneNumber();
 
     public String? Role { get; set; } = string.Empty;
 
