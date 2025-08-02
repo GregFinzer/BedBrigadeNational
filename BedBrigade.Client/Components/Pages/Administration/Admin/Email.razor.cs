@@ -132,6 +132,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                 {
                     Log.Information($"{_svcAuth.UserName} queued some Bulk Emails");
                     ShowSuccess("Email successfully queued.");
+                    Model.Subject = string.Empty;
+                    Model.Body = string.Empty;
                 }
                 else
                 {
