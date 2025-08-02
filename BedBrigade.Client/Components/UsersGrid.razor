@@ -134,7 +134,7 @@ else
                         <GridColumns>
                             <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="250px" AutoFit="false" />
-                            <GridColumn Field=@nameof(User.Phone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="150px" AutoFit="false" />
+                            <GridColumn Field=@nameof(User.FormattedPhone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="150px" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="300px" AutoFit="false" />
                             <GridForeignColumn Field=@nameof(User.FkRole) ForeignDataSource=@Roles ForeignKeyField="RoleId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Role" HeaderTextAlign="TextAlign.Center" Width="200px" AutoFit="false" />
                             <GridForeignColumn Field=@nameof(User.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" AllowFiltering="true" HeaderText="Location" HeaderTextAlign="TextAlign.Center" Width="300px" AutoFit="false" />
