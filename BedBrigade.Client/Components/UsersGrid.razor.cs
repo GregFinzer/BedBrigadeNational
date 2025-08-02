@@ -466,68 +466,40 @@ namespace BedBrigade.Client.Components
         }
         protected async Task PdfExport()
         {
-            try
+            if (Grid != null)
             {
-                if (Grid == null)
+                PdfExportProperties exportProperties = new PdfExportProperties
                 {
-                    return;
-                }
-                PdfExportProperties ExportProperties = new PdfExportProperties
-                {
-                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".pdf",
+                    FileName = FileUtil.BuildFileNameWithDate("Users", ".pdf"),
                     PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
                 };
-                await Grid.ExportToPdfAsync(ExportProperties);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error exporting to PDF");
-                _toastService.Error("Export Error", "An error occurred while exporting to PDF.");
+                await Grid.ExportToPdfAsync(exportProperties);
             }
         }
+
         protected async Task ExcelExport()
         {
-            try
+            if (Grid != null)
             {
-                if (Grid == null)
+                ExcelExportProperties exportProperties = new ExcelExportProperties
                 {
-                    return;
-                }
-                ExcelExportProperties ExportProperties = new ExcelExportProperties
-                {
-                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".xlsx",
-
+                    FileName = FileUtil.BuildFileNameWithDate("Users", ".xlsx"),
                 };
 
-                await Grid.ExportToExcelAsync(ExportProperties);
+                await Grid.ExportToExcelAsync(exportProperties);
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error exporting to Excel");
-                _toastService.Error("Export Error", "An error occurred while exporting to Excel.");
-            }
-
         }
+
         protected async Task CsvExportAsync()
         {
-            try
+            if (Grid != null)
             {
-                if (Grid == null)
+                ExcelExportProperties exportProperties = new ExcelExportProperties
                 {
-                    return;
-                }
-                ExcelExportProperties ExportProperties = new ExcelExportProperties
-                {
-                    FileName = "Users " + DateTime.Now.ToShortDateString() + ".csv",
-
+                    FileName = FileUtil.BuildFileNameWithDate("Users", ".csv"),
                 };
 
-                await Grid.ExportToCsvAsync(ExportProperties);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error exporting to CSV");
-                _toastService.Error("Export Error", "An error occurred while exporting to CSV.");
+                await Grid.ExportToCsvAsync(exportProperties);
             }
         }
 

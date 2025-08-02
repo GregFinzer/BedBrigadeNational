@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Serilog;
 using Syncfusion.Blazor.Grids;
 using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
-using BedBrigade.Data.Services;
-using BedBrigade.Common.Enums;
-using BedBrigade.Common.Models;
-using Serilog;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage;
 
@@ -257,34 +258,39 @@ public partial class ManageMetroAreas : ComponentBase
 
     protected async Task PdfExport()
     {
-        PdfExportProperties ExportProperties = new PdfExportProperties
+        if (Grid != null)
         {
-            FileName = "MetroAreas" + DateTime.Now.ToShortDateString() + ".pdf",
-            PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-        };
-        await Grid.PdfExport(ExportProperties);
+            PdfExportProperties exportProperties = new PdfExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("MetroAreas", ".pdf"),
+                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+            };
+            await Grid.ExportToPdfAsync(exportProperties);
+        }
     }
-
     protected async Task ExcelExport()
     {
-        ExcelExportProperties ExportProperties = new ExcelExportProperties
+        if (Grid != null)
         {
-            FileName = "MetroAreas " + DateTime.Now.ToShortDateString() + ".xlsx",
+            ExcelExportProperties exportProperties = new ExcelExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("MetroAreas", ".xlsx"),
+            };
 
-        };
-
-        await Grid.ExcelExport();
+            await Grid.ExportToExcelAsync(exportProperties);
+        }
     }
-
     protected async Task CsvExportAsync()
     {
-        ExcelExportProperties ExportProperties = new ExcelExportProperties
+        if (Grid != null)
         {
-            FileName = "MetroAreas " + DateTime.Now.ToShortDateString() + ".csv",
+            ExcelExportProperties exportProperties = new ExcelExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("MetroAreas", ".csv"),
+            };
 
-        };
-
-        await Grid.CsvExport(ExportProperties);
+            await Grid.ExportToCsvAsync(exportProperties);
+        }
     }
 
     /// <summary>

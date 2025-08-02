@@ -1,11 +1,12 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Grids;
 using Serilog;
-using Task = System.Threading.Tasks.Task;
-using BedBrigade.Common.Enums;
+using Syncfusion.Blazor.Grids;
 using Action = Syncfusion.Blazor.Grids.Action;
+using Task = System.Threading.Tasks.Task;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
@@ -283,32 +284,39 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected async Task PdfExport()
         {
-            PdfExportProperties ExportProperties = new PdfExportProperties
+            if (Grid != null)
             {
-                FileName = "Newsletters" + DateTime.Now.ToShortDateString() + ".pdf",
-                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-            };
-            await Grid.PdfExport(ExportProperties);
+                PdfExportProperties exportProperties = new PdfExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Newsletters", ".pdf"),
+                    PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+                };
+                await Grid.ExportToPdfAsync(exportProperties);
+            }
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = "Newsletters " + DateTime.Now.ToShortDateString() + ".xlsx",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Newsletters", ".xlsx"),
+                };
 
-            };
-
-            await Grid.ExcelExport();
+                await Grid.ExportToExcelAsync(exportProperties);
+            }
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = "Newsletters " + DateTime.Now.ToShortDateString() + ".csv",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Newsletters", ".csv"),
+                };
 
-            };
-
-            await Grid.CsvExport(ExportProperties);
+                await Grid.ExportToCsvAsync(exportProperties);
+            }
         }
 
     }

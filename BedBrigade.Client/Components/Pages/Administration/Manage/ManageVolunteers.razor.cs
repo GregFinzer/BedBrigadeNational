@@ -268,32 +268,39 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected async Task PdfExport()
         {
-            PdfExportProperties ExportProperties = new PdfExportProperties
+            if (Grid != null)
             {
-                FileName = "Volunteer" + DateTime.Now.ToShortDateString() + ".pdf",
-                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-            };
-            await Grid.ExportToPdfAsync(ExportProperties);
+                PdfExportProperties exportProperties = new PdfExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Volunteers", ".pdf"),
+                    PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+                };
+                await Grid.ExportToPdfAsync(exportProperties);
+            }
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = "Volunteer " + DateTime.Now.ToShortDateString() + ".xlsx",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Volunteers", ".xlsx"),
+                };
 
-            };
-
-            await Grid.ExportToPdfAsync();
+                await Grid.ExportToExcelAsync(exportProperties);
+            }
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = "Volunteer " + DateTime.Now.ToShortDateString() + ".csv",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("Volunteers", ".csv"),
+                };
 
-            };
-
-            await Grid.ExportToCsvAsync(ExportProperties);
+                await Grid.ExportToCsvAsync(exportProperties);
+            }
         }
 
 

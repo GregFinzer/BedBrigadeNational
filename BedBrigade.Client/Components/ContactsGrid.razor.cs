@@ -399,35 +399,41 @@ namespace BedBrigade.Client.Components
 
         protected async Task PdfExport()
         {
-            PdfExportProperties ExportProperties = new PdfExportProperties
+            if (Grid != null)
             {
-                FileName = "ContactUs" + DateTime.Now.ToShortDateString() + ".pdf",
-                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-            };
-            await Grid.PdfExport(ExportProperties);
+                PdfExportProperties exportProperties = new PdfExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("ContactUs", ".pdf"),
+                    PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+                };
+                await Grid.ExportToPdfAsync(exportProperties);
+            }
         }
         protected async Task ExcelExport()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
+            if (Grid != null)
             {
-                FileName = "ContactUs " + DateTime.Now.ToShortDateString() + ".xlsx",
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("ContactUs", ".xlsx"),
+                };
 
-            };
-
-            await Grid.ExcelExport();
+                await Grid.ExportToExcelAsync(exportProperties);
+            }
         }
         protected async Task CsvExportAsync()
         {
-            ExcelExportProperties ExportProperties = new ExcelExportProperties
-            {
-                FileName = "ContactUs " + DateTime.Now.ToShortDateString() + ".csv",
-
-            };
             if (Grid != null)
             {
-                await Grid.CsvExport(ExportProperties);
+                ExcelExportProperties exportProperties = new ExcelExportProperties
+                {
+                    FileName = FileUtil.BuildFileNameWithDate("ContactUs", ".csv"),
+                };
+
+                await Grid.ExportToCsvAsync(exportProperties);
             }
         }
+
         public async Task HandlePhoneMaskFocus()
         {
             await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);

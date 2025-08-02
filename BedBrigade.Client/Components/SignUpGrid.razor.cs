@@ -216,7 +216,8 @@ public partial class SignUpGrid : ComponentBase
             { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
             { Text = "Excel Export", Id = "excel", TooltipText = "Export Grid Data to Excel" });
-
+        Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
+            { Text = "CSV Export", Id = "csv", TooltipText = "Export Grid Data to CSV" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
             { Text = Reset, Id = Reset, TooltipText = Reset });
 
@@ -303,6 +304,12 @@ public partial class SignUpGrid : ComponentBase
         if (args.Item.Text.ToString().Contains("Excel"))
         {
             await ExcelExport();
+            return;
+        }
+
+        if (args.Item.Text.ToString().Contains("CSV"))
+        {
+            await CsvExportAsync();
             return;
         }
 
@@ -609,23 +616,39 @@ public partial class SignUpGrid : ComponentBase
 
     protected async Task PdfExport()
     {
-        PdfExportProperties ExportProperties = new PdfExportProperties
+        if (Grid != null)
         {
-            FileName = "EventVolunteers_" + DateTime.Now.ToShortDateString() + ".pdf",
-            PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
-        };
-        await Grid.ExportToPdfAsync(ExportProperties);
+            PdfExportProperties exportProperties = new PdfExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("SignUps", ".pdf"),
+                PageOrientation = Syncfusion.Blazor.Grids.PageOrientation.Landscape
+            };
+            await Grid.ExportToPdfAsync(exportProperties);
+        }
     }
-
     protected async Task ExcelExport()
     {
-        ExcelExportProperties ExportProperties = new ExcelExportProperties
+        if (Grid != null)
         {
-            FileName = "EventVolunteers" + DateTime.Now.ToShortDateString() + ".xlsx",
+            ExcelExportProperties exportProperties = new ExcelExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("SignUps", ".xlsx"),
+            };
 
-        };
+            await Grid.ExportToExcelAsync(exportProperties);
+        }
+    }
+    protected async Task CsvExportAsync()
+    {
+        if (Grid != null)
+        {
+            ExcelExportProperties exportProperties = new ExcelExportProperties
+            {
+                FileName = FileUtil.BuildFileNameWithDate("SignUps", ".csv"),
+            };
 
-        await Grid.ExportToExcelAsync(ExportProperties);
+            await Grid.ExportToCsvAsync(exportProperties);
+        }
     }
 
 

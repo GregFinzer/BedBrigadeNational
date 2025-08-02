@@ -6,6 +6,20 @@ namespace BedBrigade.Common.Logic
 {
     public static class FileUtil
     {
+        public static string BuildFileNameWithDate(string prefix, string extension)
+        {
+            if (string.IsNullOrEmpty(prefix))
+            {
+                prefix = "File";
+            }
+            if (string.IsNullOrEmpty(extension))
+            {
+                extension = ".txt";
+            }
+            string datePart = DateTime.Now.ToString("yyyy-MM-dd");
+            return $"{prefix}_{datePart}{extension}";
+        }
+
         public static string GetMediaDirectory(string directoryName)
         {
             directoryName = directoryName.TrimStart('/').TrimStart('\\');
