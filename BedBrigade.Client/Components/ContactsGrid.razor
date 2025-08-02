@@ -55,6 +55,9 @@ else
                         </EmptyRecordTemplate>
                     </GridTemplates>
                     <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                        <Validator>
+                            <DataAnnotationsValidator />
+                        </Validator>
                         <HeaderTemplate>
                             @{
                                 @HeaderTitle
@@ -75,18 +78,42 @@ else
 
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <SfTextBox ID="name" @bind-Value=@contactUs.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        <div class="form-group">
+                                            <label for="firstname" class="formlabel">@_lc.Keys["FirstName"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="firstname" @bind-Value="contactUs.FirstName"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.FirstName)"></ValidationMessage>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <SfTextBox @bind-Value=@contactUs.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        <div class="form-group">
+                                            <label for="lastName" class="formlabel">@_lc.Keys["LastName"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="lastName" @bind-Value="contactUs.LastName"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.LastName)"></ValidationMessage>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <SfMaskedTextBox @ref="phoneTextBox" Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Placeholder="@_lc.Keys["Phone"]" FloatLabelType="FloatLabelType.Auto" Focus="HandlePhoneMaskFocus"/>
+                                        <div class="form-group">
+                                            <label for="phoneTextBox" class="formlabel">@_lc.Keys["Phone"] <span class="text-danger">*</span></label>
+                                            <SfMaskedTextBox ID="phoneTextBox" @ref="phoneTextBox" Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Focus="HandlePhoneMaskFocus"/>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Phone)"></ValidationMessage>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <SfTextBox @bind-Value=@contactUs.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        <div class="form-group">
+                                            <label for="email" class="formlabel">@_lc.Keys["Email"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="email" @bind-Value="contactUs.Email"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Email)"></ValidationMessage>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -104,7 +131,14 @@ else
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <SfTextBox CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Placeholder="@_lc.Keys["Message"]" Multiline="true" FloatLabelType="FloatLabelType.Auto"/>
+                                        <div class="form-group">
+                                            <label for="message" class="formlabel">@_lc.Keys["Message"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="message" CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Multiline="true"/>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Message)"></ValidationMessage>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             }

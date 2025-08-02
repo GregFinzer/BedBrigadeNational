@@ -1,6 +1,7 @@
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Common.Models
 {
@@ -30,10 +31,12 @@ namespace BedBrigade.Common.Models
 
         [Required(ErrorMessage = "Email Address is required")]
 		[MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
+        [RegularExpression(Validation.EmailRegexPattern, ErrorMessage = "Invalid email format")]
         public String Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone Number is required")]
 		[MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
+        [RegularExpression(Validation.PhoneRegexPattern, ErrorMessage = "Invalid phone format")]
         public String Phone { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Message is required")]
