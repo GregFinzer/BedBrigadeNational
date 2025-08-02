@@ -212,6 +212,8 @@ Processing: Procesando
 RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
 Reference: Referencia
 RegisterOrUpdate: Registrarse o Actualizar
+RegularExpressionEmail: Formato de correo electrónico no válido
+RegularExpressionPhone: Formato de número de teléfono no válido
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
 RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
