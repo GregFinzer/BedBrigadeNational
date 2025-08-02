@@ -99,6 +99,7 @@ public partial class BulkSms : ComponentBase
         {
             Log.Information($"{_svcAuth.UserName} Bulk SMS successfully queued some messages");
             ShowSuccess("Text Messages successfully queued.");
+            Model.Body = string.Empty;
         }
         else
         {
