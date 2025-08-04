@@ -40,6 +40,8 @@ public partial class ManageMetroAreas : ComponentBase
 
     protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
     public string ManageMetroAreasMessage { get; set; }
+    private const string DeleteMetroArea = "Delete Metro Area";
+
     /// <summary>
     /// Setup the configuration Grid component
     /// Establish the Claims Principal
@@ -163,7 +165,7 @@ public partial class ManageMetroAreas : ComponentBase
             {
                 if (Locations != null && Locations.Any(x => x.MetroAreaId == rec.MetroAreaId))
                 {
-                    _toastService.Error("Delete Metro Area", $"Metro Area {rec.Name} cannot be deleted because it is associated with one or more locations.");
+                    _toastService.Error(DeleteMetroArea, $"Metro Area {rec.Name} cannot be deleted because it is associated with one or more locations.");
                     args.Cancel = true;
                     break;
                 }
@@ -171,12 +173,12 @@ public partial class ManageMetroAreas : ComponentBase
                 var deleteResult = await _svcMetroArea.DeleteAsync(rec.MetroAreaId);
                 if (deleteResult.Success)
                 {
-                    _toastService.Success("Delete Metro Area", $"Metro Area {rec.Name} deleted successfully!");
+                    _toastService.Success(DeleteMetroArea, $"Metro Area {rec.Name} deleted successfully!");
                 }
                 else
                 {
                     Log.Error($"Unable to delete Metro Area {rec.Name}. " + deleteResult.Message);
-                    _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
+                    _toastService.Error(DeleteMetroArea, $"Unable to delete Metro Area {rec.Name}!");
                     args.Cancel = true;
                     break;
                 }
@@ -185,7 +187,7 @@ public partial class ManageMetroAreas : ComponentBase
             {
                 args.Cancel = true;
                 Log.Error(ex, $"Unable to delete Metro Area {rec.Name}!");
-                _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
+                _toastService.Error(DeleteMetroArea, $"Unable to delete Metro Area {rec.Name}!");
             }
         }
     }

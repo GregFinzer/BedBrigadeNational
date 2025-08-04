@@ -44,7 +44,6 @@ namespace BedBrigade.Client.Components
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
         protected List<Location> Locations { get; set; } = new List<Location>();
-
         /// <summary>
         /// Setup the configuration Grid component
         /// Establish the Claims Principal
