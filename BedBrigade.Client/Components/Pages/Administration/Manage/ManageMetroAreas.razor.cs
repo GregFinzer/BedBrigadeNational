@@ -16,6 +16,8 @@ public partial class ManageMetroAreas : ComponentBase
     [Inject] private IUserDataService? _svcUser { get; set; }
     [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
+    [Inject] private ILocationDataService? _svcLocation { get; set; }
+
     [Inject] private ToastService _toastService { get; set; }
     [Parameter] public string? Id { get; set; }
 
@@ -25,6 +27,7 @@ public partial class ManageMetroAreas : ComponentBase
     private const string NextPage = "NextPage";
     private const string FirstPage = "First";
     protected List<MetroArea>? MetroAreas { get; set; }
+    protected List<Location>? Locations { get; set; }
     protected SfGrid<MetroArea>? Grid { get; set; }
     protected List<string>? ToolBar;
     protected List<string>? ContextMenu;
@@ -37,6 +40,8 @@ public partial class ManageMetroAreas : ComponentBase
 
     protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
     public string ManageMetroAreasMessage { get; set; }
+    private const string DeleteMetroArea = "Delete Metro Area";
+
     /// <summary>
     /// Setup the configuration Grid component
     /// Establish the Claims Principal
@@ -54,23 +59,29 @@ public partial class ManageMetroAreas : ComponentBase
             {
                 "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending",
                 "SortDescending"
-            }; 
+            };
             ManageMetroAreasMessage = "Manage Metro Areas";
         }
         else
         {
-            ToolBar = new List<string> { "Search"};
+            ToolBar = new List<string> { "Search" };
             ContextMenu = new List<string>
             {
                 FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending"
-            }; 
+            };
             ManageMetroAreasMessage = "View Metro Areas";
         }
 
-        var result = await _svcMetroArea.GetAllAsync();
-        if (result.Success && result.Data != null)
+        var metroAreaResult = await _svcMetroArea.GetAllAsync();
+        if (metroAreaResult.Success && metroAreaResult.Data != null)
         {
-            MetroAreas = result.Data.ToList();
+            MetroAreas = metroAreaResult.Data.ToList();
+        }
+        
+        var locationResult = await _svcLocation.GetAllAsync();
+        if (locationResult.Success && locationResult.Data != null)
+        {
+            Locations = locationResult.Data.ToList();
         }
     }
 
@@ -152,15 +163,22 @@ public partial class ManageMetroAreas : ComponentBase
         {
             try
             {
+                if (Locations != null && Locations.Any(x => x.MetroAreaId == rec.MetroAreaId))
+                {
+                    _toastService.Error(DeleteMetroArea, $"Metro Area {rec.Name} cannot be deleted because it is associated with one or more locations.");
+                    args.Cancel = true;
+                    break;
+                }
+
                 var deleteResult = await _svcMetroArea.DeleteAsync(rec.MetroAreaId);
                 if (deleteResult.Success)
                 {
-                    _toastService.Success("Delete Metro Area", $"Metro Area {rec.Name} deleted successfully!");
+                    _toastService.Success(DeleteMetroArea, $"Metro Area {rec.Name} deleted successfully!");
                 }
                 else
                 {
                     Log.Error($"Unable to delete Metro Area {rec.Name}. " + deleteResult.Message);
-                    _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
+                    _toastService.Error(DeleteMetroArea, $"Unable to delete Metro Area {rec.Name}!");
                     args.Cancel = true;
                     break;
                 }
@@ -169,7 +187,7 @@ public partial class ManageMetroAreas : ComponentBase
             {
                 args.Cancel = true;
                 Log.Error(ex, $"Unable to delete Metro Area {rec.Name}!");
-                _toastService.Error("Delete Metro Area", $"Unable to delete Metro Area {rec.Name}!");
+                _toastService.Error(DeleteMetroArea, $"Unable to delete Metro Area {rec.Name}!");
             }
         }
     }
@@ -199,6 +217,14 @@ public partial class ManageMetroAreas : ComponentBase
 
     private async Task AddNewMetroAreaAsync(MetroArea metroArea)
     {
+        var existingMetroArea = MetroAreas?.FirstOrDefault(x => x.Name.Equals(metroArea.Name, StringComparison.OrdinalIgnoreCase));
+
+        if (existingMetroArea != null)
+        {
+            _toastService.Error("Create Metro Area", $"Metro Area with name {metroArea.Name} already exists.");
+            return;
+        }
+
         var result = await _svcMetroArea.CreateAsync(metroArea);
 
         if (result.Success)

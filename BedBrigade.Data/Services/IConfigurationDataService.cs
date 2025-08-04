@@ -13,5 +13,6 @@ namespace BedBrigade.Data.Services
         Task<decimal> GetConfigValueAsDecimalAsync(ConfigSection section, string key);
         Task<bool> GetConfigValueAsBoolAsync(ConfigSection section, string key);
         Task<List<decimal>> GetAmounts(ConfigSection section, string key, int locationId);
+        Task<ServiceResponse<List<Configuration>>> GetAllForLocationAsync(int locationId);
     }
 }
