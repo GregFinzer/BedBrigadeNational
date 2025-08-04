@@ -8,7 +8,7 @@ using BedBrigade.Common.Logic;
 namespace BedBrigade.Common.Models
 {
     [Table("Configurations")]
-    public class Configuration : BaseEntity
+    public class Configuration : BaseEntity, ILocationId
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

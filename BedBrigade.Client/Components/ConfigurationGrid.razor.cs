@@ -278,6 +278,17 @@ namespace BedBrigade.Client.Components
                 }
                 else
                 {
+                    var existing = await _svcConfiguration.GetAllForLocationAsync(Configuration.LocationId);
+
+                    if (existing.Success 
+                        && existing.Data != null 
+                        && existing.Data.Any(c => c.ConfigurationKey == Configuration.ConfigurationKey))
+                    {
+                        _toastService.Error("Add Configuration Error", "Configuration Key already exists for this location!");
+                        args.Cancel = true;
+                        return;
+                    }
+
                     // new Configuration
                     var createResult = await _svcConfiguration.CreateAsync(Configuration);
                     if (createResult.Success)

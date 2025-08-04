@@ -11,13 +11,15 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly IAuthService _authService;
-
-    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
-        IAuthService authService) : base(contextFactory, cachingService, authService)
+    private readonly ICommonService _commonService;
+    public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, 
+        ICachingService cachingService,
+        IAuthService authService, ICommonService commonService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _authService = authService;
+        _commonService = commonService;
     }
 
     /// <summary>
@@ -185,6 +187,10 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return updateResult;
     }
 
+    public async Task<ServiceResponse<List<Configuration>>> GetAllForLocationAsync(int locationId)
+    {
+        return await _commonService.GetAllForLocationAsync(this, locationId);
+    }
 
 }
 
