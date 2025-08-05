@@ -14,8 +14,21 @@ public class DatabaseSetupController : ControllerBase
     }
 
     [HttpGet("PerformSetup")]
-    public async Task<IActionResult> PerformSetup()
+    public async Task<IActionResult> PerformSetup([FromQuery] string? password)
     {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+        {
+            string? apiPassword = Environment.GetEnvironmentVariable("ApiPassword");
+            if (string.IsNullOrEmpty(apiPassword))
+            {
+                return BadRequest(new { Message = "ApiPassword is not set in environment variables." });
+            }
+            if (password != apiPassword)
+            {
+                return Unauthorized(new { Message = "Invalid ApiPassword" });
+            }
+        }
+
         try
         {
             bool migrated = await _migrationDataService.MigrateAsync();

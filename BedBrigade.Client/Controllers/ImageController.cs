@@ -2,9 +2,7 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Security.Claims;
 
 namespace ImageUpload.Controllers
 {
@@ -16,19 +14,27 @@ namespace ImageUpload.Controllers
         private readonly IAuthService _authService;
         private readonly ILocationDataService _svcLocation;
         private readonly ICachingService _cachingService;
-        private ClaimsPrincipal _identity;
 
-        public ImageController(IWebHostEnvironment env, ILocationDataService location, ICachingService cachingService)
+        public ImageController(IWebHostEnvironment env, 
+            ILocationDataService location, 
+            ICachingService cachingService, IAuthService authService)
         {
             hostingEnv = env;
             _svcLocation = location;
             _cachingService = cachingService;
+            _authService = authService;
         }
 
         [Route("Save/{id:int}/{contentType}/{contentName}")]
         [HttpPost]
         public async Task Save(IList<IFormFile> UploadFiles, int Id, string contentType, string contentName)
         {
+            if (!_authService.UserHasRole(RoleNames.CanManageMedia))
+            {
+                Response.StatusCode = 403; // Forbidden
+                return;
+            }
+
             string locationRoute = string.Empty;
             try
             {

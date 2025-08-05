@@ -30,10 +30,14 @@ namespace BedBrigade.Client.Controllers
             {
                 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
                 {
-                    string? shutdownPassword = Environment.GetEnvironmentVariable("ShutdownPassword");
-                    if (string.IsNullOrEmpty(shutdownPassword) || password != shutdownPassword)
+                    string? apiPassword = Environment.GetEnvironmentVariable("ApiPassword");
+                    if (string.IsNullOrEmpty(apiPassword))
                     {
-                        return BadRequest(new { Message = "Invalid shutdown password" });
+                        return BadRequest(new { Message = "ApiPassword is not set in environment variables." });
+                    }
+                    if (password != apiPassword)
+                    {
+                        return Unauthorized(new { Message = "Invalid ApiPassword" });
                     }
                 }
 
