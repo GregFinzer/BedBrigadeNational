@@ -71,13 +71,13 @@ namespace BedBrigade.Data.Data.Seeding
                 await SeedContentTranslation(context, "New-Bed-Brigade-Columbus-Website", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
                 await SeedContentTranslation(context, "Meet-The-President", Defaults.GroveCityLocationId, "es-MX", translationsDictionary);
 
-                //Rock City Polaris Pages
-                await SeedContentTranslation(context, "Header", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Footer", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Home", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "AboutUs", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "History", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
-                await SeedContentTranslation(context, "Donations", Defaults.RockCityPolarisLocationId, "es-MX", translationsDictionary);
+                //Polaris Pages
+                await SeedContentTranslation(context, "Header", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Footer", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Home", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "AboutUs", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "History", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
+                await SeedContentTranslation(context, "Donations", Defaults.PolarisLocationId, "es-MX", translationsDictionary);
             }
         }
 

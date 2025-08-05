@@ -1,6 +1,6 @@
-﻿/* Custom adjustments for the Bootstrap navbar with rockp- prefixed classes */
+﻿/* Custom adjustments for the Bootstrap navbar with polaris- prefixed classes */
 
-.rockp-navbar {
+.polaris-navbar {
     position: fixed;
     top: 0;
     left: 0;
@@ -15,42 +15,42 @@
 }
 
 @media (max-width: 768px) {
-    .rockp-navbar {
+    .polaris-navbar {
         padding-left: 10px;
         padding-right: 20px;
     }
 }
 
 @media (max-width: 431px) {
-    .rockp-navbar-toggler 
+    .polaris-navbar-toggler 
     {
         margin-top:30px;
     }
 }
 /* Limit the logo image height */
-.rockp-navbar-brand img {
+.polaris-navbar-brand img {
     max-height: 80px;
 }
 
 /* Add vertical dividers between nav items */
-.rockp-navbar-nav .rockp-nav-item + .rockp-nav-item {
+.polaris-navbar-nav .polaris-nav-item + .polaris-nav-item {
     border-left: 1px solid #ccc;
     margin-left: 20px;
     padding-left: 20px;
 }
 
 /* Style the active nav link */
-.rockp-nav-link.active {
+.polaris-nav-link.active {
     color: #00b2b2 !important;
     border-bottom: 2px solid #00b2b2;
 }
 
-.rockp-nav-link:hover {
+.polaris-nav-link:hover {
     border-bottom: 2px solid #00b2b2;
 }
 
 /* Style the default nav links */
-.rockp-nav-link {
+.polaris-nav-link {
     color: #666 !important;
     font-weight: bold;
     font-size: 16px !important;
@@ -76,16 +76,16 @@
             background-color: rgba(0, 0, 0, 0.05); /* Light gray background on hover */
         }
 
-.rockp-dropdown-item {
+.polaris-dropdown-item {
     color: #666 !important;
     font-weight: bold;
     font-size: 16px !important;
 }
 
 /********************************************
- * Footer Section (rockp- prefixed)
+ * Footer Section (polaris- prefixed)
  ********************************************/
-.rockp-footer {
+.polaris-footer {
     background-color: #f5f5f5; /* Light gray background */
     color: #333;
     padding: 40px 0; /* Top & bottom spacing */
@@ -93,26 +93,26 @@
     font-size: 1rem;
 }
 
-.rockp-footer-container {
+.polaris-footer-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px; /* Side padding for smaller screens */
 }
 
 /* Top: Three columns */
-.rockp-footer-columns {
+.polaris-footer-columns {
     display: flex;
     flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
     justify-content: space-evenly; /* Even horizontal spacing */
     margin-bottom: 20px;
 }
 
-.rockp-footer-column {
+.polaris-footer-column {
     flex: 1 1 200px; /* Grow/shrink, minimum width ~200px */
     margin: 10px;
 }
 
-.rockp-footer-title {
+.polaris-footer-title {
     font-size: 1.2rem;
     margin-bottom: 10px;
     text-transform: uppercase;
@@ -122,13 +122,13 @@
 
 /* Responsive tweak for columns on very small screens */
 @media (max-width: 576px) {
-    .rockp-footer-columns {
+    .polaris-footer-columns {
         flex-direction: column;
         align-items: center;
     }
 
     /* Reduce vertical spacing between columns */
-    .rockp-footer-column {
+    .polaris-footer-column {
         margin: 0px;
         text-align: center;
         flex: 1 1 100px;
@@ -136,32 +136,32 @@
     }
 }
 
-.rockp-footer-list {
+.polaris-footer-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-    .rockp-footer-list li {
+    .polaris-footer-list li {
         margin-bottom: 5px;
     }
 
-    .rockp-footer-list a {
+    .polaris-footer-list a {
         color: #333;
         text-decoration: underline;
         transition: color 0.2s ease;
     }
 
-        .rockp-footer-list a:hover {
+        .polaris-footer-list a:hover {
             color: #00b2b2;
         }
 
 /* Middle: Social icons row */
-.rockp-footer-icons {
+.polaris-footer-icons {
     margin-bottom: 20px;
 }
 
-    .rockp-footer-icons a {
+    .polaris-footer-icons a {
         color: #333;
         margin: 0 10px;
         font-size: 1.2rem;
@@ -169,23 +169,23 @@
         transition: color 0.2s ease;
     }
 
-        .rockp-footer-icons a:hover {
+        .polaris-footer-icons a:hover {
             color: #00b2b2;
         }
 
 /* Bottom: Copyright */
-.rockp-footer-bottom p {
+.polaris-footer-bottom p {
     font-size: 0.9rem;
     color: #666;
 }
 
 /*************************************************************
     Home Page
-  (All classes prefixed with rockp-)
+  (All classes prefixed with polaris-)
 **************************************************************/
 
 /* Ensure the page content starts below the navbar */
-.rockp-main-content {
+.polaris-main-content {
    /* put fonts here */
 }
 
@@ -196,19 +196,19 @@
 **************************************************************/
 
 /* Container for the top section */
-.rockp-home-top {
+.polaris-home-top {
     background-color: #00b2b2; /* Teal background */
     padding: 20px;
     text-align: center;
 }
 
 /* Buttons Container */
-.rockp-home-top-buttons-container {
+.polaris-home-top-buttons-container {
     margin-bottom: 20px;
 }
 
 /* Orange buttons with white text */
-.rockp-home-top-button {
+.polaris-home-top-button {
     display: inline-block;
     background-color: #FF4600; /* Orange */
     color: #ffffff; /* White text */
@@ -225,7 +225,7 @@
 /* Font Awesome arrow icon */
 
 
-.rockp-arrow-icon {
+.polaris-arrow-icon {
     display: inline-block; /* Allows setting width/height/padding for the circle */
     border: 2px solid #000000; /* 2px black border */
     border-radius: 50%; /* Makes the border circular */
@@ -237,7 +237,7 @@
 }
 
 /* Title box with white background and black rounded border */
-.rockp-home-title-box {
+.polaris-home-title-box {
     display: inline-block; /* So it hugs the content */
     background-color: #ffffff; /* White background */
     border: 3px solid #000000; /* Black border */
@@ -246,7 +246,7 @@
     margin-bottom: 20px;
 }
 
-.rockp-home-title {
+.polaris-home-title {
     font-size: 2.8rem;
     color: #000000;
     margin: 0; /* Remove default margins */
@@ -255,7 +255,7 @@
 }
 
 /* Subtitle box with light gray background and black rounded border */
-.rockp-home-subtitle-box {
+.polaris-home-subtitle-box {
     display: inline-block;
     background-color: lightgray; /* Light gray */
     border: 3px solid #000000;
@@ -264,7 +264,7 @@
     margin-bottom: 20px;
 }
 
-.rockp-home-subtitle {
+.polaris-home-subtitle {
     font-family: Arial;
     font-size: 2.7rem;
     color: #000000;
@@ -278,7 +278,7 @@
   DONATE Panel Styles for the Home Top Section Middle
   -------------------------------------------------------------------
 */
-.rockp-home-bipanel-container {
+.polaris-home-bipanel-container {
     display: flex; /* Lay out left/right columns */
     max-width: 800px; /* Adjust as needed */
     margin: 0 auto 20px; /* Center horizontally, add spacing below */
@@ -288,7 +288,7 @@
     overflow: hidden; /* Ensure no overflow from corners */
 }
 
-.rockp-home-bipanel-left {
+.polaris-home-bipanel-left {
     flex: 1; /* Left column grows/shrinks at ratio 1 */
     display: flex;
     align-items: center; /* Vertically center "DONATE" */
@@ -297,25 +297,25 @@
     padding: 20px;
 }
 
-.rockp-home-bipanel-title {
+.polaris-home-bipanel-title {
     font-size: 3rem;
     font-weight: bold;
     margin: 0;
 }
 
-.rockp-home-bipanel-right {
+.polaris-home-bipanel-right {
     flex: 2; /* Right column grows/shrinks at ratio 2 */
     padding: 20px;
     align-items: center; /* Vertically center "DONATE" */
 }
 
-    .rockp-home-bipanel-right p {
+    .polaris-home-bipanel-right p {
         margin: 0 0 10px 0; /* Bottom spacing between lines */
         font-size: 1.2rem;
         text-align: left;
     }
 
-.rockp-home-bipanel-info {
+.polaris-home-bipanel-info {
     margin-top: 20px; /* Extra space before final note */
     font-size: 1rem;
     font-weight: normal;
@@ -325,7 +325,7 @@
 
 /* Mobile (max-width: 768px) styles for the Donate panel */
 @media (max-width: 768px) {
-    .rockp-home-bipanel-container {
+    .polaris-home-bipanel-container {
         display: block; /* Stack left & right vertically */
         max-width: 90%; /* Slightly narrower if desired */
         margin: 0 auto 20px; /* Center and add bottom spacing */
@@ -336,7 +336,7 @@
     }
 
     /* The left side (DONATE) becomes a top panel */
-    .rockp-home-bipanel-left {
+    .polaris-home-bipanel-left {
         border-right: none; /* Remove vertical divider */
         border-bottom: 3px solid #000; /* Optional horizontal divider */
         display: flex;
@@ -345,24 +345,24 @@
         padding: 20px;
     }
 
-    .rockp-home-bipanel-title {
+    .polaris-home-bipanel-title {
         font-size: 2rem; /* Adjust to fit mobile nicely */
         margin: 0;
     }
 
     /* The right side with donation amounts goes below the top panel */
-    .rockp-home-bipanel-right {
+    .polaris-home-bipanel-right {
         padding: 20px;
         text-align: center; /* Center text or left-align if preferred */
         font-weight: bold;
     }
 
-        .rockp-home-bipanel-right p {
+        .polaris-home-bipanel-right p {
             font-size: 1.1rem; /* Slightly smaller on mobile */
             margin: 0 0 10px 0;
         }
 
-    .rockp-home-bipanel-info {
+    .polaris-home-bipanel-info {
         margin-top: 20px;
         font-size: 1rem;
         font-weight: normal;
@@ -372,7 +372,7 @@
 
 
 /* Disclaimer text */
-.rockp-disclaimer {
+.polaris-disclaimer {
     margin-top: 20px;
     color: #000000;
     font-size: 0.9rem;
@@ -382,21 +382,21 @@
     text-align: center;
 }
 
-.rockp-a-bold {
+.polaris-a-bold {
     color: #2F4729;
     font-weight: bold;
 }
 
-    .rockp-a-bold:hover {
+    .polaris-a-bold:hover {
         color: #000;
         font-weight: bolder;
     }
 
-.rockp-a {
+.polaris-a {
     color: #2F4729;
 }
 
-    .rockp-a:hover {
+    .polaris-a:hover {
         color: #000;
         font-weight: 600;
     }
@@ -416,38 +416,38 @@
     }
 
 /* Connect With Us Section */
-.rockp-connect-with-us-section {
+.polaris-connect-with-us-section {
     background-color: #f5f5f5; /* Light gray background */
     padding: 60px 0; /* Top & bottom spacing */
     text-align: center; /* Center text */
 }
 
-.rockp-connect-container {
+.polaris-connect-container {
     max-width: 800px; /* Constrain width */
     margin: 0 auto; /* Center horizontally */
     padding: 0 20px; /* Side padding for small screens */
 }
 
-.rockp-connect-title {
+.polaris-connect-title {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 10px;
 }
 
-.rockp-connect-subtitle {
+.polaris-connect-subtitle {
     font-size: 1.1rem;
     color: #555;
     margin-bottom: 10px;
 }
 
-.rockp-connect-org-info {
+.polaris-connect-org-info {
     margin-bottom: 30px;
     font-weight: bold;
     color: #333;
 }
 
 /* Form Container */
-.rockp-connect-form {
+.polaris-connect-form {
     display: flex; /* Place input & button side by side */
     max-width: 700px; /* Further constrain width */
     margin: 0 auto; /* Center the form container */
@@ -457,7 +457,7 @@
 }
 
 /* Email Input Field */
-.rockp-connect-input {
+.polaris-connect-input {
     flex: 1; /* Take up remaining space */
     padding: 15px;
     border: none;
@@ -465,12 +465,12 @@
     font-size: 1rem;
 }
 
-    .rockp-connect-input::placeholder {
+    .polaris-connect-input::placeholder {
         color: #999;
     }
 
 /* Join Button */
-.rockp-connect-button {
+.polaris-connect-button {
     background-color: #00b2b2; /* Teal color */
     color: #ffffff;
     border: none;
@@ -481,31 +481,31 @@
     transition: background-color 0.2s ease;
 }
 
-    .rockp-connect-button:hover {
+    .polaris-connect-button:hover {
         background-color: #009999; /* Darker teal on hover */
     }
 
 /* Responsive Adjustments (optional) */
 @media (max-width: 576px) {
-    .rockp-connect-form {
+    .polaris-connect-form {
         flex-direction: column; /* Stack input & button vertically on very small screens */
     }
 
-    .rockp-connect-button {
+    .polaris-connect-button {
         width: 100%;
         border-radius: 0; /* Matches the form's rounded edges */
     }
 }
 
 /* About Us */
-.rockp-big-letter {
+.polaris-big-letter {
     font-size: 50px;
     line-height: 1;
     text-align: center;
 }
 
 /* Container to limit width and add padding */
-.rockp-page-container {
+.polaris-page-container {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: #333;
@@ -516,14 +516,14 @@
 }
 
     /* Main headings */
-    .rockp-page-container h1 {
+    .polaris-page-container h1 {
         font-size: 2em;
         margin-bottom: 0.5em;
         color: #333;
     }
 
     /* Subheadings */
-    .rockp-page-container h2 {
+    .polaris-page-container h2 {
         font-size: 1.5em;
         margin-top: 1.5em;
         margin-bottom: 0.5em;
@@ -531,24 +531,24 @@
     }
 
     /* Paragraph spacing */
-    .rockp-page-container p {
+    .polaris-page-container p {
         margin-bottom: 1em;
     }
 
-    .rockp-page-container a {
+    .polaris-page-container a {
         color: #444;
         font-weight: bold;
     }
 
 /* Image styling */
-.rockp-image-container {
+.polaris-image-container {
     float: left; /* Floats the image to the right */
     margin: 0 1em 0 0; /* Adds spacing around the image */
     width: 300px; /* Adjust the width as needed */
     max-width: 40%; /* Ensures it scales on smaller screens */
 }
 
-    .rockp-image-container img {
+    .polaris-image-container img {
         width: 100%;
         height: auto;
         display: block;
@@ -558,7 +558,7 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .rockp-image-container {
+    .polaris-image-container {
         float: none;
         margin: 1em 0;
         max-width: 100%;
@@ -567,7 +567,7 @@
 }
 
 /* Container styling */
-.rockp-more-information {
+.polaris-more-information {
     /* Adjust as needed for your layout */
     text-align: center;
     margin-top: 50px;
@@ -578,7 +578,7 @@
 
 
 /* Basic styling for the teal banner */
-.rockp-banner {
+.polaris-banner {
     background-color: #00B5AD; /* Adjust to match your desired teal shade */
     text-align: center;
     padding: 10px;
@@ -629,20 +629,20 @@
 
 /*************************************************************
     Donation Page
-  (All classes prefixed with rockp-)
+  (All classes prefixed with polaris-)
 **************************************************************/
 
-.rockp-dhero {
+.polaris-dhero {
     position: relative;
     /* pan background vertically so the head shows */
-    background: url('/media/rock-city-polaris/Pages/Donations/BoyOnBed.jpeg') center 40% / cover no-repeat;
+    background: url('/media/polaris/Pages/Donations/BoyOnBed.jpeg') center 40% / cover no-repeat;
     height: 60vh;
     display: flex;
     align-items: center;
     color: #fff;
 }
 
-    .rockp-dhero::before {
+    .polaris-dhero::before {
         content: '';
         position: absolute;
         inset: 0;
@@ -650,16 +650,16 @@
         z-index: 0;
     }
 
-    .rockp-dhero .rockp-dhero-content {
+    .polaris-dhero .polaris-dhero-content {
         position: relative;
         z-index: 1;
         text-align: center;
         width: 100%;
         padding: 0 1rem;
     }
-        /*All this ridiculousness was copied from the original Rock City Polaris Donation Page just for an white line */
+        /*All this ridiculousness was copied from the original Polaris Donation Page just for an white line */
         /*An HR won't work because of the transparancy */
-        .rockp-dhero .rockp-dhero-content h1::after {
+        .polaris-dhero .polaris-dhero-content h1::after {
             background-color: #fff;
             block-size: .3125rem;
             border-radius: 9999px;
@@ -673,23 +673,23 @@
         }
 
 @media (max-width: 767px) {
-    .rockp-dhero .rockp-dhero-content h1::after {
+    .polaris-dhero .polaris-dhero-content h1::after {
         inset-block-start: calc(35% + 1rem);
     }
 }
 
 @media (max-width: 626px) {
-    .rockp-dhero .rockp-dhero-content h1::after {
+    .polaris-dhero .polaris-dhero-content h1::after {
         inset-block-start: calc(25% + 1rem);
     }
 }
 
-.rockp-dhero p {
+.polaris-dhero p {
     font-weight: 500;
     color: #fff;
 }
 
-.rockp-secure-donation {
+.polaris-secure-donation {
     display: inline-flex;
     align-items: center;
     background-color: #fff;
@@ -698,12 +698,12 @@
     margin-top: 1.5rem;
 }
 
-    .rockp-secure-donation .fa-lock {
+    .polaris-secure-donation .fa-lock {
         color: #28a745;
         margin-right: 0.5rem;
     }
 
-    .rockp-secure-donation span {
+    .polaris-secure-donation span {
         color: #212529;
         font-weight: 500;
     }

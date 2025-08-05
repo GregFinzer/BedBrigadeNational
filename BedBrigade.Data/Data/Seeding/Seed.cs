@@ -62,7 +62,7 @@ public static class Seed
         },
         new Location
         {
-            Name = "Rock City Polaris Bed Brigade", Route = "/rock-city-polaris", 
+            Name = "Polaris Bed Brigade", Route = "/polaris", 
             MailingAddress = "171 E. Fifth Ave", 
             MailingCity = "Columbus",
             MailingState = "OH", 
@@ -100,17 +100,17 @@ public static class Seed
         },
         new User { FirstName = SeedConstants.SeedGroveCityName, LastName = "Admin", Role = RoleNames.LocationAdmin },
 
-        //Rock City Users
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Contributor", Role = RoleNames.LocationContributor },
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Author", Role = RoleNames.LocationAuthor },
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Editor", Role = RoleNames.LocationEditor },
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
+        //Polaris Users
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Contributor", Role = RoleNames.LocationContributor },
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Author", Role = RoleNames.LocationAuthor },
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Editor", Role = RoleNames.LocationEditor },
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Scheduler", Role = RoleNames.LocationScheduler },
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Treasurer", Role = RoleNames.LocationTreasurer },
         new User
         {
-            FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Communications", Role = RoleNames.LocationCommunications
+            FirstName = SeedConstants.SeedPolarisName, LastName = "Communications", Role = RoleNames.LocationCommunications
         },
-        new User { FirstName = SeedConstants.SeedRockCityPolarisName, LastName = "Admin", Role = RoleNames.LocationAdmin },
+        new User { FirstName = SeedConstants.SeedPolarisName, LastName = "Admin", Role = RoleNames.LocationAdmin },
     };
 
     private static readonly List<User> _productionUsers = new()
@@ -169,8 +169,8 @@ public static class Seed
             {
                 Newsletter newsletter = new Newsletter
                 {
-                    Name = "Rock City Polaris Newsletter",
-                    LocationId = Defaults.RockCityPolarisLocationId
+                    Name = "Polaris Newsletter",
+                    LocationId = Defaults.PolarisLocationId
                 };
 
                 SeedRoutines.SetMaintFields(newsletter);
@@ -253,12 +253,12 @@ public static class Seed
                     await context.SaveChangesAsync();
                 }
 
-                var rockCityPolaris = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId);
-                if (rockCityPolaris != null)
+                var polaris = await context.Locations.FirstOrDefaultAsync(o => o.LocationId == Defaults.PolarisLocationId);
+                if (polaris != null)
                 {
-                    rockCityPolaris.MetroAreaId = metroArea.MetroAreaId;
-                    rockCityPolaris.IsActive = true;
-                    context.Locations.Update(rockCityPolaris);
+                    polaris.MetroAreaId = metroArea.MetroAreaId;
+                    polaris.IsActive = true;
+                    context.Locations.Update(polaris);
                     await context.SaveChangesAsync();
                 }
             }
@@ -276,8 +276,8 @@ public static class Seed
         {
             await SeedGroveCityBuildSchedule(context);
             await SeedGroveCityDeliverySchedule(context);
-            await SeedRockCityPolarisBuildSchedule(context);
-            await SeedRockCityPolarisDeliverySchedule(context);
+            await SeedPolarisBuildSchedule(context);
+            await SeedPolarisDeliverySchedule(context);
             await context.SaveChangesAsync();
         }
     }
@@ -332,16 +332,16 @@ public static class Seed
         }
     }
 
-    public static async Task SeedRockCityPolarisBuildSchedule(DataContext context)
+    public static async Task SeedPolarisBuildSchedule(DataContext context)
     {
-        //Rock City does their builds on the first Saturday of the month
-        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId
+        //Polaris does their builds on the first Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.PolarisLocationId
                                                   && o.EventType == EventType.Build))
         {
             return;
         }
 
-        Log.Logger.Information("SeedRockCityPolarisBuildSchedule Started");
+        Log.Logger.Information("SeedPolarisBuildSchedule Started");
 
         DateTime currentDate = DateTime.Today;
 
@@ -357,7 +357,7 @@ public static class Seed
 
             Schedule schedule = new Schedule
             {
-                LocationId = Defaults.RockCityPolarisLocationId,
+                LocationId = Defaults.PolarisLocationId,
                 EventName = "Build",
                 EventNote =
                     "Come build beds with us at our shop at 171 E. 5th Ave, Columbus, OH.",
@@ -381,16 +381,16 @@ public static class Seed
         }
     }
 
-    public static async Task SeedRockCityPolarisDeliverySchedule(DataContext context)
+    public static async Task SeedPolarisDeliverySchedule(DataContext context)
     {
-        //Rock City does their deliveries on the second Saturday of the month
-        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.RockCityPolarisLocationId
+        //Polaris does their deliveries on the second Saturday of the month
+        if (await context.Schedules.AnyAsync(o => o.LocationId == Defaults.PolarisLocationId
                                                   && o.EventType == EventType.Delivery))
         {
             return;
         }
 
-        Log.Logger.Information("SeedRockCityPolarisDeliverySchedule Started");
+        Log.Logger.Information("SeedPolarisDeliverySchedule Started");
 
         DateTime currentDate = DateTime.Today;
 
@@ -407,7 +407,7 @@ public static class Seed
 
             Schedule schedule = new Schedule
             {
-                LocationId = Defaults.RockCityPolarisLocationId,
+                LocationId = Defaults.PolarisLocationId,
                 EventName = "Delivery",
                 EventNote =
                     "Come deliver beds with us from our shop at 171 E. 5th Ave, Columbus, OH.",
@@ -692,8 +692,8 @@ public static class Seed
             case SeedConstants.SeedGroveCityName:
                 user.LocationId = Defaults.GroveCityLocationId;
                 break;
-            case SeedConstants.SeedRockCityPolarisName:
-                user.LocationId = Defaults.RockCityPolarisLocationId;
+            case SeedConstants.SeedPolarisName:
+                user.LocationId = Defaults.PolarisLocationId;
                 break;
             default:
                 throw new Exception("Invalid location name: " + user.FirstName);
