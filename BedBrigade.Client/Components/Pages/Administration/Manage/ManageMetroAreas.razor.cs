@@ -208,20 +208,21 @@ public partial class ManageMetroAreas : ComponentBase
         }
         else
         {
-            await AddNewMetroAreaAsync(metroArea);
+            await AddNewMetroAreaAsync(metroArea, args);
         }
 
         await Grid.CallStateHasChangedAsync();
         await Grid.Refresh();
     }
 
-    private async Task AddNewMetroAreaAsync(MetroArea metroArea)
+    private async Task AddNewMetroAreaAsync(MetroArea metroArea, ActionEventArgs<MetroArea> args)
     {
         var existingMetroArea = MetroAreas?.FirstOrDefault(x => x.Name.Equals(metroArea.Name, StringComparison.OrdinalIgnoreCase));
 
         if (existingMetroArea != null)
         {
             _toastService.Error("Create Metro Area", $"Metro Area with name {metroArea.Name} already exists.");
+            args.Cancel = true;
             return;
         }
 
