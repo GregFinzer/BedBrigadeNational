@@ -453,7 +453,7 @@ namespace BedBrigade.Data.Data.Seeding
             };
 
             result.AddRange(LocationSpecificConfigurations(Defaults.GroveCityLocationId));
-            result.AddRange(LocationSpecificConfigurations(Defaults.RockCityPolarisLocationId));
+            result.AddRange(LocationSpecificConfigurations(Defaults.PolarisLocationId));
             return result;
         }
 

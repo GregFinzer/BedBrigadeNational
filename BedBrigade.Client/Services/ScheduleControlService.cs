@@ -63,15 +63,15 @@ namespace BedBrigade.Client.Services
                 var firstEvent = group.First();
                 string monthAbbrev = firstEvent.EventDateScheduled.ToString("MMM").ToUpperInvariant();
 
-                sb.AppendLine("<div class=\"rockp-home-bipanel-container\">");
+                sb.AppendLine("<div class=\"polaris-home-bipanel-container\">");
 
                 // Left side: display the month abbreviation.
-                sb.AppendLine("    <div class=\"rockp-home-bipanel-left\">");
-                sb.AppendLine($"        <h3 class=\"rockp-home-bipanel-title\">{monthAbbrev}</h3>");
+                sb.AppendLine("    <div class=\"polaris-home-bipanel-left\">");
+                sb.AppendLine($"        <h3 class=\"polaris-home-bipanel-title\">{monthAbbrev}</h3>");
                 sb.AppendLine("    </div>");
 
                 // Right side: list each schedule for the month.
-                sb.AppendLine("    <div class=\"rockp-home-bipanel-right\">");
+                sb.AppendLine("    <div class=\"polaris-home-bipanel-right\">");
                 foreach (var schedule in group)
                 {
                     var route = locationRoute.TrimStart('/').TrimEnd('/');
@@ -83,10 +83,10 @@ namespace BedBrigade.Client.Services
                     string mapUrl = GoogleMaps.CreateGoogleMapsLinkForSchedule(schedule);
 
                     sb.AppendLine("        <p>");
-                    sb.AppendLine($"            <a class=\"rockp-a-bold\" href=\"{volunteerUrl}\">{eventSelect}</a>");
+                    sb.AppendLine($"            <a class=\"polaris-a-bold\" href=\"{volunteerUrl}\">{eventSelect}</a>");
                     sb.AppendLine("        </p>");
-                    sb.AppendLine("        <p class=\"rockp-home-bipanel-info\">");
-                    sb.AppendLine($"            <a class=\"rockp-a\" href=\"{mapUrl}\" target=\"_blank\">{address}</a>");
+                    sb.AppendLine("        <p class=\"polaris-home-bipanel-info\">");
+                    sb.AppendLine($"            <a class=\"polaris-a\" href=\"{mapUrl}\" target=\"_blank\">{address}</a>");
                     sb.AppendLine("        </p>");
                     sb.AppendLine("<br />");
                 }

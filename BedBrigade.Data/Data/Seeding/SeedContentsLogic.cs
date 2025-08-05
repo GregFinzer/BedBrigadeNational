@@ -34,7 +34,7 @@ public static class SeedContentsLogic
             await SeedAssemblyInstructions(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
-            await SeedRockCityPolaris(context);
+            await SeedPolaris(context);
             await SeedForm(context, locations, ContentType.DeliveryCheckList);
             await SeedForm(context, locations, ContentType.EmailTaxForm);
             await SeedForm(context, locations, ContentType.BedRequestConfirmationForm);
@@ -105,23 +105,23 @@ public static class SeedContentsLogic
         await SeedContentItem(context, ContentType.Body, location, "History", "GroveCityHistory.html");
     }
 
-    private static async Task SeedRockCityPolaris(DataContext context)
+    private static async Task SeedPolaris(DataContext context)
     {
-        Log.Logger.Information("SeedRockCityPolaris Started");
-        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == Defaults.RockCityPolarisLocationId);
+        Log.Logger.Information("SeedPolaris Started");
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.LocationId == Defaults.PolarisLocationId);
 
         if (location == null)
         {
-            Console.WriteLine($"Error cannot find location with id: " + Defaults.RockCityPolarisLocationId);
+            Console.WriteLine($"Error cannot find location with id: " + Defaults.PolarisLocationId);
             return;
         }
 
-        await SeedContentItem(context, ContentType.Header, location, "Header", "RockCityPolarisHeader.html");
-        await SeedContentItem(context, ContentType.Footer, location, "Footer", "RockCityPolarisFooter.html");
-        await SeedContentItem(context, ContentType.Home, location, "Home", "RockCityPolarisHome.html");
-        await SeedContentItem(context, ContentType.Body, location, "AboutUs", "RockCityPolarisAboutUs.html");
-        await SeedContentItem(context, ContentType.Body, location, "History", "RockCityPolarisHistory.html");
-        await SeedContentItem(context, ContentType.Body, location, "Donations", "RockCityPolarisDonations.html");
+        await SeedContentItem(context, ContentType.Header, location, "Header", "PolarisHeader.html");
+        await SeedContentItem(context, ContentType.Footer, location, "Footer", "PolarisFooter.html");
+        await SeedContentItem(context, ContentType.Home, location, "Home", "PolarisHome.html");
+        await SeedContentItem(context, ContentType.Body, location, "AboutUs", "PolarisAboutUs.html");
+        await SeedContentItem(context, ContentType.Body, location, "History", "PolarisHistory.html");
+        await SeedContentItem(context, ContentType.Body, location, "Donations", "PolarisDonations.html");
     }
 
     private static async Task SeedContentItem(DataContext context,
@@ -194,7 +194,7 @@ public static class SeedContentsLogic
         foreach (var location in locations)
         {
             if (location.LocationId == Defaults.GroveCityLocationId
-                || location.LocationId == Defaults.RockCityPolarisLocationId)
+                || location.LocationId == Defaults.PolarisLocationId)
             {
                 continue;
             }
@@ -253,7 +253,7 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            if (location.LocationId == Defaults.RockCityPolarisLocationId)
+            if (location.LocationId == Defaults.PolarisLocationId)
             {
                 continue;
             }
@@ -311,7 +311,7 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
                 if (location.LocationId == Defaults.GroveCityLocationId 
-                    || location.LocationId == Defaults.RockCityPolarisLocationId)
+                    || location.LocationId == Defaults.PolarisLocationId)
                 {
                     continue;
                 }
@@ -328,7 +328,7 @@ public static class SeedContentsLogic
                         seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Grove City");
                         break;
-                    case Defaults.RockCityPolarisLocationId:
+                    case Defaults.PolarisLocationId:
                         seedHtml = WebHelper.GetSeedingFile("LocationHome.html");
                         seedHtml = seedHtml.Replace("The Bed Brigade of Columbus", "The Bed Brigade of Polaris");
                         break;
@@ -471,7 +471,7 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
                 if (location.LocationId == Defaults.GroveCityLocationId
-                    || location.LocationId == Defaults.RockCityPolarisLocationId)
+                    || location.LocationId == Defaults.PolarisLocationId)
                 {
                     continue;
                 }
@@ -524,10 +524,10 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            //We have different pages for National, Grove City and Rock City Polaris
+            //We have different pages for National, Grove City and Polaris
             if (location.LocationId == Defaults.NationalLocationId
                 || location.LocationId == Defaults.GroveCityLocationId
-                || location.LocationId == Defaults.RockCityPolarisLocationId)
+                || location.LocationId == Defaults.PolarisLocationId)
                 continue;
 
             await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");

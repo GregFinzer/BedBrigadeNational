@@ -4,7 +4,7 @@
     {
         public const int NationalLocationId = 1;
         public const int GroveCityLocationId = 2;
-        public const int RockCityPolarisLocationId = 3;
+        public const int PolarisLocationId = 3;
         public const string ErrorImagePath = "media/national/NoImageFound.jpg";
         public const string AuthToken = "AuthToken";
         public const string MediaDirectory = "MediaDirectory";
