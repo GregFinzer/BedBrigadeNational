@@ -294,7 +294,13 @@ namespace BedBrigade.Client.Components
                 }
                 else
                 {
-                    await AddNewLocationAsync(Location);
+                    bool success = await AddNewLocationAsync(Location);
+
+                    if (!success)
+                    {
+                        args.Cancel = true;
+                        return;
+                    }
                 }
 
                 await Grid.CallStateHasChangedAsync();
@@ -307,7 +313,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task AddNewLocationAsync(Location location)
+        private async Task<bool> AddNewLocationAsync(Location location)
         {
             location.Route = (location.Route.StartsWith("/") ? location.Route : "/" + location.Route).ToLower(); 
 
@@ -317,12 +323,12 @@ namespace BedBrigade.Client.Components
             if (result.Success)
             {
                 _toastService.Success("Add Location Success", "Location added successfully.");
+                return true;
             }
-            else
-            {
-                Log.Error($"Unable to add location {location.Name}. Reason: {result.Message}");
-                _toastService.Error("Add Location Error", $"Unable to add location {location.Name}. Reason: {result.Message}");
-            }
+
+            Log.Error($"Unable to add location {location.Name}. Reason: {result.Message}");
+            _toastService.Error("Add Location Error", $"Unable to add location {location.Name}. Reason: {result.Message}");
+            return false;
         }
 
         private async Task UpdateLocationAsync(Location location)
