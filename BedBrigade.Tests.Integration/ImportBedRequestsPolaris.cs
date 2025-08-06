@@ -1,4 +1,9 @@
-﻿using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
+using BedBrigade.Data;
+using KellermanSoftware.NameParser;
+using Microsoft.EntityFrameworkCore;
 using Syncfusion.Licensing;
 using Syncfusion.XlsIO;
 using System;
@@ -12,6 +17,8 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportBedRequestsPolaris
     {
+        private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
+
         private string[] groups = new[]
         {
             "New Requests",
@@ -33,7 +40,209 @@ namespace BedBrigade.Tests.Integration
                 Assert.Ignore("This test should only run locally.");
             }
 
-            List<PolarisBedRequest> bedRequests = ExcelToPolarisBedRequests();
+            List<PolarisBedRequest> polarisBedRequests = ExcelToPolarisBedRequests();
+
+            const string connectionString =
+                "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
+            DataContext context = CreateDbContext(connectionString);
+
+            List<BedRequest> existing = await context.BedRequests.ToListAsync();
+
+            List<BedRequest> newPolaris = CombinePolaris(polarisBedRequests);
+        }
+
+        private List<BedRequest> CombinePolaris(List<PolarisBedRequest> polarisBedRequests)
+        {
+            List<BedRequest> results = new List<BedRequest>();
+            BedRequest current = new BedRequest();
+            DateTime createDate = new DateTime(2025, 7, 5);
+            DateTime deliveryDate = new DateTime(2025, 7, 12);
+            foreach (PolarisBedRequest request in polarisBedRequests)
+            {
+                if (request.Group == "Out of town")
+                    continue;
+
+                string phone = request.PhoneNumber?.FormatPhoneNumber() ?? string.Empty;
+
+                if (!String.IsNullOrEmpty(current.Phone) && current.Phone != phone)
+                {
+                    results.Add(current);
+                    current = new BedRequest();
+                }
+
+                current.Phone = phone;
+                current.LocationId = Defaults.PolarisLocationId;
+                current.Group = "Polaris";
+
+                SetNotes(request, current);
+                SetStatus(request, current);
+                SetReference(request, current);
+                SetFirstNameLastName(request, current);
+                SetCreateDate(request, current, createDate);
+                createDate = current.CreateDate.Value;
+                SetDeliveryDate(request, current, deliveryDate);
+
+                if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered
+                    && current.DeliveryDate.HasValue)
+                {
+                    deliveryDate = current.DeliveryDate.Value;
+                }
+
+                //We left off at AgesGender
+            }
+        }
+
+        private void SetDeliveryDate(PolarisBedRequest request, BedRequest current, DateTime deliveryDate)
+        {
+            if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered)
+            {
+                if (current.DeliveryDate == null || current.DeliveryDate == DateTime.MinValue)
+                {
+                    if (request.DeliveryDate != DateTime.MinValue)
+                    {
+                        current.DeliveryDate = request.DeliveryDate;
+                    }
+                    else
+                    {
+                        current.DeliveryDate = deliveryDate;
+                    }
+                }
+            }
+        }
+
+        private void SetCreateDate(PolarisBedRequest request, BedRequest current, DateTime createDate)
+        {
+            if (current.CreateDate == null || current.CreateDate == DateTime.MinValue)
+            {
+                if (request.DateOfRequest != DateTime.MinValue)
+                {
+                    current.CreateDate = request.DateOfRequest;
+                }
+                else
+                {
+                    current.CreateDate = createDate;
+                }
+            }
+        }
+
+        private void SetFirstNameLastName(PolarisBedRequest request, BedRequest current)
+        {
+            var nameParts = _nameParserLogic.ParseName(request.RequestersName, NameOrder.FirstLast);
+            current.FirstName = nameParts.FirstName;
+            current.LastName = nameParts.LastName;
+
+            if (string.IsNullOrWhiteSpace(current.FirstName) && string.IsNullOrWhiteSpace(current.LastName))
+            {
+                current.FirstName = string.Empty;
+                current.LastName = request.RequestersName;
+            }
+
+            if (string.IsNullOrWhiteSpace(current.FirstName))
+            {
+                current.FirstName = "Unknown";
+            }
+
+            if (string.IsNullOrWhiteSpace(current.LastName))
+            {
+                current.LastName = string.Empty;
+            }
+        }
+
+        private void SetReference(PolarisBedRequest request, BedRequest current)
+        {
+            if (String.IsNullOrWhiteSpace(request.Name))
+                current.Reference = "Polaris Website";
+            else if (request.Name.ToLower().Contains("incoming") || request.Name.ToLower().Contains("new"))
+                current.Reference = "Polaris Website";
+            else if (request.Name.ToLower().Contains("grove") || request.Name.ToLower().Contains("gc"))
+                current.Reference = "Grove City Website";
+            else if (request.Name.ToLower().Contains("phone"))
+                current.Reference = "Phone Call";
+            else if (request.Name.ToLower().Contains("email"))
+                current.Reference = "Email";
+            else if (request.Name.ToLower().Contains("text to katie"))
+                current.Reference = "Text to Katie";
+            else if (request.Name.ToLower().Contains("facebook") || request.Name.ToLower().Contains("fb"))
+                current.Reference = "Facebook";
+            else if (request.Name.ToLower().Contains("import"))
+                current.Reference = "Import from List";
+            else if (request.Name.ToLower().Contains("spreadsheet"))
+                current.Reference = "Spreadsheet";
+            else if (request.Name.ToLower().Contains("tierra"))
+                current.Reference = "tierra";
+            else if (request.Name.ToLower().Contains("nyap"))
+                current.Reference = "NYAP";
+            else if (request.Name.ToLower().Contains("walk"))
+                current.Reference = "Walk-in";
+            else
+                current.Reference = request.Name;
+        }
+
+        private void SetStatus(PolarisBedRequest request, BedRequest current)
+        {
+            switch (request.Group)
+            {
+                case "New Requests":
+                case "Grove City requests":
+                case "Additional needs":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Waiting;
+                    current.Contacted =false;
+                    break;
+                case "Contacted (Waiting)":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Waiting;
+                    current.Contacted = true;
+                    break;
+                case "August 9th delivery":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Scheduled;
+                    current.Contacted = true;
+                    break;
+                case "Unable to contact after 3 months":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Cancelled;
+                    current.Contacted = false;
+                    AddNote(current, "Unable to contact after 3 months");
+                    break;
+                case "Wrong phone number listed":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Cancelled;
+                    current.Contacted = false;
+                    AddNote(current, "Wrong phone number listed");
+                    break;
+                case "Delivered":
+                    current.Status = BedBrigade.Common.Enums.BedRequestStatus.Delivered;
+                    current.Contacted = true;
+                    break;
+                default:
+                    Assert.Fail($"Unknown group {request.Group}");
+                    break;
+            }
+        }
+
+        private void SetNotes(PolarisBedRequest request, BedRequest current)
+        {
+            AddNote(current, request.Reference);
+            AddNote(current, request.DeliveryNotes);
+        }
+
+        private void AddNote(BedRequest current, string note)
+        {
+            if (string.IsNullOrWhiteSpace(note))
+                return;
+
+            if (string.IsNullOrEmpty(current.Notes))
+            {
+                current.Notes = note;
+            }
+            else if (!current.Notes.Contains(note))
+            {
+                current.Notes += " " + note;
+            }
+        }
+
+
+        public DataContext CreateDbContext(string connectionString)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+            optionsBuilder.UseSqlServer(connectionString);
+            return new DataContext(optionsBuilder.Options);
         }
 
         private List<PolarisBedRequest> ExcelToPolarisBedRequests()
@@ -85,7 +294,9 @@ namespace BedBrigade.Tests.Integration
                     SpeaksEnglish = usedRange[i, 15].Value?.ToString(),
                     Status = usedRange[i, 16].Value?.ToString(),
                     DeliveryDate = usedRange[i, 17].DateTime,
-                    Reference = usedRange[i, 23].Value?.ToString()
+                    TeamLead1 = usedRange[i, 18].Value?.ToString(),
+                    Reference = usedRange[i, 23].Value?.ToString(),
+                    DeliveryNotes = usedRange[i, 24].Value?.ToString()
                 };
                 results.Add(bedRequest);
             }

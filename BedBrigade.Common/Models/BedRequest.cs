@@ -54,9 +54,6 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(255, ErrorMessage = "Ages/Gender has a maximum length of 255 characters")]
     public String? AgesGender { get; set; } = string.Empty;
 
-    [MaxLength(4000, ErrorMessage = "Special Instructions has a maximum length of 4000 characters")] 
-    public String? SpecialInstructions { get; set; } = string.Empty;
-
     [Required] 
     public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
 
@@ -108,5 +105,10 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     /// </summary>
     [NotMapped]
     public double Distance { get; set; }
+
+    public bool Contacted { get; set; } = false;
+
+    [MaxLength(50)]
+    public string? BedType { get; set; }
 
 }

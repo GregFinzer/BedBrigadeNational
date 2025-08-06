@@ -26,6 +26,10 @@ namespace BedBrigade.Tests.Integration
         public string? SpeaksEnglish { get; set; }
         public string Status { get; set; }
         public DateTime? DeliveryDate { get; set; }
+
+        public string TeamLead1 { get; set; }
+
         public string Reference { get; set; }
+        public string DeliveryNotes { get; set;
     }
 }
