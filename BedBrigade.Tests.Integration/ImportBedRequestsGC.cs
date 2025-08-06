@@ -28,6 +28,11 @@ public class ImportBedRequestsGC
     [Test, Ignore("Only run manually")]
     public async Task ImportBedRequestsFromGC()
     {
+        if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
+        {
+            Assert.Ignore("This test should only run locally.");
+        }
+
         const string connectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         var context = CreateDbContext(connectionString);
@@ -90,7 +95,7 @@ public class ImportBedRequestsGC
 
     private void FillBedRequest(BedRequest bedRequest, Dictionary<string, string> item)
     {
-        bedRequest.LocationId = Defaults.GroveCityLocationId;
+        
         bedRequest.Notes = string.Empty;
         SetFirstNameLastName(item, bedRequest);
         SetPhone(item, bedRequest);
@@ -106,6 +111,15 @@ public class ImportBedRequestsGC
         if (string.IsNullOrWhiteSpace(bedRequest.Group))
         {
             bedRequest.Group = "GC";
+        }
+
+        if (bedRequest.Group.ToLower() == "polaris")
+        {
+            bedRequest.LocationId = Defaults.PolarisLocationId;
+        }
+        else
+        {
+            bedRequest.LocationId = Defaults.GroveCityLocationId;
         }
 
         bedRequest.NumberOfBeds = int.TryParse(item["#BedsRequested"], out int beds) ? beds : 1;
