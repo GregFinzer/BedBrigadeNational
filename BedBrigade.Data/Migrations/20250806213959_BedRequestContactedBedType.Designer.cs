@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250806213959_BedRequestContactedBedType")]
+    partial class BedRequestContactedBedType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +33,13 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BedRequestId"));
 
+                    b.Property<string>("AgesGender")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("BedType")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("City")
                         .HasMaxLength(50)
@@ -60,10 +67,6 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("GenderAge")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Group")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -82,10 +85,6 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("decimal(18,10)");
 
                     b.Property<string>("MachineName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Names")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

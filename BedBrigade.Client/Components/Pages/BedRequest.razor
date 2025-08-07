@@ -104,15 +104,11 @@
                             </div>
                         </div>
                         <div class="form-group ">
-                            <label for="ages" class="formlabel required">@_lc.Keys["AgesGender"]</label>
-                            <SfTextBox ID="ages" @bind-Value="newRequest.AgesGender" ></SfTextBox>
+                            <label for="ages" class="formlabel required">@_lc.Keys["GenderAge"]</label>
+                            <SfTextBox ID="ages" @bind-Value="newRequest.GenderAge" ></SfTextBox>
                             <div style="font-size: smaller">
-                                <ValidationMessage For="@(() => newRequest.AgesGender)"></ValidationMessage>
+                                <ValidationMessage For="@(() => newRequest.GenderAge)"></ValidationMessage>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inst" class="formlabel">@_lc.Keys["SpecialInstructions"]</label>
-                            <SfTextBox ID="inst" @bind-Value="newRequest.SpecialInstructions" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                         </div>
                     </div>
 

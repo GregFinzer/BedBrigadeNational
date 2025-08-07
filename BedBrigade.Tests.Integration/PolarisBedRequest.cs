@@ -30,6 +30,6 @@ namespace BedBrigade.Tests.Integration
         public string TeamLead1 { get; set; }
 
         public string Reference { get; set; }
-        public string DeliveryNotes { get; set;
+        public string DeliveryNotes { get; set; }
     }
 }

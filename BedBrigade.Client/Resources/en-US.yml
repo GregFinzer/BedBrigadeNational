@@ -2,7 +2,6 @@
 Active: Active
 Add: Add
 Address: Address
-AgesGender: Ages / Gender
 AmountColon: 'Amount:'
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 Back: Back
@@ -116,6 +115,7 @@ FirstName: First Name
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
+GenderAge: Gender / Age
 Gross: Gross
 Group: Group
 GroupName: Group Name
@@ -142,11 +142,11 @@ MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
 ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
-MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
+MaxLengthGenderAge255: Gender/Age has a maximum length of 255 characters
 MaxLengthGroup50: Group has a maximum length of 50 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
@@ -156,7 +156,6 @@ MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length o
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthReference100: Reference has a maximum length of 100 characters
-MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
 MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet50: Street Address has a maximum length of 50 characters
 MaxLengthTableName50: Table Name has a maximum length of 50 characters
@@ -214,7 +213,7 @@ RegularExpressionEmail: Invalid email format
 RegularExpressionPhone: Invalid phone format
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
-RequiredAgesGender: Please indicate the age and gender of children
+RequiredGenderAge: Please indicate the genders and ages of the children
 RequiredAmount: Amount is required
 RequiredBody: Body is required.
 RequiredCampaignName: Campaign Name is required
@@ -285,7 +284,6 @@ SorryThePage: Sorry - the page associated with this link was not found.
 SorryYouAreNot: Sorry, you are not authorized to view this page.
 SpeakEnglishCaption: Do you speak English?
 SpeakEnglishPlaceholder: English ability...
-SpecialInstructions: Special Instructions
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}
 Status: Status

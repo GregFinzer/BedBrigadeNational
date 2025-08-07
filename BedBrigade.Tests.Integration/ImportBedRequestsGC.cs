@@ -124,7 +124,7 @@ public class ImportBedRequestsGC
 
         bedRequest.NumberOfBeds = int.TryParse(item["#BedsRequested"], out int beds) ? beds : 1;
         bedRequest.Status = Enum.Parse<BedRequestStatus>(item["Status"], true);
-        bedRequest.AgesGender = item["Gender/Age"];
+        bedRequest.GenderAge = item["Gender/Age"];
         bedRequest.DeliveryDate = ParseDeliveryDate(item["DeliveryDate"]);
         bedRequest.Reference = item["Reference"];
         SetPrimaryLanguage(item, bedRequest);

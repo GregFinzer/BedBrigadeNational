@@ -39,7 +39,7 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Schedule.OrganizerPhone%%",
         "%%BedRequest.FirstName%%",
         "%%BedRequest.NumberOfBeds%%",
-        "%%BedRequest.AgesGender%%",
+        "%%BedRequest.GenderAge%%",
         "%%User.FirstName%%",
         "%%User.LastName%%",
         "%%User.Role%%",
@@ -210,7 +210,7 @@ public class MailMergeLogic : IMailMergeLogic
     {
         sb = sb.Replace("%%BedRequest.FirstName%%", entity.FirstName);
         sb = sb.Replace("%%BedRequest.NumberOfBeds%%", entity.NumberOfBeds.ToString());
-        sb = sb.Replace("%%BedRequest.AgesGender%%", entity.AgesGender);
+        sb = sb.Replace("%%BedRequest.GenderAge%%", entity.GenderAge);
         return sb;
     }
 

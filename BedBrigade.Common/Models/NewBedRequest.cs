@@ -44,12 +44,9 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "The number of ordered beds is required and must be > 0")]
         public Int32 NumberOfBeds { get; set; }
 
-        [Required(ErrorMessage = "Please indicate the age and gender of children")]
-        [MaxLength(255, ErrorMessage = "Ages/Gender has a maximum length of 255 characters")]
-        public String AgesGender { get; set; } = string.Empty;
-
-        [MaxLength(4000, ErrorMessage = "Special Instructions has a maximum length of 4000 characters")] 
-        public String? SpecialInstructions { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Please indicate the genders and ages of the children")]
+        [MaxLength(255, ErrorMessage = "Gender/Age has a maximum length of 255 characters")]
+        public String GenderAge { get; set; } = string.Empty;
 
         [Required] public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
 
@@ -64,5 +61,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(50, ErrorMessage = "Group has a maximum length of 50 characters")]
         public string? Group { get; set; } = string.Empty;
 
+        [MaxLength(100, ErrorMessage = "Names has a maximum length of 100 characters")]
+        public string? Names { get; set; }
     }
 }

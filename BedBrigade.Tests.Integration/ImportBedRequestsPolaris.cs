@@ -10,7 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using KellermanSoftware.AddressParser;
 
 namespace BedBrigade.Tests.Integration
 {
@@ -18,6 +20,10 @@ namespace BedBrigade.Tests.Integration
     public class ImportBedRequestsPolaris
     {
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
+        private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
+
+        private Regex aptRegex =
+            new Regex(@"(APT|apt)\s[#0-9A-Za-z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private string[] groups = new[]
         {
@@ -55,6 +61,7 @@ namespace BedBrigade.Tests.Integration
         {
             List<BedRequest> results = new List<BedRequest>();
             BedRequest current = new BedRequest();
+            current.NumberOfBeds = 0;
             DateTime createDate = new DateTime(2025, 7, 5);
             DateTime deliveryDate = new DateTime(2025, 7, 12);
             foreach (PolarisBedRequest request in polarisBedRequests)
@@ -88,8 +95,134 @@ namespace BedBrigade.Tests.Integration
                     deliveryDate = current.DeliveryDate.Value;
                 }
 
-                //We left off at AgesGender
+                SetGenderAge(request, current);
+                SetAddress(request, current);
+                SetLatLong(current);
+                current.Email = request.Email;
+                current.PrimaryLanguage = request.PrimaryLanguage;
+                current.SpeakEnglish = request.SpeaksEnglish;
+                current.Team = request.TeamLead1;
+                current.BedType = request.BedType;
+                current.NumberOfBeds++;
+
+                current.CreateUser = "Import";
+                current.UpdateUser = "Import";
+                current.MachineName = Environment.MachineName;
+
+                if (current.DeliveryDate.HasValue)
+                {
+                    current.UpdateDate = current.DeliveryDate.Value;
+                }
+                else
+                {
+                    current.UpdateDate = current.CreateDate.Value;
+                }
             }
+
+            return results;
+        }
+
+        private void SetLatLong(BedRequest bedRequest)
+        {
+            if (string.IsNullOrWhiteSpace(bedRequest.PostalCode))
+            {
+                return;
+            }
+
+            try
+            {
+                ZipCodeInfo? zipInfo = _addressParser.GetInfoForZipCode(bedRequest.PostalCode);
+
+                if (zipInfo == null)
+                {
+                    return;
+                }
+
+                bedRequest.Latitude = zipInfo.Latitude;
+                bedRequest.Longitude = zipInfo.Longitude;
+                bedRequest.City = zipInfo.PrimaryCity;
+                bedRequest.State = zipInfo.State;
+            }
+            catch (Exception)
+            {
+                // Ignore invalid zip codes
+            }
+        }
+
+        private void SetAddress(PolarisBedRequest request, BedRequest current)
+        {
+            //Get apartment number if it exists
+            string deliveryAddress = request.DeliveryAddress;
+            deliveryAddress = deliveryAddress.Replace(", EE. UU.", string.Empty);
+            deliveryAddress = StringUtil.TakeOffEnd(deliveryAddress, ", USA A");
+            deliveryAddress = deliveryAddress.Replace(", USA", string.Empty);
+            deliveryAddress = deliveryAddress.Replace(", MS, USA", string.Empty);
+            string aptNumber = aptRegex.Match(deliveryAddress).Value.Trim();
+
+            if (!string.IsNullOrWhiteSpace(aptNumber))
+            {
+                deliveryAddress = deliveryAddress.Replace(aptNumber, string.Empty).Trim();
+            }
+
+            string street = deliveryAddress.Split(',')[0];
+            string cityStateZip = deliveryAddress.Replace(street + ",", string.Empty).Trim();
+            deliveryAddress = current.FirstName + " " + current.LastName + "\r\n" 
+                              + street + "\r\n"
+                              + cityStateZip;
+
+            AddressResult? addressResult = _addressParser.ParseAddress(deliveryAddress);
+
+            if (addressResult == null)
+            {
+                current.Street = deliveryAddress;
+                current.City = string.Empty;
+                current.State = string.Empty;
+                current.PostalCode = string.Empty;
+            }
+            else
+            {
+                current.Street = addressResult.AddressLine1;
+
+                if (!String.IsNullOrWhiteSpace(addressResult.AddressLine2))
+                {
+                    current.Street += " " + addressResult.AddressLine2;
+                }
+                current.City = addressResult.City;
+                current.State = addressResult.Region;
+                current.PostalCode = addressResult.PostalCode;
+
+                if (!string.IsNullOrWhiteSpace(aptNumber))
+                {
+                    current.Street += " " + aptNumber;
+                }
+            }
+
+        }
+
+        private void SetGenderAge(PolarisBedRequest request, BedRequest current)
+        {
+            string genderLetter = string.Empty;
+            string ageLetter = string.Empty;
+
+            if (request.BedForAdultOrChild == "Adult")
+            {
+                ageLetter = "A";
+
+                genderLetter = request.AdultGender == "Male" ? "M" : "F";
+            }
+            else
+            {
+                ageLetter = request.ChildAge;
+
+                genderLetter = request.ChildGender == "Boy" ? "B" : "G";
+            }
+
+            if (!string.IsNullOrWhiteSpace(current.GenderAge))
+            {
+                current.GenderAge += " ";
+            }
+
+            current.GenderAge += $"{genderLetter}/{ageLetter}";
         }
 
         private void SetDeliveryDate(PolarisBedRequest request, BedRequest current, DateTime deliveryDate)
@@ -252,7 +385,7 @@ namespace BedBrigade.Tests.Integration
             ExcelEngine excelEngine = new ExcelEngine();
             IApplication application = excelEngine.Excel;
             application.DefaultVersion = ExcelVersion.Xlsx;
-            string filePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1754480988.xlsx";
+            string filePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed_Requests_1754480988.xlsx";
             IWorkbook workbook = application.Workbooks.Open(filePath);
             IWorksheet sheet = workbook.Worksheets.First();
             IRange usedRange = sheet.UsedRange;

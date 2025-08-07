@@ -2,7 +2,7 @@
 Active: Activo
 Add: Agregar
 Address: Dirección
-AgesGender: Edades / Género
+GenderAge: Género / Edad
 AmountColon: 'Importe:'
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
@@ -142,11 +142,11 @@ MailingPostalCode: Código Postal
 MailingState: Estado de envío
 ManageConfiguration: Administrar la Configuración
 ManageDonations: Administrar Donaciones
-MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
 MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
 MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
+MaxLengthGenderAge255: Sexo/Edad tiene una longitud máxima de 255 caracteres
 MaxLengthGroup50: El grupo tiene una longitud máxima de 50 caracteres
 MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
@@ -156,7 +156,6 @@ MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud má
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
 MaxLengthReference100: La referencia tiene una longitud máxima de 100 caracteres
-MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet50: La dirección tiene una longitud máxima de 50 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
@@ -216,7 +215,6 @@ RegularExpressionEmail: Formato de correo electrónico no válido
 RegularExpressionPhone: Formato de número de teléfono no válido
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
-RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
 RequiredAmount: La cantidad es requerida
 RequiredBody: Se requiere cuerpo.
 RequiredCampaignName: El nombre de la campaña es obligatorio
@@ -231,6 +229,7 @@ RequiredDonationCampaignId: Se requiere el ID de la campaña de donación
 RequiredEmail: Se requiere una dirección de correo electrónico
 RequiredFileUse: Se requiere el uso de archivos
 RequiredFirstName: El nombre de pila es obligatorio
+RequiredGenderAge: Sírvase indicar el sexo y la edad de los niños
 RequiredHash: Se requiere hash
 RequiredLastName: El apellido es obligatorio
 RequiredLocationId: Se requiere el ID de ubicación
@@ -286,7 +285,6 @@ SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
 SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
 SpeakEnglishCaption: ¿Hablas inglés?
 SpeakEnglishPlaceholder: Habilidad en inglés...
-SpecialInstructions: Instrucciones especiales
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
 Status: Estado

@@ -51,8 +51,8 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [Range(1, Int32.MaxValue, ErrorMessage = "The number of ordered beds must be greater than 0")]
     public Int32 NumberOfBeds { get; set; }
 
-    [MaxLength(255, ErrorMessage = "Ages/Gender has a maximum length of 255 characters")]
-    public String? AgesGender { get; set; } = string.Empty;
+    [MaxLength(255, ErrorMessage = "Gender/Age has a maximum length of 255 characters")]
+    public String? GenderAge { get; set; } = string.Empty;
 
     [Required] 
     public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
@@ -108,7 +108,10 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
 
     public bool Contacted { get; set; } = false;
 
-    [MaxLength(50)]
+    [MaxLength(100, ErrorMessage = "Bed Type has a maximum length of 100 characters")]
     public string? BedType { get; set; }
+
+    [MaxLength(100, ErrorMessage = "Names has a maximum length of 100 characters")]
+    public string? Names { get; set; }
 
 }
