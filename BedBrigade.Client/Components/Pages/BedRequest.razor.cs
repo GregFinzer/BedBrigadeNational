@@ -372,6 +372,9 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.NumberOfBeds = NumericValue;
                 newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
                 newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
+                newRequest.Contacted = false;
+                newRequest.BedType = Defaults.DefaultBedType;
+
                 if (newRequest.PrimaryLanguage == "English")
                 {
                     newRequest.SpeakEnglish = "Yes";
@@ -447,6 +450,18 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.Reference = "Website";
                 Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
                 ObjectUtil.CopyProperties(newRequest, bedRequest);
+                string defaultNote = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings,
+                    ConfigNames.BedRequestNote, bedRequest.LocationId);
+
+                if (String.IsNullOrWhiteSpace(newRequest.SpecialInstructions))
+                {
+                    bedRequest.Notes = defaultNote;
+                }
+                else
+                {
+                    bedRequest.Notes = defaultNote + " " + newRequest.SpecialInstructions;
+                }
+            
                 var addResult = await _svcBedRequest.CreateAsync(bedRequest);
                 if (addResult.Success && addResult.Data != null)
                 {

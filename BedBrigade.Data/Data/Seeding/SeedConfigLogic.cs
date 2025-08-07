@@ -495,7 +495,14 @@ namespace BedBrigade.Data.Data.Seeding
                     ConfigurationValue = "Location Admin",
                     Section = ConfigSection.Email,
                     LocationId = locationId
-                }
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.BedRequestNote,
+                    ConfigurationValue = "No bed bugs.",
+                    Section = ConfigSection.CustomStrings,
+                    LocationId = locationId
+                },
             };
         }
     }

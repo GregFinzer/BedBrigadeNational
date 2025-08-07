@@ -107,6 +107,7 @@ EventNote: Event Note
 EventStatus: Event Status
 EventTime: Event Time
 EventType: Event Type
+Example: Example
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FilteredTotalColon: 'Filtered Total:'
 FindABedBrigade: Find a Bed Brigade
@@ -156,6 +157,7 @@ MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length o
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthReference100: Reference has a maximum length of 100 characters
+MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
 MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet50: Street Address has a maximum length of 50 characters
 MaxLengthTableName50: Table Name has a maximum length of 50 characters
@@ -165,6 +167,7 @@ MilesAway: miles away
 MonthlyDonationOf: Monthly Donation of
 Name: Name
 NameColon: 'Name:'
+Names: Names
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 Newsletter: Newsletter
@@ -284,6 +287,7 @@ SorryThePage: Sorry - the page associated with this link was not found.
 SorryYouAreNot: Sorry, you are not authorized to view this page.
 SpeakEnglishCaption: Do you speak English?
 SpeakEnglishPlaceholder: English ability...
+SpecialInstructions: Special Instructions
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}
 Status: Status

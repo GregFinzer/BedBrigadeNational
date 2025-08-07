@@ -272,14 +272,17 @@ else
                         <GridColumn Field=@nameof(BedRequest.Group) Width="100" ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.NumberOfBeds) Width="100" ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.StatusString) Width="100" ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(BedRequest.ContactedYes) Width="110" ShowColumnMenu="false" HeaderText="Contacted" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.GenderAge) Width="225" ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.DeliveryDate) Width="125" Format="d" ShowColumnMenu="false" HeaderText="Delivered" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.Reference) Width="125" ShowColumnMenu="false" HeaderText="Reference" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.Notes) Width="425" ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.Team) Width="100" ShowColumnMenu="false" HeaderText="Team" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
-                        <GridColumn Field=@nameof(BedRequest.UpdateDateLocal) Width="150" Format="g" ShowColumnMenu="false" HeaderText="Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(BedRequest.BedType) Width="100" ShowColumnMenu="false" HeaderText="Bed Type" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
+                        <GridColumn Field=@nameof(BedRequest.Names) Width="200" ShowColumnMenu="false" HeaderText="Names" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) Width="150" ShowColumnMenu="false" HeaderText="Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.SpeakEnglish) Width="200" ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(BedRequest.UpdateDateLocal) Width="150" Format="g" ShowColumnMenu="false" HeaderText="Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" />
                     </GridColumns>
                 </SfGrid>

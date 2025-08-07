@@ -111,7 +111,9 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(100, ErrorMessage = "Bed Type has a maximum length of 100 characters")]
     public string? BedType { get; set; }
 
-    [MaxLength(100, ErrorMessage = "Names has a maximum length of 100 characters")]
+    [MaxLength(255, ErrorMessage = "Names has a maximum length of 255 characters")]
     public string? Names { get; set; }
 
+    [NotMapped]
+    public string ContactedYes => Contacted == true ? "Yes" : string.Empty;
 }

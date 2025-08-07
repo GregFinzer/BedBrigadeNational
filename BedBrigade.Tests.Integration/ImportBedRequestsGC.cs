@@ -25,7 +25,7 @@ public class ImportBedRequestsGC
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
 
-    [Test, Ignore("Only run manually")]
+    [Test]
     public async Task ImportBedRequestsFromGC()
     {
         if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
@@ -42,7 +42,7 @@ public class ImportBedRequestsGC
 
         var items = csvReader.CsvFileToDictionary(importFilePath);
         List<BedRequest> destItems = new List<BedRequest>();
-        for (int i=0;i < items.Count; i++)
+        for (int i = 0; i < items.Count; i++)
         {
             var item = items[i];
             try
@@ -79,7 +79,7 @@ public class ImportBedRequestsGC
                                                              && o.LastName == bedRequest.LastName
                                                              && o.Status == BedRequestStatus.Waiting
                                                              && !keywordsToIgnore.Any(k => (o.Reference ?? string.Empty).ToLower().Contains(k))
-                                                             && !keywordsToIgnore.Any(k => (o.Notes ?? string.Empty) .ToLower().Contains(k))
+                                                             && !keywordsToIgnore.Any(k => (o.Notes ?? string.Empty).ToLower().Contains(k))
                                                              );
         if (existing != null)
         {
@@ -95,7 +95,7 @@ public class ImportBedRequestsGC
 
     private void FillBedRequest(BedRequest bedRequest, Dictionary<string, string> item)
     {
-        
+
         bedRequest.Notes = string.Empty;
         SetFirstNameLastName(item, bedRequest);
         SetPhone(item, bedRequest);
@@ -105,9 +105,9 @@ public class ImportBedRequestsGC
         bedRequest.CreateUser = "Import";
         bedRequest.UpdateUser = "Import";
         bedRequest.MachineName = Environment.MachineName;
-        _defaultCreateDate = bedRequest.CreateDate.Value; 
+        _defaultCreateDate = bedRequest.CreateDate.Value;
         bedRequest.Group = item["OrgDeliver"];
-
+        bedRequest.BedType = Defaults.DefaultBedType;
         if (string.IsNullOrWhiteSpace(bedRequest.Group))
         {
             bedRequest.Group = "GC";
@@ -127,6 +127,7 @@ public class ImportBedRequestsGC
         bedRequest.GenderAge = item["Gender/Age"];
         bedRequest.DeliveryDate = ParseDeliveryDate(item["DeliveryDate"]);
         bedRequest.Reference = item["Reference"];
+
         SetPrimaryLanguage(item, bedRequest);
         SetLatLong(bedRequest);
         SetTeam(item, bedRequest);
@@ -144,7 +145,7 @@ public class ImportBedRequestsGC
         }
         else if (string.IsNullOrWhiteSpace(bedRequest.Reference))
         {
-            bedRequest.Reference = "Website";
+            bedRequest.Reference = "GC Website";
         }
 
         if (bedRequest.DeliveryDate.HasValue)
@@ -154,6 +155,22 @@ public class ImportBedRequestsGC
         else
         {
             bedRequest.UpdateDate = bedRequest.CreateDate.Value;
+        }
+
+        string[] calledWords = new[]
+        {
+            "lm", "left m", "called", "vm", "voicemail", "talked",
+            "contacted", "spoke", "scheduled",
+            "delivered", "delivery",
+            "/", "will call", "call after", "call back",
+            "voice mail"
+        };
+
+        if (bedRequest.Status == BedRequestStatus.Delivered
+            || bedRequest.Status == BedRequestStatus.Scheduled
+            || calledWords.Any(o => bedRequest.Notes.ToLower().Contains(o)))
+        {
+            bedRequest.Contacted = true;
         }
 
         List<string> errors = Validation.ValidateWithDataAnnotations(bedRequest);

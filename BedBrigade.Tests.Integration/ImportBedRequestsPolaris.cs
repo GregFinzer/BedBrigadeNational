@@ -96,13 +96,14 @@ namespace BedBrigade.Tests.Integration
                 }
 
                 SetGenderAge(request, current);
+                SetNames(request, current);
                 SetAddress(request, current);
                 SetLatLong(current);
                 current.Email = request.Email;
                 current.PrimaryLanguage = request.PrimaryLanguage;
                 current.SpeakEnglish = request.SpeaksEnglish;
                 current.Team = request.TeamLead1;
-                current.BedType = request.BedType;
+                AddBedType(current, request.BedType);
                 current.NumberOfBeds++;
 
                 current.CreateUser = "Import";
@@ -119,8 +120,23 @@ namespace BedBrigade.Tests.Integration
                 }
             }
 
+            results.Add(current);
+
             return results;
         }
+
+        private void SetNames(PolarisBedRequest request, BedRequest current)
+        {
+            if (request.BedForAdultOrChild == "Adult")
+            {
+                AddName(current, request.AdultName);
+            }
+            else
+            {
+                AddName(current, request.ChildName);
+            }
+        }
+
 
         private void SetLatLong(BedRequest bedRequest)
         {
@@ -207,7 +223,6 @@ namespace BedBrigade.Tests.Integration
             if (request.BedForAdultOrChild == "Adult")
             {
                 ageLetter = "A";
-
                 genderLetter = request.AdultGender == "Male" ? "M" : "F";
             }
             else
@@ -367,6 +382,35 @@ namespace BedBrigade.Tests.Integration
             else if (!current.Notes.Contains(note))
             {
                 current.Notes += " " + note;
+            }
+        }
+
+        private void AddBedType(BedRequest current, string bedType)
+        {
+            if (string.IsNullOrWhiteSpace(bedType))
+                return;
+            if (string.IsNullOrEmpty(current.BedType))
+            {
+                current.BedType = bedType;
+            }
+            else if (!current.BedType.Contains(bedType))
+            {
+                current.BedType += ", " + bedType;
+            }
+        }
+
+        private void AddName(BedRequest current, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+
+            if (string.IsNullOrEmpty(current.Names))
+            {
+                current.Names = name;
+            }
+            else if (!current.Names.Contains(name))
+            {
+                current.Names += ", " + name;
             }
         }
 
