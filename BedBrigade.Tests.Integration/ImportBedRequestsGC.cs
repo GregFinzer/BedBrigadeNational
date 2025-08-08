@@ -28,7 +28,7 @@ public class ImportBedRequestsGC
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
 
-    [Test]
+    [Test, Ignore("Only run locally manually")]
     public async Task ImportBedRequestsFromGC()
     {
         if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
