@@ -18,6 +18,9 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
+    private const string ImportFilePath = @"C:\Users\gfinz\Downloads\Bed Requests - Bed Requests.csv";
+    private const string ConnectionString =
+        "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
     private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
     private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
@@ -33,14 +36,13 @@ public class ImportBedRequestsGC
             Assert.Ignore("This test should only run locally.");
         }
 
-        const string connectionString =
-            "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-        var context = CreateDbContext(connectionString);
+
+        var context = CreateDbContext(ConnectionString);
         await DeleteExistingBedRequestsForLocation(context, Defaults.GroveCityLocationId);
-        string importFilePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed Requests - Bed Requests.csv";
+       
         CsvReader csvReader = new CsvReader();
 
-        var items = csvReader.CsvFileToDictionary(importFilePath);
+        var items = csvReader.CsvFileToDictionary(ImportFilePath);
         List<BedRequest> destItems = new List<BedRequest>();
         for (int i = 0; i < items.Count; i++)
         {

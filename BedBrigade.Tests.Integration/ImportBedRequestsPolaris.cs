@@ -20,6 +20,9 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportBedRequestsPolaris
     {
+        private const string FilePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1754656392.xlsx";
+        private const string ConnectionString =
+            "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
         private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
 
@@ -52,9 +55,8 @@ namespace BedBrigade.Tests.Integration
 
             List<PolarisBedRequest> polarisBedRequests = ExcelToPolarisBedRequests();
 
-            const string connectionString =
-                "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-            DataContext context = CreateDbContext(connectionString);
+
+            DataContext context = CreateDbContext(ConnectionString);
 
             List<BedRequest> existing = await context.BedRequests.ToListAsync();
             List<BedRequest> newPolaris = CombinePolaris(polarisBedRequests);
@@ -273,6 +275,8 @@ namespace BedBrigade.Tests.Integration
             deliveryAddress = StringUtil.TakeOffEnd(deliveryAddress, ", USA A");
             deliveryAddress = deliveryAddress.Replace(", USA", string.Empty);
             deliveryAddress = deliveryAddress.Replace(", MS, USA", string.Empty);
+            deliveryAddress = deliveryAddress.Replace(", États-Unis", string.Empty);
+            deliveryAddress = deliveryAddress.Replace("4681 Ohio River Circle South. Columbus Ohio 43228. Apt 106", "4681 Ohio River Circle South Apt 106, Columbus, Ohio 43228");
             string aptNumber = aptRegex.Match(deliveryAddress).Value.Trim();
 
             if (!string.IsNullOrWhiteSpace(aptNumber))
@@ -380,6 +384,29 @@ namespace BedBrigade.Tests.Integration
 
         private void SetFirstNameLastName(PolarisBedRequest request, BedRequest current)
         {
+            string[] splitWords = new[] { "-", "(", ",", " or "};
+            request.RequestersName = request.RequestersName.Replace(")", "").Trim();
+
+            foreach (string splitWord in splitWords)
+            {
+                if (request.RequestersName.Contains(splitWord))
+                {
+                    string[] parts = request.RequestersName.Split(splitWord);
+                    request.RequestersName =parts[0].Trim();
+
+                    if (parts.Length > 1)
+                    {
+                        AddNote(current,  "Additional Name: " + String.Join(", ", parts.Skip(1).Select(p => p.Trim())));
+                    }
+                }
+            }
+
+            if (request.RequestersName.ToLower().Contains("red de vida unlimited"))
+            {
+                request.RequestersName = request.RequestersName.Replace("Red de Vida Unlimited", string.Empty,StringComparison.OrdinalIgnoreCase).Trim();
+                AddNote(current, "Red de Vida Unlimited");
+            }
+
             var nameParts = _nameParserLogic.ParseName(request.RequestersName, NameOrder.FirstLast);
             current.FirstName = nameParts.FirstName;
             current.LastName = nameParts.LastName;
@@ -534,8 +561,8 @@ namespace BedBrigade.Tests.Integration
             ExcelEngine excelEngine = new ExcelEngine();
             IApplication application = excelEngine.Excel;
             application.DefaultVersion = ExcelVersion.Xlsx;
-            string filePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed_Requests_1754480988.xlsx";
-            IWorkbook workbook = application.Workbooks.Open(filePath);
+           
+            IWorkbook workbook = application.Workbooks.Open(FilePath);
             IWorksheet sheet = workbook.Worksheets.First();
             IRange usedRange = sheet.UsedRange;
             int lastRow = usedRange.LastRow;
