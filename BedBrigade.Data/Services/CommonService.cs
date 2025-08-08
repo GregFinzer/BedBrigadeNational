@@ -97,8 +97,11 @@ namespace BedBrigade.Data.Services
 
             using (var ctx = _contextFactory.CreateDbContext())
             {
+                string phoneWithNumbersOnly = StringUtil.ExtractDigits(phone);
+                string formattedPhone = phoneWithNumbersOnly.FormatPhoneNumber();
+
                 var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.FirstOrDefaultAsync(b => b.Phone == phone);
+                var result = await dbSet.FirstOrDefaultAsync(b => b.Phone == formattedPhone || b.Phone == phoneWithNumbersOnly);
 
                 if (result == null)
                     return new ServiceResponse<TEntity>($"No {repository.GetEntityName()} record found with phone {phone}", false);
