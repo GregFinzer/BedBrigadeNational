@@ -143,6 +143,7 @@ MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
 ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
+MaxLengthBedType100: Bed Type has a maximum length of 100 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
@@ -151,6 +152,7 @@ MaxLengthGenderAge255: Gender/Age has a maximum length of 255 characters
 MaxLengthGroup50: Group has a maximum length of 50 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
+MaxLengthNames255: Names has a maximum length of 255 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
