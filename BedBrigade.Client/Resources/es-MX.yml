@@ -239,6 +239,7 @@ RequiredLocationId: Se requiere el ID de ubicación
 RequiredLocations: Se requieren ubicaciones
 RequiredMessage: El mensaje es obligatorio
 RequiredName: El nombre es obligatorio
+RequiredNames: Se requieren nombres
 RequiredNumberOfBeds: El número de camas solicitadas es obligatorio y debe ser > 0
 RequiredNumberOfVolunteers: Se requiere el número de voluntarios
 RequiredPageName: El nombre de la página es obligatorio

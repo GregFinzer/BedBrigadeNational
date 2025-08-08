@@ -237,6 +237,7 @@ RequiredLocationId: Location Id is required
 RequiredLocations: Locations is required
 RequiredMessage: Message is required
 RequiredName: Name is required
+RequiredNames: Names are required
 RequiredNumberOfBeds: The number of ordered beds is required and must be > 0
 RequiredNumberOfVolunteers: The number of volunteers is required
 RequiredPageName: Page Name is required

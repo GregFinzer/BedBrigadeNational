@@ -69,6 +69,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(100, ErrorMessage = "Bed Type has a maximum length of 100 characters")]
         public string? BedType { get; set; }
 
+        [Required(ErrorMessage = "Names are required")]
         [MaxLength(255, ErrorMessage = "Names has a maximum length of 255 characters")]
         public string? Names { get; set; }
     }
