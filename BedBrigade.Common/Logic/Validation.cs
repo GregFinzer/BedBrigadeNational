@@ -4,7 +4,7 @@ namespace BedBrigade.Common.Logic
 {
     public static class Validation
     {
-        public const string PhoneRegexPattern = "\\(?\\d{3}\\)?\\s?-?\\d{3}-?\\d{4}";
+        public const string PhoneRegexPattern = "\\(?[2-9]\\d{2}\\)?\\s?-?\\d{3}-?\\d{4}";
         public const string EmailRegexPattern =
             "^(\\D)+(\\w)*((\\.(\\w)+)?)+@(\\D)+(\\w)*((\\.(\\D)+(\\w)*)+)?(\\.)[a-z]{2,}$";
 

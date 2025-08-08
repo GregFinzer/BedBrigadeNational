@@ -23,6 +23,7 @@
         public const string DefaultTimeZoneId = "Eastern Standard Time";
         public const string DefaultDonationCampaignName = "General";
 
+        public const string DefaultBedType = "Single Bed";
         //The reason why I have chosen 12 is because each row is four bootstrap columns 
         public const int MaxTopBlogItems = 12;
         public const int TruncationLength = 188;

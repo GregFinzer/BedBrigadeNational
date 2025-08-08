@@ -56,7 +56,7 @@ namespace BedBrigade.Tests
                     PostalCode = "43215",
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 2,
-                    AgesGender = "G/5 B/7",
+                    GenderAge = "G/5 B/7",
                     Team = "1",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
@@ -70,7 +70,7 @@ namespace BedBrigade.Tests
                     PostalCode = "43215",
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 3,
-                    AgesGender = "Self G/5 B/7",
+                    GenderAge = "Self G/5 B/7",
                     Team = "1",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
@@ -84,7 +84,7 @@ namespace BedBrigade.Tests
                     PostalCode = "43215",
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 2,
-                    AgesGender = "G/5 B/7",
+                    GenderAge = "G/5 B/7",
                     Team = "2",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday
@@ -98,7 +98,7 @@ namespace BedBrigade.Tests
                     PostalCode = "43215",
                     CreateDate = DateTime.Today,
                     NumberOfBeds = 3,
-                    AgesGender = "Self G/5 B/7",
+                    GenderAge = "Self G/5 B/7",
                     Team = "2",
                     Notes = $"No Bed Bugs. Delivery scheduled for Saturday {nextSaturday.ToShortDateString()} at 10am",
                     DeliveryDate = nextSaturday

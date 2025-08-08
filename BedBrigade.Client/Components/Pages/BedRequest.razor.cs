@@ -7,7 +7,6 @@ using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using Serilog;
 using Syncfusion.Blazor.DropDowns;
@@ -372,6 +371,9 @@ namespace BedBrigade.Client.Components.Pages
                 newRequest.NumberOfBeds = NumericValue;
                 newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
                 newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
+                newRequest.Contacted = false;
+                newRequest.BedType = Defaults.DefaultBedType;
+
                 if (newRequest.PrimaryLanguage == "English")
                 {
                     newRequest.SpeakEnglish = "Yes";
@@ -442,11 +444,8 @@ namespace BedBrigade.Client.Components.Pages
         {
             try
             {
-                //Set it to the primary city name
-                newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
-                newRequest.Reference = "Website";
-                Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
-                ObjectUtil.CopyProperties(newRequest, bedRequest);
+                Common.Models.BedRequest? bedRequest = await BuildBedRequest();
+
                 var addResult = await _svcBedRequest.CreateAsync(bedRequest);
                 if (addResult.Success && addResult.Data != null)
                 {
@@ -483,6 +482,28 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return null;
+        }
+
+        private async Task<Common.Models.BedRequest> BuildBedRequest()
+        {
+            //Set it to the primary city name
+            newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
+            newRequest.Reference = "Website";
+            Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
+            ObjectUtil.CopyProperties(newRequest, bedRequest);
+            string defaultNote = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings,
+                ConfigNames.BedRequestNote, bedRequest.LocationId);
+
+            if (String.IsNullOrWhiteSpace(newRequest.SpecialInstructions))
+            {
+                bedRequest.Notes = defaultNote;
+            }
+            else
+            {
+                bedRequest.Notes = defaultNote + " " + newRequest.SpecialInstructions;
+            }
+
+            return bedRequest;
         }
 
         #endregion

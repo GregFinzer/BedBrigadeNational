@@ -2,7 +2,6 @@
 Active: Active
 Add: Add
 Address: Address
-AgesGender: Ages / Gender
 AmountColon: 'Amount:'
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 Back: Back
@@ -108,6 +107,7 @@ EventNote: Event Note
 EventStatus: Event Status
 EventTime: Event Time
 EventType: Event Type
+Example: Example
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FilteredTotalColon: 'Filtered Total:'
 FindABedBrigade: Find a Bed Brigade
@@ -116,6 +116,7 @@ FirstName: First Name
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
+GenderAge: Gender / Age
 Gross: Gross
 Group: Group
 GroupName: Group Name
@@ -142,14 +143,16 @@ MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
 ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
-MaxLengthAgesGender255: Ages/Gender has a maximum length of 255 characters
+MaxLengthBedType100: Bed Type has a maximum length of 100 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
+MaxLengthGenderAge255: Gender/Age has a maximum length of 255 characters
 MaxLengthGroup50: Group has a maximum length of 50 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
+MaxLengthNames255: Names has a maximum length of 255 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
@@ -166,6 +169,7 @@ MilesAway: miles away
 MonthlyDonationOf: Monthly Donation of
 Name: Name
 NameColon: 'Name:'
+Names: Names
 NationalPathColon: 'National Path:'
 NewPassword: New Password
 Newsletter: Newsletter
@@ -214,7 +218,7 @@ RegularExpressionEmail: Invalid email format
 RegularExpressionPhone: Invalid phone format
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
-RequiredAgesGender: Please indicate the age and gender of children
+RequiredGenderAge: Please indicate the genders and ages of the children
 RequiredAmount: Amount is required
 RequiredBody: Body is required.
 RequiredCampaignName: Campaign Name is required
@@ -235,6 +239,7 @@ RequiredLocationId: Location Id is required
 RequiredLocations: Locations is required
 RequiredMessage: Message is required
 RequiredName: Name is required
+RequiredNames: Names are required
 RequiredNumberOfBeds: The number of ordered beds is required and must be > 0
 RequiredNumberOfVolunteers: The number of volunteers is required
 RequiredPageName: Page Name is required

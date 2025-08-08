@@ -18,26 +18,33 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
+    private const string ImportFilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed Requests - Bed Requests.csv";
+    private const string ConnectionString =
+        "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
     private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
-    private readonly Regex _phoneRegex = new Regex(@"\d{3}-\d{3}-\d{4}", RegexOptions.Compiled);
+    private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
     private readonly Regex _teamRegex = new Regex(@"(team\s)(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
 
-    [Test, Ignore("Only run manually")]
+    [Test, Ignore("Only run locally manually")]
     public async Task ImportBedRequestsFromGC()
     {
-        const string connectionString =
-            "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-        var context = CreateDbContext(connectionString);
+        if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
+        {
+            Assert.Ignore("This test should only run locally.");
+        }
+
+
+        var context = CreateDbContext(ConnectionString);
         await DeleteExistingBedRequestsForLocation(context, Defaults.GroveCityLocationId);
-        string importFilePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed Requests - Bed Requests.csv";
+       
         CsvReader csvReader = new CsvReader();
 
-        var items = csvReader.CsvFileToDictionary(importFilePath);
+        var items = csvReader.CsvFileToDictionary(ImportFilePath);
         List<BedRequest> destItems = new List<BedRequest>();
-        for (int i=0;i < items.Count; i++)
+        for (int i = 0; i < items.Count; i++)
         {
             var item = items[i];
             try
@@ -74,7 +81,7 @@ public class ImportBedRequestsGC
                                                              && o.LastName == bedRequest.LastName
                                                              && o.Status == BedRequestStatus.Waiting
                                                              && !keywordsToIgnore.Any(k => (o.Reference ?? string.Empty).ToLower().Contains(k))
-                                                             && !keywordsToIgnore.Any(k => (o.Notes ?? string.Empty) .ToLower().Contains(k))
+                                                             && !keywordsToIgnore.Any(k => (o.Notes ?? string.Empty).ToLower().Contains(k))
                                                              );
         if (existing != null)
         {
@@ -90,7 +97,7 @@ public class ImportBedRequestsGC
 
     private void FillBedRequest(BedRequest bedRequest, Dictionary<string, string> item)
     {
-        bedRequest.LocationId = Defaults.GroveCityLocationId;
+
         bedRequest.Notes = string.Empty;
         SetFirstNameLastName(item, bedRequest);
         SetPhone(item, bedRequest);
@@ -100,19 +107,29 @@ public class ImportBedRequestsGC
         bedRequest.CreateUser = "Import";
         bedRequest.UpdateUser = "Import";
         bedRequest.MachineName = Environment.MachineName;
-        _defaultCreateDate = bedRequest.CreateDate.Value; 
+        _defaultCreateDate = bedRequest.CreateDate.Value;
         bedRequest.Group = item["OrgDeliver"];
-
+        bedRequest.BedType = Defaults.DefaultBedType;
         if (string.IsNullOrWhiteSpace(bedRequest.Group))
         {
             bedRequest.Group = "GC";
         }
 
+        if (bedRequest.Group.ToLower() == "polaris")
+        {
+            bedRequest.LocationId = Defaults.PolarisLocationId;
+        }
+        else
+        {
+            bedRequest.LocationId = Defaults.GroveCityLocationId;
+        }
+
         bedRequest.NumberOfBeds = int.TryParse(item["#BedsRequested"], out int beds) ? beds : 1;
         bedRequest.Status = Enum.Parse<BedRequestStatus>(item["Status"], true);
-        bedRequest.AgesGender = item["Gender/Age"];
+        bedRequest.GenderAge = item["Gender/Age"];
         bedRequest.DeliveryDate = ParseDeliveryDate(item["DeliveryDate"]);
         bedRequest.Reference = item["Reference"];
+
         SetPrimaryLanguage(item, bedRequest);
         SetLatLong(bedRequest);
         SetTeam(item, bedRequest);
@@ -128,9 +145,9 @@ public class ImportBedRequestsGC
         {
             bedRequest.Reference = "Pick Up";
         }
-        else if (string.IsNullOrWhiteSpace(bedRequest.Reference))
+        else if (string.IsNullOrWhiteSpace(bedRequest.Reference) || bedRequest.Reference == "Website")
         {
-            bedRequest.Reference = "Website";
+            bedRequest.Reference = "GC Website";
         }
 
         if (bedRequest.DeliveryDate.HasValue)
@@ -140,6 +157,22 @@ public class ImportBedRequestsGC
         else
         {
             bedRequest.UpdateDate = bedRequest.CreateDate.Value;
+        }
+
+        string[] calledWords = new[]
+        {
+            "lm", "left m", "called", "vm", "voicemail", "talked",
+            "contacted", "spoke", "scheduled",
+            "delivered", "delivery",
+            "/", "will call", "call after", "call back",
+            "voice mail"
+        };
+
+        if (bedRequest.Status == BedRequestStatus.Delivered
+            || bedRequest.Status == BedRequestStatus.Scheduled
+            || calledWords.Any(o => bedRequest.Notes.ToLower().Contains(o)))
+        {
+            bedRequest.Contacted = true;
         }
 
         List<string> errors = Validation.ValidateWithDataAnnotations(bedRequest);
@@ -364,7 +397,7 @@ public class ImportBedRequestsGC
         }
 
         //If there are multiple matches, use the first one
-        bedRequest.Phone = phoneMatches[0].Value;
+        bedRequest.Phone = phoneMatches[0].Value.FormatPhoneNumber();
 
         if (phoneMatches.Count > 1)
         {
@@ -374,7 +407,7 @@ public class ImportBedRequestsGC
             }
 
             bedRequest.Notes += "Other Phone Numbers: ";
-            bedRequest.Notes += string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value));
+            bedRequest.Notes += string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value.FormatPhoneNumber()));
         }
     }
 

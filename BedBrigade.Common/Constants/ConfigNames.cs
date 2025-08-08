@@ -75,5 +75,8 @@
         public const string StripeDonationAmounts = "StripeDonationAmounts";
         public const string StripeSubscriptionAmounts = "StripeSubscriptionAmounts";
         public const string StripeWebhookSecret = "StripeWebhookSecret";
+
+        //Custom Strings
+        public const string BedRequestNote = "BedRequestNote";
     }
 }

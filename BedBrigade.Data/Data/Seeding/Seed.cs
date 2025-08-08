@@ -937,7 +937,8 @@ public static class Seed
                         Status = (BedRequestStatus)new Random().Next(1, 4),
                         Team = (new Random().Next(1, 5)).ToString(),
                         DeliveryDate = DateTime.UtcNow.AddDays(new Random().Next(10)),
-                        Notes = string.Empty
+                        Notes = string.Empty,
+                        BedType = Defaults.DefaultBedType
                     };
 
                     SeedRoutines.SetMaintFields(bedRequest);

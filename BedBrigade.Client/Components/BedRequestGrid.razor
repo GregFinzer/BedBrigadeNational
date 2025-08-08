@@ -194,15 +194,18 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group ">
-                                                    <label for="ages" class="formlabel required">@_lc.Keys["AgesGender"]</label>
-                                                    <SfTextBox ID="ages" @bind-Value="BedRequest.AgesGender"></SfTextBox>
+                                                    <label for="ages" class="formlabel required">@_lc.Keys["GenderAge"]</label>
+                                                    <SfTextBox ID="ages" @bind-Value="BedRequest.GenderAge"></SfTextBox>
                                                     <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.AgesGender)"></ValidationMessage>
+                                                        <ValidationMessage For="@(() => BedRequest.GenderAge)"></ValidationMessage>
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="inst" class="formlabel">@_lc.Keys["SpecialInstructions"]</label>
-                                                    <SfTextBox ID="inst" @bind-Value="BedRequest.SpecialInstructions" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
+                                                <div class="form-group ">
+                                                    <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
+                                                    <SfTextBox ID="names" CssClass="custom-textbox-height" @bind-Value="BedRequest.Names" Multiline="true"></SfTextBox>
+                                                    <div style="font-size: smaller">
+                                                        <ValidationMessage For="@(() => BedRequest.Names)"></ValidationMessage>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -276,15 +279,17 @@ else
                         <GridColumn Field=@nameof(BedRequest.Group) Width="100" ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.NumberOfBeds) Width="100" ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.StatusString) Width="100" ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
-                        <GridColumn Field=@nameof(BedRequest.AgesGender) Width="225" ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(BedRequest.ContactedYes) Width="110" ShowColumnMenu="false" HeaderText="Contacted" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(BedRequest.GenderAge) Width="225" ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.DeliveryDate) Width="125" Format="d" ShowColumnMenu="false" HeaderText="Delivered" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.Reference) Width="125" ShowColumnMenu="false" HeaderText="Reference" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.Notes) Width="425" ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
-                        <GridColumn Field=@nameof(BedRequest.SpecialInstructions) Width="289" ShowColumnMenu="false" HeaderText="Special Instructions" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.Team) Width="100" ShowColumnMenu="false" HeaderText="Team" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
-                        <GridColumn Field=@nameof(BedRequest.UpdateDateLocal) Width="150" Format="g" ShowColumnMenu="false" HeaderText="Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(BedRequest.BedType) Width="100" ShowColumnMenu="false" HeaderText="Bed Type" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
+                        <GridColumn Field=@nameof(BedRequest.Names) Width="200" ShowColumnMenu="false" HeaderText="Names" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) Width="150" ShowColumnMenu="false" HeaderText="Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.SpeakEnglish) Width="200" ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(BedRequest.UpdateDateLocal) Width="150" Format="g" ShowColumnMenu="false" HeaderText="Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
                         <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Number" AllowEditing="false" AllowFiltering="false" />
                     </GridColumns>
                 </SfGrid>

@@ -2,7 +2,7 @@
 Active: Activo
 Add: Agregar
 Address: Dirección
-AgesGender: Edades / Género
+GenderAge: Género / Edad
 AmountColon: 'Importe:'
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
@@ -108,6 +108,7 @@ EventNote: Nota del evento
 EventStatus: Estado del evento
 EventTime: Hora del evento
 EventType: Tipo de evento
+Example: Ejemplo
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FilteredTotalColon: 'Total Filtrado:'
 FindABedBrigade: Encuentra una brigada de camas
@@ -142,14 +143,16 @@ MailingPostalCode: Código Postal
 MailingState: Estado de envío
 ManageConfiguration: Administrar la Configuración
 ManageDonations: Administrar Donaciones
-MaxLengthAgesGender255: Edades/Sexo tiene una longitud máxima de 255 caracteres
+MaxLengthBedType100: El tipo de cama tiene una longitud máxima de 100 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
 MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
 MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
+MaxLengthGenderAge255: Sexo/Edad tiene una longitud máxima de 255 caracteres
 MaxLengthGroup50: El grupo tiene una longitud máxima de 50 caracteres
 MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
+MaxLengthNames255: Los nombres tienen una longitud máxima de 255 caracteres
 MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
 MaxLengthOrganizationOrGroup80: El grupo tiene una longitud máxima de 20
 MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
@@ -166,6 +169,7 @@ MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 NameColon: 'Nombre:'
+Names: Nombres
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
 Newsletter: Boletín
@@ -216,7 +220,6 @@ RegularExpressionEmail: Formato de correo electrónico no válido
 RegularExpressionPhone: Formato de número de teléfono no válido
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
-RequiredAgesGender: Sírvase indicar la edad y el sexo de los niños
 RequiredAmount: La cantidad es requerida
 RequiredBody: Se requiere cuerpo.
 RequiredCampaignName: El nombre de la campaña es obligatorio
@@ -231,12 +234,14 @@ RequiredDonationCampaignId: Se requiere el ID de la campaña de donación
 RequiredEmail: Se requiere una dirección de correo electrónico
 RequiredFileUse: Se requiere el uso de archivos
 RequiredFirstName: El nombre de pila es obligatorio
+RequiredGenderAge: Sírvase indicar el sexo y la edad de los niños
 RequiredHash: Se requiere hash
 RequiredLastName: El apellido es obligatorio
 RequiredLocationId: Se requiere el ID de ubicación
 RequiredLocations: Se requieren ubicaciones
 RequiredMessage: El mensaje es obligatorio
 RequiredName: El nombre es obligatorio
+RequiredNames: Se requieren nombres
 RequiredNumberOfBeds: El número de camas solicitadas es obligatorio y debe ser > 0
 RequiredNumberOfVolunteers: Se requiere el número de voluntarios
 RequiredPageName: El nombre de la página es obligatorio

@@ -104,7 +104,7 @@ namespace BedBrigade.Data.Services
                 worksheet.Range[row, 4].Text = bedRequest.PostalCode;
                 worksheet.Range[row, 5].Text = bedRequest.CreateDate.Value.ToShortDateString();
                 worksheet.Range[row, 6].Text = bedRequest.NumberOfBeds.ToString();
-                worksheet.Range[row, 7].Text = bedRequest.AgesGender;
+                worksheet.Range[row, 7].Text = bedRequest.GenderAge;
                 worksheet.Range[row, 8].Text = bedRequest.Team;
                 worksheet.Range[row, 9].Text = bedRequest.Notes;
 
