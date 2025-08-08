@@ -200,6 +200,13 @@ else
                                                         <ValidationMessage For="@(() => BedRequest.GenderAge)"></ValidationMessage>
                                                     </div>
                                                 </div>
+                                                <div class="form-group ">
+                                                    <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
+                                                    <SfTextBox ID="names" CssClass="custom-textbox-height" @bind-Value="BedRequest.Names" Multiline="true"></SfTextBox>
+                                                    <div style="font-size: smaller">
+                                                        <ValidationMessage For="@(() => BedRequest.Names)"></ValidationMessage>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                         </div>

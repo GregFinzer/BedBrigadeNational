@@ -18,7 +18,7 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
-    private const string ImportFilePath = @"C:\Users\gfinz\Downloads\Bed Requests - Bed Requests.csv";
+    private const string ImportFilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed Requests - Bed Requests.csv";
     private const string ConnectionString =
         "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -145,7 +145,7 @@ public class ImportBedRequestsGC
         {
             bedRequest.Reference = "Pick Up";
         }
-        else if (string.IsNullOrWhiteSpace(bedRequest.Reference))
+        else if (string.IsNullOrWhiteSpace(bedRequest.Reference) || bedRequest.Reference == "Website")
         {
             bedRequest.Reference = "GC Website";
         }

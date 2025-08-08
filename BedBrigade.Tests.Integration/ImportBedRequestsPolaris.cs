@@ -20,7 +20,7 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportBedRequestsPolaris
     {
-        private const string FilePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1754656392.xlsx";
+        private const string FilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed_Requests_1754671557.xlsx";
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -65,6 +65,15 @@ namespace BedBrigade.Tests.Integration
 
         private async Task Reconcile(DataContext context, List<BedRequest> existing, List<BedRequest> polaris)
         {
+            string[] propertiesToIgnore = new[]
+            {
+                nameof(BedRequest.BedRequestId),
+                nameof(BedRequest.CreateDate),
+                nameof(BedRequest.UpdateDate),
+                nameof(BedRequest.CreateUser),
+                nameof(BedRequest.UpdateUser),
+                nameof(BedRequest.MachineName)
+            };
             List<BedRequest> toAdd = new List<BedRequest>();
             List<BedRequest> toUpdate = new List<BedRequest>();
             foreach (BedRequest bedRequest in polaris)
@@ -78,20 +87,27 @@ namespace BedBrigade.Tests.Integration
                                                                               );
                 if (existingBedRequest == null)
                 {
-                    toAdd.Add(bedRequest);
+
+                    BedRequest? waitingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
+                        && x.FirstName == bedRequest.FirstName
+                        && x.LastName == bedRequest.LastName
+                        && x.Status == BedRequestStatus.Waiting && bedRequest.Status == BedRequestStatus.Waiting
+                    );
+
+                    if (waitingBedRequest != null)
+                    {
+                        if (bedRequest.GenderAge == "G/")
+                            continue;
+                        ObjectUtil.CopyProperties(bedRequest, waitingBedRequest, propertiesToIgnore);
+                        toUpdate.Add(waitingBedRequest);
+                    }
+                    else
+                    {
+                        toAdd.Add(bedRequest);
+                    }
                 }
                 else
                 {
-                    string[] propertiesToIgnore = new[]
-                    {
-                        nameof(BedRequest.BedRequestId), 
-                        nameof(BedRequest.CreateDate), 
-                        nameof(BedRequest.UpdateDate),
-                        nameof(BedRequest.CreateUser), 
-                        nameof(BedRequest.UpdateUser), 
-                        nameof(BedRequest.MachineName)
-                    };
-
                     ObjectUtil.CopyProperties(bedRequest, existingBedRequest, propertiesToIgnore);
                     toUpdate.Add(existingBedRequest);
                 }
@@ -273,8 +289,9 @@ namespace BedBrigade.Tests.Integration
             string deliveryAddress = request.DeliveryAddress;
             deliveryAddress = deliveryAddress.Replace(", EE. UU.", string.Empty);
             deliveryAddress = StringUtil.TakeOffEnd(deliveryAddress, ", USA A");
-            deliveryAddress = deliveryAddress.Replace(", USA", string.Empty);
             deliveryAddress = deliveryAddress.Replace(", MS, USA", string.Empty);
+            deliveryAddress = deliveryAddress.Replace(", USA", string.Empty);
+            deliveryAddress = deliveryAddress.Replace(" USA", string.Empty);
             deliveryAddress = deliveryAddress.Replace(", États-Unis", string.Empty);
             deliveryAddress = deliveryAddress.Replace("4681 Ohio River Circle South. Columbus Ohio 43228. Apt 106", "4681 Ohio River Circle South Apt 106, Columbus, Ohio 43228");
             string aptNumber = aptRegex.Match(deliveryAddress).Value.Trim();
@@ -435,7 +452,7 @@ namespace BedBrigade.Tests.Integration
             else if (request.Name.ToLower().Contains("incoming") || request.Name.ToLower().Contains("new"))
                 current.Reference = "Polaris Website";
             else if (request.Name.ToLower().Contains("grove") || request.Name.ToLower().Contains("gc"))
-                current.Reference = "Grove City Website";
+                current.Reference = "GC Website";
             else if (request.Name.ToLower().Contains("phone"))
                 current.Reference = "Phone Call";
             else if (request.Name.ToLower().Contains("email"))
