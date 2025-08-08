@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BedBrigade.Common.Enums;
 using KellermanSoftware.AddressParser;
 
 namespace BedBrigade.Tests.Integration
@@ -24,6 +25,9 @@ namespace BedBrigade.Tests.Integration
 
         private Regex aptRegex =
             new Regex(@"(APT|apt)\s[#0-9A-Za-z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
+        private readonly Regex _zipRegex = new Regex(@"\d{5}", RegexOptions.Compiled);
 
         private string[] groups = new[]
         {
@@ -53,8 +57,52 @@ namespace BedBrigade.Tests.Integration
             DataContext context = CreateDbContext(connectionString);
 
             List<BedRequest> existing = await context.BedRequests.ToListAsync();
-
             List<BedRequest> newPolaris = CombinePolaris(polarisBedRequests);
+            await Reconcile(context, existing, newPolaris);
+        }
+
+        private async Task Reconcile(DataContext context, List<BedRequest> existing, List<BedRequest> polaris)
+        {
+            List<BedRequest> toAdd = new List<BedRequest>();
+            List<BedRequest> toUpdate = new List<BedRequest>();
+            foreach (BedRequest bedRequest in polaris)
+            {
+                BedRequest? existingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
+                                                                              && x.FirstName == bedRequest.FirstName
+                                                                              && x.LastName == bedRequest.LastName
+                                                                              && x.Status == BedRequestStatus.Waiting 
+                                                                                      && (bedRequest.Status == BedRequestStatus.Scheduled 
+                                                                                  || bedRequest.Status == BedRequestStatus.Delivered)
+                                                                              );
+                if (existingBedRequest == null)
+                {
+                    toAdd.Add(bedRequest);
+                }
+                else
+                {
+                    string[] propertiesToIgnore = new[]
+                    {
+                        nameof(BedRequest.BedRequestId), 
+                        nameof(BedRequest.CreateDate), 
+                        nameof(BedRequest.UpdateDate),
+                        nameof(BedRequest.CreateUser), 
+                        nameof(BedRequest.UpdateUser), 
+                        nameof(BedRequest.MachineName)
+                    };
+
+                    ObjectUtil.CopyProperties(bedRequest, existingBedRequest, propertiesToIgnore);
+                    toUpdate.Add(existingBedRequest);
+                }
+            }
+            if (toAdd.Count > 0)
+            {
+                context.BedRequests.AddRange(toAdd);
+            }
+            if (toUpdate.Count > 0)
+            {
+                context.BedRequests.UpdateRange(toUpdate);
+            }
+            await context.SaveChangesAsync();
         }
 
         private List<BedRequest> CombinePolaris(List<PolarisBedRequest> polarisBedRequests)
@@ -69,7 +117,7 @@ namespace BedBrigade.Tests.Integration
                 if (request.Group == "Out of town")
                     continue;
 
-                string phone = request.PhoneNumber?.FormatPhoneNumber() ?? string.Empty;
+                string phone = GetFirstPhone(request.PhoneNumber);
 
                 if (!String.IsNullOrEmpty(current.Phone) && current.Phone != phone)
                 {
@@ -77,7 +125,7 @@ namespace BedBrigade.Tests.Integration
                     current = new BedRequest();
                 }
 
-                current.Phone = phone;
+                SetPhone(current, request.PhoneNumber);
                 current.LocationId = Defaults.PolarisLocationId;
                 current.Group = "Polaris";
 
@@ -123,6 +171,58 @@ namespace BedBrigade.Tests.Integration
             results.Add(current);
 
             return results;
+        }
+
+        private void SetPhone(BedRequest bedRequest, string phoneInput)
+        {
+            if (string.IsNullOrWhiteSpace(phoneInput))
+            {
+                bedRequest.Phone = string.Empty;
+                return;
+            }
+
+            //Get phone matches
+            MatchCollection phoneMatches = _phoneRegex.Matches(phoneInput);
+
+            if (phoneMatches.Count == 0)
+            {
+                bedRequest.Phone = string.Empty;
+                return;
+            }
+
+            //If there are multiple matches, use the first one
+            bedRequest.Phone = phoneMatches[0].Value.FormatPhoneNumber();
+
+            if (phoneMatches.Count > 1)
+            {
+                //We already added the other phone numbers to the notes
+                if (bedRequest.Notes.Contains(phoneMatches[1].Value.FormatPhoneNumber()))
+                {
+                    return;
+                }
+
+                if (bedRequest.Notes.Length > 0)
+                {
+                    bedRequest.Notes += " ";
+                }
+
+                bedRequest.Notes += "Other Phone Numbers: ";
+                bedRequest.Notes += string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value.FormatPhoneNumber()));
+            }
+        }
+
+        private string GetFirstPhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+            {
+                return string.Empty;
+            }
+            Match match = _phoneRegex.Match(phone);
+            if (match.Success)
+            {
+                return match.Value.FormatPhoneNumber();
+            }
+            return string.Empty;
         }
 
         private void SetNames(PolarisBedRequest request, BedRequest current)
@@ -205,7 +305,12 @@ namespace BedBrigade.Tests.Integration
                 }
                 current.City = addressResult.City;
                 current.State = addressResult.Region;
-                current.PostalCode = addressResult.PostalCode;
+                current.PostalCode = _zipRegex.Match(addressResult.PostalCode ?? string.Empty).Value ?? string.Empty;
+
+                if (!String.IsNullOrEmpty(current.PostalCode) && current.PostalCode.Length > 5)
+                {
+                    throw new FormatException("Postal code too long: " + current.PostalCode);
+                }
 
                 if (!string.IsNullOrWhiteSpace(aptNumber))
                 {

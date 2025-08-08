@@ -20,7 +20,7 @@ public class ImportBedRequestsGC
 {
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
     private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
-    private readonly Regex _phoneRegex = new Regex(@"\d{3}-\d{3}-\d{4}", RegexOptions.Compiled);
+    private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
     private readonly Regex _teamRegex = new Regex(@"(team\s)(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
@@ -395,7 +395,7 @@ public class ImportBedRequestsGC
         }
 
         //If there are multiple matches, use the first one
-        bedRequest.Phone = phoneMatches[0].Value;
+        bedRequest.Phone = phoneMatches[0].Value.FormatPhoneNumber();
 
         if (phoneMatches.Count > 1)
         {
@@ -405,7 +405,7 @@ public class ImportBedRequestsGC
             }
 
             bedRequest.Notes += "Other Phone Numbers: ";
-            bedRequest.Notes += string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value));
+            bedRequest.Notes += string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value.FormatPhoneNumber()));
         }
     }
 
