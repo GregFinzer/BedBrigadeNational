@@ -1,3 +1,4 @@
+using BedBrigade.Client.Services;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -29,6 +30,7 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
+        [Inject] private ILocationState _locationState { get; set; }
 
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
@@ -84,12 +86,24 @@ namespace BedBrigade.Client.Components.Pages
 
         #region Initialization
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
             newVolunteer = new Volunteer();
             EC = new EditContext(newVolunteer);
             _validationMessageStore = new ValidationMessageStore(EC);
+            await SetLocationState();
+        }
+
+        private async Task SetLocationState()
+        {
+            if (!string.IsNullOrEmpty(LocationRoute))
+            {
+                if (await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}") is { Success: true, Data: { } location })
+                {
+                    _locationState.Location = LocationRoute;
+                }
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
