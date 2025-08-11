@@ -69,9 +69,7 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         {
             var dbSet = ctx.Set<Volunteer>();
             var result = await dbSet.Where(o => o.LocationId == locationId
-                && (o.VehicleType == VehicleType.Minivan
-                    || o.VehicleType == VehicleType.SUV
-                    || o.VehicleType == VehicleType.Truck)).Select(b => b.Email).Distinct().ToListAsync();
+                && (o.VehicleType != VehicleType.None)).Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }
@@ -170,9 +168,7 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
             var dbSet = ctx.Set<Volunteer>();
             var result = await dbSet.Where(o => o.LocationId == locationId
                 && !String.IsNullOrEmpty(o.Phone)
-                && (o.VehicleType == VehicleType.Minivan
-                    || o.VehicleType == VehicleType.SUV
-                    || o.VehicleType == VehicleType.Truck)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                && (o.VehicleType != VehicleType.None)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
         }
