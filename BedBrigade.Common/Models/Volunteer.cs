@@ -20,14 +20,14 @@ namespace BedBrigade.Common.Models
         [MaxLength(20, ErrorMessage = "First Name has a maximum length of 20 characters")]
         public String FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last Name is required")]
-		public String LastName { get; set; } = string.Empty;
+        [MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
+        public String? LastName { get; set; } = string.Empty;
 
         [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
-		public String Email { get; set; } = string.Empty;
+		public String? Email { get; set; } = string.Empty;
 
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
-        public String Phone { get; set; } = string.Empty;
+        public String? Phone { get; set; } = string.Empty;
 
         [MaxLength(80, ErrorMessage = "Organization has a maximum length of 80 characters")]
 		public String? Organization { get; set; } = string.Empty;
@@ -60,6 +60,8 @@ namespace BedBrigade.Common.Models
 
         [MaxLength(100, ErrorMessage = "Vehicle Description has a maximum length of 100 characters")]
         public String? VehicleDescription { get; set; } = string.Empty;
+
+        public CanYouTranslate? CanYouTranslate { get; set; }
 
         [NotMapped]
         public string FullName {

@@ -1,4 +1,5 @@
 using BedBrigade.Client.Services;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -82,6 +83,7 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox phoneTextBox;
         private int _previousNumberOfVolunteers = 0;
         private VehicleType? _previousDeliveryVehicle;
+        private List<EnumNameValue<CanYouTranslate>> TranslationOptions { get; set; }
         #endregion
 
         #region Initialization
@@ -93,6 +95,7 @@ namespace BedBrigade.Client.Components.Pages
             EC = new EditContext(newVolunteer);
             _validationMessageStore = new ValidationMessageStore(EC);
             await SetLocationState();
+            TranslationOptions = EnumHelper.GetEnumNameValues<CanYouTranslate>();
         }
 
         private async Task SetLocationState()

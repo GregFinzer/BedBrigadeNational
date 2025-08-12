@@ -44,8 +44,8 @@ DeliveryVehicle: Delivery Vehicle
 DeliveryVehicleMinivan: I have a Minvan with seats removed or folded into the floor
 DeliveryVehicleNone: I do not have a delivery vehicle
 DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
-DeliveryVehicleLargeSuv: I have a large SUV (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
-DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
+DeliveryVehicleLargeSuv: I have a Large SUV (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
+DeliveryVehicleTruck: I have a Full Size Pickup Truck with tie down straps or a cap
 DonationAmount: Donation Amount
 DonationCancellation: Donation Cancellation
 DonationConfirmation: Donation Confirmation

@@ -121,8 +121,7 @@ namespace BedBrigade.Data
         private static void CreateVolunteerIndexes(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Volunteer>()
-                .HasIndex(e => e.Email)
-                .IsUnique();
+                .HasIndex(e => e.Email);
 
             modelBuilder.Entity<Volunteer>()
                 .HasIndex(e => e.LocationId);

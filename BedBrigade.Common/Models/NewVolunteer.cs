@@ -60,6 +60,8 @@ namespace BedBrigade.Common.Models
         [MaxLength(100, ErrorMessage = "Vehicle Description has a maximum length of 100 characters")]
         public String? VehicleDescription { get; set; } = string.Empty;
 
+        public CanYouTranslate? CanYouTranslate { get; set; }
+
         public string FullName
         {
             get

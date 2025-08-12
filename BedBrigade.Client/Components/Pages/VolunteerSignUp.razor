@@ -163,10 +163,6 @@
                                 <label for="numberOfVolunteers" class="formlabel">@_lc.Keys["NumberOfVolunteersIncludingYourself"]</label>
                                 <SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newVolunteer.NumberOfVolunteers"></SfNumericTextBox>
                             </div>
-                            <div class="form-group">
-                                <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
-                                <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -181,11 +177,22 @@
                                     <MultiSelectFieldSettings Text="Name" Value="Value"></MultiSelectFieldSettings>
                                 </SfMultiSelect>
                             </div>
+                            @if (SelectedLanguages != null && SelectedLanguages.Length > 0)
+                            {
+                                <div class="form-group">
+                                    <label for="translate" class="formlabel">Are you able to translate?</label>
+                                    <SfDropDownList ID="translate" TValue="CanYouTranslate" TItem="EnumNameValue<CanYouTranslate>" PopupHeight="350px" PopupWidth="350px" DataSource="TranslationOptions">
+                                        <DropDownListFieldSettings Value="Value" Text="Name"></DropDownListFieldSettings>
+                                    </SfDropDownList>
+                                </div>
+                            }
+                            else
+                            {
+                                newVolunteer.CanYouTranslate = null;
+                            }
+
                             <div class="form-group">
                                 <SfCheckBox Label="@_lc.Keys["DoYouAttendChurch"]" @bind-Checked="newVolunteer.AttendChurch"></SfCheckBox>
-                            </div>
-                            <div class="form-group">
-                                <SfCheckBox Label="@_lc.Keys["SubscribeToOurEmail"]" @bind-Checked="newVolunteer.SubscribedEmail"></SfCheckBox>
                             </div>
                             @if (newVolunteer.AttendChurch)
                             {
@@ -194,8 +201,20 @@
                                     <SfTextBox ID="churchName" @bind-Value="newVolunteer.ChurchName"></SfTextBox>
                                 </div>
                             }
+                            else
+                            {
+                                newVolunteer.ChurchName = string.Empty;
+                            }
+                            <div class="form-group">
+                                <SfCheckBox Label="@_lc.Keys["SubscribeToOurEmail"]" @bind-Checked="newVolunteer.SubscribedEmail"></SfCheckBox>
+                            </div>
+
                             <div class="form-group">
                                 <SfCheckBox Label="@_lc.Keys["SubscribeToOurText"]" @bind-Checked="newVolunteer.SubscribedSms"></SfCheckBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
+                                <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                             </div>
                         </div>
                     </div>
@@ -221,15 +240,15 @@
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a full size van that is empty without seats" Name="RadioBtn" Value="@VehicleType.FullSizeVan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="I have a Full-Size Van that is empty without seats" Name="RadioBtn" Value="@VehicleType.FullSizeVan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a small SUV (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)" Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="I have a Small SUV (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)" Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a medium SUV (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc." Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="I have a Medium SUV (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc." Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
@@ -251,6 +270,10 @@
                                         <label for="vehicleDescription" class="formlabel">Please describe your vehicle</label>
                                         <SfTextBox ID="vehicleDescription" @bind-Value="newVolunteer.VehicleDescription"></SfTextBox>
                                     </div>
+                                }
+                                else
+                                {
+                                    newVolunteer.VehicleDescription = string.Empty;
                                 }
                             </div>
                         </div>
