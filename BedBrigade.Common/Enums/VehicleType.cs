@@ -12,10 +12,12 @@ public enum VehicleType
     FullSizeVan = 2,
     [Description("I have a small SUV")]
     SmallSUV = 3,
+    [Description("I have a medium SUV")]
+    MediumSUV = 4,
     [Description("I have a large SUV")]
-    LargeSUV = 4,
+    LargeSUV = 5,
     [Description("I have a pickup truck")]
-    Truck = 5,
+    Truck = 6,
     [Description("I have other type of vehicle")]
     Other = 8,
 }

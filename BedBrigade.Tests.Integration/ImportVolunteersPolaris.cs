@@ -1,17 +1,15 @@
 ﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using BedBrigade.Common.Models;
 using BedBrigade.Data;
-using KellermanSoftware.AddressParser;
+using Bogus.DataSets;
 using KellermanSoftware.NameParser;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Licensing;
 using Syncfusion.XlsIO;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace BedBrigade.Tests.Integration
 {
@@ -22,7 +20,7 @@ namespace BedBrigade.Tests.Integration
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
-
+        private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
         private string[] groups = new[]
         {
             "Volunteer Management",
@@ -41,15 +39,220 @@ namespace BedBrigade.Tests.Integration
             }
 
             DataContext context = CreateDbContext(ConnectionString);
-            await DeleteExistingVolunteersForLocation(context, Defaults.PolarisLocationId);
+            await DeleteExistingVolunteers(context);
             List<PolarisVolunteer> polarisVolunteers = ExcelToVolunteers();
+            List<Volunteer> volunteers = CombinePolaris(polarisVolunteers);
+            InsertVolunteers(context, volunteers);
+        }
 
+        private void InsertVolunteers(DataContext context, List<Volunteer> volunteers)
+        {
+            context.Volunteers.AddRange(volunteers);
+            context.SaveChanges();
+        }
 
+        private List<Volunteer> CombinePolaris(List<PolarisVolunteer> polarisVolunteers)
+        {
+            List<Volunteer> volunteers = new List<Volunteer>();
 
+            foreach (var polarisVolunteer in polarisVolunteers)
+            {
+                Volunteer volunteer = new Volunteer();
+                volunteer.Message = string.Empty;
+                volunteer.LocationId = Defaults.PolarisLocationId;
+                volunteer.Group = polarisVolunteer.Group;
+                SetName(polarisVolunteer, volunteer);
+                volunteer.CreateDate = ParseCreationLog(polarisVolunteer.CreationLog);
+                volunteer.CreateUser = "Import";
+                volunteer.UpdateDate = volunteer.CreateDate;
+                volunteer.UpdateUser = volunteer.CreateUser;
+                volunteer.MachineName = Environment.MachineName;
+                volunteer.Email = polarisVolunteer.EmailAddress;
+                SetPhone(volunteer, polarisVolunteer.PhoneNumber);
+                volunteer.AttendChurch = (polarisVolunteer.DoYouAttendChurch ?? string.Empty).ToLower().Contains("yes");
+                volunteer.ChurchName = polarisVolunteer.ChurchName;
+                SetArea(polarisVolunteer, volunteer);
 
-            //List<BedRequest> existing = await context.BedRequests.ToListAsync();
-            //List<BedRequest> newPolaris = CombinePolaris(polarisBedRequests);
-            //await Reconcile(context, existing, newPolaris);
+                if ((polarisVolunteer.OtherArea ?? string.Empty).Length > 100)
+                {
+                    volunteer.Message = polarisVolunteer.OtherArea;
+                }
+                else
+                {
+                    volunteer.OtherArea = polarisVolunteer.OtherArea ?? string.Empty;
+                }
+                SetVehicle(polarisVolunteer, volunteer);
+                SetLanguage(polarisVolunteer, volunteer);
+
+                if (!String.IsNullOrEmpty(volunteer.Phone) && volunteers.Any(o => o.Phone == volunteer.Phone))
+                {
+                    continue;
+                }
+
+                if (!String.IsNullOrEmpty(volunteer.Email) 
+                    && volunteer.Email != "mssalas1990@gmail.com" //They share an email address
+                    && volunteers.Any(o => o.Email == volunteer.Email))
+                {
+                    continue;
+                }
+
+                volunteers.Add(volunteer);
+            }
+
+            return volunteers;
+        }
+
+        private void SetLanguage(PolarisVolunteer polarisVolunteer, Volunteer volunteer)
+        {
+            try
+            {
+                if ((polarisVolunteer.DoYouSpeakSpanish ?? string.Empty).ToLower().Contains("yes"))
+                {
+                    volunteer.OtherLanguagesSpoken = "Spanish";
+                    polarisVolunteer.CanYouTranslate = (polarisVolunteer.CanYouTranslate ?? string.Empty).Replace(" ", string.Empty);
+
+                    if (String.IsNullOrWhiteSpace(polarisVolunteer.CanYouTranslate))
+                        polarisVolunteer.CanYouTranslate = "No";
+
+                    volunteer.CanYouTranslate =
+                        (CanYouTranslate)Enum.Parse<CanYouTranslate>(polarisVolunteer.CanYouTranslate, true);
+                }
+                else
+                {
+                    volunteer.OtherLanguagesSpoken = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+
+        }
+
+        private void SetVehicle(PolarisVolunteer polarisVolunteer, Volunteer volunteer)
+        {
+            if ((polarisVolunteer.DoYouHaveAVehicle ?? string.Empty).ToLower().Contains("yes"))
+            {
+                polarisVolunteer.VehicleType = (polarisVolunteer.VehicleType ?? string.Empty).ToLower();
+
+                if (polarisVolunteer.VehicleType.Contains("mini"))
+                {
+                    volunteer.VehicleType = VehicleType.Minivan;
+                }
+                else if (polarisVolunteer.VehicleType.Contains("van"))
+                {
+                    volunteer.VehicleType = VehicleType.FullSizeVan;
+                }
+                else if (polarisVolunteer.VehicleType.Contains("truck"))
+                {
+                    volunteer.VehicleType = VehicleType.Truck;
+                }
+                else if (polarisVolunteer.VehicleType.Contains("small"))
+                {
+                    volunteer.VehicleType = VehicleType.SmallSUV;
+                }
+                else if (polarisVolunteer.VehicleType.Contains("medium"))
+                {
+                    volunteer.VehicleType = VehicleType.MediumSUV;
+                }
+                else if (polarisVolunteer.VehicleType.Contains("large"))
+                {
+                    volunteer.VehicleType = VehicleType.SmallSUV;
+                }
+                else
+                {
+                    volunteer.VehicleType = VehicleType.Other;
+                    volunteer.VehicleDescription = polarisVolunteer.VehicleDescription ?? string.Empty;
+                }
+            }
+            else
+            {
+                volunteer.VehicleType = VehicleType.None;
+            }
+        }
+
+        private void SetArea(PolarisVolunteer polarisVolunteer, Volunteer volunteer)
+        {
+            polarisVolunteer.VolunteerArea = polarisVolunteer.VolunteerArea ?? string.Empty;
+            volunteer.VolunteerArea = string.Empty;
+
+            if (polarisVolunteer.VolunteerArea.ToLower().Contains("building"))
+            {
+                volunteer.VolunteerArea = StringUtil.AddToCommaDelimitedList(volunteer.VolunteerArea, "Bed Building");
+            }
+
+            if (polarisVolunteer.VolunteerArea.ToLower().Contains("delivery"))
+            {
+                volunteer.VolunteerArea = StringUtil.AddToCommaDelimitedList(volunteer.VolunteerArea, "Bed Delivery");
+            }
+
+            if (polarisVolunteer.VolunteerArea.ToLower().Contains("planning"))
+            {
+                volunteer.VolunteerArea = StringUtil.AddToCommaDelimitedList(volunteer.VolunteerArea, "Event Planning");
+            }
+        }
+
+        private void SetPhone(Volunteer volunteer, string phoneInput)
+        {
+            if (string.IsNullOrWhiteSpace(phoneInput))
+            {
+                volunteer.Phone = string.Empty;
+                return;
+            }
+
+            //Get phone matches
+            MatchCollection phoneMatches = _phoneRegex.Matches(phoneInput);
+
+            if (phoneMatches.Count == 0)
+            {
+                volunteer.Phone = string.Empty;
+                return;
+            }
+
+            //If there are multiple matches, use the first one
+            volunteer.Phone = phoneMatches[0].Value.FormatPhoneNumber();
+
+            if (phoneMatches.Count > 1)
+            {
+                //We already added the other phone numbers to the notes
+                if (volunteer.Message.Contains(phoneMatches[1].Value.FormatPhoneNumber()))
+                {
+                    return;
+                }
+
+                if (volunteer.Message.Length > 0)
+                {
+                    volunteer.Message += " ";
+                }
+
+                volunteer.Message += "Other Phone Numbers: ";
+                volunteer.Message+= string.Join(", ", phoneMatches.Cast<Match>().Skip(1).Select(m => m.Value.FormatPhoneNumber()));
+            }
+        }
+
+        private void SetName(PolarisVolunteer polarisVolunteer, Volunteer volunteer)
+        {
+            if (!String.IsNullOrEmpty(polarisVolunteer.Apellido))
+            {
+                volunteer.FirstName = polarisVolunteer.Name;
+                volunteer.LastName = polarisVolunteer.Apellido;
+            }
+            else
+            {
+                var nameParts = _nameParserLogic.ParseName(polarisVolunteer.Name, NameOrder.FirstLast);
+
+                if (nameParts != null && !String.IsNullOrEmpty(nameParts.FirstName))
+                {
+                    volunteer.FirstName = nameParts.FirstName;
+                    volunteer.LastName = nameParts.LastName;
+                }
+                else
+                {
+                    volunteer.FirstName = polarisVolunteer.Name;
+                    volunteer.LastName = string.Empty; 
+                }
+            }
         }
 
         private List<PolarisVolunteer> ExcelToVolunteers()
@@ -91,7 +294,8 @@ namespace BedBrigade.Tests.Integration
                     PhoneNumber = usedRange[i, 5].Value?.ToString(),
                     DoYouAttendChurch = usedRange[i, 6].Value?.ToString(),
                     ChurchName = usedRange[i, 7].Value?.ToString(),
-                    VolunteerArea = usedRange[i, 9].Value?.ToString(),
+                    VolunteerArea = usedRange[i, 8].Value?.ToString(),
+                    OtherArea = usedRange[i, 9].Value?.ToString(),
                     DoYouHaveAVehicle = usedRange[i, 10].Value?.ToString(),
                     VehicleType = usedRange[i, 11].Value?.ToString(),
                     VehicleDescription = usedRange[i, 12].Value?.ToString(),
@@ -111,9 +315,9 @@ namespace BedBrigade.Tests.Integration
             return new DataContext(optionsBuilder.Options);
         }
 
-        public async Task DeleteExistingVolunteersForLocation(DataContext context, int locationId)
+        public async Task DeleteExistingVolunteers(DataContext context)
         {
-            var volunteers = await context.Volunteers.Where(o => o.LocationId == locationId).ToListAsync();
+            var volunteers = await context.Volunteers.ToListAsync();
             context.Volunteers.RemoveRange(volunteers);
             await context.SaveChangesAsync();
         }

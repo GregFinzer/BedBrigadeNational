@@ -17,6 +17,7 @@ namespace BedBrigade.Tests.Integration
         public string DoYouAttendChurch { get; set; }
         public string ChurchName { get; set; }
         public string VolunteerArea { get; set; }
+        public string OtherArea { get; set; }
         public string DoYouHaveAVehicle { get; set; }
         public string VehicleType { get; set; }
         public string VehicleDescription { get; set; }
