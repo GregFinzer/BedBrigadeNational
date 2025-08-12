@@ -393,6 +393,27 @@ namespace BedBrigade.Common.Logic
 
             return sReturn;
         }
+
+        public static string AddToCommaDelimitedList(string? existingList, string? newValue)
+        {
+            if (string.IsNullOrEmpty(existingList))
+            {
+                return newValue ?? string.Empty;
+            }
+            if (string.IsNullOrEmpty(newValue))
+            {
+                return existingList;
+            }
+            // Ensure no leading or trailing spaces
+            existingList = existingList.Trim();
+            newValue = newValue.Trim();
+            // Avoid duplicates
+            if (!existingList.Contains(newValue))
+            {
+                return $"{existingList}, {newValue}";
+            }
+            return existingList;
+        }
     } // class
 
 

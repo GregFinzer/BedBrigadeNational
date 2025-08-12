@@ -76,7 +76,7 @@ else
                             
                             <div class="form-group">
                                 <label for="email" class="formlabel">Organization or Group</label>
-                                <SfTextBox ID="email" @bind-Value="Model.OrganizationOrGroup"></SfTextBox>
+                                <SfTextBox ID="email" @bind-Value="Model.Organization"></SfTextBox>
                             </div>
                             <div class="form-group">
                                 <label for="inst" class="formlabel">Message</label>
@@ -104,7 +104,7 @@ else
                                     </div>
                                     <hr />
                                     <div class="row">
-                                        <SfRadioButton Label="I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        <SfRadioButton Label="I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)" Name="RadioBtn" Value="@VehicleType.LargeSUV.ToString()" @bind-checked="Model.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                     </div>
                                     <hr />
                                     <div class="row">

@@ -44,7 +44,7 @@ DeliveryVehicle: Delivery Vehicle
 DeliveryVehicleMinivan: I have a Minvan with seats removed or folded into the floor
 DeliveryVehicleNone: I do not have a delivery vehicle
 DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
-DeliveryVehicleSuv: I have a large SUV (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
+DeliveryVehicleLargeSuv: I have a large SUV (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
 DeliveryVehicleTruck: I have a full size pickup truck with tie down straps or a cap
 DonationAmount: Donation Amount
 DonationCancellation: Donation Cancellation
@@ -154,7 +154,7 @@ MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
 MaxLengthNames255: Names has a maximum length of 255 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
-MaxLengthOrganizationOrGroup80: Group has a maximum length of 20
+MaxLengthOrganization80: Organization has a maximum length of 20
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
@@ -188,7 +188,7 @@ NumberOfVolunteers: Number of Volunteers
 NumberOfVolunteersIncludingYourself: Number of Volunteers (including yourself)
 Ok: OK
 OneTimeDonationOf: One Time Donation of
-OrganizationOrGroup: Organization or Group
+Organization: Organization
 Organizer: Organizer
 OrganizerColon: 'Organizer:'
 OrganizerEmail: Organizer Email

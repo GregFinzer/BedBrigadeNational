@@ -90,7 +90,7 @@
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) HeaderText="Organization" Type="ColumnType.String" Width="200px" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.Organization) HeaderText="Organization" Type="ColumnType.String" Width="200px" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
                         <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" Width="200px" ForeignKeyValue="Name" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="true" AllowGrouping="false" AllowFiltering="false" AutoFit="false" />
                         <GridColumn Field=@nameof(Volunteer.NumberOfVolunteers) Width="100px" HeaderText="# Volunteers" TextAlign="TextAlign.Center" AllowFiltering="false" AutoFit="false"></GridColumn>
                         <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Width="400px" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" AllowEditing="false" AllowFiltering="false" />

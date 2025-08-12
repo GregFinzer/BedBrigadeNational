@@ -72,7 +72,7 @@ else
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Volunteer.Organization) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Volunteer.AttendChurch) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Attend Church?" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />

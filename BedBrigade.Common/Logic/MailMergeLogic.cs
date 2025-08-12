@@ -23,7 +23,7 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Volunteer.Phone%%",
         "%%Volunteer.AttendChurch%%",
         "%%Volunteer.OtherLanguagesSpoken%%",
-        "%%Volunteer.OrganizationOrGroup%%",
+        "%%Volunteer.Organization%%",
         "%%Schedule.GroupName%%",
         "%%Schedule.EventName%%",
         "%%Schedule.EventType%%",
@@ -148,7 +148,7 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Volunteer.Phone%%", volunteer.Phone.FormatPhoneNumber());
         sb = sb.Replace("%%Volunteer.AttendChurch%%", volunteer.AttendChurch ? "Yes" : "No");
         sb = sb.Replace("%%Volunteer.OtherLanguagesSpoken%%", volunteer.OtherLanguagesSpoken);
-        sb = sb.Replace("%%Volunteer.OrganizationOrGroup%%", volunteer.OrganizationOrGroup);
+        sb = sb.Replace("%%Volunteer.Organization%%", volunteer.Organization);
 
         return sb;
     }

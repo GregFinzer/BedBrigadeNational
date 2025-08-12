@@ -16,7 +16,7 @@ Organizer Phone: %%Schedule.OrganizerPhone%%
 
 Volunteer Information
 Name:  %%Volunteer.FirstName%% %%Volunteer.LastName%%
-%%Volunteer.OrganizationOrGroup%%
+%%Volunteer.Organization%%
 Email:  %%Volunteer.Email%%
 Phone:  %%Volunteer.Phone%%
 Number of Volunteers:  %%SignUp.NumberOfVolunteers%%

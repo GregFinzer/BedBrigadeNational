@@ -201,7 +201,7 @@ namespace BedBrigade.Client.Components
                             LastName = v.LastName,
                             Phone = v.Phone,
                             Email = v.Email,
-                            OrganizationOrGroup = v.OrganizationOrGroup,
+                            Organization = v.Organization,
                             Message = ve.SignUpNote,
                             VehicleType = ve.VehicleType,
                             CreateDateLocal = timezoneDataService.ConvertUtcToTimeZone(ve.CreateDate, timeZone),

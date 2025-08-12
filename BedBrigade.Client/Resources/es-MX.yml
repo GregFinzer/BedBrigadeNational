@@ -45,7 +45,7 @@ DeliveryVehicle: Vehículo de reparto
 DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
 DeliveryVehicleNone: No tengo un vehículo de reparto
 DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
-DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
+DeliveryVehicleLargeSuv: Tengo un SUV grande (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
 DonationCancellation: Cancelación de Donación
 DonationConfirmation: Confirmación de Donación
@@ -154,7 +154,7 @@ MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
 MaxLengthNames255: Los nombres tienen una longitud máxima de 255 caracteres
 MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
-MaxLengthOrganizationOrGroup80: El grupo tiene una longitud máxima de 20
+MaxLengthOrganization80: El grupo tiene una longitud máxima de 80 caracteres
 MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
@@ -188,7 +188,7 @@ NumberOfVolunteers: Número de Voluntarios
 NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
 Ok: De acuerdo
 OneTimeDonationOf: 'Donación única de'
-OrganizationOrGroup: Organización o grupo
+Organization: Organización
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
 OrganizerEmail: Correo electrónico del organizador
