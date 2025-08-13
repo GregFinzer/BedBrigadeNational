@@ -3,6 +3,7 @@ Active: Active
 Add: Add
 Address: Address
 AmountColon: 'Amount:'
+AreYouAbleToTranslate: Are you able to translate?
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
 Back: Back
 BedBrigadeLocationEvents: Bed Brigade Location Events
@@ -41,10 +42,14 @@ DateColon: 'Date:'
 DeliveryAddress: Delivery Address
 DeliveryDate: Delivery Date
 DeliveryVehicle: Delivery Vehicle
+DeliveryVehicleFullSizeVan: I have a Full-Size Van that is empty without seats
 DeliveryVehicleMinivan: I have a Minvan with seats removed or folded into the floor
 DeliveryVehicleNone: I do not have a delivery vehicle
-DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
+DeliveryVehicleOther: I have an other vehicle
 DeliveryVehicleLargeSuv: I have a Large SUV (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
+DeliveryVehicleMediumSuv: I have a Medium SUV (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc.)
+DeliveryVehicleSmallSuv: I have a Small SUV (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)
+DeliveryVehicleQuestion: Do you have a vehicle that can carry a bed and mattress?
 DeliveryVehicleTruck: I have a Full Size Pickup Truck with tie down straps or a cap
 DonationAmount: Donation Amount
 DonationCancellation: Donation Cancellation
@@ -144,17 +149,20 @@ MailingState: Mailing State
 ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
 MaxLengthBedType100: Bed Type has a maximum length of 100 characters
+MaxLengthChurchName80: Church Name has a maximum length of 80 characters
 MaxLengthCity50: City has a maximum length of 50 characters
 MaxLengthCountryCode2: Country Code has a maximum length of 2 characters
 MaxLengthEmail255: Email Address has a maximum length of 255 characters
 MaxLengthFirstName20: First Name has a maximum length of 20 characters
 MaxLengthGenderAge255: Gender/Age has a maximum length of 255 characters
 MaxLengthGroup50: Group has a maximum length of 50 characters
+MaxLengthGroup80: Group has a maximum length of 80 characters
 MaxLengthLastName25: Last Name has a maximum length of 25 characters
 MaxLengthMessage4000: Message has a maximum length of 4000 characters
 MaxLengthNames255: Names has a maximum length of 255 characters
 MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganization80: Organization has a maximum length of 20
+MaxLengthOtherArea100: Other Area has a maximum length of 100 characters
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
@@ -164,6 +172,8 @@ MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet50: Street Address has a maximum length of 50 characters
 MaxLengthTableName50: Table Name has a maximum length of 50 characters
 MaxLengthTeam50: Team has a maximum length of 50 characters
+MaxLengthVolunteerArea100: Volunteer Area has a maximum length of 100 characters
+MaxLengthVehicleDescription100: Vehicle Description has a maximum length of 100 characters
 Message: Message
 MilesAway: miles away
 MonthlyDonationOf: Monthly Donation of
@@ -321,6 +331,7 @@ UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
 VehicleTypeColon: 'Vehicle Type:'
+VehicleDescription: Please describe your vehicle
 ViewNewer: View Newer
 ViewOlder: View Older
 Volunteer: Volunteer
@@ -337,6 +348,7 @@ VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
+WhatChurch: What church do you attend?
 YourDonationHasBeenCancelled: Your donation has been cancelled.
 YourEmail: Your Email
 YouWereTryingTo: 'You were trying to access the page: '

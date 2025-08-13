@@ -36,7 +36,8 @@ else
                         AllowPdfExport="true"
                         AllowTextWrap="false"
                         AllowGrouping="true"
-                        Width="100%">
+                        Width="100%"
+                        ClipMode="ClipMode.EllipsisWithTooltip">
                     <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
                     <GridEvents DataBound=@DataBound
                                 Destroyed=@OnDestroyed

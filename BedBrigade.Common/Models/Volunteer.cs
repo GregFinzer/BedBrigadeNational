@@ -44,6 +44,9 @@ namespace BedBrigade.Common.Models
 
         public VehicleType VehicleType { get; set; } = VehicleType.None; // default value
 
+        [NotMapped]
+        public string VehicleTypeString => StringUtil.InsertSpaces(VehicleType.ToString());
+
         public bool AttendChurch { get; set; } = false;
 
         [MaxLength(4000, ErrorMessage = "Other Languages Spoken has a maximum length of 4000 characters")]
@@ -56,7 +59,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(80, ErrorMessage = "Group has a maximum length of 80 characters")]
         public String? Group { get; set; } = string.Empty;
 
-        [MaxLength(80, ErrorMessage = "Church Name has a maximum length of 50 characters")]
+        [MaxLength(80, ErrorMessage = "Church Name has a maximum length of 80 characters")]
         public String? ChurchName { get; set; } = string.Empty;
 
         [MaxLength(100, ErrorMessage = "Volunteer Area has a maximum length of 100 characters")]

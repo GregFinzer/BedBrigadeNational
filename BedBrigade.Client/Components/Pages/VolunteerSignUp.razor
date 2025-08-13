@@ -180,7 +180,7 @@
                             @if (SelectedLanguages != null && SelectedLanguages.Length > 0)
                             {
                                 <div class="form-group">
-                                    <label for="translate" class="formlabel">Are you able to translate?</label>
+                                    <label for="translate" class="formlabel">@_lc.Keys["AreYouAbleToTranslate"]</label>
                                     <SfDropDownList ID="translate" TValue="CanYouTranslate" TItem="EnumNameValue<CanYouTranslate>" PopupHeight="350px" PopupWidth="350px" DataSource="TranslationOptions">
                                         <DropDownListFieldSettings Value="Value" Text="Name"></DropDownListFieldSettings>
                                     </SfDropDownList>
@@ -197,7 +197,7 @@
                             @if (newVolunteer.AttendChurch)
                             {
                                 <div class="form-group">
-                                    <label for="churchName" class="formlabel">What church do you attend?</label>
+                                    <label for="churchName" class="formlabel">@_lc.Keys["WhatChurch"]</label>
                                     <SfTextBox ID="churchName" @bind-Value="newVolunteer.ChurchName"></SfTextBox>
                                 </div>
                             }
@@ -240,15 +240,15 @@
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a Full-Size Van that is empty without seats" Name="RadioBtn" Value="@VehicleType.FullSizeVan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleFullSizeVan"]" Name="RadioBtn" Value="@VehicleType.FullSizeVan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a Small SUV (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)" Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleSmallSuv"]" Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have a Medium SUV (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc." Name="RadioBtn" Value="@VehicleType.MediumSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleMediumSuv"]" Name="RadioBtn" Value="@VehicleType.MediumSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                         <hr />
                                         <div class="row">
@@ -260,14 +260,14 @@
                                         </div>
                                         <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="I have an other vehicle" Name="RadioBtn" Value="@VehicleType.Other.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleOther"]" Name="RadioBtn" Value="@VehicleType.Other.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
                                     </div>
                                 </div>
                                 @if (newVolunteer.VehicleType == VehicleType.Other)
                                 {
                                     <div class="form-group">
-                                        <label for="vehicleDescription" class="formlabel">Please describe your vehicle</label>
+                                        <label for="vehicleDescription" class="formlabel">@_lc.Keys["VehicleDescription"]</label>
                                         <SfTextBox ID="vehicleDescription" @bind-Value="newVolunteer.VehicleDescription"></SfTextBox>
                                     </div>
                                 }
