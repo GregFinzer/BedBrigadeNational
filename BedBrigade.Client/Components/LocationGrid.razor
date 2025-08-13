@@ -143,7 +143,7 @@ else
                             <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
                             <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                             <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" />
+                        <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
                             <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Location.MailingCity) ShowColumnMenu="false" HeaderText="Mailing City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Location.MailingState) ShowColumnMenu="false" HeaderText="Mailing State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
@@ -186,9 +186,6 @@ else
         box-shadow: none;
     }
 
-
-
-
     .e-dialog .e-dlg-header {
         font-size: 1.75rem;
         font-weight: 700;
@@ -204,5 +201,10 @@ else
         text-align: center;
         vertical-align: middle;
         border-radius: 10px; /* Rounded corners */
+    }
+
+    /* Centers the Syncfusion checkbox wrapper inside that column’s cells */
+    .center-boolean {
+        text-align: center;
     }
 </style>

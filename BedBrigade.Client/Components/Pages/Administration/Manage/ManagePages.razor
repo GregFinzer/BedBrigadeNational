@@ -60,7 +60,8 @@ else
                             AllowPdfExport="true"
                             AllowTextWrap="false"
                             AllowGrouping="true"
-                            Width="100%">
+                            Width="100%"
+                            ClipMode="ClipMode.EllipsisWithTooltip">
                         <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,30,35,40})" PageSize="40" />
                         <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Content" />
                         <GridTemplates>
@@ -78,14 +79,14 @@ else
                         <GridGroupSettings Columns=@groupColumns EnableLazyLoading="true" ShowDropArea="false" />
                         <GridColumns>
                             <GridColumn Field=@nameof(Content.ContentId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridForeignColumn Field=@nameof(Content.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" MinWidth="150px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" MinWidth="200px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.Title) ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" MinWidth="200px" AutoFit="true" />
-                            <GridForeignColumn Field=@nameof(Content.ContentType) ForeignDataSource=@ContentTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Type" ShowColumnMenu="false" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" MinWidth="200px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.CreateUser) ShowColumnMenu="false" HeaderText="Created By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" MinWidth="150px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.CreateDateLocal) ShowColumnMenu="false" HeaderText="Created On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.UpdateUser) ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" MinWidth="150px" AutoFit="true" />
-                            <GridColumn Field=@nameof(Content.UpdateDateLocal) ShowColumnMenu="false" HeaderText="Updated On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" MinWidth="150px" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(Content.LocationId) Width="100px" ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.Name) Width="200px" ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.Title) Width="200px" ShowColumnMenu="false" HeaderText="Title" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                            <GridForeignColumn Field=@nameof(Content.ContentType) Width="100px" ForeignDataSource=@ContentTypes ForeignKeyField="Value" ForeignKeyValue="Name" HeaderText="Type" ShowColumnMenu="false" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.CreateUser) Width="100px" ShowColumnMenu="false" HeaderText="Created By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.CreateDateLocal) Width="100px" ShowColumnMenu="false" HeaderText="Created On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.UpdateUser) Width="100px" ShowColumnMenu="false" HeaderText="Updated By" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                            <GridColumn Field=@nameof(Content.UpdateDateLocal) Width="100px" ShowColumnMenu="false" HeaderText="Updated On" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="false" />
                         </GridColumns>
                     </SfGrid>
                 </div>

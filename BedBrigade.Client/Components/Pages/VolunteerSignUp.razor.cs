@@ -505,6 +505,8 @@ namespace BedBrigade.Client.Components.Pages
             existingVolunteer.Phone = newVolunteer.Phone;
             existingVolunteer.Organization = newVolunteer.Organization;
             existingVolunteer.Message = newVolunteer.Message;
+            existingVolunteer.OtherLanguagesSpoken = newVolunteer.OtherLanguagesSpoken;
+            existingVolunteer.CanYouTranslate = newVolunteer.CanYouTranslate;
 
             if (SelectedEvent.EventType == EventType.Delivery)
             {

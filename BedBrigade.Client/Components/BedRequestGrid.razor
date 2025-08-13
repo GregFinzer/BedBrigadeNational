@@ -277,11 +277,11 @@ else
                         <GridColumn Field=@nameof(BedRequest.Street) Width="175" ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.PostalCode) Width="90" ShowColumnMenu="false" HeaderText="Zip" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" />
                         <GridColumn Field=@nameof(BedRequest.CreateDate) Width="100" Format="d" ShowColumnMenu="false" HeaderText="Added" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
-                        <GridColumn Field=@nameof(BedRequest.Group) Width="100" ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
-                        <GridColumn Field=@nameof(BedRequest.NumberOfBeds) Width="100" ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(BedRequest.Group) Width="100" ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })" />
+                        <GridColumn Field=@nameof(BedRequest.NumberOfBeds) Width="100" ShowColumnMenu="false" HeaderText="Beds" Type="ColumnType.Integer" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })" />
                         <GridColumn Field=@nameof(BedRequest.StatusString) Width="100" ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
-                        <GridColumn Field=@nameof(BedRequest.ContactedYes) Width="110" ShowColumnMenu="false" HeaderText="Contacted" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
-                        <GridColumn Field=@nameof(BedRequest.GenderAge) Width="225" ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(BedRequest.ContactedYes) Width="110" ShowColumnMenu="false" HeaderText="Contacted" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })" />
+                        <GridColumn Field=@nameof(BedRequest.GenderAge) Width="225" ShowColumnMenu="false" HeaderText="Gender/Age" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })" />
                         <GridColumn Field=@nameof(BedRequest.DeliveryDate) Width="125" Format="d" ShowColumnMenu="false" HeaderText="Delivered" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.Reference) Width="125" ShowColumnMenu="false" HeaderText="Reference" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.Notes) Width="425" ShowColumnMenu="false" HeaderText="Notes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" />
@@ -351,6 +351,10 @@ else
         display: flex;
         align-items: center;
         height: 100%;
+    }
+
+    .center-column {
+        text-align: center;
     }
 
 </style>

@@ -181,7 +181,7 @@
                             {
                                 <div class="form-group">
                                     <label for="translate" class="formlabel">@_lc.Keys["AreYouAbleToTranslate"]</label>
-                                    <SfDropDownList ID="translate" TValue="CanYouTranslate" TItem="EnumNameValue<CanYouTranslate>" PopupHeight="350px" PopupWidth="350px" DataSource="TranslationOptions">
+                                    <SfDropDownList ID="translate" TValue="CanYouTranslate?" TItem="EnumNameValue<CanYouTranslate>" PopupHeight="350px" PopupWidth="350px" DataSource="TranslationOptions" @bind-Value=@newVolunteer.CanYouTranslate>
                                         <DropDownListFieldSettings Value="Value" Text="Name"></DropDownListFieldSettings>
                                     </SfDropDownList>
                                 </div>
