@@ -16,7 +16,7 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportVolunteersPolaris
     {
-        private const string FilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Volunteer_Management_1754910935.xlsx";
+        private const string FilePath = @"C:\Users\gfinz\Dropbox\Transfer\Volunteer_Management_1754910935.xlsx";
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -61,6 +61,7 @@ namespace BedBrigade.Tests.Integration
                 volunteer.Message = string.Empty;
                 volunteer.LocationId = Defaults.PolarisLocationId;
                 volunteer.Group = polarisVolunteer.Group;
+                volunteer.IHaveVolunteeredBefore = volunteer.Group != "New Volunteers";
                 SetName(polarisVolunteer, volunteer);
                 volunteer.CreateDate = ParseCreationLog(polarisVolunteer.CreationLog);
                 volunteer.CreateUser = "Import";

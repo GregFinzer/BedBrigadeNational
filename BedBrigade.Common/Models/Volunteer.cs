@@ -1,6 +1,7 @@
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BedBrigade.Common.Enums;
 
 namespace BedBrigade.Common.Models
 {
@@ -28,6 +29,12 @@ namespace BedBrigade.Common.Models
 
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
         public String? Phone { get; set; } = string.Empty;
+
+        [NotMapped]
+        public String? FormattedPhone
+        {
+            get { return Phone.FormatPhoneNumber(); }
+        }
 
         [MaxLength(80, ErrorMessage = "Organization has a maximum length of 80 characters")]
 		public String? Organization { get; set; } = string.Empty;
