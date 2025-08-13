@@ -1,8 +1,7 @@
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Common.Models
 {
@@ -22,29 +21,31 @@ namespace BedBrigade.Common.Models
         [MaxLength(20, ErrorMessage = "First Name has a maximum length of 20 characters")]
         public String FirstName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Last Name is required")]
         [MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
-		public String LastName { get; set; } = string.Empty;
+        public String? LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email Address is required")]
         [MaxLength(255, ErrorMessage = "Email Address has a maximum length of 255 characters")]
-		public String Email { get; set; } = string.Empty;
+		public String? Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Phone Number is required")]
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
-        public String Phone { get; set; } = string.Empty;
+        public String? Phone { get; set; } = string.Empty;
 
-        [MaxLength(80, ErrorMessage = "Group has a maximum length of 80 characters")]
-		public String? OrganizationOrGroup { get; set; } = string.Empty;
+        [NotMapped]
+        public String? FormattedPhone
+        {
+            get { return Phone.FormatPhoneNumber(); }
+        }
 
-        [Required(ErrorMessage = "Number of Volunteers is required")]
-        [Range(1,100)]
-        public int NumberOfVolunteers { get; set; } = 1;
+        [MaxLength(80, ErrorMessage = "Organization has a maximum length of 80 characters")]
+		public String? Organization { get; set; } = string.Empty;
 
         [MaxLength(4000, ErrorMessage = "Message has a maximum length of 4000 characters")]
 		public String? Message { get; set; } = string.Empty;
 
         public VehicleType VehicleType { get; set; } = VehicleType.None; // default value
+
+        [NotMapped]
+        public string VehicleTypeString => StringUtil.InsertSpaces(VehicleType.ToString());
 
         public bool AttendChurch { get; set; } = false;
 
@@ -54,7 +55,24 @@ namespace BedBrigade.Common.Models
         public bool SubscribedEmail { get; set; } = true;
 
         public bool SubscribedSms { get; set; } = true;
-    
+
+        [MaxLength(80, ErrorMessage = "Group has a maximum length of 80 characters")]
+        public String? Group { get; set; } = string.Empty;
+
+        [MaxLength(80, ErrorMessage = "Church Name has a maximum length of 80 characters")]
+        public String? ChurchName { get; set; } = string.Empty;
+
+        [MaxLength(100, ErrorMessage = "Volunteer Area has a maximum length of 100 characters")]
+        public String? VolunteerArea { get; set; } = string.Empty;
+
+        [MaxLength(100, ErrorMessage = "Other Area has a maximum length of 100 characters")]
+        public String? OtherArea { get; set; } = string.Empty;
+
+        [MaxLength(100, ErrorMessage = "Vehicle Description has a maximum length of 100 characters")]
+        public String? VehicleDescription { get; set; } = string.Empty;
+
+        public CanYouTranslate? CanYouTranslate { get; set; }
+
         [NotMapped]
         public string FullName {
 			get
@@ -100,5 +118,6 @@ namespace BedBrigade.Common.Models
             }
         }
 
+        [NotMapped] public int NumberOfVolunteers { get; set; }
     }
 }

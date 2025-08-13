@@ -42,7 +42,8 @@
                         AllowTextWrap="true"
                         AllowGrouping="true"
                         Toolbar=@ToolBar
-                        Width="100%">
+                        Width="100%"
+                        ClipMode="ClipMode.EllipsisWithTooltip">
                     <GridTextWrapSettings WrapMode="WrapMode.Header" /> 
                     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
                     </GridFilterSettings>
@@ -221,12 +222,12 @@
                         <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
                         </GridColumn>
-                        <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center"  CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
                         <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers (Registered)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)" TextAlign="TextAlign.Right" AllowFiltering="false" AutoFit="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers (Registered)"  AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles (Registered)" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Volunteers (Max)"  AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="150px" AllowFiltering="false"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.OrganizerName) HeaderText="Organizer Name" AutoFit="true" AllowFiltering="true"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.OrganizerEmail) HeaderText="Organizer Email" AutoFit="true" AllowFiltering="true"></GridColumn>
@@ -258,6 +259,10 @@
 
     .e-dialog.e-control.e-popup {
        overflow: hidden;
+    }
+
+    .center-column {
+        text-align: center;
     }
 </style>
 

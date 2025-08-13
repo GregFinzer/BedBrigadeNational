@@ -156,22 +156,13 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="email" class="formlabel">@_lc.Keys["OrganizationOrGroup"]</label>
-                                <SfTextBox ID="email" @bind-Value="newVolunteer.OrganizationOrGroup"></SfTextBox>
+                                <label for="organization" class="formlabel">@_lc.Keys["Organization"]</label>
+                                <SfTextBox ID="organization" @bind-Value="newVolunteer.Organization"></SfTextBox>
                             </div>
                             <div class="form-group">
                                 <label for="numberOfVolunteers" class="formlabel">@_lc.Keys["NumberOfVolunteersIncludingYourself"]</label>
                                 <SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newVolunteer.NumberOfVolunteers"></SfNumericTextBox>
                             </div>
-                            <div class="form-group">
-                                <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
-                                <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
-                            </div>
-                        </div>
-                        <div class="card-footer  text-muted" style="text-align: center; font-size:small; color: GrayText; display: @DisplayExId">
-                            <span>
-                                Last Visit: @(newVolunteer.UpdateDate.HasValue ? Convert.ToDateTime(newVolunteer.UpdateDate, System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat) : "")
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -186,14 +177,44 @@
                                     <MultiSelectFieldSettings Text="Name" Value="Value"></MultiSelectFieldSettings>
                                 </SfMultiSelect>
                             </div>
+                            @if (SelectedLanguages != null && SelectedLanguages.Length > 0)
+                            {
+                                <div class="form-group">
+                                    <label for="translate" class="formlabel">@_lc.Keys["AreYouAbleToTranslate"]</label>
+                                    <SfDropDownList ID="translate" TValue="CanYouTranslate?" TItem="EnumNameValue<CanYouTranslate>" PopupHeight="350px" PopupWidth="350px" DataSource="TranslationOptions" @bind-Value=@newVolunteer.CanYouTranslate>
+                                        <DropDownListFieldSettings Value="Value" Text="Name"></DropDownListFieldSettings>
+                                    </SfDropDownList>
+                                </div>
+                            }
+                            else
+                            {
+                                newVolunteer.CanYouTranslate = null;
+                            }
+
                             <div class="form-group">
                                 <SfCheckBox Label="@_lc.Keys["DoYouAttendChurch"]" @bind-Checked="newVolunteer.AttendChurch"></SfCheckBox>
                             </div>
+                            @if (newVolunteer.AttendChurch)
+                            {
+                                <div class="form-group">
+                                    <label for="churchName" class="formlabel">@_lc.Keys["WhatChurch"]</label>
+                                    <SfTextBox ID="churchName" @bind-Value="newVolunteer.ChurchName"></SfTextBox>
+                                </div>
+                            }
+                            else
+                            {
+                                newVolunteer.ChurchName = string.Empty;
+                            }
                             <div class="form-group">
                                 <SfCheckBox Label="@_lc.Keys["SubscribeToOurEmail"]" @bind-Checked="newVolunteer.SubscribedEmail"></SfCheckBox>
                             </div>
+
                             <div class="form-group">
                                 <SfCheckBox Label="@_lc.Keys["SubscribeToOurText"]" @bind-Checked="newVolunteer.SubscribedSms"></SfCheckBox>
+                            </div>
+                            <div class="form-group">
+                                <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
+                                <SfTextBox ID="inst" @bind-Value="newVolunteer.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
                             </div>
                         </div>
                     </div>
@@ -213,20 +234,47 @@
                                         <div class="row">
                                             <SfRadioButton Label="@_lc.Keys["DeliveryVehicleNone"]" Name="RadioBtn" Value="@VehicleType.None.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                         <div class="row">
                                             <SfRadioButton Label="@_lc.Keys["DeliveryVehicleMinivan"]" Name="RadioBtn" Value="@VehicleType.Minivan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                         <div class="row">
-                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleSuv"]" Name="RadioBtn" Value="@VehicleType.SUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleFullSizeVan"]" Name="RadioBtn" Value="@VehicleType.FullSizeVan.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
-                                        <hr/>
+                                        <hr />
+                                        <div class="row">
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleSmallSuv"]" Name="RadioBtn" Value="@VehicleType.SmallSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr />
+                                        <div class="row">
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleMediumSuv"]" Name="RadioBtn" Value="@VehicleType.MediumSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr />
+                                        <div class="row">
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleLargeSuv"]" Name="RadioBtn" Value="@VehicleType.LargeSUV.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
+                                        <hr />
                                         <div class="row">
                                             <SfRadioButton Label="@_lc.Keys["DeliveryVehicleTruck"]" Value="@VehicleType.Truck.ToString()" Name="RadioBtn" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
                                         </div>
+                                        <hr />
+                                        <div class="row">
+                                            <SfRadioButton Label="@_lc.Keys["DeliveryVehicleOther"]" Name="RadioBtn" Value="@VehicleType.Other.ToString()" @bind-checked="newVolunteer.VehicleType" TChecked="VehicleType"></SfRadioButton>
+                                        </div>
                                     </div>
                                 </div>
+                                @if (newVolunteer.VehicleType == VehicleType.Other)
+                                {
+                                    <div class="form-group">
+                                        <label for="vehicleDescription" class="formlabel">@_lc.Keys["VehicleDescription"]</label>
+                                        <SfTextBox ID="vehicleDescription" @bind-Value="newVolunteer.VehicleDescription"></SfTextBox>
+                                    </div>
+                                }
+                                else
+                                {
+                                    newVolunteer.VehicleDescription = string.Empty;
+                                }
                             </div>
                         </div>
                     </div>

@@ -2,8 +2,6 @@
 @page "/administration/manage/volunteers"
 
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
-@using EditMode = Syncfusion.Blazor.Grids.EditMode
-@using WrapMode = Syncfusion.Blazor.Grids.WrapMode
 @using BedBrigade.Common.Models
 
 <CheckAuth Roles=@RoleNames.CanViewVolunteers></CheckAuth>
@@ -23,9 +21,9 @@ else
         </div>
     </div>
 
-    <div class="row">
-        <div class="content-wrapper col-md-12">
-            <div style="width: 100%">
+    <div class="col-md-12 control-sec">
+        <div class="content-wrapper">
+            <div class="row">
                 <SfGrid @ref="Grid" TValue="Volunteer" DataSource=@Volunteers
                         ContextMenuItems=@ContextMenu
                         EnablePersistence="true"
@@ -40,10 +38,10 @@ else
                         AllowResizing="true"
                         AllowSelection="true"
                         AllowPdfExport="true"
-                        AllowTextWrap="true"
+                        AllowTextWrap="false"
                         AllowGrouping="true"
-                        Width="100%">
-                    <GridTextWrapSettings WrapMode="WrapMode.Content" />
+                        Width="100%"
+                        ClipMode="ClipMode.EllipsisWithTooltip">
                     <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
                     <GridEvents DataBound=@DataBound OnLoad="@OnLoad" Destroyed=@OnDestroyed OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Volunteer" />
                     <GridTemplates>
@@ -60,26 +58,24 @@ else
                     </GridSortSettings>
                     <GridGroupSettings ShowDropArea="true" EnableLazyLoading="true" />
                     <GridColumns>
-                        <GridColumn Field=@nameof(Volunteer.VolunteerId) Visible="false" HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.FullName) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.Phone) ShowColumnMenu="false" HeaderText="Phone" Format="(000) 000-0000" Type="ColumnType.String" AllowEditing="true" AllowFiltering="true" AutoFit="true">
-                            <Template>
-                                @{
-                                    var request = (context as Volunteer);
-                                    @request.Phone.FormatPhoneNumber()
-                                    ;
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field=@nameof(Volunteer.OrganizationOrGroup) ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridForeignColumn Field=@nameof(Volunteer.VehicleType) ForeignDataSource=@lstVehicleTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.AttendChurch) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Attend Church?" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.SubscribedEmail) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Subscribed Email" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.SubscribedSms) ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Subscribed Text" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Volunteer.OtherLanguagesSpoken) HeaderText="Other Languages" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true" Width="200px" />
-                        <GridColumn Field=@nameof(Volunteer.Message) HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ClipMode="ClipMode.EllipsisWithTooltip" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="false" Width="200px" />
+                        <GridColumn Field=@nameof(Volunteer.VolunteerId) Visible="false" HeaderText="ID" TextAlign="TextAlign.Right" IsPrimaryKey="true" AutoFit="false" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Volunteer.FullName) Width="172" ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.Email) Width="225" ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.FormattedPhone) Width="118" ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.Organization) Width="150" ShowColumnMenu="false" HeaderText="Organization" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.Group) Width="150" ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.VehicleTypeString) Width="150" ShowColumnMenu="false" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.VehicleDescription) Width="150" ShowColumnMenu="false" HeaderText="Description" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
+                        <GridColumn Field=@nameof(Volunteer.IHaveVolunteeredBefore) Width="125" ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Previous?" AllowEditing="false" AllowFiltering="true" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="false" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
+                        <GridColumn Field=@nameof(Volunteer.OtherLanguagesSpoken) Width="150"HeaderText="Languages" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true"  />
+                        <GridColumn Field=@nameof(Volunteer.CanYouTranslate) Width="150"HeaderText="Translate?" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true"  />
+                        <GridColumn Field=@nameof(Volunteer.Message) Width="100" HeaderText="Notes" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(Volunteer.AttendChurch) Width="100" ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Church?" AllowEditing="false" AllowFiltering="true" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="false" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
+                        <GridColumn Field=@nameof(Volunteer.ChurchName) Width="150" HeaderText="Church Name" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(Volunteer.VolunteerArea) Width="100" HeaderText="Area" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left"  ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(Volunteer.OtherArea) Width="150" HeaderText="Other Area" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" ShowColumnMenu="false" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(Volunteer.SubscribedEmail) Width="200" ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Subscribed Email" AllowEditing="false" AllowFiltering="true" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="false" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
+                        <GridColumn Field=@nameof(Volunteer.SubscribedSms) Width="200" ShowColumnMenu="false" Type="ColumnType.Boolean" HeaderText="Subscribed Text" AllowEditing="false" AllowFiltering="true" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="false" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
                     </GridColumns>
                 </SfGrid>
             </div>
@@ -110,12 +106,14 @@ else
         box-shadow: none;
     }
 
-
-
-
     .e-dialog .e-dlg-header {
         font-size: 1.75rem;
         font-weight: 700;
     }
 
+    /* Centers the Syncfusion checkbox wrapper inside that column’s cells */
+    .center-boolean {
+        text-align:center;
+    }
+    
 </style>

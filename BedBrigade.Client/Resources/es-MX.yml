@@ -4,6 +4,7 @@ Add: Agregar
 Address: Dirección
 GenderAge: Género / Edad
 AmountColon: 'Importe:'
+AreYouAbleToTranslate: ¿Puedes traducir Bed Brigade a otro idioma?
 AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
 Back: Atrás
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
@@ -42,10 +43,14 @@ DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
 DeliveryDate: Fecha de entrega
 DeliveryVehicle: Vehículo de reparto
+DeliveryVehicleFullSizeVan: Tengo una camioneta de tamaño completo que está vacía sin asientos.
 DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
 DeliveryVehicleNone: No tengo un vehículo de reparto
+DeliveryVehicleOther: Tengo otro vehículo
 DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
-DeliveryVehicleSuv: Tengo un SUV grande (Chevrolet Suburban, Chevrolet Tahoe, Ford Expedition, GMC Yukon, Toyota Sequoia, Nissan Armada, etc.)
+DeliveryVehicleMediumSuv: Tengo una SUV mediana (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc.)
+DeliveryVehicleLargeSuv: Tengo un SUV grande (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
+DeliveryVehicleSmallSuv: Tengo un SUV pequeño (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)
 DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
 DonationCancellation: Cancelación de Donación
 DonationConfirmation: Confirmación de Donación
@@ -144,17 +149,20 @@ MailingState: Estado de envío
 ManageConfiguration: Administrar la Configuración
 ManageDonations: Administrar Donaciones
 MaxLengthBedType100: El tipo de cama tiene una longitud máxima de 100 caracteres
+MaxLengthChurchName80: El nombre de la iglesia tiene una longitud máxima de 80 caracteres
 MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
 MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
 MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
 MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
 MaxLengthGenderAge255: Sexo/Edad tiene una longitud máxima de 255 caracteres
 MaxLengthGroup50: El grupo tiene una longitud máxima de 50 caracteres
+MaxLengthGroup80: El grupo tiene una longitud máxima de 80 caracteres
 MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
 MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
 MaxLengthNames255: Los nombres tienen una longitud máxima de 255 caracteres
 MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
-MaxLengthOrganizationOrGroup80: El grupo tiene una longitud máxima de 20
+MaxLengthOrganization80: El grupo tiene una longitud máxima de 80 caracteres
+MaxLengthOtherArea100: El área de otro tiene una longitud máxima de 100 caracteres
 MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
@@ -164,6 +172,8 @@ MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet50: La dirección tiene una longitud máxima de 50 caracteres
 MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
 MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
+MaxLengthVolunteerArea100: El área del voluntario tiene una longitud máxima de 100 caracteres
+MaxLengthVehicleDescription100: La descripción del vehículo tiene una longitud máxima de 100 caracteres
 Message: Mensaje
 MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
@@ -188,7 +198,7 @@ NumberOfVolunteers: Número de Voluntarios
 NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
 Ok: De acuerdo
 OneTimeDonationOf: 'Donación única de'
-OrganizationOrGroup: Organización o grupo
+Organization: Organización
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
 OrganizerEmail: Correo electrónico del organizador
@@ -321,6 +331,7 @@ Update: Actualizar
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
+VehicleDescription: Por favor describe tu vehículo
 VehicleTypeColon: 'Tipo de vehículo:'
 ViewNewer: Ver más reciente
 ViewOlder: Ver más antiguo
@@ -338,6 +349,7 @@ VolunteersRegisteredColon: 'Voluntarios registrados:'
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
+WhatChurch: ¿A qué iglesia asistes?
 YourEmail: Tu correo electrónico
 YourDonationHasBeenCancelled: Su donación ha sido cancelada.
 YouWereTryingTo: 'Estabas intentando acceder a la página: '

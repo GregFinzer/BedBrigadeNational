@@ -1,4 +1,6 @@
-﻿using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -20,6 +22,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IJSRuntime JS { get; set; }
+        [Inject] private ILanguageContainerService _lc { get; set; }
+        [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -30,7 +34,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             { "rows", "5" },
         };
         public required SfMaskedTextBox phoneTextBox;
-
+        private string[] SelectedLanguages { get; set; } = [];
+        private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
+        private List<EnumNameValue<CanYouTranslate>> TranslationOptions { get; set; }
         protected override async Task OnInitializedAsync()
         {
             try
@@ -43,6 +49,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     CanSetLocation = true;
                 }
 
+                SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
+                TranslationOptions = EnumHelper.GetEnumNameValues<CanYouTranslate>();
                 await LoadLocations();
                 await LoadVolunteer();
             }
@@ -77,6 +85,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success)
                 {
                     Model = result.Data;
+                    SelectedLanguages = Model!.OtherLanguagesSpoken.Replace(" ", string.Empty).Split(',');
                 }
                 else
                 {
@@ -122,6 +131,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task<bool> SaveVolunteer()
         {
+            Model.OtherLanguagesSpoken = string.Join(", ", SelectedLanguages);
+
             if (VolunteerId != null)
             {
                 var updateResult = await _volunteerDataService.UpdateAsync(Model!);
@@ -136,10 +147,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return false;
             }
 
-            var existingVolunteerResult = await _volunteerDataService.GetByEmail(Model.Email);
+            var existingVolunteerResult = await _volunteerDataService.GetByPhone(Model.Phone);
             if (existingVolunteerResult.Success)
             {
-                ErrorMessage = "A volunteer with this email already exists.";
+                ErrorMessage = "A volunteer with this phone already exists.";
                 return false;
             }
 

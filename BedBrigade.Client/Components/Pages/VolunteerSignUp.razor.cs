@@ -1,4 +1,5 @@
 using BedBrigade.Client.Services;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -35,7 +36,7 @@ namespace BedBrigade.Client.Components.Pages
         [Parameter] public string? LocationRoute { get; set; }
         [Parameter] public int? ScheduleId { get; set; }
 
-        private Volunteer? newVolunteer;
+        private NewVolunteer? newVolunteer;
         private List<Schedule> LocationEvents { get; set; } = new List<Schedule>(); // Selected Location Events
         private Schedule? SelectedEvent { get; set; } // selected Event
 
@@ -82,6 +83,7 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox phoneTextBox;
         private int _previousNumberOfVolunteers = 0;
         private VehicleType? _previousDeliveryVehicle;
+        private List<EnumNameValue<CanYouTranslate>> TranslationOptions { get; set; }
         #endregion
 
         #region Initialization
@@ -89,10 +91,11 @@ namespace BedBrigade.Client.Components.Pages
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
-            newVolunteer = new Volunteer();
+            newVolunteer = new NewVolunteer();
             EC = new EditContext(newVolunteer);
             _validationMessageStore = new ValidationMessageStore(EC);
             await SetLocationState();
+            TranslationOptions = EnumHelper.GetEnumNameValues<CanYouTranslate>();
         }
 
         private async Task SetLocationState()
@@ -332,13 +335,13 @@ namespace BedBrigade.Client.Components.Pages
         {
             newVolunteer.OtherLanguagesSpoken = string.Join(", ", SelectedLanguages);
 
-            bool updateVolunteerSuccess = await UpdateVolunteer();
+            var updateResponse = await AddOrUpdateVolunteer();
 
-            if (!updateVolunteerSuccess)
+            if (!updateResponse.Success)
                 return;
 
 
-            bool scheduleVolunteerSuccess= await ScheduleVolunteer();
+            bool scheduleVolunteerSuccess= await ScheduleVolunteer(updateResponse.Data);
 
             if (!scheduleVolunteerSuccess)
                 return;
@@ -353,18 +356,18 @@ namespace BedBrigade.Client.Components.Pages
         }
 
 
-        private async Task<bool> ScheduleVolunteer()
+        private async Task<bool> ScheduleVolunteer(Volunteer volunteer)
         {
             try
             {
-                var existingSignUpResult = await _svcSignUp.GetByVolunteerEmailAndScheduleId(newVolunteer.VolunteerId, SelectedEvent.ScheduleId);
+                var existingSignUpResult = await _svcSignUp.GetByVolunteerEmailAndScheduleId(volunteer.VolunteerId, SelectedEvent.ScheduleId);
 
                 if (existingSignUpResult.Success && existingSignUpResult.Data != null)
                 {
                     return await UpdateExistingSignup(existingSignUpResult.Data);
                 }
 
-                return await CreateNewSignup();
+                return await CreateNewSignup(volunteer);
             }
             catch (Exception ex)
             {
@@ -404,11 +407,11 @@ namespace BedBrigade.Client.Components.Pages
             return true;
         }
 
-        private async Task<bool> CreateNewSignup()
+        private async Task<bool> CreateNewSignup(Volunteer volunteer)
         {
             SignUp newRegister = new SignUp();
             newRegister.ScheduleId = SelectedEvent.ScheduleId;
-            newRegister.VolunteerId = newVolunteer.VolunteerId;
+            newRegister.VolunteerId = volunteer.VolunteerId;
             newRegister.LocationId = selectedLocation;
             newRegister.SignUpNote = newVolunteer.Message;
             newRegister.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
@@ -443,65 +446,111 @@ namespace BedBrigade.Client.Components.Pages
             return true;
         }
 
-        private async Task<bool> UpdateVolunteer()
+        private async Task<ServiceResponse<Volunteer>> AddOrUpdateVolunteer()
         {
-            newVolunteer.LocationId = selectedLocation;
-
             try
             {
-                var existingVolunteerResult = await _svcVolunteer.GetByEmail(newVolunteer.Email);
+                newVolunteer.LocationId = selectedLocation;
 
-                if (existingVolunteerResult.Success && existingVolunteerResult.Data != null)
+                Volunteer? existingVolunteer = await GetExistingVolunteer();
+
+                if (existingVolunteer != null)
                 {
-                    var existingVolunteer = existingVolunteerResult.Data;
-                    existingVolunteer.LocationId = newVolunteer.LocationId;
-                    existingVolunteer.IHaveVolunteeredBefore = true;
-                    existingVolunteer.FirstName = newVolunteer.FirstName;
-                    existingVolunteer.LastName = newVolunteer.LastName;
-                    existingVolunteer.Email = newVolunteer.Email;
-                    existingVolunteer.Phone = newVolunteer.Phone;
-                    existingVolunteer.OrganizationOrGroup = newVolunteer.OrganizationOrGroup;
-                    existingVolunteer.Message = newVolunteer.Message;
-                    existingVolunteer.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
-
-                    if (SelectedEvent.EventType == EventType.Delivery)
-                    {
-                        existingVolunteer.VehicleType = newVolunteer.VehicleType;
-                    }
-
-                    var updateResult = await _svcVolunteer.UpdateAsync(existingVolunteer);
-
-                    if (!updateResult.Success)
-                    {
-                        Log.Logger.Error($"Error UpdateVolunteer, updateResult: {updateResult.Message}");
-                        await ShowMessage(updateResult.Message);
-                        return false;
-                    }
-                    newVolunteer = updateResult.Data;
+                    return await UpdateExistingVolunteer(existingVolunteer);
                 }
-                else
-                {
-                    isNewVolunteer = true;
-                    var createResult = await _svcVolunteer.CreateAsync(newVolunteer);
 
-                    if (!createResult.Success)
-                    {
-                        Log.Logger.Error($"Error UpdateVolunteer, updateResult: {createResult.Message}");
-                        await ShowMessage(createResult.Message);
-                        return false;
-                    }
-                }
+                return await CreateNewVolunteer();
             }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error UpdateVolunteer: {ex.Message}");
                 await ShowMessage("Error UpdateVolunteer: " + ex.Message);
-                return false;
+                return new ServiceResponse<Volunteer>($"Error UpdateVolunteer: {ex.Message}");
             }
-
-            return true;
         }
 
+        private async Task<ServiceResponse<Volunteer>> CreateNewVolunteer()
+        {
+            isNewVolunteer = true;
+            Volunteer toCreate = new Volunteer();
+            ObjectUtil.CopyProperties(newVolunteer, toCreate);
+
+            if (SelectedEvent.EventType == EventType.Delivery)
+            {
+                toCreate.VolunteerArea = "Bed Delivery";
+            }
+            else
+            {
+                toCreate.VolunteerArea = "Bed Building";
+            }
+
+            var createResult = await _svcVolunteer.CreateAsync(toCreate);
+
+            if (!createResult.Success)
+            {
+                Log.Logger.Error($"Error CreateNewVolunteer, createResult: {createResult.Message}");
+                await ShowMessage(createResult.Message);
+            }
+
+            return createResult;
+        }
+
+        private async Task<ServiceResponse<Volunteer>> UpdateExistingVolunteer(Volunteer existingVolunteer)
+        {
+            existingVolunteer.LocationId = newVolunteer.LocationId;
+            existingVolunteer.IHaveVolunteeredBefore = true;
+            existingVolunteer.FirstName = newVolunteer.FirstName;
+            existingVolunteer.LastName = newVolunteer.LastName;
+            existingVolunteer.Email = newVolunteer.Email;
+            existingVolunteer.Phone = newVolunteer.Phone;
+            existingVolunteer.Organization = newVolunteer.Organization;
+            existingVolunteer.Message = newVolunteer.Message;
+            existingVolunteer.OtherLanguagesSpoken = newVolunteer.OtherLanguagesSpoken;
+            existingVolunteer.CanYouTranslate = newVolunteer.CanYouTranslate;
+
+            if (SelectedEvent.EventType == EventType.Delivery)
+            {
+                existingVolunteer.VehicleType = newVolunteer.VehicleType;
+                existingVolunteer.VehicleDescription = newVolunteer.VehicleDescription;
+
+                existingVolunteer.VolunteerArea =
+                    StringUtil.AddToCommaDelimitedList(existingVolunteer.VolunteerArea, "Bed Delivery");
+            }
+            else
+            {
+                existingVolunteer.VolunteerArea =
+                    StringUtil.AddToCommaDelimitedList(existingVolunteer.VolunteerArea, "Bed Building");
+            }
+
+            var updateResult = await _svcVolunteer.UpdateAsync(existingVolunteer);
+            if (!updateResult.Success)
+            {
+                Log.Logger.Error($"Error UpdateExistingVolunteer, updateResult: {updateResult.Message}");
+                await ShowMessage(updateResult.Message);
+            }
+            return updateResult;
+        }
+
+        private async Task<Volunteer?> GetExistingVolunteer()
+        {
+            Volunteer existingVolunteer = null;
+            ServiceResponse<Volunteer> emailResult = await _svcVolunteer.GetByEmail(newVolunteer.Email);
+
+            if (emailResult.Success && emailResult.Data != null)
+            {
+                existingVolunteer = emailResult.Data;
+            }
+            else
+            {
+                ServiceResponse<Volunteer> phoneResult = await _svcVolunteer.GetByPhone(newVolunteer.Phone);
+                if (phoneResult.Success && phoneResult.Data != null)
+                {
+                    existingVolunteer = phoneResult.Data;
+                }
+            }
+
+            return existingVolunteer;
+        }
 
 
         private async Task CreateFinalMessage()
