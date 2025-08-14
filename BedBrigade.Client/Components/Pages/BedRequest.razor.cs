@@ -488,23 +488,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task<Common.Models.BedRequest?> UpdateExistingBedRequest(Common.Models.BedRequest existingBedRequest, Common.Models.BedRequest bedRequest)
         {
-            existingBedRequest.LocationId = bedRequest.LocationId;
-            existingBedRequest.FirstName = bedRequest.FirstName;
-            existingBedRequest.LastName = bedRequest.LastName;
-            existingBedRequest.Email = bedRequest.Email;
-            existingBedRequest.Phone = bedRequest.Phone;
-            existingBedRequest.Street = bedRequest.Street;
-            existingBedRequest.City = bedRequest.City;
-            existingBedRequest.State = bedRequest.State;
-            existingBedRequest.PostalCode = bedRequest.PostalCode;
-            existingBedRequest.NumberOfBeds = bedRequest.NumberOfBeds;
-            existingBedRequest.GenderAge = bedRequest.GenderAge;
-            existingBedRequest.Names = bedRequest.Names;
-            existingBedRequest.Group = bedRequest.Group;
-            existingBedRequest.Notes = bedRequest.Notes + $" Updated on {DateTime.Now.ToShortDateString()} by requester.";
-
-            //We intentionally do not update these fields:
-            //ScheduleId, Status, Team, DeliveryDate, Contacted, SpeakEnglish, PrimaryLanguage, Reference
+            existingBedRequest.UpdateDuplicateFields(bedRequest, $"Updated on {DateTime.Now.ToShortDateString()} by requester.");
 
             var updateResult = await _svcBedRequest.UpdateAsync(existingBedRequest);
             if (updateResult.Success && updateResult.Data != null)

@@ -116,4 +116,27 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
 
     [NotMapped]
     public string ContactedYes => Contacted == true ? "Yes" : string.Empty;
+
+    public void UpdateDuplicateFields(BedRequest? bedRequest, string note)
+    {
+        if (bedRequest == null) return;
+
+        LocationId = bedRequest.LocationId;
+        FirstName = bedRequest.FirstName;
+        LastName = bedRequest.LastName;
+        Email = bedRequest.Email;
+        Phone = bedRequest.Phone;
+        Street = bedRequest.Street;
+        City = bedRequest.City;
+        State = bedRequest.State;
+        PostalCode = bedRequest.PostalCode;
+        NumberOfBeds = bedRequest.NumberOfBeds;
+        GenderAge = bedRequest.GenderAge;
+        Names = bedRequest.Names;
+        Group = bedRequest.Group;
+        Notes = Notes + " " + bedRequest.Notes + " " + note;
+
+        //We intentionally do not update these fields:
+        //ScheduleId, Status, Team, DeliveryDate, Contacted, SpeakEnglish, PrimaryLanguage, Reference
+    }
 }
