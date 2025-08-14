@@ -31,7 +31,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-
+        [Inject] private NavigationManager _nav { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -388,55 +388,115 @@ namespace BedBrigade.Client.Components
 
         private async Task Save(ActionEventArgs<BedRequest> args)
         {
-            BedRequest BedRequest = args.Data;
-            BedRequest.Phone = BedRequest.Phone.FormatPhoneNumber();
+            BedRequest bedRequest = args.Data;
+            bedRequest.Phone = bedRequest.Phone.FormatPhoneNumber();
             // Set Speak English  to avoid NULL error
-            if (BedRequest.PrimaryLanguage == "English")
+            if (bedRequest.PrimaryLanguage == "English")
             {
-                BedRequest.SpeakEnglish = "Yes";
+                bedRequest.SpeakEnglish = "Yes";
             }
             else
             {
-                if (String.IsNullOrEmpty(BedRequest.SpeakEnglish))
+                if (String.IsNullOrEmpty(bedRequest.SpeakEnglish))
                 {
-                    BedRequest.SpeakEnglish = "No";
+                    bedRequest.SpeakEnglish = "No";
                 }
             }
 
-            if (BedRequest.BedRequestId != 0)
+            if (await CombineDuplicate(bedRequest))
             {
-                //Update BedRequest Record
-                var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
-                
-                if (updateResult.Success)
-                {
-                    _toastService.Success("Update Successful", "The BedRequest was updated successfully");
-                }
-                else
-                {
-                    Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
-                    _toastService.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
-                }
+                await Grid.Refresh();
+                return;
+            }
+
+            if (bedRequest.BedRequestId != 0)
+            {
+                await UpdateBedRequest(bedRequest);
             }
             else
             {
-                // new BedRequest
-                var result = await _svcBedRequest.CreateAsync(BedRequest);
-                if (result.Success)
-                {
-                    BedRequest = result.Data;
-                }
-                if (BedRequest.BedRequestId != 0)
-                {
-                    _toastService.Success("BedRequest Created", "BedRequest Created Successfully!");
-                }
-                else
-                {
-                    Log.Error($"Unable to create BedRequest : {result.Message}");
-                    _toastService.Error("BedRequest Not Created", "BedRequest was not created successfully");
-                }
+                await CreateBedRequest(bedRequest);
             }
             await Grid.Refresh();
+        }
+
+        private async Task<bool> CombineDuplicate(BedRequest bedRequest)
+        {
+            if (bedRequest.BedRequestId > 0 || bedRequest.Status != BedRequestStatus.Waiting || String.IsNullOrEmpty(bedRequest.Phone))
+            {
+                return false;
+            }
+
+            BedRequest existingBedRequest = null;
+
+            var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
+
+            if (existingByPhone.Success && existingByPhone.Data != null)
+            {
+                existingBedRequest = existingByPhone.Data;
+            }
+            else if (!String.IsNullOrEmpty(bedRequest.Email))
+            {
+                var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
+
+                if (existingByEmail.Success && existingByEmail.Data != null)
+                {
+                    existingBedRequest = existingByEmail.Data;
+                }
+            }
+
+            if (existingBedRequest == null)
+            {
+                return false;
+            }
+            existingBedRequest.UpdateDuplicateFields(bedRequest, $"Updated on {DateTime.Now.ToShortDateString()} by {_svcAuth.UserName}.");
+
+            var updateResult = await _svcBedRequest.UpdateAsync(existingBedRequest);
+
+            if (updateResult.Success && updateResult.Data != null)
+            {
+                _toastService.Warning("Update Successful", "A duplicate Bed Request with the same phone number or email was updated.");
+                ObjectUtil.CopyProperties(updateResult.Data, bedRequest);
+                return true;
+            }
+
+            Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
+            _toastService.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
+
+            return false;
+        }
+
+        private async Task CreateBedRequest(BedRequest BedRequest)
+        {
+            var result = await _svcBedRequest.CreateAsync(BedRequest);
+            if (result.Success)
+            {
+                BedRequest = result.Data;
+            }
+            if (BedRequest.BedRequestId != 0)
+            {
+                _toastService.Success("BedRequest Created", "BedRequest Created Successfully!");
+            }
+            else
+            {
+                Log.Error($"Unable to create BedRequest : {result.Message}");
+                _toastService.Error("BedRequest Not Created", "BedRequest was not created successfully");
+            }
+        }
+
+        private async Task UpdateBedRequest(BedRequest BedRequest)
+        {
+            var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
+
+            if (updateResult.Success)
+            {
+                _toastService.Success("Update Successful", "The BedRequest was updated successfully");
+            }
+            else
+            {
+                Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
+                _toastService.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
+            }
         }
 
         private void BeginEdit()
