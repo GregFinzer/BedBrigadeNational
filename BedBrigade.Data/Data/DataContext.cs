@@ -201,6 +201,9 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<BedRequest>()
                 .HasIndex(o => o.Phone);
+
+            modelBuilder.Entity<BedRequest>()
+                .HasIndex(o => o.Email);
         }
     }
 }
