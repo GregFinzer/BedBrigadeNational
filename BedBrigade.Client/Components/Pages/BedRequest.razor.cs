@@ -445,28 +445,30 @@ namespace BedBrigade.Client.Components.Pages
             try
             {
                 Common.Models.BedRequest? bedRequest = await BuildBedRequest();
+                Common.Models.BedRequest? existingBedRequest = null;
 
-                var addResult = await _svcBedRequest.CreateAsync(bedRequest);
-                if (addResult.Success && addResult.Data != null)
-                {
-                    bedRequest = addResult.Data; // added Request
-                }
+                var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
 
-                if (bedRequest != null && bedRequest.BedRequestId > 0)
+                if (existingByPhone.Success && existingByPhone.Data != null)
                 {
-                    AlertType = "alert alert-success";
-                    DisplaySearch = DisplayNone;
-                    DisplayForm = DisplayNone;
-                    ResultMessage = _lc.Keys["BedRequestFormSubmitted"];
-                    ResultDisplay = "";
-                    return bedRequest;
+                    existingBedRequest = existingByPhone.Data;
                 }
                 else
                 {
-                    ResultMessage = addResult.Message;
-                    AlertType = AlertDanger;
-                    ResultDisplay = "";
-                    Log.Error("Error saving BedRequest: " + addResult.Message);
+                    var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
+                    if (existingByEmail.Success && existingByEmail.Data != null)
+                    {
+                        existingBedRequest = existingByEmail.Data;
+                    }
+                }
+
+                if (existingBedRequest != null)
+                {
+                    return await UpdateExistingBedRequest(existingBedRequest, bedRequest);
+                }
+                else
+                {
+                    return await CreateNewBedRequest(bedRequest);
                 }
             }
             catch (Exception ex)
@@ -484,11 +486,72 @@ namespace BedBrigade.Client.Components.Pages
             return null;
         }
 
+        private async Task<Common.Models.BedRequest?> UpdateExistingBedRequest(Common.Models.BedRequest existingBedRequest, Common.Models.BedRequest bedRequest)
+        {
+            existingBedRequest.LocationId = bedRequest.LocationId;
+            existingBedRequest.FirstName = bedRequest.FirstName;
+            existingBedRequest.LastName = bedRequest.LastName;
+            existingBedRequest.Email = bedRequest.Email;
+            existingBedRequest.Phone = bedRequest.Phone;
+            existingBedRequest.Street = bedRequest.Street;
+            existingBedRequest.City = bedRequest.City;
+            existingBedRequest.State = bedRequest.State;
+            existingBedRequest.PostalCode = bedRequest.PostalCode;
+            existingBedRequest.NumberOfBeds = bedRequest.NumberOfBeds;
+            existingBedRequest.GenderAge = bedRequest.GenderAge;
+            existingBedRequest.Names = bedRequest.Names;
+            existingBedRequest.Group = bedRequest.Group;
+            existingBedRequest.Notes = bedRequest.Notes + $" Updated on {DateTime.Now.ToShortDateString()} by requester.";
+
+            //We intentionally do not update these fields:
+            //ScheduleId, Status, Team, DeliveryDate, Contacted, SpeakEnglish, PrimaryLanguage, Reference
+
+            var updateResult = await _svcBedRequest.UpdateAsync(existingBedRequest);
+            if (updateResult.Success && updateResult.Data != null)
+            {
+                bedRequest = updateResult.Data;
+
+                AlertType = "alert alert-success";
+                DisplaySearch = DisplayNone;
+                DisplayForm = DisplayNone;
+                ResultMessage = _lc.Keys["BedRequestFormUpdated"];
+                ResultDisplay = "";
+                return bedRequest;
+            }
+
+            ResultMessage = updateResult.Message;
+            AlertType = AlertDanger;
+            ResultDisplay = "";
+            Log.Error("Error updating BedRequest: " + updateResult.Message);
+            return null;
+        }
+
+        private async Task<Common.Models.BedRequest?> CreateNewBedRequest(Common.Models.BedRequest bedRequest)
+        {
+            var addResult = await _svcBedRequest.CreateAsync(bedRequest);
+            if (addResult.Success && addResult.Data != null)
+            {
+                bedRequest = addResult.Data;
+                AlertType = "alert alert-success";
+                DisplaySearch = DisplayNone;
+                DisplayForm = DisplayNone;
+                ResultMessage = _lc.Keys["BedRequestFormCreated"];
+                ResultDisplay = "";
+                return bedRequest;
+            }
+
+            ResultMessage = addResult.Message;
+            AlertType = AlertDanger;
+            ResultDisplay = "";
+            Log.Error("Error creating BedRequest: " + addResult.Message);
+            return null;
+        }
+
         private async Task<Common.Models.BedRequest> BuildBedRequest()
         {
             //Set it to the primary city name
             newRequest.City = Validation.GetCityForZipCode(newRequest.PostalCode);
-            newRequest.Reference = "Website";
+            newRequest.Reference = "National Website";
             Common.Models.BedRequest bedRequest = new Common.Models.BedRequest();
             ObjectUtil.CopyProperties(newRequest, bedRequest);
             string defaultNote = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings,

@@ -87,7 +87,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity : class, IPhone
+        public async Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity : class, IPhone, ILocationId
         {
             string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetByPhone({phone})");
             var cachedContent = _cachingService.Get<TEntity>(cacheKey);
@@ -101,7 +101,7 @@ namespace BedBrigade.Data.Services
                 string formattedPhone = phoneWithNumbersOnly.FormatPhoneNumber();
 
                 var dbSet = ctx.Set<TEntity>();
-                var result = await dbSet.FirstOrDefaultAsync(b => b.Phone == formattedPhone || b.Phone == phoneWithNumbersOnly);
+                var result = await dbSet.Where(b => b.Phone == formattedPhone || b.Phone == phoneWithNumbersOnly).OrderByDescending(o => o.UpdateDate).FirstOrDefaultAsync();
 
                 if (result == null)
                     return new ServiceResponse<TEntity>($"No {repository.GetEntityName()} record found with phone {phone}", false);

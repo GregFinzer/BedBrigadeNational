@@ -132,6 +132,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return await _commonService.GetByPhone(this, phone);
     }
 
+
     public async Task<ServiceResponse<List<string>>> EmailsForNotReceivedABed(int locationId)
     {
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"EmailsForNotReceivedABed");
@@ -240,6 +241,37 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
 
         return bedRequests.OrderBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+    }
+
+    public async Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var bedRequest = await dbSet.FirstOrDefaultAsync(o => o.Email == email && o.Status == BedRequestStatus.Waiting);
+            if (bedRequest == null)
+            {
+                return new ServiceResponse<BedRequest>($"No waiting BedRequest found for email {email}", false, null);
+            }
+            return new ServiceResponse<BedRequest>($"Found waiting BedRequest for email {email}", true, bedRequest);
+        }
+    }
+
+    public async Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            string phoneWithNumbersOnly = StringUtil.ExtractDigits(phone);
+            string formattedPhone = phoneWithNumbersOnly.FormatPhoneNumber();
+
+            var dbSet = ctx.Set<BedRequest>();
+            var bedRequest = await dbSet.FirstOrDefaultAsync(o => o.Status == BedRequestStatus.Waiting && (o.Phone == phoneWithNumbersOnly || o.Phone == formattedPhone));
+            if (bedRequest == null)
+            {
+                return new ServiceResponse<BedRequest>($"No waiting BedRequest found for phone {phone}", false, null);
+            }
+            return new ServiceResponse<BedRequest>($"Found waiting BedRequest for phone {phone}", true, bedRequest);
+        }
     }
 
     private (double? Latitude, double? Longitude) GetTargetCoordinates(BedRequest request, AddressParser addressParser)

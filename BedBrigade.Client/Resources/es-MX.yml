@@ -13,7 +13,8 @@ BedBrigadeWeb: Web de la Brigada de Camas
 BedRequest: Solicitud de cama
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
-BedRequestFormSubmitted: Gracias por coronar su solicitud de cama. Revisa tu correo electrónico para obtener una confirmación. Si no recibe un correo electrónico en 5 minutos, revise su carpeta de correo no deseado.
+BedRequestFormCreated: Gracias por crear tu solicitud de cama. Revisa tu correo electrónico para ver si hay una confirmación. Si no recibes un correo en 5 minutos, revisa tu carpeta de correo no deseado.
+BedRequestFormUpdated: Gracias por actualizar su solicitud de cama. Revise su correo electrónico para confirmarlo. Si no recibe un correo en 5 minutos, revise su carpeta de correo no deseado.
 BlogNoData: No hay artículos disponibles en este momento. ¡Vuelva más tarde para ver las actualizaciones!
 BuildAddress: Dirección de compilación
 BuildCity: Construir ciudad

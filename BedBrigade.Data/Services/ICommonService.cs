@@ -16,7 +16,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<TEntity>>> GetAllForLocationList<TEntity>(IRepository<TEntity> repository, List<int> locationIds)
             where TEntity : class, ILocationId;
 
-        Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity: class, IPhone;
+        Task<ServiceResponse<TEntity>> GetByPhone<TEntity>(IRepository<TEntity> repository, string phone) where TEntity: class, IPhone, ILocationId;
 
         Task<ServiceResponse<List<string>>> GetDistinctPhone<TEntity>(IRepository<TEntity> repository)
             where TEntity : class, IPhone;
