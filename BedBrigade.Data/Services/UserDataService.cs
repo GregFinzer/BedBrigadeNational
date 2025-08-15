@@ -234,5 +234,10 @@ namespace BedBrigade.Data.Services
 
             return new ServiceResponse<List<string>>($"Found {emails.Count} emails for location {locationId} and config key {key}", true, emails.Distinct().ToList());
         }
+
+        public Task<ServiceResponse<User>> GetByEmail(string email)
+        {
+            return _commonService.GetByEmail(this, email);
+        }
     }
 }
