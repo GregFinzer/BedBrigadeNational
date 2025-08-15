@@ -3,7 +3,7 @@ using KellermanSoftware.NetEncryptionLibrary;
 
 namespace BedBrigade.Common.Logic;
 
-    public class EncryptionLogic
+    public static class EncryptionLogic
     {
         private static Encryption _encryption;
 
@@ -28,4 +28,12 @@ namespace BedBrigade.Common.Logic;
             return Encryption.DecryptString(EncryptionProvider.FPEKELL1, key, cipherText);
         }
 
+        public static string GetTempUserHash(string email)
+        {
+            const int validSeconds = 60 * 15; // 15 minutes
+            string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
+            string oneTimePassword = _encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
+            string stringToHash = oneTimePassword + oneTimePasswordKey;
+            return _encryption.HashStringBase64(HashProvider.HMACSHA512, stringToHash);
+        }
     }
