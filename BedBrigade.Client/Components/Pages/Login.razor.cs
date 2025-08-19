@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -107,7 +109,11 @@ namespace BedBrigade.Client.Components.Pages
                         && userResult.Data.MustChangePassword)
                     {
                         string oneTimePassword = System.Web.HttpUtility.UrlPathEncode(EncryptionLogic.GetOneTimePassword(loginModel.Email));
-                        NavigationManager.NavigateTo($"/change-password/{oneTimePassword}");
+
+                        string encryptionKey = LicenseLogic.SyncfusionLicenseKey;
+                        string encryptedEmail = EncryptionLogic.EncryptString(encryptionKey, loginModel.Email);
+                        string encodedEmail = System.Web.HttpUtility.UrlPathEncode(encryptedEmail);
+                        NavigationManager.NavigateTo($"/change-password/{oneTimePassword}/{encodedEmail}");
                     }
                     else if (!string.IsNullOrEmpty(returnUrl))
                     {

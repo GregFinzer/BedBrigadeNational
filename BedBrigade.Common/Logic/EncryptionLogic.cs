@@ -21,12 +21,17 @@ public static class EncryptionLogic
 
     public static string EncryptString(string key, string plainText)
     {
-        return Encryption.EncryptString(EncryptionProvider.FPEKELL1, key, plainText);
+        byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+        byte[] encryptedBytes = Encryption.EncryptBytes(EncryptionProvider.FPEKELL1, key, plainTextBytes);
+        return Convert.ToBase64String(encryptedBytes);
     }
 
     public static string DecryptString(string key, string cipherText)
     {
-        return Encryption.DecryptString(EncryptionProvider.FPEKELL1, key, cipherText);
+        byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+        byte[] decryptedBytes = Encryption.DecryptBytes(EncryptionProvider.FPEKELL1, key, cipherTextBytes);
+        string plainText = System.Text.Encoding.UTF8.GetString(decryptedBytes);
+        return plainText;
     }
 
     public static string GetOneTimePassword(string? email)

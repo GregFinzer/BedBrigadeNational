@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
@@ -10,14 +12,13 @@ namespace BedBrigade.Client.Components.Pages;
 
 public partial class ChangePassword : ComponentBase
 {
-    [Parameter] public string email { get; set; } = string.Empty;
+    [Parameter] public string encryptedEmail { get; set; } = string.Empty;
     [Parameter] public string oneTimePassword { get; set; } = string.Empty;
 
     [Inject] public IUserDataService UserDataService { get; set; } = default!;
     [Inject] public IAuthDataService AuthDataService { get; set; } = default!;
     [Inject] public IAuthService AuthService { get; set; } = default!;
     [Inject] public NavigationManager Nav { get; set; } = default!;
-
     protected User? _user;
     protected bool _oneTimePasswordValid;
     protected bool _loading = true;
@@ -27,21 +28,17 @@ public partial class ChangePassword : ComponentBase
     protected bool _showPassword = false;
 
     protected ChangePasswordModel _model = new();
-
+    public string email;
     protected override async Task OnParametersSetAsync()
     {
         const string loadErrorMessage = "Change password expired, request Forgot Password again.";
         try
         {
             // Lookup user
-            if (AuthService.IsLoggedIn)
+            if (!string.IsNullOrEmpty(encryptedEmail))
             {
-                email = AuthService.Email;
-                var userResp = await UserDataService.GetByEmail(AuthService.Email);
-                _user = (userResp?.Success ?? false) ? userResp!.Data : null;
-            }
-            else if (!string.IsNullOrEmpty(email))
-            {
+                string encryptionKey = LicenseLogic.SyncfusionLicenseKey;
+                email = EncryptionLogic.DecryptString(encryptionKey, encryptedEmail);
                 var userResp = await UserDataService.GetByEmail(email);
                 _user = (userResp?.Success ?? false) ? userResp!.Data : null;
             }
@@ -50,8 +47,6 @@ public partial class ChangePassword : ComponentBase
                 _errorMessage = loadErrorMessage;
                 return;
             }
-
-
 
             // Validate One Time Password (GetOneTimePassword enforces 15-min window)
             var expected = EncryptionLogic.GetOneTimePassword(email);
