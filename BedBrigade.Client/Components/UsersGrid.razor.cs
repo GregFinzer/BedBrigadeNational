@@ -282,7 +282,7 @@ namespace BedBrigade.Client.Components
             if (!string.IsNullOrEmpty(userRegister.Password) && userRegister.Password == userRegister.ConfirmPassword)
             {
                 UserChangePassword changePassword = new UserChangePassword() { UserId = userRegister.user.UserName, Password = userRegister.Password, ConfirmPassword = userRegister.Password };
-                var result = await _svcAuthData.ChangePassword(changePassword.UserId, changePassword.Password);
+                var result = await _svcAuthData.ChangePassword(changePassword.UserId, changePassword.Password, mustChangePassword:true);
                 if (result.Success)
                 {
                     _toastService.Success("Change Password", "Password Changed Successfully!");

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +16,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private IAuthDataService _authDataService { get; set; }
         [Inject] private IAuthService _authService { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
-
+        [Inject] private IUserDataService _userDataService { get; set; }
         [Parameter] public string? User { get; set; }
         [Parameter] public string? Password { get; set; }
 
@@ -100,7 +101,16 @@ namespace BedBrigade.Client.Components.Pages
                 {
                     await _authService.Login(loginResult.Data);
 
-                    if (!string.IsNullOrEmpty(returnUrl))
+                    var userResult = await _userDataService.GetByEmail(loginModel.Email);
+                    if (userResult.Success 
+                        && userResult.Data != null 
+                        && userResult.Data.MustChangePassword)
+                    {
+                        string email = System.Web.HttpUtility.UrlPathEncode(loginModel.Email);
+                        string hash = System.Web.HttpUtility.UrlPathEncode(EncryptionLogic.GetTempUserHash(loginModel.Email));
+                        NavigationManager.NavigateTo($"/change-password/{email}/{hash}");
+                    }
+                    else if (!string.IsNullOrEmpty(returnUrl))
                     {
                         NavigationManager.NavigateTo(returnUrl);
                         returnUrl = string.Empty;

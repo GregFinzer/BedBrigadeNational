@@ -182,7 +182,7 @@ namespace BedBrigade.Data.Services
         }
 
 
-        public async Task<ServiceResponse<User>> ChangePassword(string userId, string newPassword)
+        public async Task<ServiceResponse<User>> ChangePassword(string userId, string newPassword, bool mustChangePassword)
         {
             using ( var context = _contextFactory.CreateDbContext())
             {
@@ -197,6 +197,7 @@ namespace BedBrigade.Data.Services
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
+                user.MustChangePassword = mustChangePassword;
                 context.Users.Update(user);
                 try
                 {

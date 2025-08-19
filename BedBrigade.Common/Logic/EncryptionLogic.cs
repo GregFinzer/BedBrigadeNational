@@ -1,4 +1,3 @@
-using System;
 using KellermanSoftware.NetEncryptionLibrary;
 
 namespace BedBrigade.Common.Logic;
@@ -32,8 +31,8 @@ namespace BedBrigade.Common.Logic;
         {
             const int validSeconds = 60 * 15; // 15 minutes
             string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
-            string oneTimePassword = _encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
+            string oneTimePassword = Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
             string stringToHash = oneTimePassword + oneTimePasswordKey;
-            return _encryption.HashStringBase64(HashProvider.HMACSHA512, stringToHash);
+            return Encryption.HashStringBase64(HashProvider.HMACSHA512, stringToHash);
         }
     }
