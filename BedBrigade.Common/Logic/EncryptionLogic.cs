@@ -2,37 +2,38 @@ using KellermanSoftware.NetEncryptionLibrary;
 
 namespace BedBrigade.Common.Logic;
 
-    public static class EncryptionLogic
+public static class EncryptionLogic
+{
+    private static Encryption _encryption;
+
+    public static Encryption Encryption
     {
-        private static Encryption _encryption;
-
-        public static Encryption Encryption
+        get
         {
-            get
+            if (_encryption == null)
             {
-                if (_encryption == null)
-                {
-                    _encryption = LibraryFactory.CreateEncryption();
-                }
-                return _encryption;
+                _encryption = LibraryFactory.CreateEncryption();
             }
-        }
-        public static string EncryptString(string key, string plainText)
-        {
-            return Encryption.EncryptString(EncryptionProvider.FPEKELL1,key,plainText);
-        }
 
-        public static string DecryptString(string key, string cipherText)
-        {
-            return Encryption.DecryptString(EncryptionProvider.FPEKELL1, key, cipherText);
-        }
-
-        public static string GetTempUserHash(string email)
-        {
-            const int validSeconds = 60 * 15; // 15 minutes
-            string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
-            string oneTimePassword = Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
-            string stringToHash = oneTimePassword + oneTimePasswordKey;
-            return Encryption.HashStringBase64(HashProvider.HMACSHA512, stringToHash);
+            return _encryption;
         }
     }
+
+    public static string EncryptString(string key, string plainText)
+    {
+        return Encryption.EncryptString(EncryptionProvider.FPEKELL1, key, plainText);
+    }
+
+    public static string DecryptString(string key, string cipherText)
+    {
+        return Encryption.DecryptString(EncryptionProvider.FPEKELL1, key, cipherText);
+    }
+
+    public static string GetOneTimePassword(string? email)
+    {
+        email = (email ?? string.Empty).Trim().ToLowerInvariant();
+        const int validSeconds = 60 * 15; // 15 minutes
+        string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
+        return Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
+    }
+}
