@@ -41,4 +41,28 @@ public static class EncryptionLogic
         string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
         return Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
     }
+
+    public static string GetEncryptedEncodedEmail(string? email)
+    {
+        email = (email ?? string.Empty).Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(email))
+        {
+            return string.Empty;
+        }
+        string key = LicenseLogic.SyncfusionLicenseKey;
+        string encrypted= EncryptString(key, email);
+        return System.Web.HttpUtility.UrlPathEncode(encrypted);
+    }
+
+    public static string GetDecryptedEmail(string? encryptedEmail)
+    {
+        if (string.IsNullOrEmpty(encryptedEmail))
+        {
+            return string.Empty;
+        }
+        string key = LicenseLogic.SyncfusionLicenseKey;
+        return DecryptString(key, encryptedEmail);
+    }
+
+
 }

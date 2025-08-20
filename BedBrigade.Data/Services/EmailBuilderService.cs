@@ -3,6 +3,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using System.Text;
+using Serilog;
 using Twilio.TwiML.Voice;
 
 
@@ -392,6 +393,16 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
+        public async Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email)
+        {
+            var userResult = await _userDataService.GetByEmail(email);
+
+            if (!userResult.Success || userResult.Data == null)
+            {
+                Log.Information($"User not found for forgot password: {email}");
+                return new ServiceResponse<bool>(userResult.Message, false);
+            }
+        }
     }
 
 

@@ -25,4 +25,6 @@ public enum ContentType
     NewsletterForm = 13,
     [Description("Contact Us Confirmation Form")]
     ContactUsConfirmationForm = 14,
+    [Description("Forgot Password Form")]
+    ForgotPasswordForm = 15,
 }

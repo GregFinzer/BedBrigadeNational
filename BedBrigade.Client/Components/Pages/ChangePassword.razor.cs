@@ -37,8 +37,7 @@ public partial class ChangePassword : ComponentBase
             // Lookup user
             if (!string.IsNullOrEmpty(encryptedEmail))
             {
-                string encryptionKey = LicenseLogic.SyncfusionLicenseKey;
-                email = EncryptionLogic.DecryptString(encryptionKey, encryptedEmail);
+                email = EncryptionLogic.GetDecryptedEmail(encryptedEmail);
                 var userResp = await UserDataService.GetByEmail(email);
                 _user = (userResp?.Success ?? false) ? userResp!.Data : null;
             }

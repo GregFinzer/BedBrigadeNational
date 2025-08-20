@@ -116,6 +116,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
             await CreateContent(location, ContentType.SignUpSmsConfirmationForm, "SignUpSmsConfirmationForm.txt", "SignUpSmsConfirmationForm");
             await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
+            await CreateContent(location, ContentType.ForgotPasswordForm, "ForgotPasswordForm.txt", "ForgotPasswordForm");
 
             //Config
             await CreateConfig(location);
