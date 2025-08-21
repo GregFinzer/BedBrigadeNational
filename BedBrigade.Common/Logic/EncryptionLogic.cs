@@ -19,16 +19,29 @@ public static class EncryptionLogic
         }
     }
 
+    /// <summary>
+    /// This is ready to be used in a URL
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="plainText"></param>
+    /// <returns></returns>
     public static string EncryptString(string key, string plainText)
     {
         byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
         byte[] encryptedBytes = Encryption.EncryptBytes(EncryptionProvider.FPEKELL1, key, plainTextBytes);
-        return Convert.ToBase64String(encryptedBytes);
+        string base64String = Convert.ToBase64String(encryptedBytes);
+        return base64String.TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 
     public static string DecryptString(string key, string cipherText)
     {
-        byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+        string padded = cipherText.Replace('-', '+').Replace('_', '/');
+        switch (padded.Length % 4)
+        {
+            case 2: padded += "=="; break;
+            case 3: padded += "="; break;
+        }
+        byte[] cipherTextBytes = Convert.FromBase64String(padded);
         byte[] decryptedBytes = Encryption.DecryptBytes(EncryptionProvider.FPEKELL1, key, cipherTextBytes);
         string plainText = System.Text.Encoding.UTF8.GetString(decryptedBytes);
         return plainText;
