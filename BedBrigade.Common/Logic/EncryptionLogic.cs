@@ -64,5 +64,22 @@ public static class EncryptionLogic
         return DecryptString(key, encryptedEmail);
     }
 
+    public static string ToBase64Url(string input)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+        var base64String = Convert.ToBase64String(bytes);
+        return base64String.TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
 
+    public static string FromBase64Url(string input)
+    {
+        var padded = input.Replace('-', '+').Replace('_', '/');
+        switch (padded.Length % 4)
+        {
+            case 2: padded += "=="; break;
+            case 3: padded += "="; break;
+        }
+        var bytes = Convert.FromBase64String(padded);
+        return System.Text.Encoding.UTF8.GetString(bytes);
+    }
 }

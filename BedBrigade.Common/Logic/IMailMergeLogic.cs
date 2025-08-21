@@ -16,5 +16,7 @@ public interface IMailMergeLogic
     string ReplaceEmailForQuery(string body, string email);
     StringBuilder ReplaceSignUpFields(Schedule schedule, SignUp signUp, StringBuilder sb);
     StringBuilder ReplaceContactUsFields(ContactUs contactUs, StringBuilder sb);
+    StringBuilder ReplaceOneTimePassword(string email, StringBuilder sb);
+    StringBuilder ReplaceEncryptedEmail(string email, StringBuilder sb);
 }
 
