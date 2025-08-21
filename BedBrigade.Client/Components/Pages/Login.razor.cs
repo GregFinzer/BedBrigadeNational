@@ -36,7 +36,7 @@ namespace BedBrigade.Client.Components.Pages
         protected string ForgotPasswordHref =>
             string.IsNullOrWhiteSpace(loginModel?.Email)
                 ? "/forgot-password"
-                : $"/forgot-password/{EncryptionLogic.ToBase64Url(loginModel.Email)}";
+                : $"/forgot-password/{EncryptionLogic.EncodeUrl(loginModel.Email)}";
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);

@@ -24,6 +24,7 @@ Calendar: Calendario
 Campaign: Campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
+ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
 ChooseADate: Escoge una fecha
 ChooseATime: Escoge una hora
 City: Ciudad
@@ -102,6 +103,7 @@ DynamicWednesday: Miércoles
 DynamicYes: Sí
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
+EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
 Event: Evento
 Events: Eventos
@@ -120,6 +122,7 @@ FilteredTotalColon: 'Total Filtrado:'
 FindABedBrigade: Encuentra una brigada de camas
 FindABedBrigadeNearMe: Encuentra una brigada de camas cerca de mí
 FirstName: Nombre
+ForgotPassword: ¿Olvidaste tu contraseña?
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
@@ -212,6 +215,7 @@ PaymentCancelled: Pago Cancelado
 PaymentProcessor: Procesador de pagos
 PaymentStatus: Estado de pago
 Password: Contraseña
+PasswordChanged: Su contraseña ha sido cambiada exitosamente.
 Phone: Teléfono
 PhoneColon: 'Teléfono:'
 PhoneNumber: Número de teléfono

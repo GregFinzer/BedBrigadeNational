@@ -64,14 +64,19 @@ public static class EncryptionLogic
         return DecryptString(key, encryptedEmail);
     }
 
-    public static string ToBase64Url(string input)
+    /// <summary>
+    /// We do this because the nonfile attribute in parameters cannot handle periods.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static string EncodeUrl(string input)
     {
         var bytes = System.Text.Encoding.UTF8.GetBytes(input);
         var base64String = Convert.ToBase64String(bytes);
         return base64String.TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 
-    public static string FromBase64Url(string input)
+    public static string DecodeUrl(string input)
     {
         var padded = input.Replace('-', '+').Replace('_', '/');
         switch (padded.Length % 4)

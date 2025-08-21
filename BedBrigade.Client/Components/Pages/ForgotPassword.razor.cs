@@ -26,7 +26,7 @@ public partial class ForgotPassword : ComponentBase
         if (!string.IsNullOrWhiteSpace(email))
         {
             // Accept route-provided email and pre-populate the textbox
-            _model.Email = EncryptionLogic.FromBase64Url(email!);
+            _model.Email = EncryptionLogic.DecodeUrl(email!);
         }
     }
 
@@ -63,11 +63,6 @@ public partial class ForgotPassword : ComponentBase
         }
     }
 
-    protected sealed class ForgotPasswordModel
-    {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Enter a valid email address")]
-        public string? Email { get; set; }
-    }
+
 }
 

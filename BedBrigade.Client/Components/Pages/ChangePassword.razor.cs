@@ -19,6 +19,8 @@ public partial class ChangePassword : ComponentBase
     [Inject] public IAuthDataService AuthDataService { get; set; } = default!;
     [Inject] public IAuthService AuthService { get; set; } = default!;
     [Inject] public NavigationManager Nav { get; set; } = default!;
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
     protected User? _user;
     protected bool _oneTimePasswordValid;
     protected bool _loading = true;
@@ -31,7 +33,7 @@ public partial class ChangePassword : ComponentBase
     public string email;
     protected override async Task OnParametersSetAsync()
     {
-        const string loadErrorMessage = "Change password expired, request Forgot Password again.";
+        string loadErrorMessage = _lc.Keys["ChangePasswordExpired"];
         try
         {
             // Lookup user
@@ -102,16 +104,6 @@ public partial class ChangePassword : ComponentBase
         }
     }
 
-    protected sealed class ChangePasswordModel
-    {
-        [Required(ErrorMessage = "Password is required")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
-            ErrorMessage = "Password must be 8+ chars with upper, lower, number, and special character")]
-        public string? Password { get; set; }
 
-        [Required(ErrorMessage = "Confirm Password is required")]
-        [Compare(nameof(Password), ErrorMessage = "Passwords must match")]
-        public string? ConfirmPassword { get; set; }
-    }
 }
 
