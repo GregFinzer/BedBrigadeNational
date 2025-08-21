@@ -63,8 +63,7 @@ public static class EncryptionLogic
             return string.Empty;
         }
         string key = LicenseLogic.SyncfusionLicenseKey;
-        string encrypted= EncryptString(key, email);
-        return System.Web.HttpUtility.UrlPathEncode(encrypted);
+        return EncryptString(key, email);
     }
 
     public static string GetDecryptedEmail(string? encryptedEmail)
