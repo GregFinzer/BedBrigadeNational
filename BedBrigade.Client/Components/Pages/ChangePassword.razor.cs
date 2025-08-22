@@ -1,12 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
-using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -23,14 +20,24 @@ public partial class ChangePassword : ComponentBase
 
     protected User? _user;
     protected bool _oneTimePasswordValid;
-    protected bool _loading = true;
-    protected bool _busy = false;
+    protected bool _isLoading = true;
+    protected bool _isBusy = false;
     protected bool _success = false;
     protected string? _errorMessage;
     protected bool _showPassword = false;
 
     protected ChangePasswordModel _model = new();
     public string email;
+    private EditContext? EC { get; set; }
+    private ValidationMessageStore _validationMessageStore;
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+        EC = new EditContext(_model);
+        _validationMessageStore = new ValidationMessageStore(EC);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         string loadErrorMessage = _lc.Keys["ChangePasswordExpired"];
@@ -66,7 +73,7 @@ public partial class ChangePassword : ComponentBase
         }
         finally
         {
-            _loading = false;
+            _isLoading = false;
         }
     }
 
@@ -74,7 +81,12 @@ public partial class ChangePassword : ComponentBase
     {
         if (_user is null || !_oneTimePasswordValid) return;
 
-        _busy = true;
+        if (!IsValid())
+        {
+            return;
+        }
+
+        _isBusy = true;
         _errorMessage = null;
 
         try
@@ -91,17 +103,23 @@ public partial class ChangePassword : ComponentBase
             }
             else
             {
-                _errorMessage = "Unable to change password. Please try again.";
+                _errorMessage = _lc.Keys["UnableToChangePassword"];
             }
         }
         catch
         {
-            _errorMessage = "Unable to change password. Please try again.";
+            _errorMessage = _lc.Keys["UnableToChangePassword"];
         }
         finally
         {
-            _busy = false;
+            _isBusy = false;
         }
+    }
+
+    private bool IsValid()
+    {
+        _validationMessageStore.Clear();
+        return ValidationLocalization.ValidateModel(_model, _validationMessageStore, _lc);
     }
 
 

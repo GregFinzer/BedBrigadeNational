@@ -13,10 +13,7 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">@_lc.Keys["PleaseEnterYourLogin"]</h5>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
+        <EditForm EditContext="@EC">
             <div class="form-group">
                 <label for="email">@_lc.Keys["Email"]</label>
                 <InputText Id="email" @ref=@inputTextFocus class="form-control" @bind-Value="loginModel.Email"  />
@@ -33,11 +30,17 @@
                     <input type="checkbox" checked=@showPassword @oninput=@HandlePassword/>
                     <label for="showPassword">@_lc.Keys["ShowPassword"]</label>
                 </div>
-                <a class="link-primary" href="@ForgotPasswordHref">Forgot Password?</a>
+                <a class="link-primary" href="@ForgotPasswordHref">@_lc.Keys["ForgotPassword"]</a>
             </div>
             <h6 class="warning login-error text-center" style="display: @DisplayError">@errorMessage</h6>
             <div class="w-100 text-center">
-                <button type="submit" class="btn btn-primary">@_lc.Keys["LogIn"]</button>
+                <button class="btn btn-primary" @onclick="(HandleLogin)" disabled="@_isBusy">
+                    @if (_isBusy)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    }
+                    @_lc.Keys["LogIn"]
+                </button>
             </div>
         </EditForm>
     </div>

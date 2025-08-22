@@ -168,6 +168,7 @@ MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
 MaxLengthOrganization80: El grupo tiene una longitud máxima de 80 caracteres
 MaxLengthOtherArea100: El área de otro tiene una longitud máxima de 100 caracteres
 MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
+MaxLengthPassword255: La contraseña tiene una longitud máxima de 255 caracteres
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
 MaxLengthReference100: La referencia tiene una longitud máxima de 100 caracteres
@@ -232,6 +233,7 @@ RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 10
 Reference: Referencia
 RegisterOrUpdate: Registrarse o Actualizar
 RegularExpressionEmail: Formato de correo electrónico no válido
+RegularExpressionPassword: La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.
 RegularExpressionPhone: Formato de número de teléfono no válido
 RequestABed: Solicitar una cama
 RequestABedFor: Solicitar una cama para otra persona
@@ -296,6 +298,7 @@ SelectLanguages: Seleccionar Idiomas
 SelectMetroArea: Seleccione Área Metropolitana
 SelectTimeZone: Seleccionar zona horaria
 Send: Enviar
+SendEmail: Enviar Correo Electrónico
 SendMessage: Enviar Mensaje
 SendTaxForms: Enviar formularios de impuestos
 ShowPassword: Mostrar contraseña
@@ -325,6 +328,8 @@ TransactionFees: Tarifas de transacción
 TransactionId: ID de transacción
 TransactionIdColon: 'ID de transacción:'
 TurnYourPhone: Gira tu teléfono hacia un lado para una mejor vista
+UnableToChangePassword: No se puede cambiar la contraseña. Inténtalo de nuevo.
+UnableToSendEmail: No se pudo enviar el correo electrónico. Inténtalo de nuevo.
 Unauthorized: Desautorizado
 Unregister: Desregistrarse
 Unsubscribe: Darse de baja

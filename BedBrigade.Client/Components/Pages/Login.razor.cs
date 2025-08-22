@@ -1,14 +1,17 @@
-using System.Security.Claims;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Serilog;
+using System.Net;
+using System.Security.Claims;
 
 namespace BedBrigade.Client.Components.Pages
 {
@@ -33,10 +36,15 @@ namespace BedBrigade.Client.Components.Pages
         public string? passwordType { get; set; }
         public string Message { get; set; }
 
+        private EditContext? EC { get; set; }
+        private ValidationMessageStore _validationMessageStore;
+        protected bool _isBusy = false;
         protected string ForgotPasswordHref =>
             string.IsNullOrWhiteSpace(loginModel?.Email)
                 ? "/forgot-password"
                 : $"/forgot-password/{EncryptionLogic.EncodeUrl(loginModel.Email)}";
+
+
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
@@ -44,6 +52,9 @@ namespace BedBrigade.Client.Components.Pages
             loginModel.Password = Password;
             passwordType = "password";
             showPassword = false;
+
+            EC = new EditContext(loginModel);
+            _validationMessageStore = new ValidationMessageStore(EC);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -99,8 +110,12 @@ namespace BedBrigade.Client.Components.Pages
 
         protected async Task HandleLogin()
         {
+            if (!IsValid())
+                return;
+
             try
             {
+                _isBusy = true;
                 ServiceResponse<ClaimsPrincipal> loginResult = await _authDataService.Login(loginModel.Email, loginModel.Password);
 
                 if (loginResult.Success && loginResult.Data != null)
@@ -145,6 +160,16 @@ namespace BedBrigade.Client.Components.Pages
                 errorMessage = "There was an error logging in, try again later.";
                 DisplayError = "block;";
             }
+            finally
+            {
+                _isBusy = false;
+            }
+        }
+
+        private bool IsValid()
+        {
+            _validationMessageStore.Clear();
+            return ValidationLocalization.ValidateModel(loginModel, _validationMessageStore, _lc);
         }
     }
 }

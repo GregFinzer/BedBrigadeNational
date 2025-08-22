@@ -8,6 +8,9 @@ namespace BedBrigade.Common.Logic
         public const string EmailRegexPattern =
             "^(\\D)+(\\w)*((\\.(\\w)+)?)+@(\\D)+(\\w)*((\\.(\\D)+(\\w)*)+)?(\\.)[a-z]{2,}$";
 
+        public const string PasswordRegexPattern =
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$";
+
         public static Result IsValidEmail(string? email)
         {
             var emailValidation = LibraryFactory.CreateEmailValidation();

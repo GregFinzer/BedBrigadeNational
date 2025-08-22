@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using BedBrigade.Common.Logic;
+﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using BedBrigade.SpeakIt;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -15,11 +17,21 @@ public partial class ForgotPassword : ComponentBase
     [Inject] public NavigationManager Nav { get; set; } = default!;
     [Inject]
     public EmailQueueBackgroundService EmailQueueBackgroundService { get; set; } = default!;
+    [Inject] private ILanguageContainerService _lc { get; set; }
 
     protected ForgotPasswordModel _model = new();
-    protected bool _busy = false;
+    protected bool _isBusy = false;
     protected bool _success = false;
     protected string? _errorMessage;
+    private EditContext? EC { get; set; }
+    private ValidationMessageStore _validationMessageStore;
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+        EC = new EditContext(_model);
+        _validationMessageStore = new ValidationMessageStore(EC);
+    }
 
     protected override void OnParametersSet()
     {
@@ -30,9 +42,18 @@ public partial class ForgotPassword : ComponentBase
         }
     }
 
+    private bool IsValid()
+    {
+        _validationMessageStore.Clear();
+        return ValidationLocalization.ValidateModel(_model, _validationMessageStore, _lc);
+    }
+
     protected async Task OnSubmitAsync()
     {
-        _busy = true;
+        if (!IsValid())
+            return;
+
+        _isBusy = true;
         _success = false;
         _errorMessage = null;
 
@@ -49,17 +70,17 @@ public partial class ForgotPassword : ComponentBase
             else
             {
                 _errorMessage = string.IsNullOrWhiteSpace(resp.Message)
-                    ? "Unable to send email. Please try again."
+                    ? _lc.Keys["UnableToSendEmail"]
                     : resp.Message;
             }
         }
         catch
         {
-            _errorMessage = "Unable to send email. Please try again.";
+            _errorMessage = _lc.Keys["UnableToSendEmail"];
         }
         finally
         {
-            _busy = false;
+            _isBusy = false;
         }
     }
 

@@ -51,6 +51,7 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox phoneTextBox;
 
         private ValidationMessageStore _validationMessageStore;
+        private bool _isBusy = false;
         #endregion
 
         #region Initialization
@@ -183,14 +184,23 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
-            if (!await IsValid())
-                return;
+            _isBusy = true;
 
-            newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
-            newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
-            newRequest.Status = ContactUsStatus.ContactRequested;
-            await UpdateDatabase();
-            await SendConfirmationEmail(newRequest);
+            try
+            {
+                if (!await IsValid())
+                    return;
+
+                newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
+                newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
+                newRequest.Status = ContactUsStatus.ContactRequested;
+                await UpdateDatabase();
+                await SendConfirmationEmail(newRequest);
+            }
+            finally
+            {
+                _isBusy = false;
+            }
         }
 
         private async Task SendConfirmationEmail(Common.Models.ContactUs contactUs)

@@ -168,6 +168,7 @@ MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganization80: Organization has a maximum length of 20
 MaxLengthOtherArea100: Other Area has a maximum length of 100 characters
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
+MaxLengthPassword255: Password has a maximum length of 255 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthReference100: Reference has a maximum length of 100 characters
@@ -230,6 +231,7 @@ RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
 Reference: Reference
 RegisterOrUpdate: Register or Update
 RegularExpressionEmail: Invalid email format
+RegularExpressionPassword: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.
 RegularExpressionPhone: Invalid phone format
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
@@ -295,6 +297,7 @@ SelectLanguages: Select Languages
 SelectMetroArea: Select Metro Area
 SelectTimeZone: Select Time Zone
 Send: Send
+SendEmail: Send Email
 SendMessage: Send Message
 SendTaxForms: Send Tax Forms
 ShowPassword: Show Password
@@ -324,6 +327,8 @@ TransactionFees: Transaction Fees
 TransactionId: Transaction ID
 TransactionIdColon: 'Transaction ID:'
 TurnYourPhone: Turn your phone sideways for a better view
+UnableToChangePassword: Unable to change password. Please try again.
+UnableToSendEmail: Unable to send email. Please try again.
 Unauthorized: Unauthorized
 Unregister: Unregister
 Unsubscribe: Unsubscribe

@@ -62,7 +62,7 @@ protected override void OnInitialized()
 ```
 
 ## How to localize validation messages
-1.  Perform a commit to Git to your feature branch so that you can revert any changes if needed.
+1.  **Perform a commit to Git to your feature branch so that you can revert any changes if needed**.
 2. Use data attributes as you normally would on your model.
 
     ```C#
@@ -75,7 +75,7 @@ protected override void OnInitialized()
 5.  Go to this site and upload the changed en-US.yml https://akmultilanguages.azurewebsites.net/TranslateApplication
 6.  Translate to es-MX
 7.  Download the file and replace the existing es-MX file in BedBrigade.Client\Resources
-8.  For a full example, see BedRequest.razor.cs  You will need to create a ValidationMessageStore private variable and initialize it.  Also, clear it before validating (see ClearValidationMessages).  In your IsValid method, instead of calling Validate() on the Edit Context, run this method:
+8.  For a full example, see Login.razor.cs  You will need to create an EditContext, ValidationMessageStore and initialize it.  Also, clear it before validating (see the IsValid() method).  In your IsValid method, instead of calling Validate() on the Edit Context, run this method:
 
     ```C#
     formIsValid = ValidationLocalization.ValidateModel(newRequest, _validationMessageStore, _lc);

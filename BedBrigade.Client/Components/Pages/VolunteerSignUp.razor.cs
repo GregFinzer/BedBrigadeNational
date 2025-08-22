@@ -84,6 +84,7 @@ namespace BedBrigade.Client.Components.Pages
         private int _previousNumberOfVolunteers = 0;
         private VehicleType? _previousDeliveryVehicle;
         private List<EnumNameValue<CanYouTranslate>> TranslationOptions { get; set; }
+        protected bool _isBusy = false;
         #endregion
 
         #region Initialization
@@ -323,12 +324,20 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveVolunteer()
         {
-            if (!await IsValid())
+            _isBusy = true;
+            try
             {
-                return;
-            }
+                if (!await IsValid())
+                {
+                    return;
+                }
 
-            await UpdateDatabase();
+                await UpdateDatabase();
+            }
+            finally
+            {
+                _isBusy = false;
+            }
         } 
 
         private async Task UpdateDatabase()
@@ -665,6 +674,7 @@ namespace BedBrigade.Client.Components.Pages
 
             try
             {
+                _isBusy = true;
                 var unregisterResponse = await _svcSignUp.Unregister(newVolunteer.Email, SelectedEvent.ScheduleId);
 
                 if (!unregisterResponse.Success)
@@ -675,7 +685,8 @@ namespace BedBrigade.Client.Components.Pages
                 }
 
                 string customMessage = "This is to confirm that your sign-up was removed.";
-                var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(unregisterResponse.Data, customMessage);
+                var emailResponse =
+                    await _svcEmailBuilder.SendSignUpConfirmationEmail(unregisterResponse.Data, customMessage);
 
                 if (!emailResponse.Success)
                 {
@@ -687,12 +698,17 @@ namespace BedBrigade.Client.Components.Pages
                 DisplaySearch = DisplayNone;
                 DisplayForm = DisplayNone;
                 ResultDisplay = "";
-                FinalMessage = BootstrapHelper.GetBootstrapJumbotron("Unregisterd", "You have sucessfully unregistered for the event", string.Empty);
+                FinalMessage = BootstrapHelper.GetBootstrapJumbotron("Unregisterd",
+                    "You have sucessfully unregistered for the event", string.Empty);
             }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error UnregisterVolunteer: {ex.Message}");
                 await ShowMessage("Error UnregisterVolunteer: " + ex.Message);
+            }
+            finally
+            {
+                _isBusy = false;
             }
         }
         #endregion

@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models;
 
 public sealed class ChangePasswordModel
 {
     [Required(ErrorMessage = "Password is required")]
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
-        ErrorMessage = "Password must be 8+ chars with upper, lower, number, and special character")]
+    [RegularExpression(Validation.PasswordRegexPattern,
+        ErrorMessage = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
     [MaxLength(255, ErrorMessage = "Password has a maximum length of 255 characters")]
     public string? Password { get; set; }
 
