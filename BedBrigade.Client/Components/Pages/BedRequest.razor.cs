@@ -76,6 +76,7 @@ namespace BedBrigade.Client.Components.Pages
         private string AlertType = AlertDanger;
         public required SfMaskedTextBox phoneTextBox;
         public required SfMaskedTextBox zipTextBox;
+        protected bool _isBusy = false;
         #endregion
         #region Initialization
 
@@ -363,38 +364,45 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
-            bool isValid = await IsValid();
+            _isBusy = true;
 
-            if (isValid)
+            try
             {
-                newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
-                newRequest.NumberOfBeds = NumericValue;
-                newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
-                newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
-                newRequest.Contacted = false;
-                newRequest.BedType = Defaults.DefaultBedType;
+                bool isValid = await IsValid();
 
-                if (newRequest.PrimaryLanguage == "English")
+                if (isValid)
                 {
-                    newRequest.SpeakEnglish = "Yes";
-                }
-                else
-                {
-                    if (String.IsNullOrEmpty(newRequest.SpeakEnglish))
+                    newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
+                    newRequest.NumberOfBeds = NumericValue;
+                    newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
+                    newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
+                    newRequest.Contacted = false;
+                    newRequest.BedType = Defaults.DefaultBedType;
+
+                    if (newRequest.PrimaryLanguage == "English")
                     {
-                        newRequest.SpeakEnglish = "No"; // cannot be null
+                        newRequest.SpeakEnglish = "Yes";
+                    }
+                    else
+                    {
+                        if (String.IsNullOrEmpty(newRequest.SpeakEnglish))
+                        {
+                            newRequest.SpeakEnglish = "No"; // cannot be null
+                        }
+                    }
+
+                    var bedRequest = await UpdateDatabase();
+
+                    if (bedRequest != null)
+                    {
+                        await SendConfirmationEmail(bedRequest);
+                        await QueueForGeoLocation(bedRequest);
                     }
                 }
-
-
-
-                var bedRequest = await UpdateDatabase();
-
-                if (bedRequest != null)
-                {
-                    await SendConfirmationEmail(bedRequest);
-                    await QueueForGeoLocation(bedRequest);
-                }
+            }
+            finally
+            {
+                _isBusy = false;
             }
         }
 

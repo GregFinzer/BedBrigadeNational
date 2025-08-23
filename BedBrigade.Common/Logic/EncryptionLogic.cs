@@ -1,31 +1,102 @@
-using System;
 using KellermanSoftware.NetEncryptionLibrary;
 
 namespace BedBrigade.Common.Logic;
 
-    public class EncryptionLogic
+public static class EncryptionLogic
+{
+    private static Encryption _encryption;
+
+    public static Encryption Encryption
     {
-        private static Encryption _encryption;
-
-        public static Encryption Encryption
+        get
         {
-            get
+            if (_encryption == null)
             {
-                if (_encryption == null)
-                {
-                    _encryption = LibraryFactory.CreateEncryption();
-                }
-                return _encryption;
+                _encryption = LibraryFactory.CreateEncryption();
             }
-        }
-        public static string EncryptString(string key, string plainText)
-        {
-            return Encryption.EncryptString(EncryptionProvider.FPEKELL1,key,plainText);
-        }
 
-        public static string DecryptString(string key, string cipherText)
-        {
-            return Encryption.DecryptString(EncryptionProvider.FPEKELL1, key, cipherText);
+            return _encryption;
         }
-
     }
+
+    /// <summary>
+    /// This is ready to be used in a URL
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="plainText"></param>
+    /// <returns></returns>
+    public static string EncryptString(string key, string plainText)
+    {
+        byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+        byte[] encryptedBytes = Encryption.EncryptBytes(EncryptionProvider.FPEKELL1, key, plainTextBytes);
+        string base64String = Convert.ToBase64String(encryptedBytes);
+        return base64String.TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
+
+    public static string DecryptString(string key, string cipherText)
+    {
+        string padded = cipherText.Replace('-', '+').Replace('_', '/');
+        switch (padded.Length % 4)
+        {
+            case 2: padded += "=="; break;
+            case 3: padded += "="; break;
+        }
+        byte[] cipherTextBytes = Convert.FromBase64String(padded);
+        byte[] decryptedBytes = Encryption.DecryptBytes(EncryptionProvider.FPEKELL1, key, cipherTextBytes);
+        string plainText = System.Text.Encoding.UTF8.GetString(decryptedBytes);
+        return plainText;
+    }
+
+    public static string GetOneTimePassword(string? email)
+    {
+        email = (email ?? string.Empty).Trim().ToLowerInvariant();
+        const int validSeconds = 60 * 15; // 15 minutes
+        string oneTimePasswordKey = email + LicenseLogic.SyncfusionLicenseKey;
+        return Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
+    }
+
+    public static string EncryptEmail(string? email)
+    {
+        email = (email ?? string.Empty).Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(email))
+        {
+            return string.Empty;
+        }
+        string key = LicenseLogic.SyncfusionLicenseKey;
+        return EncryptString(key, email);
+    }
+
+    public static string DecryptEmail(string? encryptedEmail)
+    {
+        if (string.IsNullOrEmpty(encryptedEmail))
+        {
+            return string.Empty;
+        }
+        string key = LicenseLogic.SyncfusionLicenseKey;
+        return DecryptString(key, encryptedEmail);
+    }
+
+    /// <summary>
+    /// We do this because the nonfile attribute in parameters cannot handle periods.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static string EncodeUrl(string input)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+        var base64String = Convert.ToBase64String(bytes);
+        return base64String.TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
+
+    public static string DecodeUrl(string input)
+    {
+        var padded = input.Replace('-', '+').Replace('_', '/');
+        switch (padded.Length % 4)
+        {
+            case 2: padded += "=="; break;
+            case 3: padded += "="; break;
+        }
+        var bytes = Convert.FromBase64String(padded);
+        return System.Text.Encoding.UTF8.GetString(bytes);
+    }
+}

@@ -300,8 +300,20 @@
             <br/>
             <div class="row">
                 <div class="col-md-3" style="text-align: center">
-                    <SfButton CssClass="btn btn-primary" OnClick="@SaveVolunteer">@_lc.Keys["RegisterOrUpdate"]</SfButton>
-                    <SfButton CssClass="btn btn-primary" OnClick="@UnregisterVolunteer">@_lc.Keys["Unregister"]</SfButton>
+                    <button class="btn btn-primary" @onclick="(SaveVolunteer)" disabled="@_isBusy">
+                        @if (_isBusy)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        @_lc.Keys["RegisterOrUpdate"]
+                    </button>
+                    <button class="btn btn-primary" @onclick="(UnregisterVolunteer)" disabled="@_isBusy">
+                        @if (_isBusy)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        @_lc.Keys["Unregister"]
+                    </button>
                 </div>
                 <div class="col-md-9">
                 </div>

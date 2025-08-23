@@ -68,6 +68,8 @@ public class MailMergeLogic : IMailMergeLogic
         "%%ContactUs.Phone%%",
         "%%ContactUs.Email%%",
         "%%ContactUs.Message%%",
+        "%%OneTimePassword%%",
+        "%%EncryptedEmail%%",
     };
 
     public void CheckForInvalidMergeFields(string template)
@@ -203,6 +205,20 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%ContactUs.Phone%%", contactUs.Phone.FormatPhoneNumber());
         sb = sb.Replace("%%ContactUs.Email%%", contactUs.Email);
         sb = sb.Replace("%%ContactUs.Message%%", contactUs.Message);
+        return sb;
+    }
+
+    public StringBuilder ReplaceOneTimePassword(string email, StringBuilder sb)
+    {
+        string oneTimePassword = EncryptionLogic.GetOneTimePassword(email);
+        sb = sb.Replace("%%OneTimePassword%%", oneTimePassword);
+        return sb;
+    }
+
+    public StringBuilder ReplaceEncryptedEmail(string email, StringBuilder sb)
+    {
+        string encryptEmail = EncryptionLogic.EncryptEmail(email);
+        sb = sb.Replace("%%EncryptedEmail%%", encryptEmail);
         return sb;
     }
 

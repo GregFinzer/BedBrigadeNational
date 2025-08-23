@@ -23,6 +23,7 @@ Calendar: Calendar
 Campaign: Campaign
 Cancel: Cancel
 ChangePassword: Change Password
+ChangePasswordExpired: Change password expired, request Forgot Password again.
 ChooseADate: Choose a Date
 ChooseATime: Choose a Time
 City: City
@@ -101,6 +102,7 @@ DynamicWednesday: Wednesday
 DynamicYes: Yes
 Email: Email
 EmailColon: 'Email:'
+EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
 Event: Event
 Events: Events
@@ -119,6 +121,7 @@ FilteredTotalColon: 'Filtered Total:'
 FindABedBrigade: Find a Bed Brigade
 FindABedBrigadeNearMe: Find a Bed Brigade Near Me
 FirstName: First Name
+ForgotPassword: Forgot Password
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
 FutureScheduled: Future Scheduled
@@ -165,6 +168,7 @@ MaxLengthNotes4000: Notes has a maximum length of 4000
 MaxLengthOrganization80: Organization has a maximum length of 20
 MaxLengthOtherArea100: Other Area has a maximum length of 100 characters
 MaxLengthOtherLanguagesSpoken4000: Other Languages Spoken has a maximum length of 4000 characters
+MaxLengthPassword255: Password has a maximum length of 255 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthReference100: Reference has a maximum length of 100 characters
@@ -207,6 +211,7 @@ OrganizerName: Organizer Name
 OrganizerPhone: Organizer Phone
 OtherLanguagesSpoken: Other Languages Spoken
 Password: Password
+PasswordChanged: Your password has been changed successfully.
 PaymentCancelled: Payment Cancelled
 PaymentProcessor: Payment Processor
 PaymentStatus: Payment Status
@@ -226,6 +231,7 @@ RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
 Reference: Reference
 RegisterOrUpdate: Register or Update
 RegularExpressionEmail: Invalid email format
+RegularExpressionPassword: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.
 RegularExpressionPhone: Invalid phone format
 RequestABed: Request a Bed
 RequestABedFor: Request a Bed for Another Person
@@ -291,6 +297,7 @@ SelectLanguages: Select Languages
 SelectMetroArea: Select Metro Area
 SelectTimeZone: Select Time Zone
 Send: Send
+SendEmail: Send Email
 SendMessage: Send Message
 SendTaxForms: Send Tax Forms
 ShowPassword: Show Password
@@ -320,6 +327,8 @@ TransactionFees: Transaction Fees
 TransactionId: Transaction ID
 TransactionIdColon: 'Transaction ID:'
 TurnYourPhone: Turn your phone sideways for a better view
+UnableToChangePassword: Unable to change password. Please try again.
+UnableToSendEmail: Unable to send email. Please try again.
 Unauthorized: Unauthorized
 Unregister: Unregister
 Unsubscribe: Unsubscribe

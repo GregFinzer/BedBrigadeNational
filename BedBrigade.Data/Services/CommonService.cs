@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace BedBrigade.Data.Services
 {
@@ -148,6 +149,27 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<List<string>>($"Found {result.Count()} {repository.GetEntityName()} records",
                     true, result);
 
+            }
+        }
+
+        public async Task<ServiceResponse<TEntity>> GetByEmail<TEntity>(IRepository<TEntity> repository, string email) where TEntity : class, IEmail, ILocationId
+        {
+            string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetByEmail({email})");
+            var cachedContent = _cachingService.Get<TEntity>(cacheKey);
+
+            if (cachedContent != null)
+                return new ServiceResponse<TEntity>($"Found {repository.GetEntityName()} record in cache with email {email}", true, cachedContent); ;
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<TEntity>();
+                var result = await dbSet.Where(b => b.Email.ToLower() == email.ToLower()).OrderByDescending(o => o.UpdateDate).FirstOrDefaultAsync();
+
+                if (result == null)
+                    return new ServiceResponse<TEntity>($"No {repository.GetEntityName()} record found with email {email}", false);
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<TEntity>($"Found {repository.GetEntityName()} record with email {email}", true, result);
             }
         }
     }

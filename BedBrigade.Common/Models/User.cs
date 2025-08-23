@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Logic;
@@ -46,6 +47,8 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [Range(1,int.MaxValue, ErrorMessage = "Please select a role for the user")]
     public int FkRole { get; set; }
 
+    [DefaultValue(false)]
+    public bool MustChangePassword { get; set; } = false;
 
     public string FullName
     {

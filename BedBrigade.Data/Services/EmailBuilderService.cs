@@ -3,8 +3,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using System.Text;
-using Twilio.TwiML.Voice;
-
+using Serilog;
 
 namespace BedBrigade.Data.Services
 {
@@ -392,6 +391,60 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
+        public async Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl)
+        {
+            var userResult = await _userDataService.GetByEmail(email);
+
+            if (!userResult.Success || userResult.Data == null)
+            {
+                Log.Information($"User not found for forgot password: {email}");
+                return new ServiceResponse<bool>(userResult.Message, false);
+            }
+
+            User user = userResult.Data;
+            var locationResult = await _locationDataService.GetByIdAsync(user.LocationId);
+
+            if (!locationResult.Success || locationResult.Data == null)
+            {
+                return new ServiceResponse<bool>(locationResult.Message, false);
+            }
+
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(user.LocationId, ContentType.ForgotPasswordForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("ForgotPasswordForm not found", false);
+            }
+
+            string body = BuildForgotPasswordBody(templateResult.Data.ContentHtml, locationResult.Data, user, baseUrl);
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = user.Email,
+                Subject = "Bed Brigade Password Reset Request",
+                Body = body,
+                Priority = Defaults.BulkHighPriority
+            };
+
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Forgot Password Email", true);
+        }
+
+        private string BuildForgotPasswordBody(string template, Location location, User user, string baseUrl)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = _mailMergeLogic.ReplaceUserFields(user, sb);
+            sb = _mailMergeLogic.ReplaceLocationFields(location, sb);
+            sb = _mailMergeLogic.ReplaceBaseUrl(sb, baseUrl);
+            sb = _mailMergeLogic.ReplaceOneTimePassword(user.Email, sb);
+            sb = _mailMergeLogic.ReplaceEncryptedEmail(user.Email, sb);
+            return sb.ToString();
+        }
     }
 
 
