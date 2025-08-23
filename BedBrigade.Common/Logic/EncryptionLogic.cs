@@ -55,7 +55,7 @@ public static class EncryptionLogic
         return Encryption.CreateTimedOneTimePassword(oneTimePasswordKey, validSeconds);
     }
 
-    public static string GetEncryptedEncodedEmail(string? email)
+    public static string EncryptEmail(string? email)
     {
         email = (email ?? string.Empty).Trim().ToLowerInvariant();
         if (string.IsNullOrEmpty(email))
@@ -66,7 +66,7 @@ public static class EncryptionLogic
         return EncryptString(key, email);
     }
 
-    public static string GetDecryptedEmail(string? encryptedEmail)
+    public static string DecryptEmail(string? encryptedEmail)
     {
         if (string.IsNullOrEmpty(encryptedEmail))
         {

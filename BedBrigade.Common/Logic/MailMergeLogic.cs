@@ -217,8 +217,8 @@ public class MailMergeLogic : IMailMergeLogic
 
     public StringBuilder ReplaceEncryptedEmail(string email, StringBuilder sb)
     {
-        string oneTimePassword = EncryptionLogic.GetEncryptedEncodedEmail(email);
-        sb = sb.Replace("%%EncryptedEmail%%", oneTimePassword);
+        string encryptEmail = EncryptionLogic.EncryptEmail(email);
+        sb = sb.Replace("%%EncryptedEmail%%", encryptEmail);
         return sb;
     }
 

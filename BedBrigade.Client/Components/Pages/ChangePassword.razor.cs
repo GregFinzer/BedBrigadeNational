@@ -46,7 +46,7 @@ public partial class ChangePassword : ComponentBase
             // Lookup user
             if (!string.IsNullOrEmpty(encryptedEmail))
             {
-                email = EncryptionLogic.GetDecryptedEmail(encryptedEmail);
+                email = EncryptionLogic.DecryptEmail(encryptedEmail);
                 var userResp = await UserDataService.GetByEmail(email);
                 _user = (userResp?.Success ?? false) ? userResp!.Data : null;
             }

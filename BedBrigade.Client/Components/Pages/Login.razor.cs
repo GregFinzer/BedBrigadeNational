@@ -156,7 +156,7 @@ namespace BedBrigade.Client.Components.Pages
                 && userResult.Data.MustChangePassword)
             {
                 string oneTimePassword = EncryptionLogic.GetOneTimePassword(loginModel.Email);
-                string encodedEmail = EncryptionLogic.GetEncryptedEncodedEmail(loginModel.Email);
+                string encodedEmail = EncryptionLogic.EncryptEmail(loginModel.Email);
                 NavigationManager.NavigateTo($"/change-password/{oneTimePassword}/{encodedEmail}");
             }
             else if (!string.IsNullOrEmpty(returnUrl))
