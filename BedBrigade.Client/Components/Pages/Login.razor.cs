@@ -120,27 +120,7 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (loginResult.Success && loginResult.Data != null)
                 {
-                    await _authService.Login(loginResult.Data);
-
-                    var userResult = await _userDataService.GetByEmail(loginModel.Email);
-                    if (userResult.Success 
-                        && userResult.Data != null 
-                        && userResult.Data.MustChangePassword)
-                    {
-                        string oneTimePassword = EncryptionLogic.GetOneTimePassword(loginModel.Email);
-                        string encodedEmail = EncryptionLogic.GetEncryptedEncodedEmail(loginModel.Email);
-                        NavigationManager.NavigateTo($"/change-password/{oneTimePassword}/{encodedEmail}");
-                    }
-                    else if (!string.IsNullOrEmpty(returnUrl))
-                    {
-                        NavigationManager.NavigateTo(returnUrl);
-                        returnUrl = string.Empty;
-                    }
-                    else
-                    {
-                        Log.Logger.Information($"User {_authService.UserName} logged in");
-                        NavigationManager.NavigateTo("/Administration/Dashboard");
-                    }
+                    await ProcessLoginResult(loginResult);
                 }
                 else
                 {
@@ -163,6 +143,31 @@ namespace BedBrigade.Client.Components.Pages
             finally
             {
                 _isBusy = false;
+            }
+        }
+
+        private async Task ProcessLoginResult(ServiceResponse<ClaimsPrincipal> loginResult)
+        {
+            await _authService.Login(loginResult.Data);
+
+            var userResult = await _userDataService.GetByEmail(loginModel.Email);
+            if (userResult.Success 
+                && userResult.Data != null 
+                && userResult.Data.MustChangePassword)
+            {
+                string oneTimePassword = EncryptionLogic.GetOneTimePassword(loginModel.Email);
+                string encodedEmail = EncryptionLogic.GetEncryptedEncodedEmail(loginModel.Email);
+                NavigationManager.NavigateTo($"/change-password/{oneTimePassword}/{encodedEmail}");
+            }
+            else if (!string.IsNullOrEmpty(returnUrl))
+            {
+                NavigationManager.NavigateTo(returnUrl);
+                returnUrl = string.Empty;
+            }
+            else
+            {
+                Log.Logger.Information($"User {_authService.UserName} logged in");
+                NavigationManager.NavigateTo("/Administration/Dashboard");
             }
         }
 
