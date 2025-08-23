@@ -370,6 +370,8 @@ namespace BedBrigade.Client.Components
         {
             userRegister.user = user;
             userRegister.ConfirmPassword = userRegister.Password;
+            userRegister.user.MustChangePassword = true;
+
             var registerResult = await _svcAuthData.Register(userRegister.user, userRegister.Password);
             
             if (registerResult.Success)
