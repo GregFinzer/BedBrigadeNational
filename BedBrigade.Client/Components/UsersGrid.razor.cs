@@ -66,11 +66,7 @@ namespace BedBrigade.Client.Components
                 Log.Information($"{_svcAuth.UserName} went to the Manage Users Page");
 
 
-                var getRoles = await _svcUser.GetRolesAsync();
-                if (getRoles.Success)
-                {
-                    Roles = getRoles.Data;
-                }
+                await LoadRoles();
 
                 //TODO:  Refactor
                 await LoadUsers();
@@ -98,6 +94,21 @@ namespace BedBrigade.Client.Components
             {
                 Log.Error(ex, "Error initializing UsersGrid component");
                 _toastService.Error("Error", "An error occurred while loading the user data.");
+            }
+        }
+
+        private async Task LoadRoles()
+        {
+            var getRoles = await _svcUser.GetRolesAsync();
+            if (getRoles.Success)
+            {
+                Roles = getRoles.Data;
+
+                //Only National Admins can set National Roles
+                if (!_svcAuth.IsNationalAdmin)
+                {
+                    Roles= Roles.Where(r => !r.Name.ToString().Contains("National")).ToList(); 
+                }
             }
         }
 
