@@ -75,7 +75,6 @@ namespace BedBrigade.Client.Components.Pages
             { "rows", "4" },
         };
 
-        [Parameter] public string PreloadLocation { get; set; }
         private ValidationMessageStore _validationMessageStore;
 
         private List<SpokenLanguage> SpokenLanguages { get; set; } = [];
