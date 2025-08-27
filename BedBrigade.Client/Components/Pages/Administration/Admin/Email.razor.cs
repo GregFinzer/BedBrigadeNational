@@ -22,6 +22,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
         [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
+        [Inject] private EmailQueueBackgroundService _emailQueueBackgroundService { get; set; }
         public BulkEmailModel Model { get; set; } = new();
         private bool isSuccess;
         private bool isFailure;
@@ -138,6 +139,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                 else
                 {
                     ShowFailure("Email failed to queue. " + result.Message);
+                }
+
+                if (Model.CurrentEmailRecipientOption == EmailRecipientOption.Myself)
+                {
+                    _emailQueueBackgroundService.SendNow();
                 }
             }
             catch (Exception ex)
