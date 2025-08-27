@@ -1,0 +1,14 @@
+﻿@page "/bed-brigade-near-me"
+
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["FindABedBrigade"]}")</PageTitle>
+<RotatorContainer RotatorTitle="@_lc.Keys["FindABedBrigade"]" ImagePath="pages/BedBrigadeNearMe" LocationId="1" SmallHeaderMobile="true" />
+<SearchLocation Title="@_lc.Keys["FindABedBrigadeNearMe"]" />
+
+@code {
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+}

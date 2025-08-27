@@ -1,0 +1,26 @@
+﻿%%Volunteer.FirstName%%,
+
+%%CustomMessage%%
+Location:  %%Location.Name%%
+%%Schedule.GroupName%%
+Event Name:  %%Schedule.EventName%% %%Schedule.EventType%%
+%%Schedule.EventNote%%
+Event Date:  %%Schedule.EventDateScheduled%%
+Event Duration:  %%Schedule.EventDurationHours%%
+Address: %%Schedule.Address%%, %%Schedule.City%%, %%Schedule.State%%, %%Schedule.PostalCode%%
+
+Please arrive early or on time.  If you have any questions, please contact the event organizer.
+Organizer Name: %%Schedule.OrganizerName%%
+Organizer Email: %%Schedule.OrganizerEmail%%
+Organizer Phone: %%Schedule.OrganizerPhone%%
+
+Volunteer Information
+Name:  %%Volunteer.FirstName%% %%Volunteer.LastName%%
+%%Volunteer.Organization%%
+Email:  %%Volunteer.Email%%
+Phone:  %%Volunteer.Phone%%
+Number of Volunteers:  %%SignUp.NumberOfVolunteers%%
+Attend Church Regularly:  %%Volunteer.AttendChurch%%
+Other Languages Spoken: %%Volunteer.OtherLanguagesSpoken%%
+%%SignUp.VehicleType%%
+%%SignUp.SignUpNote%%

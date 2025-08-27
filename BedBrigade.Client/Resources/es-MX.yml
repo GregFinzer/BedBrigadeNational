@@ -1,0 +1,366 @@
+5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
+Active: Activo
+Add: Agregar
+Address: Dirección
+GenderAge: Género / Edad
+AmountColon: 'Importe:'
+AreYouAbleToTranslate: ¿Puedes traducir Bed Brigade a otro idioma?
+AtBedBrigadeLocation: en la ubicación de Bed Brigade {locationName}
+Back: Atrás
+BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
+BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
+BedBrigadeWeb: Web de la Brigada de Camas
+BedRequest: Solicitud de cama
+BedRequestDetails: Detalles de la solicitud de cama
+BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
+BedRequestFormCreated: Gracias por crear tu solicitud de cama. Revisa tu correo electrónico para ver si hay una confirmación. Si no recibes un correo en 5 minutos, revisa tu carpeta de correo no deseado.
+BedRequestFormUpdated: Gracias por actualizar su solicitud de cama. Revise su correo electrónico para confirmarlo. Si no recibe un correo en 5 minutos, revise su carpeta de correo no deseado.
+BlogNoData: No hay artículos disponibles en este momento. ¡Vuelva más tarde para ver las actualizaciones!
+BuildAddress: Dirección de compilación
+BuildCity: Construir ciudad
+BuildPostalCode: Construir código postal
+BuildState: Estado de compilación
+Calendar: Calendario
+Campaign: Campaña
+Cancel: Cancelar
+ChangePassword: Cambiar contraseña
+ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
+ChooseADate: Escoge una fecha
+ChooseATime: Escoge una hora
+City: Ciudad
+ClickToSignup: (Haga clic para registrarse)
+CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
+ConfigurationKey: Clave de configuración
+ConfigurationSection: Sección de configuración
+ConfigurationValue: Valor de configuración
+ConfirmPassword: Confirmar contraseña
+ContactInformation: Información de contacto
+ContactMessage: Mensaje de contacto
+ContactUs: Contáctenos
+ContactUsFormNotCompleted: ¡El formulario de contacto no está completo!
+ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondremos en contacto con usted lo antes posible.
+Continue: Continuar
+Currency: Moneda
+DateColon: 'Fecha:'
+DeliveryAddress: Dirección de entrega
+DeliveryDate: Fecha de entrega
+DeliveryVehicle: Vehículo de reparto
+DeliveryVehicleFullSizeVan: Tengo una camioneta de tamaño completo que está vacía sin asientos.
+DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
+DeliveryVehicleNone: No tengo un vehículo de reparto
+DeliveryVehicleOther: Tengo otro vehículo
+DeliveryVehicleQuestion: ¿Tiene un vehículo que pueda transportar una cama y un colchón?
+DeliveryVehicleMediumSuv: Tengo una SUV mediana (Toyota Highlander, Hyundai Palisade, Honda Pilot, Chevrolet Traverse, Subaru Ascent, Mazda CX-90, etc.)
+DeliveryVehicleLargeSuv: Tengo un SUV grande (Chevrolet Tahoe, Chevrolet Suburban, GMC Yukon, Ford Expedition, Toyota Sequoia, Jeep Wagoneer, Nissan Armada, etc.)
+DeliveryVehicleSmallSuv: Tengo un SUV pequeño (Toyota RAV4, Honda CRV, Nissan Rogue, Hyundai Tucson, Mazda CX-5, Subaru Forester, etc.)
+DeliveryVehicleTruck: Tengo una camioneta pickup de tamaño completo con correas de amarre o una gorra
+DonationCancellation: Cancelación de Donación
+DonationConfirmation: Confirmación de Donación
+DonationAmount: Importe de la donación
+DonationFormNotCompleted: El formulario de donación no está completo
+DonationDate: Fecha de donación
+DonationDetails: Detalles de la donación
+DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
+DurationHours: Duración (horas)
+DynamicALittle: Un poco
+DynamicApril: Abril
+DynamicAprilBedBuild: Construcción de cama de abril
+DynamicAugust: Agosto
+DynamicAugustBedBuild: Construcción de cama de agosto
+DynamicBed: Cama
+DynamicBuild: Construir
+DynamicCut: Cortar
+DynamicDecember: Diciembre
+DynamicDecemberBedBuild: Construcción de camas en diciembre
+DynamicDelivery: Entrega
+DynamicFebruary: Febrero
+DynamicFebruaryBedBuild: Construcción de camas de febrero
+DynamicFriday: Viernes
+DynamicJanuary: Enero
+DynamicJanuaryBedBuild: Construcción de cama de enero
+DynamicJuly: Julio
+DynamicJulyBedBuild: Construcción de camas en julio
+DynamicJune: Junio
+DynamicJuneBedBuild: Construcción de cama de junio
+DynamicMarch: Marzo
+DynamicMarchBedBuild: Construcción de cama de marzo
+DynamicMay: Mayo
+DynamicMayBedBuild: Construcción de camas de mayo
+DynamicMonday: Lunes
+DynamicNo: No
+DynamicNovember: Noviembre
+DynamicNovemberBedBuild: Construcción de cama de noviembre
+DynamicOctober: Octubre
+DynamicOctoberBedBuild: Construcción de cama de octubre
+DynamicOther: Otro
+DynamicSaturday: Sábado
+DynamicSeptember: Septiembre
+DynamicSeptemberBedBuild: Construcción de camas en septiembre
+DynamicSunday: Domingo
+DynamicThursday: Jueves
+DynamicTuesday: Martes
+DynamicWednesday: Miércoles
+DynamicYes: Sí
+Email: Correo electrónico
+EmailColon: 'Correo electrónico:'
+EmailSent: Correo electrónico enviado
+EnterYourZipCode: Ingresa tu código postal
+Event: Evento
+Events: Eventos
+EventDate: Fecha del evento
+EventDateTime: Fecha y hora del evento
+EventDetails: Detalles del evento
+EventGroup: Grupo de eventos
+EventName: Nombre del evento
+EventNote: Nota del evento
+EventStatus: Estado del evento
+EventTime: Hora del evento
+EventType: Tipo de evento
+Example: Ejemplo
+FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
+FilteredTotalColon: 'Total Filtrado:'
+FindABedBrigade: Encuentra una brigada de camas
+FindABedBrigadeNearMe: Encuentra una brigada de camas cerca de mí
+FirstName: Nombre
+ForgotPassword: ¿Olvidaste tu contraseña?
+FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
+FromStartTimeToEndTime: de {startTime} a {endTime}
+FutureScheduled: Futuro Programado
+Gross: Bruto
+Group: Grupo
+GroupName: Nombre del grupo
+HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
+IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
+InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
+InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
+IsInYourZipCode: está en su código postal
+LanguagePreference: Preferencia de idioma
+LastName: Apellido
+Latitude: Latitud
+Loading: Carga....
+Location: Ubicación
+LocationAvailableEvents: Ubicación Disponible Eventos
+LocationColon: 'Ubicación:'
+LocationNotActive: 'Lo sentimos, esta ubicación de Bed Brigade ya no está activa: '
+LocationPathColon: 'Ruta de ubicación:'
+LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
+LogIn: Inicia sesión
+Longitude: Longitud
+MailingAddress: Dirección postal
+MailingCity: Ciudad de correo
+MailingPostalCode: Código Postal
+MailingState: Estado de envío
+ManageConfiguration: Administrar la Configuración
+ManageDonations: Administrar Donaciones
+MaxLengthBedType100: El tipo de cama tiene una longitud máxima de 100 caracteres
+MaxLengthChurchName80: El nombre de la iglesia tiene una longitud máxima de 80 caracteres
+MaxLengthCity50: La ciudad tiene una longitud máxima de 50 caracteres
+MaxLengthCountryCode2: El código de país tiene una longitud máxima de 2 caracteres
+MaxLengthEmail255: La dirección de correo electrónico tiene una longitud máxima de 255 caracteres
+MaxLengthFirstName20: El nombre tiene una longitud máxima de 20 caracteres.
+MaxLengthGenderAge255: Sexo/Edad tiene una longitud máxima de 255 caracteres
+MaxLengthGroup50: El grupo tiene una longitud máxima de 50 caracteres
+MaxLengthGroup80: El grupo tiene una longitud máxima de 80 caracteres
+MaxLengthLastName25: El apellido tiene una longitud máxima de 25 caracteres
+MaxLengthMessage4000: El mensaje tiene una longitud máxima de 4000 caracteres
+MaxLengthNames255: Los nombres tienen una longitud máxima de 255 caracteres
+MaxLengthNotes4000: Notes tiene una longitud máxima de 4000
+MaxLengthOrganization80: El grupo tiene una longitud máxima de 80 caracteres
+MaxLengthOtherArea100: El área de otro tiene una longitud máxima de 100 caracteres
+MaxLengthOtherLanguagesSpoken4000: Otros idiomas hablados tiene una longitud máxima de 4000 caracteres
+MaxLengthPassword255: La contraseña tiene una longitud máxima de 255 caracteres
+MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
+MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
+MaxLengthReference100: La referencia tiene una longitud máxima de 100 caracteres
+MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
+MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
+MaxLengthStreet50: La dirección tiene una longitud máxima de 50 caracteres
+MaxLengthTableName50: El nombre de la tabla tiene una longitud máxima de 50 caracteres
+MaxLengthTeam50: El equipo tiene una longitud máxima de 50 caracteres
+MaxLengthVolunteerArea100: El área del voluntario tiene una longitud máxima de 100 caracteres
+MaxLengthVehicleDescription100: La descripción del vehículo tiene una longitud máxima de 100 caracteres
+Message: Mensaje
+MilesAway: millas
+MonthlyDonationOf: 'Donación mensual de'
+Name: Nombre
+NameColon: 'Nombre:'
+Names: Nombres
+NationalPathColon: 'Camino Nacional:'
+NewPassword: Nueva contraseña
+Newsletter: Boletín
+NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
+NoImagesWereFound: No se encontraron imágenes
+NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
+NoLocationsHavePostalCodes: Ninguna ubicación tiene códigos postales
+NoteComment: Nota / Comentario
+Notes: Notas
+NothingToSend: Nada que enviar
+NotSent: No enviado
+NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
+NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
+NumberOfBeds: Número de camas
+NumberOfVolunteers: Número de Voluntarios
+NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
+Ok: De acuerdo
+OneTimeDonationOf: 'Donación única de'
+Organization: Organización
+Organizer: Organizador
+OrganizerColon: 'Organizador:'
+OrganizerEmail: Correo electrónico del organizador
+OrganizerName: Nombre del organizador
+OrganizerPhone: Teléfono del organizador
+OtherLanguagesSpoken: Otros idiomas hablados
+PageNext: Página siguiente
+PagePrevious: Página anterior
+PaymentCancelled: Pago Cancelado
+PaymentProcessor: Procesador de pagos
+PaymentStatus: Estado de pago
+Password: Contraseña
+PasswordChanged: Su contraseña ha sido cambiada exitosamente.
+Phone: Teléfono
+PhoneColon: 'Teléfono:'
+PhoneNumber: Número de teléfono
+PleaseCheckRecaptcha: Por favor, marque la casilla de verificación Recaptcha
+PleaseEnterAValid: Ingrese un código postal válido donde vive
+PleaseEnterYourLogin: Introduzca sus datos de inicio de sesión
+PleaseSelectAnEvent: Por favor, seleccione un evento
+PostalCode: Código postal
+PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
+PrimaryLanguageCaption: Lengua materna
+PrimaryLanguagePlaceholder: Elegir idioma
+Processing: Procesando
+RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
+Reference: Referencia
+RegisterOrUpdate: Registrarse o Actualizar
+RegularExpressionEmail: Formato de correo electrónico no válido
+RegularExpressionPassword: La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.
+RegularExpressionPhone: Formato de número de teléfono no válido
+RequestABed: Solicitar una cama
+RequestABedFor: Solicitar una cama para otra persona
+RequiredAmount: La cantidad es requerida
+RequiredBody: Se requiere cuerpo.
+RequiredCampaignName: El nombre de la campaña es obligatorio
+RequiredCity: Se requiere ciudad
+RequiredConfirmPassword: Confirmar que la contraseña es obligatoria
+RequiredContent: El contenido es obligatorio
+RequiredContentId: Se requiere Content ID
+RequiredContentType: El tipo de contenido es obligatorio
+RequiredCulture: La cultura es necesaria
+RequiredDonationAmount: Se requiere el importe de la donación
+RequiredDonationCampaignId: Se requiere el ID de la campaña de donación
+RequiredEmail: Se requiere una dirección de correo electrónico
+RequiredFileUse: Se requiere el uso de archivos
+RequiredFirstName: El nombre de pila es obligatorio
+RequiredGenderAge: Sírvase indicar el sexo y la edad de los niños
+RequiredHash: Se requiere hash
+RequiredLastName: El apellido es obligatorio
+RequiredLocationId: Se requiere el ID de ubicación
+RequiredLocations: Se requieren ubicaciones
+RequiredMessage: El mensaje es obligatorio
+RequiredName: El nombre es obligatorio
+RequiredNames: Se requieren nombres
+RequiredNumberOfBeds: El número de camas solicitadas es obligatorio y debe ser > 0
+RequiredNumberOfVolunteers: Se requiere el número de voluntarios
+RequiredPageName: El nombre de la página es obligatorio
+RequiredPageTitle: El título de la página es obligatorio
+RequiredPassword: Se requiere contraseña
+RequiredPhone: Se requiere un número de teléfono
+RequiredPostalCode: Se requiere el código postal
+RequiredPrimaryLanguage: Por favor, seleccione su idioma principal
+RequiredQueueDate: Se requiere la fecha de cola
+RequiredSection: La sección es obligatoria
+RequiredSpeakEnglish: Por favor, selecciona tu nivel de inglés
+RequiredStatus: El estado es obligatorio
+RequiredStreet: Se requiere la dirección postal
+RequiredSubject: El asunto es obligatorio.
+RequiredTransactionFee: La tarifa de transacción es obligatoria
+RequiredTranslationId: Se requiere el ID de traducción
+RequiredUserId: Se requiere un ID de usuario
+ReturnHome: Volver a casa
+ReturnToHome: Volver a casa
+Role: Rol
+Route: Ruta
+Schedule: Horario
+Scheduling: Planificación
+SeachAVolunteerBy: Buscar a un voluntario por su nombre
+Search: Buscar
+SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
+SelectACampaign: Seleccione una campaña
+SelectAGridFilter: Seleccionar un filtro de cuadrícula
+SelectANewsletter: Seleccione un boletín
+SelectALocation: Seleccione una ubicación
+SelectAnEvent: Seleccione un evento
+SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse a nosotros en la entrega o construcción de camas!
+SelectAState: Seleccione un estado
+SelectAVolunteer: Selecciona un Voluntario
+SelectedEventDetails: Detalles del evento seleccionado
+SelectLanguages: Seleccionar Idiomas
+SelectMetroArea: Seleccione Área Metropolitana
+SelectTimeZone: Seleccionar zona horaria
+Send: Enviar
+SendEmail: Enviar Correo Electrónico
+SendMessage: Enviar Mensaje
+SendTaxForms: Enviar formularios de impuestos
+ShowPassword: Mostrar contraseña
+ShowSchedules: Mostrar horarios
+SkipToBuilds: Ir a Compilaciones
+Sorry: Arrepentido
+SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
+SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
+SpeakEnglishCaption: ¿Hablas inglés?
+SpeakEnglishPlaceholder: Habilidad en inglés...
+SpecialInstructions: Instrucciones especiales
+State: Estado
+StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
+Status: Estado
+Street: Calle
+SubmitRequest: Enviar solicitud
+Subscribe: Suscribirse
+SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
+SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
+TaxFormSent: Formulario de impuestos enviado
+Team: 'Equipo #'
+ThankYou: ¡Gracias!
+ThankYouForMakingADifferenceInTheLifeOfAChild: ¡Gracias por hacer una diferencia en la vida de un niño! 
+ThankYouForYourDonation: ¡Gracias por su donación!
+TheBedBrigade: La Brigada de la Cama
+TransactionFees: Tarifas de transacción
+TransactionId: ID de transacción
+TransactionIdColon: 'ID de transacción:'
+TurnYourPhone: Gira tu teléfono hacia un lado para una mejor vista
+UnableToChangePassword: No se puede cambiar la contraseña. Inténtalo de nuevo.
+UnableToSendEmail: No se pudo enviar el correo electrónico. Inténtalo de nuevo.
+Unauthorized: Desautorizado
+Unregister: Desregistrarse
+Unsubscribe: Darse de baja
+UnsubscribeFromNewsletter: Darse de baja del boletín
+UpcomingBuilds: Próximas compilaciones
+UpcomingDeliveries: Próximas entregas
+UpcomingEvents: Próximos eventos
+Update: Actualizar
+UserName: Nombre de usuario
+ValidEmail: Introduzca una dirección de correo electrónico válida
+ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
+VehicleDescription: Por favor describe tu vehículo
+VehicleTypeColon: 'Tipo de vehículo:'
+ViewNewer: Ver más reciente
+ViewOlder: Ver más antiguo
+Volunteer: Voluntario
+VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
+VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
+VolunteerInformation: Información para voluntarios
+VolunteerInformationContinued: Continuación de la información para voluntarios
+Volunteers: Voluntarios
+VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
+VolunteerSignUpAgainSubtitle: Apreciamos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
+VolunteerSignUpNew: Bienvenido a Bed Brigade {fullName}
+VolunteerSignUpNewSubtitle: Agradecemos que se una al Equipo de Voluntarios de la Brigada de Camas.
+VolunteersRegisteredColon: 'Voluntarios registrados:'
+VolunteersRegisteredneeded: Voluntarios registrados/necesarios
+WeLookForwardToSeeingYou: Te esperamos.
+WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
+WhatChurch: ¿A qué iglesia asistes?
+YourEmail: Tu correo electrónico
+YourDonationHasBeenCancelled: Su donación ha sido cancelada.
+YouWereTryingTo: 'Estabas intentando acceder a la página: '
+ZipCode: Código postal

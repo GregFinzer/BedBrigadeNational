@@ -1,0 +1,6 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/users"
+<CheckAuth Roles=@RoleNames.CanViewUsers></CheckAuth>
+
+
+<UsersGrid />

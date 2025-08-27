@@ -1,0 +1,89 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/SMS/SmsTestHarness"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+<h3 class="mt-3">SMS Test Harness</h3>
+
+<EditForm Model="@_testSmsModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="fromPhone" class="form-label">From Phone Number</label>
+        <InputText id="fromPhone" class="form-control" @bind-Value="_testSmsModel.From" />
+    </div>
+
+    <div class="mb-3">
+        <label for="toPhone" class="form-label">To Phone Number</label>
+        <InputText id="toPhone" class="form-control" @bind-Value="_testSmsModel.To" />
+    </div>
+
+    <div class="mb-3">
+        <label for="body" class="form-label">Message Body</label>
+        <InputTextArea id="body" class="form-control" @bind-Value="_testSmsModel.Body" Rows="5" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Send SMS</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <div class="alert alert-info mt-3">@statusMessage</div>
+}
+
+@code {
+    private TestSmsMessage _testSmsModel = new TestSmsMessage();
+    private string statusMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        // Prepare the form data that matches the keys expected by the controller.
+        var formData = new Dictionary<string, string>
+        {
+            { "From", _testSmsModel.From },
+            { "To", _testSmsModel.To },
+            { "Body", _testSmsModel.Body }
+        };
+
+        var content = new FormUrlEncodedContent(formData);
+
+        try
+        {
+            string baseUrl = Navigation.BaseUri;
+            if (baseUrl.EndsWith('/'))
+            {
+                baseUrl = baseUrl.Substring(0, baseUrl.Length - 1);
+            }
+
+            string url = $"{baseUrl}/api/sms/receive";
+
+            // Post the data to the SMS controller endpoint.
+            var response = await Http.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = "SMS successfully sent!";
+                // Optionally clear the form:
+                _testSmsModel.Body = string.Empty;
+            }
+            else
+            {
+                statusMessage = $"Error sending SMS: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Exception occurred: {ex.Message}";
+        }
+    }
+
+    public class TestSmsMessage
+    {
+        public string From { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+    }
+}

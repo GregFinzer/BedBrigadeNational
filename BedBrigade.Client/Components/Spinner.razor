@@ -1,0 +1,16 @@
+@using Syncfusion.Blazor.Spinner
+
+<div id="spinner-container">
+    <SfSpinner @bind-Visible="@IsVisible" Label="@_lc.Keys["Loading"]">
+    </SfSpinner>
+</div>
+
+@code {
+    [Inject] private ILanguageContainerService _lc { get; set; }
+    public bool IsVisible { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+}

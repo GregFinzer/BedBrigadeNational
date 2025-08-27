@@ -1,0 +1,5 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/sign-ups"
+<CheckAuth Roles=@RoleNames.CanViewSignUps></CheckAuth>
+
+<SignUpGrid />

@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
 
 namespace BedBrigade.Tests
 {
     public static class TestHelper
     {
-        public static string KellermanUserName => "Bed Brigade 10101";
-
         public static bool RunningInPipeline
         {
             get
@@ -17,20 +14,6 @@ namespace BedBrigade.Tests
             }
         }
         
-        public static string KellermanLicenseKey
-        {
-            get
-            {
-                string? licenseKey = Environment.GetEnvironmentVariable("GOLD");
-                if (string.IsNullOrEmpty(licenseKey))
-                {
-                    throw new Exception("GOLD environment variable not set");
-                }
-
-                return licenseKey;
-            }
-        }
-
         public static string GetSolutionPath()
         {
             string currentPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -50,13 +33,13 @@ namespace BedBrigade.Tests
 
                 //We are at the root we did not find anything
                 if (parentPath == null || parentPath == currentPath)
-                    throw new Exception("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+                    throw new DirectoryNotFoundException("Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
 
                 currentPath = parentPath;
                 count++;
             }
 
-            throw new Exception("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
+            throw new DirectoryNotFoundException("Reached Max Depth. Could not find solution path for " + AppDomain.CurrentDomain.BaseDirectory);
         }
 
         /// <summary>
@@ -127,5 +110,26 @@ namespace BedBrigade.Tests
                 }
             }
         }
+
+        public static bool IsWindows()
+        {
+            return Environment.OSVersion.Platform == PlatformID.Win32NT;
+        }
+
+        public static bool ThisComputerHasExcelInstalled()
+        {
+            try
+            {
+                Type? excelType = Type.GetTypeFromProgID("Excel.Application");
+                return excelType != null;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+
     }
 }

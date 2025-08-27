@@ -1,0 +1,239 @@
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Common;
+@using BedBrigade.Common.Enums;
+@using BedBrigade.Common.Models
+
+@if (Contacts == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3 ps-md-0">
+            <h3>@ManageContactsMessage</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo/>
+        </div>
+    </div>
+    <div class="col-md-12 control-sec">
+        <div class="content-wrapper">
+            <div class="row">
+                <SfGrid @ref="Grid" TValue="ContactUs" DataSource=@Contacts
+                        ContextMenuItems=@ContextMenu
+                        EnablePersistence="true"
+                        ShowColumnChooser="true"
+                        Toolbar=@ToolBar
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowExcelExport="true"
+                        ShowColumnMenu="true"
+                        AllowFiltering="true"
+                        AllowReordering="true"
+                        AllowResizing="true"
+                        AllowSelection="true"
+                        AllowPdfExport="true"
+                        AllowTextWrap="true"
+                        AllowGrouping="true"
+                        Width="100%">
+                    <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="10"/>
+                    <GridEvents DataBound=@DataBound
+                                Destroyed=@OnDestroyed
+                                OnLoad=@OnLoad
+                                OnToolbarClick=@OnToolBarClick
+                                OnActionBegin=@OnActionBegin
+                                TValue="ContactUs"/>
+                    <GridTemplates>
+                        <EmptyRecordTemplate>
+                            <span>@RecordText</span>
+                        </EmptyRecordTemplate>
+                    </GridTemplates>
+                    <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                        <Validator>
+                            <DataAnnotationsValidator />
+                        </Validator>
+                        <HeaderTemplate>
+                            @{
+                                @HeaderTitle
+                            }
+                        </HeaderTemplate>
+                        <FooterTemplate>
+                            <button class="btn btn-primary" @onclick=@(() => Save(context as ContactUs)) IsPrimary="true">@ButtonTitle</button>
+                            <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
+                        </FooterTemplate>
+                        <Template>
+                            @{
+                                ContactUs contactUs = (context as ContactUs)!;
+                                if (contactUs.LocationId == 0)
+                                {
+                                    contactUs.LocationId = _svcAuth.LocationId;
+
+                                }
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="firstname" class="formlabel">@_lc.Keys["FirstName"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="firstname" @bind-Value="contactUs.FirstName"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.FirstName)"></ValidationMessage>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="lastName" class="formlabel">@_lc.Keys["LastName"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="lastName" @bind-Value="contactUs.LastName"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.LastName)"></ValidationMessage>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="phoneTextBox" class="formlabel">@_lc.Keys["Phone"] <span class="text-danger">*</span></label>
+                                            <SfMaskedTextBox ID="phoneTextBox" @ref="phoneTextBox" Mask="(000) 000-0000" @bind-Value=@contactUs.Phone Enabled="true" Focus="HandlePhoneMaskFocus"/>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Phone)"></ValidationMessage>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email" class="formlabel">@_lc.Keys["Email"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="email" @bind-Value="contactUs.Email"></SfTextBox>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Email)"></ValidationMessage>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@contactUs.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
+                                            <DropDownListFieldSettings Text="Name" Value="LocationId"/>
+                                        </SfDropDownList>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <SfDropDownList TItem="EnumNameValue<ContactUsStatus>" TValue="ContactUsStatus" DataSource=@ContactUsStatuses @bind-Value=@contactUs.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto">
+                                            <DropDownListFieldSettings Text="Name" Value="Value"/>
+                                        </SfDropDownList>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="message" class="formlabel">@_lc.Keys["Message"] <span class="text-danger">*</span></label>
+                                            <SfTextBox ID="message" CssClass="custom-textbox-height" @bind-Value=@contactUs.Message Enabled="true" Multiline="true"/>
+                                            <div style="font-size: smaller">
+                                                <ValidationMessage For="@(() => contactUs.Message)"></ValidationMessage>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridEditSettings>
+                    <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="LastName" Direction="SortDirection.Ascending"/>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                    <GridGroupSettings Columns=@groupColumns ShowDropArea="false"/>
+                    <GridColumns>
+                        <GridColumn Field=@nameof(ContactUs.ContactUsId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
+                        <GridColumn Field=@nameof(ContactUs.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(ContactUs.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
+                        </GridColumn>
+                        <GridForeignColumn Field=@nameof(ContactUs.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(ContactUs.Phone) ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
+                            <Template>
+                                @{
+                                    var request = (context as ContactUs);
+                                    @request.Phone.FormatPhoneNumber()
+                                    ;
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field=@nameof(ContactUs.Message) ShowColumnMenu="false" HeaderText="Message" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
+                        <GridColumn Field=@nameof(ContactUs.Status) ShowColumnMenu="false" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true">
+                            <Template>
+                                @{
+                                    var request = (context as ContactUs);
+                                    var status = Enum.GetName(typeof(ContactUsStatus), request.Status);
+                                    @status
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field=@nameof(ContactUs.CreateDate) ShowColumnMenu="false" HeaderText="Date Created" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="true">
+                            <Template>
+                                @{
+                                    var request = (context as ContactUs);
+                                    if (request.CreateDate.HasValue)
+                                    {
+                                        @request.CreateDate.Value.ToShortDateString()
+                                        ;
+                                    }
+                                    else
+                                    {
+                                        @string.Empty
+                                        ;
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+<style>
+    /***************************************** ContactUs.razor.css ********************************************/
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+    .e-dialog {
+        max-height: 800px !important;
+        min-height: 100px !important;
+    }
+
+    .custom-textbox-height {
+        height: 100px;
+    }
+
+</style>

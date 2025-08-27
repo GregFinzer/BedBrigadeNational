@@ -2,13 +2,374 @@
 
 Roles for Bed Brigade National Website
 
-* Anonymous – Can view public pages of the site only.
-* Location Contributor – Can create their own content for a location but cannot publish it.
-* Location Author – Can create their content for a location and publish it.
-* Location Editor – Can create, publish, and edit their own content and others for a location.
-* Location Scheduler – Can manage volunteers, bed requests, contacts, perform scheduling, and send bulk email for a location.
-* Location Treasurer – Can manage donations and send tax forms
-* Location Communications - Can perform a bulk email to all, volunteers for a location, bed request emails, contact emails, or all Bed Brigade officers, or all Bed Brigade Volunters and Officers. 
-* Location Admin – Can perform any action for a location.
-* National Editor – Can create, publish, and edit their own content and others for any location and nationally.
-* National Admin – Can perform any action
+* <a href="#anonymous-user" target="_blank">Anonymous</a> – Can view public pages of the site.  They may also Request a Bed, Volunteer for an event, and submit a contact request.
+* <a href="#location-contributor-version-2" target="_blank">Location Contributor (Version 2)</a> – Can create their own content for a location but cannot publish it. Can view several location pages and send Bulk Email and send Send SMS to location leaders. 
+* <a href="#location-author-version-2" target="_blank">Location Author (Version 2)</a> – Can create their content for a location and publish it. Can view several location pages and send Bulk Email and send Send SMS to location leaders. 
+* <a href="#location-editor-version-2" target="_blank">Location Editor (Version 2)</a> – Can create, publish, and edit their own content and others for a location. Can view several location pages and send Bulk Email and send Send SMS to location leaders. 
+* <a href="#location-scheduler" target="_blank">Location Scheduler</a> – Can manage volunteers, manage bed requests, manage volunteers, manage contacts, manage schedule, manage sign ups, send bulk email for a location, and send bulk SMS for a location.  Can view several location pages.
+* <a href="#location-treasurer" target="_blank">Location Treasurer</a> – Can manage donations and send tax forms. Can view several location pages and send Bulk Email and send Send SMS to location leaders. 
+* <a href="#location-communications" target="_blank">Location Communications</a> - The can send Bulk Email and Bulk SMS.  They can also manage Contacts.  Can view several location pages and send Bulk Email and send Send SMS to location leaders. 
+* <a href="#location-admin" target="_blank">Location Admin</a> – Can perform any action for a location.
+* <a href="#national-editor-version-2" target="_blank">National Editor (Version 2)</a> – Can create, publish, and edit their own content and others for any location and nationally.
+* <a href="#national-admin" target="_blank">National Admin</a> – Can perform any action.
+
+# Anonymous User
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [ ] Can View Admin Dashboard
+- [ ] Can View Bed Requests
+- [ ] Can View Contacts
+- [ ] Can View Locations
+- [ ] Can View Metro Areas
+- [ ] Can View Pages
+- [ ] Can View Schedule
+- [ ] Can View Sign Ups
+- [ ] Can View SMS Summary
+- [ ] Can View System Information
+- [ ] Can View Users
+- [ ] Can View Volunteers
+- [ ] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [ ] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [ ] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [ ] Can Publish Pages (Version 2)
+- [ ] Can Publish Blog Posts (Version 2)
+- [ ] Can Send Bulk Email
+- [ ] Can Send SMS
+
+# Location Contributor (Version 2)
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [x] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [ ] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [ ] Can Publish Pages (Version 2)
+- [ ] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Author (Version 2)
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [x] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [ ] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [x] Can Publish Pages (Version 2)
+- [x] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Editor (Version 2)
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [x] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [ ] Can Manage Donations
+- [x] Can Manage Media
+- [ ] Can Manage Newsletters
+- [x] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [x] Can Publish Pages (Version 2)
+- [x] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Scheduler
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [ ] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [ ] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [ ] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [x] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [x] Can Manage Contacts
+- [ ] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [x] Can Manage Schedule
+- [ ] Can Manage Users
+- [x] Can Manage Volunteers
+- [ ] Can Publish Pages (Version 2)
+- [ ] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Treasurer
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [ ] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [ ] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [ ] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [x] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [ ] Can Publish Pages (Version 2)
+- [ ] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Communications
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [ ] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [ ] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [ ] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [x] Can Manage Contacts
+- [ ] Can Manage Donations
+- [ ] Can Manage Media
+- [ ] Can Manage Newsletters
+- [ ] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [ ] Can Publish Pages (Version 2)
+- [ ] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# Location Admin
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [x] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [ ] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [ ] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [ ] Can Create Pages for National
+- [x] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [x] Can Manage Contacts
+- [x] Can Manage Donations
+- [x] Can Manage Media
+- [x] Can Manage Newsletters
+- [x] Can Manage Pages
+- [x] Can Manage Schedule
+- [x] Can Manage Users
+- [x] Can Manage Volunteers
+- [x] Can Publish Pages (Version 2)
+- [x] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+
+# National Editor (Version 2)
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [ ] Can View Bed Requests
+- [ ] Can View Contacts
+- [ ] Can View Locations
+- [ ] Can View Metro Areas
+- [x] Can View Pages
+- [ ] Can View Schedule
+- [ ] Can View Sign Ups
+- [ ] Can View SMS Summary
+- [ ] Can View System Information
+- [ ] Can View Users
+- [ ] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [x] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [x] Can Create Pages for National
+- [ ] Can Manage Bed Requests
+- [ ] Can Manage Configuration
+- [ ] Can Manage Contacts
+- [ ] Can Manage Donations
+- [x] Can Manage Media
+- [ ] Can Manage Newsletters
+- [x] Can Manage Pages
+- [ ] Can Manage Schedule
+- [ ] Can Manage Users
+- [ ] Can Manage Volunteers
+- [x] Can Publish Pages (Version 2)
+- [x] Can Publish Blog Posts (Version 2)
+- [ ] Can Send Bulk Email
+- [ ] Can Send SMS
+
+# National Admin
+- [x] Public Pages
+- [x] Request a Bed
+- [x] Volunteer for an Event
+- [x] Submit a contact request
+- [x] Can View Admin Dashboard
+- [x] Can View Bed Requests
+- [x] Can View Contacts
+- [x] Can View Locations
+- [x] Can View Metro Areas
+- [x] Can View Pages
+- [x] Can View Schedule
+- [x] Can View Sign Ups
+- [x] Can View SMS Summary
+- [x] Can View System Information
+- [x] Can View Users
+- [x] Can View Volunteers
+- [x] Can Create Blog Post for Location
+- [x] Can Create Blog Post for National
+- [x] Can Create Pages for Location
+- [x] Can Create Pages for National
+- [x] Can Manage Bed Requests
+- [x] Can Manage Configuration
+- [x] Can Manage Contacts
+- [x] Can Manage Donations
+- [x] Can Manage Media
+- [x] Can Manage Newsletters
+- [x] Can Manage Pages
+- [x] Can Manage Schedule
+- [x] Can Manage Users
+- [x] Can Manage Volunteers
+- [x] Can Publish Pages (Version 2)
+- [x] Can Publish Blog Posts (Version 2)
+- [x] Can Send Bulk Email
+- [x] Can Send SMS
+

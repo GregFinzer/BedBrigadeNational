@@ -1,0 +1,5 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/donations"
+
+<CheckAuth Roles=@RoleNames.CanManageDonations></CheckAuth>
+<DonationGrid />

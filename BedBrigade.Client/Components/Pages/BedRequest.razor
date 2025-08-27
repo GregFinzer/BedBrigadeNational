@@ -1,0 +1,229 @@
+@page "/request-bed"
+@page "/{LocationRoute:nonfile}/request-bed"
+@using BedBrigade.Common.Models
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["RequestABed"]}")</PageTitle>
+<RotatorContainer RotatorTitle="@_lc.Keys["RequestABed"]" ImagePath="pages/RequestBed" LocationId="1" SmallHeaderMobile="true" />
+
+
+<div class="container-fluid" style="display: @DisplaySearch">
+    <SearchLocation @ref="SearchLocation" Title="@_lc.Keys["FindABedBrigade"]" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
+</div>
+
+<div class="container-fluid" style="display: @DisplayForm">
+    <EditForm EditContext="@EC">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["ContactInformation"]</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
+                            <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.FirstName)"></ValidationMessage>
+                            </div>
+
+                        </div>
+                        <div class="form-group ">
+                            <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
+                            <SfTextBox ID="lastname" @bind-Value="newRequest.LastName"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.LastName)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
+                            <SfTextBox ID="email" @bind-Value="newRequest.Email"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Email)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
+                            <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="newRequest.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Phone)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["DeliveryAddress"]</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="street" class="formlabel required">@_lc.Keys["Street"]</label>
+                            <SfTextBox ID="street" @bind-Value="newRequest.Street"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Street)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="city" class="formlabel required">@_lc.Keys["City"]</label>
+                            <SfTextBox ID="city" @bind-Value="newRequest.City"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.City)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="state" class="formlabel required">@_lc.Keys["State"]</label>
+                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="newRequest.State">
+                                <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => newRequest.State)"></ValidationMessage>
+                                </div>
+                            </SfDropDownList>
+                        </div>
+                        <div class="form-group">
+                            <label for="zip" class="formlabel required">@_lc.Keys["PostalCode"]</label>
+                            <SfMaskedTextBox @ref="zipTextBox" ID="zip" Mask="00000" @bind-Value="@newRequest.PostalCode" Focus="HandleZipMaskFocus"></SfMaskedTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.PostalCode)"></ValidationMessage>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["BedRequestDetails"]</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="numbed" class="formlabel required">@_lc.Keys["NumberOfBeds"]</label>
+                            <SfNumericTextBox ID="numbed" TValue="int" Min="1" Max="50" HtmlAttributes="htmlattributeSize" @bind-Value="@NumericValue"></SfNumericTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.NumberOfBeds)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="genderAge" class="formlabel required">@_lc.Keys["GenderAge"]</label>
+                            <SfTextBox ID="genderAge" @bind-Value="newRequest.GenderAge" Placeholder='@(_lc.Keys["Example"] + ": B/7 G/6")'></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.GenderAge)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
+                            <SfTextBox ID="names" @bind-Value="newRequest.Names" Placeholder='@(_lc.Keys["Example"] + ": Noah, Emma")'></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Names)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inst" class="formlabel">@_lc.Keys["SpecialInstructions"]</label>
+                            <SfTextBox ID="inst" @bind-Value="newRequest.SpecialInstructions" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["LanguagePreference"]</div>
+                    <div class="card-body">
+                         <div class="form-group">
+                            <label for="PL" class="formlabel required">@_lc.Keys["PrimaryLanguageCaption"]</label>
+                            <SfDropDownList ID="PL" TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value="@newRequest.PrimaryLanguage" Enabled="true" Placeholder="@_lc.Keys["PrimaryLanguagePlaceholder"]">
+                                <DropDownListEvents TValue="string" TItem="string" ValueChange="OnPrimaryLanguageChange"></DropDownListEvents>
+                            </SfDropDownList>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.PrimaryLanguage)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: @DisplaySpeakEnglish" >
+                            <label for="SE" class="formlabel required">@_lc.Keys["SpeakEnglishCaption"]</label>
+                            <SfDropDownList ID="SE" TValue="string" TItem="DisplayTextValue" DataSource=@lstSpeakEnglish @bind-Value=@newRequest.SpeakEnglish Enabled="true" Placeholder="@_lc.Keys["SpeakEnglishPlaceholder"]">
+                                <DropDownListFieldSettings Value="Value" Text="DisplayText"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.SpeakEnglish)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div>
+                    <div id="myValidationMessage" class="alert alert-danger" role="alert" style="display: @MyValidationDisplay">
+                        @MyValidationMessage
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" style="text-align: center">
+                <ReCAPTCHA OnSuccess="OnSuccess" OnExpired="OnExpired" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3" style="text-align: center">
+                <button class="btn btn-primary" @onclick="(SaveRequest)" disabled="@_isBusy">
+                    @if (_isBusy)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    }
+                    @_lc.Keys["SubmitRequest"]
+                </button>
+            </div>
+            <div class="col-md-9">
+            </div>
+        </div>
+
+    </EditForm>
+
+</div>
+
+<div id="resultMessage" class="container-fluid" style="display: @ResultDisplay">
+    <div class="@AlertType" role="alert">
+        @((MarkupString)ResultMessage)
+    </div>
+</div>
+
+@if (ResultDisplay != DisplayNone)
+{
+    <SfButton CssClass="btn btn-primary ms-3 mt-3" OnClick="@RefreshPage">@_lc.Keys["RequestABedFor"]</SfButton>
+}
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .required::after {
+        content: '*';
+        font-size: medium;
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
+
+    .formlabel {
+        color: #B4886B;
+        font-weight: bold;
+        font-size: small;
+        display: block;
+    }
+</style>
+

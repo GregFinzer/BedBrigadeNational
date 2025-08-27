@@ -1,0 +1,39 @@
+﻿@page "/logout"
+@using Serilog
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ErrorMessage
+    </div>
+}
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IAuthService AuthService { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (AuthService.IsLoggedIn)
+            {
+                string locationRoute = AuthService.UserRoute.TrimStart('/');
+                await AuthService.LogoutAsync();
+                NavigationManager.NavigateTo($"/{locationRoute}");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"Logout.OnInitializedAsync");
+            ErrorMessage = "An error occurred while trying to log out. Please try again later.";
+        }
+    }
+
+}
+

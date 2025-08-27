@@ -1,0 +1,301 @@
+@using BedBrigade.Common.Models
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using LabelPosition = Syncfusion.Blazor.Buttons.LabelPosition
+
+@if (Donations == null || Locations == null || DonationCampaigns == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-4 ps-3">
+            <h3>@_lc.Keys["ManageDonations"]</h3>
+        </div>
+        <div class="col-md-6 ps-3 ps-md-0">
+            <h3>@_lc.Keys["FilteredTotalColon"] @FilteredSum.ToString("C2")</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo/>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="content-wrapper">
+            <div class="row">
+                <div style="width: 100%">
+                    <SfGrid ID="DonationGrid" @ref="Grid" TValue="Donation" DataSource=@Donations
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="true"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true"
+                            AllowGrouping="true"
+                            Width="100%">
+                        <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25, 50 })" PageSize="25"/>
+                        <GridEvents DataBound=@DataBound
+                                    Destroyed=@OnDestroyed
+                                    OnLoad=@OnLoad
+                                    OnToolbarClick=@OnToolBarClick
+                                    ContextMenuItemClicked=@OnContextMenuClicked
+                                    OnActionBegin=@OnActionBegin
+                                    OnActionComplete=@OnActionComplete
+                                    TValue="Donation"/>
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="LocationId" Direction="SortDirection.Ascending"/>
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridGroupSettings Columns=@groupColumns ShowDropArea="false">
+                            <CaptionTemplate>
+                                @{
+                                    var caption = (context as CaptionTemplateContext);
+                                    //<div>@caption.Field - @caption.ForeignKey (@caption.Key)</div>
+                                    var locations = Donations.Where(d => d.LocationId.ToString() == caption.Key); //.Sum(s => s.Amount);
+                                    var locTotal = locations.Sum(s => s.NetAmount);
+                                    //var locName = Locations.FirstOrDefault(l => l.LocationId == donation.LocationId).Name;
+                                    <div class="row">
+                                        <div class="fw-bold col-md-10">@caption.ForeignKey</div>
+                                        <div class="fw-bold col-md-2 text-right">@string.Format("Total: {0:C2}", locTotal) </div>
+                                    </div>
+                                }
+
+                            </CaptionTemplate>
+                        </GridGroupSettings>
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
+                                }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <button class="btn btn-primary" @onclick=@(() => Save(context as Donation)) IsPrimary="true">@ButtonTitle</button>
+                                <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    Donation donation = (context as Donation)!;
+                                    if (donation.LocationId == Defaults.NationalLocationId || donation.LocationId == 0)
+                                    {
+                                        donation.LocationId = _svcAuth.LocationId;
+                                    }
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfDropDownList TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@donation.DonationCampaignId Enabled="true" Placeholder="@_lc.Keys["SelectACampaign"]" FloatLabelType="FloatLabelType.Auto">
+                                                <DropDownListFieldSettings Text="CampaignName" Value="DonationCampaignId" />
+                                            </SfDropDownList> 
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfTextBox ID="name" @bind-Value=@donation.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfTextBox @bind-Value=@donation.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <SfNumericTextBox @bind-Value=@donation.TransactionFee Enabled="true" Placeholder="@_lc.Keys["TransactionFees"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDatePicker @bind-Value=@donation.DonationDate Enabled="true" Placeholder="@_lc.Keys["DonationDate"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="@_lc.Keys["TaxFormSent"]"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.PaymentProcessor Enabled="true" Placeholder="@_lc.Keys["PaymentProcessor"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.PaymentStatus Enabled="true" Placeholder="@_lc.Keys["PaymentStatus"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" FloatLabelType="FloatLabelType.Auto"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Donation.DonationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
+                            <GridForeignColumn Field=@nameof(Donation.LocationId) ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" ShowColumnMenu="false" HeaderText="Location" Type="ColumnType.String" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.FirstName) ShowColumnMenu="false" HeaderText="First Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(Donation.LastName) ShowColumnMenu="false" HeaderText="Last Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                            <GridColumn Field=@nameof(Donation.Email) ShowColumnMenu="false" HeaderText="Email" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                            <GridColumn Field=@nameof(Donation.TaxFormSent) ShowColumnMenu="false" HeaderText="Tax Form Sent" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" TextAlign="TextAlign.Center" DisplayAsCheckBox="true" AutoFit="true"/>
+                            <GridColumn Field=@nameof(Donation.DonationDate) ShowColumnMenu="false" HeaderText="Donation Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="true" AutoFit="true" Format="MM/dd/yyyy" />
+                            <GridColumn Field=@nameof(Donation.NetAmount) ShowColumnMenu="false" HeaderText="Net Amount" HeaderTextAlign="TextAlign.Center" Type="ColumnType.Decimal" Format="C2" AllowEditing="false" AllowFiltering="false" TextAlign="TextAlign.Right" AutoFit="true" />
+                            <GridForeignColumn Field=@nameof(Donation.DonationCampaignId) ForeignDataSource=@DonationCampaigns ForeignKeyField="DonationCampaignId" ForeignKeyValue="CampaignName" ShowColumnMenu="false" HeaderText="Donation Campaign" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<SfDialog Target="#target" Width="75%" Height="75%" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@TaxIsVisible">
+    <DialogTemplates>
+        <Header>@_lc.Keys["SendTaxForms"]</Header>
+        <Content>
+            <div class="col-lg-12 control-section">
+                <div id="listbox-control">
+                    <div class="dual-list-wrapper">
+                        <div class="dual-list-groupa">
+                            <h4>@_lc.Keys["NotSent"]</h4>
+                            <SfListBox @ref=@LB_NotSent Scope="@scope2" DataSource="@NotSent" TItem="Donation" Height="330px" TValue="string[]" @attributes="listbox1Attr">
+                                <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
+                                <ListBoxToolbarSettings Items="@items"></ListBoxToolbarSettings>
+                                <ListBoxTemplates TItem="Donation">
+                                    <NoRecordsTemplate>
+                                        <span>@_lc.Keys["NothingToSend"]</span>
+                                    </NoRecordsTemplate>
+                                </ListBoxTemplates>
+                            </SfListBox>
+                        </div>
+                        <div class="dual-list-groupb">
+                            <h4>@_lc.Keys["Send"]</h4>
+                            <SfListBox @ref=@LB_Send Scope="@scope1" DataSource="@Send" Height="330px" TItem="Donation" TValue="string[]" @attributes="listbox2Attr">
+                                <ListBoxFieldSettings Text="NameAndDate" Value="DonationId"></ListBoxFieldSettings>
+                                <ListBoxTemplates TItem="Donation">
+                                    <NoRecordsTemplate>
+                                        <span>@_lc.Keys["NothingToSend"]</span>
+                                    </NoRecordsTemplate>
+                                </ListBoxTemplates>
+                            </SfListBox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="Send Tax Form" CssClass="btn btn-primary" IsPrimary="true" OnClick="@SendTax" />
+        <DialogButton Content="Cancel" CssClass="btn btn-secondary" OnClick="@CloseTaxDialog" />
+    </DialogButtons>
+</SfDialog>
+
+@if (NoPaging)
+{
+    <style>
+        .e-pager {
+            display: none;
+        }
+    </style>
+}
+
+
+<style>
+    /***************************************** DonationGrid.razor.css ********************************************/
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+
+
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+    .control-section .dual-list-wrapper {
+        width: 100%;
+        margin: 0 auto 10px;
+        display: flex;
+    }
+
+    .dual-list-groupa {
+        width: 50%;
+    }
+
+
+    .dual-list-groupb {
+        width: 50%;
+    }
+
+        .dual-list-groupb .e-listbox-container,
+        .dual-list-groupb h4 {
+            width: 87%;
+            margin-left: 15px;
+        }
+
+    @@media screen and (max-width: 590px) {
+        .control-section .dual-list-wrapper {
+            width: 100%;
+        }
+
+        .dual-list-groupa {
+            width: 56%;
+        }
+
+        .dual-list-groupb {
+            width: 44%;
+        }
+    }
+
+    @@media screen and (max-width: 400px) {
+        .dual-list-groupa {
+            width: 59%;
+        }
+
+        .dual-list-groupb {
+            width: 41%;
+        }
+    }
+
+    #listbox-control {
+        margin: auto;
+    }
+
+    @@media screen and (max-width: 590px) {
+        #listbox-control {
+            width: 100%;
+        }
+    }
+</style>

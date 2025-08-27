@@ -1,0 +1,15 @@
+﻿@inherits LayoutComponentBase
+@using BedBrigade.Client.Services
+@inject IWebHostEnvironment HostEnvironment
+
+<CustomErrorBoundary @ref=errorBoundary>
+    <Header></Header>
+    <div class="page">
+        <main>
+            <article class="content">
+                @Body
+            </article>
+        </main>
+    </div>
+</CustomErrorBoundary>
+

@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+    <ItemGroup>
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.9.12" />
+    <PackageReference Include="BetterAddressParser" Version="1.18.0" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
+    <PackageReference Include="Bogus" Version="35.6.0" />
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.64" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NetCachingLibrary" Version="3.18.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
+    <PackageReference Include="Serilog.Enrichers.RequestUserId" Version="1.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Stripe.net" Version="48.1.0" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="26.2.13" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
+    <PackageReference Include="Twilio" Version="7.8.2" />
+
+  </ItemGroup>
+
+  
+  
+    <ItemGroup>
+      <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
+      <ProjectReference Include="..\BedBrigade.SpeakIt\BedBrigade.SpeakIt.csproj" />
+    </ItemGroup>
+
+  
+  
+    <ItemGroup>
+      <Folder Include="Data\Seeding\SeedTranslations\" />
+    </ItemGroup>
+
+  
+
+
+</Project>

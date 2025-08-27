@@ -1,0 +1,75 @@
+﻿<div class="polaris-main-content">
+    <!-- Your other page content goes here -->
+    <section class="polaris-home-top">
+        <!-- Top Buttons with Arrow Icon -->
+        <div class="polaris-home-top-buttons-container">
+            <a href="/polaris/donations" class="polaris-home-top-button">DONATE</a>
+            <i class="fas fa-solid fa-arrow-right polaris-arrow-icon"></i>
+            <a href="polaris/volunteer" class="polaris-home-top-button">PARTICIPATE</a>
+        </div>
+
+        <!-- Title with white background and black border -->
+        <div class="polaris-home-title-box">
+            <h1 class="polaris-home-title">Provide a Child a Warm Bed this Winter</h1>
+        </div>
+
+        <br />
+
+        <!-- Subtitle with light gray background and black border -->
+        <div class="polaris-home-subtitle-box">
+            <h2 class="polaris-home-subtitle">HOW TO DONATE &amp; PARTICIPATE</h2>
+        </div>
+
+        <!-- White Panel for DONATE -->
+        <div class="polaris-home-bipanel-container">
+            <!-- Left side: "DONATE" text -->
+            <div class="polaris-home-bipanel-left">
+                <h3 class="polaris-home-bipanel-title">DONATE</h3>
+            </div>
+
+            <!-- Right side: donation levels and info -->
+            <div class="polaris-home-bipanel-right">
+                <p style="font-weight: bold; text-align: center">
+                    $25: Bedding / Bible
+                </p>
+                <p style="font-weight: bold; text-align: center">
+                    $50: Materials / Wood
+                </p>
+                <p style="font-weight: bold; text-align: center">$100: Single Bed</p>
+                <p style="font-weight: bold; text-align: center">$200: Bunk Bed</p>
+                <p class="polaris-home-bipanel-info">
+                    Click above to donate or checks can be made out to Bed Brigade.
+                </p>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <p class="polaris-disclaimer">
+            At this time we kindly do not accept donations of bedding, pillows or
+            mattresses.
+        </p>
+
+        <!-- This is replaced with ScheduleControlService-->
+        <div data-component="bbschedule" data-months="3" id="polaris-schedule"></div>
+
+    </section>
+
+    <!--See the Index.razor.cs and CarouselService-->
+    <div data-component="bbcarousel" id="polaris-home-carousel" src="media/polaris/pages/home/carousel"></div>
+
+    <!-- "Connect With Us" Section -->
+    <section class="polaris-connect-with-us-section">
+        <div class="polaris-connect-container">
+            <h2 class="polaris-connect-title">Connect With Us</h2>
+            <p class="polaris-connect-subtitle">
+                We would love to connect with you for your future events.
+                <br />
+                Please subscribe to our mailing list.
+            </p>
+            <p class="polaris-connect-org-info">
+                Bed Brigade is a Registered 501(c)3: 47-4745642
+            </p>
+            <div data-component="bbiframe" id="polaris-subscribe-iframe" width="100%" height="250px" src="/SubscribeToNewsletter?locationId=3&newsletterName=Polaris+Newsletter"></div>
+        </div>
+    </section>
+</div>

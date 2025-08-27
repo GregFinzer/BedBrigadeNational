@@ -1,0 +1,47 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/admintasks/addpage/{ContentTypeString}"
+@using BedBrigade.Common.Constants
+@using BedBrigade.Common.Models
+@using Syncfusion.Blazor.DropDowns
+<CheckAuth Roles=@RoleNames.CanCreatePagesForLocation></CheckAuth>
+
+@if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
+{
+    <Spinner />
+}
+else
+{
+    <div class="container my-5 ">
+        <h1>@Title</h1>
+        <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator/>
+            @if (Model.IsNationalAdmin)
+            {
+                <div class="form-group mb-3">
+                    <label for="locationDropdown">Location</label>
+                    <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Model.Locations" @bind-Value="Model.CurrentLocationId">
+                        <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
+                    </SfDropDownList>
+                </div>
+            }
+            <div class="form-group mb-3">
+                <label for="pageTitle">Page Title</label>
+                <InputText id="pageTitle" class="form-control" @bind-Value="Model.PageTitle" @oninput="UpdatePageName"/>
+                <ValidationMessage For="@(() => Model.PageTitle)"/>
+            </div>
+            <div class="form-group mb-3">
+                <label for="pageName">Page Name</label>
+                <InputText id="pageName" class="form-control" @bind-Value="Model.PageName" @oninput="FilterPageName" placeholder="Alphanumeric and dashes only" title="Alphanumeric and dashes only"/>
+                <ValidationMessage For="@(() => Model.PageName)"/>
+            </div>
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ErrorMessage
+                </div>
+            }
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary" @onclick="HandleCancel">Cancel</button>
+        </EditForm>
+    </div>
+}

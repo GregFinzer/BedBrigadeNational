@@ -1,0 +1,121 @@
+@page "/sorry"
+@page "/sorry/{myLocation:nonfile}"
+@page "/sorry/{myLocation:nonfile}/{myPageName:nonfile}"
+@page "/sorry/{myLocation:nonfile}/{myPageName:nonfile}/{mySubPageName:nonfile}"
+@page "/{myLocation:nonfile}/sorry/"
+@page "/{myLocation:nonfile}/sorry/{myPageName:nonfile}"
+
+@using Serilog
+<PageTitle>@_lc.Keys["Sorry"]</PageTitle>
+
+@if (IsLocationActive)
+{
+
+    <h1 class="text-center mt-5">@_lc.Keys["SorryThePage"] </h1>
+
+    @if (myLocation != null && myPageName != null && mySubPageName != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation/@myPageName/@mySubPageName</h2>
+    }
+    else if (myLocation != null && myPageName != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation/@myPageName</h2>
+    }
+    else if (myLocation != null)
+    {
+        <h2 class="text-center mt-5">@_lc.Keys["YouWereTryingTo"]<br />/@myLocation</h2>
+    }
+}
+else
+{
+    <h1 class="text-center mt-5">@_lc.Keys["LocationNotActive"]<br />/@myLocation</h1>
+}
+
+<div class="text-center">
+    <a href="@HomeUrl" class="btn btn-primary">@_lc.Keys["ReturnToHome"]</a>
+</div>
+
+@code {
+    [Inject] private ILanguageContainerService _lc { get; set; }
+    [Inject] private ILocationDataService _svcLocation { get; set; }
+    [Inject] private IAuthService _authService { get; set; }
+    [Inject] private NavigationManager _navigationManager { get; set; }
+    [Parameter] public string? myLocation { get; set; }
+    [Parameter] public string? myPageName { get; set; }
+    [Parameter] public string? mySubPageName { get; set; }
+
+    public string HomeUrl = "/";
+    private bool IsLocationActive = true;
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+        if (myLocation != null && myPageName != null && mySubPageName != null)
+        {
+            HomeUrl = $"/{myLocation}";
+            Log.Logger.Warning($"404 for Page: /{myLocation}/{myPageName}/{mySubPageName}");
+        }
+        else if (myLocation != null && myPageName != null)
+        {
+            HomeUrl = $"/{myLocation}";
+            CheckLocationStatus(myLocation);           
+            Log.Logger.Warning($"404 for Page: /{myLocation}/{myPageName}");
+
+        }
+        else if (myLocation != null)
+        {
+            Log.Logger.Warning($"404 for Page: /{myLocation}");
+        }
+        else
+        {
+            Log.Logger.Warning($"404 for Page: /sorry");
+        }
+    } // init
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_authService.IsLoggedIn)
+        {
+            var restoredFromState = await _authService.GetStateFromTokenAsync();
+            if (restoredFromState && _authService.IsNationalAdmin)
+            {
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{myLocation}");
+
+                if (locationResponse.Success && locationResponse.Data != null)
+                {
+                    _navigationManager.NavigateTo($"/{myLocation}/{myPageName}", false);
+                }
+            }
+        }
+    }
+
+    private async void CheckLocationStatus(string location)
+    {
+        try
+        {
+            // location can be not active or not exists
+            var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{location}");
+            if (locationResponse.Message.ToLower().Contains("not found"))
+            {
+                IsLocationActive = false;
+                HomeUrl = $"/"; // return to national home
+            }
+            else
+            {
+                if (locationResponse.Success && locationResponse.Data != null)
+                {
+                    IsLocationActive = locationResponse.Data.IsActive;
+                    if (!IsLocationActive)
+                    {
+                        HomeUrl = $"/"; // return to national home
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"Sorry.CheckLocationStatus");
+        }
+    } // location status
+
+}

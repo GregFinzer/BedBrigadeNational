@@ -1,0 +1,106 @@
+@if (Cultures != null && SelectedCulture != null)
+{    
+    <div class="language-wrapper">
+        <i class="fas fa-globe"></i>
+        <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange" data-location="@_locationState.Location">
+            @foreach (var culture in Cultures)
+            {
+                <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
+            }
+        </select>
+    </div>    
+}
+
+@((MarkupString)headerContent) 
+
+
+<style>
+
+    .nadmin, .ladmin, .lsched, .ltreasure, .lauthor, .neditor, .leditor {
+        display: none;
+    }
+    #edit, #admin, #manage {
+        cursor: pointer;
+        font-size: 15px;
+        font-family: Comfortaa, cursive;
+    }
+
+        #edit::after, #admin::after, #manage::after {
+            content: '';
+        }
+
+    #locationName {
+        font-family: "Stencil Std";
+        font-size: 24px;
+    }
+
+    .language-wrapper {
+        position: fixed;
+        z-index: 1500;
+        top: 35px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        border-radius: 4px;
+    }
+
+    .language-wrapper .fa-globe {
+        color: #3498db;
+        font-size: 1.2em;
+        display: inline-block;
+    }
+
+    #languageSelect {
+        font-size: 1em;
+        border: 1px solid #e0e0e0;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    @@media screen and (max-width: 1500px) {
+        .language-wrapper {
+            top: 60px;
+        }
+    }
+
+    @@media screen and (max-width: 767px) {
+        .language-wrapper {
+            top: 75px;
+            right: 10px;
+        }
+    }
+    
+    @@media screen and (max-width: 615px) {
+        .language-wrapper {
+            top: auto;
+            bottom: 0px;
+            right: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #languageSelect {
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    @@media screen and (max-width: 500px) {
+        #locationName {
+            font-size: 20px;
+            top: 20px;
+            left: 125px;
+            position: absolute;
+        }
+    }
+
+    @@media screen and (max-width: 400px) {
+        #locationName {
+            font-size: 16px;
+        }
+    }
+
+</style>
+ 

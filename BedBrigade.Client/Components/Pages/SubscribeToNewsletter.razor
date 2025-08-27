@@ -1,0 +1,89 @@
+﻿@page "/SubscribeToNewsletter"
+@layout Layout.NoHeaderFooterLayout
+@using System.ComponentModel.DataAnnotations
+@using Serilog
+@inject ISubscriptionDataService SubscriptionDataService
+@inject ILanguageContainerService _lc
+
+<section class="polaris-connect-with-us-section">
+    <div class="polaris-connect-container">
+        <EditForm Model="@subscriptionModel" OnValidSubmit="HandleSubmit" class="polaris-connect-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputText id="email" class="polaris-connect-input" @bind-Value="subscriptionModel.Email" Placeholder="@_lc.Keys["YourEmail"]" />
+
+            <button type="submit" class="polaris-connect-button">@_lc.Keys["Subscribe"]</button>
+        </EditForm>
+    </div>
+</section>
+
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    // Query parameters passed via the URL.
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int locationId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string newsletterName { get; set; }
+
+    private SubscriptionModel subscriptionModel = new SubscriptionModel();
+    private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            if (locationId == 0)
+                message = "locationId is required.";
+
+            if (string.IsNullOrEmpty(newsletterName))
+                message = "newsletterName is required.";
+
+            // Call the subscription service using the query parameter values and the email from the form.
+            var result = await SubscriptionDataService.Subscribe(locationId, newsletterName, subscriptionModel.Email);
+
+            if (result.Success)
+            {
+                message = "Thank you for subscribing!";
+            }
+            else
+            {
+                message = $"There was an error processing your subscription. Please try again. {result.Message}";
+                Log.Error("SubscribeToNewsletter.HandleSubmit: " + result.Message);
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            message = $"There was an error processing your subscription. Please try again. {ex.Message}";
+            Log.Error(ex, "SubscribeToNewsletter.HandleSubmit");
+        }
+    }
+
+    public class SubscriptionModel
+    {
+        [Required(ErrorMessage = "Email Address is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; }
+    }
+}
+
+<style>
+    body
+    {
+        background-color: #f5f5f5;
+    }
+</style>

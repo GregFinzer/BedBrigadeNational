@@ -4,7 +4,7 @@ One thing you will notice about the following project plan is the lack of due da
 
  :heavy_check_mark: Means Done
  
-* Project Setup (Sprint 0)
+* Project Setup (Sprint 0) :heavy_check_mark:
     * Information Architecture Diagram :heavy_check_mark:
     * Define Roles :heavy_check_mark:
     * Git Repository :heavy_check_mark:
@@ -25,114 +25,268 @@ One thing you will notice about the following project plan is the lack of due da
     * Code Quality Check Razor Pages :heavy_check_mark:
     * Setup Deployment :heavy_check_mark:
     
-* Home Page
+* Home Page :heavy_check_mark:
     * Home Page Header :heavy_check_mark:
-    * Image Rotator
-    * Home Page Middle
-    * Home Page Footer
+    * Image Rotator :heavy_check_mark:
+    * Home Page Middle :heavy_check_mark:
+    * Home Page Footer :heavy_check_mark:
     
 * Basic Administration
-    * Login
+    * Login :heavy_check_mark:
     * Logout :heavy_check_mark:
-    * Administration Dashboard
-    * Edit Configuration
-    * Edit Home Page
-    * Edit Header
-    * Edit Footer
+    * Administration Dashboard :heavy_check_mark:
+    * Edit Configuration :heavy_check_mark:
+    * Edit Home Page :heavy_check_mark:
+    * Edit Header :heavy_check_mark:
+    * Edit Footer :heavy_check_mark:
     
 * Manage Images and Videos
-    * List Images and Videos
-    * Upload Image
-    * View Image
-    * Delete Image
-    * Rename Image
-    * New Folder
+    * List Images and Videos :heavy_check_mark:
+    * Upload Image :heavy_check_mark:
+    * View Image :heavy_check_mark:
+    * Delete Image :heavy_check_mark:
+    * Rename Image :heavy_check_mark:
+    * New Folder :heavy_check_mark:
     
 * Manage Web Pages
-    * List Pages
-    * Add Page
-    * Edit Page
-    * Delete Page
-    * Rename Page
+    * List Pages :heavy_check_mark:
+    * Add Page :heavy_check_mark:
+    * Edit Page :heavy_check_mark:
+    * Delete Page :heavy_check_mark:
+    * Rename Page :heavy_check_mark:
     
 * National Pages
-    * National About Us Page
-    * National History of Bed Brigade Page
+    * Design National Home Page :heavy_check_mark:
+    * National Home Page :heavy_check_mark:
+    * National About Us Page  :heavy_check_mark:
+    * National History of Bed Brigade Page 
+    * National Donations Page  :heavy_check_mark:
     
 * Locations
-    * Location List
-    * Grove City Location Home Page
-    * Polaris Location Home Page
-    * Bed Brigade Near Me
-    * Grove City Assembly Instructions
-    * Polaris Assembly Instructions
-    * Grove City Partners    
+    * Location List :heavy_check_mark:
+    * Bed Brigade Near Me :heavy_check_mark:
+    * Grove City Location Home Page :heavy_check_mark:
+    * Grove City Location About Us Page :heavy_check_mark:
+    * Grove City History  :heavy_check_mark:
+    * Grove City Partners  :heavy_check_mark:
+    * Grove City Assembly Instructions  :heavy_check_mark:
+    * Polaris Location Home Page :heavy_check_mark:
+    * Polaris About Us Page :heavy_check_mark:
+    * Polaris Donations Page
+    * Polaris History :heavy_check_mark:
+
     
 * Manage Locations
-    * Manage Locations Page
-    * Edit Location
-    * Add Location
-    * Deactivate/Activate Location
+    * Manage Locations Page :heavy_check_mark:
+    * Edit Location :heavy_check_mark:
+    * Add Location :heavy_check_mark:
+    * Deactivate/Activate Location :heavy_check_mark:
+    * Metro Areas :heavy_check_mark:
     
 * Location Request Bed
-    * Request Bed Page
-    * Manage Bed Requests
-    * Schedule Deliveries
-    * Delivery Checklist
-    * Bulk Email Scheduled Deliveries
+    * Request Bed Page :heavy_check_mark:
+    * Manage Bed Requests :heavy_check_mark:
+    * Download Delivery Sheet :heavy_check_mark:
+    * Manage Delivery Checklist :heavy_check_mark:
     
 * Location Volunteer    
-    * Volunteer Page
-    * Manage Volunteers
-    * Bulk Email Volunteers
+    * Volunteer Page :heavy_check_mark:
+    * Manage Volunteers :heavy_check_mark:
+    * Bulk Email Volunteers  :heavy_check_mark:
+    * Manage Build and Delivery Schedule :heavy_check_mark:
+    * Manage Sign Ups :heavy_check_mark: 
     
 * Location Contact Us
-    * Contact Us Page
-    * Manage Contacts
+    * Contact Us Page :heavy_check_mark:
+    * Manage Contacts :heavy_check_mark:
     
 * Location Donations
-    * Grove City Donate
+    * Grove City Donate :heavy_check_mark:
     * Polaris Donate
-    * Manage Donations
-    * Email Tax Forms
+    * Manage Donations :heavy_check_mark:
+    * Email Tax Forms :heavy_check_mark:
     
 * Manage Users
-    * User List
-    * Add User
-    * Edit User
-    * Delete User
+    * User List :heavy_check_mark:
+    * Add User :heavy_check_mark:
+    * Edit User :heavy_check_mark: 
+    * Delete User :heavy_check_mark:
     
-* National News
-    * National News Sample Story
-    * List of News
-    * News Detail
-    * Add News
-    * Edit News
-    * Delete News
+* Stories
+    * Grove City Sample Story :heavy_check_mark:
+    * Polaris Sample Story :heavy_check_mark:
+    * List of Stories :heavy_check_mark:
+    * Story Detail :heavy_check_mark:
+    * Manage Stories :heavy_check_mark:
+    * Add Story :heavy_check_mark:
+    * Edit Story :heavy_check_mark:
+    * Delete Story :heavy_check_mark:
     
-* Location Stories
-    * Grove City Sample Story
-    * Polaris Sample Story
-    * List of Stories
-    * Story Detail
-    * Add Story
-    * Edit Story
-    * Delete Story
+* News
+    * National News Sample Story :heavy_check_mark:
+    * List of News :heavy_check_mark:
+    * News Detail :heavy_check_mark:
+    * Manage News :heavy_check_mark:
+    * Add News :heavy_check_mark:
+    * Edit News :heavy_check_mark:
+    * Delete News :heavy_check_mark:
+    
+    
+* Tech Debt
+    * Upgrade to Blazor 8 :heavy_check_mark:
+    * Refactor Common.cs :heavy_check_mark:
+    * Refactor into Files :heavy_check_mark:
+    * Move Entities :heavy_check_mark:
+    * Move Syncfusion Licensing :heavy_check_mark:
+    * Regression Testing :heavy_check_mark:
+    * Change from Azure Email to SmarterASP.NET Email :heavy_check_mark:
+    * Update Diagrams :heavy_check_mark:
+    * GitHub Actions for Pull Requests :heavy_check_mark:
+    * Deploy to SmarterASP.NET Development :heavy_check_mark:
+    * Use location query parm Bed Request :heavy_check_mark:
+    * Use Location Query Parm Contact :heavy_check_mark:
+    * Use Location Query Parm Volunteer :heavy_check_mark:
+    * Design Shared Bed Requests :heavy_check_mark:
+    * Admin Dashboard Content :heavy_check_mark:
+    * Unique Volunteer Email Add Dialog :heavy_check_mark:
+    * Update NuGet Packages and Change NUnit Assertions :heavy_check_mark:
+    * Cache get files :heavy_check_mark:
+    * Remove Unused Components and Pages
+    * Add three image rotators to Bed Brigade Near Me :heavy_check_mark:
+    * Protected Directories :heavy_check_mark:
+    * Verify security for all pages
+    * Global Error Handler :heavy_check_mark:
+    * Refresh Header and Footer :heavy_check_mark:
+    * Add Page Titles :heavy_check_mark:
+    * Review All Code
+    * AppOffline for Development :heavy_check_mark:
+    * Syncfusion Spinner :heavy_check_mark:
+    * Re-add compilerconfig.json :heavy_check_mark:
+    * Rework Seeding :heavy_check_mark:
+    * Add Notification Code to Sorry Page :heavy_check_mark:
+    * Make seeding environment specific :heavy_check_mark:
+    * Add Database Indexes :heavy_check_mark:
+    * Verify Mobile for all pages :heavy_check_mark:
+    * Refactor Grid Persistence :heavy_check_mark:
+    * Add try catch and alert
+    * Seed Only Grove City and Rock City :heavy_check_mark:
+    * Location Timezone :heavy_check_mark:
+    * Redo Manage Bed Request Form :heavy_check_mark:
+    * Delivery Sheet Sort By Team Then By Distance :heavy_check_mark:
+    * Add Delivery Checklist to the Delivery Sheet :heavy_check_mark:
+    * Use Animate.css and Wow.js :heavy_check_mark:
+    * Migration Deployment Setup Database and Preload :heavy_check_mark:
+    * Improve Performance :heavy_check_mark:
+    * Edit EmailTaxForm :heavy_check_mark:
+    * Create Custom Authentication :heavy_check_mark:
+    * Create Server Information Page :heavy_check_mark:
+    * Refresh Header and Footer :heavy_check_mark:
+    * Refactor Grid Persistence :heavy_check_mark:
+    * Seed Only Grove City and Rock City :heavy_check_mark:
+    * Download Delivery Sheet :heavy_check_mark:
+    * Mobile Bed Brigade Near Me :heavy_check_mark:
+    * Mobile After Submit Bed Request :heavy_check_mark:
+    * Mobile after Contact Us :heavy_check_mark:
+    * Mobile after Submit Volunteer :heavy_check_mark:
+    * Admin Mobile Margin and Padding :heavy_check_mark:
+    * Manage Users Unusable in Mobile :heavy_check_mark:
+    * Design Spanish Translation  :heavy_check_mark:
+    * Address Autocomplete Design :heavy_check_mark:
+    * Design Bulk Email Mailing List :heavy_check_mark:
+    * Donations Design :heavy_check_mark:
+    * SMS Design  :heavy_check_mark:
+    * Delivery Sheet Slow :heavy_check_mark:
+    * Update Documentation for Localization :heavy_check_mark:
+    * Make EmailQueue into a Background Service :heavy_check_mark:
+    * Menu not wide enough when translated to Spanish :heavy_check_mark:
+    * Going to Events loads National Header and Footer :heavy_check_mark:
+    * Data Attribute Validation :heavy_check_mark:
+    * Admin Clear Cache :heavy_check_mark:
+    * Manage Configuration Location  :heavy_check_mark:
+    
+    
+* New Stories
+    * Send confirmation email for Bed Request :heavy_check_mark:
+    * Import Bed Requests
+    * Calendar :heavy_check_mark:
+    * Upcoming Events :heavy_check_mark:
+    * Add new Schedule Fields :heavy_check_mark:
+    * New Manage Volunteer Fields :heavy_check_mark:
+    * Volunteer Sign Up New Fields :heavy_check_mark:
+    * New Manage Bed Request Fields :heavy_check_mark:
+    * New Bed Request Form Fields :heavy_check_mark:
+    * Bust Browser Cache for New Version :heavy_check_mark:
+    * Localizable String Parsing :heavy_check_mark:
+    * Localize Strings :heavy_check_mark:
+    * Test Non-Localized Strings :heavy_check_mark:
+    * Localize Validation Messages :heavy_check_mark:
+    * Localize Drop Downs :heavy_check_mark:
+    * Save Messages Localization :heavy_check_mark:
+    * Send Confirmation Email for Volunteer Sign Up :heavy_check_mark:
+    * Localize Dynamic Content :heavy_check_mark:
+    * Apply String Localization :heavy_check_mark:
+    * Fix Publish :heavy_check_mark:
+    * Shutdown Background Services :heavy_check_mark:
+    * Laptop Admin Dialogs :heavy_check_mark:
+    * Generated Next Events :heavy_check_mark:
+    * Generated Carousel :heavy_check_mark:
+    
+* Address
+    * Location Latitude & Longitude :heavy_check_mark:
+    * Geolocation of Address :heavy_check_mark:
+    * Geolocation Routing
+    
+* Donations    
+    * New Donation Fields
+    * Donation Campaign Table
+    * Seed Donation Campaign
+    * Stripe Seed Configuration
+    * Stripe Processing Code
+    * Paypal IPN Handler
+    * Donations Sum By Campaign Name
+    * Edit Donations Page
 
-* Added Scope
-    * Email Bed Brigade Location Prayer Requests to all volunteers and national officers.
+ * Newsletter
+    * Create Newsletter Tables :heavy_check_mark:
+    * Manage Newsletters :heavy_check_mark:
+    * Subscribe/Unsubscribe to Newsletter Page :heavy_check_mark:
+    * Ability to Send Newsletters :heavy_check_mark:
     
-* Search
-    * Search Indexing
-    * Search Bar
-    * Search Results
+* SMS
+    * Add LocationId to Configuration with a default of National :heavy_check_mark:
+    * Design send and receive SMS Messages and Reply :heavy_check_mark:
+    * SMS Table :heavy_check_mark:
+    * SMS Database Indexes :heavy_check_mark:
+    * Create Code for SMS Queue :heavy_check_mark:
+    * SMS Message Summary :heavy_check_mark:
+    * SMS Message Detail :heavy_check_mark:
+    * SMS Controller and Test Harness  :heavy_check_mark:
+    * Bulk SMS :heavy_check_mark:
+    * SMS Missed Messages :heavy_check_mark:
+    * Re-Style Summary Page  :heavy_check_mark:
+    * SMS Delete Old Records :heavy_check_mark:
     
-* Advanced Features
-    * Remove Image Geolocation
-    * Convert Image to WebP
-    * Page Versioning
-    * Page History
-    * Restore Version
+ 
+* Custom Media Manager
+    * Custom Media Manager :heavy_check_mark:
+    * Media Manager ability to Cut, Copy, Paste, Files  :heavy_check_mark:
+    * Media Manager Refactoring  :heavy_check_mark:
     
-* Scope Added
-    * Email Prayer Requests
+    
+    
+
+* For Version 2
+    * Search
+        * Search Indexing
+        * Search Bar
+        * Search Results
+        
+    * Advanced Features
+        * Remove Image Geolocation
+        * Convert Image to WebP
+        * Page Versioning
+        * Page History
+        * Restore Version
+
+    
+

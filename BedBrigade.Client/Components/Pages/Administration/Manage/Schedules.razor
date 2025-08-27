@@ -1,0 +1,6 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/schedules"
+<CheckAuth Roles=@RoleNames.CanViewSchedule></CheckAuth>
+
+<ScheduleGrid />
+

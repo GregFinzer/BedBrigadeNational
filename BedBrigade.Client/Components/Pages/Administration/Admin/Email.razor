@@ -1,0 +1,109 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/admin/email"
+@using BedBrigade.Common.EnumModels
+@using BedBrigade.Common.Enums
+@using BedBrigade.Common.Models
+<CheckAuth Roles=@RoleNames.CanSendBulkEmail></CheckAuth>
+
+@if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
+{
+    <Spinner />
+}
+else
+{
+
+    <div class="container my-5 ">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>Send Bulk Email</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
+        <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator/>
+
+            <div class="form-group mb-3">
+                <label for="emailRecipientOptionDropdown" class="formlabel required">To <span class="text-danger">*</span></label>
+                <SfDropDownList ID="emailRecipientOptionDropdown" TItem="EnumNameValue<EmailRecipientOption>" TValue="EmailRecipientOption" DataSource=@Model.EmailRecipientOptions @bind-Value=@Model.CurrentEmailRecipientOption Enabled="true" Placeholder="Email Recipient Option" FloatLabelType="FloatLabelType.Auto">
+                    <DropDownListFieldSettings Text="Name" Value="Value"/>
+                    <DropDownListEvents TValue="EmailRecipientOption" TItem="EnumNameValue<EmailRecipientOption>" ValueChange="EmailRecipientChangeEvent"></DropDownListEvents>
+                </SfDropDownList>
+            </div>
+
+            @if (Model.ShowLocationDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="locationDropdown" class="formlabel required">Location <span class="text-danger">*</span></label>
+                    <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Model.Locations" @bind-Value="Model.CurrentLocationId">
+                        <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Location" ValueChange="LocationChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
+
+            @if (Model.ShowEventDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="events" class="formlabel required">Location Available Events&nbsp;(@Model.Schedules.Count) <span class="text-danger">*</span></label>
+                    <SfDropDownList ID="events" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@Model.Schedules">
+                        <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ScheduleChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
+
+            @if (Model.ShowNewsletterDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="newsletter" class="formlabel required">Newsletter <span class="text-danger">*</span></label>
+                    <SfDropDownList ID="newsletter" TValue="int" TItem="Newsletter" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a newsletter" DataSource="@Model.Newsletters">
+                        <DropDownListFieldSettings Value="NewsletterId" Text="Name"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Newsletter" ValueChange="NewsletterChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
+
+            <div class="form-group mb-3">
+                <label for="subject" lass="formlabel required">Subject <span class="text-danger">*</span></label>
+                <InputText id="subject" class="form-control" @bind-Value="Model.Subject" maxlength="100"/>
+                <div style="font-size: smaller">
+                    <ValidationMessage For="@(() => Model.Subject)"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="body" class="formlabel required">Body <span class="text-danger">*</span></label>
+                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="4000"></InputTextArea>
+                <div style="font-size: smaller">
+                    <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
+                </div>
+            </div>
+
+            @if (showPlan)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @message
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+
+        <p>&nbsp;</p>
+
+        @if (isSuccess)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
+        else if (isFailure)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
+    </div>
+}

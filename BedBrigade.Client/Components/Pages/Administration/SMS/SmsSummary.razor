@@ -1,0 +1,82 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/SMS/SmsSummary"
+
+@using BedBrigade.Common.Models
+
+
+<CheckAuth Roles=@RoleNames.CanViewSmsSummary></CheckAuth>
+
+@if (SummaryList == null || Locations == null || CurrentLocationId == 0)
+{
+    <Spinner />
+}
+else if (!SummaryList.Any())
+{
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3">
+            <h3>SMS Summary</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo/>
+        </div>
+    </div>
+	
+
+    @if (ShowLocationDropdown)
+    {
+        <div class="form-group mb-3 mt-3">
+            <label for="locationDropdown">Location</label>
+            <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Locations" @bind-Value="CurrentLocationId">
+                <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
+                <DropDownListEvents TValue="int" TItem="Location" ValueChange="LocationChangeEvent"></DropDownListEvents>
+            </SfDropDownList>
+        </div>
+    }
+
+    <div class="no-messages">No messages found.</div>
+}
+else
+{
+
+    @if (ShowLocationDropdown)
+    {
+        <div class="form-group mb-3 mt-3">
+            <label for="locationDropdown">Location</label>
+            <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Locations" @bind-Value="CurrentLocationId">
+                <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
+                <DropDownListEvents TValue="int" TItem="Location" ValueChange="LocationChangeEvent"></DropDownListEvents>
+            </SfDropDownList>
+        </div>
+    }
+
+    <div class="message-list">
+        @foreach (var message in SummaryList)
+        {
+            <div class="message-item" @onclick="() => NavigateToDetails(message.ToPhoneNumber)">
+                <div class="message-initials-container">
+                    <div class="message-initials">@GetInitials(message.ContactName)</div>
+                    @if (message.UnRead)
+                    {
+                        <div class="unread-badge">@message.UnReadCount</div>
+                    }
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">@message.ContactName | @message.ToPhoneNumber | @message.ContactType</span>
+                        <span class="message-time">@((message.MessageDate ?? DateTime.Now).ToString("f"))</span>
+                    </div>
+                    @if (message.IsReply)
+                    {
+                        <div class="message-preview">Received: @message.Body</div>
+                    }
+                    else
+                    {
+                        <div class="message-preview">Sent: @message.Body</div>
+                    }
+                    
+                </div>
+            </div>
+        }
+    </div>
+
+}

@@ -1,0 +1,710 @@
+﻿/* Custom adjustments for the Bootstrap navbar with polaris- prefixed classes */
+
+.polaris-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Keeps it on top */
+    background-color: rgba(255, 255, 255, 0.9); /* White with 80% opacity */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    height: 100px; /* Set a fixed height */
+    transition: background-color 0.3s ease-in-out; /* Smooth transition */
+    padding-right: 200px;
+    padding-left: 40px;    
+}
+
+@media (max-width: 768px) {
+    .polaris-navbar {
+        padding-left: 10px;
+        padding-right: 20px;
+    }
+}
+
+@media (max-width: 431px) {
+    .polaris-navbar-toggler 
+    {
+        margin-top:30px;
+    }
+}
+/* Limit the logo image height */
+.polaris-navbar-brand img {
+    max-height: 80px;
+}
+
+/* Add vertical dividers between nav items */
+.polaris-navbar-nav .polaris-nav-item + .polaris-nav-item {
+    border-left: 1px solid #ccc;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+/* Style the active nav link */
+.polaris-nav-link.active {
+    color: #00b2b2 !important;
+    border-bottom: 2px solid #00b2b2;
+}
+
+.polaris-nav-link:hover {
+    border-bottom: 2px solid #00b2b2;
+}
+
+/* Style the default nav links */
+.polaris-nav-link {
+    color: #666 !important;
+    font-weight: bold;
+    font-size: 16px !important;
+}
+
+/* Ensure mobile dropdown menu background is solid white */
+.navbar-collapse {
+    background-color: white; /* Ensures the dropdown menu is fully visible */
+}
+
+/* Ensure dropdown items are clearly visible */
+.navbar-nav .dropdown-menu {
+    background-color: white !important; /* Ensures the dropdown has a solid background */
+}
+
+    /* Style dropdown links */
+    .navbar-nav .dropdown-menu .dropdown-item {
+        color: black; /* Ensures text remains visible */
+    }
+
+        /* Ensure hover effect for dropdown items */
+        .navbar-nav .dropdown-menu .dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.05); /* Light gray background on hover */
+        }
+
+.polaris-dropdown-item {
+    color: #666 !important;
+    font-weight: bold;
+    font-size: 16px !important;
+}
+
+/********************************************
+ * Footer Section (polaris- prefixed)
+ ********************************************/
+.polaris-footer {
+    background-color: #f5f5f5; /* Light gray background */
+    color: #333;
+    padding: 40px 0; /* Top & bottom spacing */
+    text-align: center; /* Center everything */
+    font-size: 1rem;
+}
+
+.polaris-footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Side padding for smaller screens */
+}
+
+/* Top: Three columns */
+.polaris-footer-columns {
+    display: flex;
+    flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+    justify-content: space-evenly; /* Even horizontal spacing */
+    margin-bottom: 20px;
+}
+
+.polaris-footer-column {
+    flex: 1 1 200px; /* Grow/shrink, minimum width ~200px */
+    margin: 10px;
+}
+
+.polaris-footer-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+/* Responsive tweak for columns on very small screens */
+@media (max-width: 576px) {
+    .polaris-footer-columns {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Reduce vertical spacing between columns */
+    .polaris-footer-column {
+        margin: 0px;
+        text-align: center;
+        flex: 1 1 100px;
+        padding-bottom: 30px;
+    }
+}
+
+.polaris-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .polaris-footer-list li {
+        margin-bottom: 5px;
+    }
+
+    .polaris-footer-list a {
+        color: #333;
+        text-decoration: underline;
+        transition: color 0.2s ease;
+    }
+
+        .polaris-footer-list a:hover {
+            color: #00b2b2;
+        }
+
+/* Middle: Social icons row */
+.polaris-footer-icons {
+    margin-bottom: 20px;
+}
+
+    .polaris-footer-icons a {
+        color: #333;
+        margin: 0 10px;
+        font-size: 1.2rem;
+        text-decoration: none; /* No underline on normal state */
+        transition: color 0.2s ease;
+    }
+
+        .polaris-footer-icons a:hover {
+            color: #00b2b2;
+        }
+
+/* Bottom: Copyright */
+.polaris-footer-bottom p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/*************************************************************
+    Home Page
+  (All classes prefixed with polaris-)
+**************************************************************/
+
+/* Ensure the page content starts below the navbar */
+.polaris-main-content {
+   /* put fonts here */
+}
+
+
+/* Container for the top section */
+/*************************************************************
+  Top Section Styles
+**************************************************************/
+
+/* Container for the top section */
+.polaris-home-top {
+    background-color: #00b2b2; /* Teal background */
+    padding: 20px;
+    text-align: center;
+}
+
+/* Buttons Container */
+.polaris-home-top-buttons-container {
+    margin-bottom: 20px;
+}
+
+/* Orange buttons with white text */
+.polaris-home-top-button {
+    display: inline-block;
+    background-color: #FF4600; /* Orange */
+    color: #ffffff; /* White text */
+    font-weight: bolder;
+    font-size: 2rem;
+    text-decoration: underline;
+    padding: 5px 1px;
+    margin: 0 10px;
+    border-radius: 30px;
+    border: none;
+    width: 250px;
+}
+
+/* Font Awesome arrow icon */
+
+
+.polaris-arrow-icon {
+    display: inline-block; /* Allows setting width/height/padding for the circle */
+    border: 2px solid #000000; /* 2px black border */
+    border-radius: 50%; /* Makes the border circular */
+    padding: 10px; /* Space around the icon inside the circle */
+    font-size: 2rem; /* Size of the icon */
+    vertical-align: middle;
+    margin-bottom: 15px;
+    color: #000000; /* Black arrow (can be changed) */
+}
+
+/* Title box with white background and black rounded border */
+.polaris-home-title-box {
+    display: inline-block; /* So it hugs the content */
+    background-color: #ffffff; /* White background */
+    border: 3px solid #000000; /* Black border */
+    border-radius: 20px; /* Rounded corners */
+    padding: 10px 20px;
+    margin-bottom: 20px;
+}
+
+.polaris-home-title {
+    font-size: 2.8rem;
+    color: #000000;
+    margin: 0; /* Remove default margins */
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Subtitle box with light gray background and black rounded border */
+.polaris-home-subtitle-box {
+    display: inline-block;
+    background-color: lightgray; /* Light gray */
+    border: 3px solid #000000;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+}
+
+.polaris-home-subtitle {
+    font-family: Arial;
+    font-size: 2.7rem;
+    color: #000000;
+    margin: 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 
+  -------------------------------------------------------------------
+  DONATE Panel Styles for the Home Top Section Middle
+  -------------------------------------------------------------------
+*/
+.polaris-home-bipanel-container {
+    display: flex; /* Lay out left/right columns */
+    max-width: 800px; /* Adjust as needed */
+    margin: 0 auto 20px; /* Center horizontally, add spacing below */
+    border: 3px solid #000; /* Black border */
+    border-radius: 20px; /* Rounded corners */
+    background-color: #ffffff; /* White background */
+    overflow: hidden; /* Ensure no overflow from corners */
+}
+
+.polaris-home-bipanel-left {
+    flex: 1; /* Left column grows/shrinks at ratio 1 */
+    display: flex;
+    align-items: center; /* Vertically center "DONATE" */
+    justify-content: center; /* Horizontally center "DONATE" */
+    border-right: 3px solid #000; /* Black vertical divider */
+    padding: 20px;
+}
+
+.polaris-home-bipanel-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.polaris-home-bipanel-right {
+    flex: 2; /* Right column grows/shrinks at ratio 2 */
+    padding: 20px;
+    align-items: center; /* Vertically center "DONATE" */
+}
+
+    .polaris-home-bipanel-right p {
+        margin: 0 0 10px 0; /* Bottom spacing between lines */
+        font-size: 1.2rem;
+        text-align: left;
+    }
+
+.polaris-home-bipanel-info {
+    margin-top: 20px; /* Extra space before final note */
+    font-size: 1rem;
+    font-weight: normal;
+    text-align: left;
+    ;
+}
+
+/* Mobile (max-width: 768px) styles for the Donate panel */
+@media (max-width: 768px) {
+    .polaris-home-bipanel-container {
+        display: block; /* Stack left & right vertically */
+        max-width: 90%; /* Slightly narrower if desired */
+        margin: 0 auto 20px; /* Center and add bottom spacing */
+        border: 3px solid #000; /* Keep the outer black border */
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: #ffffff; /* White or match your design */
+    }
+
+    /* The left side (DONATE) becomes a top panel */
+    .polaris-home-bipanel-left {
+        border-right: none; /* Remove vertical divider */
+        border-bottom: 3px solid #000; /* Optional horizontal divider */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .polaris-home-bipanel-title {
+        font-size: 2rem; /* Adjust to fit mobile nicely */
+        margin: 0;
+    }
+
+    /* The right side with donation amounts goes below the top panel */
+    .polaris-home-bipanel-right {
+        padding: 20px;
+        text-align: center; /* Center text or left-align if preferred */
+        font-weight: bold;
+    }
+
+        .polaris-home-bipanel-right p {
+            font-size: 1.1rem; /* Slightly smaller on mobile */
+            margin: 0 0 10px 0;
+        }
+
+    .polaris-home-bipanel-info {
+        margin-top: 20px;
+        font-size: 1rem;
+        font-weight: normal;
+        text-align: center;
+    }
+}
+
+
+/* Disclaimer text */
+.polaris-disclaimer {
+    margin-top: 20px;
+    color: #000000;
+    font-size: 0.9rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.polaris-a-bold {
+    color: #2F4729;
+    font-weight: bold;
+}
+
+    .polaris-a-bold:hover {
+        color: #000;
+        font-weight: bolder;
+    }
+
+.polaris-a {
+    color: #2F4729;
+}
+
+    .polaris-a:hover {
+        color: #000;
+        font-weight: 600;
+    }
+
+.carousel {
+    max-width: 1100px;
+    max-height: 650px;
+    margin: 30px auto; /* 30px top margin; auto left/right centers the carousel */
+    background-color: #ffffff; /* ensure white background */
+}
+
+    /* Ensure that carousel images fill the container and maintain a good aspect ratio */
+    .carousel .carousel-item img {
+        width: 100%;
+        height: 650px;
+        object-fit: cover;
+    }
+
+/* Connect With Us Section */
+.polaris-connect-with-us-section {
+    background-color: #f5f5f5; /* Light gray background */
+    padding: 60px 0; /* Top & bottom spacing */
+    text-align: center; /* Center text */
+}
+
+.polaris-connect-container {
+    max-width: 800px; /* Constrain width */
+    margin: 0 auto; /* Center horizontally */
+    padding: 0 20px; /* Side padding for small screens */
+}
+
+.polaris-connect-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.polaris-connect-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.polaris-connect-org-info {
+    margin-bottom: 30px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Form Container */
+.polaris-connect-form {
+    display: flex; /* Place input & button side by side */
+    max-width: 700px; /* Further constrain width */
+    margin: 0 auto; /* Center the form container */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    border-radius: 5px; /* Slightly rounded corners */
+    overflow: hidden; /* Ensure corners remain rounded */
+}
+
+/* Email Input Field */
+.polaris-connect-input {
+    flex: 1; /* Take up remaining space */
+    padding: 15px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+}
+
+    .polaris-connect-input::placeholder {
+        color: #999;
+    }
+
+/* Join Button */
+.polaris-connect-button {
+    background-color: #00b2b2; /* Teal color */
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+    .polaris-connect-button:hover {
+        background-color: #009999; /* Darker teal on hover */
+    }
+
+/* Responsive Adjustments (optional) */
+@media (max-width: 576px) {
+    .polaris-connect-form {
+        flex-direction: column; /* Stack input & button vertically on very small screens */
+    }
+
+    .polaris-connect-button {
+        width: 100%;
+        border-radius: 0; /* Matches the form's rounded edges */
+    }
+}
+
+/* About Us */
+.polaris-big-letter {
+    font-size: 50px;
+    line-height: 1;
+    text-align: center;
+}
+
+/* Container to limit width and add padding */
+.polaris-page-container {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #fff;
+    max-width: 900px; /* Adjust as needed */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+    /* Main headings */
+    .polaris-page-container h1 {
+        font-size: 2em;
+        margin-bottom: 0.5em;
+        color: #333;
+    }
+
+    /* Subheadings */
+    .polaris-page-container h2 {
+        font-size: 1.5em;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+        color: #444;
+    }
+
+    /* Paragraph spacing */
+    .polaris-page-container p {
+        margin-bottom: 1em;
+    }
+
+    .polaris-page-container a {
+        color: #444;
+        font-weight: bold;
+    }
+
+/* Image styling */
+.polaris-image-container {
+    float: left; /* Floats the image to the right */
+    margin: 0 1em 0 0; /* Adds spacing around the image */
+    width: 300px; /* Adjust the width as needed */
+    max-width: 40%; /* Ensures it scales on smaller screens */
+}
+
+    .polaris-image-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border: 2px solid #ccc; /* Optional border styling */
+        border-radius: 4px; /* Optional rounded corners */
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .polaris-image-container {
+        float: none;
+        margin: 1em 0;
+        max-width: 100%;
+        width: auto;
+    }
+}
+
+/* Container styling */
+.polaris-more-information {
+    /* Adjust as needed for your layout */
+    text-align: center;
+    margin-top: 50px;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    color: #6f6f6f;
+}
+
+
+/* Basic styling for the teal banner */
+.polaris-banner {
+    background-color: #00B5AD; /* Adjust to match your desired teal shade */
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px; /* Rounded corners */
+    width: 100%; /* Optional: adjust width or remove for full width */
+    margin: 30px auto; /* Centers the banner horizontally on the page */
+}
+
+
+
+
+.marching-ants {
+    padding: 7px;
+    background-size: 20px 2px, 20px 2px, 2px 20px, 2px 20px;
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    -webkit-animation: marching-ants-anim 1s;
+    animation: marching-ants-anim 1s;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-play-state: running;
+    animation-play-state: running;
+    background-image: linear-gradient(to right, #fff 50%, #444 50%), linear-gradient(to right, #fff 50%, #444 50%), linear-gradient(to bottom, #fff 50%, #444 50%), linear-gradient(to bottom, #fff 50%, #444 50%);
+}
+
+
+@-webkit-keyframes marching-ants-anim {
+    0% {
+        background-position: 0 0, 0 100%, 0 0, 100% 0;
+    }
+
+    100% {
+        background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+    }
+}
+
+@keyframes marching-ants-anim {
+    0% {
+        background-position: 0 0, 0 100%, 0 0, 100% 0;
+    }
+
+    100% {
+        background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+    }
+}
+
+/*************************************************************
+    Donation Page
+  (All classes prefixed with polaris-)
+**************************************************************/
+
+.polaris-dhero {
+    position: relative;
+    /* pan background vertically so the head shows */
+    background: url('/media/polaris/Pages/Donations/BoyOnBed.jpeg') center 40% / cover no-repeat;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+    .polaris-dhero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(13, 110, 253, 0.6);
+        z-index: 0;
+    }
+
+    .polaris-dhero .polaris-dhero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        width: 100%;
+        padding: 0 1rem;
+    }
+        /*All this ridiculousness was copied from the original Polaris Donation Page just for an white line */
+        /*An HR won't work because of the transparancy */
+        .polaris-dhero .polaris-dhero-content h1::after {
+            background-color: #fff;
+            block-size: .3125rem;
+            border-radius: 9999px;
+            content: "";
+            display: block;
+            inline-size: 4.375rem;
+            inset-block-start: calc(25% + 1.75rem);
+            inset-inline-start: 50%;
+            position: absolute;
+            transform: translate(-50%);
+        }
+
+@media (max-width: 767px) {
+    .polaris-dhero .polaris-dhero-content h1::after {
+        inset-block-start: calc(35% + 1rem);
+    }
+}
+
+@media (max-width: 626px) {
+    .polaris-dhero .polaris-dhero-content h1::after {
+        inset-block-start: calc(25% + 1rem);
+    }
+}
+
+.polaris-dhero p {
+    font-weight: 500;
+    color: #fff;
+}
+
+.polaris-secure-donation {
+    display: inline-flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    margin-top: 1.5rem;
+}
+
+    .polaris-secure-donation .fa-lock {
+        color: #28a745;
+        margin-right: 0.5rem;
+    }
+
+    .polaris-secure-donation span {
+        color: #212529;
+        font-weight: 500;
+    }
+

@@ -1,0 +1,102 @@
+﻿@page "/{LocationRoute}/Blog/{BlogType}"
+@page "/{LocationRoute}/Blog/{BlogType}/{Filter}"
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger text-center mt-5">
+        <strong>@ErrorMessage</strong>
+    </p>
+}
+else if (BlogItems == null || String.IsNullOrEmpty(RotatorTitle) || string.IsNullOrEmpty(BlogType) || !LocationId.HasValue)
+{
+    <p><em>@_lc.Keys["Loading"]</em></p>
+}
+else if (!BlogItems.Any())
+{
+    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="@BlogType" LocationId="@LocationId.Value" />
+    <p><em>@_lc.Keys["BlogNoData"]</em></p>
+}
+else
+{
+    <RotatorContainer RotatorTitle="@RotatorTitle" ImagePath="@BlogType" LocationId="@LocationId.Value" />
+
+    <div class="blog-wrapper">
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-4 g-4">
+            @foreach (var item in BlogItems)
+            {
+                <div class="col">
+                    <div class="card h-100 wow slideInUp">
+                        @if (!string.IsNullOrEmpty(item.MainImageFileName))
+                        {
+                            <img src="@($"media/{LocationRoute}/{BlogType}/{item.Name}/{ImageUtil.GetThumbnailFileName(item.MainImageFileName)}")"
+                                 class="card-img-top"
+                                 alt="@item.TitleTranslated" />
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">
+                                <a href="@($"/{LocationRoute}/BlogItem/{BlogType}/{item.Name}/{Filter}")">
+                                    @item.TitleTranslated
+                                </a>
+                            </h5>
+                            <p class="card-text flex-grow-1">
+                                @item.Description
+                            </p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small>
+                                @item.UpdateDateLocal?.ToString("M/d/yyyy h:mm tt")
+                                by @item.UpdateUser
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+       
+        @if (!Older)
+        {
+            @if (BlogItems.Count() == Defaults.MaxTopBlogItems)
+            {
+                <p class="mt-5">
+                    <a href="#" @onclick="GoToOlder" @onclick:preventDefault="true" class="btn btn-primary">
+                        @_lc.Keys["ViewOlder"]
+                    </a>
+                </p>
+            }
+        }
+        else
+        {
+            <p class="mt-5">
+                <a href="#" @onclick="GoToNewer" @onclick:preventDefault="true" class="btn btn-primary">
+                    @_lc.Keys["ViewNewer"]
+                </a>
+            </p>
+        }
+    </div>
+
+
+}
+
+<style>
+    a {
+        color: #0e9241;
+    }
+
+    /* 10% horizontal margin around the card grid */
+    .blog-wrapper {
+        margin: 0 10%;
+    }
+
+    @@media screen and (max-width: 576px) {
+        .blog-wrapper {
+            margin: 0 5px;
+        }
+    }
+
+        /* cap all card images at 400px tall and crop if needed */
+    .blog-wrapper .card-img-top {
+            height: 400px;
+            width: 100%;
+            object-fit: cover;
+        }
+</style>

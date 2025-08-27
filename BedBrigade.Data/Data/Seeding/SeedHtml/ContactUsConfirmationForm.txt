@@ -1,0 +1,13 @@
+%%ContactUs.FirstName%%,
+
+We have received your contact request.
+
+First Name:  %%ContactUs.FirstName%%
+Last Name:  %%ContactUs.LastName%%
+Phone:  %%ContactUs.Phone%%
+Email:  %%ContactUs.Email%%
+
+Message: 
+%%ContactUs.Message%%
+
+Your Contact Request has been assigned to this location:  %%Location.Name%%

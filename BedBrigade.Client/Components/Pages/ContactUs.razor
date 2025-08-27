@@ -1,0 +1,143 @@
+@page "/contact-us"
+@page "/{LocationRoute:nonfile}/contact-us"
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["ContactUs"]}")</PageTitle>
+
+<RotatorContainer RotatorTitle="@_lc.Keys["ContactUs"]" ImagePath="pages/Contact" LocationId="1" />
+
+<div class="container-fluid" style="display: @DisplaySearch">
+    <SearchLocation @ref="SearchLocation" Title="@_lc.Keys["FindABedBrigade"]" ResultType="DropDownList" ParentMethod="(childData)=>CheckChildData(childData)" />
+</div>
+
+
+
+<div class="container-fluid" style="display: @DisplayForm">
+
+    <EditForm EditContext="@EC">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["ContactInformation"]</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
+                            <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.FirstName)"></ValidationMessage>
+                            </div>
+
+                        </div>
+                        <div class="form-group ">
+                            <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
+                            <SfTextBox ID="lastname" @bind-Value="newRequest.LastName"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.LastName)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
+                            <SfTextBox ID="email" @bind-Value="newRequest.Email"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Email)"></ValidationMessage>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
+                            <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="newRequest.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Phone)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">@_lc.Keys["ContactMessage"]</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inst" class="formlabel">@_lc.Keys["Message"]</label>
+                            <SfTextBox ID="inst" @bind-Value="newRequest.Message" Multiline="true" HtmlAttributes="DescriptionHtmlAttribute"></SfTextBox>
+                            <div style="font-size: smaller">
+                                <ValidationMessage For="@(() => newRequest.Message)"></ValidationMessage>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div>
+                    <div id="myValidationMessage" class="alert alert-danger" role="alert" style="display: @MyValidationDisplay">
+                        @MyValidationMessage
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" style="text-align: center">
+                <ReCAPTCHA OnSuccess="OnSuccess" OnExpired="OnExpired" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3" style="text-align: center">
+                <button class="btn btn-primary" @onclick="(SaveRequest)" disabled="@_isBusy">
+                    @if (_isBusy)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    }
+                    @_lc.Keys["SendMessage"]
+                </button>
+            </div>
+            <div class="col-md-9">
+            </div>
+        </div>
+
+    </EditForm>
+
+</div>
+
+<div id="resultMessage" class="container-fluid" style="display: @ResultDisplay">
+    <div class="@AlertType" role="alert">
+        @((MarkupString)ResultMessage)
+    </div>
+</div>
+
+
+
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .required::after {
+        content: '*';
+        font-size: medium;
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
+
+    .formlabel {
+        color: #B4886B;
+        font-weight: bold;
+        font-size: small;
+        display: block;
+    }
+</style>

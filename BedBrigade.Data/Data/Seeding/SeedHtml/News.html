@@ -1,0 +1,140 @@
+﻿<main class="body-content">
+            
+
+
+
+
+
+
+
+
+<section class="flow">
+
+
+    <div class="request-img-rotate border-bottom-green widget widget-align-justify widget-size-100">
+        <div class="Container " style="background-color:#ffffff;">
+            
+
+<section class="flow">
+
+
+    <div class="slider-angle slider-angle-1 widget widget-align-justify widget-size-33">
+        <div class="Container carousel-inner" style="background-color:#ffffff;">
+            
+
+<section class="flow">
+<img src="/media/News/TheTimes-min.jpg" alt="News" id="leftImageRotator" class="slider-angle-img" height="500" width="100%"></section>
+
+        </div>
+    </div>
+
+
+    <div class="slider-angle slider-angle-2 widget widget-align-justify widget-size-33">
+        <div class="Container carousel-inner" style="background-color:#ffffff;">
+            
+
+<section class="flow">
+<img src="/media/News/Globe-min.jpg" alt="News" id="middleImageRotator" class="slider-angle-img" height="500" width="100%"></section>
+
+        </div>
+    </div>
+
+
+    <div class="slider-angle slider-angle-3 widget widget-align-justify widget-size-33">
+        <div class="Container carousel-inner" style="background-color:#ffffff;">
+            
+
+<section class="flow">
+<img src="/media/News/LoadSpeaker2-min.jpg" alt="News" id="rightImageRotator" class="slider-angle-img" height="500" width="100%"></section>
+
+        </div>
+    </div>
+
+<div class="widget widget-h-t-m-l-block widget-align-justify widget-size-100 widget-h-t-m-l-block">
+    
+    <div class="widget-body">
+        <h2>News</h2>
+
+    </div>
+
+</div></section>
+
+        </div>
+    </div>
+</section>
+
+
+
+<div class="container">
+    <div class="blog-post-summary-box">
+        <div class="row">
+            
+
+
+        <div class="col-12 col-md-4">
+            <div class="blog-white-box mb-5">
+                <div class="blog-figure">
+                    <a class="img" href="news/2020-community-leadership-award">
+                        <img class="img-fluid rounded" {{="" model.contentitem="" |="" display_text="" }}="" alt="" src="/media/National/pages/News/2020CommunityLeadershipAward.jpg">
+                    </a>
+                </div>
+                <div class="blog-content-main mt-4">
+                    <div class="blog-author">
+                        <span class="createdDate">11/11/2021 4:18:22 PM</span>
+                        <span class="author">dhiraj</span>
+                    </div>
+                    <div class="blog-content-block mt-3">
+                        <h5> <a class="title" href="news/2020-community-leadership-award">2020 Community Leadership Award</a></h5>
+                        <p></p><p>I lead Bed Brigade in Grove City. We build and deliver beds for families in need throughout central Ohio. It's very rewarding. On Friday my friend Dale and I picked up this 2020...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+   
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/Scripts/jquery_cookie.js" type="text/javascript"></script>
+<script src="Script/js.cookie.js"></script>
+<script type="text/javascript">
+    var count = 0
+    $(".title").click(function () {
+        if (count == 0) {
+            var blogurls = [];
+            var blogtitles = [];
+            $("a.title ").each(function () {
+                var m = $(this).attr("href")
+                var t = $(this).text();
+               //alert(t)
+              //  blogurls.push({ "link": m, "title": t });
+                blogurls.push(m);
+                blogtitles.push(t);
+            });
+            count++
+          
+           // Cookies.set('bloglist', blogurls);
+           localStorage.setItem("bloglist", blogurls);
+            localStorage.setItem("blogtitle", blogtitles);
+        }
+        else {
+            return
+        }
+
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+        </main>

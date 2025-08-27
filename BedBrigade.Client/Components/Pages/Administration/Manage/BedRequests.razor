@@ -1,0 +1,5 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/bedrequests"
+<CheckAuth Roles=@RoleNames.CanViewBedRequests></CheckAuth>
+
+<BedRequestGrid />

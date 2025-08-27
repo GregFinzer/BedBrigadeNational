@@ -1,0 +1,90 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/SMS/BulkSms"
+@using BedBrigade.Common.EnumModels
+@using BedBrigade.Common.Enums
+@using BedBrigade.Common.Models
+<CheckAuth Roles=@RoleNames.CanSendSms></CheckAuth>
+
+@if (Model == null || Model.Locations == null || Model.Locations.Count == 0 || Model.CurrentLocationId == 0)
+{
+    <Spinner />
+}
+else
+{
+    <div class="container my-5 ">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>Send Bulk Text Messages</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
+        <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator/>
+            
+            <div class="form-group mb-3">
+                <label for="smsRecipientOptionDropdown">To</label>
+                <SfDropDownList ID="smsRecipientOptionDropdown" TItem="EnumNameValue<SmsRecipientOption>" TValue="SmsRecipientOption" DataSource=@Model.SmsRecipientOptions @bind-Value=@Model.CurrentSmsRecipientOption Enabled="true" Placeholder="Text Message Recipient Option" FloatLabelType="FloatLabelType.Auto">
+                    <DropDownListFieldSettings Text="Name" Value="Value" />
+                    <DropDownListEvents TValue="SmsRecipientOption" TItem="EnumNameValue<SmsRecipientOption>" ValueChange="SmsRecipientChangeEvent"></DropDownListEvents>
+                </SfDropDownList>
+            </div>
+
+            @if (Model.ShowLocationDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="locationDropdown">Location</label>
+                    <SfDropDownList ID="locationDropdown" TValue="int" TItem="Location" Placeholder="Select a location" DataSource="@Model.Locations" @bind-Value="Model.CurrentLocationId">
+                        <DropDownListFieldSettings Text="Name" Value="LocationId"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Location" ValueChange="LocationChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
+            
+            @if (Model.ShowEventDropdown)
+            {
+                <div class="form-group mb-3">
+                    <label for="events" class="formlabel">Location Available Events&nbsp;(@Model.Schedules.Count)</label>
+                    <SfDropDownList ID="events" TValue="int" TItem="Schedule" PopupHeight="350px" PopupWidth="350px" Placeholder="Select an event" DataSource="@Model.Schedules">
+                        <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="int" TItem="Schedule" ValueChange="ScheduleChangeEvent"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+            }
+
+
+            <div class="form-group mb-3">
+                <label for="body">Body:</label>
+                <InputTextArea id="body" class="form-control" style="height:240px" @bind-Value="Model.Body" maxlength="1600"></InputTextArea>
+                <div style="font-size: smaller">
+                    <ValidationMessage For="@(() => Model.Body)"></ValidationMessage>
+                </div> 
+            </div>
+
+            @if (showPlan)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @message
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+        
+        <p>&nbsp;</p>
+
+        @if (isSuccess)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
+        else if (isFailure)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @message
+            </div>
+        }
+    </div>
+}

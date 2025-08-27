@@ -1,0 +1,36 @@
+﻿@using BedBrigade.Client.Services
+@using Serilog
+
+@code
+{
+    [Parameter]
+    public string? Roles { get; set; }
+
+    [Inject]
+    private IAuthService AuthService { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!AuthService.IsLoggedIn)
+        {
+            try
+            {
+                string returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                NavigationManager.NavigateTo($"/login?returnUrl={returnUrl}", true);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warning(ex.ToString());
+                return;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(Roles) && !AuthService.UserHasRole(Roles))
+        {
+            NavigationManager.NavigateTo("/unauthorized");
+        }
+    }
+}

@@ -1,0 +1,11 @@
+﻿@page "/testError"
+
+@* This is for testing the global exception handler. *@
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        throw new InvalidOperationException("This is a test");
+    }
+}

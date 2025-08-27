@@ -1,0 +1,15 @@
+@page "/unauthorized"
+
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["Unauthorized"]}")</PageTitle>
+
+<h1>@_lc.Keys["SorryYouAreNot"]</h1>
+
+@code
+{
+    [Inject] private ILanguageContainerService _lc { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _lc.InitLocalizedComponent(this);
+    }
+}

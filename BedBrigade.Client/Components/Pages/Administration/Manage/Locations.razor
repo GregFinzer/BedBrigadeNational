@@ -1,0 +1,5 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/locations"
+<CheckAuth Roles=@RoleNames.CanViewLocations></CheckAuth>
+
+<LocationGrid />

@@ -1,0 +1,194 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/admin/serverinfo"
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+@using System.Diagnostics;
+@using System.Runtime.InteropServices;
+@using System.Management;
+@using Serilog
+
+
+<div class="row mt-3 mb-3">
+    <div class="col-md-10 ps-3 ps-md-0">
+        <h3>Server Information</h3>
+    </div>
+    <div class="col-md-2 ps-3 ps-md-0">
+        <UserInfo />
+    </div>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Information</th>
+        <th scope="col">Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th scope="row">Current Server Time</th>
+        <td>@ServerTime</td>
+    </tr>
+    <tr>
+        <th scope="row">Timezone</th>
+        <td>@Timezone</td>
+    </tr>
+    <tr>
+        <th scope="row">Server Name</th>
+        <td>@ServerName</td>
+    </tr>
+        <tr>
+            <th scope="row">OS Version</th>
+            <td>@OsVersion</td>
+        </tr>
+    <tr>
+        <th scope="row">Processor Architecture</th>
+        <td>@ProcessorArchitecture</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Name</th>
+        <td>@ProcessorName</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Count</th>
+        <td>@ProcessorCount</td>
+    </tr>
+    <tr>
+        <th scope="row">Processor Speed</th>
+        <td>@ProcessorSpeed MHz</td>
+    </tr>
+    <tr>
+        <th scope="row">CPU Utilization</th>
+        <td>@CpuUtilization %</td>
+    </tr>
+    <tr>
+        <th scope="row">Maximum Memory</th>
+        <td>@MaxMemory GB</td>
+    </tr>
+    <tr>
+        <th scope="row">Free Memory</th>
+        <td>@FreeMemory GB</td>
+    </tr>
+
+    </tbody>
+</table>
+
+<h3 class="mb-4">Clear Cache</h3>
+<p>Caching Enabled: @_cachingService.IsCachingEnabled</p>
+<p>Click the button below to clear the cache.</p>
+<button class="btn btn-primary" @onclick="ClearCache">Clear Cache</button>
+
+@code {
+    [Inject] private IAuthService? _svcAuth { get; set; }
+    private string ProcessorArchitecture { get; set; }
+    private string ProcessorName { get; set; }
+    private int ProcessorCount { get; set; }
+    private uint ProcessorSpeed { get; set; }
+    private double MaxMemory { get; set; }
+    private double FreeMemory { get; set; }
+    private float CpuUtilization { get; set; }
+    private string Timezone { get; set; }
+    private string ServerTime { get; set; }
+    private string ServerName { get; set; }
+    private string OsVersion { get; set; }
+    [Inject] private ICachingService _cachingService { get; set; }
+    [Inject] private ToastService _toastService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Log.Information($"{_svcAuth.UserName} went to the Server Information Page");
+        ProcessorArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+        ProcessorName = GetProcessorName();
+        ProcessorCount = Environment.ProcessorCount;
+        ProcessorSpeed = GetProcessorSpeed();
+        MaxMemory = GetMaxMemory();
+        FreeMemory = GetFreeMemory();
+        CpuUtilization = GetCpuUtilization();
+        Timezone = TimeZoneInfo.Local.DisplayName;
+        ServerTime = DateTime.Now.ToString();
+        ServerName = System.Environment.MachineName;
+        OsVersion = Environment.OSVersion.VersionString;
+    }
+
+    private string GetProcessorName()
+    {
+        try
+        {
+            using (var searcher = new ManagementObjectSearcher("select Name from Win32_Processor"))
+            {
+                foreach (var obj in searcher.Get())
+                {
+                    return obj["Name"].ToString().Trim();
+                }
+            }
+        }
+        catch
+        {
+            // If we can't get the name, we'll return "Unknown"
+        }
+        return "Unknown";
+    }
+
+    private uint GetProcessorSpeed()
+    {
+        uint speed = 0;
+        try
+        {
+            using (var searcher = new ManagementObjectSearcher("select MaxClockSpeed from Win32_Processor"))
+            {
+                foreach (var obj in searcher.Get())
+                {
+                    speed = (uint)obj["MaxClockSpeed"];
+                    break; // We'll just use the first processor's speed
+                }
+            }
+        }
+        catch
+        {
+            // If we can't get the speed, we'll return 0
+        }
+        return speed;
+    }
+
+    private double GetMaxMemory()
+    {
+        return Math.Round(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024), 2);
+    }
+
+    public double GetFreeMemory()
+    {
+        try
+        {
+            PerformanceCounter freeMemory = new PerformanceCounter("Memory", "Available MBytes");
+            return Math.Round(Convert.ToDouble(freeMemory.NextValue()) / 1024.0, 2);
+        }
+        catch (Exception ex)
+        {
+            return Math.Round(GC.GetGCMemoryInfo().MemoryLoadBytes / (1024.0 * 1024 * 1024), 2);
+        }
+    }
+
+    private float GetCpuUtilization()
+    {
+        try
+        {
+            PerformanceCounter cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            // Call NextValue twice to get a valid reading
+            cpuCounter.NextValue();
+            System.Threading.Thread.Sleep(1000);
+            return cpuCounter.NextValue();
+        }
+        catch (Exception)
+        {
+            return -1;
+        }
+
+    }
+
+    private Task ClearCache()
+    {
+        _cachingService.ForceClearAll();
+        _toastService.Success("Cache Cleared", "The cache has been cleared.");
+        return Task.CompletedTask;
+    }
+
+}

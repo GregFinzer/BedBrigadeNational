@@ -1,0 +1,5 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/contacts"
+<CheckAuth Roles=@RoleNames.CanViewContacts></CheckAuth>
+
+<ContactsGrid />

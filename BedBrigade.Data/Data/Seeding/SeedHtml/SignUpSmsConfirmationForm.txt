@@ -1,0 +1,16 @@
+﻿%%Volunteer.FirstName%%, we are looking forward to seeing you today.  Here is the information for the event:
+
+%%Location.Name%%
+%%Schedule.GroupName%%
+%%Schedule.EventName%% %%Schedule.EventType%%
+%%Schedule.EventNote%%
+%%Schedule.EventDateScheduled%%
+Duration: %%Schedule.EventDurationHours%%
+Address:
+%%Schedule.Address%%
+%%Schedule.City%%, %%Schedule.State%%, %%Schedule.PostalCode%%
+
+Please arrive early or on time.  If you have any questions, please contact the event organizer.
+%%Schedule.OrganizerName%%
+%%Schedule.OrganizerEmail%%
+%%Schedule.OrganizerPhone%%

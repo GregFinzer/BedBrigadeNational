@@ -1,0 +1,178 @@
+﻿@page "/calendar"
+@page "/{LocationRoute:nonfile}/calendar"
+@using BedBrigade.Common.Models
+@using BedBrigade.Common.Enums
+@using System.Diagnostics
+@inject ILogger<UpcomingEvents> Logger
+
+@using Syncfusion.Blazor.Schedule
+<div class="col-lg-12 control-section">
+    @{
+        if (IsDisplayCalendar)
+        {
+            <div class="mobile-message">@_lc.Keys["TurnYourPhone"]</div>
+            <SfSchedule
+                CssClass="customize-schedule" 
+                TValue="AppointmentData" 
+                Width="100%" Height="700px" 
+                Readonly="true"
+                CurrentView="View.Month"
+                ShowHeaderBar="true"
+                @bind-SelectedDate="@CurrentDate">
+                    <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ></ScheduleEvents>
+                    <ScheduleEventSettings DataSource="@dataSource"></ScheduleEventSettings>                <ScheduleViews>
+                        <ScheduleView MaxEventsPerRow="6" Option="View.Month">
+                            <EventTemplate>
+                                @{
+                                    AppointmentData? evt = (context as AppointmentData);
+                                    <EventView EventData="@evt" RequestedView="month" OnHyperlinkClicked="OnHyperlinkClicked" />
+                                }
+                            </EventTemplate>
+                        </ScheduleView>
+                    </ScheduleViews>
+            </SfSchedule>
+            <a href="@($"/{LocationRoute}/Events")" class="btn btn-primary mt-3 ms-3">@_lc["Events"]</a>
+        } 
+        else
+        {
+            <div class="row">
+            <div class="col-lg-12" style="text-align:center">
+                 @EventsAlert
+            </div>
+            </div>
+        }
+     }
+</div>
+
+<SfDialog Width="500px" Height="400px" @bind-Visible="Visibility" ShowCloseIcon="true"  IsModal="true"  >
+    <DialogTemplates>     
+        <Content>
+            @if (SelectedEvent != null)
+            {
+                <div>
+                    @{                        
+                       <EventView EventData="@SelectedEvent" RequestedView="quick" />
+                     }                    
+                </div>
+            }
+        </Content>
+    </DialogTemplates>
+    <DialogPositionData X="center" Y="center"></DialogPositionData>
+    <DialogEvents Closed="@DialogClose"></DialogEvents>
+    <DialogAnimationSettings Effect="@DialogEffect.None"></DialogAnimationSettings>
+</SfDialog>
+
+
+@code{
+    private bool Visibility { get; set; } = false;
+    private AppointmentData? SelectedEvent { get; set; }
+    private bool _isHyperlinkClicked;
+
+    private void OnHyperlinkClicked()
+    {
+        Debug.WriteLine("Hyperlink clicked");
+        _isHyperlinkClicked = true;
+    }
+
+    public void OnPopupOpen(PopupOpenEventArgs<AppointmentData> args)
+    {
+
+        if (args.Type == PopupType.QuickInfo) // Custom popup
+        {
+            SelectedEvent = args.Data;
+            args.Cancel = true;
+
+            if (!_isHyperlinkClicked)
+            {
+                Visibility = true;
+            }
+        }                             
+           
+        // Reset the flag after handling the event
+        _isHyperlinkClicked = false;
+
+        } // open popup
+
+
+        private void DialogClose(Object args)
+        {
+            Visibility = false;
+        _isHyperlinkClicked = false;
+        }
+
+}
+
+<style>
+
+    .e-dialog .e-dlg-header {
+        color: green;
+        font-size: 20px;
+        font-weight: normal;
+    }
+
+    .customize-schedule 
+    .e-quick-popup-wrapper 
+    .e-event-popup 
+    .e-popup-footer {
+        display: none;
+    }
+
+    .e-schedule .template-wrap {
+        height: 200px;
+        white-space: normal;
+    }
+
+    .e-schedule .agenda-wrap {
+        height: 300px;
+        white-space: normal;
+    }
+
+    .e-schedule .e-month-view {
+        height: 700px !important;
+    }
+
+    .e-schedule .e-month-view .e-work-cells {
+        height: calc((700px - 100px) / 6) !important; /* Subtracting header height and dividing by typical number of weeks */
+    }
+
+    .e-schedule .e-month-view .e-appointment {
+        height: auto !important;
+        max-height: calc(((700px - 100px) / 6) - 10px) !important; /* Leaving some padding */
+        font-size: smaller;
+        padding-left: 5px;
+        margin-left: 12px;
+    }
+
+    @@media (max-width: 767px) {
+        .e-schedule .e-month-view .e-appointment
+        {
+            padding-left: 0px;
+            margin-left: 0px;
+        }
+    }
+
+    .content-area {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .e-quick-popup-wrapper .e-cell-popup .e-popup-content {
+        padding: 0 14px;
+        height: 400px;
+        width: 800px;
+    }
+
+    .control-section {
+        margin-top: 10px;
+    }
+
+    /* Hide the view selector buttons */
+    .e-schedule .e-schedule-toolbar .e-views {
+        display: none !important;
+    }
+
+    /* Ensure the navigation controls stay visible and centered */
+    .e-schedule .e-schedule-toolbar .e-toolbar-items {
+        justify-content: center;
+    }
+</style>

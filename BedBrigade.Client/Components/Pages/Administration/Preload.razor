@@ -1,0 +1,108 @@
+﻿@page "/administration/preload"
+@using BedBrigade.Client.Services
+@using BedBrigade.Common.Models
+@using BedBrigade.Data.Data.Seeding
+
+<h2 class="preload-heading">Preload Bed Brigade Near Me</h2>
+<BedBrigadeNearMe />
+<hr />
+
+<h2 class="preload-heading">Preload Request A Bed</h2>
+<BedRequest PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Volunteer</h2>
+<VolunteerSignUp PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Contact Us</h2>
+<ContactUs PreloadLocation=@Defaults.GroveCityTrimmedRoute />
+<hr />
+
+<h2 class="preload-heading">Preload Login</h2>
+<Login />
+<hr />
+
+@if (Locations == null && BedBrigadeNearMe == null && BodyContent == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h2 class="preload-heading">Preload Location Distance</h2>
+    if (BedBrigadeNearMe != null)
+    {
+        foreach (var locationDistance in BedBrigadeNearMe)
+        {
+            <p>@locationDistance.Name - @locationDistance.MilesAwayString</p>
+        }
+    }
+    <hr />
+    <h2 class="preload-heading">Preload Syncfusion Grid</h2>
+    if (Locations != null)
+    {
+        <SfGrid DataSource="@Locations" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" AllowReordering="true" AllowResizing="true">
+            <GridPageSettings PageSize="10"></GridPageSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(Location.LocationId) HeaderText="ID" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.Name) HeaderText="Name" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.Route) HeaderText="Route" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildAddress) HeaderText="Address" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildCity) HeaderText="City" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildState) HeaderText="State" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.BuildPostalCode) HeaderText="Postal Code" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.Latitude) HeaderText="Latitude" Format="N10" TextAlign="TextAlign.Right" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.Longitude) HeaderText="Longitude" Format="N10" TextAlign="TextAlign.Right" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(Location.MetroAreaId) HeaderText="Metro Area ID" TextAlign="TextAlign.Right" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(Location.IsActive) HeaderText="Is Active" DisplayAsCheckBox="true" Width="120"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    }
+    <hr />
+    <h2 class="preload-heading">Preload Home Page</h2>
+    if (BodyContent != null)
+    {
+        @((MarkupString)BodyContent)
+    }
+
+}
+@code {
+    [Inject]
+    public ILocationDataService LocationDataService { get; set; }
+
+    [Inject] IContentDataService ContentDataService { get; set; }
+    [Inject] private ILoadImagesService _loadImagesService { get; set; }
+
+    List<Location>? Locations { get; set; } = null;
+    List<LocationDistance>? BedBrigadeNearMe { get; set; } = null;
+    public string? BodyContent { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var locationResult = await LocationDataService.GetAllAsync();
+        if (locationResult.Success && locationResult.Data != null)
+        {
+            Locations = locationResult.Data;
+        }
+
+        var distanceResult = await LocationDataService.GetBedBrigadeNearMe("43228");
+
+        if (distanceResult.Success && distanceResult.Data != null)
+        {
+            BedBrigadeNearMe = distanceResult.Data;
+        }
+
+        string defaultHome = "Home";
+        var contentResult = await ContentDataService.GetAsync(defaultHome, Defaults.NationalLocationId);
+        var path = $"/{SeedConstants.SeedNationalName}/pages/{defaultHome}";
+        string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
+        BodyContent = html;
+    }
+}
+
+<style>
+    .preload-heading 
+    {
+        background-color: lightskyblue;
+    }
+</style>

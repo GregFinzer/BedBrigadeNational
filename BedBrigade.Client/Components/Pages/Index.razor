@@ -1,0 +1,9 @@
+﻿@page "/"
+@page "/{LocationRoute:nonfile}"
+@page "/{LocationRoute:nonfile}/{PageName:nonfile}"
+
+<PageTitle>@_currentPageTitle</PageTitle>
+
+@((MarkupString)_bodyContent)
+
+
