@@ -392,10 +392,16 @@ namespace BedBrigade.Data.Services
                 smtpClient.Send(mailMessage);
                 email.Status = EmailQueueStatus.Sent.ToString();
             }
+            catch (RequestFailedException ex)
+            {
+                email.FailureMessage =
+                    $"Email send operation failed with error code: {ex.ErrorCode}, message: {ex}";
+                email.Status = EmailQueueStatus.Failed.ToString();
+            }
             catch (Exception ex)
             {
                 email.FailureMessage =
-                    $"Email send operation failed, message: {ex.Message}";
+                    $"Email send operation failed, message: {ex}";
                 email.Status = EmailQueueStatus.Failed.ToString();
             }
 
