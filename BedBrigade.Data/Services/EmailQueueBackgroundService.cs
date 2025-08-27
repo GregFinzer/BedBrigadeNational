@@ -346,7 +346,37 @@ namespace BedBrigade.Data.Services
 
         private async Task SendLiveEmail(EmailQueue email)
         {
-            // Create the email message
+            MailMessage mailMessage = CreateTheMailMessage(email);
+
+            // Send the email
+            SmtpClient smtpClient = new SmtpClient(_host, _port);
+
+            try
+            {
+                smtpClient.Credentials = new System.Net.NetworkCredential(_userName, _password);
+                smtpClient.Send(mailMessage);
+                email.Status = EmailQueueStatus.Sent.ToString();
+            }
+            catch (RequestFailedException ex)
+            {
+                email.FailureMessage =
+                    $"Email send operation failed with error code: {ex.ErrorCode}, message: {ex}";
+                email.Status = EmailQueueStatus.Failed.ToString();
+            }
+            catch (Exception ex)
+            {
+                email.FailureMessage =
+                    $"Email send operation failed, message: {ex}";
+                email.Status = EmailQueueStatus.Failed.ToString();
+            }
+
+            email.LockDate = null;
+            email.SentDate = DateTime.UtcNow;
+            await _emailQueueDataService.UpdateAsync(email);
+        }
+
+        private static MailMessage CreateTheMailMessage(EmailQueue email)
+        {
             MailMessage mailMessage = new MailMessage();
 
             if (!string.IsNullOrEmpty(email.FromDisplayName))
@@ -381,27 +411,7 @@ namespace BedBrigade.Data.Services
 
             mailMessage.Subject = email.Subject;
             mailMessage.Body = email.Body;
-
-            // Send the email
-            SmtpClient smtpClient = new SmtpClient(_host, _port);
-
-
-            try
-            {
-                smtpClient.Credentials = new System.Net.NetworkCredential(_userName, _password);
-                smtpClient.Send(mailMessage);
-                email.Status = EmailQueueStatus.Sent.ToString();
-            }
-            catch (RequestFailedException ex)
-            {
-                email.FailureMessage =
-                    $"Email send operation failed with error code: {ex.ErrorCode}, message: {ex.Message}";
-                email.Status = EmailQueueStatus.Failed.ToString();
-            }
-
-            email.LockDate = null;
-            email.SentDate = DateTime.UtcNow;
-            await _emailQueueDataService.UpdateAsync(email);
+            return mailMessage;
         }
     }
 }
