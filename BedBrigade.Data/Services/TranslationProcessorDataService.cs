@@ -179,21 +179,7 @@ namespace BedBrigade.Data.Services
                     continue;
                 }
 
-                // Rate limiting logic
-                if (_requestsThisMinute >= _maxPerMinute)
-                {
-                    var elapsed = _rateLimitStopwatch.ElapsedMilliseconds;
-                    if (elapsed < 60000)
-                    {
-                        var waitTime = 60000 - (int)elapsed;
-                        Log.Information($"Translation Rate limit reached. Waiting {waitTime}ms before resuming.");
-                        await Task.Delay(waitTime, cancellationToken);
-                    }
-
-                    // Reset for next cycle
-                    _requestsThisMinute = 0;
-                    _rateLimitStopwatch.Restart();
-                }
+                await RateLimiting(cancellationToken);
 
                 var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
                 _requestsThisMinute++;
@@ -208,13 +194,7 @@ namespace BedBrigade.Data.Services
                     break;
                 }
 
-                Translation translation = new Translation
-                {
-                    Hash = parentTranslation.Hash,
-                    Culture = itemToProcess.Culture,
-                    Content = translatedText,
-                    ParentId = parentTranslation.TranslationId
-                };
+                Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
                 await _translationDataService.CreateAsync(translation);
                 await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
 
@@ -222,6 +202,38 @@ namespace BedBrigade.Data.Services
                 {
                     break;
                 }
+            }
+        }
+
+        private static Translation BuildTranslation(Translation parentTranslation, 
+            TranslationQueue itemToProcess,
+            string translatedText)
+        {
+            Translation translation = new Translation
+            {
+                Hash = parentTranslation.Hash,
+                Culture = itemToProcess.Culture,
+                Content = translatedText,
+                ParentId = parentTranslation.TranslationId
+            };
+            return translation;
+        }
+
+        private async Task RateLimiting(CancellationToken cancellationToken)
+        {
+            if (_requestsThisMinute >= _maxPerMinute)
+            {
+                var elapsed = _rateLimitStopwatch.ElapsedMilliseconds;
+                if (elapsed < 60000)
+                {
+                    var waitTime = 60000 - (int)elapsed;
+                    Log.Information($"Translation Rate limit reached. Waiting {waitTime}ms before resuming.");
+                    await Task.Delay(waitTime, cancellationToken);
+                }
+
+                // Reset for next cycle
+                _requestsThisMinute = 0;
+                _rateLimitStopwatch.Restart();
             }
         }
 
