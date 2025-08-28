@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.SpeakIt;
-using RestSharp;
+using OpenAI;
 using Serilog;
-using JsonException = Newtonsoft.Json.JsonException;
+using System.Globalization;
 using Translation = BedBrigade.Common.Models.Translation;
+using System.Diagnostics;
 
 namespace BedBrigade.Data.Services
 {
@@ -26,6 +20,9 @@ namespace BedBrigade.Data.Services
         private readonly IContentTranslationQueueDataService _contentTranslationQueueDataService;
         private readonly ITranslateLogic _translateLogic;
         private readonly ParseLogic _parseLogic = new ParseLogic();
+        private int _maxPerMinute;
+        private readonly Stopwatch _rateLimitStopwatch = new Stopwatch();
+        private int _requestsThisMinute = 0;
 
         public TranslationProcessorDataService(IConfigurationDataService configurationDataService,
             IContentDataService contentDataService, 
@@ -46,8 +43,15 @@ namespace BedBrigade.Data.Services
 
         public async Task ProcessQueue(CancellationToken cancellationToken)
         {
+            await LoadConfig();
             await ProcessTranslations(cancellationToken);
             await ProcessContentTranslations(cancellationToken);
+        }
+
+        private async Task LoadConfig()
+        {
+            _maxPerMinute = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.TranslationMaxRequestsPerMinute);
         }
 
         private async Task ProcessContentTranslations(CancellationToken cancellationToken)
@@ -157,6 +161,12 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            // Ensure stopwatch is running
+            if (!_rateLimitStopwatch.IsRunning)
+            {
+                _rateLimitStopwatch.Start();
+            }
+
             foreach (var itemToProcess in queueResult.Data)
             {
                 var parentTranslation =
@@ -169,7 +179,24 @@ namespace BedBrigade.Data.Services
                     continue;
                 }
 
+                // Rate limiting logic
+                if (_requestsThisMinute >= _maxPerMinute)
+                {
+                    var elapsed = _rateLimitStopwatch.ElapsedMilliseconds;
+                    if (elapsed < 60000)
+                    {
+                        var waitTime = 60000 - (int)elapsed;
+                        Log.Information($"Translation Rate limit reached. Waiting {waitTime}ms before resuming.");
+                        await Task.Delay(waitTime, cancellationToken);
+                    }
+
+                    // Reset for next cycle
+                    _requestsThisMinute = 0;
+                    _rateLimitStopwatch.Restart();
+                }
+
                 var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
+                _requestsThisMinute++;
 
                 if (translatedText == null)
                 {
@@ -190,7 +217,7 @@ namespace BedBrigade.Data.Services
                 };
                 await _translationDataService.CreateAsync(translation);
                 await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
-                
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
@@ -198,47 +225,44 @@ namespace BedBrigade.Data.Services
             }
         }
 
+
         private async Task<string?> TranslateTextAsync(string textToTranslate, string cultureName)
         {
             try
             {
-                string[] words = cultureName.Split("-");
-                string locale = words[0];
-                string url = $"https://api.apilayer.com/language_translation/translate?target={locale}";
-                var client = new RestClient(url);
+                // Normalize culture name (e.g., "es-ES", "fr", etc.)
+                var cultureInfo = new CultureInfo(cultureName);
+                string targetLanguage = cultureInfo.DisplayName; // Human-readable language name
 
-                CultureInfo cultureInfo = new CultureInfo(locale);
-
-                Log.Debug($"Using: {url}");
-                Log.Debug($"Translating to {cultureInfo.DisplayName}: {textToTranslate}");
-
-                var request = new RestRequest();
-                request.Method = Method.Post;
-
-                var apiKey =
-                    await _configurationDataService.GetConfigValueAsync(ConfigSection.System,
-                        ConfigNames.TranslationApiKey);
+                // Get the API key from your configuration service
+                var apiKey = await _configurationDataService.GetConfigValueAsync(
+                    ConfigSection.System, ConfigNames.TranslationApiKey);
 
                 if (string.IsNullOrWhiteSpace(apiKey))
                 {
                     Log.Error("TranslateTextAsync TranslationApiKey is null or empty");
-                }
-
-                request.AddHeader("apikey", apiKey);
-
-                request.AddParameter("text/plain", textToTranslate, ParameterType.RequestBody);
-
-                RestResponse response = await client.ExecuteAsync(request);
-
-                if (!response.IsSuccessful)
-                {
-                    Log.Error("TranslateTextAsync response error " + response.ErrorMessage);
                     return null;
                 }
 
-                string translation = GetFirstTranslation(response.Content);
+                var client = new OpenAIClient(apiKey);
 
-                Log.Debug($"Translated to: {translation}");
+                // Use GPT-5 mini for translation
+                var chat = client.GetChatClient("gpt-5-mini");
+
+                string prompt =
+                    $"Translate the following text from English into {targetLanguage}:\n\n{textToTranslate}";
+
+                var response = await chat.CompleteChatAsync(prompt);
+                string translation = response?.Value?.Content.FirstOrDefault()?.Text ?? string.Empty;
+
+                if (String.IsNullOrEmpty(translation))
+                {
+                    Log.Error("TranslateTextAsync GPT response was null or empty");
+                    return null;
+                }
+
+                Log.Debug($"Translated to {targetLanguage}: {translation}");
+
                 return translation;
             }
             catch (Exception ex)
@@ -248,36 +272,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        private string? GetFirstTranslation(string? jsonString)
-        {
-            if (string.IsNullOrWhiteSpace(jsonString))
-            {
-                return null;
-            }
 
-            try
-            {
-                using JsonDocument doc = JsonDocument.Parse(jsonString);
-                JsonElement root = doc.RootElement;
-
-                if (root.TryGetProperty("translations", out JsonElement translations) &&
-                    translations.ValueKind == JsonValueKind.Array &&
-                    translations.GetArrayLength() > 0)
-                {
-                    JsonElement firstTranslation = translations[0];
-                    if (firstTranslation.TryGetProperty("translation", out JsonElement translationValue))
-                    {
-                        return translationValue.GetString();
-                    }
-                }
-
-                return null;
-            }
-            catch (JsonException)
-            {
-                return null;
-            }
-        }
 
         public async Task QueueContentTranslation(Content content)
         {

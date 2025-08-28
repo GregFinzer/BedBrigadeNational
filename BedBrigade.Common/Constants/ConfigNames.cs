@@ -11,7 +11,10 @@
         public const string DisplayIdFields = "DisplayIdFields";
         public const string EmptyGridText = "EmptyGridText";
         public const string EventCutOffTimeDays = "EventCutOffTimeDays";
+
+        //Translation
         public const string TranslationApiKey = "TranslationApiKey";
+        public const string TranslationMaxRequestsPerMinute = "TranslationMaxRequestsPerMinute";
 
         //Media
         public const string AllowedFileExtensions = "AllowedFileExtensions";
