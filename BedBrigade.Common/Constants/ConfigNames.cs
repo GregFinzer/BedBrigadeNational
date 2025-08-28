@@ -15,6 +15,7 @@
         //Translation
         public const string TranslationApiKey = "TranslationApiKey";
         public const string TranslationMaxRequestsPerMinute = "TranslationMaxRequestsPerMinute";
+        public const string TranslationMaxRequestsPerDay = "TranslationMaxRequestsPerDay";
 
         //Media
         public const string AllowedFileExtensions = "AllowedFileExtensions";

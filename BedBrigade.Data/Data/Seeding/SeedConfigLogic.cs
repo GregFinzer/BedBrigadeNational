@@ -275,7 +275,14 @@ namespace BedBrigade.Data.Data.Seeding
                 new()
                 {
                     ConfigurationKey = ConfigNames.TranslationMaxRequestsPerMinute,
-                    ConfigurationValue = "500",
+                    ConfigurationValue = "3",
+                    Section = ConfigSection.System,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.TranslationMaxRequestsPerDay,
+                    ConfigurationValue = "200",
                     Section = ConfigSection.System,
                     LocationId = Defaults.NationalLocationId
                 },
