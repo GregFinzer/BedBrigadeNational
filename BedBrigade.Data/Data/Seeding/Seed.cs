@@ -7,7 +7,6 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using Bogus;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BedBrigade.Data.Seeding;
 
