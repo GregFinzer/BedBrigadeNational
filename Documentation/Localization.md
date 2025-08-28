@@ -1,6 +1,15 @@
 # Localization
-TLDR; The localization process for the project involves using resource files and the aksoftware.localization.multilanguages package for translating static strings and dynamic content. Automated tests ensure that all strings are localized correctly, and any updates to pages trigger content to be queued for translation, with detailed steps provided for handling validation messages, dropdowns, and seeded content.
+TLDR; The localization process for the project involves using resource files and the aksoftware.localization.multilanguages package for translating static strings and dynamic content. Automated tests ensure that all strings are localized correctly, and any updates to pages trigger content to be queued for translation, with detailed steps provided for handling validation messages, dropdowns, and seeded content. When content is changed, only new sentences are translated in the background.
 
+**Links**
+* [Failing Tests](#failing-tests)
+* [How to localize a new string in a Razor file](#how-to-localize-a-new-string-in-a-razor-file)
+* [How to localize validation messages](#how-to-localize-validation-messages)
+* [How to Translate Drop Down Lists and Other Dynamic Content](#how-to-translate-drop-down-lists-and-other-dynamic-content)
+* [Seeding Localized Content](#seeding-localized-content)
+* [Translation Queue Logic](#translation-queue-logic)
+* [Translation Process Logic](#translation-process-logic)
+* [Adding a New Language like French, Chinese etc.](#adding-a-new-language-like-french-chinese-etc)
 
 ## Overview
 Localization also known as language translation is one of the more complicated pieces of the project.  There are three major pieces which perform the language translation.
@@ -152,6 +161,45 @@ protected override void OnInitialized()
 Data\Seeding\SeedTranslations folder on Development using FTP
 12.  Perform a deployment
 
+## Translation Queue Logic
+
+### Overview
+In order to minimize the cost of translations, we keep a list of all English and translated sentences used in the entire Website in the Translations table.  The ContentTranslations keep the entire translated page of text.  When someone adds a new page or updates an existing page, all the sentences are extracted out.  Only new sentences are translated keeping costs low.
+
+### Queue Flow
+When a content item is saved here is the flow:
+Extract out localizable strings from the HTML.
+Remove double spaces and line feeds.
+Get a distinct list of localizable strings.
+Get all the existing translations
+If this is brand new text, then create a new Translation record.  This contains English sentences and translated sentences.
+For each language to be translated, create a new TranslationQueue record.  This will be used to translate sentences.
+For each language to be translated, create a new ContentTranslationQueue record.  This will be used to translate an entire website Page.
+
+**Here is the call flow:**
+```
+EditContent.razor.cs.HandleSaveOnlyClick
+	--> TranslationProcessorDataService.QueueContentTranslation
+		--> TranslateLogic.CleanUpSpacesAndLineFeedsFromHtml
+		--> ParseLogic.GetLocalizableStringsInText
+		--> TranslationProcessorDataService.SaveNewEnglishLocalizableStringsToTranslations
+		--> TranslationProcessorDataService.QueueTranslationsForLocalizableStrings
+		--> TranslationProcessorDataService.QueueContentTranslationForNonEnglishCultures
+```		
+## Translation Process Logic
+
+### Overview
+Every minute there is a background process that runs to see if there are items to translate.  It uses the OpenAI api to perform the language translations.  It first checks to see if there are any sentences to be translated and then it uses those translations in content pages.  There is a limit of 500 requests per minute.
+
+**Here is the call flow:**
+```
+TranslationBackgroundService.ExecuteAsync
+	--> TranslationProcessorDataService.ProcessQueue
+		--> TranslationProcessorDataService.LoadConfig
+		--> TranslationProcessorDataService.ProcessTranslations
+		--> TranslationProcessorDataService.ProcessContentTranslations
+```
+
 ## Adding a New Language like French, Chinese etc.
 1.  Go to this site:  https://akmultilanguages.azurewebsites.net/TranslateApplication
 2.  Upload BedBrigade.Client\Resources\en-US.yml
@@ -159,3 +207,5 @@ Data\Seeding\SeedTranslations folder on Development using FTP
 4.  Upload BedBrigade.Data\Data\Seeding\SeedTranslations\en-US.yml
 5.  Select the desired language and download to BedBrigade.Data\Data\Seeding\SeedTranslations
 6.  In BedBrigade.Data\Data\Seeding\SeedTranslationLogic you will need to alter a bunch of code to support the new language and then get those translations into development/test/production, etc.  Really it should loop through the languages other than English based on what is in the directory:  BedBrigade.Data\Data\Seeding\SeedTranslations
+
+
