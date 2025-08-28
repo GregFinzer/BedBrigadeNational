@@ -98,7 +98,7 @@ jobs:
         attempt=1
         while [ $attempt -le $max_attempts ]; do
           echo "Attempt $attempt: Loading preload page..."
-          response=$(curl -s -o /dev/null -w "%{http_code}"http://gregfinzer2-001-site4.ktempurl.com/administration/preload)
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site4.ktempurl.com/administration/preload)
           if [ $response -eq 200 ]; then
             echo "Preload page loaded successfully"
             exit 0
