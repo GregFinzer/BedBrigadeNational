@@ -21,8 +21,11 @@ namespace BedBrigade.Data.Services
         private readonly ITranslateLogic _translateLogic;
         private readonly ParseLogic _parseLogic = new ParseLogic();
         private int _maxPerMinute;
+        private int _maxPerDay;
         private readonly Stopwatch _rateLimitStopwatch = new Stopwatch();
         private int _requestsThisMinute = 0;
+        private static int _requestsToday = 0;
+        private static DateTime _dayStart = DateTime.UtcNow.Date;
 
         public TranslationProcessorDataService(IConfigurationDataService configurationDataService,
             IContentDataService contentDataService, 
@@ -52,6 +55,8 @@ namespace BedBrigade.Data.Services
         {
             _maxPerMinute = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
                 ConfigNames.TranslationMaxRequestsPerMinute);
+            _maxPerDay = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.TranslationMaxRequestsPerDay);
         }
 
         private async Task ProcessContentTranslations(CancellationToken cancellationToken)
@@ -169,6 +174,9 @@ namespace BedBrigade.Data.Services
 
             foreach (var itemToProcess in queueResult.Data)
             {
+                if (ReachedDailyLimit())
+                    break;
+
                 var parentTranslation =
                     translationsResult.Data.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
 
@@ -183,6 +191,7 @@ namespace BedBrigade.Data.Services
 
                 var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
                 _requestsThisMinute++;
+                _requestsToday++;
 
                 if (translatedText == null)
                 {
@@ -203,6 +212,24 @@ namespace BedBrigade.Data.Services
                     break;
                 }
             }
+        }
+
+        private bool ReachedDailyLimit()
+        {
+            // Reset daily counter if new day
+            if (DateTime.UtcNow.Date > _dayStart)
+            {
+                _dayStart = DateTime.UtcNow.Date;
+                _requestsToday = 0;
+            }
+
+            if (_requestsToday >= _maxPerDay)
+            {
+                Log.Information("Daily translation limit reached. Halting until next day.");
+                return true;
+            }
+
+            return false;
         }
 
         private static Translation BuildTranslation(Translation parentTranslation, 
