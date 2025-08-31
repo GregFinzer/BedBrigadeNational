@@ -129,5 +129,22 @@ namespace BedBrigade.Data.Services
                 _cachingService.ClearByEntityName(GetEntityName());
             }
         }
+
+        public override async Task<ServiceResponse<GeoLocationQueue>> CreateAsync(GeoLocationQueue entity)
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var existingRecord = ctx.GeoLocationQueue.Where(o => o.TableId == entity.TableId
+                                                                     && o.TableName == entity.TableName
+                                                                     && o.Street == entity.Street
+                                                                     && o.PostalCode == entity.PostalCode).FirstOrDefault();
+                if (existingRecord == null)
+                {
+                    return await base.CreateAsync(entity);
+                }
+
+                return new ServiceResponse<GeoLocationQueue>("Existing queued record found, not adding duplicate", true, existingRecord);
+            }
+        }
     }
 }

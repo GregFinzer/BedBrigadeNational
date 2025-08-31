@@ -79,6 +79,14 @@ namespace BedBrigade.Data
 
             CreateVolunteerIndexes(modelBuilder);
             CreateNewsletterIndexes(modelBuilder);
+            CreateGeoLocationQueueIndexes(modelBuilder);
+        }
+
+        private static void CreateGeoLocationQueueIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Common.Models.GeoLocationQueue>()
+                .HasIndex(o => new { o.TableId, o.TableName})
+                .HasDatabaseName("IX_GeoLocation_TableId_TableName");
         }
 
         private static void CreateNewsletterIndexes(ModelBuilder modelBuilder)
