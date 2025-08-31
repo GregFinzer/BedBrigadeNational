@@ -32,6 +32,7 @@ namespace BedBrigade.Client.Components
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private NavigationManager _nav { get; set; }
+        [Inject] private IGeoLocationQueueDataService? _svcGeoLocation { get; set; }
         [Parameter] public string? Id { get; set; }
 
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -475,6 +476,11 @@ namespace BedBrigade.Client.Components
             }
             if (BedRequest.BedRequestId != 0)
             {
+                bool success = await QueueForGeoLocation(BedRequest);
+                if (!success)
+                {
+                    return;
+                }
                 _toastService.Success("BedRequest Created", "BedRequest Created Successfully!");
             }
             else
@@ -484,12 +490,45 @@ namespace BedBrigade.Client.Components
             }
         }
 
+        private async Task<bool> QueueForGeoLocation(Common.Models.BedRequest bedRequest)
+        {
+            GeoLocationQueue item = new GeoLocationQueue();
+            item.Street = bedRequest.Street;
+            item.City = bedRequest.City;
+            item.State = bedRequest.State;
+            item.PostalCode = bedRequest.PostalCode;
+            item.CountryCode = Defaults.CountryCode;
+            item.TableName = TableNames.BedRequests.ToString();
+            item.TableId = bedRequest.BedRequestId;
+            item.QueueDate = DateTime.UtcNow;
+            item.Priority = 1;
+            item.Status = GeoLocationStatus.Queued.ToString();
+            var result = await _svcGeoLocation.CreateAsync(item);
+
+            if (!result.Success)
+            {
+                string message = "Created bed request but could not queue for Geolocation: " + result.Message;
+                Log.Error(message);
+                _toastService.Error("GeoLocation Failure", message);
+                return false;
+            }
+
+            return true;
+        }
+
+
         private async Task UpdateBedRequest(BedRequest BedRequest)
         {
             var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
 
             if (updateResult.Success)
             {
+                bool success = await QueueForGeoLocation(BedRequest);
+                if (!success)
+                {
+                    return;
+                }
+
                 _toastService.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else

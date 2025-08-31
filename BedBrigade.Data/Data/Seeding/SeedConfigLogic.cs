@@ -324,7 +324,7 @@ namespace BedBrigade.Data.Data.Seeding
                 new()
                 {
                     ConfigurationKey = ConfigNames.GeoLocationMaxRequestsPerSecond,
-                    ConfigurationValue = "2",
+                    ConfigurationValue = "1",
                     Section = ConfigSection.GeoLocation,
                     LocationId = Defaults.NationalLocationId
                 },
