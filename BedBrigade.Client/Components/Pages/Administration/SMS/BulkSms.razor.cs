@@ -13,12 +13,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.SMS;
 public partial class BulkSms : ComponentBase
 {
     [Inject] private IJSRuntime _js { get; set; }
-    [Inject] private IUserDataService _svcUserDataService { get; set; }
     [Inject] private ILocationDataService _svcLocationDataService { get; set; }
     [Inject] private IScheduleDataService _svcScheduleDataService { get; set; }
     [Inject] private ISmsQueueDataService _svcSmsQueueDataService { get; set; }
     [Inject] private IAuthService? _svcAuth { get; set; }
     [Inject] private ToastService _toastService { get; set; }
+    [Inject] private SmsQueueBackgroundService _smsQueueBackgroundService { get; set; }
     public BulkSmsModel Model { get; set; } = new();
     private bool isSuccess;
     private bool isFailure;
@@ -100,6 +100,11 @@ public partial class BulkSms : ComponentBase
             Log.Information($"{_svcAuth.UserName} Bulk SMS successfully queued some messages");
             ShowSuccess("Text Messages successfully queued.");
             Model.Body = string.Empty;
+
+            if (Model.CurrentSmsRecipientOption == SmsRecipientOption.Myself)
+            {
+                _smsQueueBackgroundService.SendNow();
+            }
         }
         else
         {
