@@ -435,35 +435,6 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.Sms,
                     LocationId = Defaults.NationalLocationId
                 },
-                //Payments
-                new()
-                {
-                    ConfigurationKey = ConfigNames.StripePublishableKey,
-                    ConfigurationValue = string.Empty,
-                    Section = ConfigSection.Payments,
-                    LocationId = Defaults.NationalLocationId
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.StripeSecretKey,
-                    ConfigurationValue = string.Empty,
-                    Section = ConfigSection.Payments,
-                    LocationId = Defaults.NationalLocationId
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.SessionEncryptionKey,
-                    ConfigurationValue = string.Empty,
-                    Section = ConfigSection.Payments,
-                    LocationId = Defaults.NationalLocationId
-                },
-                new()
-                {
-                    ConfigurationKey = ConfigNames.StripeWebhookSecret,
-                    ConfigurationValue = string.Empty,
-                    Section = ConfigSection.Payments,
-                    LocationId = Defaults.NationalLocationId
-                }
             };
 
             result.AddRange(LocationSpecificConfigurations(Defaults.GroveCityLocationId));
@@ -475,6 +446,7 @@ namespace BedBrigade.Data.Data.Seeding
         {
             return new List<Configuration>()
             {
+                //SMS
                 new ()
                 {
                     ConfigurationKey = ConfigNames.SmsPhone,
@@ -482,23 +454,38 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.Sms,
                     LocationId = locationId
                 },
+                //Payments
                 new()
                 {
-                    ConfigurationKey = ConfigNames.StripeAccountId,
+                    ConfigurationKey = ConfigNames.StripeLocationSecretKey,
                     ConfigurationValue = string.Empty,
                     Section = ConfigSection.Payments,
                     LocationId = locationId,
                 },
                 new()
                 {
-                    ConfigurationKey = ConfigNames.StripeDonationAmounts,
+                    ConfigurationKey = ConfigNames.SessionLocationEncryptionKey,
+                    ConfigurationValue = string.Empty,
+                    Section = ConfigSection.Payments,
+                    LocationId = locationId,
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.StripeLocationWebhookSecret,
+                    ConfigurationValue = string.Empty,
+                    Section = ConfigSection.Payments,
+                    LocationId = locationId,
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.StripeLocationDonationAmounts,
                     ConfigurationValue = "25|50|100||200|500",
                     Section = ConfigSection.Payments,
                     LocationId = locationId
                 },
                 new()
                 {
-                    ConfigurationKey = ConfigNames.StripeSubscriptionAmounts,
+                    ConfigurationKey = ConfigNames.StripeLocationSubscriptionAmounts,
                     ConfigurationValue = "25|50|100||200|500",
                     Section = ConfigSection.Payments,
                     LocationId = locationId

@@ -70,10 +70,10 @@ public partial class Donations : ComponentBase, IDisposable
             RotatorTitle = $"{locationResponse.Data.Name} {DonationName}";
 
             await LoadBodyContent();
-            DonationAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeDonationAmounts,
+            DonationAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeLocationDonationAmounts,
                 LocationId.Value);
 
-            SubscriptionAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeSubscriptionAmounts,
+            SubscriptionAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeLocationSubscriptionAmounts,
                 LocationId.Value);
 
             var donationCampaignsResponse = await _donationCampaignService.GetAllForLocationAsync(LocationId.Value);
