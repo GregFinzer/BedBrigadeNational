@@ -72,13 +72,11 @@
         public const string SmsMissedMessageMinutes = "SmsMissedMessageMinutes";
 
         //Payments
-        public const string StripePublishableKey = "StripePublishableKey";
-        public const string StripeSecretKey = "StripeSecretKey";
-        public const string SessionEncryptionKey = "SessionEncryptionKey";
-        public const string StripeAccountId = "StripeAccountId";
-        public const string StripeDonationAmounts = "StripeDonationAmounts";
-        public const string StripeSubscriptionAmounts = "StripeSubscriptionAmounts";
-        public const string StripeWebhookSecret = "StripeWebhookSecret";
+        public const string StripeLocationSecretKey = "StripeLocationSecretKey";
+        public const string SessionLocationEncryptionKey = "SessionLocationEncryptionKey";
+        public const string StripeLocationDonationAmounts = "StripeLocationDonationAmounts";
+        public const string StripeLocationSubscriptionAmounts = "StripeLocationSubscriptionAmounts";
+        public const string StripeLocationWebhookSecret = "StripeLocationWebhookSecret";
 
         //Custom Strings
         public const string BedRequestNote = "BedRequestNote";
