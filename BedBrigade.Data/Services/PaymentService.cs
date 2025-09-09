@@ -43,7 +43,7 @@ namespace BedBrigade.Data.Services
         private async Task<string> CreateSessionId(PaymentSession paymentSession)
         {
             string encryptionKey = await _configurationDataService
-                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.SessionEncryptionKey);
+                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.SessionLocationEncryptionKey, paymentSession.LocationId.Value);
             string plainText = paymentSession.PaymentSessionId.ToString();
             return EncryptionLogic.EncryptString(encryptionKey, plainText);
         }
@@ -51,7 +51,7 @@ namespace BedBrigade.Data.Services
         public async Task<bool> VerifySessionId(PaymentSession paymentSession, string sessionId)
         {
             string encryptionKey = await _configurationDataService
-                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.SessionEncryptionKey);
+                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.SessionLocationEncryptionKey, paymentSession.LocationId.Value);
             try
             {
                 string plainText = EncryptionLogic.DecryptString(encryptionKey, sessionId);
@@ -69,7 +69,7 @@ namespace BedBrigade.Data.Services
             const string donationCancellationPage = "donation-cancellation";
 
             // Retrieve and validate Stripe secret key
-            ServiceResponse<string> secretKeyResponse = await GetStripeSecretKeyAsync();
+            ServiceResponse<string> secretKeyResponse = await GetStripeSecretKeyAsync(paymentSession.LocationId.Value);
             if (!secretKeyResponse.Success || secretKeyResponse.Data == null)
                 return new ServiceResponse<string>(secretKeyResponse.Message, false);
             StripeConfiguration.ApiKey = secretKeyResponse.Data!;
@@ -87,9 +87,6 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>(
                     $"Location not found for ID {paymentSession.LocationId}", false);
 
-            // Build RequestOptions (StripeAccount per location)
-            RequestOptions requestOptions = await BuildRequestOptionsAsync(paymentSession.LocationId.Value);
-
             // Build line items (one�time vs. subscription)
             List<SessionLineItemOptions> lineItems = BuildLineItems(paymentSession);
 
@@ -106,7 +103,7 @@ namespace BedBrigade.Data.Services
 
             // Call Stripe to create the Checkout Session
             SessionService service = new SessionService();
-            Session? session = await service.CreateAsync(options, requestOptions);
+            Session? session = await service.CreateAsync(options);
 
             if (session == null || string.IsNullOrEmpty(session.Url))
             {
@@ -118,10 +115,10 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>("Valid", true, session.Url);
         }
 
-        private async Task<ServiceResponse<string>> GetStripeSecretKeyAsync()
+        private async Task<ServiceResponse<string>> GetStripeSecretKeyAsync(int locationId)
         {
             string key = await _configurationDataService
-                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeSecretKey);
+                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeLocationSecretKey, locationId);
             if (string.IsNullOrEmpty(key))
                 return new ServiceResponse<string>("Stripe secret key is not configured.", false);
             return new ServiceResponse<string>("Valid", true, key);
@@ -129,12 +126,7 @@ namespace BedBrigade.Data.Services
 
 
 
-        private async Task<RequestOptions> BuildRequestOptionsAsync(int locationId)
-        {
-            string accountId = await _configurationDataService
-                .GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeAccountId, locationId);
-            return new RequestOptions { StripeAccount = accountId };
-        }
+
 
         private List<SessionLineItemOptions> BuildLineItems(PaymentSession paymentSession)
         {
