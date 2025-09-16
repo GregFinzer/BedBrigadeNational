@@ -1,0 +1,8 @@
+title Bed Request Flow
+
+BedRequest.razor->BedRequestDataService: Save Request
+BedRequest.razor->EmailBuilderService: Send Bed Request Confirmation Email
+EmailBuilderService->ContentDataService: Get Email Tempalte
+note right of EmailBuilderService: Build Bed Request Confirmation Body
+EmailBuilderService->EmailQueueDataService: Queue Email
+BedRequest.razor->GeoLocationQueueDataService: Queue for Geo Location

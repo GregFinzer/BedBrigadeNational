@@ -19,3 +19,6 @@ BedBrigadeNational\Documentation\Design
 
 ## Entity Relationship Diagram
 ![Entity Relationship Diagram](Design/EntityRelationshipDiagram.png)
+
+## Bed Request Flow
+![Bed Request Sequence Diagram](Design/Bed%20Request%20Sequence%20Diagram.png)
