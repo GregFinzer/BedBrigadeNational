@@ -1,0 +1,12 @@
+title Volunteer Sign-up Flow
+
+VolunteerSignUp.razor->VolunteerDataService: Save Request
+VolunteerSignUp.razor->SignUpDataService: Create Sign-up
+VolunteerSignUp.razor->EmailBuilderService: Sign-up Confirmation Email
+EmailBuilderService->ContentDataService: Get Email Tempalte
+note right of EmailBuilderService: Build Sign-up Confirmation Body
+EmailBuilderService->EmailQueueDataService: Queue Email
+VolunteerSignUp.razor->SendSmsLogic: Create Sign-up SMS Reminder
+SendSmsLogic->ContentDataService: Get SMS Tempalte
+note right of SendSmsLogic: Build Queue Record
+SendSmsLogic->SmsQueueDataService: Queue SMS

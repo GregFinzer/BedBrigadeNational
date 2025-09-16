@@ -22,3 +22,6 @@ BedBrigadeNational\Documentation\Design
 
 ## Bed Request Flow
 ![Bed Request Sequence Diagram](Design/Bed%20Request%20Sequence%20Diagram.png)
+
+## Volunteer Sign-up Flow
+![Volunteer Signup Sequence Diagram](Design/Volunteer%20Signup%20Sequence%20Diagram.png)
