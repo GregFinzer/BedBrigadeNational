@@ -52,3 +52,19 @@ OnParametersSetAsync()
             
 ```          
 
+## Language Change Call Tree
+The user has the ability to select a different language in the Header.razor.  When the SelectedLanguage changes, all other listening components are notified that the language has changed.  The individual components are responsible for loading different content.  The header component loads the content for English or for other languages.
+
+```
+Header.razor
+	-> SelectedCulture
+		-> LocalStorageService.SetItemAsync("language", value);
+		-> LanguageService.CurrentCulture = CultureInfo.GetCultureInfo(value);
+	-> LanguageService.OnLanguageChanged (event)
+		-> LoadContent
+		-> LocationDataService.GetLocationByRoute
+		-> LoadDefaultContent (if English)
+			-> ContentDataService.GetAsync
+		-> LoadContentByLanguage (if other than English)
+			-> ContentTranslationDataService.GetAsync
+```
