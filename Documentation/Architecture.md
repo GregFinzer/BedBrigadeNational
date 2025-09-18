@@ -28,3 +28,27 @@ BedBrigadeNational\Documentation\Design
 
 ## Contact Us Flow
 ![Contact Us Sequence Diagram](Design/Contact%20Us%20Sequence%20Diagram.png)
+
+## Index.razor Call Tree
+The Bed Brigade National Website has a light content management system.  The Index.razor page displays html loaded from the database.  Here is the call tree.
+
+```
+OnParametersSetAsync()
+    -> PopulateCurrentLocationAndPageName()
+        -> LocationDataService.GetActiveLocations()
+    -> LoadLocationPage()
+        -> LocationDataService.GetLocationByRouteAsync()
+        -> LoadDefaultContent() (if English)
+            -> ContentDataService.GetAsync()
+            -> ReplaceHtmlControls()
+                -> LoadImageService.SetImagesForHtml()
+                -> CarouselService.ReplaceCarousel()
+                -> ScheduleControlService.ReplaceScheduleControl()
+                -> ReplaceIFrame()
+        -> LoadContentByLanguage() (if something other than English)
+            -> ContentTranslationDataService.GetAsync()
+            -> ReplaceHtmlControls()
+            -> TranslationDataService.GetTranslation() (for the title of the page)
+            
+```          
+
