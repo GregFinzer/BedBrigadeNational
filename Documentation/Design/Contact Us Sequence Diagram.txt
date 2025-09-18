@@ -1,0 +1,7 @@
+title Contact Us Flow
+
+ContactUs.razor->ContactUsDataService: Save Request
+ContactUs.razor->EmailBuilderService: Contact Us Confirmation Email
+EmailBuilderService->ContentDataService: Get Email Template
+note right of EmailBuilderService: Build Confirmation Body
+EmailBuilderService->EmailQueueDataService: Queue Email

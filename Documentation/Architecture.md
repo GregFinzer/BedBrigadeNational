@@ -25,3 +25,6 @@ BedBrigadeNational\Documentation\Design
 
 ## Volunteer Sign-up Flow
 ![Volunteer Signup Sequence Diagram](Design/Volunteer%20Signup%20Sequence%20Diagram.png)
+
+## Contact Us Flow
+![Contact Us Sequence Diagram](Design/Contact%20Us%20Sequence%20Diagram.png)
