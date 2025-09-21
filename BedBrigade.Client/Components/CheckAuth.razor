@@ -21,9 +21,9 @@
                 string returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
                 NavigationManager.NavigateTo($"/login?returnUrl={returnUrl}", true);
             }
-            catch (Exception ex)
+            catch (Microsoft.AspNetCore.Components.NavigationException)
             {
-                Log.Logger.Warning(ex.ToString());
+                //This is expected on the first load when the user is not authenticated.
                 return;
             }
         }
