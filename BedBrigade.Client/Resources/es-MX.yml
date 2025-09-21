@@ -131,6 +131,7 @@ Group: Grupo
 GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
+IdleLogoutMessage: Se ha cerrado la sesión por inactividad. Vuelva a iniciar sesión para continuar.
 InvalidCity: 'La ciudad que ha ingresado no coincide con el código postal. Los nombres de ciudades válidos son: {cityNames}'
 InvalidPostalCode: El código postal que ha ingresado no es un código postal conocido válido
 IsInYourZipCode: está en su código postal
@@ -145,6 +146,7 @@ LocationNotActive: 'Lo sentimos, esta ubicación de Bed Brigade ya no está acti
 LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
 LogIn: Inicia sesión
+LogOut: Cerrar sesión
 Longitude: Longitud
 MailingAddress: Dirección postal
 MailingCity: Ciudad de correo

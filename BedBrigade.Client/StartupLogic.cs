@@ -167,6 +167,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ICarouselService, CarouselService>();
             builder.Services.AddScoped<IScheduleControlService, ScheduleControlService>();
             builder.Services.AddScoped<IIFrameControlService, IFrameControlService>();
+            builder.Services.AddScoped<IdleLogoutService>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)
