@@ -1,0 +1,466 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.JSInterop;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace BedBrigade.Client.Components.Pages.Administration.Admin;
+
+public partial class ViewLogs : ComponentBase, IAsyncDisposable
+{
+    [Inject] protected IConfiguration Config { get; set; } = default!;
+    [Inject] protected IWebHostEnvironment Env { get; set; } = default!;
+    [Inject] protected IJSRuntime JS { get; set; } = default!;
+    protected List<LogFileOption> LogFiles { get; private set; } = new();
+    protected string? SelectedLogPath { get; set; }
+    protected bool ShowDebug { get; set; } = true;
+    protected bool ShowInfo { get; set; } = true;
+    protected bool ShowWarn { get; set; } = true;
+    protected bool ShowError { get; set; } = true;
+
+   
+    protected bool IsTailing { get; private set; }
+    protected bool IsLoading { get; private set; }
+    protected string? LoadError { get; private set; }
+
+    protected readonly List<LogEvent> AllEntries = new(capacity: 1024);
+    protected List<LogEvent> FilteredEntries => ApplyLevelFilter(AllEntries);
+    protected ElementReference LogContainerRef;
+
+    // --- tailing state
+    private FileStream? _stream;
+    private long _lastReadPosition;
+    private CancellationTokenSource? _tailCts;
+    private Task? _tailLoopTask;
+    private readonly object _lock = new();
+    private readonly Regex _entryStart = new(
+        @"^(?<ts>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\s[+\-]\d{2}:\d{2}),\s\[(?<level>[A-Za-z]+)\],\s\[(?<source>[^\]]*)\],\s\[(?<event>[^\]]*)\],\s\[User=(?<user>[^\]]*)\],\s(?<message>.*)$",
+        RegexOptions.Compiled);
+
+    private string? _logDir;
+    private string _baseFileName = "Log.txt"; // from configuration
+    private string _baseNameNoExt = "Log";
+    private bool _shouldTail = true;
+
+    protected bool ShouldTail
+    {
+        get
+        {
+            return _shouldTail;
+        }
+        set
+        {
+            _shouldTail = value;
+
+            if (!_shouldTail && IsTailing)
+            {
+                StopTailing();
+            }
+            else if (_shouldTail && !IsTailing && SelectedLogPath is not null)
+            {
+                TryStartTailIfCurrent(SelectedLogPath);
+            }
+        }
+    } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ResolveLogDirectoryAndBaseName();
+            DiscoverLogFiles();
+
+            // pick today's file (or the most recent one)
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var todayCandidate = LogFiles.FirstOrDefault(f => f.IsToday) ?? LogFiles.FirstOrDefault();
+            SelectedLogPath = todayCandidate?.FullPath;
+
+            if (SelectedLogPath is not null)
+            {
+                await LoadFileAsync(SelectedLogPath);
+                TryStartTailIfCurrent(SelectedLogPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            LoadError = ex.Message;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ScrollToBottomAsync();
+        }
+    }
+
+    protected async Task OnLogChanged(ChangeEventArgs e)
+    {
+        if (e.Value is null) return;
+
+        await LoadFileAsync(e.Value.ToString());
+        TryStartTailIfCurrent(e.Value.ToString());
+    }
+
+    private void ResolveLogDirectoryAndBaseName()
+    {
+        // Find the File sink path from Serilog config (works with your attached JSONs)
+        // Examples:
+        //   Local:       ..\Logs\Log.txt
+        //   Dev/Prod:    .\Logs\Log.txt
+        // (rollingInterval is Day)  :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
+        var writeToSection = Config.GetSection("Serilog:WriteTo");
+        foreach (var child in writeToSection.GetChildren())
+        {
+            var name = child.GetValue<string>("Name");
+            if (!string.Equals(name, "File", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var path = child.GetSection("Args").GetValue<string>("path");
+            if (string.IsNullOrWhiteSpace(path)) continue;
+
+            // Normalize relative to ContentRoot
+            var full = Path.GetFullPath(Path.Combine(Env.ContentRootPath, path));
+            _logDir = Path.GetDirectoryName(full)!;
+            _baseFileName = Path.GetFileName(full);
+            _baseNameNoExt = Path.GetFileNameWithoutExtension(_baseFileName);
+            return;
+        }
+
+        throw new InvalidOperationException("Could not resolve Serilog file sink path from configuration.");
+    }
+
+    private void DiscoverLogFiles()
+    {
+        LogFiles.Clear();
+        if (_logDir is null || !Directory.Exists(_logDir)) return;
+
+        // Serilog's daily rolling will produce files like:
+        //   Log.txt (depending on sink config) and/or LogyyyyMMdd.txt
+        // We'll include anything that looks like the base name.
+        var pattern = $"{_baseNameNoExt}*.txt";
+        var files = Directory.GetFiles(_logDir, pattern, SearchOption.TopDirectoryOnly);
+
+        foreach (var f in files)
+        {
+            var fi = new FileInfo(f);
+            var isToday = fi.LastWriteTime.Date == DateTime.Now.Date
+                          || Path.GetFileName(f).Contains(DateTime.Now.ToString("yyyyMMdd"));
+            LogFiles.Add(new LogFileOption
+            {
+                FullPath = f,
+                DisplayName = Path.GetFileName(f),
+                LastWrite = fi.LastWriteTime,
+                IsToday = isToday
+            });
+        }
+
+        // If nothing matched (edge cases), also probe plain "Log.txt"
+        var fallback = Path.Combine(_logDir, _baseFileName);
+        if (LogFiles.Count == 0 && File.Exists(fallback))
+        {
+            var fi = new FileInfo(fallback);
+            LogFiles.Add(new LogFileOption
+            {
+                FullPath = fallback,
+                DisplayName = Path.GetFileName(fallback),
+                LastWrite = fi.LastWriteTime,
+                IsToday = fi.LastWriteTime.Date == DateTime.Now.Date
+            });
+        }
+
+        LogFiles = LogFiles.OrderByDescending(f => f.LastWrite).ToList();
+    }
+
+    private async Task LoadFileAsync(string fullPath)
+    {
+        StopTailing();
+
+        IsLoading = true;
+        LoadError = null;
+        AllEntries.Clear();
+        StateHasChanged();
+
+        try
+        {
+            // read safely while Serilog might still be writing
+            using var fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var sr = new StreamReader(fs, Encoding.UTF8);
+
+            var content = await sr.ReadToEndAsync();
+            ParseAndAppend(content);
+
+            // To keep memory reasonable on very large logs, keep last ~500 events
+            TrimToLast(500);
+        }
+        catch (Exception ex)
+        {
+            LoadError = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void TryStartTailIfCurrent(string fullPath)
+    {
+        var selected = LogFiles.FirstOrDefault(l => l.FullPath == fullPath);
+        if (selected is null) return;
+
+        if (selected.IsToday)
+        {
+            StartTailing(fullPath);
+        }
+        else
+        {
+            StopTailing();
+        }
+    }
+
+    private void StartTailing(string fullPath)
+    {
+        StopTailing();
+
+        try
+        {
+            _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            _lastReadPosition = _stream.Length; // start at end
+            _tailCts = new CancellationTokenSource();
+            var ct = _tailCts.Token;
+
+            IsTailing = true;
+
+            _tailLoopTask = Task.Run(async () =>
+            {
+                var buffer = new byte[64 * 1024];
+                var incomplete = new StringBuilder();
+
+                while (!ct.IsCancellationRequested)
+                {
+                    try
+                    {
+                        if (_stream is null) break;
+
+                        if (_stream.Length < _lastReadPosition)
+                        {
+                            // file rolled or truncated; reopen and start at 0
+                            _stream.Dispose();
+                            _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            _lastReadPosition = 0;
+                            incomplete.Clear();
+                        }
+
+                        if (_stream.Length > _lastReadPosition)
+                        {
+                            _stream.Seek(_lastReadPosition, SeekOrigin.Begin);
+                            var toRead = (int)Math.Min(buffer.Length, _stream.Length - _lastReadPosition);
+                            var read = await _stream.ReadAsync(buffer.AsMemory(0, toRead), ct);
+                            if (read > 0)
+                            {
+                                _lastReadPosition += read;
+                                var chunk = Encoding.UTF8.GetString(buffer, 0, read);
+                                incomplete.Append(chunk);
+
+                                // process only full lines; keep the trailing partial
+                                var text = incomplete.ToString();
+                                var lastNewline = text.LastIndexOf('\n');
+                                if (lastNewline >= 0)
+                                {
+                                    var full = text.Substring(0, lastNewline + 1);
+                                    incomplete.Remove(0, lastNewline + 1);
+
+                                    lock (_lock)
+                                    {
+                                        ParseAndAppend(full);
+                                        TrimToLast(500);
+                                    }
+
+                                    // refresh UI
+                                    await InvokeAsync(StateHasChanged);
+                                    await ScrollToBottomAsync();
+                                }
+                            }
+                        }
+
+                        await Task.Delay(1000, ct);
+                    }
+                    catch (TaskCanceledException) { }
+                    catch (Exception)
+                    {
+                        // ignore transient read issues during rolling
+                        await Task.Delay(1000, ct);
+                    }
+                }
+            }, _tailCts.Token);
+        }
+        catch
+        {
+            StopTailing();
+        }
+        finally
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void StopTailing()
+    {
+        IsTailing = false;
+        try { _tailCts?.Cancel(); } catch { }
+        try { _tailLoopTask?.Wait(250); } catch { }
+        try { _tailCts?.Dispose(); } catch { }
+        _tailCts = null;
+        _tailLoopTask = null;
+
+        if (_stream is not null)
+        {
+            try { _stream.Dispose(); } catch { }
+            _stream = null;
+        }
+    }
+
+    private void ParseAndAppend(string text)
+    {
+        // Group lines into events, where a new event begins when the timestamp pattern appears.
+        using var reader = new StringReader(text);
+        string? line;
+        LogEvent? current = null;
+        var block = new StringBuilder();
+
+        void Commit()
+        {
+            if (current is null) return;
+
+            // Split message vs exception in the block
+            current.Raw = block.ToString().TrimEnd('\r', '\n');
+
+            // The first line was already parsed into current.Message.
+            // Any subsequent lines belong to Exception block (if any).
+            if (!string.IsNullOrWhiteSpace(current.Message))
+            {
+                var raw = current.Raw;
+                var idx = raw.IndexOf('\n');
+                if (idx >= 0)
+                {
+                    var afterFirst = raw[(idx + 1)..];
+                    current.Exception = afterFirst.TrimEnd();
+                }
+            }
+
+            // normalize level css
+            current.LevelCss = current.Level switch
+            {
+                "Debug" => "Debug",
+                "Information" => "Information",
+                "Warning" => "Warning",
+                "Error" => "Error",
+                _ => ""
+            };
+
+            AllEntries.Add(current);
+        }
+
+        while ((line = reader.ReadLine()) is not null)
+        {
+            var m = _entryStart.Match(line);
+            if (m.Success)
+            {
+                // new event begins
+                if (current is not null) Commit();
+
+                current = new LogEvent
+                {
+                    Timestamp = DateTimeOffset.TryParse(m.Groups["ts"].Value, out var dto) ? dto : null,
+                    Level = NormalizeLevel(m.Groups["level"].Value),
+                    SourceContext = m.Groups["source"].Value,
+                    EventId = m.Groups["event"].Value,
+                    UserId = m.Groups["user"].Value,
+                    Message = m.Groups["message"].Value
+                };
+
+                block.Clear();
+                block.Append(line).Append('\n');
+            }
+            else
+            {
+                // continuation line (exception or multi-line message)
+                if (current is null)
+                {
+                    // stray lines before first match — collect into a synthetic Debug entry
+                    current = new LogEvent { Level = "Debug", Message = line };
+                    block.Clear();
+                }
+                block.Append(line).Append('\n');
+            }
+        }
+
+        if (current is not null) Commit();
+    }
+
+    private static string NormalizeLevel(string raw) =>
+        raw switch
+        {
+            "DBG" or "Debug" or "DEBUG" => "Debug",
+            "INF" or "Info" or "Information" => "Information",
+            "WRN" or "Warn" or "Warning" => "Warning",
+            "ERR" or "Error" or "ERROR" => "Error",
+            _ => raw
+        };
+
+    private void TrimToLast(int maxEvents)
+    {
+        if (AllEntries.Count > maxEvents)
+        {
+            AllEntries.RemoveRange(0, AllEntries.Count - maxEvents);
+        }
+    }
+
+    private List<LogEvent> ApplyLevelFilter(List<LogEvent> source)
+    {
+        return source.Where(e =>
+            (ShowDebug || e.Level != "Debug") &&
+            (ShowInfo || e.Level != "Information") &&
+            (ShowWarn || e.Level != "Warning") &&
+            (ShowError || e.Level != "Error")
+        ).ToList();
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("blazorScrollToBottom", LogContainerRef);
+        }
+        catch { /* no-op if container not yet rendered */ }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        StopTailing();
+        await Task.CompletedTask;
+    }
+
+    // --- types
+    protected sealed class LogFileOption
+    {
+        public string FullPath { get; set; } = default!;
+        public string DisplayName { get; set; } = default!;
+        public DateTime LastWrite { get; set; }
+        public bool IsToday { get; set; }
+    }
+
+    protected sealed class LogEvent
+    {
+        public DateTimeOffset? Timestamp { get; set; }
+        public string Level { get; set; } = "";
+        public string? SourceContext { get; set; }
+        public string? EventId { get; set; }
+        public string? UserId { get; set; }
+        public string? Message { get; set; }
+        public string? Exception { get; set; }
+        public string? Raw { get; set; }
+        public string LevelCss { get; set; } = "";
+    }
+}
