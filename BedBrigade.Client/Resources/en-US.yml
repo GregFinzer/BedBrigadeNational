@@ -130,8 +130,7 @@ Gross: Gross
 Group: Group
 GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
-IdleLogoutMessage: You have been logged out due to inactivity. Please log in again to continue.
-Image: Image
+IdleLogoutMessage: 'You have been logged out due to inactivity. Please log in again to continue.'
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
 InvalidCity: 'The city that you have entered does not match the zip code. Valid city names are: {cityNames}'
 InvalidPostalCode: The Zip Code that you have entered is not a valid known Zip Code

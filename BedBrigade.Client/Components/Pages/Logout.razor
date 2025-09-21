@@ -2,10 +2,10 @@
 @page "/logout/{reason}"
 @using Serilog
 
-<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["Logout"]}")</PageTitle>
+<PageTitle>@($"{_lc.Keys["TheBedBrigade"]} | {_lc.Keys["LogOut"]}")</PageTitle>
 
 <div class="text-center w-100 m-2 text-black-50 mt-5">
-    <h2>@_lc.Keys["Logout"]</h2>
+    <h2>@_lc.Keys["LogOut"]</h2>
 </div>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
@@ -18,7 +18,7 @@ else
 {
     <div class="container p-5">
         <p>@_lc.Keys["IdleLogoutMessage"]</p>
-        <a class="btn btn-primary" href="/login">@_lc.Keys["Login"]</a>
+        <a class="btn btn-primary" href="/login">@_lc.Keys["LogIn"]</a>
     </div>
 }
 
