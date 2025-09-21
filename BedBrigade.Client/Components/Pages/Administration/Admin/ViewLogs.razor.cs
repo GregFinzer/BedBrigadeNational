@@ -42,7 +42,10 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
     private string _baseFileName = "Log.txt"; // from configuration
     private string _baseNameNoExt = "Log";
     private bool _shouldTail = true;
-
+    private const string Error = "Error";
+    private const string Warning = "Warning";
+    private const string Information = "Information";
+    private const string Debug = "Debug";
     protected bool ShouldTail
     {
         get
@@ -227,75 +230,8 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
 
         try
         {
-            _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            _lastReadPosition = _stream.Length; // start at end
-            _tailCts = new CancellationTokenSource();
-            var ct = _tailCts.Token;
-
-            IsTailing = true;
-
-            _tailLoopTask = Task.Run(async () =>
-            {
-                var buffer = new byte[64 * 1024];
-                var incomplete = new StringBuilder();
-
-                while (!ct.IsCancellationRequested)
-                {
-                    try
-                    {
-                        if (_stream is null) break;
-
-                        if (_stream.Length < _lastReadPosition)
-                        {
-                            // file rolled or truncated; reopen and start at 0
-                            _stream.Dispose();
-                            _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                            _lastReadPosition = 0;
-                            incomplete.Clear();
-                        }
-
-                        if (_stream.Length > _lastReadPosition)
-                        {
-                            _stream.Seek(_lastReadPosition, SeekOrigin.Begin);
-                            var toRead = (int)Math.Min(buffer.Length, _stream.Length - _lastReadPosition);
-                            var read = await _stream.ReadAsync(buffer.AsMemory(0, toRead), ct);
-                            if (read > 0)
-                            {
-                                _lastReadPosition += read;
-                                var chunk = Encoding.UTF8.GetString(buffer, 0, read);
-                                incomplete.Append(chunk);
-
-                                // process only full lines; keep the trailing partial
-                                var text = incomplete.ToString();
-                                var lastNewline = text.LastIndexOf('\n');
-                                if (lastNewline >= 0)
-                                {
-                                    var full = text.Substring(0, lastNewline + 1);
-                                    incomplete.Remove(0, lastNewline + 1);
-
-                                    lock (_lock)
-                                    {
-                                        ParseAndAppend(full);
-                                        TrimToLast(500);
-                                    }
-
-                                    // refresh UI
-                                    await InvokeAsync(StateHasChanged);
-                                    await ScrollToBottomAsync();
-                                }
-                            }
-                        }
-
-                        await Task.Delay(1000, ct);
-                    }
-                    catch (TaskCanceledException) { }
-                    catch (Exception)
-                    {
-                        // ignore transient read issues during rolling
-                        await Task.Delay(1000, ct);
-                    }
-                }
-            }, _tailCts.Token);
+            InitializeTail(fullPath);
+            StartTailLoop(fullPath);
         }
         catch
         {
@@ -306,6 +242,116 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
             InvokeAsync(StateHasChanged);
         }
     }
+
+    private void InitializeTail(string fullPath)
+    {
+        _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        _lastReadPosition = _stream.Length; // start at end
+        _tailCts = new CancellationTokenSource();
+        IsTailing = true;
+    }
+
+    private void StartTailLoop(string fullPath)
+    {
+        var ct = _tailCts.Token;
+        _tailLoopTask = Task.Run(() => TailLoopAsync(fullPath, ct), ct);
+    }
+
+    private async Task TailLoopAsync(string fullPath, CancellationToken ct)
+    {
+        var buffer = new byte[64 * 1024];
+        var incomplete = new StringBuilder();
+
+        while (!ct.IsCancellationRequested)
+        {
+            try
+            {
+                if (_stream is null) break;
+
+                await TailIterationAsync(fullPath, buffer, incomplete, ct);
+                await Task.Delay(1000, ct);
+            }
+            catch (TaskCanceledException) { /* expected on cancel */ }
+            catch (Exception)
+            {
+                // ignore transient read issues during rolling
+                await Task.Delay(1000, ct);
+            }
+        }
+    }
+
+    private async Task TailIterationAsync(
+        string fullPath,
+        byte[] buffer,
+        StringBuilder incomplete,
+        CancellationToken ct)
+    {
+        if (_stream is null) return;
+
+        if (_stream.Length < _lastReadPosition)
+        {
+            ReopenStreamFromStart(fullPath, incomplete);
+            return;
+        }
+
+        if (_stream.Length > _lastReadPosition)
+        {
+            await ReadAndProcessAsync(buffer, incomplete, ct);
+        }
+    }
+
+    private void ReopenStreamFromStart(string fullPath, StringBuilder incomplete)
+    {
+        _stream?.Dispose();
+        _stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        _lastReadPosition = 0;
+        incomplete.Clear();
+    }
+
+    private async Task ReadAndProcessAsync(
+        byte[] buffer,
+        StringBuilder incomplete,
+        CancellationToken ct)
+    {
+        if (_stream is null) return;
+
+        _stream.Seek(_lastReadPosition, SeekOrigin.Begin);
+
+        var toRead = (int)Math.Min(buffer.Length, _stream.Length - _lastReadPosition);
+        var read = await _stream.ReadAsync(buffer.AsMemory(0, toRead), ct);
+        if (read <= 0) return;
+
+        _lastReadPosition += read;
+        var chunk = Encoding.UTF8.GetString(buffer, 0, read);
+        incomplete.Append(chunk);
+
+        await ProcessCompletedLinesAsync(incomplete);
+    }
+
+    private async Task ProcessCompletedLinesAsync(StringBuilder incomplete)
+    {
+        var text = incomplete.ToString();
+        var lastNewline = text.LastIndexOf('\n');
+        if (lastNewline < 0) return;
+
+        var full = text[..(lastNewline + 1)];
+        incomplete.Remove(0, lastNewline + 1);
+
+        lock (_lock)
+        {
+            ParseAndAppend(full);
+            TrimToLast(500);
+        }
+
+        await RefreshUiAsync();
+    }
+
+    private async Task RefreshUiAsync()
+    {
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottomAsync();
+    }
+
 
     private void StopTailing()
     {
@@ -325,89 +371,114 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
 
     private void ParseAndAppend(string text)
     {
-        // Group lines into events, where a new event begins when the timestamp pattern appears.
         using var reader = new StringReader(text);
         string? line;
         LogEvent? current = null;
         var block = new StringBuilder();
 
-        void Commit()
-        {
-            if (current is null) return;
-
-            // Split message vs exception in the block
-            current.Raw = block.ToString().TrimEnd('\r', '\n');
-
-            // The first line was already parsed into current.Message.
-            // Any subsequent lines belong to Exception block (if any).
-            if (!string.IsNullOrWhiteSpace(current.Message))
-            {
-                var raw = current.Raw;
-                var idx = raw.IndexOf('\n');
-                if (idx >= 0)
-                {
-                    var afterFirst = raw[(idx + 1)..];
-                    current.Exception = afterFirst.TrimEnd();
-                }
-            }
-
-            // normalize level css
-            current.LevelCss = current.Level switch
-            {
-                "Debug" => "Debug",
-                "Information" => "Information",
-                "Warning" => "Warning",
-                "Error" => "Error",
-                _ => ""
-            };
-
-            AllEntries.Add(current);
-        }
-
         while ((line = reader.ReadLine()) is not null)
         {
-            var m = _entryStart.Match(line);
-            if (m.Success)
-            {
-                // new event begins
-                if (current is not null) Commit();
+            if (TryStartNewEvent(line, ref current, block))
+                continue;
 
-                current = new LogEvent
-                {
-                    Timestamp = DateTimeOffset.TryParse(m.Groups["ts"].Value, out var dto) ? dto : null,
-                    Level = NormalizeLevel(m.Groups["level"].Value),
-                    SourceContext = m.Groups["source"].Value,
-                    EventId = m.Groups["event"].Value,
-                    UserId = m.Groups["user"].Value,
-                    Message = m.Groups["message"].Value
-                };
-
-                block.Clear();
-                block.Append(line).Append('\n');
-            }
-            else
-            {
-                // continuation line (exception or multi-line message)
-                if (current is null)
-                {
-                    // stray lines before first match — collect into a synthetic Debug entry
-                    current = new LogEvent { Level = "Debug", Message = line };
-                    block.Clear();
-                }
-                block.Append(line).Append('\n');
-            }
+            AppendContinuation(line, ref current, block);
         }
 
-        if (current is not null) Commit();
+        if (current is not null)
+            CommitEvent(current, block);
     }
+
+    private bool TryStartNewEvent(string line, ref LogEvent? current, StringBuilder block)
+    {
+        var m = _entryStart.Match(line);
+        if (!m.Success) return false;
+
+        if (current is not null)
+            CommitEvent(current, block);
+
+        current = CreateEventFromMatch(m);
+        block.Clear();
+        block.Append(line).Append(Environment.NewLine);
+        return true;
+    }
+
+    private void AppendContinuation(string line, ref LogEvent? current, StringBuilder block)
+    {
+        if (current is null)
+        {
+            current = CreateSyntheticDebug(line);
+            block.Clear();
+        }
+
+        block.Append(line).Append(Environment.NewLine);
+    }
+
+    private LogEvent CreateEventFromMatch(Match m)
+    {
+        return new LogEvent
+        {
+            Timestamp = DateTimeOffset.TryParse(m.Groups["ts"].Value, out var dto) ? dto : null,
+            Level = NormalizeLevel(m.Groups["level"].Value),
+            SourceContext = m.Groups["source"].Value,
+            EventId = m.Groups["event"].Value,
+            UserId = m.Groups["user"].Value,
+            Message = m.Groups["message"].Value
+        };
+    }
+
+    private LogEvent CreateSyntheticDebug(string firstLine)
+    {
+        return new LogEvent
+        {
+            Level = "Debug",
+            Message = firstLine
+        };
+    }
+
+    private void CommitEvent(LogEvent current, StringBuilder block)
+    {
+        current.Raw = block.ToString().TrimEnd('\r', '\n');
+        ExtractExceptionIfPresent(current);
+        NormalizeLevelCss(current);
+        AllEntries.Add(current);
+    }
+
+    private void ExtractExceptionIfPresent(LogEvent current)
+    {
+        if (string.IsNullOrWhiteSpace(current.Message))
+            return;
+
+        var raw = current.Raw ?? string.Empty;
+        var idx = raw.IndexOf('\n');
+        if (idx < 0) return;
+
+        var afterFirst = raw[(idx + 1)..];
+        current.Exception = afterFirst.TrimEnd();
+    }
+
+    private void NormalizeLevelCss(LogEvent current)
+    {
+        if (current.Level != Error &&
+            current.Level != Warning &&
+            current.Level != Information &&
+            current.Level != Debug)
+        {
+            current.LevelCss = string.Empty;
+        }
+        else
+        {
+            current.LevelCss = current.Level;
+        }
+    }
+
 
     private static string NormalizeLevel(string raw) =>
         raw switch
         {
-            "DBG" or "Debug" or "DEBUG" => "Debug",
-            "INF" or "Info" or "Information" => "Information",
-            "WRN" or "Warn" or "Warning" => "Warning",
-            "ERR" or "Error" or "ERROR" => "Error",
+            "DBG" or "Debug" or "DEBUG" => Debug,
+            "INF" or "Info" or "Information" => Information,
+            "WRN" or "Warn" or "Warning" => Warning,
+            "ERR" or "Error" or "ERROR" => Error,
             _ => raw
         };
 
@@ -422,10 +493,10 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
     private List<LogEvent> ApplyLevelFilter(List<LogEvent> source)
     {
         return source.Where(e =>
-            (ShowDebug || e.Level != "Debug") &&
-            (ShowInfo || e.Level != "Information") &&
-            (ShowWarn || e.Level != "Warning") &&
-            (ShowError || e.Level != "Error")
+            (ShowDebug || e.Level != Debug) &&
+            (ShowInfo || e.Level != Information) &&
+            (ShowWarn || e.Level != Warning) &&
+            (ShowError || e.Level != Error)
         ).ToList();
     }
 
