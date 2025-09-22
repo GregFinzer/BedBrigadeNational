@@ -194,9 +194,6 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
 
             var content = await sr.ReadToEndAsync();
             ParseAndAppend(content);
-
-            // To keep memory reasonable on very large logs, keep last ~500 events
-            TrimToLast(500);
         }
         catch (Exception ex)
         {
@@ -340,7 +337,6 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
         lock (_lock)
         {
             ParseAndAppend(full);
-            TrimToLast(500);
         }
 
         await RefreshUiAsync();
@@ -482,17 +478,11 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
             _ => raw
         };
 
-    private void TrimToLast(int maxEvents)
-    {
-        if (AllEntries.Count > maxEvents)
-        {
-            AllEntries.RemoveRange(0, AllEntries.Count - maxEvents);
-        }
-    }
+
 
     private List<LogEvent> ApplyLevelFilter(List<LogEvent> source)
     {
-        return source.Where(e =>
+       return  source.Where(e =>
             (ShowDebug || e.Level != Debug) &&
             (ShowInfo || e.Level != Information) &&
             (ShowWarn || e.Level != Warning) &&
