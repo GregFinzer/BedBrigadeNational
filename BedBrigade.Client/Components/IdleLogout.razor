@@ -1,0 +1,39 @@
+﻿@inject BedBrigade.Client.Services.IdleLogoutService Idle
+@inject NavigationManager Nav
+@inject IConfiguration Configuration
+@inject IAuthService AuthService
+@implements IAsyncDisposable
+@rendermode InteractiveServer
+
+@code {
+    
+    private bool _started;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _started) return;
+
+        // Avoid JS interop during the prerender pass
+        try
+        {
+            if (AuthService.IsLoggedIn)
+            {
+                _started = true;
+
+                string returnUrl = Nav.ToBaseRelativePath(Nav.Uri);
+                var logoutUrl = Nav.BaseUri.TrimEnd('/') + $"/logout/idle";
+
+                var idleTimeoutMinutesString = Configuration.GetSection("AppSettings:IdleLogoutMinutes").Value;
+                int.TryParse(idleTimeoutMinutesString, out int idleTimeoutMinutes);
+                await Idle.StartAsync(TimeSpan.FromMinutes(idleTimeoutMinutes), logoutUrl);
+            }
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop isn't available during server prerender; the framework will re-render on connect,
+            // and we'll run again safely then.
+        }
+    }
+
+    public async ValueTask DisposeAsync() => await Idle.StopAsync();
+}

@@ -169,11 +169,18 @@ namespace BedBrigade.Data.Services
             CurrentUser = new();
 
             //Remove the JWT from the browser session
-            string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
-
-            if (!string.IsNullOrEmpty(authToken))
+            try
             {
-                await _sessionService.RemoveItemAsync(AuthTokenName);
+                string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
+
+                if (!string.IsNullOrEmpty(authToken))
+                {
+                    await _sessionService.RemoveItemAsync(AuthTokenName);
+                }
+            }
+            catch (System.InvalidOperationException)
+            {
+                //This happens if the component is statically rendered
             }
         }
 
