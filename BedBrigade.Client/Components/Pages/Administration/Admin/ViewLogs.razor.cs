@@ -18,14 +18,18 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
     protected bool ShowInfo { get; set; } = true;
     protected bool ShowWarn { get; set; } = true;
     protected bool ShowError { get; set; } = true;
+    protected bool ShowBackground { get; set; } = true;
+    protected int MaxLogEntries { get; set; } = 500;
+    protected int AllLogEntriesCount => AllEntries.Count;
+    
+    protected string SearchString { get; set; } = string.Empty;
 
-   
     protected bool IsTailing { get; private set; }
     protected bool IsLoading { get; private set; }
     protected string? LoadError { get; private set; }
 
     protected readonly List<LogEvent> AllEntries = new(capacity: 1024);
-    protected List<LogEvent> FilteredEntries => ApplyLevelFilter(AllEntries);
+    protected List<LogEvent> FilteredEntries => ApplyFilters(AllEntries);
     protected ElementReference LogContainerRef;
 
     // --- tailing state
@@ -194,9 +198,6 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
 
             var content = await sr.ReadToEndAsync();
             ParseAndAppend(content);
-
-            // To keep memory reasonable on very large logs, keep last ~500 events
-            TrimToLast(500);
         }
         catch (Exception ex)
         {
@@ -340,7 +341,6 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
         lock (_lock)
         {
             ParseAndAppend(full);
-            TrimToLast(500);
         }
 
         await RefreshUiAsync();
@@ -482,22 +482,25 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
             _ => raw
         };
 
-    private void TrimToLast(int maxEvents)
-    {
-        if (AllEntries.Count > maxEvents)
-        {
-            AllEntries.RemoveRange(0, AllEntries.Count - maxEvents);
-        }
-    }
 
-    private List<LogEvent> ApplyLevelFilter(List<LogEvent> source)
+
+    private List<LogEvent> ApplyFilters(List<LogEvent> source)
     {
-        return source.Where(e =>
+       var result =  source.Where(e =>
             (ShowDebug || e.Level != Debug) &&
             (ShowInfo || e.Level != Information) &&
             (ShowWarn || e.Level != Warning) &&
-            (ShowError || e.Level != Error)
-        ).ToList();
+            (ShowError || e.Level != Error) &&
+            (ShowBackground || (e.Raw != null && !e.Raw.Contains("background", StringComparison.OrdinalIgnoreCase))) &&
+            (String.IsNullOrEmpty(SearchString) || (e.Raw != null && e.Raw.Contains(SearchString, StringComparison.OrdinalIgnoreCase))))
+           .ToList();
+
+       if (result.Count > MaxLogEntries && MaxLogEntries > 0)
+       {
+           result = result.Skip(result.Count - MaxLogEntries).ToList();
+       }
+
+       return result;
     }
 
     private async Task ScrollToBottomAsync()

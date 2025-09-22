@@ -21,31 +21,54 @@
         </select>
     </div>
 
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="chkDebug" @bind="ShowDebug">
-    <label class="form-check-label" for="chkDebug">Debug</label>
-  </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="chkInfo" @bind="ShowInfo">
-    <label class="form-check-label" for="chkInfo">Info</label>
-  </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="chkWarn" @bind="ShowWarn">
-    <label class="form-check-label" for="chkWarn">Warn</label>
-  </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="chkError" @bind="ShowError">
-    <label class="form-check-label" for="chkError">Error</label>
-  </div>
-  
-  <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="chkShouldTail" @bind="ShouldTail">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkDebug" @bind="ShowDebug">
+        <label class="form-check-label" for="chkDebug">Debug</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkInfo" @bind="ShowInfo">
+        <label class="form-check-label" for="chkInfo">Info</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkWarn" @bind="ShowWarn">
+        <label class="form-check-label" for="chkWarn">Warn</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkError" @bind="ShowError">
+        <label class="form-check-label" for="chkError">Error</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkBackground" @bind="ShowBackground">
+        <label class="form-check-label" for="chkBackground">Background</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="chkShouldTail" @bind="ShouldTail">
         <label class="form-check-label" for="chkShouldTail">Should Tail</label>
-  </div>
+    </div>
+  
+    <!-- NEW: Max Log Entries -->
+    <div class="d-flex align-items-center gap-2">
+        <label for="maxEntries" class="form-label mb-0">Max</label>
+        <input id="maxEntries" type="number" class="form-control form-control-sm"
+                style="width: 100px"
+               min="0" @bind="MaxLogEntries" />
+    </div>
 
-  <div class="ms-auto small text-muted">
-    @if (IsTailing) { <span>tailing live…</span> } else if (IsLoading) { <span>loading…</span> }
-  </div>
+    <!-- NEW: All Log Entries (read-only label) -->
+    <div class="d-flex align-items-center">
+        <label class="form-label mb-0">Total: <span class="fw-semibold">@AllLogEntriesCount</span></label>
+    </div>
+
+    <!-- NEW: Search -->
+    <div class="d-flex align-items-center gap-2">
+        <label for="logSearch" class="form-label mb-0">Search</label>
+        <input id="logSearch" type="text" class="form-control form-control-sm w-auto"
+               placeholder="search…" @bind="SearchString" @bind:event="oninput" />
+    </div>
+
+    <div class="ms-auto small text-muted">
+        @if (IsTailing) { <span>tailing live…</span> } else if (IsLoading) { <span>loading…</span> }
+    </div>
 </div>
 
 @if (LoadError is not null)

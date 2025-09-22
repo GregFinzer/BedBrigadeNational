@@ -46,6 +46,11 @@ public partial class Logout : ComponentBase
                 }
             }
         }
+        catch (System.InvalidOperationException)
+        {
+            // This can happen if JavaScript is being statically rendered.
+            // We can safely ignore this error.
+        }
         catch (Exception ex)
         {
             Log.Logger.Error(ex, $"Logout.OnInitializedAsync");
