@@ -27,14 +27,8 @@ namespace ImageUpload.Controllers
 
         [Route("Save/{id:int}/{contentType}/{contentName}")]
         [HttpPost]
-        public async Task Save(IList<IFormFile> UploadFiles, int Id, string contentType, string contentName)
+        public async Task Save(IList<IFormFile> uploadFiles, int Id, string contentType, string contentName)
         {
-            if (!_authService.UserHasRole(RoleNames.CanManageMedia))
-            {
-                Response.StatusCode = 403; // Forbidden
-                return;
-            }
-
             string locationRoute = string.Empty;
             try
             {
@@ -43,7 +37,7 @@ namespace ImageUpload.Controllers
                 {
                     locationRoute = result.Data.Route.TrimStart('/');
                 }
-                foreach (var file in UploadFiles)
+                foreach (var file in uploadFiles)
                 {
                     string targetLocation = Path.Combine(hostingEnv.ContentRootPath,
                         "wwwroot",
