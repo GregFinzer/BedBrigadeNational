@@ -177,17 +177,9 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadConfiguration()
         {
-            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System); // Configuration ============================
-            if (dataConfiguration.Success && dataConfiguration != null)
-            {
-                var dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
-                string delimitedString = dctConfiguration[ConfigNames.PrimaryLanguage].ToString();
-                lstPrimaryLanguage = new List<string>(delimitedString.Split(';'));
-                delimitedString = dctConfiguration[ConfigNames.SpeakEnglish].ToString();
-                lstSpeakEnglish = new List<string>(delimitedString.Split(';'));
-                
-            }
-        } // Configuration
+            lstPrimaryLanguage = await _svcConfiguration.GetPrimaryLanguages();
+            lstSpeakEnglish = await _svcConfiguration.GetSpeakEnglish();
+        }
 
         private void SetupToolbar()
         {

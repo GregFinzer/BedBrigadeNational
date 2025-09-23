@@ -61,6 +61,7 @@ namespace BedBrigade.Data.Services
 
         private async Task ProcessContentTranslations(CancellationToken cancellationToken)
         {
+            //This GetAllAsync should always have less than 1000 records
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
             if (!queueResult.Success || queueResult.Data == null)
@@ -73,6 +74,7 @@ namespace BedBrigade.Data.Services
             if (queueResult.Data.Any())
                 return;
 
+            //This GetAllAsync should always have less than 1000 records
             var contentQueueResult = await _contentTranslationQueueDataService.GetAllAsync();
 
             if (!contentQueueResult.Success || contentQueueResult.Data == null)
@@ -81,6 +83,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //TODO:  Do not use GetAllAsync here
             var contentResult = await _contentDataService.GetAllAsync();
 
             if (!contentResult.Success || contentResult.Data == null)
@@ -89,6 +92,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //TODO:  Do not use GetAllAsync here
             var translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -158,6 +162,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //This GetAllAsync should always have less than 1000 records
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
             if (!queueResult.Success || queueResult.Data == null)
@@ -345,6 +350,7 @@ namespace BedBrigade.Data.Services
 
         private async Task QueueTranslationsForLocalizableStrings(List<string> distinctLocalizable)
         {
+            //TODO:  Do not use GetAllAsync here
             ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -410,6 +416,7 @@ namespace BedBrigade.Data.Services
         private async Task SaveNewEnglishLocalizableStringsToTranslations(List<string> distinctLocalizable)
         {
             bool itemsAdded = false;
+            //TODO:  Do not use GetAllAsync here
             ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)

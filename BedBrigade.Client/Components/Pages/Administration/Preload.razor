@@ -79,6 +79,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        //This GetAllAsync should always have less than 1000 records
         var locationResult = await LocationDataService.GetAllAsync();
         if (locationResult.Success && locationResult.Data != null)
         {

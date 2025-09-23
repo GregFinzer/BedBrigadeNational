@@ -14,5 +14,7 @@ namespace BedBrigade.Data.Services
         Task<bool> GetConfigValueAsBoolAsync(ConfigSection section, string key);
         Task<List<decimal>> GetAmounts(ConfigSection section, string key, int locationId);
         Task<ServiceResponse<List<Configuration>>> GetAllForLocationAsync(int locationId);
+        Task<List<string>> GetPrimaryLanguages();
+        Task<List<string>> GetSpeakEnglish();
     }
 }

@@ -104,6 +104,7 @@ namespace BedBrigade.Client.Components
                 _toastService.Error("Error loading data", result.Message);
             }
 
+            //This GetAllAsync should always have less than 1000 records
             ServiceResponse<List<MetroArea>> metroResult = await _svcMetroArea.GetAllAsync();
             if (metroResult.Success && metroResult.Data != null)
             {

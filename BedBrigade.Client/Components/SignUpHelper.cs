@@ -11,91 +11,41 @@ namespace BedBrigade.Client.Components
     {
 
 
-        public static async Task<List<Volunteer>> GetVolunteers(IVolunteerDataService svcVolunteer)
+        public static async Task<List<Volunteer>> GetVolunteers(IVolunteerDataService svcVolunteer, int locationId)
         {
-            var dataVolunteer = await svcVolunteer.GetAllAsync(); // get Schedules           
+            var dataVolunteer = await svcVolunteer.GetAllForLocationAsync(locationId); // get Schedules           
             if (dataVolunteer.Success && dataVolunteer.Data != null)
             {
-                if (dataVolunteer.Data.Count > 0)
-                {
-                    return(dataVolunteer.Data.ToList()); 
-                } 
+                return dataVolunteer.Data;
             }
 
-            return (null);
+            return new List<Volunteer>();
         }// Get Volunteers
 
         public static async Task<List<Schedule>> GetSchedules (IScheduleDataService? svcSchedule, bool isLocationAdmin, int userLocationId)
         {
-            var dataSchedules = await svcSchedule.GetAllAsync();
+            var dataSchedules = await svcSchedule.GetFutureSchedulesByLocationId(userLocationId);
             if (dataSchedules.Success) // 
             {
-                var Schedules = dataSchedules.Data.ToList();
-                if(Schedules != null && Schedules.Count > 0)
-                { // select Location Schedules
-                    if (isLocationAdmin)
-                    {
-                        Schedules = Schedules.FindAll(s => s.LocationId == userLocationId);
-                    }
-                    // only future && scheduled
-                    Schedules = Schedules.FindAll(s => s.EventDateScheduled >= DateTime.Today && s.EventStatus == EventStatus.Scheduled);
-
-                    return (Schedules);
-                }
+                return dataSchedules.Data;
             }
 
             return null;
 
         } // Schedules
 
-        public static async Task<List<SignUp>?> GetSignUps(ISignUpDataService svcSignUp, bool isLocationAdmin,
-            int userLocationId)
+        public static async Task<List<SignUp>?> GetSignUps(ISignUpDataService svcSignUp, bool isLocationAdmin, int userLocationId)
         {
 
-            var dataEvents = await svcSignUp.GetAllAsync();
+            var dataEvents = await svcSignUp.GetAllForLocationAsync(userLocationId);
             if (dataEvents.Success && dataEvents.Data != null) // 
             {
-                var signUps = dataEvents.Data.ToList();
-
-                if (isLocationAdmin)
-                {
-                    signUps = signUps.FindAll(e => e.LocationId == userLocationId);
-                }
-
-                return signUps;
+                return dataEvents.Data;
             }
 
             return null;
         }
 
-        public static async Task<List<string>> GetSignUpDataStatusAsync(IScheduleDataService? svcSchedule, IVolunteerDataService? _svcVolunteer)
-        {
-            var bTableStatus = false;
-            var lstEmptyTables = new List<string>();
-            // Schedules
-            var dataTable = await svcSchedule.GetAllAsync();            
-            if (dataTable.Success && dataTable.Data.ToList().Count > 0)  
-            {
-                bTableStatus = true;
-            }
-            if(!bTableStatus)
-            {
-                lstEmptyTables.Add("Schedules");
-            }
-            // Volunteers            
-            bTableStatus = false;
-            var dataTableV = await _svcVolunteer.GetAllAsync();
-            if (dataTableV.Success && dataTableV.Data.ToList().Count > 0)
-            {
-                bTableStatus = true;
-            }
-            if (!bTableStatus)
-            {
-                lstEmptyTables.Add("Volunteers");
-            }
-
-            return (lstEmptyTables);
-        } 
 
         public static MarkupString GetSignUpDataStatusMessage(List<string> lstEmptyTables)
         {

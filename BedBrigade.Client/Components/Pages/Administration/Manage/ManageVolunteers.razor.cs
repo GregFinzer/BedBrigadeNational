@@ -91,6 +91,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task LoadLocations()
         {
+            //This GetAllAsync should always have less than 1000 records
             var dataLocations = await _svcLocation!.GetAllAsync();
 
             if (dataLocations.Success) // 

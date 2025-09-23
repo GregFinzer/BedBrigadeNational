@@ -62,6 +62,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (_svcAuth.IsNationalAdmin)
             {
                 IsLocationColumnVisible = true;
+                //This GetAllAsync should always have less than 1000 records
                 var result = await _svcNewsletter.GetAllAsync();
                 if (result.Success)
                 {

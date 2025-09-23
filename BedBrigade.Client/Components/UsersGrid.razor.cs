@@ -149,6 +149,7 @@ namespace BedBrigade.Client.Components
             bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
             if (isNationalAdmin)
             {
+                //This GetAllAsync should always have less than 1000 records
                 var allResult = await _svcUser.GetAllAsync();
 
                 if (allResult.Success && allResult.Data != null)

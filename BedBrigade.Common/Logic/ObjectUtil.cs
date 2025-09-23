@@ -1,12 +1,13 @@
-﻿using System;
+﻿using BedBrigade.Common.Models;
+using KellermanSoftware.CompareNetObjects;
+using KellermanSoftware.CompareNetObjects.Reports;
+using KellermanSoftware.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using KellermanSoftware.CompareNetObjects;
-using KellermanSoftware.CompareNetObjects.Reports;
-using KellermanSoftware.Serialization;
 
 namespace BedBrigade.Common.Logic
 {
@@ -168,6 +169,21 @@ namespace BedBrigade.Common.Logic
                 _elementsToIgnore.Add("IsDirty");
                 _elementsToIgnore.Add("IsNew");
             }
+        }
+
+        public static List<DisplayTextValue> ListStringToListDisplayTextValue(List<string> values)
+        {
+            List<DisplayTextValue> result = new List<DisplayTextValue>();
+            foreach (var value in values)
+            {
+                result.Add(new DisplayTextValue
+                {
+                    Value = value,
+                    DisplayText = value
+                });
+            }
+
+            return result;
         }
     }
 }
