@@ -184,44 +184,52 @@ namespace BedBrigade.Data.Services
 
             foreach (var itemToProcess in queueResult.Data)
             {
-                if (ReachedDailyLimit())
-                    break;
-
-                var parentTranslation =
-                    translationsResult.Data.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
-
-                if (parentTranslation == null)
-                {
-                    Log.Error(
-                        $"ProcessTranslations parentTranslation is null for TranslationId {itemToProcess.TranslationId}");
+                if (await ProcessTranslationItem(cancellationToken, translationsResult.Data, itemToProcess))
                     continue;
-                }
-
-                await RateLimiting(cancellationToken);
-
-                var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
-                _requestsThisMinute++;
-                _requestsToday++;
-
-                if (translatedText == null)
-                {
+                else
                     break;
-                }
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
-                await _translationDataService.CreateAsync(translation);
-                await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
             }
+        }
+
+        private async Task<bool> ProcessTranslationItem(CancellationToken cancellationToken, List<Translation> translations, TranslationQueue itemToProcess)
+        {
+            if (ReachedDailyLimit())
+                return false;
+
+            var parentTranslation =  translations.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
+
+            if (parentTranslation == null)
+            {
+                Log.Error($"ProcessTranslations parentTranslation is null for TranslationId {itemToProcess.TranslationId}");
+                return true;
+            }
+
+            await RateLimiting(cancellationToken);
+
+            var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
+            _requestsThisMinute++;
+            _requestsToday++;
+
+            if (translatedText == null)
+            {
+                return false;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
+            await _translationDataService.CreateAsync(translation);
+            await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool ReachedDailyLimit()
