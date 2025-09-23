@@ -71,6 +71,10 @@ namespace BedBrigade.Client.Components.Layout
                 //Collapse the mobile menu
                 await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
             catch (Microsoft.JSInterop.JSDisconnectedException)
             {
                 // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)

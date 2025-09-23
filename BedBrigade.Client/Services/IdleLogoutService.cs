@@ -19,6 +19,10 @@ public sealed class IdleLogoutService : IAsyncDisposable
             _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/scripts/IdleLogout.js");
             await _module.InvokeVoidAsync("startIdleTimer", (int)timeout.TotalMilliseconds, logoutUrl);
         }
+        catch (System.Threading.Tasks.TaskCanceledException)
+        {
+            // Ignore the exception when the component is disposed before the JS call completes
+        }
         catch (Microsoft.JSInterop.JSDisconnectedException)
         {
             // Ignore if the JS runtime is disconnected (e.g., during dispose)
@@ -32,6 +36,10 @@ public sealed class IdleLogoutService : IAsyncDisposable
             if (_module is not null)
                 await _module.InvokeVoidAsync("stopIdleTimer");
         }
+        catch (System.Threading.Tasks.TaskCanceledException)
+        {
+            // Ignore the exception when the component is disposed before the JS call completes
+        }
         catch (Microsoft.JSInterop.JSDisconnectedException)
         {
             // Ignore if the JS runtime is disconnected (e.g., during dispose)
@@ -44,6 +52,10 @@ public sealed class IdleLogoutService : IAsyncDisposable
         {
             if (_module is not null)
                 await _module.DisposeAsync();
+        }
+        catch (System.Threading.Tasks.TaskCanceledException)
+        {
+            // Ignore the exception when the component is disposed before the JS call completes
         }
         catch (Microsoft.JSInterop.JSDisconnectedException)
         {

@@ -141,6 +141,10 @@ public partial class Index : ComponentBase, IDisposable
                 await _js.InvokeVoidAsync("BedBrigadeUtil.runCarousel", 3000);
             }
         }
+        catch (System.Threading.Tasks.TaskCanceledException)
+        {
+            // Ignore the exception when the component is disposed before the JS call completes
+        }
         catch (Microsoft.JSInterop.JSDisconnectedException)
         {
             // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)

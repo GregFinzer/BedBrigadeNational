@@ -198,6 +198,10 @@ namespace BedBrigade.Client.Components
 
                 await HandleRender();
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
             catch (Microsoft.JSInterop.JSDisconnectedException)
             {
                 // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
@@ -262,6 +266,10 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync("DisplayToggle.HideByClass", "nadmin");
                 }
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
             catch (Microsoft.JSInterop.JSDisconnectedException)
             {
                 // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
@@ -311,6 +319,10 @@ namespace BedBrigade.Client.Components
                     await Show("lcommunications");
                 }
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
             catch (Microsoft.JSInterop.JSDisconnectedException)
             {
                 // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
@@ -327,6 +339,10 @@ namespace BedBrigade.Client.Components
             try
             {
                 await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
             }
             catch (Microsoft.JSInterop.JSDisconnectedException)
             {
