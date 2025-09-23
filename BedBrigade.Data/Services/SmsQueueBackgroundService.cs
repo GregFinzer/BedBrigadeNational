@@ -95,7 +95,7 @@ public class SmsQueueBackgroundService : BackgroundService
                 finally
                 {
                     _isProcessing = false;
-                    _logger.LogInformation("Email Queue Background Service Complete");
+                    _logger.LogInformation("SMS Queue Background Service Complete");
                 }
             }
 
@@ -184,7 +184,7 @@ public class SmsQueueBackgroundService : BackgroundService
                 Priority = Defaults.BulkMediumPriority
             };
             await _emailQueueDataService.QueueEmail(emailQueue);
-            _logger.LogInformation($"Queued Missed Message to {email}:\r\n{body}");
+            _logger.LogInformation($"Queued Missed SMS Message to Email: {email}:\r\n{body}");
         }
     }
 

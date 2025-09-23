@@ -71,7 +71,7 @@ namespace BedBrigade.Data.Services
             }
 
             //If there are no translations to translate then return
-            if (queueResult.Data.Any())
+            if (!queueResult.Data.Any())
                 return;
 
             //This GetAllAsync should always have less than 1000 records
@@ -155,20 +155,24 @@ namespace BedBrigade.Data.Services
 
         private async Task ProcessTranslations(CancellationToken cancellationToken)
         {
-            var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
-
-            if (!translationsResult.Success || translationsResult.Data == null)
-            {
-                Log.Error("ProcessTranslations translationsResult: " + translationsResult.Message);
-                return;
-            }
-
             //This GetAllAsync should always have less than 1000 records
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
             if (!queueResult.Success || queueResult.Data == null)
             {
                 Log.Error("ProcessTranslations queueResult: " + queueResult.Message);
+                return;
+            }
+
+            //If there are no translations to translate then return
+            if (!queueResult.Data.Any())
+                return;
+
+            var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
+
+            if (!translationsResult.Success || translationsResult.Data == null)
+            {
+                Log.Error("ProcessTranslations translationsResult: " + translationsResult.Message);
                 return;
             }
 
