@@ -187,14 +187,26 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Log.Debug("Header.OnAfterRenderAsync");
-
-            if (firstRender)
+            try
             {
-                await LanguageLoadedFromBrowser();
-            }
+                Log.Debug("Header.OnAfterRenderAsync");
 
-            await HandleRender();
+                if (firstRender)
+                {
+                    await LanguageLoadedFromBrowser();
+                }
+
+                await HandleRender();
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.OnAfterRenderAsync: {ex.Message}");
+                throw;
+            }
         }
 
         private async Task<bool> LanguageLoadedFromBrowser()

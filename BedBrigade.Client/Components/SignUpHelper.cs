@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components;
 using System.Text;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using Serilog;
+
 
 namespace BedBrigade.Client.Components
 {
@@ -18,6 +20,10 @@ namespace BedBrigade.Client.Components
             {
                 return dataVolunteer.Data;
             }
+            else
+            {
+                Log.Error(dataVolunteer.Message);
+            }
 
             return new List<Volunteer>();
         }// Get Volunteers
@@ -25,12 +31,15 @@ namespace BedBrigade.Client.Components
         public static async Task<List<Schedule>> GetSchedules (IScheduleDataService? svcSchedule, bool isLocationAdmin, int userLocationId)
         {
             var dataSchedules = await svcSchedule.GetFutureSchedulesByLocationId(userLocationId);
-            if (dataSchedules.Success) // 
+            if (dataSchedules.Success && dataSchedules.Data != null) // 
             {
                 return dataSchedules.Data;
             }
-
-            return null;
+            else
+            {
+                Log.Error(dataSchedules.Message);
+            }
+            return new List<Schedule>();
 
         } // Schedules
 
@@ -42,8 +51,11 @@ namespace BedBrigade.Client.Components
             {
                 return dataEvents.Data;
             }
-
-            return null;
+            else
+            {
+                Log.Error(dataEvents.Message);
+            }
+            return new List<SignUp>();
         }
 
 
