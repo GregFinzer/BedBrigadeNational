@@ -40,7 +40,14 @@ public sealed class IdleLogoutService : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (_module is not null)
-            await _module.DisposeAsync();
+        try
+        {
+            if (_module is not null)
+                await _module.DisposeAsync();
+        }
+        catch (Microsoft.JSInterop.JSDisconnectedException)
+        {
+            // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+        }
     }
 }
