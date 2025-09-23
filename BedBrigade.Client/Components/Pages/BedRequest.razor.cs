@@ -12,6 +12,7 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
+using static OfficeOpenXml.ExcelErrorValue;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -125,26 +126,11 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task LoadConfiguration()
         {
-            var dataConfiguration = await _svcConfiguration.GetAllAsync(ConfigSection.System); // Configuration ============================
-            if (dataConfiguration.Success && dataConfiguration != null)
-            {
-                var dctConfiguration = dataConfiguration.Data.ToDictionary(keySelector: x => x.ConfigurationKey, elementSelector: x => x.ConfigurationValue);
-                string delimitedString = dctConfiguration[ConfigNames.PrimaryLanguage].ToString();
-                lstPrimaryLanguage = new List<string>(delimitedString.Split(';'));
-                delimitedString = dctConfiguration[ConfigNames.SpeakEnglish].ToString();
-                string[] values = delimitedString.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                lstSpeakEnglish = new List<DisplayTextValue>();
-                foreach (var value in values)
-                {
-                    lstSpeakEnglish.Add(new DisplayTextValue
-                    {
-                        Value = value,
-                        DisplayText = value 
-                    });
-                }
-                await TranslateSpeakEnglish();
-            }
-        } // Configuration
+            lstPrimaryLanguage = await _svcConfiguration.GetPrimaryLanguages();
+            List<string> speakEnglish = await _svcConfiguration.GetSpeakEnglish();
+            lstSpeakEnglish = ObjectUtil.ListStringToListDisplayTextValue(speakEnglish);
+            await TranslateSpeakEnglish();
+        } 
 
         private async Task TranslateSpeakEnglish()
         {

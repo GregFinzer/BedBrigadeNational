@@ -187,14 +187,30 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Log.Debug("Header.OnAfterRenderAsync");
-
-            if (firstRender)
+            try
             {
-                await LanguageLoadedFromBrowser();
-            }
+                Log.Debug("Header.OnAfterRenderAsync");
 
-            await HandleRender();
+                if (firstRender)
+                {
+                    await LanguageLoadedFromBrowser();
+                }
+
+                await HandleRender();
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.OnAfterRenderAsync: {ex.Message}");
+                throw;
+            }
         }
 
         private async Task<bool> LanguageLoadedFromBrowser()
@@ -250,6 +266,14 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync("DisplayToggle.HideByClass", "nadmin");
                 }
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Header.HandleOtherRenders: {ex.Message}");
@@ -295,6 +319,14 @@ namespace BedBrigade.Client.Components
                     await Show("lcommunications");
                 }
             }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
@@ -304,7 +336,18 @@ namespace BedBrigade.Client.Components
 
         private async Task Show(string cssClass)
         {
-            await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+            try
+            {
+                await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
         }
 
 

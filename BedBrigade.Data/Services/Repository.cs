@@ -77,6 +77,13 @@ namespace BedBrigade.Data.Services
                 {
                     var dbSet = ctx.Set<TEntity>();
                     var result = await dbSet.ToListAsync();
+                    const int maxRecordsWarningThreshold = 5000;
+
+                    if (result.Count > maxRecordsWarningThreshold)
+                    {
+                        Log.Warning($"GetAllAsync for {GetEntityName()} returned {result.Count()} records. This is a lot and may impact performance. Consider using a more targeted query.");
+                    }
+
                     _cachingService.Set(cacheKey, result);
                     return new ServiceResponse<List<TEntity>>($"Found {result.Count()} {GetEntityName()}", true, result);
                 }

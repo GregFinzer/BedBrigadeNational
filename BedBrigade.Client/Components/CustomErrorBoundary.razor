@@ -31,8 +31,16 @@ else
 
     protected override Task OnErrorAsync(Exception exception)
     {
-        Logger.LogError(exception, "An unhandled exception occurred on page: " + Navigation.Uri);
-        return base.OnErrorAsync(exception);
+        if (exception != null && (exception is JSDisconnectedException || exception is System.Threading.Tasks.TaskCanceledException))
+        {
+            // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            return Task.CompletedTask;
+        }
+        else
+        {
+            Logger.LogError(exception, "An unhandled exception occurred on page: " + Navigation.Uri);
+            return base.OnErrorAsync(exception);
+        }
     }
 
     private void ReloadPage()

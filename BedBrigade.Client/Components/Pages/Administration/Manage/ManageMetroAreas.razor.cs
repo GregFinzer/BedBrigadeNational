@@ -72,12 +72,14 @@ public partial class ManageMetroAreas : ComponentBase
             ManageMetroAreasMessage = "View Metro Areas";
         }
 
+        //This GetAllAsync should always have less than 1000 records
         var metroAreaResult = await _svcMetroArea.GetAllAsync();
         if (metroAreaResult.Success && metroAreaResult.Data != null)
         {
             MetroAreas = metroAreaResult.Data.ToList();
         }
-        
+
+        //This GetAllAsync should always have less than 1000 records
         var locationResult = await _svcLocation.GetAllAsync();
         if (locationResult.Success && locationResult.Data != null)
         {

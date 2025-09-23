@@ -141,6 +141,11 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         _cachingService.ClearScheduleRelated();
         return new ServiceResponse<SignUp>($"Successfully unregistered volunteer {volunteerId} from schedule {scheduleId}", true, existingSignup.Data);
     }
+
+    public async Task<ServiceResponse<List<SignUp>>> GetAllForLocationAsync(int locationId)
+    {
+        return await _commonService.GetAllForLocationAsync(this, locationId);
+    }
 }
 
 

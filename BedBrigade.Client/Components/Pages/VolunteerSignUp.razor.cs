@@ -115,6 +115,7 @@ namespace BedBrigade.Client.Components.Pages
             {
                 if (firstRender)
                 {
+                    //This GetAllAsync should always have less than 1000 records
                     SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
 
                     if (!string.IsNullOrEmpty(LocationRoute))
