@@ -262,6 +262,10 @@ namespace BedBrigade.Client.Components
                     await _js.InvokeVoidAsync("DisplayToggle.HideByClass", "nadmin");
                 }
             }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Header.HandleOtherRenders: {ex.Message}");
@@ -307,6 +311,10 @@ namespace BedBrigade.Client.Components
                     await Show("lcommunications");
                 }
             }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
@@ -316,7 +324,14 @@ namespace BedBrigade.Client.Components
 
         private async Task Show(string cssClass)
         {
-            await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+            try
+            {
+                await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
         }
 
 

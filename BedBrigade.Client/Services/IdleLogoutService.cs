@@ -13,9 +13,16 @@ public sealed class IdleLogoutService : IAsyncDisposable
 
     public async Task StartAsync(TimeSpan timeout, string logoutUrl = "/logout")
     {
-        // Import the ES module on the client
-        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/scripts/IdleLogout.js");
-        await _module.InvokeVoidAsync("startIdleTimer", (int)timeout.TotalMilliseconds, logoutUrl);
+        try
+        {
+            // Import the ES module on the client
+            _module ??= await _js.InvokeAsync<IJSObjectReference>("import", "/scripts/IdleLogout.js");
+            await _module.InvokeVoidAsync("startIdleTimer", (int)timeout.TotalMilliseconds, logoutUrl);
+        }
+        catch (Microsoft.JSInterop.JSDisconnectedException)
+        {
+            // Ignore if the JS runtime is disconnected (e.g., during dispose)
+        }
     }
 
     public async Task StopAsync()
