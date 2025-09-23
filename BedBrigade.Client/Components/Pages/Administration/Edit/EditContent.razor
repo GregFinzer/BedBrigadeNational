@@ -17,7 +17,15 @@ else
 {
 
     <div class="container my-3 ">
-        <h3 class="">@WorkTitle </h3>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="mb-0">@WorkTitle</h4>
+
+            <div class="form-check d-flex align-items-center ms-3">
+                <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
+                       @bind="ConvertImages" @bind:after="UpdateSaveUrl"  />
+                <label class="form-check-label" for="chkConvertImages">Convert Images</label>
+            </div>
+        </div>
         <table>
             @foreach(var item in ImageButtonList)
             {
@@ -61,11 +69,12 @@ else
             <div class="rte-container">
                 <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
                     <RichTextEditorImageSettings SaveUrl="@SaveUrl" Path=@ImagePath AllowedTypes="AllowedTypes" />
-                    <RichTextEditorEvents/>
                     <RichTextEditorToolbarSettings Items="@Tools">
                         <RichTextEditorCustomToolbarItems>
                         </RichTextEditorCustomToolbarItems>
                     </RichTextEditorToolbarSettings>
+                        <RichTextEditorEvents
+                            OnImageUploadSuccess="OnImageUploadSuccess" />
                 </SfRichTextEditor>
             </div>
             <div>

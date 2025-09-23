@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Serilog;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
 
 namespace BedBrigade.Client.Components
 {
@@ -29,11 +32,14 @@ namespace BedBrigade.Client.Components
         private string CopySourceFolder = string.Empty;
         private bool ShowCopyPasteButton => CutOrCopyFiles.Any() && CopySourceFolder != CurrentFolderPath && CutSourceFolder != CurrentFolderPath;
         private List<string> _protectedFolders = new List<string>();
-
+        private bool ConvertImages { get; set; } = true;
         [Parameter]
         public string RootFolder { get; set; } = string.Empty;
 
-
+        private static readonly HashSet<string> _imageConvertibleExts = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".gif", ".webp"
+        };
 
         //Default to 250MB
         [Parameter] public int MaxFileSize { get; set; } = 262144000;
@@ -393,12 +399,12 @@ namespace BedBrigade.Client.Components
             }
         }
 
+        // UPDATED: HandleFileUpload — replace the inner foreach body where files are written
         private async Task HandleFileUpload(InputFileChangeEventArgs e)
         {
             try
             {
-                if (e == null)
-                    return;
+                if (e == null) return;
 
                 IReadOnlyList<IBrowserFile> inputFiles = e.GetMultipleFiles();
 
@@ -421,17 +427,28 @@ namespace BedBrigade.Client.Components
                         return;
                     }
 
-                    MemoryStream stream = new MemoryStream();
+                    using var stream = new MemoryStream();
                     await file.OpenReadStream(file.Size).CopyToAsync(stream);
                     byte[] fileBytes = stream.ToArray();
 
-                    await File.WriteAllBytesAsync(targetPath, fileBytes);
+                    var ext = Path.GetExtension(file.Name) ?? string.Empty;
+
+                    // Is this an image we should process?
+                    if (ConvertImages && _imageConvertibleExts.Contains(ext))
+                    {
+                        // Process -> strip EXIF, resize, save as .webp (if not already).
+                        await ProcessAndSaveImageAsync(file.Name, fileBytes, CurrentFolderPath);
+                    }
+                    else
+                    {
+                        // Not converting (either not an image, or checkbox unchecked): save as-is
+                        await File.WriteAllBytesAsync(targetPath, fileBytes);
+                    }
                 }
 
                 // Refresh files after upload
                 RefreshFiles(CurrentFolderPath);
                 StateHasChanged();
-
             }
             catch (Exception ex)
             {
@@ -439,8 +456,44 @@ namespace BedBrigade.Client.Components
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to upload: {ex.Message}");
             }
-
         }
+
+        
+        private async Task<string> ProcessAndSaveImageAsync(string originalFileName, byte[] fileBytes, string folderPath)
+        {
+            // Determine source extension and target path
+            var srcExt = Path.GetExtension(originalFileName) ?? string.Empty;
+            var baseName = Path.GetFileNameWithoutExtension(originalFileName);
+
+            // We will save as .webp
+            var finalFileName = $"{baseName}.webp";
+            var finalPath = Path.Combine(folderPath, finalFileName);
+
+            using var inStream = new MemoryStream(fileBytes);
+            using var image = await Image.LoadAsync(inStream);
+
+            // Strip all EXIF (removes geolocation)
+            image.Metadata.ExifProfile = null;
+
+            // Resize to max 1000 on the longer edge (maintain aspect)
+            image.Mutate(ctx => ctx.Resize(new ResizeOptions
+            {
+                Mode = ResizeMode.Max,
+                Size = new Size(1000, 1000)
+            }));
+
+            // Save to WebP (quality can be adjusted)
+            var encoder = new WebpEncoder
+            {
+                Quality = 80 // tweak if desired
+            };
+
+            await using var outStream = new FileStream(finalPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await image.SaveAsync(outStream, encoder);
+
+            return finalPath;
+        }
+
 
         private async Task ShowRenameFileModal()
         {
