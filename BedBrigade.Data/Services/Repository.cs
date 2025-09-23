@@ -77,7 +77,7 @@ namespace BedBrigade.Data.Services
                 {
                     var dbSet = ctx.Set<TEntity>();
                     var result = await dbSet.ToListAsync();
-                    const int maxRecordsWarningThreshold = 10000;
+                    const int maxRecordsWarningThreshold = 5000;
 
                     if (result.Count > maxRecordsWarningThreshold)
                     {

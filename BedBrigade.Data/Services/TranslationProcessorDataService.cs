@@ -70,7 +70,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            //If there are still translations to translate then return
+            //If there are no translations to translate then return
             if (queueResult.Data.Any())
                 return;
 
@@ -83,7 +83,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            //TODO:  Do not use GetAllAsync here
+            //This should have less than 1000 records
             var contentResult = await _contentDataService.GetAllAsync();
 
             if (!contentResult.Success || contentResult.Data == null)
@@ -92,7 +92,8 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            //TODO:  Do not use GetAllAsync here
+            //This should have less than 5000 records (both the English source culture and the target cultures are needed)
+            //We are always translating the cultures one after another 
             var translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -350,7 +351,7 @@ namespace BedBrigade.Data.Services
 
         private async Task QueueTranslationsForLocalizableStrings(List<string> distinctLocalizable)
         {
-            //TODO:  Do not use GetAllAsync here
+            //This should have less than 5000 records (both the English source culture and the target cultures are needed)
             ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -360,6 +361,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //This should always be less than 1000 records
             ServiceResponse<List<TranslationQueue>> translationQueueResult =
                 await _translationQueueDataService.GetAllAsync();
 
@@ -416,8 +418,7 @@ namespace BedBrigade.Data.Services
         private async Task SaveNewEnglishLocalizableStringsToTranslations(List<string> distinctLocalizable)
         {
             bool itemsAdded = false;
-            //TODO:  Do not use GetAllAsync here
-            ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
+            ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
 
             if (!translationsResult.Success || translationsResult.Data == null)
             {
@@ -425,7 +426,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            List<Translation> defaultTranslations = translationsResult.Data.Where(t => t.Culture == Defaults.DefaultLanguage).ToList();
+            List<Translation> defaultTranslations = translationsResult.Data;
 
             foreach (var localizableString in distinctLocalizable)
             {
