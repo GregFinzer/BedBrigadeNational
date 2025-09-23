@@ -96,6 +96,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 : "Replace Main Image";
         private InputFile _fileInput;
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
+        private bool ConvertImages { get; set; } = true;
 
         protected override async Task OnInitializedAsync()
         {
@@ -178,8 +179,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route.TrimStart('/');
                 ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                SaveUrl =  $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
+                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
             }
+        }
+
+        private void UpdateSaveUrl()
+        {
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+        }
+
+        private void OnImageUploadSuccess(ImageSuccessEventArgs args)
+        {
+            // Try to get the final server-saved name from the response headers
+            var headersText = args.Response?.Headers?.ToString() ?? string.Empty;
+            var newName = ExtractHeaderValue(headersText, "name");
+
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                // ✅ Tell the RTE the actual saved name so it inserts the right src
+                args.File.Name = newName;
+            }
+            else
+            {
+                // Fallback: if converting to webp and no header was sent, force .webp name
+                if (ConvertImages && !args.File.Name.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                {
+                    args.File.Name = Path.GetFileNameWithoutExtension(args.File.Name) + ".webp";
+                }
+            }
+        }
+
+
+        private static string? ExtractHeaderValue(string headers, string key)
+        {
+            var prefix = key + ": ";
+            var i = headers.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+            if (i < 0) return null;
+            var start = i + prefix.Length;
+            var end = headers.IndexOfAny(new[] { '\r', '\n' }, start);
+            return end > start ? headers[start..end] : headers[start..];
         }
 
         private async Task<string?> ProcessHtml(string? html)
