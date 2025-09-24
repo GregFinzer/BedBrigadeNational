@@ -26,20 +26,19 @@ else
                 <label class="form-check-label" for="chkConvertImages">Convert Images</label>
             </div>
         </div>
-        <table>
-            @foreach(var item in ImageButtonList)
+        <div class="row">
+            @foreach (var item in ImageButtonList)
             {
-                <tr class="center-align">
-                    <td>
-                        @(item.Key)
-                    </td>
-                    <td>
-                        <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))"><img src="Media/national/photosIcon16x16.png" /></button>
-                    </td>
-                </tr>
+                <div class="col-12 col-md-4 d-flex align-items-center mb-1">
+                    <div class="me-2">
+                        @item.Key
+                    </div>
+                    <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))">
+                        <img src="Media/national/photosIcon16x16.png" />
+                    </button>
+                </div>
             }
-        </table>
-        <p>&nbsp;</p>
+        </div>
         <EditForm Model="Content">
             <DataAnnotationsValidator />
             @* only show when editing Stories or News *@
