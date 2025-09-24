@@ -164,10 +164,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 string firstLetterCapitalized = rotatorImage.First().ToString().ToUpper() + rotatorImage.Substring(1);
                 string imagePath = StringUtil.InsertSpaces(firstLetterCapitalized);
                 
-                imageButtonList.Add($"Upload and maintain images for {imagePath}", rotatorImage);
+                imageButtonList.Add($"Manage images for {imagePath}", rotatorImage);
             }
 
-            imageButtonList.Add("Upload and maintain all images", string.Empty);
+            imageButtonList.Add("Manage all images", string.Empty);
             return imageButtonList;
         }
 
