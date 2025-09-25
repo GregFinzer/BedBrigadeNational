@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using AngleSharp.Html;
+using AngleSharp.Html.Parser;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace BedBrigade.Common.Logic
@@ -46,6 +49,37 @@ namespace BedBrigade.Common.Logic
                 Console.WriteLine(msg);
             }
             return decode ? HttpUtility.HtmlDecode(stripped) : stripped;
+        }
+
+        /// <summary>
+        /// Pretty-formats an HTML string but does NOT inject <html>/<body> wrappers.
+        /// </summary>
+        public static string FormatHtml(string html, string indent = "  ", string newLine = "\r\n")
+        {
+            if (string.IsNullOrWhiteSpace(html)) return string.Empty;
+
+            var parser = new HtmlParser();
+
+            // Parse as a fragment instead of a full document
+            var context = parser.ParseDocument(""); // empty doc just to get a context
+            var fragment = parser.ParseFragment(html, context.Body);
+
+            var formatter = new PrettyMarkupFormatter
+            {
+                Indentation = indent,
+                NewLine = newLine
+            };
+
+            var sb = new StringBuilder();
+            using (var writer = new StringWriter(sb))
+            {
+                foreach (var node in fragment)
+                {
+                    node.ToHtml(writer, formatter);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

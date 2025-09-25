@@ -70,12 +70,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
              new ToolbarItemModel() {Command = ToolbarCommand.RemoveLink },
-             new ToolbarItemModel() {Command = ToolbarCommand.SourceCode },
-             new ToolbarItemModel() {Command = ToolbarCommand.FullScreen },
              new ToolbarItemModel() {Command = ToolbarCommand.FontName },
              new ToolbarItemModel() {Command = ToolbarCommand.FontColor },
              new ToolbarItemModel() {Command = ToolbarCommand.FontSize },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Name = "bbSource", TooltipText = "Source" },
              new ToolbarItemModel() {Command = ToolbarCommand.BackgroundColor },
              new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
@@ -97,7 +96,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private InputFile _fileInput;
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
         private bool ConvertImages { get; set; } = true;
-
+        private bool ShowSourceBox { get; set; } = false;
         protected override async Task OnInitializedAsync()
         {
             try
@@ -226,6 +225,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
+
+            html = WebHelper.FormatHtml(html);
             return html;
         }
 
@@ -233,7 +234,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         {
             try
             {
-                Content.ContentHtml = await RteObj.GetXhtmlAsync();
+                if (ShowSourceBox)
+                {
+                    Content.ContentHtml = Body;
+                }
+                else
+                {
+                    Content.ContentHtml = await RteObj.GetXhtmlAsync();
+                }
 
                 //Update Content  Record
                 var updateResult = await _svcContent.UpdateAsync(Content);
@@ -353,5 +361,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             }
         }
 
+        private async Task OpenSource()
+        {
+            // Seed the textarea with the latest editor content
+            var current = await RteObj!.GetXhtmlAsync();
+            Body = WebHelper.FormatHtml(current ?? string.Empty); ;
+
+            // Show the multi-line textbox (source) and exit preview
+            ShowSourceBox = true;
+
+            // No internal toolbar pipeline is running, so a simple render is safe
+            StateHasChanged();
+        }
+
+
+
+
+        private async Task PreviewFromSource()
+        {
+            // If you want to pretty-print before previewing, uncomment:
+            // Body = WebHelper.FormatHtml(Body ?? string.Empty);
+
+            // Switch UI: show RTE in preview
+            ShowSourceBox = false;
+
+            //// Refresh the editor so it renders the just-updated Body
+            //await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
+
+        private async Task CancelSource()
+        {
+            ShowSourceBox = false;
+            await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
+        private async Task ExitPreview()
+        {
+            await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
     }
 }

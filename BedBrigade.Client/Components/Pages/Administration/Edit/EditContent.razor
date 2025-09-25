@@ -66,17 +66,51 @@ else
                 </div>
             }
             <div class="rte-container">
-                <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
-                    <RichTextEditorImageSettings SaveUrl="@SaveUrl" Path=@ImagePath AllowedTypes="AllowedTypes" />
-                    <RichTextEditorToolbarSettings Items="@Tools">
-                        <RichTextEditorCustomToolbarItems>
-                        </RichTextEditorCustomToolbarItems>
-                    </RichTextEditorToolbarSettings>
-                        <RichTextEditorEvents
-                            OnImageUploadSuccess="OnImageUploadSuccess" />
-                </SfRichTextEditor>
+                @* Show our own Source view *@
+                @if (ShowSourceBox)
+                {
+                    <textarea class="form-control source-textarea" @bind="Body"></textarea>
+                }
+                else
+                {
+                    <SfRichTextEditor @ref="RteObj"
+                                      EditorMode="EditorMode.HTML"
+                                      Height="500"
+                                      @bind-Value="Body"
+                                      EnableHtmlSanitizer="true">
+
+                        <RichTextEditorPasteCleanupSettings KeepFormat="true" PlainText="false" />
+
+                        <RichTextEditorImageSettings SaveUrl="@SaveUrl"
+                                                     Path="@ImagePath"
+                                                     AllowedTypes="@AllowedTypes" />
+
+                        <RichTextEditorToolbarSettings Items="@Tools">
+                            <RichTextEditorCustomToolbarItems>
+                                <RichTextEditorCustomToolbarItem Name="bbSource">
+                                    <Template>
+                                        <!-- Render a toolbar-styled button with an icon -->
+                                        <button type="button"
+                                                class="e-tbar-btn e-control e-btn"
+                                                @onclick="OpenSource">
+                                            <span class="e-icons e-code-view" aria-hidden="true"></span>
+                                            <span class="e-tbar-btn-text">Source</span>
+                                        </button>
+                                    </Template>
+                                </RichTextEditorCustomToolbarItem>
+                            </RichTextEditorCustomToolbarItems>
+                        </RichTextEditorToolbarSettings>
+
+                        <RichTextEditorEvents OnImageUploadSuccess="OnImageUploadSuccess" />
+                    </SfRichTextEditor>
+                }
+
             </div>
             <div>
+                @if (ShowSourceBox)
+                {
+                    <button class="btn btn-success" @onclick="PreviewFromSource">Preview</button>
+                }
                 <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveOnlyClick())">Save Only</button>
                 <button id="saveAndClose" type="button" class="btn btn-primary" @onclick="(() => HandleSaveAndCloseClick())">Save and Close</button>
                 <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
@@ -104,3 +138,8 @@ else
     </SfDialog>
 }
 
+<style>
+    .source-textarea {
+        height:500px;
+    }
+</style>
