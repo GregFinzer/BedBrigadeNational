@@ -5,13 +5,13 @@ using BedBrigade.Data.Services;
 
 namespace BedBrigade.Client.Services
 {
-    public class AdminMenuService
+    public class AdminMenuService : IAdminMenuService
     {
         private readonly IAuthService? _auth;
 
         private const string _pattern =
-            @"<div\s+(?=[^>]*\bdata-component=""(?<component>[^""]+)"")(?=[^>]*\bdata-style=""(?<style>[^""]+)"")(?=[^>]*\bid=""(?<id>[^""]+)"")[^>]*>\s*</div>";
-        private static readonly Regex _regex = new Regex(_pattern, RegexOptions.IgnoreCase);
+            @"<div\s+(?=[^>]*\bdata-component=""(?<component>[^""]+)"")(?=[^>]*\bdata-style=""(?<style>[^""]*)"")(?=[^>]*\bid=""(?<id>[^""]+)"")[^>]*>\s*</div>";
+        private static readonly Regex _regex = new Regex(_pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public AdminMenuService(IAuthService? authService)
         {
@@ -20,23 +20,61 @@ namespace BedBrigade.Client.Services
 
         public string ReplaceAdminMenu(string htmlText)
         {
+            if (string.IsNullOrEmpty(htmlText))
+                return htmlText;
+
             var match = _regex.Match(htmlText);
 
             if (!match.Success) return htmlText;
 
+            string id = match.Groups["id"].Value;
             var style = match.Groups["style"].Value;
             string navItemStyle = String.IsNullOrEmpty(style) ? string.Empty : $"{style}-nav-item";
             string navLinkStyle = String.IsNullOrEmpty(style) ? string.Empty : $"{style}-nav-link";
             string dropDownItemStyle = String.IsNullOrEmpty(style) ? string.Empty : $"{style}-dropdown-item";
-            return BuildAdminMenu(navItemStyle, navLinkStyle, dropDownItemStyle);
+            string replacement= BuildAdminMenu(id, navItemStyle, navLinkStyle, dropDownItemStyle);
+
+            return htmlText.Replace(match.Value, replacement);
         }
-        private string BuildAdminMenu(string navItemStyle, string navLinkStyle, string dropDownItemStyle )
+
+        private string BuildAdminMenu(string id, string navItemStyle, string navLinkStyle, string dropDownItemStyle )
         {
             if (_auth == null || !_auth.IsLoggedIn)
                 return string.Empty;
 
 
             // Collect visible items based on role gates inferred from AdminMenu.html
+            List<(string Text, string Href, string Icon, bool Show)> items = BuildMenuItems();
+
+            // If nothing to show, return empty
+            if (!items.Any(i => i.Show)) return string.Empty;
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"<li id=\"{id}\" class=\"dropdown nav-item {navItemStyle}\">");
+            sb.AppendLine(
+                $"  <a class=\"nav-link dropdown-toggle {navLinkStyle}\" data-bs-toggle=\"dropdown\" href=\"administration/dashboard\">");
+            sb.AppendLine("    <i class=\"fas fa-tools me-1\" aria-hidden=\"true\"></i>Administration");
+            sb.AppendLine("  </a>");
+            sb.AppendLine("  <ul class=\"dropdown-menu admin-dropdown\">");
+
+            foreach (var (text, href, icon, show) in items)
+            {
+                if (!show) continue;
+                sb.AppendLine("    <li class=\"nav-item\">");
+                sb.AppendLine($"      <a class=\"dropdown-item mx-2 {dropDownItemStyle}\" href=\"{href}\">");
+                sb.AppendLine($"        <i class=\"{icon} me-2\" aria-hidden=\"true\"></i>{text}");
+                sb.AppendLine("      </a>");
+                sb.AppendLine("    </li>");
+            }
+
+            sb.AppendLine("  </ul>");
+            sb.AppendLine("</li>");
+
+            return sb.ToString();
+        }
+
+        private List<(string Text, string Href, string Icon, bool Show)> BuildMenuItems()
+        {
             var items = new List<(string Text, string Href, string Icon, bool Show)>
             {
                 ("Bed Requests", "administration/manage/bedrequests", "fas fa-bed",
@@ -79,32 +117,7 @@ namespace BedBrigade.Client.Services
                 ("Volunteers", "administration/manage/Volunteers", "fas fa-user-friends",
                     _auth.UserHasRole(RoleNames.CanViewVolunteers)),
             };
-
-            // If nothing to show, return empty
-            if (!items.Any(i => i.Show)) return string.Empty;
-
-            var sb = new StringBuilder();
-            sb.AppendLine($"<li id=\"administration\" class=\"dropdown nav-item {navItemStyle}\">");
-            sb.AppendLine(
-                $"  <a class=\"nav-link dropdown-toggle {navLinkStyle}\" data-bs-toggle=\"dropdown\" href=\"administration/dashboard\">");
-            sb.AppendLine("    <i class=\"fas fa-tools me-1\" aria-hidden=\"true\"></i>Administration");
-            sb.AppendLine("  </a>");
-            sb.AppendLine("  <ul class=\"dropdown-menu admin-dropdown\">");
-
-            foreach (var (text, href, icon, show) in items)
-            {
-                if (!show) continue;
-                sb.AppendLine("    <li class=\"nav-item\">");
-                sb.AppendLine($"      <a class=\"dropdown-item mx-2 {dropDownItemStyle}\" href=\"{href}\">");
-                sb.AppendLine($"        <i class=\"{icon} me-2\" aria-hidden=\"true\"></i>{text}");
-                sb.AppendLine("      </a>");
-                sb.AppendLine("    </li>");
-            }
-
-            sb.AppendLine("  </ul>");
-            sb.AppendLine("</li>");
-
-            return sb.ToString();
+            return items;
         }
     }
 }
