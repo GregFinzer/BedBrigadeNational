@@ -7,6 +7,49 @@ There are a few custom HTML Controls that have been created to be used with Bed 
 * <a href="#bbschedule" target="_blank">Bed Brigade Schedule</a>
 * <a href="#bb-iframe" target="_blank">Bed Brigade iFrame</a>
 
+## Admin Menu
+The Admin Menu control builds an administration menu when the user logs in.  It only shows the menu items the user has access to.  Currently it is only used in the Header.razor.cs where it calls the AdminMenuService.cs
+
+### Example Admin Menu Specification
+```html
+<div data-component="bbadminmenu" data-style="polaris" id="administration"></div>
+```
+
+* The id will become the id of the list item.  
+* If the data-style is specified as empty then there will be no additional styles.  For example if "polaris" is specified as the  data-style, it will translate into these styles:
+    * polaris-nav-item
+    * polaris-nav-link
+    * polaris-dropdown-item
+    
+### Example Admin Menu Output
+```html
+<li id="administration" class="dropdown nav-item polaris-nav-item" style="display: none;">
+	<a class="nav-link dropdown-toggle polaris-nav-link" data-bs-toggle="dropdown" href="administration/dashboard">Administration</a>
+	<ul class="dropdown-menu admin-dropdown">
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/bedrequests">Bed Requests</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/admin/email">Bulk Email</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/SMS/BulkSms">Bulk Text Messages</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/configuration">Configuration</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/Contacts">Contacts</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/dashboard">Dashboard</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/donations">Donations</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/locations">Locations</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/fm">Media</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/metroareas">Metro Areas</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/pages/Body">Pages</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/pages/News">News</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/newsletters">Newsletters</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/pages/Stories">Stories</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/admin/serverinfo">Server Info</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/schedules">Schedules</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/sign-ups">Sign-Ups</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/SMS/SmsSummary">Text Messages</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/users">Users</a></li>
+		<li class="nav-link"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/admin/viewlogs">View Logs</a></li>
+		<li class="nav-item"><a class="dropdown-item mx-2 polaris-dropdown-item" href="administration/manage/Volunteers">Volunteers</a></li>
+	</ul>
+</li>
+```
 
 ## Image Rotator
 This is an image control that is identified by the word *ImageRotator* in the id.  It specifies a normal image path in the media directory but when the Index.razor.cs loads, the src will be replaced with a different path every 30 minutes.  You can have multiple image rotators on a page but they must have a different id for each image rotator.  The home page has a single image rotator for Grove City.  There is also an ImageRotator razor Blazor Custom Component that is used by the RotatorContainer Razor Custom Component that is used by BedBrigadeNearMe and other pages.
