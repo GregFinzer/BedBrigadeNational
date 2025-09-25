@@ -66,15 +66,31 @@ else
                 </div>
             }
             <div class="rte-container">
-                <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
-                    <RichTextEditorImageSettings SaveUrl="@SaveUrl" Path=@ImagePath AllowedTypes="AllowedTypes" />
+                <SfRichTextEditor @ref="RteObj"
+                                  EditorMode="EditorMode.HTML"
+                                  Height="500"
+                                  @bind-Value="Body"
+                                  EnableHtmlSanitizer="false">
+                    <!-- Keep formatting on paste (bold/italics, lists, etc.) -->
+                    <RichTextEditorPasteCleanupSettings KeepFormat="true" PlainText="false" />
+
+                    <!-- Image upload config -->
+                    <RichTextEditorImageSettings SaveUrl="@SaveUrl"
+                                                 Path="@ImagePath"
+                                                 AllowedTypes="@AllowedTypes" />
+
+                    <!-- Toolbar with Source toggle -->
                     <RichTextEditorToolbarSettings Items="@Tools">
                         <RichTextEditorCustomToolbarItems>
+                            <!-- (Optional) Add custom buttons here later -->
                         </RichTextEditorCustomToolbarItems>
                     </RichTextEditorToolbarSettings>
-                        <RichTextEditorEvents
-                            OnImageUploadSuccess="OnImageUploadSuccess" />
+
+                    <!-- Hook toolbar clicks so we can pretty-print when Source is toggled -->
+                    <RichTextEditorEvents OnToolbarClick="OnToolbarClick"
+                                          OnImageUploadSuccess="OnImageUploadSuccess" />
                 </SfRichTextEditor>
+
             </div>
             <div>
                 <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveOnlyClick())">Save Only</button>

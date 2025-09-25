@@ -226,6 +226,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
+
+            html = WebHelper.FormatHtml(html);
             return html;
         }
 
@@ -350,6 +352,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 // always catch *everything* so nothing bubbles out
                 Console.Error.WriteLine($"Upload error: {ex}");
                 _toastService.Error("Upload error", ex.Message);
+            }
+        }
+
+        private async Task OnToolbarClick(ToolbarClickEventArgs args)
+        {
+            // The built-in id contains "SourceCode" when you click the Source button.
+            if (args.Item?.Id?.IndexOf("SourceCode", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                // Grab what the editor currently has and format it
+                var current = await RteObj!.GetXhtmlAsync();   // Or GetHtmlAsync()
+                Body = WebHelper.FormatHtml(current);       // The FormatHtml method we wrote earlier
             }
         }
 
