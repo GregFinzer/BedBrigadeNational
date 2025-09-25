@@ -53,6 +53,7 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
             return new ServiceResponse<Configuration>("Configuration.GetByIdAsync id is null", false);
         }
 
+        //This GetAllAsync should always have less than 1000 records
         var response = await base.GetAllAsync();
 
         if (!response.Success || response.Data == null)
@@ -192,6 +193,17 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
+    public async Task<List<string>> GetPrimaryLanguages()
+    {
+        string delimitedString = await GetConfigValueAsync(ConfigSection.System, ConfigNames.PrimaryLanguage);
+        return new List<string>(delimitedString.Split(';'));
+    }
+
+    public async Task<List<string>> GetSpeakEnglish()
+    {
+        string delimitedString = await GetConfigValueAsync(ConfigSection.System, ConfigNames.SpeakEnglish);
+        return new List<string>(delimitedString.Split(';'));
+    }
 }
 
 

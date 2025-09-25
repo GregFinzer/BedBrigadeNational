@@ -129,14 +129,25 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!String.IsNullOrEmpty(_bodyContent) && _bodyContent.Contains("jarallax"))
+        try
         {
-            await _js.InvokeVoidAsync("BedBrigadeUtil.InitializeJarallax");
-        }
+            if (!String.IsNullOrEmpty(_bodyContent) && _bodyContent.Contains("jarallax"))
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.InitializeJarallax");
+            }
 
-        if (!String.IsNullOrEmpty(_bodyContent) && _bodyContent.Contains("carousel\""))
+            if (!String.IsNullOrEmpty(_bodyContent) && _bodyContent.Contains("carousel\""))
+            {
+                await _js.InvokeVoidAsync("BedBrigadeUtil.runCarousel", 3000);
+            }
+        }
+        catch (System.Threading.Tasks.TaskCanceledException)
         {
-            await _js.InvokeVoidAsync("BedBrigadeUtil.runCarousel", 3000);
+            // Ignore the exception when the component is disposed before the JS call completes
+        }
+        catch (Microsoft.JSInterop.JSDisconnectedException)
+        {
+            // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
         }
     }
 

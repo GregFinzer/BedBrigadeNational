@@ -164,6 +164,7 @@ public class ContentDataService : Repository<Content>, IContentDataService
 
     public override async Task<ServiceResponse<List<Content>>> GetAllAsync()
     {
+        //This GetAllAsync should always have less than 1000 records
         var result = await base.GetAllAsync();
 
         if (result.Success && result.Data != null)

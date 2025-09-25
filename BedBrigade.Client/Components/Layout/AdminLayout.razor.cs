@@ -59,26 +59,37 @@ namespace BedBrigade.Client.Components.Layout
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            // A hard refresh or the user just navigated to the application for the first time
-            if (firstRender && !AuthService.IsLoggedIn)
+            try
             {
-                var url = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString();
-                if (url.Contains("/login"))
+                // A hard refresh or the user just navigated to the application for the first time
+                if (firstRender && !AuthService.IsLoggedIn)
                 {
-                    return;
+                    var url = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString();
+                    if (url.Contains("/login"))
+                    {
+                        return;
+                    }
+
+                    var restoredFromState = await AuthService.GetStateFromTokenAsync();
+                    //The user lost their server side session, but still has a valid JWT
+                    if (restoredFromState)
+                    {
+                        NavigationManager.Refresh();
+                    }
                 }
 
-                var restoredFromState = await AuthService.GetStateFromTokenAsync();
-                //The user lost their server side session, but still has a valid JWT
-                if (restoredFromState)
-                {
-                    NavigationManager.Refresh();
-                }
+                //Collapse the mobile menu
+                await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
             }
 
-
-            //Collapse the mobile menu
-            await _js.InvokeVoidAsync("AddRemoveClass.RemoveClass", "navbarResponsive", "show");
         }
     }
 }

@@ -93,6 +93,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadData()
         {
+            //This GetAllAsync should always have less than 1000 records
             var result = await _svcConfiguration.GetAllAsync();
             if (result.Success && result.Data != null)
             {

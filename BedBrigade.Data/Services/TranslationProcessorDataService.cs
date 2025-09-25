@@ -61,6 +61,7 @@ namespace BedBrigade.Data.Services
 
         private async Task ProcessContentTranslations(CancellationToken cancellationToken)
         {
+            //This GetAllAsync should always have less than 1000 records
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
             if (!queueResult.Success || queueResult.Data == null)
@@ -69,10 +70,11 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            //If there are still translations to translate then return
-            if (queueResult.Data.Any())
+            //If there are no translations to translate then return
+            if (!queueResult.Data.Any())
                 return;
 
+            //This GetAllAsync should always have less than 1000 records
             var contentQueueResult = await _contentTranslationQueueDataService.GetAllAsync();
 
             if (!contentQueueResult.Success || contentQueueResult.Data == null)
@@ -81,6 +83,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //This should have less than 1000 records
             var contentResult = await _contentDataService.GetAllAsync();
 
             if (!contentResult.Success || contentResult.Data == null)
@@ -89,6 +92,8 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //This should have less than 5000 records (both the English source culture and the target cultures are needed)
+            //We are always translating the cultures one after another 
             var translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -150,19 +155,24 @@ namespace BedBrigade.Data.Services
 
         private async Task ProcessTranslations(CancellationToken cancellationToken)
         {
-            var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
-
-            if (!translationsResult.Success || translationsResult.Data == null)
-            {
-                Log.Error("ProcessTranslations translationsResult: " + translationsResult.Message);
-                return;
-            }
-
+            //This GetAllAsync should always have less than 1000 records
             var queueResult = await _translationQueueDataService.GetAllAsync();
 
             if (!queueResult.Success || queueResult.Data == null)
             {
                 Log.Error("ProcessTranslations queueResult: " + queueResult.Message);
+                return;
+            }
+
+            //If there are no translations to translate then return
+            if (!queueResult.Data.Any())
+                return;
+
+            var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
+
+            if (!translationsResult.Success || translationsResult.Data == null)
+            {
+                Log.Error("ProcessTranslations translationsResult: " + translationsResult.Message);
                 return;
             }
 
@@ -174,44 +184,52 @@ namespace BedBrigade.Data.Services
 
             foreach (var itemToProcess in queueResult.Data)
             {
-                if (ReachedDailyLimit())
-                    break;
-
-                var parentTranslation =
-                    translationsResult.Data.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
-
-                if (parentTranslation == null)
-                {
-                    Log.Error(
-                        $"ProcessTranslations parentTranslation is null for TranslationId {itemToProcess.TranslationId}");
+                if (await ProcessTranslationItem(cancellationToken, translationsResult.Data, itemToProcess))
                     continue;
-                }
-
-                await RateLimiting(cancellationToken);
-
-                var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
-                _requestsThisMinute++;
-                _requestsToday++;
-
-                if (translatedText == null)
-                {
+                else
                     break;
-                }
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
-                await _translationDataService.CreateAsync(translation);
-                await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
             }
+        }
+
+        private async Task<bool> ProcessTranslationItem(CancellationToken cancellationToken, List<Translation> translations, TranslationQueue itemToProcess)
+        {
+            if (ReachedDailyLimit())
+                return false;
+
+            var parentTranslation =  translations.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
+
+            if (parentTranslation == null)
+            {
+                Log.Error($"ProcessTranslations parentTranslation is null for TranslationId {itemToProcess.TranslationId}");
+                return true;
+            }
+
+            await RateLimiting(cancellationToken);
+
+            var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
+            _requestsThisMinute++;
+            _requestsToday++;
+
+            if (translatedText == null)
+            {
+                return false;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
+            await _translationDataService.CreateAsync(translation);
+            await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool ReachedDailyLimit()
@@ -345,6 +363,7 @@ namespace BedBrigade.Data.Services
 
         private async Task QueueTranslationsForLocalizableStrings(List<string> distinctLocalizable)
         {
+            //This should have less than 5000 records (both the English source culture and the target cultures are needed)
             ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
 
             if (!translationsResult.Success || translationsResult.Data == null)
@@ -354,6 +373,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
+            //This should always be less than 1000 records
             ServiceResponse<List<TranslationQueue>> translationQueueResult =
                 await _translationQueueDataService.GetAllAsync();
 
@@ -410,7 +430,7 @@ namespace BedBrigade.Data.Services
         private async Task SaveNewEnglishLocalizableStringsToTranslations(List<string> distinctLocalizable)
         {
             bool itemsAdded = false;
-            ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetAllAsync();
+            ServiceResponse<List<Translation>> translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
 
             if (!translationsResult.Success || translationsResult.Data == null)
             {
@@ -418,7 +438,7 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            List<Translation> defaultTranslations = translationsResult.Data.Where(t => t.Culture == Defaults.DefaultLanguage).ToList();
+            List<Translation> defaultTranslations = translationsResult.Data;
 
             foreach (var localizableString in distinctLocalizable)
             {

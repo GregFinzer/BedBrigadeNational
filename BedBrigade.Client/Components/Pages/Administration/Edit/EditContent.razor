@@ -17,21 +17,28 @@ else
 {
 
     <div class="container my-3 ">
-        <h3 class="">@WorkTitle </h3>
-        <table>
-            @foreach(var item in ImageButtonList)
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="mb-0">@WorkTitle</h4>
+
+            <div class="form-check d-flex align-items-center ms-3">
+                <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
+                       @bind="ConvertImages" @bind:after="UpdateSaveUrl"  />
+                <label class="form-check-label" for="chkConvertImages">Convert Images</label>
+            </div>
+        </div>
+        <div class="row">
+            @foreach (var item in ImageButtonList)
             {
-                <tr class="center-align">
-                    <td>
-                        @(item.Key)
-                    </td>
-                    <td>
-                        <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))"><img src="Media/national/photosIcon16x16.png" /></button>
-                    </td>
-                </tr>
+                <div class="col-12 col-md-4 d-flex align-items-center mb-1">
+                    <div class="me-2">
+                        @item.Key
+                    </div>
+                    <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))">
+                        <img src="Media/national/photosIcon16x16.png" />
+                    </button>
+                </div>
             }
-        </table>
-        <p>&nbsp;</p>
+        </div>
         <EditForm Model="Content">
             <DataAnnotationsValidator />
             @* only show when editing Stories or News *@
@@ -59,16 +66,51 @@ else
                 </div>
             }
             <div class="rte-container">
-                <SfRichTextEditor @ref=@RteObj EditorMode="EditorMode.HTML" Height="500" @bind-Value="Body">
-                    <RichTextEditorImageSettings SaveUrl="@SaveUrl" Path=@ImagePath AllowedTypes="AllowedTypes" />
-                    <RichTextEditorEvents/>
-                    <RichTextEditorToolbarSettings Items="@Tools">
-                        <RichTextEditorCustomToolbarItems>
-                        </RichTextEditorCustomToolbarItems>
-                    </RichTextEditorToolbarSettings>
-                </SfRichTextEditor>
+                @* Show our own Source view *@
+                @if (ShowSourceBox)
+                {
+                    <textarea class="form-control source-textarea" @bind="Body"></textarea>
+                }
+                else
+                {
+                    <SfRichTextEditor @ref="RteObj"
+                                      EditorMode="EditorMode.HTML"
+                                      Height="500"
+                                      @bind-Value="Body"
+                                      EnableHtmlSanitizer="true">
+
+                        <RichTextEditorPasteCleanupSettings KeepFormat="true" PlainText="false" />
+
+                        <RichTextEditorImageSettings SaveUrl="@SaveUrl"
+                                                     Path="@ImagePath"
+                                                     AllowedTypes="@AllowedTypes" />
+
+                        <RichTextEditorToolbarSettings Items="@Tools">
+                            <RichTextEditorCustomToolbarItems>
+                                <RichTextEditorCustomToolbarItem Name="bbSource">
+                                    <Template>
+                                        <!-- Render a toolbar-styled button with an icon -->
+                                        <button type="button"
+                                                class="e-tbar-btn e-control e-btn"
+                                                @onclick="OpenSource">
+                                            <span class="e-icons e-code-view" aria-hidden="true"></span>
+                                            <span class="e-tbar-btn-text">Source</span>
+                                        </button>
+                                    </Template>
+                                </RichTextEditorCustomToolbarItem>
+                            </RichTextEditorCustomToolbarItems>
+                        </RichTextEditorToolbarSettings>
+
+                        <RichTextEditorEvents OnImageUploadSuccess="OnImageUploadSuccess" />
+                    </SfRichTextEditor>
+                }
+
             </div>
             <div>
+                @if (ShowSourceBox)
+                {
+                    <button class="btn btn-success" @onclick="PreviewFromSource">Preview</button>
+                }
                 <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveOnlyClick())">Save Only</button>
                 <button id="saveAndClose" type="button" class="btn btn-primary" @onclick="(() => HandleSaveAndCloseClick())">Save and Close</button>
                 <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
@@ -96,3 +138,8 @@ else
     </SfDialog>
 }
 
+<style>
+    .source-textarea {
+        height:500px;
+    }
+</style>

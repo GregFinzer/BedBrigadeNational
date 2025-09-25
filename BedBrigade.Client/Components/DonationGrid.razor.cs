@@ -117,6 +117,7 @@ namespace BedBrigade.Client.Components
         }
         private async Task LoadDonationCampaigns()
         {
+            //This GetAllAsync should always have less than 1000 records
             var result = await _svcDonationCampaign.GetAllAsync();
             if (result.Success && result.Data != null)
             {
@@ -195,36 +196,17 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadDonations()
         {
-            bool isNationalAdmin = _svcUser.IsUserNationalAdmin();
-            if (isNationalAdmin)
+            int userLocationId = _svcUser.GetUserLocationId();
+            var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
+            if (contactUsResult.Success && contactUsResult.Data != null)
             {
-                var allResult = await _svcDonation.GetAllAsync();
-
-                if (allResult.Success && allResult.Data != null)
-                {
-                    Donations = allResult.Data.ToList();
-                }
-                else
-                {
-                    Log.Error($"Error loading donations: {allResult.Message}");
-                    _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
-                    Donations = new List<Donation>();
-                }
+                Donations = contactUsResult.Data.ToList();
             }
             else
             {
-                int userLocationId = _svcUser.GetUserLocationId();
-                var contactUsResult = await _svcDonation.GetAllForLocationAsync(userLocationId);
-                if (contactUsResult.Success && contactUsResult.Data != null)
-                {
-                    Donations = contactUsResult.Data.ToList();
-                }
-                else
-                {
-                    Log.Error($"Error loading donations for location {userLocationId}: {contactUsResult.Message}");
-                    _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
-                    Donations = new List<Donation>();
-                }
+                Log.Error($"Error loading donations for location {userLocationId}: {contactUsResult.Message}");
+                _toastService.Error("Error loading donations", "An error occurred while loading donations. Please try again later.");
+                Donations = new List<Donation>();
             }
         }
 

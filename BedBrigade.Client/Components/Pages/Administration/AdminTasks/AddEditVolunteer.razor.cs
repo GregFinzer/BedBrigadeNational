@@ -49,6 +49,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     CanSetLocation = true;
                 }
 
+                //This GetAllAsync should always have less than 1000 records
                 SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
                 TranslationOptions = EnumHelper.GetEnumNameValues<CanYouTranslate>();
                 await LoadLocations();
@@ -63,6 +64,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task LoadLocations()
         {
+            //This GetAllAsync should always have less than 1000 records
             var result = await _svcLocation!.GetAllAsync();
 
             if (result.Success) // 

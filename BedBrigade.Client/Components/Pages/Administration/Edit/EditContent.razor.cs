@@ -70,12 +70,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
              new ToolbarItemModel() {Command = ToolbarCommand.RemoveLink },
-             new ToolbarItemModel() {Command = ToolbarCommand.SourceCode },
-             new ToolbarItemModel() {Command = ToolbarCommand.FullScreen },
              new ToolbarItemModel() {Command = ToolbarCommand.FontName },
              new ToolbarItemModel() {Command = ToolbarCommand.FontColor },
              new ToolbarItemModel() {Command = ToolbarCommand.FontSize },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Name = "bbSource", TooltipText = "Source" },
              new ToolbarItemModel() {Command = ToolbarCommand.BackgroundColor },
              new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
@@ -96,7 +95,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 : "Replace Main Image";
         private InputFile _fileInput;
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
-
+        private bool ConvertImages { get; set; } = true;
+        private bool ShowSourceBox { get; set; } = false;
         protected override async Task OnInitializedAsync()
         {
             try
@@ -163,10 +163,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 string firstLetterCapitalized = rotatorImage.First().ToString().ToUpper() + rotatorImage.Substring(1);
                 string imagePath = StringUtil.InsertSpaces(firstLetterCapitalized);
                 
-                imageButtonList.Add($"Upload and maintain images for {imagePath}", rotatorImage);
+                imageButtonList.Add($"Manage images for {imagePath}", rotatorImage);
             }
 
-            imageButtonList.Add("Upload and maintain all images", string.Empty);
+            imageButtonList.Add("Manage all images", string.Empty);
             return imageButtonList;
         }
 
@@ -178,8 +178,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route.TrimStart('/');
                 ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                SaveUrl =  $"api/image/save/{locationId}/{_subdirectory}/{ContentName}";
+                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
             }
+        }
+
+        private void UpdateSaveUrl()
+        {
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+        }
+
+        private void OnImageUploadSuccess(ImageSuccessEventArgs args)
+        {
+            // Try to get the final server-saved name from the response headers
+            var headersText = args.Response?.Headers?.ToString() ?? string.Empty;
+            var newName = ExtractHeaderValue(headersText, "name");
+
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                // ✅ Tell the RTE the actual saved name so it inserts the right src
+                args.File.Name = newName;
+            }
+            else
+            {
+                // Fallback: if converting to webp and no header was sent, force .webp name
+                if (ConvertImages && !args.File.Name.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                {
+                    args.File.Name = Path.GetFileNameWithoutExtension(args.File.Name) + ".webp";
+                }
+            }
+        }
+
+
+        private static string? ExtractHeaderValue(string headers, string key)
+        {
+            var prefix = key + ": ";
+            var i = headers.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+            if (i < 0) return null;
+            var start = i + prefix.Length;
+            var end = headers.IndexOfAny(new[] { '\r', '\n' }, start);
+            return end > start ? headers[start..end] : headers[start..];
         }
 
         private async Task<string?> ProcessHtml(string? html)
@@ -188,6 +225,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             html = html ?? string.Empty;
             _loadImagesService.EnsureDirectoriesExist(path, html);
             html = _loadImagesService.SetImgSourceForImageRotators(path, html);
+
+            html = WebHelper.FormatHtml(html);
             return html;
         }
 
@@ -195,7 +234,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         {
             try
             {
-                Content.ContentHtml = await RteObj.GetXhtmlAsync();
+                if (ShowSourceBox)
+                {
+                    Content.ContentHtml = Body;
+                }
+                else
+                {
+                    Content.ContentHtml = await RteObj.GetXhtmlAsync();
+                }
 
                 //Update Content  Record
                 var updateResult = await _svcContent.UpdateAsync(Content);
@@ -315,5 +361,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             }
         }
 
+        private async Task OpenSource()
+        {
+            // Seed the textarea with the latest editor content
+            var current = await RteObj!.GetXhtmlAsync();
+            Body = WebHelper.FormatHtml(current ?? string.Empty); ;
+
+            // Show the multi-line textbox (source) and exit preview
+            ShowSourceBox = true;
+
+            // No internal toolbar pipeline is running, so a simple render is safe
+            StateHasChanged();
+        }
+
+
+
+
+        private async Task PreviewFromSource()
+        {
+            // If you want to pretty-print before previewing, uncomment:
+            // Body = WebHelper.FormatHtml(Body ?? string.Empty);
+
+            // Switch UI: show RTE in preview
+            ShowSourceBox = false;
+
+            //// Refresh the editor so it renders the just-updated Body
+            //await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
+
+        private async Task CancelSource()
+        {
+            ShowSourceBox = false;
+            await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
+        private async Task ExitPreview()
+        {
+            await RteObj.RefreshUIAsync();
+            StateHasChanged();
+        }
     }
 }

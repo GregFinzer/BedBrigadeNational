@@ -31,11 +31,12 @@ namespace BedBrigade.Client.Components
         [Inject] private ITranslateLogic _translateLogic { get; set; }
 
         [Inject] private ILocalStorageService _localStorage { get; set; }
+        [Inject] private IAdminMenuService _adminMenuService { get; set; }
         const string LoginElement = "loginElement";
         const string AdminElement = "adminElement";
         const string SetInnerHTML = "SetGetValue.SetInnerHtml";
 
-        private string headerContent = string.Empty;
+        private string _headerContent = string.Empty;
         protected string Login = "login";
         private ClaimsPrincipal? User { get; set; }
 
@@ -135,6 +136,8 @@ namespace BedBrigade.Client.Components
                         await LoadContentByLanguage(locationResult, locationName);
                     }
                 }
+
+                _headerContent = _adminMenuService.ReplaceAdminMenu(_headerContent);
             }
             catch (Exception ex)
             {
@@ -149,7 +152,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                headerContent = contentResult.Data.ContentHtml;
+                _headerContent = contentResult.Data.ContentHtml;
             }
             else
             {
@@ -169,7 +172,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                headerContent = contentResult.Data.ContentHtml;
+                _headerContent = contentResult.Data.ContentHtml;
             }
             else
             {
@@ -187,14 +190,30 @@ namespace BedBrigade.Client.Components
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Log.Debug("Header.OnAfterRenderAsync");
-
-            if (firstRender)
+            try
             {
-                await LanguageLoadedFromBrowser();
-            }
+                Log.Debug("Header.OnAfterRenderAsync");
 
-            await HandleRender();
+                if (firstRender)
+                {
+                    await LanguageLoadedFromBrowser();
+                }
+
+                await HandleRender();
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, $"Header.OnAfterRenderAsync: {ex.Message}");
+                throw;
+            }
         }
 
         private async Task<bool> LanguageLoadedFromBrowser()
@@ -240,15 +259,20 @@ namespace BedBrigade.Client.Components
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
-                    await _js.InvokeVoidAsync("DisplayToggle.Show", "administration");
-                    await ShowMenuItems();
                 }
                 else
                 {
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Login");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/login");
-                    await _js.InvokeVoidAsync("DisplayToggle.HideByClass", "nadmin");
                 }
+            }
+            catch (System.Threading.Tasks.TaskCanceledException)
+            {
+                // Ignore the exception when the component is disposed before the JS call completes
+            }
+            catch (Microsoft.JSInterop.JSDisconnectedException)
+            {
+                // Ignore the exception when the JS runtime is disconnected (e.g., during hot reload)
             }
             catch (Exception ex)
             {
@@ -257,55 +281,9 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task ShowMenuItems()
-        {
-            Log.Debug("Header.SetMenuItems");
-            try
-            {
-                if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalAdmin))
-                {
-                    await Show("nadmin");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.NationalEditor))
-                {
-                    await Show("neditor");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAdmin))
-                {
-                    await Show("ladmin");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationEditor))
-                {
-                    await Show("leditor");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationAuthor))
-                {
-                    await Show("lauthor");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationScheduler))
-                {
-                    await Show("lscheduler");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationTreasurer))
-                {
-                    await Show("ltreasurer");
-                }
-                else if (_svcAuth.CurrentUser.HasRole(RoleNames.LocationCommunications))
-                {
-                    await Show("lcommunications");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, $"Error loading Menu: {ex.Message}");
-            }
 
-        }
 
-        private async Task Show(string cssClass)
-        {
-            await _js.InvokeVoidAsync("DisplayToggle.ShowByClass", cssClass);
-        }
+
 
 
 

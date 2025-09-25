@@ -55,7 +55,6 @@ public partial class SignUpGrid : ComponentBase
     // variables
 
     protected string? RecordText { get; set; } = "Loading Schedules ...";
-    public bool DataStatus = true;
 
     // Grid references
 
@@ -95,29 +94,14 @@ public partial class SignUpGrid : ComponentBase
 
     public string strHtml = string.Empty;
     
-    private List<string> lstEmptyTables = new List<string>();
     public string ManageSignUpsMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-
             _lc.InitLocalizedComponent(this);
-            lstEmptyTables = await SignUpHelper.GetSignUpDataStatusAsync(_svcSchedule, _svcVolunteer);
-            if (lstEmptyTables.Count > 0)
-            {
-                DataStatus = false;
-                GridDisplay = DisplayNone;
-                _ = Task.CompletedTask;
-                return;
-            }
-
-            if (DataStatus)
-            {
-                await LoadGridData();
-            }
-
+            await LoadGridData();
         }
         catch (Exception ex)
         {
@@ -234,6 +218,7 @@ public partial class SignUpGrid : ComponentBase
 
     private async Task LoadLocations()
     {
+        //This GetAllAsync should always have less than 1000 records
         var dataLocations = await _svcLocation!.GetAllAsync();
         if (dataLocations.Success && dataLocations.Data != null) // 
         {
@@ -253,16 +238,10 @@ public partial class SignUpGrid : ComponentBase
     {
         try // get Volunteer List ===========================================================================================
         {
-            Volunteers = await SignUpHelper.GetVolunteers(_svcVolunteer);
+            Volunteers = await SignUpHelper.GetVolunteers(_svcVolunteer, userLocationId);
             if (Volunteers.Count > 0)
             {
-                if (IsLocationAdmin)
-                {
-                    Volunteers = Volunteers.FindAll(e => e.LocationId == userLocationId); // Location Filter
-                }
-
                 lstVolunteerSelector = Volunteers;
-
             }
             else
             {

@@ -28,6 +28,9 @@ public partial class Logout : ComponentBase
                 string locationRoute = AuthService.UserRoute.TrimStart('/');
                 await AuthService.LogoutAsync();
 
+                //This will force the header to update and remove the admin menu
+                await _locationState.NotifyStateChangedAsync();
+
                 if (reason != "idle")
                 {
                     NavigationManager.NavigateTo($"/{locationRoute}");

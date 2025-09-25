@@ -76,6 +76,12 @@
                                 <i class="fas fa-sync"></i> Refresh
                             </button>
                         </li>
+                        <li class="nav-item">
+                            <label class="nav-link" for="chkConvertImages" style="font-size:.85em">Convert Images
+                                <input class="form-check-input" type="checkbox" id="chkConvertImages"
+                                   @bind="ConvertImages" />
+                            </label>
+                        </li>
                     </ul>
                     <form class="form-inline">
                         <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" @bind="SearchQuery" @bind:event="oninput">
@@ -172,7 +178,9 @@
             border: none;
         }
 
-
+        .media-manager .navbar-collapse {
+            background-color: black;
+        }
 
         .media-manager h5 {
             font-family: Arial, Helvetica, sans-serif;
