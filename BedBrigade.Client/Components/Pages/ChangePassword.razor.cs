@@ -4,6 +4,7 @@ using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages;
 

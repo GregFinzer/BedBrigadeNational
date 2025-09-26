@@ -98,7 +98,7 @@
         Log.Information($"{_svcAuth.UserName} went to the Server Information Page");
         ProcessorArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
         ProcessorName = GetProcessorName();
-        ProcessorCount = System.Environment.ProcessorCount;
+        ProcessorCount = Environment.ProcessorCount;
         ProcessorSpeed = GetProcessorSpeed();
         MaxMemory = GetMaxMemory();
         FreeMemory = GetFreeMemory();
@@ -106,7 +106,7 @@
         Timezone = TimeZoneInfo.Local.DisplayName;
         ServerTime = DateTime.Now.ToString();
         ServerName = System.Environment.MachineName;
-        OsVersion = System.Environment.OSVersion.VersionString;
+        OsVersion = Environment.OSVersion.VersionString;
     }
 
     private string GetProcessorName()

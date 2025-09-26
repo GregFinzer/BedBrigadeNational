@@ -101,7 +101,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ToastService, ToastService>();
             builder.Services.AddSignalR(o => { o.MaximumReceiveMessageSize = 300 * 1024 * 1024; });
 
-            //Possible fix for AT&T Mobile Data
+            //Fix for AT&T Mobile Data
             builder.Services.AddResponseCompression(options =>
             {
                 // Exclude SSE so it's never compressed

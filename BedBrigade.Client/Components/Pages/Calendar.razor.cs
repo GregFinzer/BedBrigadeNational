@@ -6,6 +6,7 @@ using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Schedule;
 using System.Text;
 using Serilog;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Components.Pages
 {

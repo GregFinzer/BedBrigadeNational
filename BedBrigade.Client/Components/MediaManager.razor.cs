@@ -427,9 +427,13 @@ namespace BedBrigade.Client.Components
                         return;
                     }
 
-                    using var stream = new MemoryStream();
-                    await file.OpenReadStream(file.Size).CopyToAsync(stream);
-                    byte[] fileBytes = stream.ToArray();
+                    using (var targetStream = new FileStream(targetPath, FileMode.Create))
+                    {
+                        using (var fileStream = file.OpenReadStream(MaxFileSize))
+                        {
+                            await fileStream.CopyToAsync(targetStream);
+                        }
+                    }
 
                     var ext = Path.GetExtension(file.Name) ?? string.Empty;
 
@@ -437,12 +441,8 @@ namespace BedBrigade.Client.Components
                     if (ConvertImages && _imageConvertibleExts.Contains(ext))
                     {
                         // Process -> strip EXIF, resize, save as .webp (if not already).
-                        await ProcessAndSaveImageAsync(file.Name, fileBytes, CurrentFolderPath);
-                    }
-                    else
-                    {
-                        // Not converting (either not an image, or checkbox unchecked): save as-is
-                        await File.WriteAllBytesAsync(targetPath, fileBytes);
+                        await ProcessAndSaveImageAsync(targetPath);
+                        File.Delete(targetPath);
                     }
                 }
 
@@ -458,38 +458,41 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        
-        private async Task<string> ProcessAndSaveImageAsync(string originalFileName, byte[] fileBytes, string folderPath)
+
+        private async Task<string> ProcessAndSaveImageAsync(string targetPath)
         {
             // Determine source extension and target path
-            var srcExt = Path.GetExtension(originalFileName) ?? string.Empty;
-            var baseName = Path.GetFileNameWithoutExtension(originalFileName);
+            var srcExt = Path.GetExtension(targetPath) ?? string.Empty;
+            var baseName = Path.GetFileNameWithoutExtension(targetPath);
+            var folderPath = Path.GetDirectoryName(targetPath) ?? string.Empty;
 
             // We will save as .webp
             var finalFileName = $"{baseName}.webp";
             var finalPath = Path.Combine(folderPath, finalFileName);
 
-            using var inStream = new MemoryStream(fileBytes);
-            using var image = await Image.LoadAsync(inStream);
-
-            // Strip all EXIF (removes geolocation)
-            image.Metadata.ExifProfile = null;
-
-            // Resize to max 1000 on the longer edge (maintain aspect)
-            image.Mutate(ctx => ctx.Resize(new ResizeOptions
+            using (var image = await Image.LoadAsync(targetPath))
             {
-                Mode = ResizeMode.Max,
-                Size = new Size(1000, 1000)
-            }));
+                // Strip all EXIF (removes geolocation)
+                image.Metadata.ExifProfile = null;
 
-            // Save to WebP (quality can be adjusted)
-            var encoder = new WebpEncoder
-            {
-                Quality = 80 // tweak if desired
-            };
+                // Resize to max 1000 on the longer edge (maintain aspect)
+                image.Mutate(ctx => ctx.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(1000, 1000)
+                }));
 
-            await using var outStream = new FileStream(finalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            await image.SaveAsync(outStream, encoder);
+                // Save to WebP (quality can be adjusted)
+                var encoder = new WebpEncoder
+                {
+                    Quality = 80 // tweak if desired
+                };
+
+                using (var outStream = new FileStream(finalPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await image.SaveAsync(outStream, encoder);
+                }
+            }
 
             return finalPath;
         }
