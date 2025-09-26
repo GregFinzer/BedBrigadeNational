@@ -28,6 +28,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         [Parameter] public int LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
+        private const string TrueConst = "true";
+        private const string FalseConst = "false";
         private SfRichTextEditor RteObj { get; set; }
         private string? WorkTitle { get; set; }
         private string? Body { get; set; }
@@ -114,9 +116,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 SuggestOnTriggerCharacters = true,   // e.g., after typing a space in a tag, etc.
                 QuickSuggestions = new()
                 {
-                    Other = "true",    // suggest in markup
-                    Comments = "false",
-                    Strings = "true"
+                    Other = TrueConst,    // suggest in markup
+                    Comments = FalseConst,
+                    Strings = TrueConst
                 },
                 SnippetSuggestions = "inline",       // show snippets with suggestions
                 TabCompletion = "on"                 // Tab to accept suggestion
@@ -224,13 +226,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route.TrimStart('/');
                 ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
             }
         }
 
         private void UpdateSaveUrl()
         {
-            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
         }
 
         private void OnImageUploadSuccess(ImageSuccessEventArgs args)
