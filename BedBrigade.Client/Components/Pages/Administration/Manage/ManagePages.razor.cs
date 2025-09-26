@@ -9,6 +9,7 @@ using Serilog;
 using Syncfusion.Blazor.Grids;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage

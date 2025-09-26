@@ -8,6 +8,7 @@ using System.Globalization;
 using BedBrigade.Common.Constants;
 using BedBrigade.Client.Services;
 using Serilog;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Components.Pages
 {

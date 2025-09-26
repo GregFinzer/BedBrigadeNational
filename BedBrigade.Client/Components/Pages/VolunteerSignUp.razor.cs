@@ -11,6 +11,7 @@ using Microsoft.JSInterop;
 using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
