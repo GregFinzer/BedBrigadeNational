@@ -1,4 +1,13 @@
-﻿<div class="container-fluid mt-4 media-manager">
+﻿@if (IsUploading)
+{
+    <div class="mm-overlay" role="status" aria-live="polite" aria-busy="true">
+        <div class="text-center">
+            <div class="spinner-border" role="status" aria-label="Uploading"></div>
+            <div class="mt-2 small fw-semibold">Uploading… Please wait</div>
+        </div>
+    </div>
+}
+<div class="container-fluid mt-4 media-manager">
     <div class="row">
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -220,5 +229,16 @@
         top: 5px;
         left: 5px;
         z-index: 10;
+    }
+
+    .mm-overlay {
+        position: fixed; /* or absolute if you only want to cover the component region inside a relatively positioned container */
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,.6);
+        z-index: 1080; /* above most content, below modals if you prefer */
+        backdrop-filter: blur(2px);
     }
 </style>

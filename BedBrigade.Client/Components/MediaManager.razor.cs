@@ -52,7 +52,7 @@ namespace BedBrigade.Client.Components
 
         [Parameter] public bool EnableFolderOperations { get; set; } = true;
         [Parameter] public string MediaFolderName { get; set; } = "Media";
-
+        private bool IsUploading { get; set; }
         private string SearchQuery
         {
             get => _searchQuery;
@@ -406,6 +406,7 @@ namespace BedBrigade.Client.Components
             {
                 if (e == null) return;
 
+                IsUploading = true;
                 IReadOnlyList<IBrowserFile> inputFiles = e.GetMultipleFiles();
 
                 foreach (var file in inputFiles)
@@ -455,6 +456,11 @@ namespace BedBrigade.Client.Components
                 Log.Error(ex, "Failed to upload files to {CurrentFolderPath}", CurrentFolderPath);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to upload: {ex.Message}");
+            }
+            finally
+            {
+                IsUploading = false;
+                StateHasChanged();
             }
         }
 
