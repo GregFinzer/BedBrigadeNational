@@ -52,7 +52,7 @@ namespace BedBrigade.Client.Components
 
         [Parameter] public bool EnableFolderOperations { get; set; } = true;
         [Parameter] public string MediaFolderName { get; set; } = "Media";
-
+        private bool IsUploading { get; set; }
         private string SearchQuery
         {
             get => _searchQuery;
@@ -199,9 +199,9 @@ namespace BedBrigade.Client.Components
             builder.OpenElement(seq++, "button");
             builder.AddAttribute(seq++, classAttribute, "btn btn-link p-0");
             builder.AddAttribute(seq++, "data-bs-toggle", "collapse");
-            builder.AddAttribute(seq++, "data-bs-target", $"#folder-{folder.Id}");
+            builder.AddAttribute(seq++, "data-bs-target", $"#mm-folder-{folder.Id}");
             builder.AddAttribute(seq++, "aria-expanded", "false");
-            builder.AddAttribute(seq++, "aria-controls", $"folder-{folder.Id}");
+            builder.AddAttribute(seq++, "aria-controls", $"mm-folder-{folder.Id}");
             builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => OnFolderClick(folder)));
             builder.OpenElement(seq++, "i");
             builder.AddAttribute(seq++, classAttribute, "fas fa-folder");
@@ -212,7 +212,7 @@ namespace BedBrigade.Client.Components
             // Subfolders
             builder.OpenElement(seq++, "div");
             builder.AddAttribute(seq++, classAttribute, "collapse ms-3");
-            builder.AddAttribute(seq++, "id", $"folder-{folder.Id}");
+            builder.AddAttribute(seq++, "id", $"mm-folder-{folder.Id}");
             builder.OpenElement(seq++, "ul");
             builder.AddAttribute(seq++, classAttribute, "list-group");
             foreach (var subFolder in folder.SubFolders)
@@ -406,6 +406,7 @@ namespace BedBrigade.Client.Components
             {
                 if (e == null) return;
 
+                IsUploading = true;
                 IReadOnlyList<IBrowserFile> inputFiles = e.GetMultipleFiles();
 
                 foreach (var file in inputFiles)
@@ -455,6 +456,11 @@ namespace BedBrigade.Client.Components
                 Log.Error(ex, "Failed to upload files to {CurrentFolderPath}", CurrentFolderPath);
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Error, ErrorTitle,
                     $"Failed to upload: {ex.Message}");
+            }
+            finally
+            {
+                IsUploading = false;
+                StateHasChanged();
             }
         }
 

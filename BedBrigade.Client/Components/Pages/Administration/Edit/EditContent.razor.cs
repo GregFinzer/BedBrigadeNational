@@ -1,14 +1,15 @@
 ﻿using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.RichTextEditor;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using BedBrigade.Data.Services;
-using Syncfusion.Blazor.Popups;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using BlazorMonaco.Editor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using BedBrigade.Common.Constants;
 using Serilog;
+using Syncfusion.Blazor.Popups;
+using Syncfusion.Blazor.RichTextEditor;
 using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
@@ -28,6 +29,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         [Parameter] public int LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
+        private const string TrueConst = "true";
+        private const string FalseConst = "false";
         private SfRichTextEditor RteObj { get; set; }
         private string? WorkTitle { get; set; }
         private string? Body { get; set; }
@@ -62,30 +65,28 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
              new ToolbarItemModel() {Command = ToolbarCommand.Italic},
              new ToolbarItemModel() {Command = ToolbarCommand.Underline },
              new ToolbarItemModel() {Command = ToolbarCommand.Alignments },
-             new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Command = ToolbarCommand.Image },
              new ToolbarItemModel() {Command = ToolbarCommand.OrderedList },
              new ToolbarItemModel() {Command = ToolbarCommand.UnorderedList },
+             new ToolbarItemModel() {Command = ToolbarCommand.Separator },
+             new ToolbarItemModel() { Name = "bbSource", TooltipText = "Source" },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Indent },
              new ToolbarItemModel() {Command = ToolbarCommand.Outdent },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
-             new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
-             new ToolbarItemModel() {Command = ToolbarCommand.RemoveLink },
+             new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.FontName },
              new ToolbarItemModel() {Command = ToolbarCommand.FontColor },
              new ToolbarItemModel() {Command = ToolbarCommand.FontSize },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
-             new ToolbarItemModel() { Name = "bbSource", TooltipText = "Source" },
              new ToolbarItemModel() {Command = ToolbarCommand.BackgroundColor },
-             new ToolbarItemModel() {Command = ToolbarCommand.Formats },
              new ToolbarItemModel() {Command = ToolbarCommand.ClearFormat },
-             new ToolbarItemModel() { Command = ToolbarCommand.Separator },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateLink },
-             new ToolbarItemModel() { Command = ToolbarCommand.Image },
+             new ToolbarItemModel() {Command = ToolbarCommand.RemoveLink },
              new ToolbarItemModel() { Command = ToolbarCommand.CreateTable },
              new ToolbarItemModel() {Command = ToolbarCommand.Separator },
              new ToolbarItemModel() {Command = ToolbarCommand.Redo },
-             new ToolbarItemModel() {Command = ToolbarCommand.Undo }
+             new ToolbarItemModel() {Command = ToolbarCommand.Undo },
 
         };
 
@@ -98,6 +99,51 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
         private bool ConvertImages { get; set; } = true;
         private bool ShowSourceBox { get; set; } = false;
+        private StandaloneCodeEditor? _monaco;
+        private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor _)
+            => new()
+            {
+                Theme = "vs-dark",
+                AutomaticLayout = true,
+                Language = "html",
+                Value = Body ?? string.Empty,
+                WordWrap = "on",
+                TabSize = 2,
+                Minimap = new() { Enabled = false },
+
+                // Make completion feel like VS Code
+                SuggestOnTriggerCharacters = true,   // e.g., after typing a space in a tag, etc.
+                QuickSuggestions = new()
+                {
+                    Other = TrueConst,    // suggest in markup
+                    Comments = FalseConst,
+                    Strings = TrueConst
+                },
+                SnippetSuggestions = "inline",       // show snippets with suggestions
+                TabCompletion = "on"                 // Tab to accept suggestion
+            };
+
+        private bool _isDarkMode = true;
+        public bool IsDarkMode
+        {
+            get => _isDarkMode;
+            set
+            {
+                if (_isDarkMode == value) return;
+                _isDarkMode = value;
+                _ = UpdateEditorTheme();
+            }
+        }
+
+        private async Task UpdateEditorTheme()
+        {
+            if (_monaco is null) return;
+            var theme = IsDarkMode ? "vs-dark" : "vs-light"; // vs = light theme
+            await _monaco.UpdateOptions(new EditorUpdateOptions
+            {
+                Theme = theme
+            });
+        }
         protected override async Task OnInitializedAsync()
         {
             try
@@ -157,17 +203,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 return new Dictionary<string, string>();
 
             Dictionary<string, string> imageButtonList = new Dictionary<string, string>();
-            var rotatorImages=  _loadImagesService.GetImgIdsWithRotator(html);
+            var rotatorImages = _loadImagesService.GetImgIdsWithRotator(html);
 
             foreach (var rotatorImage in rotatorImages)
             {
                 string firstLetterCapitalized = rotatorImage.First().ToString().ToUpper() + rotatorImage.Substring(1);
                 string imagePath = StringUtil.InsertSpaces(firstLetterCapitalized);
-                
-                imageButtonList.Add($"Manage images for {imagePath}", rotatorImage);
+
+                imageButtonList.Add($"{imagePath}", rotatorImage);
             }
 
-            imageButtonList.Add("Manage all images", string.Empty);
+            imageButtonList.Add("All images", string.Empty);
             return imageButtonList;
         }
 
@@ -179,13 +225,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route.TrimStart('/');
                 ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
             }
         }
 
         private void UpdateSaveUrl()
         {
-            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? "true" : "false")}";
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
         }
 
         private void OnImageUploadSuccess(ImageSuccessEventArgs args)
@@ -347,7 +393,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     await file.OpenReadStream().CopyToAsync(fs);
 
                 // Create a thumbnail
-                string thumbnailPath = Path.Combine(FileUtil.ExtractPath(path),  ImageUtil.GetThumbnailFileName(path));
+                string thumbnailPath = Path.Combine(FileUtil.ExtractPath(path), ImageUtil.GetThumbnailFileName(path));
                 ImageUtil.CreateThumbnail(path, thumbnailPath, 600, 75);
 
                 Content.MainImageFileName = fileName;
@@ -376,18 +422,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         }
 
 
-
+        private async Task OnMonacoChanged(ModelContentChangedEvent _)
+        {
+            if (_monaco is null) return;
+            Body = await _monaco.GetValue(); // supported pattern in BlazorMonaco wrappers. :contentReference[oaicite:3]{index=3}
+        }
 
         private async Task PreviewFromSource()
         {
-            // If you want to pretty-print before previewing, uncomment:
-            // Body = WebHelper.FormatHtml(Body ?? string.Empty);
+            // if you want to force-sync one more time:
+            if (_monaco is not null) Body = await _monaco.GetValue();
 
-            // Switch UI: show RTE in preview
             ShowSourceBox = false;
-
-            //// Refresh the editor so it renders the just-updated Body
-            //await RteObj.RefreshUIAsync();
             StateHasChanged();
         }
 
@@ -401,6 +447,20 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         {
             await RteObj.RefreshUIAsync();
             StateHasChanged();
+        }
+
+        private async Task OpenFind()
+        {
+            if (_monaco is null) return;
+            // Open Monaco's find widget (same as Ctrl+F)
+            await _monaco.Trigger("bb", "actions.find", null);
+        }
+
+        private async Task OpenFindReplace()
+        {
+            if (_monaco is null) return;
+            // Open Monaco's find+replace widget (same as Ctrl+H)
+            await _monaco.Trigger("bb", "editor.action.startFindReplaceAction", null);
         }
     }
 }
