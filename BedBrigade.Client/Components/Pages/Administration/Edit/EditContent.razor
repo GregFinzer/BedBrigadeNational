@@ -18,7 +18,7 @@ else
 {
 
     <div class="container my-3 ">
-        <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center justify-content-between mb-1">
             <h4 class="mb-0">@WorkTitle</h4>
 
             <div class="form-check d-flex align-items-center ms-3">
@@ -30,7 +30,7 @@ else
         <div class="row">
             @foreach (var item in ImageButtonList)
             {
-                <div class="col-12 col-md-4 d-flex align-items-center mb-1">
+                <div class="col-12 col-md-3 d-flex align-items-center mb-1">
                     <div class="me-2">
                         @item.Key
                     </div>
@@ -104,7 +104,7 @@ else
                 {
                     <SfRichTextEditor @ref="RteObj"
                                       EditorMode="EditorMode.HTML"
-                                      Height="500"
+                                      Height="560"
                                       @bind-Value="Body"
                                       EnableHtmlSanitizer="true">
 
@@ -165,7 +165,7 @@ else
 
 <style>
     .bb-source-editor {
-        height: 450px;
+        height: 545px;
     }
 
     .editor-btn {
