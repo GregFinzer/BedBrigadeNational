@@ -102,14 +102,47 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor _)
             => new()
             {
+                Theme = "vs-dark",
                 AutomaticLayout = true,
                 Language = "html",
                 Value = Body ?? string.Empty,
                 WordWrap = "on",
                 TabSize = 2,
-                Minimap = new() { Enabled = false } // note: property is "Minimap" in some versions
+                Minimap = new() { Enabled = false },
+
+                // Make completion feel like VS Code
+                SuggestOnTriggerCharacters = true,   // e.g., after typing a space in a tag, etc.
+                QuickSuggestions = new()
+                {
+                    Other = "true",    // suggest in markup
+                    Comments = "false",
+                    Strings = "true"
+                },
+                SnippetSuggestions = "inline",       // show snippets with suggestions
+                TabCompletion = "on"                 // Tab to accept suggestion
             };
 
+        private bool _isDarkMode = true;
+        public bool IsDarkMode
+        {
+            get => _isDarkMode;
+            set
+            {
+                if (_isDarkMode == value) return;
+                _isDarkMode = value;
+                _ = UpdateEditorTheme();
+            }
+        }
+
+        private async Task UpdateEditorTheme()
+        {
+            if (_monaco is null) return;
+            var theme = IsDarkMode ? "vs-dark" : "vs-light"; // vs = light theme
+            await _monaco.UpdateOptions(new EditorUpdateOptions
+            {
+                Theme = theme
+            });
+        }
         protected override async Task OnInitializedAsync()
         {
             try

@@ -78,6 +78,13 @@ else
                         <button class="btn editor-btn" @onclick="OpenFindReplace">
                             <i class="fas fa-search-plus"></i> Find &amp; Replace
                         </button>
+                        <div class="form-check form-switch text-dark ms-3">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="darkModeSwitch"
+                                   @bind="IsDarkMode" />
+                            <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
+                        </div>
                     </div>
                 </div>
 
