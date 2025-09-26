@@ -65,11 +65,32 @@ else
                     </label>
                 </div>
             }
+            @if (ShowSourceBox)
+            {
+                <div class="container">
+                    <div class="btn-group" role="group">
+                        <button class="btn editor-btn" @onclick="PreviewFromSource">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button class="btn editor-btn" @onclick="OpenFind">
+                            <i class="fas fa-search"></i> Find
+                        </button>
+                        <button class="btn editor-btn" @onclick="OpenFindReplace">
+                            <i class="fas fa-search-plus"></i> Find &amp; Replace
+                        </button>
+                    </div>
+                </div>
+
+            }
             <div class="rte-container">
                 @* Show our own Source view *@
                 @if (ShowSourceBox)
                 {
-                    <textarea class="form-control source-textarea" @bind="Body"></textarea>
+                    <StandaloneCodeEditor @ref="_monaco"
+                                          Id="bb-source-editor"
+                                          CssClass="bb-source-editor"
+                                          ConstructionOptions="EditorConstructionOptions"
+                                          OnDidChangeModelContent="OnMonacoChanged" />
                 }
                 else
                 {
@@ -107,10 +128,6 @@ else
 
             </div>
             <div>
-                @if (ShowSourceBox)
-                {
-                    <button class="btn btn-success" @onclick="PreviewFromSource">Preview</button>
-                }
                 <button id="save" type="button" class="btn btn-primary" @onclick="(() => HandleSaveOnlyClick())">Save Only</button>
                 <button id="saveAndClose" type="button" class="btn btn-primary" @onclick="(() => HandleSaveAndCloseClick())">Save and Close</button>
                 <button id="cancel" type="button" class="btn btn-secondary" @onclick="(() => HandleCancelClick())">Cancel</button>
@@ -139,7 +156,15 @@ else
 }
 
 <style>
-    .source-textarea {
-        height:500px;
+    .bb-source-editor {
+        height: 450px;
+    }
+
+    .editor-btn {
+        font-size: 0.8rem; /* smaller text */
+        padding: 0.25rem 0.5rem; /* smaller height */
+        border: 1px solid #dee2e6; /* lighter gray (Bootstrap gray-200) */
+        box-shadow: 1px 1px 2px rgba(0,0,0,0.15); /* subtle shadow */
+        line-height: 1.2; /* tighter vertical alignment */
     }
 </style>

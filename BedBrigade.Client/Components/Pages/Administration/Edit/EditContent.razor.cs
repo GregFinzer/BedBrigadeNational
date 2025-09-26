@@ -1,14 +1,15 @@
 ﻿using BedBrigade.Client.Services;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.RichTextEditor;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
-using BedBrigade.Data.Services;
-using Syncfusion.Blazor.Popups;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using BlazorMonaco.Editor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using BedBrigade.Common.Constants;
 using Serilog;
+using Syncfusion.Blazor.Popups;
+using Syncfusion.Blazor.RichTextEditor;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Edit
 {
@@ -97,6 +98,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private readonly string _fileInputId = $"fileInput_{Guid.NewGuid():N}";
         private bool ConvertImages { get; set; } = true;
         private bool ShowSourceBox { get; set; } = false;
+        private StandaloneCodeEditor? _monaco;
+        private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor _)
+            => new()
+            {
+                AutomaticLayout = true,
+                Language = "html",
+                Value = Body ?? string.Empty,
+                WordWrap = "on",
+                TabSize = 2,
+                Minimap = new() { Enabled = false } // note: property is "Minimap" in some versions
+            };
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -375,18 +388,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         }
 
 
-
+        private async Task OnMonacoChanged(ModelContentChangedEvent _)
+        {
+            if (_monaco is null) return;
+            Body = await _monaco.GetValue(); // supported pattern in BlazorMonaco wrappers. :contentReference[oaicite:3]{index=3}
+        }
 
         private async Task PreviewFromSource()
         {
-            // If you want to pretty-print before previewing, uncomment:
-            // Body = WebHelper.FormatHtml(Body ?? string.Empty);
+            // if you want to force-sync one more time:
+            if (_monaco is not null) Body = await _monaco.GetValue();
 
-            // Switch UI: show RTE in preview
             ShowSourceBox = false;
-
-            //// Refresh the editor so it renders the just-updated Body
-            //await RteObj.RefreshUIAsync();
             StateHasChanged();
         }
 
@@ -400,6 +413,20 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         {
             await RteObj.RefreshUIAsync();
             StateHasChanged();
+        }
+
+        private async Task OpenFind()
+        {
+            if (_monaco is null) return;
+            // Open Monaco's find widget (same as Ctrl+F)
+            await _monaco.Trigger("bb", "actions.find", null);
+        }
+
+        private async Task OpenFindReplace()
+        {
+            if (_monaco is null) return;
+            // Open Monaco's find+replace widget (same as Ctrl+H)
+            await _monaco.Trigger("bb", "editor.action.startFindReplaceAction", null);
         }
     }
 }
