@@ -411,32 +411,7 @@ namespace BedBrigade.Client.Components
 
                 foreach (var file in inputFiles)
                 {
-                    var targetPath = Path.Combine(CurrentFolderPath, file.Name);
-
-                    if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
-                    {
-                        IsUploading = false;
-                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                            $"File type not allowed for {file.Name}. Valid File Types are:<br />" +
-                            String.Join("<br />", AllowedExtensions));
-                        return;
-                    }
-
-                    if (file.Size > MaxFileSize)
-                    {
-                        IsUploading = false;
-                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                            $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
-                        return;
-                    }
-
-                    using (var targetStream = new FileStream(targetPath, FileMode.Create))
-                    {
-                        using (var fileStream = file.OpenReadStream(MaxFileSize))
-                        {
-                            await fileStream.CopyToAsync(targetStream);
-                        }
-                    }
+                    if (!await HandleSingleFile(file)) return;
                 }
 
                 foreach (var file in inputFiles)
@@ -462,8 +437,37 @@ namespace BedBrigade.Client.Components
             }
         }
 
+        private async Task<bool> HandleSingleFile(IBrowserFile file)
+        {
+            var targetPath = Path.Combine(CurrentFolderPath, file.Name);
 
+            if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
+            {
+                IsUploading = false;
+                await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                    $"File type not allowed for {file.Name}. Valid File Types are:<br />" +
+                    String.Join("<br />", AllowedExtensions));
+                return false;
+            }
 
+            if (file.Size > MaxFileSize)
+            {
+                IsUploading = false;
+                await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                    $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
+                return false;
+            }
+
+            using (var targetStream = new FileStream(targetPath, FileMode.Create))
+            {
+                using (var fileStream = file.OpenReadStream(MaxFileSize))
+                {
+                    await fileStream.CopyToAsync(targetStream);
+                }
+            }
+
+            return true;
+        }
 
 
         private async Task ShowRenameFileModal()
