@@ -18,46 +18,49 @@ else
 {
 
     <div class="container my-3 ">
-        <div class="d-flex align-items-center justify-content-between mb-1">
-            <h4 class="mb-0">@WorkTitle</h4>
+        @if (!ShowSourceBox)
+        {
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <h4 class="mb-0">@WorkTitle</h4>
 
-            <div class="form-check d-flex align-items-center ms-3">
-                <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
-                       @bind="ConvertImages" @bind:after="UpdateSaveUrl"  />
-                <label class="form-check-label" for="chkConvertImages">Convert Images</label>
-            </div>
-        </div>
-        <div class="row">
-            @foreach (var item in ImageButtonList)
-            {
-                <div class="col-12 col-md-3 d-flex align-items-center mb-1">
-                    <div class="me-2">
-                        @item.Key
-                    </div>
-                    <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))">
-                        <img src="Media/national/photosIcon16x16.png" />
-                    </button>
+                <div class="form-check d-flex align-items-center ms-3">
+                    <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
+                           @bind="ConvertImages" @bind:after="UpdateSaveUrl"/>
+                    <label class="form-check-label" for="chkConvertImages">Convert Images</label>
                 </div>
-            }
-        </div>
+            </div>
+            <div class="row">
+                @foreach (var item in ImageButtonList)
+                {
+                    <div class="col-12 col-md-3 d-flex align-items-center mb-1">
+                        <div class="me-2">
+                            @item.Key
+                        </div>
+                        <button type="button" class="btn" @onclick="(() => HandleImageButtonClick(item.Value))">
+                            <img src="Media/national/photosIcon16x16.png"/>
+                        </button>
+                    </div>
+                }
+            </div>
+        }
         <EditForm Model="Content">
-            <DataAnnotationsValidator />
+            <DataAnnotationsValidator/>
             @* only show when editing Stories or News *@
-            @if (Content?.ContentType == ContentType.Stories
-                 || Content?.ContentType == ContentType.News)
+            @if (!ShowSourceBox 
+                 && (Content?.ContentType == ContentType.Stories || Content?.ContentType == ContentType.News))
             {
                 <div class="mb-3">
                     @if (!string.IsNullOrEmpty(Content.MainImageFileName))
                     {
                         <img src="@($"{ImagePath}/{Content.MainImageFileName}")"
                              class="img-thumbnail"
-                             style="max-height:200px;" />
+                             style="max-height:200px;"/>
                     }
                     <!-- Hidden native file input -->
                     <InputFile id="@_fileInputId"
                                @ref="_fileInput"
                                OnChange="OnInputFileChange"
-                               accept=".gif,.jpg,.jpeg,.png,.webp"
+                               accept="@String.Join(',', _allowedImageExtensions)"
                                style="display:none"/>
 
                     <!-- Label that looks like a button -->
@@ -83,7 +86,7 @@ else
                             <input class="form-check-input"
                                    type="checkbox"
                                    id="darkModeSwitch"
-                                   @bind="IsDarkMode" />
+                                   @bind="IsDarkMode"/>
                             <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
                         </div>
                     </div>
@@ -98,7 +101,7 @@ else
                                           Id="bb-source-editor"
                                           CssClass="bb-source-editor"
                                           ConstructionOptions="EditorConstructionOptions"
-                                          OnDidChangeModelContent="OnMonacoChanged" />
+                                          OnDidChangeModelContent="OnMonacoChanged"/>
                 }
                 else
                 {
@@ -108,11 +111,11 @@ else
                                       @bind-Value="Body"
                                       EnableHtmlSanitizer="true">
 
-                        <RichTextEditorPasteCleanupSettings KeepFormat="true" PlainText="false" />
+                        <RichTextEditorPasteCleanupSettings KeepFormat="true" PlainText="false"/>
 
                         <RichTextEditorImageSettings SaveUrl="@SaveUrl"
                                                      Path="@ImagePath"
-                                                     AllowedTypes="@AllowedTypes" />
+                                                     AllowedTypes="@_allowedImageExtensions"/>
 
                         <RichTextEditorToolbarSettings Items="@Tools">
                             <RichTextEditorCustomToolbarItems>
@@ -130,7 +133,7 @@ else
                             </RichTextEditorCustomToolbarItems>
                         </RichTextEditorToolbarSettings>
 
-                        <RichTextEditorEvents OnImageUploadSuccess="OnImageUploadSuccess" />
+                        <RichTextEditorEvents OnImageUploadSuccess="OnImageUploadSuccess"/>
                     </SfRichTextEditor>
                 }
 
@@ -149,7 +152,7 @@ else
             <Header>Upload Files</Header>
             <Content>
 
-                <MediaManager AllowedExtensions="@_allowedExtensions" 
+                <MediaManager AllowedExtensions="@_allowedImageExtensions" 
                               EnableFolderOperations="@_enableFolderOperations" 
                               MaxFileSize="@_maxFileSize" 
                               RootFolder="@FolderPath"

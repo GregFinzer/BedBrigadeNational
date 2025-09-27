@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp.Formats.Webp;
 using System.Net.Http.Headers;
+using BedBrigade.Client.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -15,17 +16,21 @@ namespace ImageUpload.Controllers
     {
         private readonly IWebHostEnvironment hostingEnv;
         private readonly IAuthService _authService;
+        private readonly ILoadImagesService _loadImageService;
         private readonly ILocationDataService _svcLocation;
         private readonly ICachingService _cachingService;
 
         public ImageController(IWebHostEnvironment env, 
             ILocationDataService location, 
-            ICachingService cachingService, IAuthService authService)
+            ICachingService cachingService, 
+            IAuthService authService,
+            ILoadImagesService loadImageService)
         {
             hostingEnv = env;
             _svcLocation = location;
             _cachingService = cachingService;
             _authService = authService;
+            _loadImageService = loadImageService;
         }
 
         [Route("Save/{id:int}/{contentType}/{contentName}")]
@@ -51,33 +56,19 @@ namespace ImageUpload.Controllers
             if (file is null) return BadRequest(new { message = "No file." });
 
             var rawFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-            var ext = Path.GetExtension(rawFileName)?.ToLowerInvariant();
-            var isConvertible = ext is ".jpg" or ".jpeg" or ".png" or ".gif" or ".webp";
 
-            string finalFileName;
-            string webRelativeUrl;
+            var targetPath = Path.Combine(targetDir, rawFileName);
 
-            await using (var ms = new MemoryStream())
+            using (var targetStream = new FileStream(targetPath, FileMode.Create))
             {
-                await file.CopyToAsync(ms);
-                var bytes = ms.ToArray();
-
-                if (convertImages && isConvertible)
-                {
-                    // your existing helper that strips EXIF, resizes, saves as .webp
-                    var finalPath = await ProcessAndSaveImageAsync(bytes, rawFileName, targetDir);
-                    finalFileName = Path.GetFileName(finalPath);
-                }
-                else
-                {
-                    // save as-is, but still produce the final name we actually wrote
-                    CreateFile(file, targetDir, rawFileName);
-                    finalFileName = Path.GetFileName(rawFileName);
-                }
+                await file.CopyToAsync(targetStream);
             }
 
+            targetPath = await _loadImageService.ConvertToWebp(targetPath);
+            var finalFileName = Path.GetFileName(targetPath);
+
             // Build a URL the browser can use
-            webRelativeUrl = $"/media/{locationRoute}/{contentType}/{contentName}/{finalFileName}";
+            var webRelativeUrl = $"/media/{locationRoute}/{contentType}/{contentName}/{finalFileName}";
 
             // After you computed the final file name you actually wrote, e.g. "foo.webp"
             Response.Headers["name"] = finalFileName;

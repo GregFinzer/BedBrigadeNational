@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Client.Services;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -15,6 +16,8 @@ namespace BedBrigade.Client.Components
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILocationDataService LocationDataService { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private IConfigurationDataService ConfigurationDataService { get; set; }
+        [Inject] private ILoadImagesService LoadImagesService { get; set; }
         private int _currentId = 1;
         
         private List<FolderItem> Folders = new List<FolderItem>();
@@ -36,13 +39,10 @@ namespace BedBrigade.Client.Components
         [Parameter]
         public string RootFolder { get; set; } = string.Empty;
 
-        private static readonly HashSet<string> _imageConvertibleExts = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ".jpg", ".jpeg", ".png", ".gif", ".webp"
-        };
 
-        //Default to 250MB
-        [Parameter] public int MaxFileSize { get; set; } = 262144000;
+
+        //Default to 300MB
+        [Parameter] public int MaxFileSize { get; set; } = 314572800;
 
         [Parameter]
         public List<string> AllowedExtensions { get; set; } = new List<string>()
@@ -411,40 +411,13 @@ namespace BedBrigade.Client.Components
 
                 foreach (var file in inputFiles)
                 {
+                    if (!await HandleSingleFile(file)) return;
+                }
+
+                foreach (var file in inputFiles)
+                {
                     var targetPath = Path.Combine(CurrentFolderPath, file.Name);
-
-                    if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
-                    {
-                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                            $"File type not allowed for {file.Name}. Valid File Types are:<br />" +
-                            String.Join("<br />", AllowedExtensions));
-                        return;
-                    }
-
-                    if (file.Size > MaxFileSize)
-                    {
-                        await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
-                            $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
-                        return;
-                    }
-
-                    using (var targetStream = new FileStream(targetPath, FileMode.Create))
-                    {
-                        using (var fileStream = file.OpenReadStream(MaxFileSize))
-                        {
-                            await fileStream.CopyToAsync(targetStream);
-                        }
-                    }
-
-                    var ext = Path.GetExtension(file.Name) ?? string.Empty;
-
-                    // Is this an image we should process?
-                    if (ConvertImages && _imageConvertibleExts.Contains(ext))
-                    {
-                        // Process -> strip EXIF, resize, save as .webp (if not already).
-                        await ProcessAndSaveImageAsync(targetPath);
-                        File.Delete(targetPath);
-                    }
+                    await LoadImagesService.ConvertToWebp(targetPath);
                 }
 
                 // Refresh files after upload
@@ -464,43 +437,36 @@ namespace BedBrigade.Client.Components
             }
         }
 
-
-        private async Task<string> ProcessAndSaveImageAsync(string targetPath)
+        private async Task<bool> HandleSingleFile(IBrowserFile file)
         {
-            // Determine source extension and target path
-            var srcExt = Path.GetExtension(targetPath) ?? string.Empty;
-            var baseName = Path.GetFileNameWithoutExtension(targetPath);
-            var folderPath = Path.GetDirectoryName(targetPath) ?? string.Empty;
+            var targetPath = Path.Combine(CurrentFolderPath, file.Name);
 
-            // We will save as .webp
-            var finalFileName = $"{baseName}.webp";
-            var finalPath = Path.Combine(folderPath, finalFileName);
-
-            using (var image = await Image.LoadAsync(targetPath))
+            if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
             {
-                // Strip all EXIF (removes geolocation)
-                image.Metadata.ExifProfile = null;
+                IsUploading = false;
+                await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                    $"File type not allowed for {file.Name}. Valid File Types are:<br />" +
+                    String.Join("<br />", AllowedExtensions));
+                return false;
+            }
 
-                // Resize to max 1000 on the longer edge (maintain aspect)
-                image.Mutate(ctx => ctx.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Max,
-                    Size = new Size(1000, 1000)
-                }));
+            if (file.Size > MaxFileSize)
+            {
+                IsUploading = false;
+                await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
+                    $"File size exceeds the maximum limit of {MaxFileSize / 1024.0 / 1024.0:F2} MB for for {file.Name}.");
+                return false;
+            }
 
-                // Save to WebP (quality can be adjusted)
-                var encoder = new WebpEncoder
+            using (var targetStream = new FileStream(targetPath, FileMode.Create))
+            {
+                using (var fileStream = file.OpenReadStream(MaxFileSize))
                 {
-                    Quality = 80 // tweak if desired
-                };
-
-                using (var outStream = new FileStream(finalPath, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    await image.SaveAsync(outStream, encoder);
+                    await fileStream.CopyToAsync(targetStream);
                 }
             }
 
-            return finalPath;
+            return true;
         }
 
 

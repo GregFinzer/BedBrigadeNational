@@ -55,7 +55,7 @@ namespace BedBrigade.Client.Services
                 $"  <a class=\"nav-link dropdown-toggle {navLinkStyle}\" data-bs-toggle=\"dropdown\" href=\"administration/dashboard\">");
             sb.AppendLine("    <i class=\"fas fa-tools me-1\" aria-hidden=\"true\"></i>Administration");
             sb.AppendLine("  </a>");
-            sb.AppendLine("  <ul class=\"dropdown-menu admin-dropdown\">");
+            sb.AppendLine("  <ul class=\"dropdown-menu scroll-dropdown\">");
 
             foreach (var (text, href, icon, show) in items)
             {

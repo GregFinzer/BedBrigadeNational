@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
@@ -26,14 +27,13 @@ public partial class FileManagerUse : ComponentBase
         try
         {
             Log.Information($"{_svcAuth.UserName} went to the Manage Media Page");
-            _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
-            _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
+            _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, ConfigNames.MaxFileSize);
+            _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, ConfigNames.MediaFolder);
 
-            string allowedFileExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedFileExtensions");
-            string allowedVideoExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedVideoExtensions");
-            _allowedExtensions.AddRange(allowedFileExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
+            _allowedExtensions =
+                (await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, ConfigNames.AllowedFileExtensions))
+                .Split(',').ToList();
+            _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, ConfigNames.EnableFolderOperations);
             userRoute = (_svcAuth.UserRoute ?? string.Empty).Replace(PathDivider, string.Empty);
 
             if (_svcAuth.IsNationalAdmin)
