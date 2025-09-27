@@ -1,15 +1,89 @@
 ﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using HtmlAgilityPack;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Services
 {
     public class LoadImagesService : ILoadImagesService
     {
+        private readonly IConfigurationDataService _configurationDataService;
+        private readonly ICachingService _cachingService;
         private const string imageRotatorTag = "ImageRotator";
         private const string mediaDirectory = "wwwroot/media";
-        private readonly ICachingService _cachingService;
+
+        public LoadImagesService(IConfigurationDataService configurationDataService, 
+            ICachingService cachingService)
+        {
+            _configurationDataService = configurationDataService;
+            _cachingService = cachingService;
+        }
+
+        public async Task<string> ConvertToWebp(string targetPath)
+        {
+            string[] convertableImageExtensions =
+                (await _configurationDataService.GetConfigValueAsync(ConfigSection.Media,
+                    ConfigNames.ConvertableImageExtensions))
+                .Split(',');
+
+            int maxWidth =
+                await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Media,
+                    ConfigNames.ConvertableMaxWidth);
+
+            if (!convertableImageExtensions.Contains(Path.GetExtension(targetPath)))
+                return targetPath;
+
+            // Determine source info
+            var folderPath = Path.GetDirectoryName(targetPath) ?? string.Empty;
+            var finalFileName = $"{Path.GetFileNameWithoutExtension(targetPath)}.webp";
+            var finalPath = Path.Combine(folderPath, finalFileName);
+
+            // Temporary GUID-based file path
+            var tempFileName = $"{Guid.NewGuid()}.tmp";
+            var tempPath = Path.Combine(folderPath, tempFileName);
+
+            using (var image = await Image.LoadAsync(targetPath))
+            {
+                // Strip EXIF metadata
+                image.Metadata.ExifProfile = null;
+
+                // Resize to maxWidth on the longer edge
+                image.Mutate(ctx => ctx.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(maxWidth, maxWidth)
+                }));
+
+                // Encode as WebP
+                var encoder = new WebpEncoder
+                {
+                    Quality = 80
+                };
+
+                // Save into temporary file
+                using (var outStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await image.SaveAsync(outStream, encoder);
+                }
+            }
+
+            // Delete the original file
+            if (File.Exists(targetPath))
+            {
+                File.Delete(targetPath);
+            }
+
+            // Move temp file to final .webp path
+            File.Move(tempPath, finalPath);
+
+            return finalPath;
+        }
+
 
         public string SetImgSourceForImageRotators(string path, string html)
         {
@@ -91,10 +165,6 @@ namespace BedBrigade.Client.Services
             return imgIds;
         }
 
-        public LoadImagesService(ICachingService cachingService)
-        {
-            _cachingService = cachingService;
-        }
 
         /// <summary>
         /// Get a rotated image for the path and area

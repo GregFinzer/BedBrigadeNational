@@ -44,19 +44,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private string LocationRoute { get; set; } = "";
         private string SaveUrl { get; set; }
         private string ImagePath { get; set; }
-        private List<string> AllowedTypes = new()
-        {
-            ".jpg",
-            ".png",
-            ".gif",
-            ".jpeg",
-            ".webp"
-        };
         private string _contentRootPath = string.Empty;
         private int _maxFileSize;
 
         private string _mediaFolder;
-        private List<string> _allowedExtensions = new List<string>();
+        private List<string> _allowedImageExtensions = new List<string>();
         private bool _enableFolderOperations = false;
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
@@ -151,14 +143,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 Log.Information($"{_svcAuth.UserName} went to the EditContent Page for location id {LocationId} for content name {ContentName}");
                 Refreshed = false;
 
-                _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, "MaxVideoSize");
-                _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "MediaFolder");
+                _maxFileSize = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Media, ConfigNames.MaxFileSize);
+                _mediaFolder = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, ConfigNames.MediaFolder);
 
-                string allowedFileExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedFileExtensions");
-                string allowedVideoExtensions = await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, "AllowedVideoExtensions");
-                _allowedExtensions.AddRange(allowedFileExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-                _allowedExtensions.AddRange(allowedVideoExtensions.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-                _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, "EnableFolderOperations");
+                _allowedImageExtensions = (await _svcConfiguration.GetConfigValueAsync(ConfigSection.Media, ConfigNames.AllowedImageExtensions))
+                    .Split(',').ToList();
+                _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, ConfigNames.EnableFolderOperations);
 
                 ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, LocationId);
 
@@ -373,10 +363,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 var file = e.File;
                 var ext = Path.GetExtension(file.Name).ToLowerInvariant();
 
-                if (!AllowedTypes.Contains(ext))
+                if (!_allowedImageExtensions.Contains(ext))
                 {
                     _toastService.Error("Invalid file type",
-                        $"Only: {string.Join(", ", AllowedTypes)}");
+                        $"Only: {string.Join(", ", _allowedImageExtensions)}");
                     return;
                 }
 
@@ -390,13 +380,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 string fileName = file.Name;
                 string path = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName, fileName);
                 using (FileStream fs = System.IO.File.Create(path))
-                    await file.OpenReadStream().CopyToAsync(fs);
+                    await file.OpenReadStream(_maxFileSize).CopyToAsync(fs);
+
+                path = await _loadImagesService.ConvertToWebp(path);
 
                 // Create a thumbnail
                 string thumbnailPath = Path.Combine(FileUtil.ExtractPath(path), ImageUtil.GetThumbnailFileName(path));
                 ImageUtil.CreateThumbnail(path, thumbnailPath, 600, 75);
 
-                Content.MainImageFileName = fileName;
+                Content.MainImageFileName = Path.GetFileName(path);
                 _toastService.Success("Upload succeeded", fileName);
                 StateHasChanged();
             }

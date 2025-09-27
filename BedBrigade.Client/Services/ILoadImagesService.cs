@@ -47,4 +47,6 @@ public interface ILoadImagesService
 
     string GetRotatedImage(List<string> images);
     string GetDirectoryForPathAndArea(string path, string area);
+
+    Task<string> ConvertToWebp(string targetPath);
 }

@@ -19,13 +19,14 @@
 
         //Media
         public const string AllowedFileExtensions = "AllowedFileExtensions";
-        public const string AllowedVideoExtensions = "AllowedVideoExtensions";
+        public const string AllowedImageExtensions = "AllowedImageExtensions";
         public const string MediaFolder = "MediaFolder";
         public const string MainMediaSubFolder = "MainMediaSubFolder";
         public const string MaxFileSize = "MaxFileSize";
-        public const string MaxVideoSize = "MaxVideoSize";
         public const string EnableFolderOperations = "EnableFolderOperations";
-       
+        public const string ConvertableImageExtensions = "ConvertableImageExtensions";
+        public const string ConvertableMaxWidth = "ConvertableMaxWidth";
+
         //Email Section
         public const string FromEmailAddress = "FromEmailAddress";
         public const string FromEmailDisplayName = "FromEmailDisplayName";
