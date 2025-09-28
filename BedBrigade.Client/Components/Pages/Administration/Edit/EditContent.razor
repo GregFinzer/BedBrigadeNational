@@ -1,4 +1,4 @@
-﻿@layout Layout.AdminLayout
+﻿@layout Layout.NoHeaderFooterLayout
 @page "/administration/edit/editcontent/{LocationId:int}/{ContentName}"
 @using BlazorMonaco.Editor
 @using ContentType = BedBrigade.Common.Enums.ContentType
@@ -17,22 +17,17 @@
 else
 {
 
-    <div class="container my-3 ">
+    <div class="container-fluid px-3">
+
+        <div class="d-flex align-items-center justify-content-between mb-1 mt-2">
+            <h4 class="mb-0">@WorkTitle</h4>
+        </div>
         @if (!ShowSourceBox)
         {
-            <div class="d-flex align-items-center justify-content-between mb-1">
-                <h4 class="mb-0">@WorkTitle</h4>
-
-                <div class="form-check d-flex align-items-center ms-3">
-                    <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
-                           @bind="ConvertImages" @bind:after="UpdateSaveUrl"/>
-                    <label class="form-check-label" for="chkConvertImages">Convert Images</label>
-                </div>
-            </div>
             <div class="row">
                 @foreach (var item in ImageButtonList)
                 {
-                    <div class="col-12 col-md-3 d-flex align-items-center mb-1">
+                    <div class="col-12 col-md-2 d-flex align-items-center mb-1">
                         <div class="me-2">
                             @item.Key
                         </div>
@@ -41,6 +36,11 @@ else
                         </button>
                     </div>
                 }
+                <div class="col-12 col-md-2 d-flex align-items-center mb-1">
+                    <input class="form-check-input me-2" type="checkbox" id="chkConvertImages"
+                           @bind="ConvertImages" @bind:after="UpdateSaveUrl"/>
+                    <label class="form-check-label" for="chkConvertImages">Convert Images</label>
+                </div>
             </div>
         }
         <EditForm Model="Content">
@@ -71,27 +71,24 @@ else
             }
             @if (ShowSourceBox)
             {
-                <div class="container">
-                    <div class="btn-group" role="group">
-                        <button class="btn editor-btn" @onclick="PreviewFromSource">
-                            <i class="fas fa-eye"></i> Preview
-                        </button>
-                        <button class="btn editor-btn" @onclick="OpenFind">
-                            <i class="fas fa-search"></i> Find
-                        </button>
-                        <button class="btn editor-btn" @onclick="OpenFindReplace">
-                            <i class="fas fa-search-plus"></i> Find &amp; Replace
-                        </button>
-                        <div class="form-check form-switch text-dark ms-3">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="darkModeSwitch"
-                                   @bind="IsDarkMode"/>
-                            <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
-                        </div>
+                <div class="btn-group" role="group">
+                    <button class="btn editor-btn" @onclick="PreviewFromSource">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button class="btn editor-btn" @onclick="OpenFind">
+                        <i class="fas fa-search"></i> Find
+                    </button>
+                    <button class="btn editor-btn" @onclick="OpenFindReplace">
+                        <i class="fas fa-search-plus"></i> Find &amp; Replace
+                    </button>
+                    <div class="form-check form-switch text-dark ms-3">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="darkModeSwitch"
+                               @bind="IsDarkMode"/>
+                        <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
                     </div>
                 </div>
-
             }
             <div class="rte-container">
                 @* Show our own Source view *@
@@ -107,7 +104,7 @@ else
                 {
                     <SfRichTextEditor @ref="RteObj"
                                       EditorMode="EditorMode.HTML"
-                                      Height="560"
+                                      Height="80vh"
                                       @bind-Value="Body"
                                       EnableHtmlSanitizer="true">
 
@@ -168,7 +165,7 @@ else
 
 <style>
     .bb-source-editor {
-        height: 545px;
+        height: 82vh;
     }
 
     .editor-btn {
