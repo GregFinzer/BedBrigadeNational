@@ -151,11 +151,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 _enableFolderOperations = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.Media, ConfigNames.EnableFolderOperations);
 
                 ServiceResponse<Content> contentResult = await _svcContent.GetAsync(ContentName, LocationId);
+                await SetLocationName(LocationId);
 
                 if (contentResult.Success && contentResult.Data != null)
                 {
                     Content = contentResult.Data;
-                    WorkTitle = $"Editing {Content.Title}";
+                    WorkTitle = $"Editing {Content.Title} for {LocationName}";
 
                     if (BlogTypes.ValidBlogTypes.Contains(Content.ContentType))
                     {
@@ -165,7 +166,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     {
                         _subdirectory = "pages";
                     }
-                    await SetLocationName(LocationId);
+                   
+                    SetPaths();
                     _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
 
                     Body = await ProcessHtml(Content.ContentHtml);
@@ -214,9 +216,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             {
                 LocationName = locationResult.Data.Name;
                 LocationRoute = locationResult.Data.Route.TrimStart('/');
-                ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-                SaveUrl = $"api/image/save/{locationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
             }
+        }
+
+        private void SetPaths()
+        {
+            ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
         }
 
         private void UpdateSaveUrl()
