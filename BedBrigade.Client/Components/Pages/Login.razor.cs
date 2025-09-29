@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Serilog;
 using System.Net;
 using System.Security.Claims;
+using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
 {

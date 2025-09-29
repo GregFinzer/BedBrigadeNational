@@ -53,21 +53,6 @@ img {
         color: #000000 !important;
     }
 
-.btn-success {
-    font-size: 15px;
-    font-weight: bold;
-    font-family: "Comfortaa";
-    border-radius: 100px;
-    padding: 9px 40px;
-    margin: 20px 0 0;
-    transition: 0.7s ease;
-}
-
-    .btn-success:hover {
-        background-color: white !important;
-        color: #198754 !important;
-    }
-
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -335,4 +320,40 @@ img {
     .mobile-message {
         display: block;
     }
+}
+
+
+
+@media (max-width: 767.98px) {
+    #about .dropdown-menu {
+        position: fixed !important;
+        top: 100px; /* adjust as needed to place below navbar */
+        left: 140px !important;
+        width: 225px !important;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1050; /* ensure it's above other content */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+        #about .dropdown-menu::before {
+            display: none; /* hide caret arrow if Bootstrap adds one */
+        }
+}
+
+@media (max-width: 767.98px) {
+    #administration .dropdown-menu {
+        position: fixed !important;
+        top: 80px; /* adjust as needed to place below navbar */
+        left: 140px !important;
+        width: 250px !important;
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 1050; /* ensure it's above other content */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+        #administration .dropdown-menu::before {
+            display: none; /* hide caret arrow if Bootstrap adds one */
+        }
 }

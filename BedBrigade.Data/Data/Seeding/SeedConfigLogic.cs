@@ -18,22 +18,35 @@ namespace BedBrigade.Data.Data.Seeding
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() // added by VS 2/19/2023
+                new() 
                 {
                     ConfigurationKey = ConfigNames.AllowedFileExtensions,
-                    ConfigurationValue = ".jpg, .png, .pdf, .webp, .jpeg, .gif, .svg, .ico",
+                    ConfigurationValue = ".jpg,.png,.webp,.jpeg,.gif,.svg,.ico,.pdf,.mp4,.webm,.avi,.av1,.mov",
                     Section = ConfigSection.Media,
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() // added by VS 2/19/2023
+                new() 
                 {
-                    ConfigurationKey = ConfigNames.AllowedVideoExtensions,
-                    ConfigurationValue = ".mp4, .webm, .avi, .av1, .mov",
+                    ConfigurationKey = ConfigNames.AllowedImageExtensions,
+                    ConfigurationValue = ".jpg,.png,.webp,.jpeg,.gif,.svg,.ico",
                     Section = ConfigSection.Media,
                     LocationId = Defaults.NationalLocationId
                 },
-
+                new()
+                {
+                    ConfigurationKey = ConfigNames.ConvertableImageExtensions,
+                    ConfigurationValue = ".jpg,.png,.webp,.jpeg,.gif",
+                    Section = ConfigSection.Media,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.ConvertableMaxWidth,
+                    ConfigurationValue = "1000",
+                    Section = ConfigSection.Media,
+                    LocationId = Defaults.NationalLocationId
+                },
                 new() // added by VS 2/19/2023
                 {
                     ConfigurationKey = ConfigNames.MediaFolder,
@@ -50,20 +63,11 @@ namespace BedBrigade.Data.Data.Seeding
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() // added by VS 2/19/2023
+                new() 
                 {
                     ConfigurationKey = ConfigNames.MaxFileSize,
-                    //100 MB
-                    ConfigurationValue = "104857600",
-                    Section = ConfigSection.Media,
-                    LocationId = Defaults.NationalLocationId
-                },
-
-                new() // added by VS 2/19/2023
-                {
-                    ConfigurationKey = ConfigNames.MaxVideoSize,
-                    //250 MB
-                    ConfigurationValue = "262144000",
+                    //300 MB
+                    ConfigurationValue = "314572800",
                     Section = ConfigSection.Media,
                     LocationId = Defaults.NationalLocationId
                 },
