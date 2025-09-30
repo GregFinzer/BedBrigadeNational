@@ -1,12 +1,14 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Migrations;
 using BedBrigade.SpeakIt;
 using OpenAI;
 using Serilog;
+using System.Diagnostics;
 using System.Globalization;
 using Translation = BedBrigade.Common.Models.Translation;
-using System.Diagnostics;
+using TranslationQueue = BedBrigade.Common.Models.TranslationQueue;
 
 namespace BedBrigade.Data.Services
 {
@@ -22,9 +24,12 @@ namespace BedBrigade.Data.Services
         private readonly ParseLogic _parseLogic = new ParseLogic();
         private int _maxPerMinute;
         private int _maxPerDay;
+        private int _maxPerChunk;
         private readonly Stopwatch _rateLimitStopwatch = new Stopwatch();
         private int _requestsThisMinute = 0;
         private static int _requestsToday = 0;
+        private int _lockWaitMinutes;
+        private int _translationQueueKeepDays;
         private static DateTime _dayStart = DateTime.UtcNow.Date;
 
         public TranslationProcessorDataService(IConfigurationDataService configurationDataService,
@@ -47,8 +52,10 @@ namespace BedBrigade.Data.Services
         public async Task ProcessQueue(CancellationToken cancellationToken)
         {
             await LoadConfig();
-            await ProcessTranslations(cancellationToken);
-            await ProcessContentTranslations(cancellationToken);
+            if (await ProcessTranslations(cancellationToken))
+            {
+                await ProcessContentTranslations(cancellationToken);
+            }
         }
 
         private async Task LoadConfig()
@@ -57,31 +64,24 @@ namespace BedBrigade.Data.Services
                 ConfigNames.TranslationMaxRequestsPerMinute);
             _maxPerDay = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
                 ConfigNames.TranslationMaxRequestsPerDay);
+            _maxPerChunk = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.TranslationMaxPerChunk);
+            _lockWaitMinutes = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.TranslationLockWaitMinutes);
+            _translationQueueKeepDays = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.TranslationQueueKeepDays);
         }
 
         private async Task ProcessContentTranslations(CancellationToken cancellationToken)
         {
-            //This GetAllAsync should always have less than 1000 records
-            var queueResult = await _translationQueueDataService.GetAllAsync();
-
-            if (!queueResult.Success || queueResult.Data == null)
-            {
-                Log.Error("ProcessContentTranslations queueResult: " + queueResult.Message);
-                return;
-            }
-
-            //If there are no translations to translate then return
-            if (!queueResult.Data.Any())
+            if (await WaitForContentTranslationQueueLock())
                 return;
 
-            //This GetAllAsync should always have less than 1000 records
-            var contentQueueResult = await _contentTranslationQueueDataService.GetAllAsync();
+            var contentTranslationQueueResult = await _contentTranslationQueueDataService.GetContentTranslationsToProcess(_maxPerChunk);
+            Log.Debug("TranslationProcessorDataService:  ContentTranslationQueue: " + contentTranslationQueueResult.Count);
 
-            if (!contentQueueResult.Success || contentQueueResult.Data == null)
-            {
-                Log.Error("ProcessContentTranslations contentQueueResult: " + contentQueueResult.Message);
+            if (!contentTranslationQueueResult.Any())
                 return;
-            }
 
             //This should have less than 1000 records
             var contentResult = await _contentDataService.GetAllAsync();
@@ -104,7 +104,7 @@ namespace BedBrigade.Data.Services
 
 
             var translationsDictionary = _translateLogic.TranslationsToDictionary(translationsResult.Data);
-            foreach (var itemToProcess in contentQueueResult.Data)
+            foreach (var itemToProcess in contentTranslationQueueResult)
             {
                 await TranslateContentItem(contentResult, itemToProcess, translationsDictionary);
 
@@ -113,6 +113,8 @@ namespace BedBrigade.Data.Services
                     break;
                 }
             }
+
+            await _contentTranslationQueueDataService.DeleteOldContentTranslationQueue(_translationQueueKeepDays);
         }
 
         private async Task TranslateContentItem(ServiceResponse<List<Content>> contentResult, ContentTranslationQueue itemToProcess,
@@ -150,30 +152,82 @@ namespace BedBrigade.Data.Services
                 await _contentTranslationDataService.CreateAsync(contentTranslation);
             }
 
-            await _contentTranslationQueueDataService.DeleteAsync(itemToProcess.ContentTranslationQueueId);
+            itemToProcess.LockDate = null;
+            itemToProcess.SentDate = DateTime.UtcNow;
+            itemToProcess.Status = QueueStatus.Sent.ToString();
+            await _contentTranslationQueueDataService.UpdateAsync(itemToProcess);
         }
 
-        private async Task ProcessTranslations(CancellationToken cancellationToken)
+        private async Task<bool> WaitForTranslationQueueLock()
         {
-            //This GetAllAsync should always have less than 1000 records
-            var queueResult = await _translationQueueDataService.GetAllAsync();
+            Log.Debug("TranslationProcessorDataService:  GetTranslationQueueLocked");
+            List<TranslationQueue> lockedTranslations = await _translationQueueDataService.GetLockedTranslations();
 
-            if (!queueResult.Success || queueResult.Data == null)
+            TranslationQueue firstLockedTranslation = lockedTranslations.FirstOrDefault();
+
+            if (firstLockedTranslation != null)
             {
-                Log.Error("ProcessTranslations queueResult: " + queueResult.Message);
-                return;
+                //If there are translation queue locked less than an hour ago, skip
+                if (firstLockedTranslation.LockDate.HasValue
+                    && firstLockedTranslation.LockDate.Value > DateTime.UtcNow.AddMinutes(_lockWaitMinutes * -1))
+                {
+                    Log.Debug($"TranslationProcessorDataService:  TranslationQueue is currently locked, waiting for {_lockWaitMinutes} minutes");
+                    return true;
+                }
+
+                //Clear locked because something bad happened and we want to retry
+                await _translationQueueDataService.ClearTranslationQueueLock();
             }
 
-            //If there are no translations to translate then return
-            if (!queueResult.Data.Any())
-                return;
+            return false;
+        }
 
-            var translationsResult = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
+        private async Task<bool> WaitForContentTranslationQueueLock()
+        {
+            Log.Debug("TranslationProcessorDataService:  ContentTranslationQueueLock");
+            List<ContentTranslationQueue> lockedTranslations =
+                await _contentTranslationQueueDataService.GetLockedContentTranslations();
 
-            if (!translationsResult.Success || translationsResult.Data == null)
+            ContentTranslationQueue firstLockedTranslation = lockedTranslations.FirstOrDefault();
+
+            if (firstLockedTranslation != null)
             {
-                Log.Error("ProcessTranslations translationsResult: " + translationsResult.Message);
-                return;
+                //If there are translation queue locked less than an hour ago, skip
+                if (firstLockedTranslation.LockDate.HasValue
+                    && firstLockedTranslation.LockDate.Value > DateTime.UtcNow.AddMinutes(_lockWaitMinutes * -1))
+                {
+                    Log.Debug($"TranslationProcessorDataService:  ContentTranslationQueue is currently locked, waiting for {_lockWaitMinutes} minutes");
+                    return true;
+                }
+
+                //Clear locked because something bad happened and we want to retry
+                await _contentTranslationQueueDataService.ClearContentTranslationQueueLock();
+            }
+
+            return false;
+        }
+
+        private async Task<bool> ProcessTranslations(CancellationToken cancellationToken)
+        {
+            if (await WaitForTranslationQueueLock())
+                return false;
+
+            var translationsToProcess = await _translationQueueDataService.GetTranslationsToProcess(_maxPerChunk);
+            Log.Debug("TranslationProcessorDataService:  TranslationQueue: " + translationsToProcess.Count);
+
+            //If there are no translations to translate then return
+            if (!translationsToProcess.Any())
+                return false;
+
+            Log.Debug("TranslationProcessorDataService:  Locking TranslationQueue");
+            await _translationQueueDataService.LockTranslationsToProcess(translationsToProcess);
+
+            var translationsForLanguage = await _translationDataService.GetTranslationsForLanguage(Defaults.DefaultLanguage);
+
+            if (!translationsForLanguage.Success || translationsForLanguage.Data == null)
+            {
+                Log.Error("ProcessTranslations translationsResult: " + translationsForLanguage.Message);
+                return false;
             }
 
             // Ensure stopwatch is running
@@ -182,31 +236,36 @@ namespace BedBrigade.Data.Services
                 _rateLimitStopwatch.Start();
             }
 
-            foreach (var itemToProcess in queueResult.Data)
+            foreach (var itemToProcess in translationsToProcess)
             {
-                if (await ProcessTranslationItem(cancellationToken, translationsResult.Data, itemToProcess))
+                if (await ProcessTranslationItem(cancellationToken, translationsForLanguage.Data, itemToProcess))
                     continue;
                 else
-                    break;
+                    return false;
             }
+
+            await _translationQueueDataService.DeleteOldTranslationQueue(_translationQueueKeepDays);
+            return true;
         }
 
-        private async Task<bool> ProcessTranslationItem(CancellationToken cancellationToken, List<Translation> translations, TranslationQueue itemToProcess)
+        private async Task<bool> ProcessTranslationItem(CancellationToken cancellationToken, 
+            List<Translation> translations, 
+            TranslationQueue translationQueue)
         {
             if (ReachedDailyLimit())
                 return false;
 
-            var parentTranslation =  translations.FirstOrDefault(o => o.TranslationId == itemToProcess.TranslationId);
+            var parentTranslation =  translations.FirstOrDefault(o => o.TranslationId == translationQueue.TranslationId);
 
             if (parentTranslation == null)
             {
-                Log.Error($"ProcessTranslations parentTranslation is null for TranslationId {itemToProcess.TranslationId}");
+                Log.Error($"ProcessTranslationItem parentTranslation is null for TranslationId {translationQueue.TranslationId}");
                 return true;
             }
 
             await RateLimiting(cancellationToken);
 
-            var translatedText = await TranslateTextAsync(parentTranslation.Content, itemToProcess.Culture);
+            var translatedText = await TranslateTextAsync(parentTranslation.Content, translationQueue.Culture);
             _requestsThisMinute++;
             _requestsToday++;
 
@@ -220,9 +279,13 @@ namespace BedBrigade.Data.Services
                 return false;
             }
 
-            Translation translation = BuildTranslation(parentTranslation, itemToProcess, translatedText);
+            Translation translation = BuildTranslation(parentTranslation, translationQueue, translatedText);
             await _translationDataService.CreateAsync(translation);
-            await _translationQueueDataService.DeleteAsync(itemToProcess.TranslationQueueId);
+
+            translationQueue.LockDate = null;
+            translationQueue.SentDate = DateTime.UtcNow;
+            translationQueue.Status = QueueStatus.Sent.ToString();
+            await _translationQueueDataService.UpdateAsync(translationQueue);
 
             if (cancellationToken.IsCancellationRequested)
             {
@@ -307,7 +370,7 @@ namespace BedBrigade.Data.Services
                 var chat = client.GetChatClient("gpt-5-mini");
 
                 string prompt =
-                    $"Translate the following text from English into {targetLanguage}:\n\n{textToTranslate}";
+                    $"Translate the following text from English into {targetLanguage}. Only give the best translation with no other options.:\n\n{textToTranslate}";
 
                 var response = await chat.CompleteChatAsync(prompt);
                 string translation = response?.Value?.Content.FirstOrDefault()?.Text ?? string.Empty;
@@ -357,7 +420,7 @@ namespace BedBrigade.Data.Services
                     ContentId = content.ContentId,
                     Culture = nonEnglishCulture.Name
                 };
-                await _contentTranslationQueueDataService.CreateAsync(contentTranslationQueue);
+                await _contentTranslationQueueDataService.QueueContentTranslation(contentTranslationQueue);
             }
         }
 
@@ -373,16 +436,9 @@ namespace BedBrigade.Data.Services
                 return;
             }
 
-            //This should always be less than 1000 records
-            ServiceResponse<List<TranslationQueue>> translationQueueResult =
-                await _translationQueueDataService.GetAllAsync();
-
-            if (!translationQueueResult.Success || translationQueueResult.Data == null)
-            {
-                Log.Error("SaveNewEnglishLocalizableStringsToTranslations translationQueueResult: " +
-                          translationQueueResult.Message);
-                return;
-            }
+            //We are intentionally getting all queued translations to avoid queuing duplicates
+            List<TranslationQueue> translationQueueResult =
+                await _translationQueueDataService.GetTranslationsToProcess(Int32.MaxValue);
 
             var nonEnglishCultures =
                 _translateLogic.GetRegisteredLanguages().Where(o => o.Name != Defaults.DefaultLanguage);
@@ -408,7 +464,7 @@ namespace BedBrigade.Data.Services
                     }
 
                     //Skip if the translation for the culture is already queued
-                    if (translationQueueResult.Data.Any(o =>
+                    if (translationQueueResult.Any(o =>
                             o.Culture == nonEnglishCulture.Name && o.TranslationId == englishTranslation.TranslationId))
                     {
                         continue;
@@ -420,10 +476,8 @@ namespace BedBrigade.Data.Services
                         Culture = nonEnglishCulture.Name,
                         TranslationId = englishTranslation.TranslationId
                     };
-                    await _translationQueueDataService.CreateAsync(translationQueue);
+                    await _translationQueueDataService.QueueTranslation(translationQueue);
                 }
-
-
             }
         }
 

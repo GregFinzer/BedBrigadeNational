@@ -16,5 +16,18 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "Culture is required")]
         [MaxLength(11)]
         public string Culture { get; set; } = string.Empty;
+
+        [Required, StringLength(50)]
+        public string Status { get; set; }
+
+        [Required]
+        public DateTime QueueDate { get; set; }
+
+        public DateTime? LockDate { get; set; }
+
+        [MaxLength(4000)]
+        public string? FailureMessage { get; set; }
+
+        public DateTime? SentDate { get; set; }
     }
 }

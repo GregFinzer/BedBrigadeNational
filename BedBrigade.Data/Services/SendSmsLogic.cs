@@ -94,7 +94,7 @@ public class SendSmsLogic : ISendSmsLogic
             ToPhoneNumber = phone.FormatPhoneNumber(),
             Body = body,
             Priority = 1,
-            Status = SmsQueueStatus.Locked.ToString(),
+            Status = QueueStatus.Locked.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
             TargetDate = DateTime.UtcNow,
@@ -119,7 +119,7 @@ public class SendSmsLogic : ISendSmsLogic
             ToPhoneNumber = volunteerResult.Data.Phone.FormatPhoneNumber(),
             Body = templateResult.Data.ContentHtml,
             Priority = Defaults.BulkHighPriority,
-            Status = SmsQueueStatus.Queued.ToString(),
+            Status = QueueStatus.Queued.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
             TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2),
@@ -164,7 +164,7 @@ public class SendSmsLogic : ISendSmsLogic
 
     private async Task HandleFailure(SmsQueue smsQueue, Exception ex)
     {
-        smsQueue.Status = SmsQueueStatus.Failed.ToString();
+        smsQueue.Status = QueueStatus.Failed.ToString();
         smsQueue.FailureMessage = ex.Message;
         await _smsQueueDataService.UpdateAsync(smsQueue);
         Log.Error(ex, "Error merging SMS message");
@@ -223,7 +223,7 @@ public class SendSmsLogic : ISendSmsLogic
         Log.Information(sb.ToString());
 
         message.SentDate = DateTime.UtcNow;
-        message.Status = SmsQueueStatus.Sent.ToString();
+        message.Status = QueueStatus.Sent.ToString();
         var result = await _smsQueueDataService.UpdateAsync(message);
         if (!result.Success)
             return new ServiceResponse<bool>(result.Message);
@@ -257,17 +257,17 @@ public class SendSmsLogic : ISendSmsLogic
             {
                 message.FailureMessage =
                     $"SMS send operation failed: result is null";
-                message.Status = EmailQueueStatus.Failed.ToString();
+                message.Status = QueueStatus.Failed.ToString();
             }
             else if (result.ErrorCode.HasValue && result.ErrorCode.Value > 0)
             {
                 message.FailureMessage =
                     $"SMS send operation failed with error code: {result.ErrorCode}, message: {result.ErrorMessage}";
-                message.Status = EmailQueueStatus.Failed.ToString();
+                message.Status = QueueStatus.Failed.ToString();
             }
             else
             {
-                message.Status = EmailQueueStatus.Sent.ToString();
+                message.Status = QueueStatus.Sent.ToString();
                 success = true;
             }
         }
@@ -275,7 +275,7 @@ public class SendSmsLogic : ISendSmsLogic
         {
             message.FailureMessage =
                 $"SMS send operation failed: {ex.Message}";
-            message.Status = EmailQueueStatus.Failed.ToString();
+            message.Status = QueueStatus.Failed.ToString();
         }
 
         message.LockDate = null;

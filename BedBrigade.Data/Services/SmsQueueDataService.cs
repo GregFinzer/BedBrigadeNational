@@ -61,7 +61,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
-            var result = await dbSet.Where(o => o.Status == SmsQueueStatus.Locked.ToString()).ToListAsync();
+            var result = await dbSet.Where(o => o.Status == QueueStatus.Locked.ToString()).ToListAsync();
             _cachingService.Set(cacheKey, result);
             return result;
         }
@@ -80,7 +80,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             foreach (var lockedMessage in lockedMessages)
             {
                 lockedMessage.LockDate = null;
-                lockedMessage.Status = SmsQueueStatus.Queued.ToString();
+                lockedMessage.Status = QueueStatus.Queued.ToString();
                 lockedMessage.UpdateDate = DateTime.UtcNow;
                 dbSet.Update(lockedMessage);
             }
@@ -103,7 +103,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
-            var result = await dbSet.Where(o => o.Status == SmsQueueStatus.Queued.ToString()
+            var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString()
                                                 && DateTime.UtcNow >= o.TargetDate)
                 .OrderByDescending(o => o.Priority)
                 .ThenBy(o => o.QueueDate)
@@ -120,7 +120,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         {
             var dbSet = ctx.Set<SmsQueue>();
             var oldMessages = dbSet.Where(o =>
-                o.Status != SmsQueueStatus.Queued.ToString() && o.UpdateDate < DateTime.UtcNow.AddDays(-daysOld));
+                o.Status != QueueStatus.Queued.ToString() && o.UpdateDate < DateTime.UtcNow.AddDays(-daysOld));
 
             var oldMessagesList = await oldMessages.ToListAsync();
             if (oldMessagesList.Count > 0)
@@ -141,7 +141,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             foreach (var message in messagesToProcess)
             {
                 message.LockDate = DateTime.UtcNow;
-                message.Status = SmsQueueStatus.Locked.ToString();
+                message.Status = QueueStatus.Locked.ToString();
                 message.UpdateDate = DateTime.UtcNow;
                 dbSet.Update(message);
                 anyLocked = true;
@@ -173,8 +173,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             {
                 var result = await ctx.Set<SmsQueue>()
                     .Where(o => o.LocationId == locationId
-                        && (o.Status == SmsQueueStatus.Sent.ToString() 
-                        || o.Status == SmsQueueStatus.Received.ToString()))
+                        && (o.Status == QueueStatus.Sent.ToString() 
+                        || o.Status == QueueStatus.Received.ToString()))
                     .GroupBy(o => o.ToPhoneNumber)
                     .Select(g => new SmsQueueSummary
                     {
@@ -225,8 +225,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 var dbSet = ctx.Set<SmsQueue>();
                 var result = await dbSet.Where(o => o.LocationId == locationId
                                                     && o.ToPhoneNumber == toPhoneNumber
-                                                    && (o.Status == SmsQueueStatus.Sent.ToString() 
-                                                    || o.Status == SmsQueueStatus.Received.ToString()))
+                                                    && (o.Status == QueueStatus.Sent.ToString() 
+                                                    || o.Status == QueueStatus.Received.ToString()))
                     .OrderBy(o => o.SentDate).ToListAsync();
 
                 _svcTimeZone.FillLocalDates(result);
@@ -308,7 +308,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             Priority = Defaults.BulkHighPriority,
             FailureMessage = string.Empty,
             IsReply = true,
-            Status = SmsQueueStatus.Received.ToString(),
+            Status = QueueStatus.Received.ToString(),
             IsRead = false
         };
 
@@ -429,8 +429,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         {
             var dbSet = ctx.Set<SmsQueue>();
             var messages = await dbSet.Where(o => o.LocationId == locationId 
-                                                  && (o.Status == SmsQueueStatus.Sent.ToString()
-                                                    || o.Status == SmsQueueStatus.Received.ToString())
+                                                  && (o.Status == QueueStatus.Sent.ToString()
+                                                    || o.Status == QueueStatus.Received.ToString())
                                                   && o.ToPhoneNumber == toPhoneNumber 
                                                   && !o.IsRead).ToListAsync();
 
@@ -519,7 +519,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
                 ToPhoneNumber = phone.FormatPhoneNumber(),
                 Body = body,
                 Priority = Defaults.BulkLowPriority,
-                Status = SmsQueueStatus.Queued.ToString(),
+                Status = QueueStatus.Queued.ToString(),
                 QueueDate = DateTime.UtcNow,
                 FailureMessage = string.Empty,
                 TargetDate = DateTime.UtcNow,
@@ -544,7 +544,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
             _cachingService.ClearByEntityName(GetEntityName());
 
-            return new ServiceResponse<string>($"Queued {smsQueueList.Count} text messages", true, SmsQueueStatus.Queued.ToString());
+            return new ServiceResponse<string>($"Queued {smsQueueList.Count} text messages", true, QueueStatus.Queued.ToString());
         }
         catch (Exception ex)
         {
@@ -597,7 +597,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SmsQueue>();
-            var result = await dbSet.CountAsync(o => o.Status == SmsQueueStatus.Queued.ToString());
+            var result = await dbSet.CountAsync(o => o.Status == QueueStatus.Queued.ToString());
             _cachingService.Set(cacheKey, result);
             return result;
         }
