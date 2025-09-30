@@ -52,8 +52,10 @@ namespace BedBrigade.Data.Services
         public async Task ProcessQueue(CancellationToken cancellationToken)
         {
             await LoadConfig();
-            await ProcessTranslations(cancellationToken);
-            await ProcessContentTranslations(cancellationToken);
+            if (await ProcessTranslations(cancellationToken))
+            {
+                await ProcessContentTranslations(cancellationToken);
+            }
         }
 
         private async Task LoadConfig()
@@ -77,6 +79,9 @@ namespace BedBrigade.Data.Services
 
             var contentTranslationQueueResult = await _contentTranslationQueueDataService.GetContentTranslationsToProcess(_maxPerChunk);
             Log.Debug("TranslationProcessorDataService:  ContentTranslationQueue: " + contentTranslationQueueResult.Count);
+
+            if (!contentTranslationQueueResult.Any())
+                return;
 
             //This should have less than 1000 records
             var contentResult = await _contentDataService.GetAllAsync();
@@ -202,17 +207,17 @@ namespace BedBrigade.Data.Services
             return false;
         }
 
-        private async Task ProcessTranslations(CancellationToken cancellationToken)
+        private async Task<bool> ProcessTranslations(CancellationToken cancellationToken)
         {
             if (await WaitForTranslationQueueLock())
-                return;
+                return false;
 
             var translationsToProcess = await _translationQueueDataService.GetTranslationsToProcess(_maxPerChunk);
             Log.Debug("TranslationProcessorDataService:  TranslationQueue: " + translationsToProcess.Count);
 
             //If there are no translations to translate then return
             if (!translationsToProcess.Any())
-                return;
+                return false;
 
             Log.Debug("TranslationProcessorDataService:  Locking TranslationQueue");
             await _translationQueueDataService.LockTranslationsToProcess(translationsToProcess);
@@ -222,7 +227,7 @@ namespace BedBrigade.Data.Services
             if (!translationsForLanguage.Success || translationsForLanguage.Data == null)
             {
                 Log.Error("ProcessTranslations translationsResult: " + translationsForLanguage.Message);
-                return;
+                return false;
             }
 
             // Ensure stopwatch is running
@@ -236,10 +241,11 @@ namespace BedBrigade.Data.Services
                 if (await ProcessTranslationItem(cancellationToken, translationsForLanguage.Data, itemToProcess))
                     continue;
                 else
-                    break;
+                    return false;
             }
 
             await _translationQueueDataService.DeleteOldTranslationQueue(_translationQueueKeepDays);
+            return true;
         }
 
         private async Task<bool> ProcessTranslationItem(CancellationToken cancellationToken, 
@@ -364,7 +370,7 @@ namespace BedBrigade.Data.Services
                 var chat = client.GetChatClient("gpt-5-mini");
 
                 string prompt =
-                    $"Translate the following text from English into {targetLanguage}:\n\n{textToTranslate}";
+                    $"Translate the following text from English into {targetLanguage}. Only give the best translation with no other options.:\n\n{textToTranslate}";
 
                 var response = await chat.CompleteChatAsync(prompt);
                 string translation = response?.Value?.Content.FirstOrDefault()?.Text ?? string.Empty;

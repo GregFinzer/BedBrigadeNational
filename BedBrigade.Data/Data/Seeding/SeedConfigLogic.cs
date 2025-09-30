@@ -306,8 +306,8 @@ namespace BedBrigade.Data.Data.Seeding
                 },
                 new()
                 {
-                    ConfigurationKey = ConfigNames.TranslationLockWaitMinutes,
-                    ConfigurationValue = "10",
+                    ConfigurationKey = ConfigNames.TranslationQueueKeepDays,
+                    ConfigurationValue = "30",
                     Section = ConfigSection.System,
                     LocationId = Defaults.NationalLocationId
                 },
