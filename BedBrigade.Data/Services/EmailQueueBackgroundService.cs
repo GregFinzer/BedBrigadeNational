@@ -319,8 +319,8 @@ namespace BedBrigade.Data.Services
             }
 
             int total = emailsToProcess.Count;
-            int sent = emailsToProcess.Count(o => o.Status == EmailQueueStatus.Sent.ToString());
-            int failed = emailsToProcess.Count(o => o.Status == EmailQueueStatus.Failed.ToString());
+            int sent = emailsToProcess.Count(o => o.Status == QueueStatus.Sent.ToString());
+            int failed = emailsToProcess.Count(o => o.Status == QueueStatus.Failed.ToString());
 
             string msg = string.Format("{0} emails sent, {1} emails failed, {2} total emails", sent, failed, total);
             _logger.LogDebug(msg);
@@ -340,7 +340,7 @@ namespace BedBrigade.Data.Services
 
             email.LockDate = null;
             email.SentDate = DateTime.UtcNow;
-            email.Status = EmailQueueStatus.Sent.ToString();
+            email.Status = QueueStatus.Sent.ToString();
             await _emailQueueDataService.UpdateAsync(email);
         }
 
@@ -355,19 +355,19 @@ namespace BedBrigade.Data.Services
             {
                 smtpClient.Credentials = new System.Net.NetworkCredential(_userName, _password);
                 smtpClient.Send(mailMessage);
-                email.Status = EmailQueueStatus.Sent.ToString();
+                email.Status = QueueStatus.Sent.ToString();
             }
             catch (RequestFailedException ex)
             {
                 email.FailureMessage =
                     $"Email send operation failed with error code: {ex.ErrorCode}, message: {ex}";
-                email.Status = EmailQueueStatus.Failed.ToString();
+                email.Status = QueueStatus.Failed.ToString();
             }
             catch (Exception ex)
             {
                 email.FailureMessage =
                     $"Email send operation failed, message: {ex}";
-                email.Status = EmailQueueStatus.Failed.ToString();
+                email.Status = QueueStatus.Failed.ToString();
             }
 
             email.LockDate = null;

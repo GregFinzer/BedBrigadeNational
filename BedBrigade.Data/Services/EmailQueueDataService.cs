@@ -65,7 +65,7 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.Status == EmailQueueStatus.Locked.ToString()).ToListAsync();
+                var result = await dbSet.Where(o => o.Status == QueueStatus.Locked.ToString()).ToListAsync();
                 _cachingService.Set(cacheKey, result);
                 return result;
             }
@@ -130,7 +130,7 @@ namespace BedBrigade.Data.Services
                 foreach (var lockedEmail in lockedEmails)
                 {
                     lockedEmail.LockDate = null;
-                    lockedEmail.Status = EmailQueueStatus.Queued.ToString();
+                    lockedEmail.Status = QueueStatus.Queued.ToString();
                     lockedEmail.UpdateDate = DateTime.UtcNow;
                     dbSet.Update(lockedEmail);
                 }
@@ -152,7 +152,7 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.Status == EmailQueueStatus.Queued.ToString())
+                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString())
                     .OrderByDescending(o => o.Priority)
                     .ThenBy(o => o.QueueDate)
                     .Take(maxPerChunk)
@@ -169,7 +169,7 @@ namespace BedBrigade.Data.Services
             {
                 var dbSet = ctx.Set<EmailQueue>();
                 var oldEmails = dbSet.Where(o =>
-                    o.Status != EmailQueueStatus.Queued.ToString() && o.UpdateDate < DateTime.UtcNow.AddDays(-daysOld));
+                    o.Status != QueueStatus.Queued.ToString() && o.UpdateDate < DateTime.UtcNow.AddDays(-daysOld));
                 dbSet.RemoveRange(oldEmails);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
@@ -184,7 +184,7 @@ namespace BedBrigade.Data.Services
                 foreach (var email in emailsToProcess)
                 {
                     email.LockDate = DateTime.UtcNow;
-                    email.Status = EmailQueueStatus.Locked.ToString();
+                    email.Status = QueueStatus.Locked.ToString();
                     email.UpdateDate = DateTime.UtcNow;
                     dbSet.Update(email);
                 }
@@ -285,7 +285,7 @@ namespace BedBrigade.Data.Services
         {
             try
             {
-                email.Status = EmailQueueStatus.Queued.ToString();
+                email.Status = QueueStatus.Queued.ToString();
                 email.QueueDate = DateTime.UtcNow;
                 email.FailureMessage = string.Empty;
                 await CreateAsync(email);
@@ -295,7 +295,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>(ex.Message, false);
             }
 
-            return new ServiceResponse<string>(EmailQueueStatus.Queued.ToString(), true);
+            return new ServiceResponse<string>(QueueStatus.Queued.ToString(), true);
         }
 
         public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body)
@@ -310,7 +310,7 @@ namespace BedBrigade.Data.Services
                     ToAddress = email,
                     Subject = subject,
                     Body = body,
-                    Status = EmailQueueStatus.Queued.ToString(),
+                    Status = QueueStatus.Queued.ToString(),
                     QueueDate = DateTime.UtcNow,
                     FailureMessage = string.Empty,
                     Priority = Defaults.BulkLowPriority
@@ -333,7 +333,7 @@ namespace BedBrigade.Data.Services
 
                 _cachingService.ClearByEntityName(GetEntityName());
 
-                return new ServiceResponse<string>($"Queued {emailList.Count} emails", true, EmailQueueStatus.Queued.ToString());
+                return new ServiceResponse<string>($"Queued {emailList.Count} emails", true, QueueStatus.Queued.ToString());
             }
             catch (Exception ex)
             {
@@ -390,7 +390,7 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.CountAsync(o => o.Status == EmailQueueStatus.Queued.ToString());
+                var result = await dbSet.CountAsync(o => o.Status == QueueStatus.Queued.ToString());
                 _cachingService.Set(cacheKey, result);
                 return result;
             }

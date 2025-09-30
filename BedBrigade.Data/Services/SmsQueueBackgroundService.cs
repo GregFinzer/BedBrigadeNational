@@ -180,7 +180,7 @@ public class SmsQueueBackgroundService : BackgroundService
                 Body = body,
                 QueueDate = DateTime.UtcNow,
                 FailureMessage = string.Empty,
-                Status = EmailQueueStatus.Queued.ToString(),
+                Status = QueueStatus.Queued.ToString(),
                 Priority = Defaults.BulkMediumPriority
             };
             await _emailQueueDataService.QueueEmail(emailQueue);
@@ -292,8 +292,8 @@ public class SmsQueueBackgroundService : BackgroundService
         }
 
         int total = messagesToProcess.Count;
-        int sent = messagesToProcess.Count(o => o.Status == SmsQueueStatus.Sent.ToString());
-        int failed = messagesToProcess.Count(o => o.Status == SmsQueueStatus.Failed.ToString());
+        int sent = messagesToProcess.Count(o => o.Status == QueueStatus.Sent.ToString());
+        int failed = messagesToProcess.Count(o => o.Status == QueueStatus.Failed.ToString());
 
         string msg = string.Format("{0} SMS messages sent, {1} SMS messages failed, {2} total SMS messages", sent, failed, total);
         _logger.LogDebug(msg);
@@ -301,7 +301,7 @@ public class SmsQueueBackgroundService : BackgroundService
 
     private async Task UnlockMessage(SmsQueue message)
     {
-        message.Status = SmsQueueStatus.Queued.ToString();
+        message.Status = QueueStatus.Queued.ToString();
         message.LockDate = null;
         message.UpdateDate = DateTime.UtcNow;
         await _smsQueueDataService.UpdateAsync(message);

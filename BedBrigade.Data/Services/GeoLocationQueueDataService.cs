@@ -108,7 +108,7 @@ namespace BedBrigade.Data.Services
                 foreach (var item in itemsToProcess)
                 {
                     item.LockDate = DateTime.UtcNow;
-                    item.Status = EmailQueueStatus.Locked.ToString();
+                    item.Status = QueueStatus.Locked.ToString();
                     item.UpdateDate = DateTime.UtcNow;
                     dbSet.Update(item);
                 }
