@@ -1,0 +1,42 @@
+﻿@page "/administration/notebook"
+@inject IJSRuntime JS
+@layout Layout.AdminLayout
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+<h3 class="text-center my-3">Temporary Notebook</h3>
+
+<textarea @bind="NotebookText"
+          class="form-control"
+          style="width: 100%; height: calc(100vh - 252px); resize: none;">
+</textarea>
+
+<div class="d-flex justify-content-center gap-3 p-3 bg-light fixed-bottom border-top">
+    <button class="btn btn-primary" @onclick="PasteFromClipboard">
+        <i class="fas fa-paste me-1"></i> Paste
+    </button>
+    <button class="btn btn-success" @onclick="CopyToClipboard">
+        <i class="fas fa-copy me-1"></i> Copy
+    </button>
+    <button class="btn btn-danger" @onclick="ClearText">
+        <i class="fas fa-eraser me-1"></i> Clear
+    </button>
+</div>
+
+@code {
+    private static string NotebookText { get; set; } = string.Empty;
+    private async Task PasteFromClipboard()
+    {
+        var text = await JS.InvokeAsync<string>("navigator.clipboard.readText");
+        NotebookText = text;
+    }
+
+    private async Task CopyToClipboard()
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", NotebookText);
+    }
+
+    private void ClearText()
+    {
+        NotebookText = string.Empty;
+    }
+}
