@@ -16,5 +16,6 @@ public enum PersistGrid
     SignUp = 12,
     MetroAreas =13,
     SmsSummary=14,
-    Newsletter=15
+    Newsletter=15,
+    DonationCampaign= 16
 }

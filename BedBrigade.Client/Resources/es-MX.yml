@@ -22,6 +22,7 @@ BuildPostalCode: Construir código postal
 BuildState: Estado de compilación
 Calendar: Calendario
 Campaign: Campaña
+CampaignName: Nombre de la campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
 ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
@@ -104,6 +105,7 @@ DynamicYes: Sí
 Email: Correo electrónico
 EmailColon: 'Correo electrónico:'
 EmailSent: Correo electrónico enviado
+EndDate: Fecha de finalización
 EnterYourZipCode: Ingresa tu código postal
 Event: Evento
 Events: Eventos
@@ -312,6 +314,7 @@ SorryYouAreNot: Lo sentimos, no está autorizado a ver esta página.
 SpeakEnglishCaption: ¿Hablas inglés?
 SpeakEnglishPlaceholder: Habilidad en inglés...
 SpecialInstructions: Instrucciones especiales
+StartDate: Fecha de inicio
 State: Estado
 StateNotMatchZipCode: El estado que ha ingresado no coincide con el código postal.  Debería ser {stateForZipCode}
 Status: Estado
