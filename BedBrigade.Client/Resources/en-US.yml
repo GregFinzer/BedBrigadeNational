@@ -29,9 +29,6 @@ ChooseATime: Choose a Time
 City: City
 ClickToSignup: (Click to Signup)
 CompareConfirmPasswordToPassword: The passwords do not match.
-ConfigurationKey: Configuration Key
-ConfigurationSection: Configuration Section
-ConfigurationValue: Configuration Value
 ConfirmPassword: Confirm Password
 ContactInformation: Contact Information
 ContactMessage: Contact Message
@@ -152,7 +149,6 @@ MailingAddress: Mailing Address
 MailingCity: Mailing City
 MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
-ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
 MaxLengthBedType100: Bed Type has a maximum length of 100 characters
 MaxLengthChurchName80: Church Name has a maximum length of 80 characters

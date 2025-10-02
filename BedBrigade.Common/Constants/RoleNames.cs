@@ -30,6 +30,7 @@
         public const string CanPublishBlogPosts = "National Admin, National Editor, Location Admin, Location Editor";
         public const string CanSendBulkEmail = "National Admin, Location Admin, Location Scheduler, Location Communications";
         public const string CanSendSms = "National Admin, Location Admin, Location Scheduler, Location Communications";
+        public const string CanManageDonationCampaigns = "National Admin, Location Admin, Location Treasurer";
 
         public const string CanViewAdminDashboard =
             "National Admin, National Editor, Location Admin, Location Editor, Location Author, Location Scheduler, Location Contributor, Location Treasurer, Location Communications";

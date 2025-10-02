@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
 using BedBrigade.Data.Services;
 using Serilog;
@@ -8,15 +8,15 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 
-namespace BedBrigade.Client.Components
+namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
-    public partial class ConfigurationGrid : ComponentBase
+    public partial class ManageConfiguration : ComponentBase
     {
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
+
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ToastService _toastService { get; set; }
 
@@ -53,8 +53,6 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-
-                _lc.InitLocalizedComponent(this);
                 Log.Information($"{_svcAuth.UserName} went to the Manage Configurations Page");
 
                 if (_svcAuth.IsNationalAdmin)
@@ -104,7 +102,7 @@ namespace BedBrigade.Client.Components
                 Log.Error($"Unable to load configurations: {result.Message}");
                 _toastService.Error("Unable to load configurations", result.Message);
             }
-                
+
             var locationResult = await _svcLocation.GetActiveLocations();
             if (locationResult.Success && locationResult.Data != null)
             {
@@ -280,8 +278,8 @@ namespace BedBrigade.Client.Components
                 {
                     var existing = await _svcConfiguration.GetAllForLocationAsync(Configuration.LocationId);
 
-                    if (existing.Success 
-                        && existing.Data != null 
+                    if (existing.Success
+                        && existing.Data != null
                         && existing.Data.Any(c => c.ConfigurationKey == Configuration.ConfigurationKey))
                     {
                         _toastService.Error("Add Configuration Error", "Configuration Key already exists for this location!");
@@ -378,7 +376,5 @@ namespace BedBrigade.Client.Components
             }
         }
 
-
     }
 }
-

@@ -1,0 +1,132 @@
+﻿@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using BedBrigade.Common
+@using BedBrigade.Common.Logic;
+@using BedBrigade.Common.Models
+
+@layout Layout.AdminLayout
+@page "/administration/manage/DonationCampaigns"
+<CheckAuth Roles=@RoleNames.CanManageDonationCampaigns></CheckAuth>
+
+@if (DonationCampaignRecords == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3">
+            <h3>Manage Donation Campaigns</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo />
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="content-wrapper">
+            <div class="row">
+                <div style="width: 100%">
+                    <SfGrid @ref="Grid" TValue="DonationCampaign" DataSource=@DonationCampaignRecords
+                            ContextMenuItems=@ContextMenu
+                            EnablePersistence="true"
+                            ShowColumnChooser="true"
+                            Toolbar=@ToolBar
+                            AllowPaging="true"
+                            AllowSorting="true"
+                            AllowExcelExport="true"
+                            ShowColumnMenu="false"
+                            AllowFiltering="true"
+                            AllowReordering="true"
+                            AllowResizing="true"
+                            AllowSelection="true"
+                            AllowPdfExport="true"
+                            AllowTextWrap="true"
+                            AllowGrouping="true"
+                            Width="100%">
+                        <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
+                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="DonationCampaign" />
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                            <HeaderTemplate>
+                                @{
+                                    @HeaderTitle
+                                }
+                            </HeaderTemplate>
+                            <FooterTemplate>
+                                <button class="btn btn-primary" @onclick=@(() => Save(context as DonationCampaign)) IsPrimary="true">@ButtonTitle</button>
+                                <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                            </FooterTemplate>
+                            <Template>
+                                @{
+                                    DonationCampaign donationCampaignRec = (context as DonationCampaign)!;
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <SfDropDownList TItem="Location" TValue="Int32" Enabled=@AddMode DataSource="Locations" @bind-Value=@donationCampaignRec.LocationId Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
+                                                    <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                                </SfDropDownList>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <SfTextBox ID="donationCampaignName" @bind-Value=@donationCampaignRec.CampaignName Enabled="true" Placeholder="Campaign Name" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <SfDatePicker @bind-Value=@donationCampaignRec.StartDate Enabled="true" Placeholder="Start Date" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <SfDatePicker @bind-Value=@donationCampaignRec.EndDate Enabled="true" Placeholder="End Date" FloatLabelType="FloatLabelType.Auto" />
+                                        </div>
+                                    </div>
+                                }
+                            </Template>
+                        </GridEditSettings>
+                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                        <GridSortSettings>
+                            <GridSortColumns>
+                                <GridSortColumn Field="@nameof(DonationCampaign.LocationId)" Direction="SortDirection.Ascending" />
+                                <GridSortColumn Field="@nameof(DonationCampaign.CampaignName)" Direction="SortDirection.Ascending" />
+                            </GridSortColumns>
+                        </GridSortSettings>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(DonationCampaign.DonationCampaignId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                            <GridForeignColumn Field=@nameof(DonationCampaign.LocationId) Visible=@IsLocationColumnVisible ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(DonationCampaign.CampaignName) HeaderText="Name" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                            <GridColumn Field=@nameof(DonationCampaign.StartDate) Width="100" Format="d" ShowColumnMenu="false" HeaderText="Start Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
+                            <GridColumn Field=@nameof(DonationCampaign.EndDate) Width="100" Format="d" ShowColumnMenu="false" HeaderText="End Date" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
+                        </GridColumns>
+                    </SfGrid>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+
+    .e-grid td.e-rowcell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-grid th.e-headercell.e-focus.e-focused {
+        box-shadow: none;
+    }
+
+    .e-dialog .e-dlg-header {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+</style>
