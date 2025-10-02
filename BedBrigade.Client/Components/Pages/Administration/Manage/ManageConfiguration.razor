@@ -21,7 +21,7 @@ else
 {
     <div class="row">
         <div class="col-md-6 mt-3">
-            <h2>@_lc.Keys["ManageConfiguration"]</h2>
+            <h2>Manage Configuration</h2>
         </div>
         <div class="col-md-6 mt-3">
             <UserInfo />
@@ -62,7 +62,7 @@ else
                         </HeaderTemplate>
                         <FooterTemplate>
                             <button class="btn btn-primary" @onclick=@(() => Save(context as Configuration)) IsPrimary="true">@ButtonTitle</button>
-                            <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
+                            <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
                         </FooterTemplate>
                         <Template>
                             @{
@@ -70,23 +70,23 @@ else
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <SfDropDownList TItem="Location" TValue="Int32" Enabled=@AddKey DataSource="Locations" @bind-Value=@configRec.LocationId Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
+                                            <SfDropDownList TItem="Location" TValue="Int32" Enabled=@AddKey DataSource="Locations" @bind-Value=@configRec.LocationId Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
                                                 <DropDownListFieldSettings Text="Name" Value="LocationId" />
                                             </SfDropDownList>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="@_lc.Keys["ConfigurationSection"]" FloatLabelType="FloatLabelType.Auto">
+                                        <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="Configuration Section" FloatLabelType="FloatLabelType.Auto">
                                             <DropDownListFieldSettings Text="Name" Value="Value" />
                                         </SfDropDownList>
                                     </div>
                                     <div class="col-md-4">
-                                        <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="@_lc.Keys["ConfigurationKey"]" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="@_lc.Keys["ConfigurationValue"]" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                             }

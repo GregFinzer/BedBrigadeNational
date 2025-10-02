@@ -16,7 +16,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ToastService? _toastService { get; set; }
         protected List<DonationCampaign>? DonationCampaignRecords { get; set; }
@@ -39,7 +38,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool IsLocationColumnVisible { get; set; } = false;
         protected override async Task OnInitializedAsync()
         {
-            _lc.InitLocalizedComponent(this);
             Log.Information($"{_svcAuth.UserName} went to the Manage DonationCampaigns Page");
 
             var locationResult = await _svcLocation.GetActiveLocations();

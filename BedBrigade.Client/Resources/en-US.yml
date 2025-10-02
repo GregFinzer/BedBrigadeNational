@@ -21,7 +21,6 @@ BuildPostalCode: Build Postal Code
 BuildState: Build State
 Calendar: Calendar
 Campaign: Campaign
-CampaignName: Campaign Name
 Cancel: Cancel
 ChangePassword: Change Password
 ChangePasswordExpired: Change password expired, request Forgot Password again.
@@ -30,9 +29,6 @@ ChooseATime: Choose a Time
 City: City
 ClickToSignup: (Click to Signup)
 CompareConfirmPasswordToPassword: The passwords do not match.
-ConfigurationKey: Configuration Key
-ConfigurationSection: Configuration Section
-ConfigurationValue: Configuration Value
 ConfirmPassword: Confirm Password
 ContactInformation: Contact Information
 ContactMessage: Contact Message
@@ -104,7 +100,6 @@ DynamicYes: Yes
 Email: Email
 EmailColon: 'Email:'
 EmailSent: Email Sent
-EndDate: End Date
 EnterYourZipCode: Enter your Zip code
 Event: Event
 Events: Events
@@ -154,7 +149,6 @@ MailingAddress: Mailing Address
 MailingCity: Mailing City
 MailingPostalCode: Mailing Postal Code
 MailingState: Mailing State
-ManageConfiguration: Manage Configuration
 ManageDonations: Manage Donations
 MaxLengthBedType100: Bed Type has a maximum length of 100 characters
 MaxLengthChurchName80: Church Name has a maximum length of 80 characters
@@ -313,7 +307,6 @@ SorryYouAreNot: Sorry, you are not authorized to view this page.
 SpeakEnglishCaption: Do you speak English?
 SpeakEnglishPlaceholder: English ability...
 SpecialInstructions: Special Instructions
-StartDate: Start Date
 State: State
 StateNotMatchZipCode: The state that you have entered does not match the zip code.  It should be {stateForZipCode}
 Status: Status

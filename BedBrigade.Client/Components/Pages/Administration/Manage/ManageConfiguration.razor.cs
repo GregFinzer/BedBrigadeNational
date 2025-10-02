@@ -16,7 +16,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private IUserDataService? _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
-        [Inject] private ILanguageContainerService _lc { get; set; }
+
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private ToastService _toastService { get; set; }
 
@@ -53,8 +53,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             try
             {
-
-                _lc.InitLocalizedComponent(this);
                 Log.Information($"{_svcAuth.UserName} went to the Manage Configurations Page");
 
                 if (_svcAuth.IsNationalAdmin)
