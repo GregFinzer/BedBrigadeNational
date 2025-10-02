@@ -53,6 +53,42 @@ img {
         color: #000000 !important;
     }
 
+.btn-success {
+    background-color: green !important;
+    font-size: 15px;
+    font-weight: bold;
+    color: white !important;
+    border-color: green !important;
+    font-family: "Comfortaa";
+    border-radius: 100px;
+    padding: 9px 40px;
+    margin: 20px 0 0;
+    transition: 0.7s ease;
+}
+
+    .btn-success:hover {
+        background-color: #171717 !important;
+        color: white !important;
+    }
+
+.btn-danger {
+    background-color: red !important;
+    font-size: 15px;
+    font-weight: bold;
+    color: white !important;
+    border-color: red !important;
+    font-family: "Comfortaa";
+    border-radius: 100px;
+    padding: 9px 40px;
+    margin: 20px 0 0;
+    transition: 0.7s ease;
+}
+
+    .btn-danger:hover {
+        background-color: #171717 !important;
+        color: white !important;
+    }
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
