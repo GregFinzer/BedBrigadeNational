@@ -18,7 +18,7 @@ namespace BedBrigade.Common.Models
         public string CampaignName { get; set; } = string.Empty;
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
         public DateTime? EndDate { get; set; }
 

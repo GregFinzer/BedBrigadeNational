@@ -90,6 +90,8 @@ namespace BedBrigade.Client.Services
                     _auth.UserHasRole(RoleNames.CanViewAdminDashboard)),
                 ("Donations", "administration/manage/donations", "fas fa-donate",
                     _auth.UserHasRole(RoleNames.CanManageDonations)),
+                ("Donation Campaigns", "administration/manage/DonationCampaigns", "fas fa-bullseye",
+                    _auth.UserHasRole(RoleNames.CanManageDonationCampaigns)),
                 ("Locations", "administration/manage/locations", "fas fa-map-marker-alt",
                     _auth.UserHasRole(RoleNames.CanViewLocations)),
                 ("Media", "administration/manage/fm", "fas fa-images", _auth.UserHasRole(RoleNames.CanManageMedia)),

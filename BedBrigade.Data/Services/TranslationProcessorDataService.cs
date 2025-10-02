@@ -217,7 +217,7 @@ namespace BedBrigade.Data.Services
 
             //If there are no translations to translate then return
             if (!translationsToProcess.Any())
-                return false;
+                return true; // It is not a failure, just nothing to do
 
             Log.Debug("TranslationProcessorDataService:  Locking TranslationQueue");
             await _translationQueueDataService.LockTranslationsToProcess(translationsToProcess);

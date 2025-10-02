@@ -30,9 +30,6 @@ ChooseATime: Escoge una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
-ConfigurationKey: Clave de configuración
-ConfigurationSection: Sección de configuración
-ConfigurationValue: Valor de configuración
 ConfirmPassword: Confirmar contraseña
 ContactInformation: Información de contacto
 ContactMessage: Mensaje de contacto
@@ -152,7 +149,6 @@ MailingAddress: Dirección postal
 MailingCity: Ciudad de correo
 MailingPostalCode: Código Postal
 MailingState: Estado de envío
-ManageConfiguration: Administrar la Configuración
 ManageDonations: Administrar Donaciones
 MaxLengthBedType100: El tipo de cama tiene una longitud máxima de 100 caracteres
 MaxLengthChurchName80: El nombre de la iglesia tiene una longitud máxima de 80 caracteres
