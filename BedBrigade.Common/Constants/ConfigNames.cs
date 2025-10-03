@@ -51,6 +51,7 @@
         public const string PrimaryLanguage = "PrimaryLanguage";
         public const string SpeakEnglish = "SpeakEnglish";
         public const string ContactUsEmails = "ContactUsEmails";
+        public const string BedRequestEmails = "BedRequestEmails";
 
         //GeoLocation
         public const string GeoLocationUrl = "GeoLocationUrl";

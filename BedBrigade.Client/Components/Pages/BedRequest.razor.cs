@@ -301,13 +301,13 @@ namespace BedBrigade.Client.Components.Pages
             if (!cities.Any(o => o.ToLower() == newRequest.City.ToLower()))
             {
                 string cityNames = string.Join(", ", cities);
-                return _lc.Keys["InvalidCity", new {cityNames = cityNames}];
+                return _lc.Keys["InvalidCity"] + " " + cityNames;
             }
 
             string stateForZipCode = Validation.GetStateForZipCode(newRequest.PostalCode);
             if (newRequest.State != stateForZipCode)
             {
-                return _lc.Keys["StateNotMatchZipCode", stateForZipCode];
+                return _lc.Keys["StateNotMatchZipCode"] + " " + stateForZipCode;
             }
 
             return string.Empty;
