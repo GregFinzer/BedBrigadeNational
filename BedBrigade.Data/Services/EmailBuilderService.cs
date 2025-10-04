@@ -326,10 +326,11 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<bool>(bodyResult.Message, false);
             }
 
+            string subject = BuildBedRequestConfirmationSubject(entity);
             EmailQueue emailQueue = new()
             {
                 ToAddress = entity.Email,
-                Subject = BuildBedRequestConfirmationSubject(entity),
+                Subject = subject,
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority
             };
@@ -338,6 +339,24 @@ namespace BedBrigade.Data.Services
             if (!emailResult.Success)
             {
                 return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            ServiceResponse<List<string>> userEmails =
+                await _userDataService.GetEmailsByLocationAndConfigName(entity.LocationId, ConfigNames.BedRequestEmails);
+
+            if (!userEmails.Success || userEmails.Data == null)
+            {
+                return new ServiceResponse<bool>(userEmails.Message, false);
+            }
+
+            if (userEmails.Data.Count > 0)
+            {
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+
+                if (!bulkEmailResponse.Success)
+                {
+                    return new ServiceResponse<bool>(bulkEmailResponse.Message, false);
+                }
             }
 
             return new ServiceResponse<bool>("Successfully queued Bed Request Confirmation Email", true);

@@ -257,6 +257,12 @@ namespace BedBrigade.Client.Components
             {
                 if (_svcAuth.IsLoggedIn)
                 {
+                    //Force load the Admin menu if the session is restored. All logged in users should see the Dashboard link
+                    if (!_headerContent.Contains("Dashboard"))
+                    {
+                        await LoadContent();
+                        StateHasChanged();
+                    }
                     await _js.InvokeVoidAsync(SetInnerHTML, LoginElement, "Logout");
                     await _js.InvokeVoidAsync("SetGetValue.SetAttribute", LoginElement, "href", "/logout");
                 }

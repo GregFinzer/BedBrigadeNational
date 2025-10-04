@@ -486,12 +486,18 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
 
     private List<LogEvent> ApplyFilters(List<LogEvent> source)
     {
+        List<string> backgroundNames = new List<string>()
+        {
+            "background",
+            "GeoLocationProcessorDataService",
+            "TranslationProcessorDataService",
+        };
        var result =  source.Where(e =>
             (ShowDebug || e.Level != Debug) &&
             (ShowInfo || e.Level != Information) &&
             (ShowWarn || e.Level != Warning) &&
             (ShowError || e.Level != Error) &&
-            (ShowBackground || (e.Raw != null && !e.Raw.Contains("background", StringComparison.OrdinalIgnoreCase))) &&
+            (ShowBackground || (e.Raw != null && !backgroundNames.Any(b=>  e.Raw.Contains(b, StringComparison.OrdinalIgnoreCase)))) &&
             (String.IsNullOrEmpty(SearchString) || (e.Raw != null && e.Raw.Contains(SearchString, StringComparison.OrdinalIgnoreCase))))
            .ToList();
 

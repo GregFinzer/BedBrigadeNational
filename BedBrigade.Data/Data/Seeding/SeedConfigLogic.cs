@@ -529,6 +529,13 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.CustomStrings,
                     LocationId = locationId
                 },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.BedRequestEmails,
+                    ConfigurationValue = "Location Scheduler",
+                    Section = ConfigSection.Email,
+                    LocationId = locationId
+                },
             };
         }
     }
