@@ -46,6 +46,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool NoPaging { get; private set; }
         private bool ShouldDisplayEmailMessage = false;
         public string ManageVolunteersMessage { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -79,6 +80,21 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
         }
 
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!firstRender)
+            {
+                if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
+                {
+                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    Grid.EditSettings.AllowDeleting = true;
+                    Grid.EditSettings.AllowAdding = true;
+                    Grid.EditSettings.AllowEditing = true;
+                    StateHasChanged();
+                }
+            }
+            return base.OnAfterRenderAsync(firstRender);
+        }
 
         private async Task LoadUserData()
         {
@@ -196,13 +212,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected async Task Edit(ActionEventArgs<Volunteer> args)
         {
-            var volunteer = (await Grid.GetSelectedRecordsAsync()).FirstOrDefault();
-
-            if (volunteer != null)
-            {
-                args.Cancel = true; 
-                _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
-            }
+            var volunteer = args.Data;
+            await Grid.EndEditAsync();
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
         }
 
         public async Task OnActionBegin(ActionEventArgs<Volunteer> args)
