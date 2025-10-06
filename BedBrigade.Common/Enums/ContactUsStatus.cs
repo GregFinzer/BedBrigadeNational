@@ -3,6 +3,7 @@
     public enum ContactUsStatus
     {
         ContactRequested,
-        Responded
+        Responded,
+        Cancelled
     }
 }

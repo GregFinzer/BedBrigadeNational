@@ -491,6 +491,7 @@ public partial class ViewLogs : ComponentBase, IAsyncDisposable
             "background",
             "GeoLocationProcessorDataService",
             "TranslationProcessorDataService",
+            "EmailBounceService"
         };
        var result =  source.Where(e =>
             (ShowDebug || e.Level != Debug) &&
