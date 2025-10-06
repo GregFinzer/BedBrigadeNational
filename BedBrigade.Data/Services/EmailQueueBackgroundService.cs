@@ -6,6 +6,8 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using System.Net.Mail;
+using BedBrigade.Common.Logic;
+using KellermanSoftware.NetEmailValidation;
 
 namespace BedBrigade.Data.Services
 {
@@ -16,6 +18,7 @@ namespace BedBrigade.Data.Services
         private IEmailBounceService _emailBounceService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<EmailQueueBackgroundService> _logger;
+        private readonly EmailValidation _emailValidation;
         private bool _isProcessing = false;
         private bool _isStopping;
         private bool _sendNow;
@@ -45,6 +48,7 @@ namespace BedBrigade.Data.Services
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _emailValidation = LibraryFactory.CreateEmailValidation();
         }
 
         public void StopService()
@@ -355,6 +359,10 @@ namespace BedBrigade.Data.Services
 
         private async Task SendLiveEmail(EmailQueue email)
         {
+            if (!(await CheckEmailValid(email)))
+                return;
+            
+
             MailMessage mailMessage = CreateTheMailMessage(email);
 
             // Send the email
@@ -376,6 +384,27 @@ namespace BedBrigade.Data.Services
             email.LockDate = null;
             email.SentDate = DateTime.UtcNow;
             await _emailQueueDataService.UpdateAsync(email);
+        }
+
+        private async Task<bool> CheckEmailValid(EmailQueue email)
+        {
+            List<ValidationOptions> options = new List<ValidationOptions>(_emailValidation.NoConnectOptions);
+            options.Add(ValidationOptions.MailServerExists);
+            _emailValidation.FromEmail = _fromEmailAddress;
+            _emailValidation.FromMailServer = _host;
+
+            Result? result = _emailValidation.ValidEmail(email.ToAddress, options);
+
+            if (result.IsValid)
+                return true;
+
+            email.Status = QueueStatus.Failed.ToString();
+            email.FailureMessage = $"Email address is not valid: {result.StatusDescription}";
+            email.LockDate = null;
+            email.SentDate = DateTime.UtcNow;
+            await _emailQueueDataService.UpdateAsync(email);
+            await _emailBounceService.ProcessInvalidEmail(email.ToAddress);
+            return false;
         }
 
         private static MailMessage CreateTheMailMessage(EmailQueue email)

@@ -55,6 +55,23 @@ public class EmailBounceService : IEmailBounceService
         _bounceKeywords.Add("undelivered mail");
     }
 
+    public async Task ProcessInvalidEmail(string email)
+    {
+        List<string> bouncedEmails = new List<string>() { email };
+        int cancelledBeRequests = await _bedRequestDataService.CancelWaitingForBouncedEmail(bouncedEmails);
+
+        if (cancelledBeRequests > 0)
+        {
+            _logger.LogInformation($"{cancelledBeRequests} Bed Requests cancelled due to invalid email.");
+        }
+        int cancelledContactUs = await _contactUsDataService.CancelContactRequestedForBouncedEmail(bouncedEmails);
+
+        if (cancelledContactUs > 0)
+        {
+            _logger.LogInformation($"{cancelledContactUs} Contact Requests cancelled due to invalid email.");
+        }
+    }
+
     public async Task ProcessBounces(CancellationToken cancellationToken = default)
     {
         try

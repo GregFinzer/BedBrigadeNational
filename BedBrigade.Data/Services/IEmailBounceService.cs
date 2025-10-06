@@ -9,5 +9,6 @@ namespace BedBrigade.Data.Services
     public interface IEmailBounceService
     {
         Task ProcessBounces(CancellationToken cancellationToken = default);
+        Task ProcessInvalidEmail(string email);
     }
 }
