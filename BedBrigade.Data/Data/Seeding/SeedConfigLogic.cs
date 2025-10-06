@@ -245,7 +245,20 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.Email,
                     LocationId = Defaults.NationalLocationId
                 },
-
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailImapPort,
+                    ConfigurationValue = "993",
+                    Section = ConfigSection.Email,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.EmailImapUseSsl,
+                    ConfigurationValue = "true",
+                    Section = ConfigSection.Email,
+                    LocationId = Defaults.NationalLocationId
+                },
                 new()
                 {
                     ConfigurationKey = ConfigNames.DisplayIdFields,

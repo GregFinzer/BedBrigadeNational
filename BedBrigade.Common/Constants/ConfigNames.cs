@@ -52,6 +52,8 @@
         public const string SpeakEnglish = "SpeakEnglish";
         public const string ContactUsEmails = "ContactUsEmails";
         public const string BedRequestEmails = "BedRequestEmails";
+        public const string EmailImapPort = "EmailImapPort";
+        public const string EmailImapUseSsl = "EmailImapUseSsl";
 
         //GeoLocation
         public const string GeoLocationUrl = "GeoLocationUrl";

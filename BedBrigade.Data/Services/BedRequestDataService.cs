@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Constants;
+﻿using AngleSharp.Dom;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -256,6 +257,35 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<BedRequest>($"Found waiting BedRequest for email {email}", true, bedRequest);
         }
     }
+
+    public async Task<int> CancelWaitingForBouncedEmail(List<string> emailList)
+    {
+        string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var lowerEmailList = emailList.Select(e => e.ToLower()).ToList();
+
+            int updated = await ctx.Set<BedRequest>()
+                .Where(o => lowerEmailList.Contains(o.Email.ToLower())
+                            && o.Status == BedRequestStatus.Waiting)
+                .ExecuteUpdateAsync(updates => updates
+                    .SetProperty(o => o.UpdateUser, userName)
+                    .SetProperty(o => o.UpdateDate, DateTime.UtcNow)
+                    .SetProperty(o => o.MachineName, Environment.MachineName)
+                    .SetProperty(o => o.Status, o => BedRequestStatus.Cancelled)
+                    .SetProperty(o => o.Notes,
+                        o => (o.Notes ?? "") + " | Cancelled due to bounced email"));
+
+            if (updated > 0)
+            {
+                _cachingService.ClearScheduleRelated();
+            }
+
+            return updated;
+        }
+    }
+
+
 
     public async Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone)
     {
