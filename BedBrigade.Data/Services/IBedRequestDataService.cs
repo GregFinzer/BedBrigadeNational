@@ -22,5 +22,6 @@ namespace BedBrigade.Data.Services
         List<BedRequest> SortBedRequestClosestToAddress(List<BedRequest> bedRequests, int bedRequestId);
         Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email);
         Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone);
+        Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
     }
 }

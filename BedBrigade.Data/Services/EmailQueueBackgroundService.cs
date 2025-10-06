@@ -5,7 +5,6 @@ using System.Text;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using Azure;
 using System.Net.Mail;
 
 namespace BedBrigade.Data.Services
@@ -14,6 +13,7 @@ namespace BedBrigade.Data.Services
     {
         private IEmailQueueDataService _emailQueueDataService;
         private IConfigurationDataService _configurationDataService;
+        private IEmailBounceService _emailBounceService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<EmailQueueBackgroundService> _logger;
         private bool _isProcessing = false;
@@ -74,7 +74,7 @@ namespace BedBrigade.Data.Services
                         {
                             _emailQueueDataService = scope.ServiceProvider.GetRequiredService<IEmailQueueDataService>();
                             _configurationDataService = scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
-
+                            _emailBounceService = scope.ServiceProvider.GetRequiredService<IEmailBounceService>();
                             await LoadConfiguration();
                             await ProcessQueue(cancellationToken);
                         }
@@ -194,7 +194,16 @@ namespace BedBrigade.Data.Services
                 return;
 
             await SendQueuedEmails(cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
             await _emailQueueDataService.DeleteOldEmailQueue(_emailKeepDays);
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            await _emailBounceService.ProcessBounces(cancellationToken);
         }
 
         private bool TimeToSendEmail()
@@ -356,12 +365,6 @@ namespace BedBrigade.Data.Services
                 smtpClient.Credentials = new System.Net.NetworkCredential(_userName, _password);
                 smtpClient.Send(mailMessage);
                 email.Status = QueueStatus.Sent.ToString();
-            }
-            catch (RequestFailedException ex)
-            {
-                email.FailureMessage =
-                    $"Email send operation failed with error code: {ex.ErrorCode}, message: {ex}";
-                email.Status = QueueStatus.Failed.ToString();
             }
             catch (Exception ex)
             {

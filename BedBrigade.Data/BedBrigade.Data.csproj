@@ -13,6 +13,7 @@
     <PackageReference Include="Bogus" Version="35.6.0" />
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.64" />
+    <PackageReference Include="MailKit" Version="4.14.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
