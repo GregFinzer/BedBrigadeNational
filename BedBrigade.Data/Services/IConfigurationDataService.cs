@@ -8,6 +8,7 @@ namespace BedBrigade.Data.Services
     {
         Task<ServiceResponse<List<Configuration>>> GetAllAsync(ConfigSection section);
         Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key);
+        Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key, int locationId);
         Task<string> GetConfigValueAsync(ConfigSection section, string key);
         Task<string> GetConfigValueAsync(ConfigSection section, string key, int locationId);
         Task<decimal> GetConfigValueAsDecimalAsync(ConfigSection section, string key);

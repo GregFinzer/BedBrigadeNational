@@ -5,6 +5,8 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.AddressParser;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
+using Stripe.Terminal;
 
 namespace BedBrigade.Data.Services;
 
@@ -16,12 +18,15 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly ILocationDataService _locationDataService;
     private readonly IGeoLocationQueueDataService _geoLocationQueueDataService;
     private readonly ITimezoneDataService _timezoneDataService;
+    private readonly IConfigurationDataService _configurationDataService;
 
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         IAuthService authService,
         ICommonService commonService,
         ILocationDataService locationDataService,
-        IGeoLocationQueueDataService geoLocationQueueDataService, ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
+        IGeoLocationQueueDataService geoLocationQueueDataService, 
+        ITimezoneDataService timezoneDataService,
+        IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -29,6 +34,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _locationDataService = locationDataService;
         _geoLocationQueueDataService = geoLocationQueueDataService;
         _timezoneDataService = timezoneDataService;
+        _configurationDataService = configurationDataService;
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -463,6 +469,34 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                                                 && o.Status == BedRequestStatus.Scheduled).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
+        }
+    }
+
+    public async Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var result = await dbSet.Where(o => (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
+                && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) || o.Email == bedRequest.Email))
+                    .OrderByDescending(o => o.DeliveryDate)
+                    .FirstOrDefaultAsync();
+
+            if (result == null || !result.DeliveryDate.HasValue)
+            {
+                return new ServiceResponse<DateTime?>("No previous bed request", true, null);
+            }
+
+            int monthsBetweenRequests = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.MonthsBetweenRequests, bedRequest.LocationId);
+
+            if (monthsBetweenRequests <= 0)
+            {
+                return new ServiceResponse<DateTime?>("No restriction on months between requests", true, null);
+            }
+
+            DateTime nextEligibleDate = result.DeliveryDate.Value.AddMonths(monthsBetweenRequests).AddDays(1);
+            return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
         }
     }
 }
