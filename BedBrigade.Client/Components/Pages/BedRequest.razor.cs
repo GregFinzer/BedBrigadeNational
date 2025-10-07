@@ -203,8 +203,15 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            @@@HERE
-            if (await _svcBedRequest.HasRecentPreviousDelivery(newRequest))
+            newRequest.LocationId = SearchLocation.ddlValue;
+            DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
+
+            if (nextEligibleDate.HasValue)
+            {
+                await ShowValidationMessage(_lc.Keys["RecentlyGivenBed"] + " " + nextEligibleDate.Value.ToShortDateString());
+                return false;
+            }
+
             if (newRequest.PrimaryLanguage != "English")
             {
                 if (string.IsNullOrEmpty(newRequest.SpeakEnglish))

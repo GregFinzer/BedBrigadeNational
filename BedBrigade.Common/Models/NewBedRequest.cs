@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,6 +26,11 @@ namespace BedBrigade.Common.Models
         [Required(ErrorMessage = "Phone Number is required")]
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
         public String Phone { get; set; } = string.Empty;
+
+        public String? FormattedPhone
+        {
+            get { return Phone.FormatPhoneNumber(); }
+        }
 
         [Required(ErrorMessage = "Street Address is required")]
         [MaxLength(50, ErrorMessage = "Street Address has a maximum length of 50 characters")]

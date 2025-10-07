@@ -23,6 +23,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email);
         Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone);
         Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
-        Task<ServiceResponse<bool>> HasRecentPreviousDelivery(BedRequest bedRequest);
+        Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
     }
 }

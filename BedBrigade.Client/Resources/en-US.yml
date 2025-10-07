@@ -226,6 +226,7 @@ PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
 Processing: Processing
 RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
+RecentlyGivenBed: You were recently given a bed.  Your next eligible date to request a bed is
 Reference: Reference
 RegisterOrUpdate: Register or Update
 RegularExpressionEmail: Invalid email format

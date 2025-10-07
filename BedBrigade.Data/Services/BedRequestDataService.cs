@@ -472,19 +472,19 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-    public async Task<ServiceResponse<bool>> HasRecentPreviousDelivery(BedRequest bedRequest)
+    public async Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest)
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
-                && (o.FormattedPhone == bedRequest.FormattedPhone || o.Email == bedRequest.Email))
+                && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) || o.Email == bedRequest.Email))
                     .OrderByDescending(o => o.DeliveryDate)
                     .FirstOrDefaultAsync();
 
             if (result == null || !result.DeliveryDate.HasValue)
             {
-                return new ServiceResponse<bool>("No previous bed request", true, false);
+                return new ServiceResponse<DateTime?>("No previous bed request", true, null);
             }
 
             int monthsBetweenRequests = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
@@ -492,12 +492,11 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
             if (monthsBetweenRequests <= 0)
             {
-                return new ServiceResponse<bool>("No restriction on months between requests", true, false);
+                return new ServiceResponse<DateTime?>("No restriction on months between requests", true, null);
             }
 
-            DateTime thresholdDate = DateTime.UtcNow.AddMonths(-monthsBetweenRequests);
-            bool isRecent = result.DeliveryDate.Value > thresholdDate;
-            return new ServiceResponse<bool>($"Previous delivery date {result.DeliveryDate.Value}, threshold date {thresholdDate}, is recent: {isRecent}", true, isRecent);
+            DateTime nextEligibleDate = result.DeliveryDate.Value.AddMonths(monthsBetweenRequests).AddDays(1);
+            return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
         }
     }
 }
