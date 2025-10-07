@@ -62,6 +62,9 @@ public class Location : BaseEntity
     [MaxLength(50, ErrorMessage = "Group has a maximum length of 50 characters")]
     public string? Group { get; set; } = string.Empty;
 
+    [MaxLength(4000, ErrorMessage = "Service Zip Codes has a maximum length of 4000 characters")]
+    public string? ServiceZipCodes { get; set; } = string.Empty;
+
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
     public ICollection<Content> Contents { get; set; } = new List<Content>();

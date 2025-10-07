@@ -170,6 +170,7 @@ MaxLengthPassword255: La contraseña tiene una longitud máxima de 255 caractere
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
 MaxLengthReference100: La referencia tiene una longitud máxima de 100 caracteres
+MaxLengthServiceZipCodes4000: Los códigos postales de servicio tienen una longitud máxima de 4000 caracteres
 MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet50: La dirección tiene una longitud máxima de 50 caracteres
@@ -300,6 +301,7 @@ Send: Enviar
 SendEmail: Enviar Correo Electrónico
 SendMessage: Enviar Mensaje
 SendTaxForms: Enviar formularios de impuestos
+ServiceZipCodes: Códigos postales de servicio
 ShowPassword: Mostrar contraseña
 ShowSchedules: Mostrar horarios
 SkipToBuilds: Ir a Compilaciones
