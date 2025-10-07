@@ -269,6 +269,10 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             var distance = parser.GetDistanceInMilesBetweenTwoZipCodes(postalCode, loc.BuildPostalCode);
             if (distance < maxMiles)
             {
+                //This is a Bed Brigade location that serves specific zip codes. It has to be in the list
+                if (!String.IsNullOrWhiteSpace(loc.ServiceZipCodes) && !loc.ServiceZipCodes.Contains(postalCode))
+                    continue;
+
                 LocationDistance locationDistance = new LocationDistance();
                 locationDistance.LocationId = loc.LocationId;
                 locationDistance.Name = loc.IsActive ? loc.Name : $"*{loc.Name}";

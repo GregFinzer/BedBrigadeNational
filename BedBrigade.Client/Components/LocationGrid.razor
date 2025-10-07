@@ -17,151 +17,161 @@ else
             <h3>@ManageLocationsMessage</h3>
         </div>
         <div class="col-md-2 ps-3 ps-md-0">
-            <UserInfo />
+            <UserInfo/>
         </div>
     </div>
 
-        <div class="col-md-12 control-sec">
-            <div class="content-wrapper">
-                <div class="row">
-                    <SfGrid @ref="Grid" TValue="Location" DataSource=@Locations
-                            ContextMenuItems=@ContextMenu
-                            EnablePersistence="true"
-                            ShowColumnChooser="true"
-                            Toolbar=@ToolBar
-                            AllowPaging="true"
-                            AllowSorting="true"
-                            AllowExcelExport="true"
-                            ShowColumnMenu="false"
-                            AllowFiltering="true"
-                            AllowReordering="true"
-                            AllowResizing="true"
-                            AllowSelection="true"
-                            AllowPdfExport="true"
-                            AllowTextWrap="true">
-                        <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25})" PageSize="15" />
-                        <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Location" />
-                        <GridTemplates>
-                            <EmptyRecordTemplate>
-                                <span>@RecordText</span>
-                            </EmptyRecordTemplate>
-                        </GridTemplates>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                            <HeaderTemplate>
-                                @{
-                                    @HeaderTitle
-                                }
-                            </HeaderTemplate>
-                            <FooterTemplate>
-                                <button class="btn btn-primary" @onclick=@(() => Save(context as Location)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
-                            </FooterTemplate>
-                            <Template>
-                                @{
-                                    Location location = (context as Location)!;
+    <div class="col-md-12 control-sec">
+        <div class="content-wrapper">
+            <div class="row">
+                <SfGrid @ref="Grid" TValue="Location" DataSource=@Locations
+                        ContextMenuItems=@ContextMenu
+                        EnablePersistence="true"
+                        ShowColumnChooser="true"
+                        Toolbar=@ToolBar
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowExcelExport="true"
+                        ShowColumnMenu="false"
+                        AllowFiltering="true"
+                        AllowReordering="true"
+                        AllowResizing="true"
+                        AllowSelection="true"
+                        AllowPdfExport="true"
+                        AllowTextWrap="true">
+                    <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15"/>
+                    <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin TValue="Location"/>
+                    <GridTemplates>
+                        <EmptyRecordTemplate>
+                            <span>@RecordText</span>
+                        </EmptyRecordTemplate>
+                    </GridTemplates>
+                    <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
+                        <HeaderTemplate>
+                            @{
+                                @HeaderTitle
+                            }
+                        </HeaderTemplate>
+                        <FooterTemplate>
+                            <button class="btn btn-primary" @onclick=@(() => Save(context as Location)) IsPrimary="true">@ButtonTitle</button>
+                            <button class="btn btn-secondary" @onclick="Cancel">@_lc.Keys["Cancel"]</button>
+                        </FooterTemplate>
+                        <Template>
+                            @{
+                                Location location = (context as Location)!;
 
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="@_lc.Keys["Name"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.Route Enabled="true" Placeholder="@_lc.Keys["Route"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4" >
-                                            <div class="important-box">
-                                                <label for="checked" style="font-weight: bold" >@_lc.Keys["Active"]</label>
-                                                <SfSwitch @bind-Checked="@location.IsActive"></SfSwitch>
-                                            </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="@_lc.Keys["Name"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <SfTextBox ID="group" @bind-Value=@location.Group Enabled="true" Placeholder="@_lc.Keys["Group"]" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <SfTextBox @bind-Value=@location.Route Enabled="true" Placeholder="@_lc.Keys["Route"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="important-box">
+                                            <label for="checked" style="font-weight: bold">@_lc.Keys["Active"]</label>
+                                            <SfSwitch @bind-Checked="@location.IsActive"></SfSwitch>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-8">
-                                            <SfTextBox @bind-Value=@location.MailingAddress Enabled="true" Placeholder="@_lc.Keys["MailingAddress"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-8">
+                                        <SfTextBox @bind-Value=@location.MailingAddress Enabled="true" Placeholder="@_lc.Keys["MailingAddress"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.MailingCity Enabled="true" Placeholder="@_lc.Keys["MailingCity"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.MailingState Enabled="true" Placeholder="@_lc.Keys["MailingState"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.MailingPostalCode Enabled="true" Placeholder="@_lc.Keys["MailingPostalCode"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.MailingCity Enabled="true" Placeholder="@_lc.Keys["MailingCity"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-8">
-                                            <SfTextBox @bind-Value=@location.BuildAddress Enabled="true" Placeholder="@_lc.Keys["BuildAddress"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.MailingState Enabled="true" Placeholder="@_lc.Keys["MailingState"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.BuildCity Enabled="true" Placeholder="@_lc.Keys["BuildCity"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.BuildState Enabled="true" Placeholder="@_lc.Keys["BuildState"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfTextBox @bind-Value=@location.BuildPostalCode Enabled="true" Placeholder="@_lc.Keys["BuildPostalCode"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.MailingPostalCode Enabled="true" Placeholder="@_lc.Keys["MailingPostalCode"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <SfNumericTextBox TValue="decimal?" Min="-90.000000m" Max="90.000000m" Step="0.000001m" Format="n6" 
-                                                              @bind-Value=@location.Latitude Enabled="true" 
-                                                              Placeholder="@_lc.Keys["Latitude"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <SfNumericTextBox TValue="decimal?" Min="-180.000000m" Max="180.000000m" Step="0.000001m" Format="n6" 
-                                                              @bind-Value=@location.Longitude Enabled="true" 
-                                                              Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-8">
+                                        <SfTextBox @bind-Value=@location.BuildAddress Enabled="true" Placeholder="@_lc.Keys["BuildAddress"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="@_lc.Keys["SelectMetroArea"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
-                                                <DropDownListFieldSettings Value="MetroAreaId" Text="Name" />
-                                            </SfDropDownList>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfDropDownList TValue="string?" TItem="TimeZoneItem" DataSource="@TimeZones" Placeholder="@_lc.Keys["SelectTimeZone"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.TimeZoneId">
-                                                <DropDownListFieldSettings Value="TimeZoneId" Text="TimeZoneWithGmt" />
-                                            </SfDropDownList>
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.BuildCity Enabled="true" Placeholder="@_lc.Keys["BuildCity"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
-                                }
-                            </Template>
-                        </GridEditSettings>
-                        <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
-                        <GridSortSettings>
-                            <GridSortColumns>
-                                <GridSortColumn Field="Name" Direction="SortDirection.Ascending" />
-                            </GridSortColumns>
-                        </GridSortSettings>
-                        <GridColumns>
-                            <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
-                            <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })" />
-                            <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.MailingCity) ShowColumnMenu="false" HeaderText="Mailing City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.MailingState) ShowColumnMenu="false" HeaderText="Mailing State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.MailingPostalCode) ShowColumnMenu="false" HeaderText="Mailing Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.BuildAddress) ShowColumnMenu="false" HeaderText="Build Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.BuildCity) ShowColumnMenu="false" HeaderText="Build City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.BuildState) ShowColumnMenu="false" HeaderText="Build State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.BuildPostalCode) ShowColumnMenu="false" HeaderText="Build Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                            <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true" />
-                            <GridForeignColumn Field=@nameof(Location.MetroAreaId) ForeignDataSource=@MetroAreas ForeignKeyField="MetroAreaId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Metro Area" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
-                        <GridColumn Field=@nameof(Location.TimeZoneId) ShowColumnMenu="false" HeaderText="Timezone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
-                        </GridColumns>
-                    </SfGrid>
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.BuildState Enabled="true" Placeholder="@_lc.Keys["BuildState"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <SfTextBox @bind-Value=@location.BuildPostalCode Enabled="true" Placeholder="@_lc.Keys["BuildPostalCode"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <SfNumericTextBox TValue="decimal?" Min="-90.000000m" Max="90.000000m" Step="0.000001m" Format="n6"
+                                                          @bind-Value=@location.Latitude Enabled="true"
+                                                          Placeholder="@_lc.Keys["Latitude"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <SfNumericTextBox TValue="decimal?" Min="-180.000000m" Max="180.000000m" Step="0.000001m" Format="n6"
+                                                          @bind-Value=@location.Longitude Enabled="true"
+                                                          Placeholder="@_lc.Keys["Longitude"]" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <SfDropDownList TValue="int?" TItem="MetroArea" DataSource="@MetroAreas" Placeholder="@_lc.Keys["SelectMetroArea"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.MetroAreaId">
+                                            <DropDownListFieldSettings Value="MetroAreaId" Text="Name"/>
+                                        </SfDropDownList>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <SfDropDownList TValue="string?" TItem="TimeZoneItem" DataSource="@TimeZones" Placeholder="@_lc.Keys["SelectTimeZone"]" FloatLabelType="FloatLabelType.Auto" @bind-Value="location.TimeZoneId">
+                                            <DropDownListFieldSettings Value="TimeZoneId" Text="TimeZoneWithGmt"/>
+                                        </SfDropDownList>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <SfTextArea @bind-Value=@location.ServiceZipCodes Enabled="true" Placeholder="@_lc.Keys["ServiceZipCodes"]" FloatLabelType="FloatLabelType.Auto" RowCount="10" ColumnCount="50" Width="100%" />
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridEditSettings>
+                    <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+                    <GridSortSettings>
+                        <GridSortColumns>
+                            <GridSortColumn Field="Name" Direction="SortDirection.Ascending"/>
+                        </GridSortColumns>
+                    </GridSortSettings>
+                    <GridColumns>
+                        <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
+                        <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.Group) ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
+                        <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.MailingCity) ShowColumnMenu="false" HeaderText="Mailing City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.MailingState) ShowColumnMenu="false" HeaderText="Mailing State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.MailingPostalCode) ShowColumnMenu="false" HeaderText="Mailing Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.BuildAddress) ShowColumnMenu="false" HeaderText="Build Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.BuildCity) ShowColumnMenu="false" HeaderText="Build City" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.BuildState) ShowColumnMenu="false" HeaderText="Build State" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.BuildPostalCode) ShowColumnMenu="false" HeaderText="Build Postal Code" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.Latitude) ShowColumnMenu="false" HeaderText="Latitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.Longitude) ShowColumnMenu="false" HeaderText="Longitude" Type="ColumnType.Number" Format="###.######" AllowEditing="false" AllowFiltering="false" AutoFit="true"/>
+                        <GridForeignColumn Field=@nameof(Location.MetroAreaId) ForeignDataSource=@MetroAreas ForeignKeyField="MetroAreaId" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Metro Area" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.TimeZoneId) ShowColumnMenu="false" HeaderText="Timezone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                        <GridColumn Field=@nameof(Location.ServiceZipCodes) ShowColumnMenu="false" HeaderText="Service Zip Codes" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                    </GridColumns>
+                </SfGrid>
 
-                </div>
             </div>
         </div>
+    </div>
 
 }
 

@@ -170,6 +170,7 @@ MaxLengthPassword255: Password has a maximum length of 255 characters
 MaxLengthPhone14: Phone Number has a maximum length of 14 characters
 MaxLengthPostalCode5: Postal Code has a maximum length of 5 characters
 MaxLengthReference100: Reference has a maximum length of 100 characters
+MaxLengthServiceZipCodes4000: Service Zip Codes has a maximum length of 4000 characters
 MaxLengthSpecialInstructions4000: Special Instructions has a maximum length of 4000 characters
 MaxLengthState30: State has a maximum length of 30 characters
 MaxLengthStreet50: Street Address has a maximum length of 50 characters
@@ -299,6 +300,7 @@ Send: Send
 SendEmail: Send Email
 SendMessage: Send Message
 SendTaxForms: Send Tax Forms
+ServiceZipCodes: Service Zip Codes
 ShowPassword: Show Password
 ShowSchedules: Show Schedules
 SkipToBuilds: Skip to Builds
