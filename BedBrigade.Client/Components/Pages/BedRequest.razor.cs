@@ -203,6 +203,8 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            @@@HERE
+            if (await _svcBedRequest.HasRecentPreviousDelivery(newRequest))
             if (newRequest.PrimaryLanguage != "English")
             {
                 if (string.IsNullOrEmpty(newRequest.SpeakEnglish))

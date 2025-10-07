@@ -549,6 +549,13 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.Email,
                     LocationId = locationId
                 },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.MonthsBetweenRequests,
+                    ConfigurationValue = "12",
+                    Section = ConfigSection.System,
+                    LocationId = locationId
+                },
             };
         }
     }
