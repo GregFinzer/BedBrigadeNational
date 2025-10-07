@@ -203,6 +203,19 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            if (!await DeepValidation()) return false;
+
+            if (!ValidReCAPTCHA)
+            {
+                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DeepValidation()
+        {
             newRequest.LocationId = SearchLocation.ddlValue;
             DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
 
@@ -247,12 +260,6 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            if (!ValidReCAPTCHA)
-            {
-                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
-                return false;
-            }
-
             string distanceMessage = await ValidateZipDistance();
 
             if (!string.IsNullOrEmpty(distanceMessage))
@@ -262,7 +269,7 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        } 
+        }
 
         private void ClearValidationMessage()
         {
