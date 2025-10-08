@@ -8,7 +8,7 @@
 <div class="container my-4">
     <div class="row">
         <!-- Schedules Section -->
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule</a></h5>
@@ -30,8 +30,10 @@
                                     <th>Date</th>
                                     <th>Event</th>
                                     <th>Group</th>
-                                    <th>Volunteers</th>
-                                    <th>Vehicles</th>
+                                    <th class="text-center">Volunteers</th>
+                                    <th class="text-center">Vehicles</th>
+                                    <th class="text-center">Teams</th>
+                                    <th class="text-center">Beds</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,11 +45,44 @@
                                         <td>@s.GroupName</td>
                                         <td class="text-center">@s.VolunteersRegistered</td>
                                         <td class="text-center">@s.DeliveryVehiclesRegistered</td>
+                                        <td class="text-center">@s.Teams</td>
+                                        <td class="text-center">@s.Beds</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/bedrequests">Waiting Bed Requests</a></h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-secondary">
+                        <tr>
+                            <th>Location</th>
+                            <th class="text-center">Requests</th>
+                            <th class="text-center">Beds</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (BedRequestsDashboard != null)
+                        {
+                            foreach (var r in BedRequestsDashboard)
+                            {
+                                <tr>
+                                    <td>@r.LocationName</td>
+                                    <td class="text-center">@r.Requests</td>
+                                    <td class="text-center">@r.Beds</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -210,6 +210,34 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
                 $"Error GetFutureSchedulesByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
     }
+
+    public async Task UpdateBedRequestSummaryInformation(int locationId, List<BedRequest> scheduledBedRequests)
+    {
+        var scheduleResult = await GetFutureSchedulesByLocationId(locationId);
+        if (!scheduleResult.Success || scheduleResult.Data == null || scheduleResult.Data.Count == 0)
+            return;
+
+        foreach (var schedule in scheduleResult.Data)
+        {
+            if (scheduledBedRequests.Any(o =>
+                    o.DeliveryDate.HasValue && o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date))
+            {
+                schedule.Teams = scheduledBedRequests
+                    .Where(o => o.DeliveryDate.HasValue &&
+                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Select(request => request.Team)
+                    .Distinct()
+                    .Count();
+
+                schedule.Beds = scheduledBedRequests
+                    .Where(o => o.DeliveryDate.HasValue &&
+                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Sum(request => request.NumberOfBeds);
+
+                await UpdateAsync(schedule);
+            }
+        }
+    }
 }
 
 
