@@ -1,0 +1,111 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/admintasks/addeditschedule/{LocationId:int}"
+@page "/administration/admintasks/addeditschedule/{LocationId:int}/{ScheduleId:int}"
+@using BedBrigade.Common.Models
+
+<CheckAuth Roles=@RoleNames.CanManageSchedule></CheckAuth>
+
+<div class="container my-4">
+
+    <h3>@HeaderText</h3>
+            
+    <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator/>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header" style="font-weight: bold">Event Details</div>
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="EventName" class="formlabel required" style="font-weight: bold">Event Name</label>
+                            <SfTextBox ID="EventName" @bind-Value=@Model.EventName Enabled="true" Placeholder="Event Name" maxlength="50" minlength="5" ValidateOnInput="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="EventType" class="formlabel required" style="font-weight: bold">Event Type</label>
+                            <SfDropDownList ID="EventType" TItem="EventTypeEnumItem" TValue="EventType" DataSource=@EventTypes @bind-Value=Model.EventType Enabled="true" Placeholder="Event Type">
+                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                            </SfDropDownList>
+                        </div>
+                        <div class="form-group">
+                            <label for="EventGroup" class="formlabel" style="font-weight: bold">Group Name</label>
+                            <SfTextBox ID="EventGroup" @bind-Value=@Model.GroupName Enabled="true" Placeholder="Group Name" maxlength="50" />
+                        </div>
+                        <div class="form-group">
+                            <label for="VolunteersMax" class="formlabel"><b>Max Volunteers</b></label>
+                            <SfNumericTextBox ID="VolunteersMax" TValue="Int32" @bind-Value="@Model.VolunteersMax" Min="0" Max="250" Enabled="true"></SfNumericTextBox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header" style="font-weight: bold">Scheduling</div>
+                    <div class="card-body">
+                        @{
+                            ScheduleStartDate = Model.EventDateScheduled.Date;
+                            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
+                        }
+                        <div class="form-group">
+                            <label for="ScheduleDateOnly" class="formlabel required" style="font-weight: bold"><b>Event Date</b></label>
+                            <SfDatePicker ID="ScheduleDateOnly" TValue="DateTime" @bind-Value="@ScheduleStartDate" Placeholder="Choose a date" ShowClearButton="true"></SfDatePicker>
+                        </div>
+                        <div class="form-group">
+                            <label for="ScheduleTimeOnly" class="formlabel required" style="font-weight: bold"><b>Event Time</b></label>
+                            <SfTimePicker ID="ScheduleTimeOnly" TValue="DateTime" Format="hh:mm tt" Step="30" @bind-Value="@ScheduleStartTime" Placeholder="Choose a time" ShowClearButton="true"></SfTimePicker>
+                        </div>
+                        <div class="form-group">
+                            <label for="EventDurationHours" class="formlabel required" style="font-weight: bold">Duration in Hours</label>
+                            <SfNumericTextBox ID="EventDurationHours" @bind-Value=@Model.EventDurationHours Min="0" Max="8" Enabled="true"></SfNumericTextBox>
+                        </div>
+                        <div class="form-group">
+                            <label for="EventStatus" class="formlabel" style="font-weight: bold">Event Status</label>
+                            <SfDropDownList ID="EventStatus" TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@EventStatuses @bind-Value=Model.EventStatus Enabled="true" Placeholder="Event Status">
+                                <DropDownListFieldSettings Text="Name" Value="Value" />
+                            </SfDropDownList>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header" style="font-weight: bold">Location</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="formlabel"><b>Address</b></label>
+                            <SfTextBox ID="Address" @bind-Value=@Model.Address Enabled="true" Placeholder="Address" maxlength="256" ValidateOnInput="true" />
+                        </div>
+                        <div class="form-group">
+                            <label class="formlabel"><b>City</b></label>
+                            <SfTextBox ID="City" @bind-Value=@Model.City Enabled="true" Placeholder="City" maxlength="128" ValidateOnInput="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="state" class="formlabel"><b>State</b></label>
+                            @{
+                                if (Model.ScheduleId > 0)
+                                {
+                                    var inputState = @AddressHelper.FindStateAbbreviation(StringUtil.IsNull(Model.State, ""));
+                                    Model.State = inputState;
+                                }
+                            }
+                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a State" DataSource="@StateList" @bind-Value=@Model.State>
+                                <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
+                                <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
+                            </SfDropDownList>
+                        </div>
+                        <div class="form-group">
+                            <label class="formlabell"><b>Postal Code</b></label>
+                            <SfTextBox ID="PostalCode" @bind-Value=@Model.PostalCode Enabled="true" Placeholder="Postal Code" maxlength="10" ValidateOnInput="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </EditForm>
+        
+</div>

@@ -1,3 +1,8 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/schedules"
+@page "/administration/manage/schedules/{id:int}"
+<CheckAuth Roles=@RoleNames.CanViewSchedule></CheckAuth>
+
 @using Syncfusion.Blazor.Grids
 @using BedBrigade.Data
 @using BedBrigade.Common
@@ -14,11 +19,11 @@
     </div>
     <div class="col-md-4 ps-3 ps-md-0">
         @_lc.Keys["ShowSchedules"]
-        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px"   >
-            <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange" ></DropDownListEvents>
-            <DropDownListFieldSettings Value="ID" Text="Text" ></DropDownListFieldSettings>
+        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px">
+            <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange"></DropDownListEvents>
+            <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>
         </SfDropDownList>
-    </div>		
+    </div>
     <div class="col-md-2 ps-3 ps-md-0">
         <UserInfo />
     </div>
@@ -28,8 +33,8 @@
     <div class="content-wrapper">
         <div class="row">
             <div style="width: 100%">
-                <SfGrid @ref="Grid" TValue="Schedule"  DataSource="@lstSchedules" 
-                        ShowColumnChooser="true"                        
+                <SfGrid @ref="Grid" TValue="Schedule" DataSource="@lstSchedules"
+                        ShowColumnChooser="true"
                         AllowPaging="true"
                         AllowSorting="true"
                         AllowExcelExport="true"
@@ -44,30 +49,29 @@
                         Toolbar=@ToolBar
                         Width="100%"
                         ClipMode="ClipMode.EllipsisWithTooltip">
-                    <GridTextWrapSettings WrapMode="WrapMode.Header" /> 
-                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox"   >
+                    <GridTextWrapSettings WrapMode="WrapMode.Header" />
+                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox">
                     </GridFilterSettings>
-                    <GridPageSettings PageSizes="@(new int[]{5,10,15,20,25,50,100})" PageSize="15" />
+                    <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25, 50, 100 })" PageSize="15" />
                     <GridSortSettings Columns="@DefaultSortColumns" />
                     <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
-                    <GridEditSettings 
-                        AllowAdding="true" 
-                        AllowEditing="true" 
-                        AllowDeleting="true"
-                        Dialog=@DialogParams                        
-                        Mode="EditMode.Dialog"
-                        ShowConfirmDialog="true"
-                        ShowDeleteConfirmDialog="true">
+                    <GridEditSettings AllowAdding="true"
+                                      AllowEditing="true"
+                                      AllowDeleting="true"
+                                      Dialog=@DialogParams
+                                      Mode="EditMode.Dialog"
+                                      ShowConfirmDialog="true"
+                                      ShowDeleteConfirmDialog="true">
                         <HeaderTemplate>
                             @{
-                                <span style="font-weight: bold; font-size: large" >@HeaderTitle</span>
+                                <span style="font-weight: bold; font-size: large">@HeaderTitle</span>
                             }
-                        </HeaderTemplate>                  
+                        </HeaderTemplate>
                         <FooterTemplate>
                             <button class="btn btn-primary" @onclick=@(() => Save(context as Schedule)) IsPrimary="true">@ButtonTitle</button>
                             <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
                         </FooterTemplate>
-                        <Template >                             
+                        <Template>
                             @{
                                 Schedule schedule = (context as Schedule)!;
 
@@ -98,17 +102,17 @@
 
                                                 <div class="form-group">
                                                     <label for="EventName" class="formlabel required" style="font-weight: bold">@_lc.Keys["EventName"]</label>
-                                                    <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="@_lc.Keys["EventName"]" maxlength="50" minlength="5" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="EventName" @bind-Value=@schedule.EventName Enabled="true" Placeholder="@_lc.Keys["EventName"]" maxlength="50" minlength="5" ValidateOnInput="true" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="EventType" class="formlabel required" style="font-weight: bold">@_lc.Keys["EventType"]</label>
                                                     <SfDropDownList ID="EventType" TItem="EventTypeEnumItem" TValue="EventType" DataSource=@lstEventTypes @bind-Value=schedule.EventType Enabled="true" Placeholder="@_lc.Keys["EventType"]">
-                                                        <DropDownListFieldSettings Text="Name" Value="Value"/>
+                                                        <DropDownListFieldSettings Text="Name" Value="Value" />
                                                     </SfDropDownList>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="EventGroup" class="formlabel" style="font-weight: bold">@_lc.Keys["GroupName"]</label>
-                                                    <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="@_lc.Keys["GroupName"]" maxlength="50"/>
+                                                    <SfTextBox ID="EventGroup" @bind-Value=@schedule.GroupName Enabled="true" Placeholder="@_lc.Keys["GroupName"]" maxlength="50" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="VolunteersMax" class="formlabel"><b>@_lc.Keys["Volunteers"]</b></label>
@@ -141,7 +145,7 @@
                                                 <div class="form-group">
                                                     <label for="EventStatus" class="formlabel" style="font-weight: bold">@_lc.Keys["EventStatus"]</label>
                                                     <SfDropDownList ID="EventStatus" TItem="EventStatusEnumItem" TValue="EventStatus" DataSource=@lstEventStatuses @bind-Value=schedule.EventStatus Enabled="true" Placeholder="@_lc.Keys["EventStatus"]">
-                                                        <DropDownListFieldSettings Text="Name" Value="Value"/>
+                                                        <DropDownListFieldSettings Text="Name" Value="Value" />
                                                     </SfDropDownList>
                                                 </div>
                                             </div>
@@ -154,11 +158,11 @@
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label class="formlabel"><b>@_lc.Keys["Address"]</b></label>
-                                                    <SfTextBox ID="Address" @bind-Value=@schedule.Address Enabled="true" Placeholder="@_lc.Keys["Address"]" maxlength="256" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="Address" @bind-Value=@schedule.Address Enabled="true" Placeholder="@_lc.Keys["Address"]" maxlength="256" ValidateOnInput="true" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label class="formlabel"><b>@_lc.Keys["City"]</b></label>
-                                                    <SfTextBox ID="City" @bind-Value=@schedule.City Enabled="true" Placeholder="@_lc.Keys["City"]" maxlength="128" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="City" @bind-Value=@schedule.City Enabled="true" Placeholder="@_lc.Keys["City"]" maxlength="128" ValidateOnInput="true" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="state" class="formlabel"><b>@_lc.Keys["State"]</b></label>
@@ -176,7 +180,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label class="formlabell"><b>@_lc.Keys["PostalCode"]</b></label>
-                                                    <SfTextBox ID="PostalCode" @bind-Value=@schedule.PostalCode Enabled="true" Placeholder="@_lc.Keys["PostalCode"]" maxlength="10" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="PostalCode" @bind-Value=@schedule.PostalCode Enabled="true" Placeholder="@_lc.Keys["PostalCode"]" maxlength="10" ValidateOnInput="true" />
                                                 </div>
                                             </div>
                                         </div>
@@ -188,15 +192,15 @@
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="OrganizerName" class="formlabel" style="font-weight: bold">@_lc.Keys["OrganizerName"]</label>
-                                                    <SfTextBox ID="OrganizerName" @bind-Value=@schedule.OrganizerName Enabled="true" Placeholder="@_lc.Keys["OrganizerName"]" maxlength="45" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="OrganizerName" @bind-Value=@schedule.OrganizerName Enabled="true" Placeholder="@_lc.Keys["OrganizerName"]" maxlength="45" ValidateOnInput="true" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="OrganizerEmail" class="formlabel" style="font-weight: bold">@_lc.Keys["OrganizerEmail"]</label>
-                                                    <SfTextBox ID="OrganizerEmail" @bind-Value=@schedule.OrganizerEmail Enabled="true" Placeholder="@_lc.Keys["OrganizerEmail"]" maxlength="255" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="OrganizerEmail" @bind-Value=@schedule.OrganizerEmail Enabled="true" Placeholder="@_lc.Keys["OrganizerEmail"]" maxlength="255" ValidateOnInput="true" />
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="OrganizerPhone" class="formlabel" style="font-weight: bold">@_lc.Keys["OrganizerPhone"]</label>
-                                                    <SfTextBox ID="OrganizerPhone" @bind-Value=@schedule.OrganizerPhone Enabled="true" Placeholder="@_lc.Keys["OrganizerPhone"]" maxlength="14" ValidateOnInput="true"/>
+                                                    <SfTextBox ID="OrganizerPhone" @bind-Value=@schedule.OrganizerPhone Enabled="true" Placeholder="@_lc.Keys["OrganizerPhone"]" maxlength="14" ValidateOnInput="true" />
                                                 </div>
                                             </div>
                                         </div>
@@ -207,27 +211,27 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="EventNote" class="formlabel" style="font-weight: bold">@_lc.Keys["NoteComment"]</label>
-                                            <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="@_lc.Keys["EventNote"]" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass"/>
+                                            <SfTextBox ID="EventNote" @bind-Value=@schedule.EventNote Enabled="true" Placeholder="@_lc.Keys["EventNote"]" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
                                         </div>
                                     </div>
                                 </div>
-                            }                           
+                            }
                         </Template>
 
-                    </GridEditSettings>                                                                                              
-          
+                    </GridEditSettings>
+
                     <GridColumns>
-                        <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false" ></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="true" AllowAdding="true" AllowEditing="true" ></GridColumn>
-                        <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="true" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
                         </GridColumn>
-                        <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center"  CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
-                        <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false"  AllowGrouping="true" AllowFiltering="true" AutoFit="true" />                                                                
+                        <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers"  AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
-                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Max Volunteers"  AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Max Volunteers" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.Teams) HeaderText="Teams" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.Beds) HeaderText="Beds" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                         <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="150px" AllowFiltering="false"></GridColumn>
@@ -245,28 +249,29 @@
     </div>
 </div>
 
-<style type="text/css"> 
- .periodselector
-   {
-        font-size:larger;
+<style type="text/css">
+    .periodselector {
+        font-size: larger;
         font-weight: bold;
     }
 
- .required::after { 
-  content: '*'; 
-  font-weight: bold;
-  margin-right: 4px; 
-  color: red; 
-}
+    .required::after {
+        content: '*';
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
 
     .e-dialog.e-control.e-popup {
-       overflow: hidden;
+        overflow: hidden;
     }
 
     .center-column {
         text-align: center;
     }
 </style>
+
+
 
 
 

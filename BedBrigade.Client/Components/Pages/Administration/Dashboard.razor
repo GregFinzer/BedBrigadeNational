@@ -55,7 +55,11 @@
                             @foreach (var s in Schedules)
                             {
                                 <tr>
-                                    <td>@s.EventDateScheduled.ToString("g")</td>
+                                    <td>
+                                        <a href="@($"/administration/manage/schedules/{s.ScheduleId}")">
+                                            @s.EventDateScheduled.ToString("g")
+                                        </a>
+                                    </td>
                                     <td>@s.EventName</td>
                                     <td>@s.GroupName</td>
                                     <td class="text-center">@s.VolunteersRegistered</td>
