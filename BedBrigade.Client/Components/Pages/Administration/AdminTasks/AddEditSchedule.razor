@@ -44,10 +44,6 @@
                 <div class="card">
                     <div class="card-header" style="font-weight: bold">Scheduling</div>
                     <div class="card-body">
-                        @{
-                            ScheduleStartDate = Model.EventDateScheduled.Date;
-                            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
-                        }
                         <div class="form-group">
                             <label for="ScheduleDateOnly" class="formlabel required" style="font-weight: bold"><b>Event Date</b></label>
                             <SfDatePicker ID="ScheduleDateOnly" TValue="DateTime" @bind-Value="@ScheduleStartDate" Placeholder="Choose a date" ShowClearButton="true"></SfDatePicker>
@@ -83,13 +79,7 @@
                         </div>
                         <div class="form-group">
                             <label for="state" class="formlabel"><b>State</b></label>
-                            @{
-                                if (Model.ScheduleId > 0)
-                                {
-                                    var inputState = @AddressHelper.FindStateAbbreviation(StringUtil.IsNull(Model.State, ""));
-                                    Model.State = inputState;
-                                }
-                            }
+
                             <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="Select a State" DataSource="@StateList" @bind-Value=@Model.State>
                                 <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
@@ -102,9 +92,45 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header" style="font-weight: bold">Organizer</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="OrganizerName" class="formlabel" style="font-weight: bold">Organizer Name</label>
+                            <SfTextBox ID="OrganizerName" @bind-Value=@Model.OrganizerName Enabled="true" Placeholder="Organizer Name" maxlength="45" ValidateOnInput="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="OrganizerEmail" class="formlabel" style="font-weight: bold">Organizer Email</label>
+                            <SfTextBox ID="OrganizerEmail" @bind-Value=@Model.OrganizerEmail Enabled="true" Placeholder="Organizer Email" maxlength="255" ValidateOnInput="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="OrganizerPhone" class="formlabel" style="font-weight: bold">Organizer Phone</label>
+                            <SfTextBox ID="OrganizerPhone" @bind-Value=@Model.OrganizerPhone Enabled="true" Placeholder="Organizer Phone" maxlength="14" ValidateOnInput="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="EventNote" class="formlabel" style="font-weight: bold">Note / Comment</label>
+                    <SfTextBox ID="EventNote" @bind-Value=@Model.EventNote Enabled="true" Placeholder="Event Note" Multiline="true" HtmlAttributes="@DescriptionHtmlAttribute" CssClass="@cssClass" />
+                </div>
+            </div>
         </div>
 
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ErrorMessage
+            </div>
+        }
 
+        <button type="submit" class="btn btn-primary mt-5">Save</button>
+        <button type="button" class="btn btn-secondary mt-5" @onclick="HandleCancel">Cancel</button> 
 
     </EditForm>
         
