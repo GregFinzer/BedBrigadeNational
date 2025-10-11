@@ -1,7 +1,9 @@
-﻿using BedBrigade.Common.EnumModels;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Migrations;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
@@ -35,6 +37,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         public string HeaderText => ScheduleId.HasValue ? $"Edit Schedule" : "Add Schedule";
         public string ButtonText => ScheduleId.HasValue ? "Update" : "Add";
         private List<UsState>? StateList = AddressHelper.GetStateList();
+        private User? _currentUser = new User();
 
         protected override async Task OnInitializedAsync()
         {
@@ -44,6 +47,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 CanSetLocation = _svcUser.IsUserNationalAdmin();
 
                 await LoadLocations();
+                await LoadUserData();
                 await LoadModel();
 
                 // Enum lists
@@ -56,6 +60,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 _toast.Error("Error", "An error occurred while loading the schedule data.");
             }
         }
+
+        private async Task LoadUserData()
+        {
+            Log.Information($"{_svcAuth.UserName} went to the Manage Schedules Page");
+            _currentUser = (await _svcUser!.GetCurrentLoggedInUser()).Data;
+        } 
 
         private async Task LoadLocations()
         {
@@ -70,6 +80,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task LoadModel()
         {
+            //Edit
             if (ScheduleId.HasValue)
             {
                 var result = await _svcSchedule.GetByIdAsync(ScheduleId.Value);
@@ -85,54 +96,100 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     ErrorMessage = result.Message ?? "Could not load schedule.";
                 }
             }
-            else
+            else //Add
             {
-                // Add mode
-                Model = new Common.Models.Schedule();
-                Model.LocationId = LocationId ?? _svcAuth.LocationId;
+                await BuildModelForAdd();
             }
         }
 
-        private DateTime ComposeEventDate()
+        private async Task BuildModelForAdd()
         {
-            // Combine date and time string (HH:mm)
-            if (!TimeSpan.TryParse(ScheduleTimeString, out var ts))
+            Model = new Common.Models.Schedule();
+            Model.LocationId = LocationId ?? _svcAuth.LocationId;
+                
+            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationId(_svcAuth.LocationId);
+
+            if (scheduleResult.Success && scheduleResult.Data != null)
             {
-                ts = new TimeSpan(8, 0, 0);
+                Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.AddDays(7);
             }
-            return ScheduleDate.Date.Add(ts);
+            else
+            {
+                //TODO:  Change to config values
+                Model.EventDateScheduled = DateUtil.NextSaturday().AddHours(9);
+            }
+
+            ScheduleStartDate = Model.EventDateScheduled.Date;
+            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
+
+            if (DateUtil.IsFirstSaturdayOfTheMonth(Model.EventDateScheduled))
+            {
+                Model.EventName = "Build";
+                Model.EventType = EventType.Build;
+                //TODO:  Change to config values
+                Model.EventDurationHours = 2;
+                Model.VolunteersMax = 20;
+                Model.EventNote = "Come build beds with us!";
+            }
+            else
+            {
+                Model.EventName = "Delivery";
+                Model.EventType = EventType.Delivery;
+                //TODO:  Change to config values
+                Model.EventDurationHours = 3;
+                Model.EventNote = "Come deliver beds with us!";
+            }
+
+            Location loc = Locations.First(l => l.LocationId == Model.LocationId);
+            Model.Address = loc.BuildAddress;
+            Model.City = loc.BuildCity;
+            Model.State = loc.BuildState;
+            Model.PostalCode = loc.BuildPostalCode;
+            Model.OrganizerName = _currentUser.FullName;
+            Model.OrganizerEmail = _currentUser.Email;
+            Model.OrganizerPhone = _currentUser.Phone.FormatPhoneNumber();
         }
+
 
         protected async Task HandleValidSubmit()
         {
-            Model.EventDateScheduled = ComposeEventDate();
-
-            if (ScheduleId.HasValue)
+            try
             {
-                var update = await _svcSchedule.UpdateAsync(Model);
-                if (update.Success)
+                Model.EventDateScheduled = ScheduleStartDate.Date + ScheduleStartTime.TimeOfDay;
+
+                if (ScheduleId.HasValue)
                 {
-                    _toast.Success("Success", "Schedule updated successfully");
-                    _nav.NavigateTo("/administration/manage/schedules");
+                    var update = await _svcSchedule.UpdateAsync(Model);
+                    if (update.Success)
+                    {
+                        _toast.Success("Success", "Schedule updated successfully");
+                        _nav.NavigateTo("/administration/manage/schedules");
+                        return;
+                    }
+                    ErrorMessage = update.Message;
+                    _toast.Error("Error", update.Message);
                     return;
                 }
-                ErrorMessage = update.Message;
-                _toast.Error("Error", update.Message);
-                return;
+
+                // Create
+                var create = await _svcSchedule.CreateAsync(Model);
+                if (create.Success)
+                {
+                    _toast.Success("Success", "Schedule created successfully");
+                    _nav.NavigateTo("/administration/manage/schedules");
+                }
+                else
+                {
+                    ErrorMessage = create.Message;
+                    _toast.Error("Error", create.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error saving schedule");
+                _toast.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
             }
 
-            // Create
-            var create = await _svcSchedule.CreateAsync(Model);
-            if (create.Success)
-            {
-                _toast.Success("Success", "Schedule created successfully");
-                _nav.NavigateTo("/administration/manage/schedules");
-            }
-            else
-            {
-                ErrorMessage = create.Message;
-                _toast.Error("Error", create.Message);
-            }
         }
 
         protected void HandleCancel()

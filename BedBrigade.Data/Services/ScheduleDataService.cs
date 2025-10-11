@@ -180,6 +180,37 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         }
     }
 
+    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationId(int locationId)
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetLastScheduledByLocationId({locationId})");
+        Schedule? cachedContent = _cachingService.Get<Schedule>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<Schedule>($"Found GetLastScheduledByLocationId in cache", true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Schedule>();
+                var result = await dbSet
+                    .Where(o => o.LocationId == locationId)
+                    .OrderByDescending(o => o.EventDateScheduled).FirstOrDefaultAsync();
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<Schedule>($"GetLastScheduledByLocationId", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<Schedule>(
+                $"Error GetLastScheduledByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
     public async Task<ServiceResponse<List<Schedule>>> GetFutureSchedulesByLocationId(int locationId)
     {
         string cacheKey =

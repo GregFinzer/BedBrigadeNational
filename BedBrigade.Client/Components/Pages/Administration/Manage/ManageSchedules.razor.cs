@@ -21,6 +21,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
+        [Inject] private NavigationManager? _navigationManager { get; set; }
         [Parameter] public int? Id { get; set; }
         protected SfGrid<Common.Models.Schedule>? Grid { get; set; }
         protected List<Common.Models.Schedule>? lstSchedules { get; set; }
@@ -76,28 +77,25 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
         }
 
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender && Id.HasValue && Id.Value > 0 && Grid != null && lstSchedules != null && lstSchedules.Any())
-            {
-                var schedule = lstSchedules.FirstOrDefault(s => s.ScheduleId == Id.Value);
-                if (schedule != null)
-                {
-                    selectedScheduleId = schedule.ScheduleId;
-                    var rowIndex = lstSchedules.IndexOf(schedule);
-
-                    // Ensure the row is selected before editing
-                    await Grid.SelectRowAsync(rowIndex, true);   // true = clear previous selection
-                    await Task.Delay(1000);                      // short delay to let grid process selection
-                    await Grid.StartEditAsync();        // now open the modal
-                }
-            }
-            else if (firstRender)
+            if (firstRender)
             {
                 await SetInitialFilter();
             }
+            else
+            {
+                if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
+                {
+                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    Grid.EditSettings.AllowDeleting = true;
+                    Grid.EditSettings.AllowAdding = true;
+                    Grid.EditSettings.AllowEditing = true;
+                    StateHasChanged();
+                }
+            }
         }
-
 
         private void SetupToolbar()
         {
@@ -238,17 +236,27 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     break;
 
                 case Action.Add:
+                    args.Cancel = true;
                     Add();
                     break;
 
-                case Action.Save:
-                    await Save(args);
-                    break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    await Edit(args);
                     break;
             }
 
+        }
+
+        private void Add()
+        {
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditschedule/{_selectedLocationId}");
+        }
+
+        protected async Task Edit(ActionEventArgs<Common.Models.Schedule> args)
+        {
+            var schedule = args.Data;
+            args.Cancel = true;
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditschedule/{_selectedLocationId}/{schedule.ScheduleId}");
         }
 
         private async Task Delete(Syncfusion.Blazor.Grids.ActionEventArgs<Common.Models.Schedule> args)
@@ -281,83 +289,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
         }
 
-        private void Add()
-        {
-            HeaderTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"];
-            ButtonTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"];
-            enabledLocationSelector = false;
-        }
 
-        private async Task Save(Syncfusion.Blazor.Grids.ActionEventArgs<Common.Models.Schedule> args)
-        {
-            try
-            {
-
-                Common.Models.Schedule editSchedule = args.Data;
-
-                editSchedule.EventDateScheduled = ScheduleStartDate.Date + ScheduleStartTime.TimeOfDay;
-
-                if (editSchedule.ScheduleId != 0) // Updated schedule
-                {
-                    //Update Schedule Record
-                    var updateResult = await _svcSchedule.UpdateAsync(editSchedule);
-
-                    if (updateResult.Success)
-                    {
-                        _toastService.Success("Update Schedule",
-                            $"Schedule for {editSchedule.EventDateScheduled.ToShortDateString()} updated Successfully");
-                    }
-                    else
-                    {
-                        Log.Error("Unable to update schedule " + updateResult.Message);
-                        _toastService.Error("Update Schedule", $"Unable to update Schedule. {updateResult.Message}");
-                    }
-                }
-                else // new schedule
-                {
-                    var addResult = await _svcSchedule.CreateAsync(editSchedule);
-                    if (addResult.Success && addResult.Data != null)
-                    {
-                        editSchedule = addResult.Data; // added Schedule
-                    }
-
-                    if (editSchedule != null && editSchedule.ScheduleId > 0)
-                    {
-                        _toastService.Success("Add Schedule",
-                            $"New Schedule for {editSchedule.EventDateScheduled.ToShortDateString()} added Successfully");
-                    }
-                    else
-                    {
-                        Log.Error("Unable to add schedule " + addResult.Message);
-                        _toastService.Error("Add Schedule", $"Unable to add Schedule. {addResult.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error saving schedule");
-                _toastService.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
-            }
-
-            await Grid.Refresh();
-        }
-
-        private void BeginEdit()
-        {
-            HeaderTitle = _lc.Keys["Update"] + " " + _lc.Keys["Schedule"] + " #" + selectedScheduleId.ToString();
-            ButtonTitle = _lc.Keys["Update"];
-            enabledLocationSelector = false;
-        }
-
-        public async Task Save(Common.Models.Schedule schedule)
-        {
-            await Grid.EndEditAsync();
-        }
-
-        public async Task Cancel()
-        {
-            await Grid.CloseEditAsync();
-        }
         protected void DataBound()
         {
             if (lstSchedules.Count == 0) RecordText = "No Schedule records found";
