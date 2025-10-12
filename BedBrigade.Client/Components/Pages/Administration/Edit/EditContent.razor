@@ -45,6 +45,12 @@ else
         }
         <EditForm Model="Content">
             <DataAnnotationsValidator/>
+            <div class="form-group mb-3">
+                <label for="pageTitle">Page Title</label>
+                <InputText id="pageTitle" class="form-control" @bind-Value="Content.Title"  />
+                <ValidationMessage For="@(() => Content.Title)" />
+            </div>
+
             @* only show when editing Stories or News *@
             @if (!ShowSourceBox 
                  && (Content?.ContentType == ContentType.Stories || Content?.ContentType == ContentType.News))
