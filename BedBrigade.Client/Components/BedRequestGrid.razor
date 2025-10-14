@@ -35,10 +35,11 @@ else
                         AllowSelection="true"
                         AllowPdfExport="true"
                         AllowTextWrap="false"
-                        AllowGrouping="true"
+                        AllowGrouping="true"                        
                         Width="100%"
                         ClipMode="ClipMode.EllipsisWithTooltip">
                     <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
+                    <GridEditSettings ShowDeleteConfirmDialog="true"></GridEditSettings>
                     <GridEvents DataBound=@DataBound
                                 Destroyed=@OnDestroyed
                                 OnLoad=@OnLoad
@@ -50,219 +51,7 @@ else
                             <span>@RecordText</span>
                         </EmptyRecordTemplate>
                     </GridTemplates>
-                    <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                        <HeaderTemplate>
-                            @{
-                                @HeaderTitle
-                            }
-                        </HeaderTemplate>
-                        <FooterTemplate>
-                            <button class="btn btn-primary" @onclick=@(() => Save(context as BedRequest)) IsPrimary="true">@ButtonTitle</button>
-                            <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
-                        </FooterTemplate>
-                        <Template>
-                            @{
-                                BedRequest BedRequest = (context as BedRequest)!;
-                                if (BedRequest.LocationId == Defaults.NationalLocationId)
-                                {
-                                    BedRequest.LocationId = _svcAuth.LocationId;
 
-                                }
-
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="card">
-                                            <div class="card-header">@_lc.Keys["ContactInformation"]</div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
-                                                    <SfTextBox ID="firstname" @bind-Value="BedRequest.FirstName"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.FirstName)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group ">
-                                                    <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
-                                                    <SfTextBox ID="lastname" @bind-Value="BedRequest.LastName"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.LastName)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
-                                                    <SfTextBox ID="email" @bind-Value="BedRequest.Email"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Email)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
-                                                    <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="BedRequest.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Phone)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="reference" class="formlabel required">@_lc.Keys["Reference"]</label>
-                                                    <SfTextBox ID="reference" @bind-Value="BedRequest.Reference"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Reference)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="primaryLanguage" class="formlabel required">@_lc.Keys["PrimaryLanguagePlaceholder"]</label>
-                                                    <SfDropDownList ID="primaryLanguage" TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value=@BedRequest.PrimaryLanguage Enabled="true">
-                                                        <DropDownListEvents TValue="string" TItem="string" ValueChange="OnLanguageChange"></DropDownListEvents>
-                                                    </SfDropDownList>
-                                                </div>
-                                                @{
-                                                    SpeakEnglishVisibility = "none";
-                                                    if (!String.IsNullOrEmpty(BedRequest.PrimaryLanguage))
-                                                    {
-                                                        if (BedRequest.PrimaryLanguage.Length > 0 && BedRequest.PrimaryLanguage != "English")
-                                                        {
-                                                            SpeakEnglishVisibility = "";
-                                                        }
-                                                    }
-                                                }
-                                                <div class="form-group" style="display: @SpeakEnglishVisibility">
-                                                    <label for="speakEnglish" class="formlabel required">@_lc.Keys["SpeakEnglishPlaceholder"]</label>
-                                                    <SfDropDownList ID="speakEnglish" TItem="string" TValue="string" DataSource=@lstSpeakEnglish @bind-Value=@BedRequest.SpeakEnglish Enabled="true">
-                                                    </SfDropDownList>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-
-                                        <div class="card">
-                                            <div class="card-header">@_lc.Keys["DeliveryAddress"]</div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label for="street" class="formlabel required">@_lc.Keys["Street"]</label>
-                                                    <SfTextBox ID="street" @bind-Value="BedRequest.Street"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Street)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group ">
-                                                    <label for="city" class="formlabel required">@_lc.Keys["City"]</label>
-                                                    <SfTextBox ID="city" @bind-Value="BedRequest.City"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.City)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="state" class="formlabel required">@_lc.Keys["State"]</label>
-                                                    @{
-                                                        if (BedRequest.BedRequestId > 0)
-                                                        {
-                                                            var inputState = @AddressHelper.FindStateAbbreviation(StringUtil.IsNull(BedRequest.State, ""));
-                                                            BedRequest.State = inputState;
-                                                        }
-                                                    }
-                                                    <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="@BedRequest.State">
-                                                        <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
-                                                        <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
-                                                        <div style="font-size: smaller">
-                                                            <ValidationMessage For="@(() => BedRequest.State)"></ValidationMessage>
-                                                        </div>
-                                                    </SfDropDownList>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="zip" class="formlabel required">@_lc.Keys["PostalCode"]</label>
-                                                    <SfMaskedTextBox @ref="zipTextBox" ID="zip" Mask="00000" @bind-Value="@BedRequest.PostalCode" Focus="HandleZipMaskFocus"></SfMaskedTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.PostalCode)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="card">
-                                            <div class="card-header">@_lc.Keys["BedRequestDetails"]</div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label for="numbed" class="formlabel required">@_lc.Keys["NumberOfBeds"]</label>
-                                                    <SfNumericTextBox ID="numbed" @bind-Value=@BedRequest.NumberOfBeds Min="1" Max="99" Enabled="true" />
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.NumberOfBeds)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group ">
-                                                    <label for="ages" class="formlabel required">@_lc.Keys["GenderAge"]</label>
-                                                    <SfTextBox ID="ages" @bind-Value="BedRequest.GenderAge"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.GenderAge)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group ">
-                                                    <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
-                                                    <SfTextBox ID="names" CssClass="custom-textbox-height" @bind-Value="BedRequest.Names" Multiline="true"></SfTextBox>
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Names)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="card">
-                                            <div class="card-header">@_lc.Keys["Scheduling"]</div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@BedRequest.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
-                                                        <DropDownListFieldSettings Text="Name" Value="LocationId" />
-                                                        <DropDownListEvents TValue="Int32" TItem="Location" ValueChange="OnLocationChange"></DropDownListEvents>
-                                                    </SfDropDownList>
-                                                </div>
-                                                <div class="form-group">
-                                                    <SfTextBox @bind-Value=@BedRequest.Group MaxLength="50" Enabled="true" Placeholder="@_lc.Keys["Group"]" FloatLabelType="FloatLabelType.Auto" />
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Group)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@BedRequest.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto">
-                                                        <DropDownListFieldSettings Text="Name" Value="Value" />
-                                                    </SfDropDownList>
-                                                </div>
-                                                <div class="form-group">
-                                                    <SfDatePicker @bind-Value=@BedRequest.DeliveryDate Enabled="true" Placeholder="@_lc.Keys["DeliveryDate"]" FloatLabelType="FloatLabelType.Auto" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <SfTextBox @bind-Value=@BedRequest.Team MaxLength="50" Enabled="true" Placeholder="@_lc.Keys["Team"]" FloatLabelType="FloatLabelType.Auto" />
-                                                    <div style="font-size: smaller">
-                                                        <ValidationMessage For="@(() => BedRequest.Team)"></ValidationMessage>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="note" class="formlabel required">@_lc.Keys["Notes"]</label>
-                                            <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@BedRequest.Notes Enabled="true" Placeholder="@_lc.Keys["Notes"]" Multiline="true" FloatLabelType="FloatLabelType.Never" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                            }
-                        </Template>
-                    </GridEditSettings>
                     <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                     <GridSortSettings>
                         <GridSortColumns>
@@ -270,7 +59,7 @@ else
                         </GridSortColumns>
                     </GridSortSettings>
                     <GridColumns>
-                        <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false" />
+                        <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="true" />
                         <GridForeignColumn Field=@nameof(BedRequest.LocationId) Width="172" Visible="false" ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" />
                         <GridColumn Field=@nameof(BedRequest.FullName) Width="172" ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.FormattedPhone) Width="118" ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
