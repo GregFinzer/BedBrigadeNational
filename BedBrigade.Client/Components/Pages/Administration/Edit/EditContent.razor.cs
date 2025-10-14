@@ -33,6 +33,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private const string FalseConst = "false";
         private SfRichTextEditor RteObj { get; set; }
         private string? WorkTitle { get; set; }
+        private string? OriginalTitle { get; set; }
         private string? Body { get; set; }
         private Content? Content { get; set; }
         private Dictionary<string, string>? ImageButtonList { get; set; } = null;
@@ -156,7 +157,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 if (contentResult.Success && contentResult.Data != null)
                 {
                     Content = contentResult.Data;
-                    WorkTitle = $"Editing {Content.Title} for {LocationName}";
+                    WorkTitle = $"Editing page {Content.Name} for {LocationName}";
 
                     if (BlogTypes.ValidBlogTypes.Contains(Content.ContentType))
                     {
@@ -171,7 +172,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
 
                     Body = await ProcessHtml(Content.ContentHtml);
-
+                    OriginalTitle = Content.Title;
                     Content.UpdateDate = DateTime.UtcNow;
                     Content.UpdateUser = _svcAuth.UserName;
                     ImageButtonList = GetImageButtonList(Body);
@@ -272,6 +273,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
             html = WebHelper.FormatHtml(html);
             return html;
         }
+                
 
         private async Task<bool> HandleSaveOnlyClick(bool queueTranslation = false)
         {
@@ -286,6 +288,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     Content.ContentHtml = await RteObj.GetXhtmlAsync();
                 }
 
+                
                 //Update Content  Record
                 var updateResult = await _svcContent.UpdateAsync(Content);
                 if (updateResult.Success)
@@ -301,8 +304,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     }
 
                     _toastService.Success("Content Saved",
-                        $"Content saved for location {LocationRoute} with name of {ContentName}");
-
+                        $"Content saved for location {LocationRoute} with name of '{ContentName}' and Title of '{Content.Title}'");                       
+                                  
                     return true;
                 }
 
