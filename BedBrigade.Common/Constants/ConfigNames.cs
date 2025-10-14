@@ -88,5 +88,15 @@
 
         //Custom Strings
         public const string BedRequestNote = "BedRequestNote";
+
+        //Schedule
+        public const string DefaultBuildTime = "DefaultBuildTime";
+        public const string DefaultBuildDurationHours = "DefaultBuildDurationHours";
+        public const string DefaultBuildMaxVolunteers = "DefaultBuildMaxVolunteers";
+        public const string DefaultBuildEventNote = "DefaultBuildEventNote";
+        public const string DefaultDeliveryTime = "DefaultDeliveryTime";
+        public const string DefaultDeliveryDurationHours = "DefaultDeliveryDurationHours";
+        public const string DefaultDeliveryMaxVolunteers = "DefaultDeliveryMaxVolunteers";
+        public const string DefaultDeliveryEventNote = "DefaultDeliveryEventNote";
     }
 }

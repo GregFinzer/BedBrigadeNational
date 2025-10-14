@@ -21,6 +21,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private IUserDataService _svcUser { get; set; }
+        [Inject] private IConfigurationDataService _svcConfig { get; set; }
 
         public string ErrorMessage { get; set; } = string.Empty;
         public Common.Models.Schedule Model { get; set; } = new();
@@ -111,34 +112,24 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (scheduleResult.Success && scheduleResult.Data != null)
             {
-                Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.AddDays(7);
+                Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.Date.AddDays(7);
             }
             else
             {
-                //TODO:  Change to config values
-                Model.EventDateScheduled = DateUtil.NextSaturday().AddHours(9);
+                Model.EventDateScheduled = DateUtil.NextSaturday();
+            }
+
+            if (DateUtil.IsFirstSaturdayOfTheMonth(Model.EventDateScheduled))
+            {
+                await SetBuildValues();
+            }
+            else
+            {
+                await SetDeliveryValues();
             }
 
             ScheduleStartDate = Model.EventDateScheduled.Date;
             ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
-
-            if (DateUtil.IsFirstSaturdayOfTheMonth(Model.EventDateScheduled))
-            {
-                Model.EventName = "Build";
-                Model.EventType = EventType.Build;
-                //TODO:  Change to config values
-                Model.EventDurationHours = 2;
-                Model.VolunteersMax = 20;
-                Model.EventNote = "Come build beds with us!";
-            }
-            else
-            {
-                Model.EventName = "Delivery";
-                Model.EventType = EventType.Delivery;
-                //TODO:  Change to config values
-                Model.EventDurationHours = 3;
-                Model.EventNote = "Come deliver beds with us!";
-            }
 
             Location loc = Locations.First(l => l.LocationId == Model.LocationId);
             Model.Address = loc.BuildAddress;
@@ -148,6 +139,42 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             Model.OrganizerName = _currentUser.FullName;
             Model.OrganizerEmail = _currentUser.Email;
             Model.OrganizerPhone = _currentUser.Phone.FormatPhoneNumber();
+        }
+
+        private async Task SetDeliveryValues()
+        {
+            Model.EventName = "Delivery";
+            Model.EventType = EventType.Delivery;
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryTime, Model.LocationId);
+            Model.EventDateScheduled.AddHours(defaultHour);
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
+            Model.EventDurationHours = defaultDuration;
+            int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryMaxVolunteers, Model.LocationId);
+            Model.VolunteersMax = defaultMaxVolunteers;
+            string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryEventNote, Model.LocationId);
+            Model.EventNote = defaultEventNote;
+        }
+
+        private async Task SetBuildValues()
+        {
+            Model.EventName = "Build";
+            Model.EventType = EventType.Build;
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildTime, Model.LocationId);
+            Model.EventDateScheduled.AddHours(defaultHour);
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildDurationHours, Model.LocationId);
+            Model.EventDurationHours = defaultDuration;
+            int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildMaxVolunteers, Model.LocationId);
+            Model.VolunteersMax = defaultMaxVolunteers;
+            string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildEventNote, Model.LocationId);
+            Model.EventNote =defaultEventNote;
         }
 
 
