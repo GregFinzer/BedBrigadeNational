@@ -20,6 +20,19 @@
                 </div>
             </div>
         }
+        @if (SmsQueueSummaries != null && SmsQueueSummaries.Any(o => o.UnRead))
+        {
+            <div class="col-md-3">
+                <div class="card shadow-sm text-dark" style="background-color: #d1ecf1;">
+                    <div class="card-header fw-bold">
+                        <h5 class="mb-0"><a href="/administration/SMS/SmsSummary">SMS Queue</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/administration/SMS/SmsSummary">Unread Messages</a>: @UnreadMessages
+                    </div>
+                </div>
+            </div>
+        }
     </div>
     <div class="row">
         <!-- Schedules Section -->
