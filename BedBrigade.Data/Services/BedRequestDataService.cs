@@ -4,9 +4,11 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.AddressParser;
+using KellermanSoftware.NetEmailValidation;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Stripe.Terminal;
+using Location = BedBrigade.Common.Models.Location;
 
 namespace BedBrigade.Data.Services;
 
@@ -19,6 +21,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly IGeoLocationQueueDataService _geoLocationQueueDataService;
     private readonly ITimezoneDataService _timezoneDataService;
     private readonly IConfigurationDataService _configurationDataService;
+    private readonly IScheduleDataService _scheduleDataService;
 
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         IAuthService authService,
@@ -26,7 +29,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         ILocationDataService locationDataService,
         IGeoLocationQueueDataService geoLocationQueueDataService, 
         ITimezoneDataService timezoneDataService,
-        IConfigurationDataService configurationDataService) : base(contextFactory, cachingService, authService)
+        IConfigurationDataService configurationDataService,
+        IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -35,6 +39,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _geoLocationQueueDataService = geoLocationQueueDataService;
         _timezoneDataService = timezoneDataService;
         _configurationDataService = configurationDataService;
+        _scheduleDataService = scheduleDataService;
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -63,9 +68,24 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var result = await base.UpdateAsync(entity);
         _cachingService.ClearScheduleRelated();
 
+        var tasks = new List<Task>();
+
         if (geoLocationUpdateNeeded)
         {
-            await QueueForGeoLocation(entity);
+            tasks.Add(QueueForGeoLocation(entity));
+        }
+
+        var scheduled = await GetScheduledBedRequestsForLocation(entity.LocationId);
+        if (scheduled.Success && scheduled.Data != null)
+        {
+            tasks.Add(_scheduleDataService.UpdateBedRequestSummaryInformation(
+                entity.LocationId, scheduled.Data));
+        }
+
+        // Run both in parallel for performance
+        if (tasks.Count > 0)
+        {
+            await Task.WhenAll(tasks);
         }
 
         return result;
@@ -497,6 +517,48 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
             DateTime nextEligibleDate = result.DeliveryDate.Value.AddMonths(monthsBetweenRequests).AddDays(1);
             return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
+        }
+    }
+
+    public async Task<ServiceResponse<List<BedRequestDashboardRow>>> GetWaitingDashboard(int userLocationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetWaitingDashboard({userLocationId})");
+        var cachedContent = _cachingService.Get<List<BedRequestDashboardRow>>(cacheKey);
+        if (cachedContent != null)
+            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetWaitingDashboard", true, cachedContent); 
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+
+            var grouped = await dbSet
+                .Where(o => o.Status == BedRequestStatus.Waiting)
+                .GroupBy(o => o.LocationId)
+                .Select(g => new BedRequestDashboardRow
+                {
+                    LocationId = g.Key,
+                    LocationName = ctx.Set<Location>().First(l => l.LocationId == g.Key).Name,
+                    Requests = g.Count(),
+                    Beds = g.Sum(x => x.NumberOfBeds)
+                })
+                .ToListAsync();
+
+            // Order: user's location first, then alphabetical
+            var ordered = grouped
+                .OrderByDescending(r => r.LocationId == userLocationId)
+                .ThenBy(r => r.LocationName)
+                .ToList();
+
+            // Add totals row
+            ordered.Add(new BedRequestDashboardRow
+            {
+                LocationName = "Total",
+                Requests = ordered.Sum(r => r.Requests),
+                Beds = ordered.Sum(r => r.Beds)
+            });
+
+            _cachingService.Set(cacheKey, ordered);
+            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {ordered.Count} dashboard rows", true, ordered);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace BedBrigade.Data.Data.Seeding
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() 
+                new()
                 {
                     ConfigurationKey = ConfigNames.AllowedFileExtensions,
                     ConfigurationValue = ".jpg,.png,.webp,.jpeg,.gif,.svg,.ico,.pdf,.mp4,.webm,.avi,.av1,.mov",
@@ -26,7 +26,7 @@ namespace BedBrigade.Data.Data.Seeding
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() 
+                new()
                 {
                     ConfigurationKey = ConfigNames.AllowedImageExtensions,
                     ConfigurationValue = ".jpg,.png,.webp,.jpeg,.gif,.svg,.ico",
@@ -63,7 +63,7 @@ namespace BedBrigade.Data.Data.Seeding
                     LocationId = Defaults.NationalLocationId
                 },
 
-                new() 
+                new()
                 {
                     ConfigurationKey = ConfigNames.MaxFileSize,
                     //300 MB
@@ -482,10 +482,10 @@ namespace BedBrigade.Data.Data.Seeding
 
         public static List<Configuration> LocationSpecificConfigurations(int locationId)
         {
-            return new List<Configuration>()
+            List<Configuration> result = new List<Configuration>()
             {
                 //SMS
-                new ()
+                new()
                 {
                     ConfigurationKey = ConfigNames.SmsPhone,
                     ConfigurationValue = string.Empty,
@@ -556,7 +556,89 @@ namespace BedBrigade.Data.Data.Seeding
                     Section = ConfigSection.System,
                     LocationId = locationId
                 },
+                //Schedule
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultBuildTime,
+                    ConfigurationValue = "9",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultBuildDurationHours,
+                    ConfigurationValue = "2",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultBuildMaxVolunteers,
+                    ConfigurationValue = "20",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
+
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultDeliveryTime,
+                    ConfigurationValue = "9",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultDeliveryDurationHours,
+                    ConfigurationValue = "3",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.DefaultDeliveryMaxVolunteers,
+                    ConfigurationValue = "40",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                },
             };
+
+            if (locationId == Defaults.GroveCityLocationId)
+            {
+                result.Add(new Configuration()
+                {
+                    ConfigurationKey = ConfigNames.DefaultBuildEventNote,
+                    ConfigurationValue = "Our shop is located behind Home Depot off Stringtown Road. Look for signs.",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                });
+                result.Add(new Configuration()
+                {
+                    ConfigurationKey = ConfigNames.DefaultDeliveryEventNote,
+                    ConfigurationValue = "Our shop is located behind Home Depot off Stringtown Road. Look for signs.",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                });
+            }
+            else
+            {
+                result.Add(new Configuration()
+                {
+                    ConfigurationKey = ConfigNames.DefaultBuildEventNote,
+                    ConfigurationValue = "Let's Build Beds!",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                });
+                result.Add(new Configuration()
+                {
+                    ConfigurationKey = ConfigNames.DefaultDeliveryEventNote,
+                    ConfigurationValue = "Let's Deliver Beds!",
+                    Section = ConfigSection.Schedule,
+                    LocationId = locationId
+                });
+            }
+
+
+            return result;
         }
     }
 }

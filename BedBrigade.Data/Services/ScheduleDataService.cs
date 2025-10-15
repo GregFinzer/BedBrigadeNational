@@ -180,6 +180,37 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         }
     }
 
+    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationId(int locationId)
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetLastScheduledByLocationId({locationId})");
+        Schedule? cachedContent = _cachingService.Get<Schedule>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<Schedule>($"Found GetLastScheduledByLocationId in cache", true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Schedule>();
+                var result = await dbSet
+                    .Where(o => o.LocationId == locationId)
+                    .OrderByDescending(o => o.EventDateScheduled).FirstOrDefaultAsync();
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<Schedule>($"GetLastScheduledByLocationId", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<Schedule>(
+                $"Error GetLastScheduledByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
     public async Task<ServiceResponse<List<Schedule>>> GetFutureSchedulesByLocationId(int locationId)
     {
         string cacheKey =
@@ -208,6 +239,34 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         {
             return new ServiceResponse<List<Schedule>>(
                 $"Error GetFutureSchedulesByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task UpdateBedRequestSummaryInformation(int locationId, List<BedRequest> scheduledBedRequests)
+    {
+        var scheduleResult = await GetFutureSchedulesByLocationId(locationId);
+        if (!scheduleResult.Success || scheduleResult.Data == null || scheduleResult.Data.Count == 0)
+            return;
+
+        foreach (var schedule in scheduleResult.Data)
+        {
+            if (scheduledBedRequests.Any(o =>
+                    o.DeliveryDate.HasValue && o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date))
+            {
+                schedule.Teams = scheduledBedRequests
+                    .Where(o => o.DeliveryDate.HasValue &&
+                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Select(request => request.Team)
+                    .Distinct()
+                    .Count();
+
+                schedule.Beds = scheduledBedRequests
+                    .Where(o => o.DeliveryDate.HasValue &&
+                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Sum(request => request.NumberOfBeds);
+
+                await UpdateAsync(schedule);
+            }
         }
     }
 }

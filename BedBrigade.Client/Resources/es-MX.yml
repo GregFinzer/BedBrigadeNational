@@ -25,8 +25,6 @@ Campaign: Campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
 ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
-ChooseADate: Escoge una fecha
-ChooseATime: Escoge una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
@@ -58,7 +56,6 @@ DonationFormNotCompleted: El formulario de donación no está completo
 DonationDate: Fecha de donación
 DonationDetails: Detalles de la donación
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
-DurationHours: Duración (horas)
 DynamicALittle: Un poco
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
@@ -104,14 +101,9 @@ EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
 Event: Evento
 Events: Eventos
-EventDate: Fecha del evento
 EventDateTime: Fecha y hora del evento
-EventDetails: Detalles del evento
 EventGroup: Grupo de eventos
-EventName: Nombre del evento
 EventNote: Nota del evento
-EventStatus: Estado del evento
-EventTime: Hora del evento
 EventType: Tipo de evento
 Example: Ejemplo
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
@@ -125,7 +117,6 @@ FromStartTimeToEndTime: de {startTime} a {endTime}
 FutureScheduled: Futuro Programado
 Gross: Bruto
 Group: Grupo
-GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
 IdleLogoutMessage: 'Se ha cerrado la sesión por inactividad. Vuelva a iniciar sesión para continuar.'
@@ -191,7 +182,6 @@ NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
 NoLocationsHavePostalCodes: Ninguna ubicación tiene códigos postales
-NoteComment: Nota / Comentario
 Notes: Notas
 NothingToSend: Nada que enviar
 NotSent: No enviado
@@ -205,9 +195,6 @@ OneTimeDonationOf: 'Donación única de'
 Organization: Organización
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
-OrganizerEmail: Correo electrónico del organizador
-OrganizerName: Nombre del organizador
-OrganizerPhone: Teléfono del organizador
 OtherLanguagesSpoken: Otros idiomas hablados
 PageNext: Página siguiente
 PagePrevious: Página anterior
@@ -280,7 +267,6 @@ ReturnHome: Volver a casa
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
-Schedule: Horario
 Scheduling: Planificación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
@@ -303,7 +289,6 @@ SendMessage: Enviar Mensaje
 SendTaxForms: Enviar formularios de impuestos
 ServiceZipCodes: Códigos postales de servicio
 ShowPassword: Mostrar contraseña
-ShowSchedules: Mostrar horarios
 SkipToBuilds: Ir a Compilaciones
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
@@ -351,7 +336,6 @@ VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
 VolunteerInformation: Información para voluntarios
 VolunteerInformationContinued: Continuación de la información para voluntarios
-Volunteers: Voluntarios
 VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
 VolunteerSignUpAgainSubtitle: Apreciamos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
 VolunteerSignUpNew: Bienvenido a Bed Brigade {fullName}

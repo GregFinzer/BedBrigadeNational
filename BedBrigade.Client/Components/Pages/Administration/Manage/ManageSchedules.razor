@@ -1,0 +1,112 @@
+﻿@layout Layout.AdminLayout
+@page "/administration/manage/schedules"
+@page "/administration/manage/schedules/{id:int}"
+<CheckAuth Roles=@RoleNames.CanViewSchedule></CheckAuth>
+
+@using Syncfusion.Blazor.Grids
+@using BedBrigade.Data
+@using BedBrigade.Common
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using EditMode = Syncfusion.Blazor.Grids.EditMode
+@using WrapMode = Syncfusion.Blazor.Grids.WrapMode
+@using System.Diagnostics;
+@using BedBrigade.Common.Models
+@using BedBrigade.Common.Logic;
+
+<div class="row mt-3">
+    <div class="col-md-6 ps-3">
+        <h3>@ManageScheduleMessage</h3>
+    </div>
+    <div class="col-md-4 ps-3 ps-md-0">
+        @_lc.Keys["ShowSchedules"]
+        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px">
+            <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange"></DropDownListEvents>
+            <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>
+    <div class="col-md-2 ps-3 ps-md-0">
+        <UserInfo />
+    </div>
+</div>
+<div class="col-lg-12 control-sec">
+
+    <div class="content-wrapper">
+        <div class="row">
+            <div style="width: 100%">
+                <SfGrid @ref="Grid" TValue="Schedule" DataSource="@lstSchedules"
+                        ShowColumnChooser="true"
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        AllowExcelExport="true"
+                        ShowColumnMenu="false"
+                        AllowFiltering="true"
+                        AllowReordering="true"
+                        AllowResizing="true"
+                        AllowSelection="true"
+                        AllowPdfExport="true"
+                        AllowTextWrap="true"
+                        AllowGrouping="true"
+                        Toolbar=@ToolBar
+                        Width="100%"
+                        ClipMode="ClipMode.EllipsisWithTooltip">
+                    <GridTextWrapSettings WrapMode="WrapMode.Header" />
+                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.CheckBox">
+                    </GridFilterSettings>
+                    <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25, 50, 100 })" PageSize="15" />
+                    <GridSortSettings Columns="@DefaultSortColumns" />
+                    <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
+                    <GridColumns>
+                        <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="true" AllowAdding="false" AllowEditing="false"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">
+                        </GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventDurationHours) HeaderText="Duration in Hours" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Schedule.EventStatus) ForeignDataSource=@lstEventStatuses ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Status" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Schedule.GroupName) HeaderText="Group" AutoFit="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersRegistered) HeaderText="Volunteers" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.DeliveryVehiclesRegistered) HeaderText="Vehicles" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.VolunteersMax) HeaderText="Max Volunteers" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.Teams) HeaderText="Teams" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.Beds) HeaderText="Beds" AllowFiltering="false" AutoFit="true" HeaderTextAlign="TextAlign.Center" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.EventNote) HeaderText="Note" Width="150px" AllowFiltering="false"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.OrganizerName) HeaderText="Organizer Name" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.OrganizerEmail) HeaderText="Organizer Email" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.OrganizerPhone) HeaderText="Organizer Phone" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.Address) HeaderText="Address" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.City) HeaderText="City" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.State) HeaderText="State" AutoFit="true" AllowFiltering="true"></GridColumn>
+                        <GridColumn Field=@nameof(Schedule.PostalCode) HeaderText="Postal Code" AutoFit="true" AllowFiltering="true"></GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    .periodselector {
+        font-size: larger;
+        font-weight: bold;
+    }
+
+    .required::after {
+        content: '*';
+        font-weight: bold;
+        margin-right: 4px;
+        color: red;
+    }
+
+    .e-dialog.e-control.e-popup {
+        overflow: hidden;
+    }
+
+    .center-column {
+        text-align: center;
+    }
+</style>
+
+
+
+
+

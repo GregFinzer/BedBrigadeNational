@@ -5,9 +5,116 @@
 
 <h3 class="w-100 text-center mt-3">Administration Dashboard</h3>
 
-<div class="text-center">
-    <h2>Bed Brigade</h2>
+<div class="container my-4">
+    <div class="row mb-4">
+        @if (ContactsNeedingResponses > 0)
+        {
+            <div class="col-md-3">
+                <div class="card shadow-sm text-dark" style="background-color: #fff3cd;">
+                    <div class="card-header fw-bold">
+                        <h5 class="mb-0"><a href="/administration/manage/contacts">Contact Requested</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/administration/manage/contacts">Contacts Needing Responses</a>: @ContactsNeedingResponses
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <!-- Schedules Section -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule</a></h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Schedules == null)
+                    {
+                        <div class="p-3 text-muted">Loading schedules...</div>
+                    }
+                    else if (!Schedules.Any())
+                    {
+                        <div class="p-3 text-muted">No schedules found.</div>
+                    }
+                    else
+                    {
+                        <table class="table table-striped table-sm mb-0">
+                            <thead class="table-secondary">
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Group</th>
+                                <th class="text-center">Volunteers</th>
+                                <th class="text-center">Vehicles</th>
+                                <th class="text-center">Teams</th>
+                                <th class="text-center">Beds</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var s in Schedules)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@($"/administration/admintasks/addeditschedule/{s.LocationId}/{s.ScheduleId}")">
+                                            @s.EventDateScheduled.ToString("g")
+                                        </a>
+                                    </td>
+                                    <td>@s.EventName</td>
+                                    <td>@s.GroupName</td>
+                                    <td class="text-center">@s.VolunteersRegistered</td>
+                                    <td class="text-center">@s.DeliveryVehiclesRegistered</td>
+                                    <td class="text-center">@s.Teams</td>
+                                    <td class="text-center">@s.Beds</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/bedrequests">Waiting Bed Requests</a></h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-secondary">
+                        <tr>
+                            <th>Location</th>
+                            <th class="text-center">Requests</th>
+                            <th class="text-center">Beds</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (BedRequestsDashboard != null)
+                        {
+                            foreach (var r in BedRequestsDashboard)
+                            {
+                                <tr>
+                                    <td>@r.LocationName</td>
+                                    <td class="text-center">@r.Requests</td>
+                                    <td class="text-center">@r.Beds</td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections (future cards) -->
+        @*         <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Coming Soon</h5>
+                    <p class="card-text text-muted">Other dashboard sections will go here.</p>
+                </div>
+            </div>
+        </div> *@
+    </div>
 </div>
 
-<p class="text-center">Please use the Administration menu to perform Admin functions.</p>
-<p class="text-center">A future version of this dashboard will have summary information.</p>

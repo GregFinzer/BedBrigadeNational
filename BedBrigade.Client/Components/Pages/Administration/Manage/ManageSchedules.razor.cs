@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
 using Action = Syncfusion.Blazor.Grids.Action;
 using Syncfusion.Blazor.DropDowns;
@@ -10,9 +10,9 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 
 
-namespace BedBrigade.Client.Components
+namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
-    public partial class ScheduleGrid : ComponentBase
+    public partial class ManageSchedules : ComponentBase
     {
         // Data Services
         [Inject] private ILocationDataService? _svcLocation { get; set; }
@@ -21,8 +21,10 @@ namespace BedBrigade.Client.Components
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
-        protected SfGrid<Schedule>? Grid { get; set; }
-        protected List<Schedule>? lstSchedules { get; set; }
+        [Inject] private NavigationManager? _navigationManager { get; set; }
+        [Parameter] public int? Id { get; set; }
+        protected SfGrid<Common.Models.Schedule>? Grid { get; set; }
+        protected List<Common.Models.Schedule>? lstSchedules { get; set; }
         protected List<Location>? lstLocations;
 
         private string userRole = String.Empty;
@@ -35,7 +37,7 @@ namespace BedBrigade.Client.Components
         public bool enabledLocationSelector { get; set; } = true;
 
         private const string EventDate = "EventDateScheduled";
-        private const string FutureFilter = "future"; 
+        private const string FutureFilter = "future";
         // Edit Form
 
         protected List<string>? ToolBar;
@@ -46,7 +48,7 @@ namespace BedBrigade.Client.Components
         public bool NoPaging { get; private set; }
         public int selectedScheduleId = 0;
 
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight="200px", EnableResize=true };
+        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px", EnableResize = true };
 
         private User? _currentUser = new User();
         private int _selectedLocationId = 0;
@@ -66,15 +68,33 @@ namespace BedBrigade.Client.Components
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();
                 DefaultSortColumns = new List<GridSortColumn> { new GridSortColumn { Field = EventDate, Direction = SortDirection.Ascending } };
-                await SetInitialFilter();
+                
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error initializing ScheduleGrid component");
                 _toastService.Error("Error", $"An error occurred while initializing the page: {ex.Message}");
             }
+        }
 
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await SetInitialFilter();
+            }
+            else
+            {
+                if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
+                {
+                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    Grid.EditSettings.AllowDeleting = true;
+                    Grid.EditSettings.AllowAdding = true;
+                    Grid.EditSettings.AllowEditing = true;
+                    StateHasChanged();
+                }
+            }
         }
 
         private void SetupToolbar()
@@ -96,11 +116,6 @@ namespace BedBrigade.Client.Components
         {
             if (Grid != null)
             {
-                if (lstSchedules != null && lstSchedules.Count > 0 && Grid != null)
-                {
-                    Grid.SelectedRowIndex = 0;
-                }
-
                 try
                 {
                     await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal",
@@ -146,7 +161,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadScheduleData()
         {
-            ServiceResponse<List<Schedule>> recordResult;
+            ServiceResponse<List<Common.Models.Schedule>> recordResult;
             recordResult = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
 
             if (recordResult.Success && recordResult.Data != null)
@@ -155,7 +170,7 @@ namespace BedBrigade.Client.Components
             }
             else
             {
-                lstSchedules = new List<Schedule>();
+                lstSchedules = new List<Common.Models.Schedule>();
                 Log.Error("Error loading schedules: {ErrorMessage}", recordResult.Message);
                 _toastService.Error("Error", $"An error occurred while loading schedules: {recordResult.Message}");
             }
@@ -184,7 +199,7 @@ namespace BedBrigade.Client.Components
             if (args.Item.Text == "Reset")
             {
                 await Grid.ResetPersistDataAsync();
-                DefaultFilter = FutureFilter; 
+                DefaultFilter = FutureFilter;
                 await SetInitialFilter();
                 //It is not possible to save the grid state for this grid for some reason
                 return;
@@ -207,7 +222,7 @@ namespace BedBrigade.Client.Components
 
         }
 
-        public async Task OnActionBegin(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)
+        public async Task OnActionBegin(Syncfusion.Blazor.Grids.ActionEventArgs<Common.Models.Schedule> args)
         {
             var requestType = args.RequestType;
             switch (requestType)
@@ -221,24 +236,34 @@ namespace BedBrigade.Client.Components
                     break;
 
                 case Action.Add:
+                    args.Cancel = true;
                     Add();
                     break;
 
-                case Action.Save:
-                    await Save(args);
-                    break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    await Edit(args);
                     break;
             }
 
         }
 
-        private async Task Delete(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)
+        private void Add()
+        {
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditschedule/{_selectedLocationId}");
+        }
+
+        protected async Task Edit(ActionEventArgs<Common.Models.Schedule> args)
+        {
+            var schedule = args.Data;
+            args.Cancel = true;
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditschedule/{_selectedLocationId}/{schedule.ScheduleId}");
+        }
+
+        private async Task Delete(Syncfusion.Blazor.Grids.ActionEventArgs<Common.Models.Schedule> args)
         {
             try
             {
-                List<Schedule> records = await Grid.GetSelectedRecordsAsync();
+                List<Common.Models.Schedule> records = await Grid.GetSelectedRecordsAsync();
                 foreach (var rec in records)
                 {
                     var deleteResult = await _svcSchedule.DeleteAsync(rec.ScheduleId);
@@ -264,83 +289,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private void Add()
-        {
-            HeaderTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"];
-            ButtonTitle = _lc.Keys["Add"] + " " + _lc.Keys["Schedule"]; 
-            enabledLocationSelector = false;
-        }
 
-        private async Task Save(Syncfusion.Blazor.Grids.ActionEventArgs<Schedule> args)
-        {
-            try
-            {
-
-                Schedule editSchedule = args.Data;
-
-                editSchedule.EventDateScheduled = ScheduleStartDate.Date + ScheduleStartTime.TimeOfDay;
-
-                if (editSchedule.ScheduleId != 0) // Updated schedule
-                {
-                    //Update Schedule Record
-                    var updateResult = await _svcSchedule.UpdateAsync(editSchedule);
-
-                    if (updateResult.Success)
-                    {
-                        _toastService.Success("Update Schedule",
-                            $"Schedule for {editSchedule.EventDateScheduled.ToShortDateString()} updated Successfully");
-                    }
-                    else
-                    {
-                        Log.Error("Unable to update schedule " + updateResult.Message);
-                        _toastService.Error("Update Schedule", $"Unable to update Schedule. {updateResult.Message}");
-                    }
-                }
-                else // new schedule
-                {
-                    var addResult = await _svcSchedule.CreateAsync(editSchedule);
-                    if (addResult.Success && addResult.Data != null)
-                    {
-                        editSchedule = addResult.Data; // added Schedule
-                    }
-
-                    if (editSchedule != null && editSchedule.ScheduleId > 0)
-                    {
-                        _toastService.Success("Add Schedule",
-                            $"New Schedule for {editSchedule.EventDateScheduled.ToShortDateString()} added Successfully");
-                    }
-                    else
-                    {
-                        Log.Error("Unable to add schedule " + addResult.Message);
-                        _toastService.Error("Add Schedule", $"Unable to add Schedule. {addResult.Message}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error saving schedule");
-                _toastService.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
-            }
-
-            await Grid.Refresh();
-        }
-
-        private void BeginEdit()
-        {          
-            HeaderTitle = _lc.Keys["Update"] + " " + _lc.Keys["Schedule"]+ " #" + selectedScheduleId.ToString();
-            ButtonTitle = _lc.Keys["Update"];
-            enabledLocationSelector = false;          
-        }
-
-        public async Task Save(Schedule schedule)        
-        {          
-            await Grid.EndEditAsync();
-        }
-
-        public async Task Cancel()
-        {
-            await Grid.CloseEditAsync();
-        }
         protected void DataBound()
         {
             if (lstSchedules.Count == 0) RecordText = "No Schedule records found";
@@ -391,7 +340,7 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        public void RowSelectHandler(RowSelectEventArgs<Schedule> args)
+        public void RowSelectHandler(RowSelectEventArgs<Common.Models.Schedule> args)
         {
             selectedScheduleId = args.Data.ScheduleId;
             _selectedLocationId = args.Data.LocationId;
@@ -425,7 +374,7 @@ namespace BedBrigade.Client.Components
                     await Grid.FilterByColumnAsync(EventDate, "lessthan", DateTime.Today);
                     break;
                 default:
-                    await Grid.ClearFilteringAsync(EventDate);                  
+                    await Grid.ClearFilteringAsync(EventDate);
                     break;
 
             }
@@ -444,7 +393,7 @@ namespace BedBrigade.Client.Components
 
 
     } // class
-    
+
 
 
 } // namespace

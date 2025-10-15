@@ -51,11 +51,13 @@ namespace BedBrigade.Common.Models
         [MaxLength(255)]
         public String? OrganizerEmail { get; set; } = string.Empty;
 
-        // Event Resources  (3)
+        public int VolunteersMax { get; set; } = 0;
 
-        public int VolunteersMax { get; set; } = 0; 
+        //Summary Information
         public int VolunteersRegistered { get; set; } = 0;
         public int DeliveryVehiclesRegistered { get; set; } = 0;
+        public int Teams { get; set; } = 0;
+        public int Beds { get; set; } = 0;
 
         [NotMapped]
         public string? EventSelect { get; set; }
