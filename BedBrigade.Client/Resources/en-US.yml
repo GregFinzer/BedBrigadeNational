@@ -24,8 +24,6 @@ Campaign: Campaign
 Cancel: Cancel
 ChangePassword: Change Password
 ChangePasswordExpired: Change password expired, request Forgot Password again.
-ChooseADate: Choose a Date
-ChooseATime: Choose a Time
 City: City
 ClickToSignup: (Click to Signup)
 CompareConfirmPasswordToPassword: The passwords do not match.
@@ -57,7 +55,6 @@ DonationDate: Donation Date
 DonationDetails: Donation Details
 DonationFormNotCompleted: The Donation Form is not completed
 DoYouAttendChurch: Do you attend church regularly?
-DurationHours: Duration (hours)
 DynamicALittle: A little
 DynamicApril: April
 DynamicAprilBedBuild: April Bed Build
@@ -103,14 +100,9 @@ EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
 Event: Event
 Events: Events
-EventDate: Event Date
 EventDateTime: Event Date & Time
-EventDetails: Event Details
 EventGroup: Event Group
-EventName: Event Name
 EventNote: Event Note
-EventStatus: Event Status
-EventTime: Event Time
 EventType: Event Type
 Example: Example
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
@@ -125,7 +117,6 @@ FutureScheduled: Future Scheduled
 GenderAge: Gender / Age
 Gross: Gross
 Group: Group
-GroupName: Group Name
 HaveYouVolunteeredFor: Have you volunteered for Bed Brigade before?
 IdleLogoutMessage: 'You have been logged out due to inactivity. Please log in again to continue.'
 IfYouLikeTo: If you like to volunteer with Bed Brigade, please select our Location and complete the Volunteer registration form
@@ -191,7 +182,6 @@ NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
 NoLocationsHavePostalCodes: No locations have postal codes
-NoteComment: Note / Comment
 Notes: Notes
 NothingToSend: Nothing to send
 NotSent: Not Sent
@@ -205,9 +195,6 @@ OneTimeDonationOf: One Time Donation of
 Organization: Organization
 Organizer: Organizer
 OrganizerColon: 'Organizer:'
-OrganizerEmail: Organizer Email
-OrganizerName: Organizer Name
-OrganizerPhone: Organizer Phone
 OtherLanguagesSpoken: Other Languages Spoken
 Password: Password
 PasswordChanged: Your password has been changed successfully.
@@ -279,7 +266,6 @@ ReturnHome: Return Home
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
-Schedule: Schedule
 Scheduling: Scheduling
 SeachAVolunteerBy: Seach a Volunteer by Name
 Search: Search
@@ -302,7 +288,6 @@ SendMessage: Send Message
 SendTaxForms: Send Tax Forms
 ServiceZipCodes: Service Zip Codes
 ShowPassword: Show Password
-ShowSchedules: Show Schedules
 SkipToBuilds: Skip to Builds
 Sorry: Sorry
 SorryThePage: Sorry - the page associated with this link was not found.
@@ -350,7 +335,6 @@ VolunteerForAnotherEvent: Volunteer for Another Event
 VolunteerFormNotCompleted: The Volunteer Form is not completed!
 VolunteerInformation: Volunteer Information
 VolunteerInformationContinued: Volunteer Information Continued
-Volunteers: Volunteers
 VolunteerSignUpAgain: Thanks for serving again {fullName}
 VolunteerSignUpAgainSubtitle: We appreciate you continuing to serve with the Bed Brigade Volunteer Team.
 VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
