@@ -147,7 +147,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             Model.EventType = EventType.Delivery;
             int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryTime, Model.LocationId);
-            Model.EventDateScheduled.AddHours(defaultHour);
+            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
             int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
             Model.EventDurationHours = defaultDuration;
@@ -165,7 +165,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             Model.EventType = EventType.Build;
             int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildTime, Model.LocationId);
-            Model.EventDateScheduled.AddHours(defaultHour);
+            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
             int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildDurationHours, Model.LocationId);
             Model.EventDurationHours = defaultDuration;

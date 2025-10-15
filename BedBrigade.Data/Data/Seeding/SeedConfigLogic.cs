@@ -624,14 +624,14 @@ namespace BedBrigade.Data.Data.Seeding
                 result.Add(new Configuration()
                 {
                     ConfigurationKey = ConfigNames.DefaultBuildEventNote,
-                    ConfigurationValue = "Default build event note.",
+                    ConfigurationValue = "Let's Build Beds!",
                     Section = ConfigSection.Schedule,
                     LocationId = locationId
                 });
                 result.Add(new Configuration()
                 {
                     ConfigurationKey = ConfigNames.DefaultDeliveryEventNote,
-                    ConfigurationValue = "Default build event note.",
+                    ConfigurationValue = "Let's Deliver Beds!",
                     Section = ConfigSection.Schedule,
                     LocationId = locationId
                 });
