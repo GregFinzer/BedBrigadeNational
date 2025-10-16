@@ -36,7 +36,7 @@
     </div>
     <div class="row">
         <!-- Schedules Section -->
-        <div class="col-md-8">
+        <div class="col-md-8 col-xl-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule for @LocationName </a></h5>
@@ -89,7 +89,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 col-xl-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
                     <h5 class="mb-0"><a href="/administration/manage/bedrequests">Waiting Bed Requests</a></h5>
@@ -119,6 +119,20 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 d-none d-xl-block">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body p-2">
+                    <p><a href="/administration/manage/bedrequests">Bed Requests</a></p>
+                    <p><a href="/administration/manage/contacts">Contacts</a></p>
+                    <p><a href="/administration/manage/schedules">Schedules</a></p>
+                    <p><a href="/administration/manage/sign-ups">Sign-Ups</a></p>
+                    <p><a href="/administration/manage/volunteers">Volunteers</a></p>
                 </div>
             </div>
         </div>
@@ -277,6 +291,130 @@
                                 <ChartSeries DataSource="@DeliverySeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
                             </ChartSeriesCollection>
                         </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bed Request Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Request Statistics for @LocationName</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (IsHistoryLoading)
+                    {
+                        <div class="p-3 text-muted">Loading statistics...</div>
+                    }
+                    else if (SeriesCurrentYear == null)
+                    {
+                        <div class="p-3 text-muted">No statistics available.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                <tr>
+                                    <th>Statistic</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>@CurrentYearLabel YTD</td>
+                                    <td class="text-end">@CurrentYearYtdTotal</td>
+                                </tr>
+                                <tr>
+                                    <td>@PrevYearLabel Total</td>
+                                    <td class="text-end">@PrevYearTotal</td>
+                                </tr>
+                                <tr>
+                                    <td>@TwoYearsAgoLabel Total</td>
+                                    <td class="text-end">@TwoYearsAgoTotal</td>
+                                </tr>
+                                <tr>
+                                        <td>Min Beds Requested Per Month for @CurrentYearLabel</td>
+                                    <td class="text-end">@MinBedsPerMonth</td>
+                                </tr>
+                                <tr>
+                                        <td>Max Beds Requested Per Month for @CurrentYearLabel</td>
+                                    <td class="text-end">@MaxBedsPerMonth</td>
+                                </tr>
+                                <tr>
+                                        <td>Average Beds Requested Per Month for @CurrentYearLabel</td>
+                                    <td class="text-end">@AverageBedsPerMonth.ToString("F1")</td>
+                                </tr>
+                                <tr>
+                                        <td>Average Beds Requested Per Week for @CurrentYearLabel</td>
+                                    <td class="text-end">@AverageBedsPerWeek.ToString("F1")</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Delivery Statistics for @LocationName</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (IsDeliveryHistoryLoading)
+                    {
+                        <div class="p-3 text-muted">Loading statistics...</div>
+                    }
+                    else if (DeliverySeriesCurrentYear == null)
+                    {
+                        <div class="p-3 text-muted">No statistics available.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Statistic</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@CurrentYearLabel YTD</td>
+                                        <td class="text-end">@DeliveryCurrentYearYtdTotal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@PrevYearLabel Total</td>
+                                        <td class="text-end">@DeliveryPrevYearTotal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@TwoYearsAgoLabel Total</td>
+                                        <td class="text-end">@DeliveryTwoYearsAgoTotal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Min Beds Delivered Per Month for @CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMinBedsPerMonth</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Max Beds Delivered Per Month for @CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMaxBedsPerMonth</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Beds Delivered Per Month for @CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageBedsPerMonth.ToString("F1")</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Beds Delivered Per Week for @CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageBedsPerWeek.ToString("F1")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     }
                 </div>
             </div>

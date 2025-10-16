@@ -34,6 +34,25 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<ChartPoint>? DeliverySeriesPrevYear { get; set; }
         protected List<ChartPoint>? DeliverySeriesTwoYearsAgo { get; set; }
         protected string LocationName { get; set; }
+
+        // Statistics for Bed Requests (derived from SeriesCurrentYear/Prev/TwoYearsAgo)
+        protected int CurrentYearYtdTotal { get; set; }
+        protected int PrevYearTotal { get; set; }
+        protected int TwoYearsAgoTotal { get; set; }
+        protected int MinBedsPerMonth { get; set; }
+        protected int MaxBedsPerMonth { get; set; }
+        protected double AverageBedsPerMonth { get; set; }
+        protected double AverageBedsPerWeek { get; set; }
+
+        // Statistics for Bed Deliveries (derived from DeliverySeriesCurrentYear/Prev/TwoYearsAgo)
+        protected int DeliveryCurrentYearYtdTotal { get; set; }
+        protected int DeliveryPrevYearTotal { get; set; }
+        protected int DeliveryTwoYearsAgoTotal { get; set; }
+        protected int DeliveryMinBedsPerMonth { get; set; }
+        protected int DeliveryMaxBedsPerMonth { get; set; }
+        protected double DeliveryAverageBedsPerMonth { get; set; }
+        protected double DeliveryAverageBedsPerWeek { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             int locationId = AuthService.LocationId;
@@ -60,10 +79,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
             SignUps = signUpsResponse.Success ? signUpsResponse.Data : new List<SignUp>();
 
             // Load chart data
-            await LoadHistory(locationId);
+            await LoadBedRequestHistory(locationId);
             await LoadDeliveryHistory(locationId);
         }
-        private async Task LoadHistory(int locationId)
+        private async Task LoadBedRequestHistory(int locationId)
         {
             try
             {
@@ -77,6 +96,9 @@ namespace BedBrigade.Client.Components.Pages.Administration
                 SeriesCurrentYear = BuildSeries(data, currentYear);
                 SeriesPrevYear = BuildSeries(data, currentYear - 1);
                 SeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
+
+                // Compute statistics based on the series
+                ComputeBedRequestStatistics();
             }
             finally
             {
@@ -98,6 +120,9 @@ namespace BedBrigade.Client.Components.Pages.Administration
                 DeliverySeriesCurrentYear = BuildSeries(data, currentYear);
                 DeliverySeriesPrevYear = BuildSeries(data, currentYear - 1);
                 DeliverySeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
+
+                // Compute statistics for deliveries
+                ComputeDeliveryStatistics();
             }
             finally
             {
@@ -114,6 +139,80 @@ namespace BedBrigade.Client.Components.Pages.Administration
                 Month = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
                 Count = dict.TryGetValue(m, out var c) ? c : 0
             }).ToList();
+        }
+
+        private void ComputeBedRequestStatistics()
+        {
+            var currentMonth = DateTime.UtcNow.Month;
+            // Helper enumerables
+            var ytdCounts = SeriesCurrentYear?.Take(currentMonth).Select(p => p.Count) ?? Enumerable.Empty<int>();
+            var prevYearCounts = SeriesPrevYear?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+            var twoYearsAgoCounts = SeriesTwoYearsAgo?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+
+            // Totals
+            CurrentYearYtdTotal = ytdCounts.Sum();
+            PrevYearTotal = prevYearCounts.Sum();
+            TwoYearsAgoTotal = twoYearsAgoCounts.Sum();
+
+            // Exclude zero values for min and averages
+            var ytdNonZero = ytdCounts.Where(c => c > 0).ToList();
+            MinBedsPerMonth = ytdNonZero.Any() ? ytdNonZero.Min() : 0;
+            MaxBedsPerMonth = ytdCounts.Any() ? ytdCounts.Max() : 0;
+            AverageBedsPerMonth = ytdNonZero.Any() ? ytdNonZero.Average() : 0.0;
+
+            // Average per week over months that have data (exclude zeros)
+            double totalWeeks = 0.0;
+            if (SeriesCurrentYear != null)
+            {
+                int year = DateTime.UtcNow.Year;
+                for (int m = 1; m <= currentMonth; m++)
+                {
+                    var count = SeriesCurrentYear[m - 1].Count; // BuildSeries ensures order
+                    if (count > 0)
+                    {
+                        totalWeeks += DateTime.DaysInMonth(year, m) / 7.0;
+                    }
+                }
+            }
+            var totalBedsNonZero = ytdNonZero.Sum();
+            AverageBedsPerWeek = totalWeeks > 0 ? totalBedsNonZero / totalWeeks : 0.0;
+        }
+
+        private void ComputeDeliveryStatistics()
+        {
+            var currentMonth = DateTime.UtcNow.Month;
+            // Helper enumerables for deliveries
+            var ytdCounts = DeliverySeriesCurrentYear?.Take(currentMonth).Select(p => p.Count) ?? Enumerable.Empty<int>();
+            var prevYearCounts = DeliverySeriesPrevYear?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+            var twoYearsAgoCounts = DeliverySeriesTwoYearsAgo?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+
+            // Totals
+            DeliveryCurrentYearYtdTotal = ytdCounts.Sum();
+            DeliveryPrevYearTotal = prevYearCounts.Sum();
+            DeliveryTwoYearsAgoTotal = twoYearsAgoCounts.Sum();
+
+            // Exclude zero values for min and averages
+            var ytdNonZero = ytdCounts.Where(c => c > 0).ToList();
+            DeliveryMinBedsPerMonth = ytdNonZero.Any() ? ytdNonZero.Min() : 0;
+            DeliveryMaxBedsPerMonth = ytdCounts.Any() ? ytdCounts.Max() : 0;
+            DeliveryAverageBedsPerMonth = ytdNonZero.Any() ? ytdNonZero.Average() : 0.0;
+
+            // Average per week over months that have data (exclude zeros)
+            double totalWeeks = 0.0;
+            if (DeliverySeriesCurrentYear != null)
+            {
+                int year = DateTime.UtcNow.Year;
+                for (int m = 1; m <= currentMonth; m++)
+                {
+                    var count = DeliverySeriesCurrentYear[m - 1].Count;
+                    if (count > 0)
+                    {
+                        totalWeeks += DateTime.DaysInMonth(year, m) / 7.0;
+                    }
+                }
+            }
+            var totalBedsNonZero = ytdNonZero.Sum();
+            DeliveryAverageBedsPerWeek = totalWeeks > 0 ? totalBedsNonZero / totalWeeks : 0.0;
         }
 
         protected class ChartPoint
