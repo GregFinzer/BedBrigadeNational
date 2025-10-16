@@ -20,7 +20,7 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportBedRequestsPolaris
     {
-        private const string FilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed_Requests_1754671557.xlsx";
+        private const string FilePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1760554665.xlsx";
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -36,7 +36,7 @@ namespace BedBrigade.Tests.Integration
         {
             "New Requests",
             "Contacted (Waiting)",
-            "August 9th delivery",
+            "November 8th delivery",
             "Grove City requests",
             "Additional needs",
             "Unable to contact after 3 months",
@@ -45,6 +45,7 @@ namespace BedBrigade.Tests.Integration
             "Delivered"
         };
 
+        //[Test]
         [Test, Ignore("Only run locally manually")]
         public async Task Import()
         {
@@ -424,6 +425,12 @@ namespace BedBrigade.Tests.Integration
                 AddNote(current, "Red de Vida Unlimited");
             }
 
+            if (request.RequestersName.Contains("Alice Prout Nationwide Children's Hospital Partner's for Kids"))
+            {
+                request.RequestersName = "Alice Prout";
+                AddNote(current, "Nationwide Children's Hospital Partner's for Kids");
+            }
+
             var nameParts = _nameParserLogic.ParseName(request.RequestersName, NameOrder.FirstLast);
             current.FirstName = nameParts.FirstName;
             current.LastName = nameParts.LastName;
@@ -489,7 +496,7 @@ namespace BedBrigade.Tests.Integration
                     current.Status = BedBrigade.Common.Enums.BedRequestStatus.Waiting;
                     current.Contacted = true;
                     break;
-                case "August 9th delivery":
+                case "November 8th delivery":
                     current.Status = BedBrigade.Common.Enums.BedRequestStatus.Scheduled;
                     current.Contacted = true;
                     break;

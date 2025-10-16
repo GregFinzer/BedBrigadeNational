@@ -39,7 +39,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule</a></h5>
+                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule for @LocationName </a></h5>
                 </div>
                 <div class="card-body p-0">
                     @if (Schedules == null)
@@ -122,16 +122,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Other sections (future cards) -->
-        @*         <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Coming Soon</h5>
-                    <p class="card-text text-muted">Other dashboard sections will go here.</p>
-                </div>
-            </div>
-        </div> *@
     </div>
     
     <!-- Sign-Ups Section (full width) -->
@@ -139,7 +129,7 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><a href="/administration/manage/sign-ups">Sign-Ups</a></h5>
+                    <h5 class="mb-0"><a href="/administration/manage/sign-ups">Sign-Ups for @LocationName</a></h5>
                 </div>
                 <div class="card-body p-0">
                     @if (SignUps == null)
@@ -231,7 +221,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">Bed Request History</h5>
+                    <h5 class="mb-0">Bed Request History for @LocationName</h5>
                 </div>
                 <div class="card-body">
                     @if (IsHistoryLoading)
@@ -263,7 +253,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">Bed Delivery History</h5>
+                    <h5 class="mb-0">Bed Delivery History for @LocationName</h5>
                 </div>
                 <div class="card-body">
                     @if (IsDeliveryHistoryLoading)

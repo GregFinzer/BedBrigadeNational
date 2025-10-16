@@ -16,7 +16,7 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportVolunteersPolaris
     {
-        private const string FilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Volunteer_Management_1754910935.xlsx";
+        private const string FilePath = @"C:\Users\gfinz\Downloads\Volunteer_Management_1760555072.xlsx";
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -31,6 +31,7 @@ namespace BedBrigade.Tests.Integration
         };
 
         [Test, Ignore("Only run locally manually")]
+        //[Test]
         public async Task Import()
         {
             if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())

@@ -3,6 +3,7 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,7 +19,7 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
-    private const string ImportFilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed Requests - Bed Requests.csv";
+    private const string ImportFilePath = @"C:\Users\gfinz\Downloads\Bed Requests - Bed Requests.csv";
     private const string ConnectionString =
         "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -27,7 +28,9 @@ public class ImportBedRequestsGC
     private readonly Regex _teamRegex = new Regex(@"(team\s)(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
+    private DateTime _lastDeliveryDate = DateTime.Now;
 
+    //[Test]
     [Test, Ignore("Only run locally manually")]
     public async Task ImportBedRequestsFromGC()
     {
@@ -150,9 +153,24 @@ public class ImportBedRequestsGC
             bedRequest.Reference = "GC Website";
         }
 
+        if (bedRequest.Status == BedRequestStatus.Given && !bedRequest.DeliveryDate.HasValue)
+        {
+            bedRequest.DeliveryDate = bedRequest.CreateDate;
+        }
+        else if (bedRequest.Status == BedRequestStatus.Delivered && !bedRequest.DeliveryDate.HasValue)
+        {
+            bedRequest.DeliveryDate = GetDateFromNote(item["Notes"]);
+
+            if (!bedRequest.DeliveryDate.HasValue)
+            {
+                bedRequest.DeliveryDate = _lastDeliveryDate;
+            }
+        }
+
         if (bedRequest.DeliveryDate.HasValue)
         {
             bedRequest.UpdateDate = bedRequest.DeliveryDate.Value;
+            _lastDeliveryDate = bedRequest.DeliveryDate.Value;
         }
         else
         {
@@ -170,6 +188,7 @@ public class ImportBedRequestsGC
 
         if (bedRequest.Status == BedRequestStatus.Delivered
             || bedRequest.Status == BedRequestStatus.Scheduled
+            || bedRequest.Status == BedRequestStatus.Given
             || calledWords.Any(o => bedRequest.Notes.ToLower().Contains(o)))
         {
             bedRequest.Contacted = true;
@@ -376,6 +395,36 @@ public class ImportBedRequestsGC
         }
 
         return _defaultCreateDate;
+    }
+
+    public static DateTime? GetDateFromNote(string note)
+    {
+        if (string.IsNullOrWhiteSpace(note))
+            return null;
+
+        // Pattern matches dates like 9/20/2025, 09/20/25, etc.
+        var pattern = @"\b(?<month>\d{1,2})/(?<day>\d{1,2})/(?<year>\d{2,4})\b";
+        var match = Regex.Match(note, pattern);
+
+        if (!match.Success)
+            return null;
+
+        string dateStr = match.Value;
+
+        // All supported formats
+        string[] formats = new[]
+        {
+            "MM/dd/yyyy", "M/d/yyyy", "M/dd/yyyy", "MM/d/yyyy",
+            "MM/dd/yy", "M/d/yy", "M/dd/yy", "MM/d/yy"
+        };
+
+        if (DateTime.TryParseExact(dateStr, formats, CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out var parsedDate))
+        {
+            return parsedDate;
+        }
+
+        return null;
     }
 
     private void SetPhone(Dictionary<string, string> item, BedRequest bedRequest)
