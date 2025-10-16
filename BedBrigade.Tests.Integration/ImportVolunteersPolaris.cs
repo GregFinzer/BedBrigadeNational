@@ -17,6 +17,7 @@ namespace BedBrigade.Tests.Integration
     public class ImportVolunteersPolaris
     {
         private const string FilePath = @"C:\Users\gfinz\Downloads\Volunteer_Management_1760555072.xlsx";
+
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
