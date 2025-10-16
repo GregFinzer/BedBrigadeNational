@@ -27,6 +27,11 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<ChartPoint>? SeriesCurrentYear { get; set; }
         protected List<ChartPoint>? SeriesPrevYear { get; set; }
         protected List<ChartPoint>? SeriesTwoYearsAgo { get; set; }
+        // Chart data for Bed Delivery History
+        protected bool IsDeliveryHistoryLoading { get; set; } = true;
+        protected List<ChartPoint>? DeliverySeriesCurrentYear { get; set; }
+        protected List<ChartPoint>? DeliverySeriesPrevYear { get; set; }
+        protected List<ChartPoint>? DeliverySeriesTwoYearsAgo { get; set; }
         protected override async Task OnInitializedAsync()
         {
             int locationId = AuthService.LocationId;
@@ -53,6 +58,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
 
             // Load chart data
             await LoadHistory(locationId);
+            await LoadDeliveryHistory(locationId);
         }
         private async Task LoadHistory(int locationId)
         {
@@ -72,6 +78,27 @@ namespace BedBrigade.Client.Components.Pages.Administration
             finally
             {
                 IsHistoryLoading = false;
+            }
+        }
+
+        private async Task LoadDeliveryHistory(int locationId)
+        {
+            try
+            {
+                IsDeliveryHistoryLoading = true;
+                var historyResponse = await BedRequestService.GetBedDeliveryHistory(locationId);
+                var data = historyResponse.Success && historyResponse.Data != null
+                    ? historyResponse.Data
+                    : new List<BedRequestHistoryRow>();
+
+                var currentYear = DateTime.UtcNow.Year;
+                DeliverySeriesCurrentYear = BuildSeries(data, currentYear);
+                DeliverySeriesPrevYear = BuildSeries(data, currentYear - 1);
+                DeliverySeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
+            }
+            finally
+            {
+                IsDeliveryHistoryLoading = false;
             }
         }
 

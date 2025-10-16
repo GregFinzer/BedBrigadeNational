@@ -27,5 +27,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<BedRequestDashboardRow>>> GetWaitingDashboard(int userLocationId);
         // New: Bed request history for dashboard chart
         Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId);
+        // New: Delivery history
+        Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId);
     }
 }

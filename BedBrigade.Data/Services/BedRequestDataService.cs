@@ -593,7 +593,46 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
+
+    // New: Get monthly delivery history counts for current and previous two years, Delivered or Given
+    public async Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBedDeliveryHistory({locationId})");
+        var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedDeliveryHistory", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var currentYear = DateTime.UtcNow.Year;
+            var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
+
+            var result = await dbSet
+                .Where(o => o.LocationId == locationId
+                            && o.DeliveryDate.HasValue
+                            && years.Contains(o.DeliveryDate.Value.Year)
+                            && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
+                .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
+                .Select(g => new BedRequestHistoryRow
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
+    }
 }
+
+
+
+
 
 
 
