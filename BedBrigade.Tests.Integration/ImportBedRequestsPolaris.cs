@@ -21,6 +21,7 @@ namespace BedBrigade.Tests.Integration
     public class ImportBedRequestsPolaris
     {
         private const string FilePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1760554665.xlsx";
+
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -130,7 +131,6 @@ namespace BedBrigade.Tests.Integration
             BedRequest current = new BedRequest();
             current.NumberOfBeds = 0;
             DateTime createDate = new DateTime(2025, 7, 5);
-            DateTime deliveryDate = new DateTime(2025, 7, 12);
             foreach (PolarisBedRequest request in polarisBedRequests)
             {
                 if (request.Group == "Out of town")
@@ -154,13 +154,8 @@ namespace BedBrigade.Tests.Integration
                 SetFirstNameLastName(request, current);
                 SetCreateDate(request, current, createDate);
                 createDate = current.CreateDate.Value;
-                SetDeliveryDate(request, current, deliveryDate);
+                SetDeliveryDate(request, current);
 
-                if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered
-                    && current.DeliveryDate.HasValue)
-                {
-                    deliveryDate = current.DeliveryDate.Value;
-                }
 
                 SetGenderAge(request, current);
                 SetNames(request, current);
@@ -367,7 +362,7 @@ namespace BedBrigade.Tests.Integration
             current.GenderAge += $"{genderLetter}/{ageLetter}";
         }
 
-        private void SetDeliveryDate(PolarisBedRequest request, BedRequest current, DateTime deliveryDate)
+        private void SetDeliveryDate(PolarisBedRequest request, BedRequest current)
         {
             if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered)
             {
@@ -379,7 +374,14 @@ namespace BedBrigade.Tests.Integration
                     }
                     else
                     {
-                        current.DeliveryDate = deliveryDate;
+                        if (current.CreateDate.Value.AddMonths(1) > DateTime.Now)
+                        {
+                            current.DeliveryDate = current.CreateDate.Value.AddDays(1);
+                        }
+                        else
+                        {
+                            current.DeliveryDate = current.CreateDate.Value.AddMonths(1);
+                        }
                     }
                 }
             }
