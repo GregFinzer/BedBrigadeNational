@@ -11,11 +11,13 @@ namespace BedBrigade.Client.Components.Pages.Administration
         [Inject] protected IBedRequestDataService BedRequestService { get; set; } = default!;
         [Inject] protected IContactUsDataService ContactUsService { get; set; } = default!;
         [Inject] protected ISmsQueueDataService SmsQueueDataService  { get; set; } = default!;
+        [Inject] protected ISignUpDataService SignUpDataService { get; set; } = default!;
         protected List<BedRequestDashboardRow>? BedRequestsDashboard { get; set; } = default!;
         protected List<Common.Models.Schedule>? Schedules { get; set; }
         protected int ContactsNeedingResponses { get; set; }
         protected List<SmsQueueSummary>? SmsQueueSummaries { get; set; }
         protected int UnreadMessages { get; set; }
+        protected List<SignUp>? SignUps { get; set; }
         protected override async Task OnInitializedAsync()
         {
             int locationId = AuthService.LocationId;
@@ -35,6 +37,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
             var smsResponse = await SmsQueueDataService.GetSummaryForLocation(locationId);
             SmsQueueSummaries = smsResponse.Success ? smsResponse.Data : new List<SmsQueueSummary>();
             UnreadMessages = SmsQueueSummaries?.Sum(s => s.UnReadCount) ?? 0;
+
+            // Sign-Ups for dashboard (through next two Saturdays)
+            var signUpsResponse = await SignUpDataService.GetSignUpsForDashboard(locationId);
+            SignUps = signUpsResponse.Success ? signUpsResponse.Data : new List<SignUp>();
         }
     }
 }
