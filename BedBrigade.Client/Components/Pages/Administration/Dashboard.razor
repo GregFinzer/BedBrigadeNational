@@ -129,7 +129,7 @@
             </div>
         </div> *@
     </div>
-
+    
     <!-- Sign-Ups Section (full width) -->
     <div class="row mt-4">
         <div class="col-12">
@@ -150,69 +150,69 @@
                     {
                         <table class="table table-striped table-sm mb-0">
                             <thead class="table-secondary">
-                            <tr>
-                                <th>Date</th>
-                                <th>Event</th>
-                                <th>Volunteer</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Organization</th>
-                                <th>Vehicle</th>
-                                <th class="text-center"># Volunteers</th>
-                                <th>Notes</th>
-                            </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Event</th>
+                                    <th>Volunteer</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Organization</th>
+                                    <th>Vehicle</th>
+                                    <th class="text-center"># Volunteers</th>
+                                    <th>Notes</th>
+                                </tr>
                             </thead>
                             <tbody>
-                            @foreach (var su in SignUps)
-                            {
-                                <tr>
-                                    <td>
-                                        @if (su.Schedule != null)
-                                        {
-                                            <a href="@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")">@su.Schedule.EventDateScheduled.ToString("g")</a>
-                                        }
-                                        else
-                                        {
-                                            @su.Schedule?.EventDateScheduled.ToString("g")
-                                        }
-                                    </td>
-                                    <td>@su.Schedule?.ScheduleName</td>
-                                    <td>
-                                        @if (su.Volunteer != null)
-                                        {
-                                            <a href="@($"/administration/admintasks/addeditvolunteer/{su.Volunteer.LocationId}/{su.VolunteerId}")">@su.Volunteer.FullName</a>
-                                        }
-                                        else
-                                        {
-                                            @su.Volunteer?.FullName
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Email))
-                                        {
-                                            <a href="mailto:@su.Volunteer.Email">@su.Volunteer.Email</a>
-                                        }
-                                        else
-                                        {
-                                            @su.Volunteer?.Email
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Phone))
-                                        {
-                                            <a href="tel:@su.Volunteer.Phone">@su.Volunteer.FormattedPhone</a>
-                                        }
-                                        else
-                                        {
-                                            @su.Volunteer?.FormattedPhone
-                                        }
-                                    </td>
-                                    <td>@su.Volunteer?.Organization</td>
-                                    <td>@su.VehicleTypeString</td>
-                                    <td class="text-center">@su.NumberOfVolunteers</td>
-                                    <td>@su.SignUpNote</td>
-                                </tr>
-                            }
+                                @foreach (var su in SignUps)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (su.Schedule != null)
+                                            {
+                                                <a href="@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")">@su.Schedule.EventDateScheduled.ToString("g")</a>
+                                            }
+                                            else
+                                            {
+                                                @su.Schedule?.EventDateScheduled.ToString("g")
+                                            }
+                                        </td>
+                                        <td>@su.Schedule?.ScheduleName</td>
+                                        <td>
+                                            @if (su.Volunteer != null)
+                                            {
+                                                <a href="@($"/administration/admintasks/addeditvolunteer/{su.Volunteer.LocationId}/{su.VolunteerId}")">@su.Volunteer.FullName</a>
+                                            }
+                                            else
+                                            {
+                                                @su.Volunteer?.FullName
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Email))
+                                            {
+                                                <a href="mailto:@su.Volunteer.Email">@su.Volunteer.Email</a>
+                                            }
+                                            else
+                                            {
+                                                @su.Volunteer?.Email
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Phone))
+                                            {
+                                                <a href="tel:@su.Volunteer.Phone">@su.Volunteer.FormattedPhone</a>
+                                            }
+                                            else
+                                            {
+                                                @su.Volunteer?.FormattedPhone
+                                            }
+                                        </td>
+                                        <td>@su.Volunteer?.Organization</td>
+                                        <td>@su.VehicleTypeString</td>
+                                        <td class="text-center">@su.NumberOfVolunteers</td>
+                                        <td>@su.SignUpNote</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     }
@@ -220,5 +220,41 @@
             </div>
         </div>
     </div>
+    <!-- Bed Request History -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Request History</h5>
+                </div>
+                <div class="card-body">
+                    @if (IsHistoryLoading)
+                    {
+                        <div class="text-muted">Loading history...</div>
+                    }
+                    else if (SeriesCurrentYear == null)
+                    {
+                        <div class="text-muted">No history available.</div>
+                    }
+                    else
+                    {
+                        <SfChart>
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Month" Interval="1"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Title="Requests"></ChartPrimaryYAxis>
+                            <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@SeriesTwoYearsAgo" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@TwoYearsAgoLabel" Width="2" Fill="#008000"></ChartSeries>
+                                <ChartSeries DataSource="@SeriesPrevYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@PrevYearLabel" Width="2" Fill="#0000FF"></ChartSeries>
+                                <ChartSeries DataSource="@SeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
