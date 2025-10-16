@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models
 {
@@ -62,7 +63,23 @@ namespace BedBrigade.Common.Models
         [NotMapped]
         public string? EventSelect { get; set; }
 
+        [NotMapped]
+        public string? ScheduleName
+        {
+            get
+            {
+                string eventTypeString = EnumHelper.GetEnumDescription(EventType);
 
+                if (EventName != eventTypeString)
+                {
+                    return EventName;
+                }
+                else
+                {
+                    return eventTypeString;
+                }
+            }
+        }
 
     }
 }

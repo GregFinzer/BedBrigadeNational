@@ -146,7 +146,47 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     {
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }
+
+    public async Task<ServiceResponse<List<SignUp>>> GetSignUpsForDashboard(int locationId)
+    {
+        // Calculate target date to include the next two Saturdays
+        DateTime today = DateTime.UtcNow.Date;
+        int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)today.DayOfWeek + 7) % 7;
+        DateTime nextSaturday = today.AddDays(daysUntilSaturday == 0 ? 0 : daysUntilSaturday);
+        DateTime secondSaturday = nextSaturday.AddDays(7);
+        DateTime targetDateInclusive = secondSaturday.Date.AddDays(1).AddTicks(-1); // end of the day
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), locationId, $"GetSignUpsForDashboard({targetDateInclusive:yyyyMMdd})");
+        List<SignUp>? cachedContent = _cachingService.Get<List<SignUp>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SignUp>>($"Found {cachedContent.Count} GetSignUpsForDashboard in cache", true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.SignUps
+                    .Include(s => s.Schedule)
+                    .Include(s => s.Volunteer)
+                    .Where(s => s.LocationId == locationId
+                                && s.Schedule != null
+                                && s.Schedule.EventDateScheduled <= targetDateInclusive)
+                    .OrderByDescending(s => s.UpdateDate)
+                    .ToListAsync();
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SignUp>>($"Found {result.Count} {GetEntityName()} for dashboard through {secondSaturday:yyyy-MM-dd}", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SignUp>>($"Error GetSignUpsForDashboard for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
 }
+
 
 
 
