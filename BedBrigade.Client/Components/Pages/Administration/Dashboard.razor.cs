@@ -13,6 +13,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
         [Inject] protected IContactUsDataService ContactUsService { get; set; } = default!;
         [Inject] protected ISmsQueueDataService SmsQueueDataService  { get; set; } = default!;
         [Inject] protected ISignUpDataService SignUpDataService { get; set; } = default!;
+        [Inject] protected ILocationDataService LocationDataService { get; set; } = default!;
         protected List<BedRequestDashboardRow>? BedRequestsDashboard { get; set; } = default!;
         protected List<Common.Models.Schedule>? Schedules { get; set; }
         protected int ContactsNeedingResponses { get; set; }
@@ -32,9 +33,11 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<ChartPoint>? DeliverySeriesCurrentYear { get; set; }
         protected List<ChartPoint>? DeliverySeriesPrevYear { get; set; }
         protected List<ChartPoint>? DeliverySeriesTwoYearsAgo { get; set; }
+        protected string LocationName { get; set; }
         protected override async Task OnInitializedAsync()
         {
             int locationId = AuthService.LocationId;
+            LocationName = (await LocationDataService.GetByIdAsync(locationId))?.Data?.Name ?? "Unknown Location";
 
             // Existing schedules
             var scheduleResponse = await ScheduleService.GetScheduleForMonthsAndLocation(locationId, 2);

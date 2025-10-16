@@ -172,6 +172,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                     .Include(s => s.Volunteer)
                     .Where(s => s.LocationId == locationId
                                 && s.Schedule != null
+                                && s.Schedule.EventDateScheduled >= today
                                 && s.Schedule.EventDateScheduled <= targetDateInclusive)
                     .OrderByDescending(s => s.UpdateDate)
                     .ToListAsync();
