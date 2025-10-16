@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
+using System.Linq;
 
 namespace BedBrigade.Client.Components.Pages.Administration
 {
@@ -18,6 +19,14 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<SmsQueueSummary>? SmsQueueSummaries { get; set; }
         protected int UnreadMessages { get; set; }
         protected List<SignUp>? SignUps { get; set; }
+        // Chart data for Bed Request History
+        protected bool IsHistoryLoading { get; set; } = true;
+        protected string CurrentYearLabel => DateTime.UtcNow.Year.ToString();
+        protected string PrevYearLabel => (DateTime.UtcNow.Year - 1).ToString();
+        protected string TwoYearsAgoLabel => (DateTime.UtcNow.Year - 2).ToString();
+        protected List<ChartPoint>? SeriesCurrentYear { get; set; }
+        protected List<ChartPoint>? SeriesPrevYear { get; set; }
+        protected List<ChartPoint>? SeriesTwoYearsAgo { get; set; }
         protected override async Task OnInitializedAsync()
         {
             int locationId = AuthService.LocationId;
@@ -41,6 +50,46 @@ namespace BedBrigade.Client.Components.Pages.Administration
             // Sign-Ups for dashboard (through next two Saturdays)
             var signUpsResponse = await SignUpDataService.GetSignUpsForDashboard(locationId);
             SignUps = signUpsResponse.Success ? signUpsResponse.Data : new List<SignUp>();
+
+            // Load chart data
+            await LoadHistory(locationId);
+        }
+        private async Task LoadHistory(int locationId)
+        {
+            try
+            {
+                IsHistoryLoading = true;
+                var historyResponse = await BedRequestService.GetBedRequestHistory(locationId);
+                var data = historyResponse.Success && historyResponse.Data != null
+                    ? historyResponse.Data
+                    : new List<BedRequestHistoryRow>();
+
+                var currentYear = DateTime.UtcNow.Year;
+                SeriesCurrentYear = BuildSeries(data, currentYear);
+                SeriesPrevYear = BuildSeries(data, currentYear - 1);
+                SeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
+            }
+            finally
+            {
+                IsHistoryLoading = false;
+            }
+        }
+
+        private static List<ChartPoint> BuildSeries(List<BedRequestHistoryRow> rows, int year)
+        {
+            var months = Enumerable.Range(1, 12);
+            var dict = rows.Where(r => r.Year == year).ToDictionary(r => r.Month, r => r.Count);
+            return months.Select(m => new ChartPoint
+            {
+                Month = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
+                Count = dict.TryGetValue(m, out var c) ? c : 0
+            }).ToList();
+        }
+
+        protected class ChartPoint
+        {
+            public string Month { get; set; } = string.Empty;
+            public int Count { get; set; }
         }
     }
 }

@@ -561,7 +561,41 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {ordered.Count} dashboard rows", true, ordered);
         }
     }
+
+    // New: Get monthly history counts for current and previous two years
+    public async Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBedRequestHistory({locationId})");
+        var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedRequestHistory", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var currentYear = DateTime.UtcNow.Year;
+            var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
+
+            var result = await dbSet
+                .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year))
+                .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
+                .Select(g => new BedRequestHistoryRow
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
+    }
 }
+
+
 
 
 
