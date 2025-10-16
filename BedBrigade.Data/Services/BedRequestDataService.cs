@@ -585,7 +585,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Count = g.Count()
+                    Count = g.Sum(x => x.NumberOfBeds)
                 })
                 .ToListAsync();
 
@@ -620,7 +620,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Count = g.Count()
+                    Count = g.Sum(x => x.NumberOfBeds)
                 })
                 .ToListAsync();
 
