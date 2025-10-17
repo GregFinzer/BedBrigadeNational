@@ -361,17 +361,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private void HandleCancel()
         {
-            if (_toastService != null)
-            {
-                string message = "Add new Bed Request cancelled.";
-                if (BedRequestId > 0)
-                {
-                    message = "Edit cancelled, no changes made to Bed Request " + BedRequestId.ToString() + ".";    
-                }
-
-                _toastService.Warning("Bed Request", message);
-            }
-
             if (_nav != null)
             {
                 _nav.NavigateTo("/administration/manage/bedrequests");

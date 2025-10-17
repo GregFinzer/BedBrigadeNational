@@ -16,7 +16,7 @@ else
 {
     <div class="row mt-3">
         <div class="col-md-10 ps-3">
-            <h3>@(IsNew ? @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"] : @_lc.Keys["Update"] + " " + @_lc.Keys["BedRequest"] + " [Id="+ Model.BedRequestId + "]")</h3>
+            <h3>@(IsNew ? @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"] : "Update " + @_lc.Keys["BedRequest"])</h3>
         </div>
         <div class="col-md-2 ps-3 ps-md-0">
             <UserInfo />
@@ -62,8 +62,8 @@ else
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="reference" class="formlabel">@_lc.Keys["Reference"]</label>
-                                <SfTextBox ID="reference" @bind-Value="Model.Reference" FloatLabelType="FloatLabelType.Never" Placeholder="@_lc.Keys["Reference"]"></SfTextBox>
+                                <label for="reference" class="formlabel">Reference</label>
+                                <SfTextBox ID="reference" @bind-Value="Model.Reference" FloatLabelType="FloatLabelType.Never" Placeholder="Reference"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => Model.Reference)"></ValidationMessage>
                                 </div>
@@ -173,7 +173,7 @@ else
 
                 <div class="col-md-3">
                     <div class="card">
-                        <div class="card-header">@_lc.Keys["Scheduling"]</div>
+                        <div class="card-header">Scheduling</div>
                         <div class="card-body">
                             <div class="form-group">
 
@@ -195,12 +195,12 @@ else
                                 </SfDropDownList>
                             </div>
                             <div class="form-group">
-                                <label for="txtdelierydate" class="formlabel">@_lc.Keys["DeliveryDate"]</label>
-                                <SfDatePicker ID="txtdeliverydate" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="@_lc.Keys["DeliveryDate"]" FloatLabelType="FloatLabelType.Never" />
+                                <label for="txtdelierydate" class="formlabel">Delivery Date</label>
+                                <SfDatePicker ID="txtdeliverydate" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Never" />
                             </div>
                             <div class="form-group">
-                                <label for="txtteam" class="formlabel">@_lc.Keys["Team"]</label>
-                                <SfTextBox ID="txtteam" @bind-Value=@Model.Team MaxLength="50" Enabled="true" Placeholder="@_lc.Keys["Team"]" FloatLabelType="FloatLabelType.Never" />
+                                <label for="txtteam" class="formlabel">Team</label>
+                                <SfTextBox ID="txtteam" @bind-Value=@Model.Team MaxLength="50" Enabled="true" Placeholder="Team" FloatLabelType="FloatLabelType.Never" />
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => Model.Team)"></ValidationMessage>
                                 </div>
@@ -214,8 +214,8 @@ else
             <div class="row mt-3">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="note" class="formlabel">@_lc.Keys["Notes"]</label>
-                        <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@Model.Notes Enabled="true" Placeholder="@_lc.Keys["Notes"]" Multiline="true" FloatLabelType="FloatLabelType.Never" />
+                        <label for="note" class="formlabel">Notes</label>
+                        <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@Model.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Never" />
                     </div>
                 </div>
             </div>
@@ -229,7 +229,7 @@ else
             <div class="row mt-3">
                 <div class="col-md-12 text-left">
                     <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
-                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
+                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
                 </div>
             </div>
         </EditForm>

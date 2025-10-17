@@ -37,7 +37,6 @@ Continue: Continue
 Currency: Currency
 DateColon: 'Date:'
 DeliveryAddress: Delivery Address
-DeliveryDate: Delivery Date
 DeliveryVehicle: Delivery Vehicle
 DeliveryVehicleFullSizeVan: I have a Full-Size Van that is empty without seats
 DeliveryVehicleMinivan: I have a Minvan with seats removed or folded into the floor
@@ -182,7 +181,6 @@ NoBedBrigadeNear: No Bed Brigade Near That Zip Code
 NoImagesWereFound: No images were found
 NoLocationsFoundWithin: No locations found within {maxMiles} miles of {postalCode}
 NoLocationsHavePostalCodes: No locations have postal codes
-Notes: Notes
 NothingToSend: Nothing to send
 NotSent: Not Sent
 NoUpcomingBuildsScheduled: No upcoming builds scheduled.
@@ -215,7 +213,6 @@ PrimaryLanguagePlaceholder: Choose language
 Processing: Processing
 RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
 RecentlyGivenBed: You were recently given a bed.  Your next eligible date to request a bed is
-Reference: Reference
 RegisterOrUpdate: Register or Update
 RegularExpressionEmail: Invalid email format
 RegularExpressionPassword: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.
@@ -266,7 +263,6 @@ ReturnHome: Return Home
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
-Scheduling: Scheduling
 SeachAVolunteerBy: Seach a Volunteer by Name
 Search: Search
 SearchBedBrigadeLocations: Search Bed Brigade Locations
@@ -304,7 +300,6 @@ Subscribe: Subscribe
 SubscribeToOurEmail: Subscribe to our Email Newsletter?
 SubscribeToOurText: Subscribe to our Text List?
 TaxFormSent: Tax Form Sent
-Team: Team
 ThankYou: Thank you!
 ThankYouForMakingADifferenceInTheLifeOfAChild: Thank you for making a difference in the life of a child.
 ThankYouForYourDonation: Thank You For Your Donation!
@@ -322,7 +317,6 @@ UnsubscribeFromNewsletter: Unsubscribe from Newsletter
 UpcomingBuilds: Upcoming Builds
 UpcomingDeliveries: Upcoming Deliveries
 UpcomingEvents: Upcoming Events
-Update: Update
 UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
