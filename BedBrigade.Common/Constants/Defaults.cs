@@ -29,5 +29,10 @@
         public const int TruncationLength = 188;
 
         public const string PaymentSessionKey = "PaymentSession";
+
+        public const string GroupGroveCity = "GC";
+        public const string GroupPolaris = "Polaris";
+        public const string GroupPeace = "Peace";
+        public const string GroupUalc = "UALC";
     }
 }

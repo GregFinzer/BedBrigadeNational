@@ -57,7 +57,7 @@ public static class Seed
             Latitude = 39.882527M,
             Longitude = -83.042266M,
             TimeZoneId = Defaults.DefaultTimeZoneId,
-            Group= "GC"
+            Group= Defaults.GroupGroveCity
         },
         new Location
         {
