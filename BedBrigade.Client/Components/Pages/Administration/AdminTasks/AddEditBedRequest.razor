@@ -1,0 +1,247 @@
+﻿@page "/administration/admintasks/addeditbedrequest/{LocationId:int}"
+@page "/administration/admintasks/addeditbedrequest/{LocationId:int}/{BedRequestId:int}"
+@layout Layout.AdminLayout
+
+@using BedBrigade.Common.Models
+@using BedBrigade.Common.EnumModels
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+
+<CheckAuth Roles=@RoleNames.CanManageBedRequests></CheckAuth>
+
+@if (Model == null || Locations == null || lstPrimaryLanguage == null || lstSpeakEnglish == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3">
+            <h3>@(IsNew ? @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"] : "Update " + @_lc.Keys["BedRequest"])</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo />
+        </div>
+    </div>
+
+    <div class="content-wrapper mt-3">
+        <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["ContactInformation"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
+                                <SfTextBox ID="firstname" @bind-Value="Model.FirstName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.FirstName)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
+                                <SfTextBox ID="lastname" @bind-Value="Model.LastName"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.LastName)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
+                                <SfTextBox ID="email" @bind-Value="Model.Email"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Email)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="formlabel required">@_lc.Keys["Phone"]</label>
+                                <SfMaskedTextBox @ref="phoneTextBox" Mask='(000) 000-0000' ID="phone" @bind-Value="Model.Phone" Focus="HandlePhoneMaskFocus"></SfMaskedTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Phone)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reference" class="formlabel">Reference</label>
+                                <SfTextBox ID="reference" @bind-Value="Model.Reference" FloatLabelType="FloatLabelType.Never" Placeholder="Reference"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Reference)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="primaryLanguage" class="formlabel required">@_lc.Keys["PrimaryLanguagePlaceholder"]</label>
+                                <SfDropDownList ID="primaryLanguage" TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value=@Model.PrimaryLanguage Enabled="true">
+                                    <DropDownListEvents TValue="string" TItem="string" ValueChange="OnLanguageChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            </div>
+                            @{
+                                SpeakEnglishVisibility = "none";
+                                if (!String.IsNullOrEmpty(Model.PrimaryLanguage))
+                                {
+                                    if (Model.PrimaryLanguage.Length > 0 && Model.PrimaryLanguage != "English")
+                                    {
+                                        SpeakEnglishVisibility = "";
+                                    }
+                                }
+                            }
+                            <div class="form-group" style="display: @SpeakEnglishVisibility">
+                                <label for="speakEnglish" class="formlabel required">@_lc.Keys["SpeakEnglishPlaceholder"]</label>
+                                <SfDropDownList ID="speakEnglish" TItem="string" TValue="string" DataSource=@lstSpeakEnglish @bind-Value=@Model.SpeakEnglish Enabled="true">
+                                </SfDropDownList>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["DeliveryAddress"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="street" class="formlabel required">@_lc.Keys["Street"]</label>
+                                <SfTextBox ID="street" @bind-Value="Model.Street"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Street)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="city" class="formlabel required">@_lc.Keys["City"]</label>
+                                <SfTextBox ID="city" @bind-Value="Model.City"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.City)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="state" class="formlabel required">@_lc.Keys["State"]</label>
+                                @{
+                                    if (Model.BedRequestId > 0)
+                                    {
+                                        var inputState = @AddressHelper.FindStateAbbreviation(StringUtil.IsNull(Model.State, ""));
+                                        Model.State = inputState;
+                                    }
+                                }
+                                <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="@Model.State">
+                                    <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
+                                    <div style="font-size: smaller">
+                                        <ValidationMessage For="@(() => Model.State)"></ValidationMessage>
+                                    </div>
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip" class="formlabel required">@_lc.Keys["PostalCode"]</label>
+                                <SfMaskedTextBox @ref="zipTextBox" ID="zip" Mask="00000" @bind-Value="@Model.PostalCode" Focus="HandleZipMaskFocus"></SfMaskedTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.PostalCode)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["BedRequestDetails"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="numbed" class="formlabel required">@_lc.Keys["NumberOfBeds"]</label>
+                                <SfNumericTextBox ID="numbed" @bind-Value=@Model.NumberOfBeds Min="1" Max="99" Enabled="true" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.NumberOfBeds)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="ages" class="formlabel required">@_lc.Keys["GenderAge"]</label>
+                                <SfTextBox ID="ages" @bind-Value="Model.GenderAge"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.GenderAge)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
+                                <SfTextBox ID="names" CssClass="custom-textbox-height" @bind-Value="Model.Names" Multiline="true"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Names)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">Scheduling</div>
+                        <div class="card-body">
+                            <div class="form-group">
+
+
+                                <SfDropDownList TItem="Location" TValue="Int32" DataSource="Locations" @bind-Value=@Model.LocationId Readonly=@OnlyRead Enabled="true" Placeholder="@_lc.Keys["Location"]" FloatLabelType="FloatLabelType.Auto">
+                                    <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                    <DropDownListEvents TValue="Int32" TItem="Location" ValueChange="OnLocationChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group">
+                                <SfTextBox @bind-Value=@Model.Group MaxLength="50" Enabled="true" Placeholder="@_lc.Keys["Group"]" FloatLabelType="FloatLabelType.Auto" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Group)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@Model.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto">
+                                    <DropDownListFieldSettings Text="Name" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group">
+                                <label for="txtdelierydate" class="formlabel">Delivery Date</label>
+                                <SfDatePicker ID="txtdeliverydate" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Never" />
+                            </div>
+                            <div class="form-group">
+                                <label for="txtteam" class="formlabel">Team</label>
+                                <SfTextBox ID="txtteam" @bind-Value=@Model.Team MaxLength="50" Enabled="true" Placeholder="Team" FloatLabelType="FloatLabelType.Never" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Team)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="note" class="formlabel">Notes</label>
+                        <SfTextBox ID="note" CssClass="custom-textbox-height" @bind-Value=@Model.Notes Enabled="true" Placeholder="Notes" Multiline="true" FloatLabelType="FloatLabelType.Never" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12 text-left">
+                    <ValidationSummary />
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12 text-left">
+                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
+                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+
+<style>
+    .custom-textbox-height {
+        height: 80px;
+    }
+
+    .min-width-button {
+        min-width: 100px; 
+    }
+</style>
