@@ -38,7 +38,6 @@ Continue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
-DeliveryDate: Fecha de entrega
 DeliveryVehicle: Vehículo de reparto
 DeliveryVehicleFullSizeVan: Tengo una camioneta de tamaño completo que está vacía sin asientos.
 DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
@@ -182,7 +181,6 @@ NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
 NoLocationsHavePostalCodes: Ninguna ubicación tiene códigos postales
-Notes: Notas
 NothingToSend: Nada que enviar
 NotSent: No enviado
 NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
@@ -217,7 +215,6 @@ PrimaryLanguagePlaceholder: Elegir idioma
 Processing: Procesando
 RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
 RecentlyGivenBed: Recientemente se le entregó una cama. Su próxima fecha elegible es
-Reference: Referencia
 RegisterOrUpdate: Registrarse o Actualizar
 RegularExpressionEmail: Formato de correo electrónico no válido
 RegularExpressionPassword: La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.
@@ -267,7 +264,6 @@ ReturnHome: Volver a casa
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
-Scheduling: Planificación
 SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
@@ -305,7 +301,6 @@ Subscribe: Suscribirse
 SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
 SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
-Team: 'Equipo #'
 ThankYou: ¡Gracias!
 ThankYouForMakingADifferenceInTheLifeOfAChild: ¡Gracias por hacer una diferencia en la vida de un niño! 
 ThankYouForYourDonation: ¡Gracias por su donación!
@@ -323,7 +318,6 @@ UnsubscribeFromNewsletter: Darse de baja del boletín
 UpcomingBuilds: Próximas compilaciones
 UpcomingDeliveries: Próximas entregas
 UpcomingEvents: Próximos eventos
-Update: Actualizar
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
