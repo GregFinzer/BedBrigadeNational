@@ -577,17 +577,38 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             var dbSet = ctx.Set<BedRequest>();
             var currentYear = DateTime.UtcNow.Year;
             var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
+            List<BedRequestHistoryRow> result;
 
-            var result = await dbSet
-                .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year))
-                .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
-                .Select(g => new BedRequestHistoryRow
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Count = g.Sum(x => x.NumberOfBeds)
-                })
-                .ToListAsync();
+            if (locationId == Defaults.GroveCityLocationId)
+            {
+                result = await dbSet
+                    .Where(o => o.LocationId == locationId
+                                && o.Group != Defaults.GroupPeace
+                                && o.Group != Defaults.GroupUalc
+                                && o.CreateDate.HasValue 
+                                && years.Contains(o.CreateDate.Value.Year))
+                    .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
+                    .Select(g => new BedRequestHistoryRow
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Count = g.Sum(x => x.NumberOfBeds)
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+               result = await dbSet
+                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year))
+                    .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
+                    .Select(g => new BedRequestHistoryRow
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Count = g.Sum(x => x.NumberOfBeds)
+                    })
+                    .ToListAsync();
+            }
 
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
@@ -610,19 +631,43 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             var currentYear = DateTime.UtcNow.Year;
             var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
 
-            var result = await dbSet
-                .Where(o => o.LocationId == locationId
-                            && o.DeliveryDate.HasValue
-                            && years.Contains(o.DeliveryDate.Value.Year)
-                            && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
-                .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
-                .Select(g => new BedRequestHistoryRow
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Count = g.Sum(x => x.NumberOfBeds)
-                })
-                .ToListAsync();
+            List<BedRequestHistoryRow> result;
+
+            if (locationId == Defaults.GroveCityLocationId)
+            {
+                result = await dbSet
+                    .Where(o => o.LocationId == locationId
+                                && o.Group != Defaults.GroupPeace
+                                && o.Group != Defaults.GroupUalc
+                                && o.DeliveryDate.HasValue
+                                && years.Contains(o.DeliveryDate.Value.Year)
+                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
+                    .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
+                    .Select(g => new BedRequestHistoryRow
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Count = g.Sum(x => x.NumberOfBeds)
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                result = await dbSet
+                    .Where(o => o.LocationId == locationId
+                                && o.DeliveryDate.HasValue
+                                && years.Contains(o.DeliveryDate.Value.Year)
+                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
+                    .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
+                    .Select(g => new BedRequestHistoryRow
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        Count = g.Sum(x => x.NumberOfBeds)
+                    })
+                    .ToListAsync();
+            }
+
 
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
