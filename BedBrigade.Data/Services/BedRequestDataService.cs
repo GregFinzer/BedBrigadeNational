@@ -673,7 +673,96 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
+
+    public async Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetEstimatedWaitTime({locationId})");
+        var cached = _cachingService.Get<string>(cacheKey);
+        if (!string.IsNullOrWhiteSpace(cached))
+        {
+            return new ServiceResponse<string>("Found cached estimated wait time", true, cached);
+        }
+
+        // Get waiting beds for this location from the dashboard summary
+        var dashboard = await GetWaitingDashboard(locationId);
+        if (!dashboard.Success || dashboard.Data == null)
+        {
+            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
+        }
+
+        int bedsWaiting = dashboard.Data.FirstOrDefault(r => r.LocationId == locationId)?.Beds ?? 0;
+
+        // If no beds are waiting, wait time is zero
+        if (bedsWaiting <= 0)
+        {
+            _cachingService.Set(cacheKey, "0 weeks");
+            return new ServiceResponse<string>("No beds waiting", true, "0 weeks");
+        }
+
+        // Use delivery history to compute average delivered per month for prev year + current YTD, excluding zero-months
+        var deliveriesResponse = await GetBedDeliveryHistory(locationId);
+        if (!deliveriesResponse.Success || deliveriesResponse.Data == null)
+        {
+            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
+        }
+
+        var currentYear = DateTime.UtcNow.Year;
+        var currentMonth = DateTime.UtcNow.Month;
+        int prevYear = currentYear - 1;
+
+        int[] delPrevYear = new int[12];
+        int[] delCurrentYtd = new int[currentMonth];
+        foreach (var row in deliveriesResponse.Data.Where(r => r.Year == prevYear))
+        {
+            if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Count;
+        }
+        foreach (var row in deliveriesResponse.Data.Where(r => r.Year == currentYear))
+        {
+            if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Count;
+        }
+
+        double avgDelPerMonth = AverageExcludingZeros(delPrevYear.Concat(delCurrentYtd));
+
+        if (avgDelPerMonth <= 0)
+        {
+            return new ServiceResponse<string>("Insufficient data to estimate wait time", true, "0 weeks");
+        }
+
+        double estimatedMonths = bedsWaiting / avgDelPerMonth;
+
+        string resultText;
+        if (estimatedMonths < 1.0)
+        {
+            double weeks = estimatedMonths * 4.345;
+            int weeksRoundedUp = (int)Math.Ceiling(weeks);
+            weeksRoundedUp = Math.Max(weeksRoundedUp, 1);
+            resultText = weeksRoundedUp == 1 ? "1 week" : $"{weeksRoundedUp} weeks";
+        }
+        else
+        {
+            int monthsRoundedUp = (int)Math.Ceiling(estimatedMonths);
+            resultText = monthsRoundedUp == 1 ? "1 month" : $"{monthsRoundedUp} months";
+        }
+
+        _cachingService.Set(cacheKey, resultText);
+        return new ServiceResponse<string>("Estimated wait time calculated", true, resultText);
+    }
+
+    private static double AverageExcludingZeros(IEnumerable<int> values)
+    {
+        var nonZero = values.Where(v => v > 0).ToList();
+        if (nonZero.Count == 0) return 0.0;
+        return nonZero.Average();
+    }
 }
+
+
+
+
+
+
+
+
 
 
 

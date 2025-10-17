@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace BedBrigade.Client.Components.Pages.Administration
 {
@@ -52,35 +53,37 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected int DeliveryMaxBedsPerMonth { get; set; }
         protected double DeliveryAverageBedsPerMonth { get; set; }
         protected double DeliveryAverageBedsPerWeek { get; set; }
-
+        protected int LocationId { get; set; }
+        protected string EstimatedWaitingTime { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            int locationId = AuthService.LocationId;
-            LocationName = (await LocationDataService.GetByIdAsync(locationId))?.Data?.Name ?? "Unknown Location";
+            LocationId= AuthService.LocationId;
+            LocationName = (await LocationDataService.GetByIdAsync(LocationId))?.Data?.Name ?? "Unknown Location";
 
             // Existing schedules
-            var scheduleResponse = await ScheduleService.GetScheduleForMonthsAndLocation(locationId, 2);
+            var scheduleResponse = await ScheduleService.GetScheduleForMonthsAndLocation(LocationId, 2);
             Schedules = scheduleResponse.Success ? scheduleResponse.Data : new List<Common.Models.Schedule>();
 
             // New bed requests
-            var bedResponse = await BedRequestService.GetWaitingDashboard(locationId);
+            var bedResponse = await BedRequestService.GetWaitingDashboard(LocationId);
             BedRequestsDashboard = bedResponse.Success ? bedResponse.Data : new List<BedRequestDashboardRow>();
 
             // Contacts requested
-            ContactsNeedingResponses = await ContactUsService.ContactsRequested(locationId);
+            ContactsNeedingResponses = await ContactUsService.ContactsRequested(LocationId);
 
             // SMS Queue
-            var smsResponse = await SmsQueueDataService.GetSummaryForLocation(locationId);
+            var smsResponse = await SmsQueueDataService.GetSummaryForLocation(LocationId);
             SmsQueueSummaries = smsResponse.Success ? smsResponse.Data : new List<SmsQueueSummary>();
             UnreadMessages = SmsQueueSummaries?.Sum(s => s.UnReadCount) ?? 0;
 
             // Sign-Ups for dashboard (through next two Saturdays)
-            var signUpsResponse = await SignUpDataService.GetSignUpsForDashboard(locationId);
+            var signUpsResponse = await SignUpDataService.GetSignUpsForDashboard(LocationId);
             SignUps = signUpsResponse.Success ? signUpsResponse.Data : new List<SignUp>();
 
             // Load chart data
-            await LoadBedRequestHistory(locationId);
-            await LoadDeliveryHistory(locationId);
+            await LoadBedRequestHistory(LocationId);
+            await LoadDeliveryHistory(LocationId);
+            EstimatedWaitingTime = (await BedRequestService.GetEstimatedWaitTime(LocationId))?.Data ?? "Unknown";
         }
         private async Task LoadBedRequestHistory(int locationId)
         {
@@ -252,6 +255,8 @@ namespace BedBrigade.Client.Components.Pages.Administration
 
             DeliveryAverageBedsPerWeek = totalWeeks > 0 ? totalBedsNonZero / totalWeeks : 0.0;
         }
+
+
 
         protected class ChartPoint
         {

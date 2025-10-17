@@ -119,6 +119,8 @@
                             </tbody>
                         </table>
                     </div>
+                    <br />
+                    <strong class="p-2" >Estimated Waiting Time: @EstimatedWaitingTime</strong>
                 </div>
             </div>
         </div>
@@ -303,6 +305,10 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">Bed Request Statistics for @LocationName</h5>
+                    @if (LocationId == Defaults.GroveCityLocationId)
+                    {
+                        <span>* Excludes UALC and Peace</span>
+                    }
                 </div>
                 <div class="card-body p-0">
                     @if (IsHistoryLoading)
@@ -363,6 +369,10 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">Bed Delivery Statistics for @LocationName</h5>
+                    @if (LocationId == Defaults.GroveCityLocationId)
+                    {
+                        <span>* Excludes UALC and Peace</span>
+                    }
                 </div>
                 <div class="card-body p-0">
                     @if (IsDeliveryHistoryLoading)

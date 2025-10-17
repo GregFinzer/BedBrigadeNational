@@ -25,9 +25,8 @@ namespace BedBrigade.Data.Services
         Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
         Task<ServiceResponse<List<BedRequestDashboardRow>>> GetWaitingDashboard(int userLocationId);
-        // New: Bed request history for dashboard chart
         Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId);
-        // New: Delivery history
         Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId);
+        Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId);
     }
 }
