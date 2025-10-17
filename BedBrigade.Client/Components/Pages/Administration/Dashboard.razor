@@ -326,36 +326,44 @@
                                 <thead class="table-secondary">
                                 <tr>
                                     <th>Statistic</th>
-                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">Families in Need</th>
+                                    <th class="text-end">Beds</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <td>@CurrentYearLabel YTD</td>
+                                    <td class="text-end">@CurrentYearYtdRequests</td>
                                     <td class="text-end">@CurrentYearYtdTotal</td>
                                 </tr>
                                 <tr>
                                     <td>@PrevYearLabel Total</td>
+                                    <td class="text-end">@PrevYearRequestsTotal</td>
                                     <td class="text-end">@PrevYearTotal</td>
                                 </tr>
                                 <tr>
                                     <td>@TwoYearsAgoLabel Total</td>
+                                    <td class="text-end">@TwoYearsAgoRequestsTotal</td>
                                     <td class="text-end">@TwoYearsAgoTotal</td>
                                 </tr>
                                 <tr>
-                                        <td>Min Beds Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td>Min Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@MinRequestsPerMonth</td>
                                     <td class="text-end">@MinBedsPerMonth</td>
                                 </tr>
                                 <tr>
-                                        <td>Max Beds Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td>Max Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@MaxRequestsPerMonth</td>
                                     <td class="text-end">@MaxBedsPerMonth</td>
                                 </tr>
                                 <tr>
-                                        <td>Average Beds Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td>Average Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@AverageRequestsPerMonth.ToString("F1")</td>
                                     <td class="text-end">@AverageBedsPerMonth.ToString("F1")</td>
                                 </tr>
                                 <tr>
-                                        <td>Average Beds Requested Per Week for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td>Average Requested Per Week for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@AverageRequestsPerWeek.ToString("F1")</td>
                                     <td class="text-end">@AverageBedsPerWeek.ToString("F1")</td>
                                 </tr>
                                 </tbody>
@@ -390,36 +398,44 @@
                                 <thead class="table-secondary">
                                     <tr>
                                         <th>Statistic</th>
-                                        <th class="text-end">Amount</th>
+                                        <th class="text-end">Families Blessed</th>
+                                        <th class="text-end">Beds</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>@CurrentYearLabel YTD</td>
-                                        <td class="text-end">@DeliveryCurrentYearYtdTotal</td>
+                                        <td class="text-end">@DeliveryCurrentYearYtdRequests</td>
+                                        <td class="text-end">@DeliveryCurrentYearYtdBeds</td>
                                     </tr>
                                     <tr>
                                         <td>@PrevYearLabel Total</td>
-                                        <td class="text-end">@DeliveryPrevYearTotal</td>
+                                        <td class="text-end">@DeliveryPrevYearRequestsTotal</td>
+                                        <td class="text-end">@DeliveryPrevYearBeds</td>
                                     </tr>
                                     <tr>
                                         <td>@TwoYearsAgoLabel Total</td>
-                                        <td class="text-end">@DeliveryTwoYearsAgoTotal</td>
+                                        <td class="text-end">@DeliveryTwoYearsAgoRequestsTotal</td>
+                                        <td class="text-end">@DeliveryTwoYearsAgoBeds</td>
                                     </tr>
                                     <tr>
-                                        <td>Min Beds Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td>Min Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMinRequestsPerMonth</td>
                                         <td class="text-end">@DeliveryMinBedsPerMonth</td>
                                     </tr>
                                     <tr>
-                                        <td>Max Beds Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td>Max Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMaxRequestsPerMonth</td>
                                         <td class="text-end">@DeliveryMaxBedsPerMonth</td>
                                     </tr>
                                     <tr>
-                                        <td>Average Beds Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td>Average Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageRequestsPerMonth.ToString("F1")</td>
                                         <td class="text-end">@DeliveryAverageBedsPerMonth.ToString("F1")</td>
                                     </tr>
                                     <tr>
-                                        <td>Average Beds Delivered Per Week for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td>Average Delivered Per Woche for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageRequestsPerWeek.ToString("F1")</td>
                                         <td class="text-end">@DeliveryAverageBedsPerWeek.ToString("F1")</td>
                                     </tr>
                                 </tbody>

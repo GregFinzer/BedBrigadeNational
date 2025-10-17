@@ -129,8 +129,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
-
-
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
     {
         return await _commonService.GetDistinctEmail(this);
@@ -159,10 +157,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return await _commonService.GetByPhone(this, phone);
     }
 
-
     public async Task<ServiceResponse<List<string>>> EmailsForNotReceivedABed(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"EmailsForNotReceivedABed");
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "EmailsForNotReceivedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
@@ -181,7 +178,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<string>>> EmailsForReceivedABed(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"RecievedABed");
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "RecievedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
@@ -311,8 +308,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-
-
     public async Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone)
     {
         using (var ctx = _contextFactory.CreateDbContext())
@@ -422,7 +417,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     {
         double R = 3956; // miles
         double dLat = (lat2 - lat1) * Math.PI / 180;
-        double dLon = (lon2 - lon1) * Math.PI / 180;
+        double dLon = (lat2 - lat1) * Math.PI / 180;
         double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
                    Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
@@ -443,7 +438,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<string>>> PhonesForNotReceivedABed(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"PhonesForNotReceivedABed");
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "PhonesForNotReceivedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
         if (cachedContent != null)
             return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForNotReceivedABed", true, cachedContent); ;
@@ -460,7 +455,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<string>>> PhonesForReceivedABed(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"PhonesForReceivedABed");
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "PhonesForReceivedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
         if (cachedContent != null)
             return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForReceivedABed", true, cachedContent); ;
@@ -556,11 +551,11 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         foreach (var row in data.Where(r => r.Year == prevYear))
         {
-            if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Count;
+            if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Beds;
         }
         foreach (var row in data.Where(r => r.Year == currentYear))
         {
-            if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Count;
+            if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Beds;
         }
 
         return AverageExcludingZeros(delPrevYear.Concat(delCurrentYtd));
@@ -691,7 +686,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                     {
                         Year = g.Key.Year,
                         Month = g.Key.Month,
-                        Count = g.Sum(x => x.NumberOfBeds)
+                        Beds = g.Sum(x => x.NumberOfBeds),
+                        Requests = g.Count()
                     })
                     .ToListAsync();
             }
@@ -704,7 +700,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                     {
                         Year = g.Key.Year,
                         Month = g.Key.Month,
-                        Count = g.Sum(x => x.NumberOfBeds)
+                        Beds = g.Sum(x => x.NumberOfBeds),
+                        Requests = g.Count()
                     })
                     .ToListAsync();
             }
@@ -714,7 +711,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-   
     public async Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId)
     {
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBedDeliveryHistory({locationId})");
@@ -735,7 +731,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Count = g.Sum(x => x.NumberOfBeds)
+                    Beds = g.Sum(x => x.NumberOfBeds),
+                    Requests = g.Count()
                 })
                 .ToListAsync();
 
