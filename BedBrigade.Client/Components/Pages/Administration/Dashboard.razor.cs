@@ -196,51 +196,12 @@ namespace BedBrigade.Client.Components.Pages.Administration
             var currentYear = DateTime.UtcNow.Year;
             var prevYear = currentYear - 1;
 
-            // Beds-based statistics (unchanged)
-            var ytdBeds = BedRequestSeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
-            var prevYearBeds = BedRequestSeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
-            var twoYearsAgoBeds = BedRequestSeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            CalculateBedRequestNumberOfBedsStatistics(currentMonth, prevYear, currentYear);
+            CalculateBedRequestCountStatistics(currentMonth, prevYear, currentYear);
+        }
 
-            CurrentYearYtdTotal = ytdBeds.Sum();
-            PrevYearTotal = prevYearBeds.Sum();
-            TwoYearsAgoTotal = twoYearsAgoBeds.Sum();
-
-            var bedsCombined = prevYearBeds.Concat(ytdBeds).ToList();
-            var bedsNonZero = bedsCombined.Where(c => c > 0).ToList();
-
-            MinBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Min() : 0;
-            MaxBedsPerMonth = bedsCombined.Any() ? bedsCombined.Max() : 0;
-            AverageBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Average() : 0.0;
-
-            double bedsWeeks = 0.0;
-            int bedsTotalNonZero = 0;
-            if (BedRequestSeriesPrevYear != null)
-            {
-                for (int m = 1; m <= 12; m++)
-                {
-                    var count = BedRequestSeriesPrevYear[m - 1].Count ?? 0;
-                    if (count > 0)
-                    {
-                        bedsWeeks += DateTime.DaysInMonth(prevYear, m) / 7.0;
-                        bedsTotalNonZero += count;
-                    }
-                }
-            }
-            if (BedRequestSeriesCurrentYear != null)
-            {
-                for (int m = 1; m <= currentMonth; m++)
-                {
-                    var count = BedRequestSeriesCurrentYear[m - 1].Count ?? 0;
-                    if (count > 0)
-                    {
-                        bedsWeeks += DateTime.DaysInMonth(currentYear, m) / 7.0;
-                        bedsTotalNonZero += count;
-                    }
-                }
-            }
-            AverageBedsPerWeek = bedsWeeks > 0 ? bedsTotalNonZero / bedsWeeks : 0.0;
-
-            // Requests-based statistics
+        private void CalculateBedRequestCountStatistics(int currentMonth, int prevYear, int currentYear)
+        {
             var ytdReq = BedRequestRequestsSeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
             var prevYearReq = BedRequestRequestsSeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
             var twoYearsAgoReq = BedRequestRequestsSeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
@@ -284,35 +245,30 @@ namespace BedBrigade.Client.Components.Pages.Administration
             AverageRequestsPerWeek = reqWeeks > 0 ? reqTotalNonZero / reqWeeks : 0.0;
         }
 
-        private void ComputeDeliveryStatistics()
+        private void CalculateBedRequestNumberOfBedsStatistics(int currentMonth, int prevYear, int currentYear)
         {
-            var currentMonth = DateTime.UtcNow.Month;
-            var currentYear = DateTime.UtcNow.Year;
-            var prevYear = currentYear - 1;
+            var ytdBeds = BedRequestSeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var prevYearBeds = BedRequestSeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var twoYearsAgoBeds = BedRequestSeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
 
-            // Beds-based statistics
-            var ytdBeds = DeliverySeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
-            var prevYearBeds = DeliverySeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
-            var twoYearsAgoBeds = DeliverySeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
-
-            DeliveryCurrentYearYtdBeds = ytdBeds.Sum();
-            DeliveryPrevYearBeds = prevYearBeds.Sum();
-            DeliveryTwoYearsAgoBeds = twoYearsAgoBeds.Sum();
+            CurrentYearYtdTotal = ytdBeds.Sum();
+            PrevYearTotal = prevYearBeds.Sum();
+            TwoYearsAgoTotal = twoYearsAgoBeds.Sum();
 
             var bedsCombined = prevYearBeds.Concat(ytdBeds).ToList();
             var bedsNonZero = bedsCombined.Where(c => c > 0).ToList();
 
-            DeliveryMinBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Min() : 0;
-            DeliveryMaxBedsPerMonth = bedsCombined.Any() ? bedsCombined.Max() : 0;
-            DeliveryAverageBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Average() : 0.0;
+            MinBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Min() : 0;
+            MaxBedsPerMonth = bedsCombined.Any() ? bedsCombined.Max() : 0;
+            AverageBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Average() : 0.0;
 
             double bedsWeeks = 0.0;
             int bedsTotalNonZero = 0;
-            if (DeliverySeriesPrevYear != null)
+            if (BedRequestSeriesPrevYear != null)
             {
                 for (int m = 1; m <= 12; m++)
                 {
-                    var count = DeliverySeriesPrevYear[m - 1].Count ?? 0;
+                    var count = BedRequestSeriesPrevYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         bedsWeeks += DateTime.DaysInMonth(prevYear, m) / 7.0;
@@ -320,11 +276,11 @@ namespace BedBrigade.Client.Components.Pages.Administration
                     }
                 }
             }
-            if (DeliverySeriesCurrentYear != null)
+            if (BedRequestSeriesCurrentYear != null)
             {
                 for (int m = 1; m <= currentMonth; m++)
                 {
-                    var count = DeliverySeriesCurrentYear[m - 1].Count ?? 0;
+                    var count = BedRequestSeriesCurrentYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         bedsWeeks += DateTime.DaysInMonth(currentYear, m) / 7.0;
@@ -332,10 +288,21 @@ namespace BedBrigade.Client.Components.Pages.Administration
                     }
                 }
             }
+            AverageBedsPerWeek = bedsWeeks > 0 ? bedsTotalNonZero / bedsWeeks : 0.0;
+        }
 
-            DeliveryAverageBedsPerWeek = bedsWeeks > 0 ? bedsTotalNonZero / bedsWeeks : 0.0;
+        private void ComputeDeliveryStatistics()
+        {
+            var currentMonth = DateTime.UtcNow.Month;
+            var currentYear = DateTime.UtcNow.Year;
+            var prevYear = currentYear - 1;
 
-            // Requests-based statistics
+            CalculateDeliveryBedStatistics(currentMonth, prevYear, currentYear);
+            CalculateDeliveryRequestStatistics(currentMonth, prevYear, currentYear);
+        }
+
+        private void CalculateDeliveryRequestStatistics(int currentMonth, int prevYear, int currentYear)
+        {
             var ytdReq = DeliveryRequestsSeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
             var prevYearReq = DeliveryRequestsSeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
             var twoYearsAgoReq = DeliveryRequestsSeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
@@ -380,6 +347,52 @@ namespace BedBrigade.Client.Components.Pages.Administration
             DeliveryAverageRequestsPerWeek = reqWeeks > 0 ? reqTotalNonZero / reqWeeks : 0.0;
         }
 
+        private void CalculateDeliveryBedStatistics(int currentMonth, int prevYear, int currentYear)
+        {
+            var ytdBeds = DeliverySeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var prevYearBeds = DeliverySeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var twoYearsAgoBeds = DeliverySeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+
+            DeliveryCurrentYearYtdBeds = ytdBeds.Sum();
+            DeliveryPrevYearBeds = prevYearBeds.Sum();
+            DeliveryTwoYearsAgoBeds = twoYearsAgoBeds.Sum();
+
+            var bedsCombined = prevYearBeds.Concat(ytdBeds).ToList();
+            var bedsNonZero = bedsCombined.Where(c => c > 0).ToList();
+
+            DeliveryMinBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Min() : 0;
+            DeliveryMaxBedsPerMonth = bedsCombined.Any() ? bedsCombined.Max() : 0;
+            DeliveryAverageBedsPerMonth = bedsNonZero.Any() ? bedsNonZero.Average() : 0.0;
+
+            double bedsWeeks = 0.0;
+            int bedsTotalNonZero = 0;
+            if (DeliverySeriesPrevYear != null)
+            {
+                for (int m = 1; m <= 12; m++)
+                {
+                    var count = DeliverySeriesPrevYear[m - 1].Count ?? 0;
+                    if (count > 0)
+                    {
+                        bedsWeeks += DateTime.DaysInMonth(prevYear, m) / 7.0;
+                        bedsTotalNonZero += count;
+                    }
+                }
+            }
+            if (DeliverySeriesCurrentYear != null)
+            {
+                for (int m = 1; m <= currentMonth; m++)
+                {
+                    var count = DeliverySeriesCurrentYear[m - 1].Count ?? 0;
+                    if (count > 0)
+                    {
+                        bedsWeeks += DateTime.DaysInMonth(currentYear, m) / 7.0;
+                        bedsTotalNonZero += count;
+                    }
+                }
+            }
+
+            DeliveryAverageBedsPerWeek = bedsWeeks > 0 ? bedsTotalNonZero / bedsWeeks : 0.0;
+        }
 
 
         protected class ChartPoint
