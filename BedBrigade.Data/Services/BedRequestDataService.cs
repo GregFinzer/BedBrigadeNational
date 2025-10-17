@@ -575,7 +575,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var currentYear = DateTime.UtcNow.Year;
+            var now = DateTime.UtcNow;
+            var currentYear = now.Year;
             var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
             List<BedRequestHistoryRow> result;
 
@@ -586,7 +587,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                                 && o.Group != Defaults.GroupPeace
                                 && o.Group != Defaults.GroupUalc
                                 && o.CreateDate.HasValue 
-                                && years.Contains(o.CreateDate.Value.Year))
+                                && years.Contains(o.CreateDate.Value.Year)
+                                && o.CreateDate.Value <= now)
                     .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
                     .Select(g => new BedRequestHistoryRow
                     {
@@ -599,7 +601,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             else
             {
                result = await dbSet
-                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year))
+                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year) && o.CreateDate.Value <= now)
                     .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
                     .Select(g => new BedRequestHistoryRow
                     {
@@ -628,7 +630,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var currentYear = DateTime.UtcNow.Year;
+            var now = DateTime.UtcNow;
+            var currentYear = now.Year;
             var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
 
             List<BedRequestHistoryRow> result;
@@ -641,7 +644,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                                 && o.Group != Defaults.GroupUalc
                                 && o.DeliveryDate.HasValue
                                 && years.Contains(o.DeliveryDate.Value.Year)
-                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
+                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
+                                && o.DeliveryDate.Value <= now)
                     .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
                     .Select(g => new BedRequestHistoryRow
                     {
@@ -657,7 +661,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                     .Where(o => o.LocationId == locationId
                                 && o.DeliveryDate.HasValue
                                 && years.Contains(o.DeliveryDate.Value.Year)
-                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given))
+                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
+                                && o.DeliveryDate.Value <= now)
                     .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
                     .Select(g => new BedRequestHistoryRow
                     {
@@ -755,6 +760,22 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return nonZero.Average();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

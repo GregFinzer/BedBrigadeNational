@@ -26,9 +26,9 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected string CurrentYearLabel => DateTime.UtcNow.Year.ToString();
         protected string PrevYearLabel => (DateTime.UtcNow.Year - 1).ToString();
         protected string TwoYearsAgoLabel => (DateTime.UtcNow.Year - 2).ToString();
-        protected List<ChartPoint>? SeriesCurrentYear { get; set; }
-        protected List<ChartPoint>? SeriesPrevYear { get; set; }
-        protected List<ChartPoint>? SeriesTwoYearsAgo { get; set; }
+        protected List<ChartPoint>? BedRequestSeriesCurrentYear { get; set; }
+        protected List<ChartPoint>? BedRequestSeriesPrevYear { get; set; }
+        protected List<ChartPoint>? BedRequestSeriesTwoYearsAgo { get; set; }
         // Chart data for Bed Delivery History
         protected bool IsDeliveryHistoryLoading { get; set; } = true;
         protected List<ChartPoint>? DeliverySeriesCurrentYear { get; set; }
@@ -36,7 +36,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<ChartPoint>? DeliverySeriesTwoYearsAgo { get; set; }
         protected string LocationName { get; set; }
 
-        // Statistics for Bed Requests (derived from SeriesCurrentYear/Prev/TwoYearsAgo)
+        // Statistics for Bed Requests (derived from BedRequestSeriesCurrentYear/Prev/TwoYearsAgo)
         protected int CurrentYearYtdTotal { get; set; }
         protected int PrevYearTotal { get; set; }
         protected int TwoYearsAgoTotal { get; set; }
@@ -96,9 +96,9 @@ namespace BedBrigade.Client.Components.Pages.Administration
                     : new List<BedRequestHistoryRow>();
 
                 var currentYear = DateTime.UtcNow.Year;
-                SeriesCurrentYear = BuildSeries(data, currentYear);
-                SeriesPrevYear = BuildSeries(data, currentYear - 1);
-                SeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
+                BedRequestSeriesCurrentYear = BuildSeries(data, currentYear);
+                BedRequestSeriesPrevYear = BuildSeries(data, currentYear - 1);
+                BedRequestSeriesTwoYearsAgo = BuildSeries(data, currentYear - 2);
 
                 // Compute statistics based on the series
                 ComputeBedRequestStatistics();
@@ -137,10 +137,16 @@ namespace BedBrigade.Client.Components.Pages.Administration
         {
             var months = Enumerable.Range(1, 12);
             var dict = rows.Where(r => r.Year == year).ToDictionary(r => r.Month, r => r.Count);
+            var currentYear = DateTime.UtcNow.Year;
+            var currentMonth = DateTime.UtcNow.Month;
+
             return months.Select(m => new ChartPoint
             {
                 Month = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
-                Count = dict.TryGetValue(m, out var c) ? c : 0
+                // For the current year, do not plot future months: set Count to null so the chart skips them
+                Count = (year == currentYear && m > currentMonth)
+                    ? (int?)null
+                    : dict.TryGetValue(m, out var c) ? (int?)c : 0
             }).ToList();
         }
 
@@ -150,10 +156,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
             var currentYear = DateTime.UtcNow.Year;
             var prevYear = currentYear - 1;
 
-            // Helper enumerables
-            var ytdCounts = SeriesCurrentYear?.Take(currentMonth).Select(p => p.Count) ?? Enumerable.Empty<int>();
-            var prevYearCounts = SeriesPrevYear?.Select(p => p.Count) ?? Enumerable.Empty<int>();
-            var twoYearsAgoCounts = SeriesTwoYearsAgo?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+            // Helper enumerables (coalesce nulls to zero)
+            var ytdCounts = BedRequestSeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var prevYearCounts = BedRequestSeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var twoYearsAgoCounts = BedRequestSeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
 
             // Totals (unchanged)
             CurrentYearYtdTotal = ytdCounts.Sum();
@@ -172,11 +178,11 @@ namespace BedBrigade.Client.Components.Pages.Administration
             double totalWeeks = 0.0;
             int totalBedsNonZero = 0;
 
-            if (SeriesPrevYear != null)
+            if (BedRequestSeriesPrevYear != null)
             {
                 for (int m = 1; m <= 12; m++)
                 {
-                    var count = SeriesPrevYear[m - 1].Count;
+                    var count = BedRequestSeriesPrevYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         totalWeeks += DateTime.DaysInMonth(prevYear, m) / 7.0;
@@ -184,11 +190,11 @@ namespace BedBrigade.Client.Components.Pages.Administration
                     }
                 }
             }
-            if (SeriesCurrentYear != null)
+            if (BedRequestSeriesCurrentYear != null)
             {
                 for (int m = 1; m <= currentMonth; m++)
                 {
-                    var count = SeriesCurrentYear[m - 1].Count;
+                    var count = BedRequestSeriesCurrentYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         totalWeeks += DateTime.DaysInMonth(currentYear, m) / 7.0;
@@ -206,10 +212,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
             var currentYear = DateTime.UtcNow.Year;
             var prevYear = currentYear - 1;
 
-            // Helper enumerables for deliveries
-            var ytdCounts = DeliverySeriesCurrentYear?.Take(currentMonth).Select(p => p.Count) ?? Enumerable.Empty<int>();
-            var prevYearCounts = DeliverySeriesPrevYear?.Select(p => p.Count) ?? Enumerable.Empty<int>();
-            var twoYearsAgoCounts = DeliverySeriesTwoYearsAgo?.Select(p => p.Count) ?? Enumerable.Empty<int>();
+            // Helper enumerables for deliveries (coalesce nulls to zero)
+            var ytdCounts = DeliverySeriesCurrentYear?.Take(currentMonth).Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var prevYearCounts = DeliverySeriesPrevYear?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
+            var twoYearsAgoCounts = DeliverySeriesTwoYearsAgo?.Select(p => p.Count ?? 0) ?? Enumerable.Empty<int>();
 
             // Totals (unchanged)
             DeliveryCurrentYearYtdTotal = ytdCounts.Sum();
@@ -232,7 +238,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             {
                 for (int m = 1; m <= 12; m++)
                 {
-                    var count = DeliverySeriesPrevYear[m - 1].Count;
+                    var count = DeliverySeriesPrevYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         totalWeeks += DateTime.DaysInMonth(prevYear, m) / 7.0;
@@ -244,7 +250,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             {
                 for (int m = 1; m <= currentMonth; m++)
                 {
-                    var count = DeliverySeriesCurrentYear[m - 1].Count;
+                    var count = DeliverySeriesCurrentYear[m - 1].Count ?? 0;
                     if (count > 0)
                     {
                         totalWeeks += DateTime.DaysInMonth(currentYear, m) / 7.0;
@@ -261,7 +267,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected class ChartPoint
         {
             public string Month { get; set; } = string.Empty;
-            public int Count { get; set; }
+            public int? Count { get; set; }
         }
     }
 }

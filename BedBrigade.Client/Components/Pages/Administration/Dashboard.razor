@@ -244,7 +244,7 @@
                     {
                         <div class="text-muted">Loading history...</div>
                     }
-                    else if (SeriesCurrentYear == null)
+                    else if (BedRequestSeriesCurrentYear == null)
                     {
                         <div class="text-muted">No history available.</div>
                     }
@@ -256,9 +256,9 @@
                             <ChartLegendSettings Visible="true"></ChartLegendSettings>
                             <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
                             <ChartSeriesCollection>
-                                <ChartSeries DataSource="@SeriesTwoYearsAgo" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@TwoYearsAgoLabel" Width="2" Fill="#008000"></ChartSeries>
-                                <ChartSeries DataSource="@SeriesPrevYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@PrevYearLabel" Width="2" Fill="#0000FF"></ChartSeries>
-                                <ChartSeries DataSource="@SeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
+                                <ChartSeries DataSource="@BedRequestSeriesTwoYearsAgo" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@TwoYearsAgoLabel" Width="2" Fill="#008000"></ChartSeries>
+                                <ChartSeries DataSource="@BedRequestSeriesPrevYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@PrevYearLabel" Width="2" Fill="#0000FF"></ChartSeries>
+                                <ChartSeries DataSource="@BedRequestSeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
                             </ChartSeriesCollection>
                         </SfChart>
                     }
@@ -315,7 +315,7 @@
                     {
                         <div class="p-3 text-muted">Loading statistics...</div>
                     }
-                    else if (SeriesCurrentYear == null)
+                    else if (BedRequestSeriesCurrentYear == null)
                     {
                         <div class="p-3 text-muted">No statistics available.</div>
                     }
