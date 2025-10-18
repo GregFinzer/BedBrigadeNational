@@ -46,8 +46,8 @@ namespace BedBrigade.Tests.Integration
             "Delivered"
         };
 
-        [Test]
-        //[Test, Ignore("Only run locally manually")]
+        //[Test]
+        [Test, Ignore("Only run locally manually")]
         public async Task Import()
         {
             if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
