@@ -30,8 +30,8 @@ public class ImportBedRequestsGC
     private DateTime _defaultCreateDate = new DateTime(2018, 11, 11);
     private DateTime _lastDeliveryDate = DateTime.Now;
 
-    //[Test]
-    [Test, Ignore("Only run locally manually")]
+    [Test]
+    //[Test, Ignore("Only run locally manually")]
     public async Task ImportBedRequestsFromGC()
     {
         if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())

@@ -189,33 +189,32 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task LoadBedRequests(){          
-           
-
-             if (metroLocations != null)
-             {
-                        // Fix for CS8602: Check for null before dereferencing _svcBedRequest
-                        if (_svcBedRequest == null)
-                        {
-                            Log.Error("IBedRequestDataService (_svcBedRequest) is not injected.");
-                            return;
-                        }
-
-                        var metroAreaLocationIds = metroLocations.Select(l => l.LocationId).ToList();
-                        var metroAreaBedRequestResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
-                        if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
-                        {
-                            BedRequests = metroAreaBedRequestResult.Data.ToList();
-                        }
-             }
-
-          
-                //Get By Location
+        private async Task LoadBedRequests()
+        {
+            if (metroLocations != null)
+            {
+                // Fix for CS8602: Check for null before dereferencing _svcBedRequest
                 if (_svcBedRequest == null)
                 {
                     Log.Error("IBedRequestDataService (_svcBedRequest) is not injected.");
                     return;
                 }
+
+                var metroAreaLocationIds = metroLocations.Select(l => l.LocationId).ToList();
+                var metroAreaBedRequestResult = await _svcBedRequest.GetAllForLocationList(metroAreaLocationIds);
+                if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+                {
+                    BedRequests = metroAreaBedRequestResult.Data.ToList();
+                    return;
+                }
+            }
+
+            //Get By Location
+            if (_svcBedRequest == null)
+            {
+                Log.Error("IBedRequestDataService (_svcBedRequest) is not injected.");
+                return;
+            }
 
             if (UserLocation != null && _svcBedRequest != null)
             {
@@ -234,7 +233,7 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-        }// LoadBedRequests
+        } // LoadBedRequests
 
         private async Task LoadLocations()
         {

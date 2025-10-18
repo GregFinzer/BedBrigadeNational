@@ -46,8 +46,8 @@ namespace BedBrigade.Tests.Integration
             "Delivered"
         };
 
-        //[Test]
-        [Test, Ignore("Only run locally manually")]
+        [Test]
+        //[Test, Ignore("Only run locally manually")]
         public async Task Import()
         {
             if (!TestHelper.IsWindows() || !TestHelper.ThisComputerHasExcelInstalled())
@@ -80,36 +80,26 @@ namespace BedBrigade.Tests.Integration
             List<BedRequest> toUpdate = new List<BedRequest>();
             foreach (BedRequest bedRequest in polaris)
             {
-                BedRequest? existingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
-                                                                              && x.FirstName == bedRequest.FirstName
-                                                                              && x.LastName == bedRequest.LastName
-                                                                              && x.Status == BedRequestStatus.Waiting 
-                                                                                      && (bedRequest.Status == BedRequestStatus.Scheduled 
-                                                                                  || bedRequest.Status == BedRequestStatus.Delivered)
-                                                                              );
+                if (bedRequest.GenderAge == "G/")
+                    continue;
+
+                BedRequest? existingBedRequest = existing.FirstOrDefault(x => !String.IsNullOrEmpty(x.Phone)
+                                                                              && x.Phone == bedRequest.Phone
+                                                                              && !String.IsNullOrEmpty(x.LastName)
+                                                                              && x.LastName.ToLower() != "unknown"
+                                                                              && x.LastName.ToLower() == bedRequest.LastName.ToLower()
+                                                                              && x.Status == bedRequest.Status);
                 if (existingBedRequest == null)
                 {
-
-                    BedRequest? waitingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
-                        && x.FirstName == bedRequest.FirstName
-                        && x.LastName == bedRequest.LastName
-                        && x.Status == BedRequestStatus.Waiting && bedRequest.Status == BedRequestStatus.Waiting
-                    );
-
-                    if (waitingBedRequest != null)
-                    {
-                        if (bedRequest.GenderAge == "G/")
-                            continue;
-                        ObjectUtil.CopyProperties(bedRequest, waitingBedRequest, propertiesToIgnore);
-                        toUpdate.Add(waitingBedRequest);
-                    }
-                    else
-                    {
-                        toAdd.Add(bedRequest);
-                    }
+                    toAdd.Add(bedRequest);
                 }
                 else
                 {
+                    if (bedRequest.Status != BedRequestStatus.Delivered)
+                    {
+                        Console.WriteLine("here");
+                    }
+
                     ObjectUtil.CopyProperties(bedRequest, existingBedRequest, propertiesToIgnore);
                     toUpdate.Add(existingBedRequest);
                 }
@@ -131,6 +121,7 @@ namespace BedBrigade.Tests.Integration
             BedRequest current = new BedRequest();
             current.NumberOfBeds = 0;
             DateTime createDate = new DateTime(2025, 7, 5);
+
             foreach (PolarisBedRequest request in polarisBedRequests)
             {
                 if (request.Group == "Out of town")
@@ -155,8 +146,6 @@ namespace BedBrigade.Tests.Integration
                 SetCreateDate(request, current, createDate);
                 createDate = current.CreateDate.Value;
                 SetDeliveryDate(request, current);
-
-
                 SetGenderAge(request, current);
                 SetNames(request, current);
                 SetAddress(request, current);
@@ -368,12 +357,14 @@ namespace BedBrigade.Tests.Integration
             {
                 if (current.DeliveryDate == null || current.DeliveryDate == DateTime.MinValue)
                 {
+                    //Set the delivery date if it is specified in the request
                     if (request.DeliveryDate != DateTime.MinValue)
                     {
                         current.DeliveryDate = request.DeliveryDate;
                     }
                     else
                     {
+                        //No delivery date specified, set it to a future create date
                         if (current.CreateDate.Value.AddMonths(1) > DateTime.Now)
                         {
                             current.DeliveryDate = current.CreateDate.Value.AddDays(1);
