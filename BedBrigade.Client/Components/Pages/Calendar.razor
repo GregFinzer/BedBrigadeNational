@@ -20,12 +20,13 @@
                 ShowHeaderBar="true"
                 @bind-SelectedDate="@CurrentDate">
                     <ScheduleEvents TValue="AppointmentData" OnPopupOpen="OnPopupOpen" ></ScheduleEvents>
-                    <ScheduleEventSettings DataSource="@dataSource"></ScheduleEventSettings>                <ScheduleViews>
+                    <ScheduleEventSettings DataSource="@dataSource"></ScheduleEventSettings>
+                    <ScheduleViews>
                         <ScheduleView MaxEventsPerRow="6" Option="View.Month">
                             <EventTemplate>
                                 @{
                                     AppointmentData? evt = (context as AppointmentData);
-                                    <EventView EventData="@evt" RequestedView="month" OnHyperlinkClicked="OnHyperlinkClicked" />
+                                    <EventView EventData="@evt" RequestedView="month" OnHyperlinkClicked="OnHyperlinkClicked" LocationRoute="@LocationRoute" />
                                 }
                             </EventTemplate>
                         </ScheduleView>
@@ -44,14 +45,14 @@
      }
 </div>
 
-<SfDialog Width="500px" Height="400px" @bind-Visible="Visibility" ShowCloseIcon="true"  IsModal="true"  >
+<SfDialog Width="360px" Height="400px" @bind-Visible="Visibility" ShowCloseIcon="true"  IsModal="true"  >
     <DialogTemplates>     
         <Content>
             @if (SelectedEvent != null)
             {
                 <div>
-                    @{                        
-                       <EventView EventData="@SelectedEvent" RequestedView="quick" />
+                    @{
+                        <EventView EventData="@SelectedEvent" RequestedView="quick" LocationRoute="@LocationRoute" />
                      }                    
                 </div>
             }
