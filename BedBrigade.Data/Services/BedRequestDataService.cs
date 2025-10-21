@@ -27,7 +27,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         IAuthService authService,
         ICommonService commonService,
         ILocationDataService locationDataService,
-        IGeoLocationQueueDataService geoLocationQueueDataService, 
+        IGeoLocationQueueDataService geoLocationQueueDataService,
         ITimezoneDataService timezoneDataService,
         IConfigurationDataService configurationDataService,
         IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
@@ -55,7 +55,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         if (!previousBedRequest.Success || previousBedRequest.Data == null)
         {
-            return new ServiceResponse<BedRequest>($"BedRequest with BedRequestId {entity.BedRequestId} not found", false, null);
+            return new ServiceResponse<BedRequest>($"BedRequest with BedRequestId {entity.BedRequestId} not found",
+                false, null);
         }
 
         bool geoLocationUpdateNeeded = !entity.Latitude.HasValue
@@ -163,14 +164,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForNotReceivedABed", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForNotReceivedABed", true,
+                cachedContent);
+        ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && !string.IsNullOrEmpty(o.Email)
-                                                && o.Status == BedRequestStatus.Waiting).Select(b => b.Email).Distinct().ToListAsync();
+                                                && o.Status == BedRequestStatus.Waiting).Select(b => b.Email).Distinct()
+                .ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
@@ -182,13 +187,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForReceivedABed", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForReceivedABed", true,
+                cachedContent);
+        ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => o.LocationId == locationId && !string.IsNullOrEmpty(o.Email)
-                                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)).Select(b => b.Email).Distinct().ToListAsync();
+                                                                           && (o.Status == BedRequestStatus.Delivered ||
+                                                                               o.Status == BedRequestStatus.Given))
+                .Select(b => b.Email).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
@@ -200,14 +210,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForSchedule", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for EmailsForSchedule", true,
+                cachedContent);
+        ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == locationId 
+            var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && !string.IsNullOrEmpty(o.Email)
-                                                && o.Status == BedRequestStatus.Scheduled).Select(b => b.Email).Distinct().ToListAsync();
+                                                && o.Status == BedRequestStatus.Scheduled).Select(b => b.Email)
+                .Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
@@ -229,21 +243,25 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<BedRequest>>> GetScheduledBedRequestsForLocation(int locationId)
     {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"ScheduledBedRequestsForLocation({locationId})");
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"ScheduledBedRequestsForLocation({locationId})");
         var cachedContent = _cachingService.Get<List<BedRequest>>(cacheKey);
 
         if (cachedContent != null)
-            return new ServiceResponse<List<BedRequest>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetScheduledBedRequestsForLocation", true, cachedContent);
+            return new ServiceResponse<List<BedRequest>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetScheduledBedRequestsForLocation",
+                true, cachedContent);
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == locationId 
+            var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && o.Status == BedRequestStatus.Scheduled).ToListAsync();
 
             result = await SortScheduledBedRequests(locationId, result);
             _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true, result);
+            return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true,
+                result);
         }
     }
 
@@ -272,11 +290,13 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var bedRequest = await dbSet.FirstOrDefaultAsync(o => o.Email == email && o.Status == BedRequestStatus.Waiting);
+            var bedRequest =
+                await dbSet.FirstOrDefaultAsync(o => o.Email == email && o.Status == BedRequestStatus.Waiting);
             if (bedRequest == null)
             {
                 return new ServiceResponse<BedRequest>($"No waiting BedRequest found for email {email}", false, null);
             }
+
             return new ServiceResponse<BedRequest>($"Found waiting BedRequest for email {email}", true, bedRequest);
         }
     }
@@ -316,11 +336,13 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             string formattedPhone = phoneWithNumbersOnly.FormatPhoneNumber();
 
             var dbSet = ctx.Set<BedRequest>();
-            var bedRequest = await dbSet.FirstOrDefaultAsync(o => o.Status == BedRequestStatus.Waiting && (o.Phone == phoneWithNumbersOnly || o.Phone == formattedPhone));
+            var bedRequest = await dbSet.FirstOrDefaultAsync(o =>
+                o.Status == BedRequestStatus.Waiting && (o.Phone == phoneWithNumbersOnly || o.Phone == formattedPhone));
             if (bedRequest == null)
             {
                 return new ServiceResponse<BedRequest>($"No waiting BedRequest found for phone {phone}", false, null);
             }
+
             return new ServiceResponse<BedRequest>($"Found waiting BedRequest for phone {phone}", true, bedRequest);
         }
     }
@@ -328,7 +350,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private (double? Latitude, double? Longitude) GetTargetCoordinates(BedRequest request, AddressParser addressParser)
     {
         if (request.Latitude.HasValue && request.Longitude.HasValue)
-            return ((double) request.Latitude.Value, (double) request.Longitude.Value);
+            return ((double)request.Latitude.Value, (double)request.Longitude.Value);
 
         try
         {
@@ -342,10 +364,12 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         {
             // Swallow and fall through
         }
+
         return (null, null);
     }
 
-    private void SetDistance(BedRequest request, BedRequest target, double targetLatitude, double targetLongitude, AddressParser addressParser)
+    private void SetDistance(BedRequest request, BedRequest target, double targetLatitude, double targetLongitude,
+        AddressParser addressParser)
     {
         const double defaultDistance = 999;
         request.Distance = defaultDistance;
@@ -361,13 +385,15 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         if (request.Latitude.HasValue && request.Longitude.HasValue)
         {
-            request.Distance = CalculateDistance(targetLatitude, targetLongitude, (double)request.Latitude.Value, (double)request.Longitude.Value);
+            request.Distance = CalculateDistance(targetLatitude, targetLongitude, (double)request.Latitude.Value,
+                (double)request.Longitude.Value);
         }
         else if (Validation.IsValidZipCode(request.PostalCode))
         {
             try
             {
-                request.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(target.PostalCode, request.PostalCode);
+                request.Distance =
+                    addressParser.GetDistanceInMilesBetweenTwoZipCodes(target.PostalCode, request.PostalCode);
             }
             catch
             {
@@ -380,7 +406,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     {
         var locationResult = await _locationDataService.GetByIdAsync(locationId);
 
-        if (!locationResult.Success || locationResult.Data == null || !Validation.IsValidZipCode(locationResult.Data.MailingPostalCode))
+        if (!locationResult.Success || locationResult.Data == null ||
+            !Validation.IsValidZipCode(locationResult.Data.MailingPostalCode))
         {
             return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
         }
@@ -392,16 +419,21 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         {
             bedRequest.Distance = 0;
 
-            if (location.Latitude.HasValue && location.Longitude.HasValue && bedRequest.Latitude.HasValue && bedRequest.Longitude.HasValue)
+            if (location.Latitude.HasValue && location.Longitude.HasValue && bedRequest.Latitude.HasValue &&
+                bedRequest.Longitude.HasValue)
             {
-                bedRequest.Distance = CalculateDistance((double)location.Latitude.Value, (double)location.Longitude.Value,
+                bedRequest.Distance = CalculateDistance((double)location.Latitude.Value,
+                    (double)location.Longitude.Value,
                     (double)bedRequest.Latitude.Value, (double)bedRequest.Longitude.Value);
             }
-            else if (location.MailingPostalCode != bedRequest.PostalCode && Validation.IsValidZipCode(bedRequest.PostalCode))
+            else if (location.MailingPostalCode != bedRequest.PostalCode &&
+                     Validation.IsValidZipCode(bedRequest.PostalCode))
             {
                 try
                 {
-                    bedRequest.Distance = addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode, bedRequest.PostalCode);
+                    bedRequest.Distance =
+                        addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode,
+                            bedRequest.PostalCode);
                 }
                 catch (Exception)
                 {
@@ -415,16 +447,31 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
-        double R = 3956; // miles
-        double dLat = (lat2 - lat1) * Math.PI / 180;
-        double dLon = (lat2 - lat1) * Math.PI / 180;
-        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                   Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
-                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-        double d = R * c;
-        return d;
+        const double EarthRadiusMiles = 3958.8; // Mean radius of the Earth in miles
+
+        double lat1Rad = DegreesToRadians(lat1);
+        double lon1Rad = DegreesToRadians(lon1);
+        double lat2Rad = DegreesToRadians(lat2);
+        double lon2Rad = DegreesToRadians(lon2);
+
+        double dLat = lat2Rad - lat1Rad;
+        double dLon = lon2Rad - lon1Rad;
+
+        double a = Math.Pow(Math.Sin(dLat / 2), 2) +
+                   Math.Cos(lat1Rad) * Math.Cos(lat2Rad) *
+                   Math.Pow(Math.Sin(dLon / 2), 2);
+
+        double c = 2 * Math.Asin(Math.Sqrt(a));
+        double distance = EarthRadiusMiles * c;
+
+        return Math.Round(distance, 2); // Rounded to 2 decimal places
     }
+
+    private static double DegreesToRadians(double degrees)
+    {
+        return degrees * Math.PI / 180.0;
+    }
+    
 
     public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
     {
@@ -441,13 +488,17 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "PhonesForNotReceivedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForNotReceivedABed", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForNotReceivedABed", true,
+                cachedContent);
+        ;
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && !string.IsNullOrEmpty(o.Phone)
-                                                && o.Status == BedRequestStatus.Waiting).Select(b => b.Phone).Distinct().ToListAsync();
+                                                && o.Status == BedRequestStatus.Waiting).Select(b => b.Phone).Distinct()
+                .ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
@@ -458,13 +509,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "PhonesForReceivedABed");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForReceivedABed", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForReceivedABed", true,
+                cachedContent);
+        ;
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
             var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && !string.IsNullOrEmpty(o.Phone)
-                                                && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                                                && (o.Status == BedRequestStatus.Delivered ||
+                                                    o.Status == BedRequestStatus.Given))
+                .Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
@@ -475,19 +531,23 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"PhonesForSchedule({locationId})");
         var cachedContent = _cachingService.Get<List<string>>(cacheKey);
         if (cachedContent != null)
-            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForSchedule", true, cachedContent); ;
+            return new ServiceResponse<List<string>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for PhonesForSchedule", true,
+                cachedContent);
+        ;
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == locationId 
+            var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && !string.IsNullOrEmpty(o.Phone)
-                                                && o.Status == BedRequestStatus.Scheduled).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+                                                && o.Status == BedRequestStatus.Scheduled)
+                .Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
 
-    
+
     public async Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId)
     {
         string cacheKey = GetWaitTimeCacheKey(locationId);
@@ -553,6 +613,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         {
             if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Beds;
         }
+
         foreach (var row in data.Where(r => r.Year == currentYear))
         {
             if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Beds;
@@ -584,16 +645,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return nonZero.Average();
     }
 
-    
+
     public async Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest)
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
-                && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) || o.Email == bedRequest.Email))
-                    .OrderByDescending(o => o.DeliveryDate)
-                    .FirstOrDefaultAsync();
+            var result = await dbSet.Where(o =>
+                    (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
+                    && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) ||
+                        o.Email == bedRequest.Email))
+                .OrderByDescending(o => o.DeliveryDate)
+                .FirstOrDefaultAsync();
 
             if (result == null || !result.DeliveryDate.HasValue)
             {
@@ -618,7 +681,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetWaitingDashboard({userLocationId})");
         var cachedContent = _cachingService.Get<List<BedRequestDashboardRow>>(cacheKey);
         if (cachedContent != null)
-            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetWaitingDashboard", true, cachedContent);
+            return new ServiceResponse<List<BedRequestDashboardRow>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetWaitingDashboard", true,
+                cachedContent);
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -651,7 +716,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             });
 
             _cachingService.Set(cacheKey, ordered);
-            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {ordered.Count} dashboard rows", true, ordered);
+            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {ordered.Count} dashboard rows", true,
+                ordered);
         }
     }
 
@@ -661,7 +727,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
         if (cachedContent != null)
         {
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedRequestHistory", true, cachedContent);
+            return new ServiceResponse<List<BedRequestHistoryRow>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedRequestHistory", true,
+                cachedContent);
         }
 
         using (var ctx = _contextFactory.CreateDbContext())
@@ -678,7 +746,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                     .Where(o => o.LocationId == locationId
                                 && o.Group != Defaults.GroupPeace
                                 && o.Group != Defaults.GroupUalc
-                                && o.CreateDate.HasValue 
+                                && o.CreateDate.HasValue
                                 && years.Contains(o.CreateDate.Value.Year)
                                 && o.CreateDate.Value <= now)
                     .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
@@ -693,8 +761,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
             else
             {
-               result = await dbSet
-                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue && years.Contains(o.CreateDate.Value.Year) && o.CreateDate.Value <= now)
+                result = await dbSet
+                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue &&
+                                years.Contains(o.CreateDate.Value.Year) && o.CreateDate.Value <= now)
                     .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
                     .Select(g => new BedRequestHistoryRow
                     {
@@ -707,7 +776,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
 
             _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records",
+                true, result);
         }
     }
 
@@ -717,7 +787,9 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
         if (cachedContent != null)
         {
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedDeliveryHistory", true, cachedContent);
+            return new ServiceResponse<List<BedRequestHistoryRow>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedDeliveryHistory", true,
+                cachedContent);
         }
 
         using (var ctx = _contextFactory.CreateDbContext())
@@ -737,11 +809,13 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 .ToListAsync();
 
             _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records", true, result);
+            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records",
+                true, result);
         }
     }
 
-    private static IQueryable<BedRequest> BuildDeliveryHistoryQuery(IQueryable<BedRequest> source, int locationId, DateTime now)
+    private static IQueryable<BedRequest> BuildDeliveryHistoryQuery(IQueryable<BedRequest> source, int locationId,
+        DateTime now)
     {
         int currentYear = now.Year;
         var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
@@ -759,6 +833,172 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
         return query;
     }
+
+    public async Task<ServiceResponse<List<NationalDelivery>>> GetNationalDeliveries()
+    {
+        var now = DateTime.UtcNow;
+        int currentYear = now.Year;
+        int prevYear = currentYear - 1;
+        int twoYearsAgo = currentYear - 2;
+
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetNationalDeliveries()");
+        var cachedContent = _cachingService.Get<List<NationalDelivery>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<NationalDelivery>>(
+                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetNationalDeliveries", true,
+                cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var delivered = await ctx.BedRequests
+                .Include(l => l.Location)
+                .Where(br => br.DeliveryDate.HasValue
+                             && br.DeliveryDate!.Value <= now
+                             && (br.Status == BedRequestStatus.Delivered || br.Status == BedRequestStatus.Given))
+                .Select(br => new NationalDelivery()
+                {
+                    Location = br.Location.Name,
+                    Group = br.Group,
+                    Year = br.DeliveryDate!.Value.Year,
+                    Beds = br.NumberOfBeds
+                }).ToListAsync();
+
+            List<NationalDelivery> results = new List<NationalDelivery>();
+
+
+            // Current Year YTD
+            var currentYtd = delivered.Where(x => x.Year == currentYear).ToList();
+            string currentYearLabel = $"{currentYear} YTD";
+            AddGroupedRows(currentYtd, currentYearLabel, 10, results);
+
+            // Previous Year
+            var prev = delivered.Where(x => x.Year == prevYear).ToList();
+            AddGroupedRows(prev, prevYear.ToString(), 20, results);
+
+            // Two Years Ago
+            var twoAgo = delivered.Where(x => x.Year == twoYearsAgo).ToList();
+            AddGroupedRows(twoAgo, twoYearsAgo.ToString(), 30, results);
+
+            // Older
+            var older = delivered.Where(x => x.Year < twoYearsAgo).ToList();
+            AddGroupedRows(older, "Older", 40, results);
+
+            AddNationalDeliveryYtdTotal(currentYtd, results, currentYear, currentYearLabel);
+            AddNationalDeliveryPreviousTotal(prev, results, prevYear);
+            AddNationalDeliveryTwoYearsAgoTotal(twoAgo, results, twoYearsAgo);
+            AddNationalDeliveryOlderTotal(older, results);
+            AddNationalDeliveryGrandTotal(delivered, results);
+
+            // Order for output stability
+            results = results
+                .OrderBy(r => r.SortOrder)
+                .ThenBy(r => r.Location)
+                .ThenBy(r => r.Group)
+                .ToList();
+
+            _cachingService.Set(cacheKey, results);
+
+            return new ServiceResponse<List<NationalDelivery>>($"Found {results.Count} national delivery rows", true,
+                results);
+        }
+    }
+
+    private void AddNationalDeliveryGrandTotal(List<NationalDelivery> delivered, List<NationalDelivery> results)
+    {
+        if (delivered.Count > 0)
+        {
+            results.Add(new NationalDelivery
+            {
+                Location = "Grand Total",
+                Group = string.Empty,
+                YearString = string.Empty,
+                Beds = delivered.Sum(x => (int)x.Beds),
+                SortOrder = 999
+            });
+        }
+    }
+
+    private static void AddNationalDeliveryOlderTotal(List<NationalDelivery> older, List<NationalDelivery> results)
+    {
+        if (older.Count > 0)
+        {
+            results.Add(new NationalDelivery
+            {
+                Location = "Older Total",
+                Group = string.Empty,
+                YearString = "Older",
+                Beds = older.Sum(x => (int)x.Beds),
+                SortOrder = 49
+            });
+        }
+    }
+
+    private static void AddNationalDeliveryTwoYearsAgoTotal(List<NationalDelivery> twoAgo,
+        List<NationalDelivery> results, int twoYearsAgo)
+    {
+        if (twoAgo.Count > 0)
+        {
+            results.Add(new NationalDelivery
+            {
+                Location = $"{twoYearsAgo} Total",
+                Group = string.Empty,
+                YearString = twoYearsAgo.ToString(),
+                Beds = twoAgo.Sum(x => (int)x.Beds),
+                SortOrder = 39
+            });
+        }
+    }
+
+    private static void AddNationalDeliveryPreviousTotal(List<NationalDelivery> prev,
+        List<NationalDelivery> results, int prevYear)
+    {
+        if (prev.Count > 0)
+        {
+            results.Add(new NationalDelivery
+            {
+                Location = $"{prevYear} Total",
+                Group = string.Empty,
+                YearString = prevYear.ToString(),
+                Beds = prev.Sum(x => (int)x.Beds),
+                SortOrder = 29
+            });
+        }
+    }
+
+    private static void AddNationalDeliveryYtdTotal(List<NationalDelivery> currentYtd,
+        List<NationalDelivery> results, int currentYear, string currentYearLabel)
+    {
+        if (currentYtd.Count > 0)
+        {
+            results.Add(new NationalDelivery
+            {
+                Location = $"{currentYear} YTD Total",
+                Group = string.Empty,
+                YearString = currentYearLabel,
+                Beds = currentYtd.Sum(x => (int)x.Beds),
+                SortOrder = 19
+            });
+        }
+    }
+
+    private void AddGroupedRows(IEnumerable<dynamic> source, string yearLabel, int sortBase,
+        List<NationalDelivery> results)
+    {
+        var grouped = source
+            .GroupBy(x => new { x.LocationName, Group = x.GroupName ?? string.Empty })
+            .Select(g => new NationalDelivery
+            {
+                Location = g.Key.LocationName,
+                Group = g.Key.Group,
+                YearString = yearLabel,
+                Beds = g.Sum(x => (int)x.Beds),
+                SortOrder = sortBase
+            });
+        results.AddRange(grouped);
+    }
 }
+
 
 

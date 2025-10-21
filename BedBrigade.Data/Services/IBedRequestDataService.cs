@@ -28,5 +28,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId);
         Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId);
         Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId);
+        Task<ServiceResponse<List<NationalDelivery>>> GetNationalDeliveries();
     }
 }
