@@ -15,6 +15,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
         [Inject] protected ISmsQueueDataService SmsQueueDataService  { get; set; } = default!;
         [Inject] protected ISignUpDataService SignUpDataService { get; set; } = default!;
         [Inject] protected ILocationDataService LocationDataService { get; set; } = default!;
+        [Inject] protected IDashboardDataService DashboardService { get; set; } = default!;
         protected List<BedRequestDashboardRow>? BedRequestsDashboard { get; set; } = default!;
         protected List<Common.Models.Schedule>? Schedules { get; set; }
         protected int ContactsNeedingResponses { get; set; }
@@ -80,6 +81,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
 
         protected int LocationId { get; set; }
         protected string EstimatedWaitingTime { get; set; }
+        protected List<NationalDelivery>? NationalDeliveries { get; set; }
         protected override async Task OnInitializedAsync()
         {
             LocationId= AuthService.LocationId;
@@ -90,7 +92,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             Schedules = scheduleResponse.Success ? scheduleResponse.Data : new List<Common.Models.Schedule>();
 
             // New bed requests
-            var bedResponse = await BedRequestService.GetWaitingDashboard(LocationId);
+            var bedResponse = await DashboardService.GetWaitingDashboard(LocationId);
             BedRequestsDashboard = bedResponse.Success ? bedResponse.Data : new List<BedRequestDashboardRow>();
 
             // Contacts requested
@@ -108,14 +110,18 @@ namespace BedBrigade.Client.Components.Pages.Administration
             // Load chart data
             await LoadBedRequestHistory(LocationId);
             await LoadDeliveryHistory(LocationId);
-            EstimatedWaitingTime = (await BedRequestService.GetEstimatedWaitTime(LocationId))?.Data ?? "Unknown";
+            EstimatedWaitingTime = (await DashboardService.GetEstimatedWaitTime(LocationId))?.Data ?? "Unknown";
+
+            // National deliveries
+            var ndResponse = await DashboardService.GetNationalDeliveries();
+            NationalDeliveries = ndResponse.Success ? ndResponse.Data : new List<NationalDelivery>();
         }
         private async Task LoadBedRequestHistory(int locationId)
         {
             try
             {
                 IsHistoryLoading = true;
-                var historyResponse = await BedRequestService.GetBedRequestHistory(locationId);
+                var historyResponse = await DashboardService.GetBedRequestHistory(locationId);
                 var data = historyResponse.Success && historyResponse.Data != null
                     ? historyResponse.Data
                     : new List<BedRequestHistoryRow>();
@@ -144,7 +150,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             try
             {
                 IsDeliveryHistoryLoading = true;
-                var historyResponse = await BedRequestService.GetBedDeliveryHistory(locationId);
+                var historyResponse = await DashboardService.GetBedDeliveryHistory(locationId);
                 var data = historyResponse.Success && historyResponse.Data != null
                     ? historyResponse.Data
                     : new List<BedRequestHistoryRow>();
@@ -402,6 +408,30 @@ namespace BedBrigade.Client.Components.Pages.Administration
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

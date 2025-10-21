@@ -13,6 +13,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     public Int32 BedRequestId { get; set; }
 
     [ForeignKey("LocationId"), Required] public Int32 LocationId { get; set; }
+    public Location Location { get; set; }
 
     [ForeignKey("ScheduleId")] public Int32? ScheduleId { get; set; }
 
