@@ -1,4 +1,4 @@
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -8,6 +8,7 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using System.Collections;
+using System.Diagnostics;
 using Action = Syncfusion.Blazor.Grids.Action;
 
 namespace BedBrigade.Client.Components
@@ -23,14 +24,16 @@ namespace BedBrigade.Client.Components
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private NavigationManager? _nav { get; set; }
         [Parameter] public string? Id { get; set; }
+
+        private string EditPageUrl = "/administration/admintasks/addeditdonation/";
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
         private const string NextPage = "NextPage";
         private const string FirstPage = "First";
         private const string SendTaxForm = "Send Tax Form";
-
 
         protected List<Donation>? Donations { get; set; }
         protected List<Location>? Locations { get; set; }
@@ -49,6 +52,7 @@ namespace BedBrigade.Client.Components
         public bool TaxIsVisible { get; private set; }
         protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "400px" };
         private Donation Donation = new Donation();
+
         protected decimal FilteredSum { get; set; }
 
         /// <summary>
@@ -150,9 +154,9 @@ namespace BedBrigade.Client.Components
                 .ThenBy(o => o.DonationDate).ToList();
         }
 
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
+           if (!firstRender)
             {
                 if (_svcAuth.UserHasRole(RoleNames.CanManageDonations))
                 {
@@ -164,7 +168,7 @@ namespace BedBrigade.Client.Components
                 }
             }
 
-            return base.OnAfterRenderAsync(firstRender);
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task LoadLocations()
@@ -300,7 +304,7 @@ namespace BedBrigade.Client.Components
             }
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
+                await Grid.ResetPersistDataAsync();
                 await SaveGridPersistence();
                 return;
             }
@@ -334,77 +338,64 @@ namespace BedBrigade.Client.Components
                     await Delete(args);
                     break;
                 case Action.Add:
-                    Add();
+                    //Add();
+                    NavigateToAdd();
+                    args.Cancel = true;
                     break;
                 case Action.Save:
-                    await Save(args);
+                    //await Save(args);
                     break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    //BeginEdit();
+                    await NavigateToEdit(args);
+                    args.Cancel = true;
                     break;
             }
         }
 
-        private void BeginEdit()
+        private void NavigateToAdd()
         {
-            HeaderTitle = "Update Donation";
-            ButtonTitle = "Update";
-        }
-        private void Add()
-        {
-            HeaderTitle = "Add Donation";
-            ButtonTitle = "Add";
-            Donation.LocationId = _svcAuth.LocationId;
+            int loc = _svcAuth.LocationId;
+            _nav.NavigateTo($"{EditPageUrl}{loc}");
         }
 
-        protected async Task Cancel()
+        private async Task NavigateToEdit(ActionEventArgs<Donation> args)
         {
-            await Grid.CloseEdit();
-        }
-
-        private async Task Save(ActionEventArgs<Donation> args)
-        {
-            Donation donation = args.Data;
-            if (donation.DonationId != 0)
+            int id = 0;
+            if (args.Data != null && args.Data.DonationId > 0)
             {
-                //Update Record
-                var updateResult = await _svcDonation.UpdateAsync(donation);
-                
-                if (updateResult.Success)
-                {
-                    _toastService.Success("Donation Updated", "Donation Updated Successfully!");
-                }
-                else
-                {
-                    _toastService.Error("Could not update donation", "Unable to update Donation!");
-                }
+                id = args.Data.DonationId;
             }
             else
             {
-                // new 
-                var result = await _svcDonation.CreateAsync(donation);
-                if (result.Success)
+                var selected = await Grid.GetSelectedRecordsAsync();
+                if (selected.Any())
                 {
-                    Donation = result.Data;
+                    id = selected.First().DonationId;
                 }
-                if (result.Success)
-                {
-                    _toastService.Success("Donation Added", "Donation Added Successfully!");
-                }
-                else
-                {
-                    _toastService.Error("Could not add donation", "Unable to add Donation!");
-                }
-
             }
 
-            await Grid.Refresh();
+            if (id == 0)
+            {
+                // show dialog for select row - reuse existing Tax dialog binding? use ActiveDialog
+               // DialogHeader = "Select Row";
+              //  DialogContent = "Please select a row to edit.";
+               // IsDialogVisible = true;
+                return;
+            }
+
+            int loc = _svcAuth.LocationId;
+            _nav.NavigateTo($"{EditPageUrl}{loc}/{id}");
         }
 
-        protected async Task Save(Donation donation)
-        {
-            await Grid.EndEdit();
-        }
+
+
+       // protected async Task Cancel()
+       // {
+            //await Grid.CloseEditAsync();
+       // }
+
+   
 
         private async Task Delete(ActionEventArgs<Donation> args)
         {
@@ -477,8 +468,7 @@ namespace BedBrigade.Client.Components
                 await Grid.ExportToCsvAsync(exportProperties);
             }
         }
-
-
+      
         #region Send Tax
 
         protected async Task CloseTaxDialog()

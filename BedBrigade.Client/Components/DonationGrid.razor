@@ -81,78 +81,7 @@ else
 
                             </CaptionTemplate>
                         </GridGroupSettings>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                            <HeaderTemplate>
-                                @{
-                                    @HeaderTitle
-                                }
-                            </HeaderTemplate>
-                            <FooterTemplate>
-                                <button class="btn btn-primary" @onclick=@(() => Save(context as Donation)) IsPrimary="true">@ButtonTitle</button>
-                                <button class="btn btn-secondary" @onclick="(Cancel)">@_lc.Keys["Cancel"]</button>
-                            </FooterTemplate>
-                            <Template>
-                                @{
-                                    Donation donation = (context as Donation)!;
-                                    if (donation.LocationId == Defaults.NationalLocationId || donation.LocationId == 0)
-                                    {
-                                        donation.LocationId = _svcAuth.LocationId;
-                                    }
-
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <SfDropDownList TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@donation.DonationCampaignId Enabled="true" Placeholder="@_lc.Keys["SelectACampaign"]" FloatLabelType="FloatLabelType.Auto">
-                                                <DropDownListFieldSettings Text="CampaignName" Value="DonationCampaignId" />
-                                            </SfDropDownList> 
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfTextBox ID="name" @bind-Value=@donation.FirstName Enabled="true" Placeholder="@_lc.Keys["FirstName"]" FloatLabelType="FloatLabelType.Auto"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.LastName Enabled="true" Placeholder="@_lc.Keys["LastName"]" FloatLabelType="FloatLabelType.Auto"/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <SfTextBox @bind-Value=@donation.Email Type="InputType.Email" Enabled="true" Placeholder="@_lc.Keys["Email"]" FloatLabelType="FloatLabelType.Auto"/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2" />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <SfNumericTextBox @bind-Value=@donation.TransactionFee Enabled="true" Placeholder="@_lc.Keys["TransactionFees"]" FloatLabelType="FloatLabelType.Auto" Format="C2" Decimals="2"/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfDatePicker @bind-Value=@donation.DonationDate Enabled="true" Placeholder="@_lc.Keys["DonationDate"]" FloatLabelType="FloatLabelType.Auto"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfCheckBox @bind-Checked=@donation.TaxFormSent Enabled="true" Label="@_lc.Keys["TaxFormSent"]"/>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.PaymentProcessor Enabled="true" Placeholder="@_lc.Keys["PaymentProcessor"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.PaymentStatus Enabled="true" Placeholder="@_lc.Keys["PaymentStatus"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <SfTextBox @bind-Value=@donation.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" FloatLabelType="FloatLabelType.Auto"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <SfTextBox @bind-Value=@donation.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" FloatLabelType="FloatLabelType.Auto" />
-                                        </div>
-                                    </div>
-                                }
-                            </Template>
+                        <GridEditSettings ShowDeleteConfirmDialog="true" >              
                         </GridEditSettings>
                         <GridColumns>
                             <GridColumn Field=@nameof(Donation.DonationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
@@ -214,6 +143,18 @@ else
         <DialogButton Content="Cancel" CssClass="btn btn-secondary" OnClick="@CloseTaxDialog" />
     </DialogButtons>
 </SfDialog>
+
+<div style="display: none">
+    @_lc.Keys["Currency"]
+    @_lc.Keys["DonationDate"]
+    @_lc.Keys["Gross"]
+    @_lc.Keys["PaymentProcessor"]
+    @_lc.Keys["PaymentStatus"]
+    @_lc.Keys["TaxFormSent"]
+    @_lc.Keys["TransactionFees"]
+    @_lc.Keys["TransactionId"]
+</div>
+
 
 @if (NoPaging)
 {
