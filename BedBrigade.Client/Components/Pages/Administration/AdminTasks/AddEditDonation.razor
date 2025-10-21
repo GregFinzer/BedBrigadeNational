@@ -1,0 +1,174 @@
+﻿@page "/administration/admintasks/addeditdonation/{LocationId:int}"
+@page "/administration/admintasks/addeditdonation/{LocationId:int}/{DonationId:int}"
+@layout Layout.AdminLayout
+
+@using BedBrigade.Common.Models
+@using Syncfusion.Blazor.Inputs
+
+<CheckAuth Roles=@RoleNames.CanManageDonations></CheckAuth>
+
+@if (Model == null || Locations == null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row mt-3">
+        <div class="col-md-10 ps-3">
+            <h3>@(IsNew? @_lc.Keys["Add"] + " " + @_lc.Keys["Donation"] : @_lc.Keys["Update"] + " " + @_lc.Keys["Donation"])</h3>
+        </div>
+        <div class="col-md-2 ps-3 ps-md-0">
+            <UserInfo />
+        </div>
+    </div>
+
+    <div class="content-wrapper mt-3">
+        <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+
+                    <div class="card shadow-lg m-0">
+                        <div class="card-body  @(Model.TaxFormSent ? "bg-info" : "bg-warning")">
+                            <div class="row mb-1 h-25 align-items-center">
+                                <div class="col-auto">
+                                    <span style="white-space: nowrap; font-size: large; font-weight: bold">@_lc.Keys["TaxFormSent"]</span>
+                                </div>
+                                <div class="col-auto">
+                                    <SfCheckBox Label="@(Model.TaxFormSent? @_lc.Keys["DynamicYes"] : @_lc.Keys["DynamicNo"])"
+                                                @bind-Checked="Model.TaxFormSent"
+                                                EnablePersistence="false">
+                                    </SfCheckBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["ContactInformation"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
+                                <SfTextBox ID="firstname" @bind-Value="Model.FirstName" Placeholder="@_lc.Keys["FirstName"]"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.FirstName)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
+                                <SfTextBox ID="lastname" @bind-Value="Model.LastName" Placeholder="@_lc.Keys["LastName"]"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.LastName)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="formlabel required">@_lc.Keys["Email"]</label>
+                                <SfTextBox ID="email" @bind-Value="Model.Email" Placeholder="@_lc.Keys["Email"]"></SfTextBox>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Email)"></ValidationMessage>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["DonationDetails"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="campain" class="formlabel">@_lc.Keys["SelectACampaign"]</label>
+                                <SfDropDownList id="campain" TItem="DonationCampaign" TValue="Int32" DataSource="DonationCampaigns" @bind-Value=@Model.DonationCampaignId Enabled="true" Placeholder="@_lc.Keys["SelectACampaign"]">
+                                    <DropDownListFieldSettings Text="CampaignName" Value="DonationCampaignId" />
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group">
+                                <label for="ddate" class="formlabel required">@_lc.Keys["DonationDate"]</label>
+                                <SfDatePicker ID="ddate" @bind-Value=@Model.DonationDate Enabled="true" Placeholder="@_lc.Keys["DonationDate"]" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.DonationDate)"></ValidationMessage>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount" class="formlabel required">@_lc.Keys["Gross"]</label>
+                                <SfNumericTextBox ID="amount" @bind-Value=@Model.Gross Enabled="true" Placeholder="@_lc.Keys["Gross"]" Format="C2" Decimals="2" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.Gross)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fee" class="formlabel required">@_lc.Keys["TransactionFees"]</label>
+                                <SfNumericTextBox @bind-Value=@Model.TransactionFee Enabled="true" Placeholder="@_lc.Keys["TransactionFees"]" Format="C2" Decimals="2" />
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.TransactionFee)"></ValidationMessage>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <label for="net" class="formlabel">@_lc.Keys["DonationAmount"]</label>:&nbsp;&nbsp;
+                                @{
+                                    decimal GrossAmount = Model.Gross ?? 0;
+                                    decimal TransFee = Model.TransactionFee ?? 0;
+                                    double netAmount = (double)GrossAmount - (double)TransFee;
+                                    string strAmount = netAmount.ToString("C");
+                                }
+                                <span style="font-weight: bold">@strAmount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">@_lc.Keys["PaymentStatus"]</div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="transid" class="formlabel">@_lc.Keys["TransactionId"]</label>
+                                <SfTextBox ID="transid" @bind-Value=@Model.TransactionId Enabled="true" Placeholder="@_lc.Keys["TransactionId"]" />
+                            </div>
+                            <div class="form-group">
+                                <label for="status" class="formlabel">@_lc.Keys["Status"]</label>
+                                <SfTextBox ID="status" @bind-Value=@Model.PaymentStatus Enabled="true" Placeholder="@_lc.Keys["Status"]" />
+                            </div>
+                            <div class="form-group">
+                                <label for="processor" class="formlabel">@_lc.Keys["PaymentProcessor"]</label>
+                                <SfTextBox ID="processor" @bind-Value=@Model.PaymentProcessor Enabled="true" Placeholder="@_lc.Keys["PaymentProcessor"]" />
+                            </div>
+                            <div class="form-group">
+                                <label for="currency" class="formlabel">@_lc.Keys["Currency"]</label>
+                                <SfTextBox ID="currency" @bind-Value=@Model.Currency Enabled="true" Placeholder="@_lc.Keys["Currency"]" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12 text-left">
+                    <ValidationSummary />
+                </div>
+            </div>
+
+            <div class="row mt-3" >
+                <div class="col-md-12 text-left">
+                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
+                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
+                </div>
+            </div>
+
+        </EditForm>
+    </div>
+}
+
+<style>
+    .custom-textbox-height {
+        height: 60px;
+    }
+</style>
+
+
