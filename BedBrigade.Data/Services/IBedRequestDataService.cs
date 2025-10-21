@@ -24,10 +24,5 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone);
         Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
-        Task<ServiceResponse<List<BedRequestDashboardRow>>> GetWaitingDashboard(int userLocationId);
-        Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId);
-        Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId);
-        Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId);
-        Task<ServiceResponse<List<NationalDelivery>>> GetNationalDeliveries();
     }
 }

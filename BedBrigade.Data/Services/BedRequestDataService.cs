@@ -1,13 +1,9 @@
-﻿using AngleSharp.Dom;
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.AddressParser;
-using KellermanSoftware.NetEmailValidation;
 using Microsoft.EntityFrameworkCore;
-using Stripe;
-using Stripe.Terminal;
 using Location = BedBrigade.Common.Models.Location;
 
 namespace BedBrigade.Data.Services;
@@ -347,6 +343,36 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
+    public async Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var result = await dbSet.Where(o =>
+                    (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
+                    && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) ||
+                        o.Email == bedRequest.Email))
+                .OrderByDescending(o => o.DeliveryDate)
+                .FirstOrDefaultAsync();
+
+            if (result == null || !result.DeliveryDate.HasValue)
+            {
+                return new ServiceResponse<DateTime?>("No previous bed request", true, null);
+            }
+
+            int monthsBetweenRequests = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                ConfigNames.MonthsBetweenRequests, bedRequest.LocationId);
+
+            if (monthsBetweenRequests <= 0)
+            {
+                return new ServiceResponse<DateTime?>("No restriction on months between requests", true, null);
+            }
+
+            DateTime nextEligibleDate = result.DeliveryDate.Value.AddMonths(monthsBetweenRequests).AddDays(1);
+            return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
+        }
+    }
+
     private (double? Latitude, double? Longitude) GetTargetCoordinates(BedRequest request, AddressParser addressParser)
     {
         if (request.Latitude.HasValue && request.Longitude.HasValue)
@@ -455,7 +481,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         double lon2Rad = DegreesToRadians(lon2);
 
         double dLat = lat2Rad - lat1Rad;
-        double dLon = lon2Rad - lon1Rad;
+        double dLon = lat2Rad - lon1Rad;
 
         double a = Math.Pow(Math.Sin(dLat / 2), 2) +
                    Math.Cos(lat1Rad) * Math.Cos(lat2Rad) *
@@ -546,459 +572,11 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
-
-
-    public async Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId)
-    {
-        string cacheKey = GetWaitTimeCacheKey(locationId);
-        var cached = _cachingService.Get<string>(cacheKey);
-        if (!string.IsNullOrWhiteSpace(cached))
-            return new ServiceResponse<string>("Found cached estimated wait time", true, cached);
-
-        var (success, bedsWaiting) = await TryGetBedsWaitingAsync(locationId);
-        if (!success)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
-
-        if (bedsWaiting <= 0)
-        {
-            _cachingService.Set(cacheKey, "0 weeks");
-            return new ServiceResponse<string>("No beds waiting", true, "0 weeks");
-        }
-
-        var deliveries = await GetDeliveriesHistoryAsync(locationId);
-        if (deliveries == null)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
-
-        double avgDelPerMonth = CalculateAverageDeliveredPerMonth(deliveries);
-        if (avgDelPerMonth <= 0)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", true, "0 weeks");
-
-        double estimatedMonths = bedsWaiting / avgDelPerMonth;
-        string resultText = FormatEstimatedWaitText(estimatedMonths);
-        _cachingService.Set(cacheKey, resultText);
-        return new ServiceResponse<string>("Estimated wait time calculated", true, resultText);
-    }
-
-    private string GetWaitTimeCacheKey(int locationId)
-        => _cachingService.BuildCacheKey(GetEntityName(), $"GetEstimatedWaitTime({locationId})");
-
-    private async Task<(bool Success, int BedsWaiting)> TryGetBedsWaitingAsync(int locationId)
-    {
-        var dashboard = await GetWaitingDashboard(locationId);
-        if (!dashboard.Success || dashboard.Data == null)
-            return (false, 0);
-
-        int bedsWaiting = dashboard.Data.FirstOrDefault(r => r.LocationId == locationId)?.Beds ?? 0;
-        return (true, bedsWaiting);
-    }
-
-    private async Task<List<BedRequestHistoryRow>?> GetDeliveriesHistoryAsync(int locationId)
-    {
-        var deliveriesResponse = await GetBedDeliveryHistory(locationId);
-        if (!deliveriesResponse.Success || deliveriesResponse.Data == null)
-            return null;
-        return deliveriesResponse.Data;
-    }
-
-    private static double CalculateAverageDeliveredPerMonth(List<BedRequestHistoryRow> data)
-    {
-        var currentYear = DateTime.UtcNow.Year;
-        var currentMonth = DateTime.UtcNow.Month;
-        int prevYear = currentYear - 1;
-
-        int[] delPrevYear = new int[12];
-        int[] delCurrentYtd = new int[currentMonth];
-
-        foreach (var row in data.Where(r => r.Year == prevYear))
-        {
-            if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Beds;
-        }
-
-        foreach (var row in data.Where(r => r.Year == currentYear))
-        {
-            if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Beds;
-        }
-
-        return AverageExcludingZeros(delPrevYear.Concat(delCurrentYtd));
-    }
-
-    private static string FormatEstimatedWaitText(double estimatedMonths)
-    {
-        if (estimatedMonths < 1.0)
-        {
-            double weeks = estimatedMonths * 4.345;
-            int weeksRoundedUp = (int)Math.Ceiling(weeks);
-            weeksRoundedUp = Math.Max(weeksRoundedUp, 1);
-            return weeksRoundedUp == 1 ? "1 week" : $"{weeksRoundedUp} weeks";
-        }
-        else
-        {
-            int monthsRoundedUp = (int)Math.Ceiling(estimatedMonths);
-            return monthsRoundedUp == 1 ? "1 month" : $"{monthsRoundedUp} months";
-        }
-    }
-
-    private static double AverageExcludingZeros(IEnumerable<int> values)
-    {
-        var nonZero = values.Where(v => v > 0).ToList();
-        if (nonZero.Count == 0) return 0.0;
-        return nonZero.Average();
-    }
-
-
-    public async Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest)
-    {
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o =>
-                    (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
-                    && (o.Phone == bedRequest.FormattedPhone || o.Phone == StringUtil.ExtractDigits(bedRequest.Phone) ||
-                        o.Email == bedRequest.Email))
-                .OrderByDescending(o => o.DeliveryDate)
-                .FirstOrDefaultAsync();
-
-            if (result == null || !result.DeliveryDate.HasValue)
-            {
-                return new ServiceResponse<DateTime?>("No previous bed request", true, null);
-            }
-
-            int monthsBetweenRequests = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
-                ConfigNames.MonthsBetweenRequests, bedRequest.LocationId);
-
-            if (monthsBetweenRequests <= 0)
-            {
-                return new ServiceResponse<DateTime?>("No restriction on months between requests", true, null);
-            }
-
-            DateTime nextEligibleDate = result.DeliveryDate.Value.AddMonths(monthsBetweenRequests).AddDays(1);
-            return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
-        }
-    }
-
-    public async Task<ServiceResponse<List<BedRequestDashboardRow>>> GetWaitingDashboard(int userLocationId)
-    {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetWaitingDashboard({userLocationId})");
-        var cachedContent = _cachingService.Get<List<BedRequestDashboardRow>>(cacheKey);
-        if (cachedContent != null)
-            return new ServiceResponse<List<BedRequestDashboardRow>>(
-                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetWaitingDashboard", true,
-                cachedContent);
-
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var dbSet = ctx.Set<BedRequest>();
-
-            var grouped = await dbSet
-                .Where(o => o.Status == BedRequestStatus.Waiting)
-                .GroupBy(o => o.LocationId)
-                .Select(g => new BedRequestDashboardRow
-                {
-                    LocationId = g.Key,
-                    LocationName = ctx.Set<Location>().First(l => l.LocationId == g.Key).Name,
-                    Requests = g.Count(),
-                    Beds = g.Sum(x => x.NumberOfBeds)
-                })
-                .ToListAsync();
-
-            // Order: user's location first, then alphabetical
-            var ordered = grouped
-                .OrderByDescending(r => r.LocationId == userLocationId)
-                .ThenBy(r => r.LocationName)
-                .ToList();
-
-            // Add totals row
-            ordered.Add(new BedRequestDashboardRow
-            {
-                LocationName = "Total",
-                Requests = ordered.Sum(r => r.Requests),
-                Beds = ordered.Sum(r => r.Beds)
-            });
-
-            _cachingService.Set(cacheKey, ordered);
-            return new ServiceResponse<List<BedRequestDashboardRow>>($"Found {ordered.Count} dashboard rows", true,
-                ordered);
-        }
-    }
-
-    public async Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedRequestHistory(int locationId)
-    {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBedRequestHistory({locationId})");
-        var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
-        if (cachedContent != null)
-        {
-            return new ServiceResponse<List<BedRequestHistoryRow>>(
-                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedRequestHistory", true,
-                cachedContent);
-        }
-
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var dbSet = ctx.Set<BedRequest>();
-            var now = DateTime.UtcNow;
-            var currentYear = now.Year;
-            var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
-            List<BedRequestHistoryRow> result;
-
-            if (locationId == Defaults.GroveCityLocationId)
-            {
-                result = await dbSet
-                    .Where(o => o.LocationId == locationId
-                                && o.Group != Defaults.GroupPeace
-                                && o.Group != Defaults.GroupUalc
-                                && o.CreateDate.HasValue
-                                && years.Contains(o.CreateDate.Value.Year)
-                                && o.CreateDate.Value <= now)
-                    .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
-                    .Select(g => new BedRequestHistoryRow
-                    {
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
-                        Beds = g.Sum(x => x.NumberOfBeds),
-                        Requests = g.Count()
-                    })
-                    .ToListAsync();
-            }
-            else
-            {
-                result = await dbSet
-                    .Where(o => o.LocationId == locationId && o.CreateDate.HasValue &&
-                                years.Contains(o.CreateDate.Value.Year) && o.CreateDate.Value <= now)
-                    .GroupBy(o => new { Year = o.CreateDate.Value.Year, Month = o.CreateDate.Value.Month })
-                    .Select(g => new BedRequestHistoryRow
-                    {
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
-                        Beds = g.Sum(x => x.NumberOfBeds),
-                        Requests = g.Count()
-                    })
-                    .ToListAsync();
-            }
-
-            _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records",
-                true, result);
-        }
-    }
-
-    public async Task<ServiceResponse<List<BedRequestHistoryRow>>> GetBedDeliveryHistory(int locationId)
-    {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetBedDeliveryHistory({locationId})");
-        var cachedContent = _cachingService.Get<List<BedRequestHistoryRow>>(cacheKey);
-        if (cachedContent != null)
-        {
-            return new ServiceResponse<List<BedRequestHistoryRow>>(
-                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetBedDeliveryHistory", true,
-                cachedContent);
-        }
-
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var now = DateTime.UtcNow;
-            var query = BuildDeliveryHistoryQuery(ctx.Set<BedRequest>(), locationId, now);
-
-            var result = await query
-                .GroupBy(o => new { Year = o.DeliveryDate.Value.Year, Month = o.DeliveryDate.Value.Month })
-                .Select(g => new BedRequestHistoryRow
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    Beds = g.Sum(x => x.NumberOfBeds),
-                    Requests = g.Count()
-                })
-                .ToListAsync();
-
-            _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<BedRequestHistoryRow>>($"Found {result.Count} {GetEntityName()} records",
-                true, result);
-        }
-    }
-
-    private static IQueryable<BedRequest> BuildDeliveryHistoryQuery(IQueryable<BedRequest> source, int locationId,
-        DateTime now)
-    {
-        int currentYear = now.Year;
-        var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
-
-        var query = source.Where(o => o.LocationId == locationId
-                                      && o.DeliveryDate.HasValue
-                                      && years.Contains(o.DeliveryDate.Value.Year)
-                                      && (o.Status == BedRequestStatus.Delivered || o.Status == BedRequestStatus.Given)
-                                      && o.DeliveryDate.Value <= now);
-
-        if (locationId == Defaults.GroveCityLocationId)
-        {
-            query = query.Where(o => o.Group != Defaults.GroupPeace && o.Group != Defaults.GroupUalc);
-        }
-
-        return query;
-    }
-
-    public async Task<ServiceResponse<List<NationalDelivery>>> GetNationalDeliveries()
-    {
-        var now = DateTime.UtcNow;
-        int currentYear = now.Year;
-        int prevYear = currentYear - 1;
-        int twoYearsAgo = currentYear - 2;
-
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetNationalDeliveries()");
-        var cachedContent = _cachingService.Get<List<NationalDelivery>>(cacheKey);
-        if (cachedContent != null)
-        {
-            return new ServiceResponse<List<NationalDelivery>>(
-                $"Found {cachedContent.Count} {GetEntityName()} records in cache for GetNationalDeliveries", true,
-                cachedContent);
-        }
-
-        using (var ctx = _contextFactory.CreateDbContext())
-        {
-            var delivered = await ctx.BedRequests
-                .Include(l => l.Location)
-                .Where(br => br.DeliveryDate.HasValue
-                             && br.DeliveryDate!.Value <= now
-                             && (br.Status == BedRequestStatus.Delivered || br.Status == BedRequestStatus.Given))
-                .Select(br => new NationalDelivery()
-                {
-                    Location = br.Location.Name,
-                    Group = br.Group,
-                    Year = br.DeliveryDate!.Value.Year,
-                    Beds = br.NumberOfBeds
-                }).ToListAsync();
-
-            List<NationalDelivery> results = new List<NationalDelivery>();
-
-
-            // Current Year YTD
-            var currentYtd = delivered.Where(x => x.Year == currentYear).ToList();
-            string currentYearLabel = $"{currentYear} YTD";
-            AddGroupedRows(currentYtd, currentYearLabel, 10, results);
-
-            // Previous Year
-            var prev = delivered.Where(x => x.Year == prevYear).ToList();
-            AddGroupedRows(prev, prevYear.ToString(), 20, results);
-
-            // Two Years Ago
-            var twoAgo = delivered.Where(x => x.Year == twoYearsAgo).ToList();
-            AddGroupedRows(twoAgo, twoYearsAgo.ToString(), 30, results);
-
-            // Older
-            var older = delivered.Where(x => x.Year < twoYearsAgo).ToList();
-            AddGroupedRows(older, "Older", 40, results);
-
-            AddNationalDeliveryYtdTotal(currentYtd, results, currentYear, currentYearLabel);
-            AddNationalDeliveryPreviousTotal(prev, results, prevYear);
-            AddNationalDeliveryTwoYearsAgoTotal(twoAgo, results, twoYearsAgo);
-            AddNationalDeliveryOlderTotal(older, results);
-            AddNationalDeliveryGrandTotal(delivered, results);
-
-            // Order for output stability
-            results = results
-                .OrderBy(r => r.SortOrder)
-                .ThenBy(r => r.Location)
-                .ThenBy(r => r.Group)
-                .ToList();
-
-            _cachingService.Set(cacheKey, results);
-
-            return new ServiceResponse<List<NationalDelivery>>($"Found {results.Count} national delivery rows", true,
-                results);
-        }
-    }
-
-    private void AddNationalDeliveryGrandTotal(List<NationalDelivery> delivered, List<NationalDelivery> results)
-    {
-        if (delivered.Count > 0)
-        {
-            results.Add(new NationalDelivery
-            {
-                Location = "Grand Total",
-                Group = string.Empty,
-                YearString = string.Empty,
-                Beds = delivered.Sum(x => (int)x.Beds),
-                SortOrder = 999
-            });
-        }
-    }
-
-    private static void AddNationalDeliveryOlderTotal(List<NationalDelivery> older, List<NationalDelivery> results)
-    {
-        if (older.Count > 0)
-        {
-            results.Add(new NationalDelivery
-            {
-                Location = "Older Total",
-                Group = string.Empty,
-                YearString = "Older",
-                Beds = older.Sum(x => (int)x.Beds),
-                SortOrder = 49
-            });
-        }
-    }
-
-    private static void AddNationalDeliveryTwoYearsAgoTotal(List<NationalDelivery> twoAgo,
-        List<NationalDelivery> results, int twoYearsAgo)
-    {
-        if (twoAgo.Count > 0)
-        {
-            results.Add(new NationalDelivery
-            {
-                Location = $"{twoYearsAgo} Total",
-                Group = string.Empty,
-                YearString = twoYearsAgo.ToString(),
-                Beds = twoAgo.Sum(x => (int)x.Beds),
-                SortOrder = 39
-            });
-        }
-    }
-
-    private static void AddNationalDeliveryPreviousTotal(List<NationalDelivery> prev,
-        List<NationalDelivery> results, int prevYear)
-    {
-        if (prev.Count > 0)
-        {
-            results.Add(new NationalDelivery
-            {
-                Location = $"{prevYear} Total",
-                Group = string.Empty,
-                YearString = prevYear.ToString(),
-                Beds = prev.Sum(x => (int)x.Beds),
-                SortOrder = 29
-            });
-        }
-    }
-
-    private static void AddNationalDeliveryYtdTotal(List<NationalDelivery> currentYtd,
-        List<NationalDelivery> results, int currentYear, string currentYearLabel)
-    {
-        if (currentYtd.Count > 0)
-        {
-            results.Add(new NationalDelivery
-            {
-                Location = $"{currentYear} YTD Total",
-                Group = string.Empty,
-                YearString = currentYearLabel,
-                Beds = currentYtd.Sum(x => (int)x.Beds),
-                SortOrder = 19
-            });
-        }
-    }
-
-    private void AddGroupedRows(IEnumerable<dynamic> source, string yearLabel, int sortBase,
-        List<NationalDelivery> results)
-    {
-        var grouped = source
-            .GroupBy(x => new { x.LocationName, Group = x.GroupName ?? string.Empty })
-            .Select(g => new NationalDelivery
-            {
-                Location = g.Key.LocationName,
-                Group = g.Key.Group,
-                YearString = yearLabel,
-                Beds = g.Sum(x => (int)x.Beds),
-                SortOrder = sortBase
-            });
-        results.AddRange(grouped);
-    }
 }
+
+
+
+
 
 
 
