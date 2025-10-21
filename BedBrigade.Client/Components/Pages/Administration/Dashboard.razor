@@ -70,7 +70,7 @@
                                 {
                                     <tr>
                                         <td>
-                                            <a href="@($"/administration/admintasks/addeditschedule/{s.LocationId}/{s.ScheduleId}")">
+                                            <a href=@($"/administration/admintasks/addeditschedule/{s.LocationId}/{s.ScheduleId}")>
                                                 @s.EventDateScheduled.ToString("g")
                                             </a>
                                         </td>
@@ -180,7 +180,7 @@
                                             <td>
                                                 @if (su.Schedule != null)
                                                 {
-                                                    <a href="@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")">@su.Schedule.EventDateScheduled.ToString("g")</a>
+                                                    <a href=@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")>@su.Schedule.EventDateScheduled.ToString("g")</a>
                                                 }
                                                 else
                                                 {
@@ -191,7 +191,7 @@
                                             <td>
                                                 @if (su.Volunteer != null)
                                                 {
-                                                    <a href="@($"/administration/admintasks/addeditvolunteer/{su.Volunteer.LocationId}/{su.VolunteerId}")">@su.Volunteer.FullName</a>
+                                                    <a href=@($"/administration/admintasks/addeditvolunteer/{su.Volunteer.LocationId}/{su.VolunteerId}")>@su.Volunteer.FullName</a>
                                                 }
                                                 else
                                                 {
@@ -476,10 +476,20 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @{ string lastYearHeader = null; }
                                 @foreach (var nd in NationalDeliveries)
                                 {
+                                    if (!String.IsNullOrEmpty(nd.YearString) && lastYearHeader != nd.YearString)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="background-color: Gold; text-align: center;">
+                                                <strong>@nd.YearString</strong>
+                                            </td>
+                                        </tr>
+                                        lastYearHeader = nd.YearString;
+                                    }
                                     var isTotal = string.IsNullOrWhiteSpace(nd.Group) || (nd.Location?.Contains("Total") ?? false);
-                                    <tr style="@(isTotal ? "background-color: PowderBlue;" : string.Empty)">
+                                    <tr style=@(isTotal ? "background-color: PowderBlue;" : string.Empty)>
                                         <td>@nd.Location</td>
                                         <td>@nd.Group</td>
                                         <td>@nd.YearString</td>
