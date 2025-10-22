@@ -80,7 +80,7 @@ namespace BedBrigade.Client.Components.Pages
             appointments = BBEvents
                 .Select(s => new AppointmentData
                 {
-                    Id = s.ScheduleId,
+                    Id = s.ScheduleId,                   
                     Subject = StringUtil.IsNull(s.EventName,"'"),
                     StartTime = s.EventDateScheduled, 
                     EndTime = s.EventDateScheduled.AddHours(s.EventDurationHours),
