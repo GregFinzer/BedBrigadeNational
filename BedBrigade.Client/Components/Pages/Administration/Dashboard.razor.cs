@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
 using System.Linq;
 using System.Security.Cryptography;
+using Microsoft.JSInterop;
 
 namespace BedBrigade.Client.Components.Pages.Administration
 {
@@ -16,12 +17,15 @@ namespace BedBrigade.Client.Components.Pages.Administration
         [Inject] protected ISignUpDataService SignUpDataService { get; set; } = default!;
         [Inject] protected ILocationDataService LocationDataService { get; set; } = default!;
         [Inject] protected IDashboardDataService DashboardService { get; set; } = default!;
+        [Inject] protected IDeliveryPlanService DeliveryPlanService { get; set; } = default!;
+        [Inject] protected IJSRuntime JS { get; set; } = default!;
         protected List<BedRequestDashboardRow>? BedRequestsDashboard { get; set; } = default!;
         protected List<Common.Models.Schedule>? Schedules { get; set; }
         protected int ContactsNeedingResponses { get; set; }
         protected List<SmsQueueSummary>? SmsQueueSummaries { get; set; }
         protected int UnreadMessages { get; set; }
         protected List<SignUp>? SignUps { get; set; }
+        protected List<DeliveryPlan>? DeliveryPlanList { get; set; }
         // Chart data for Bed Request History
         protected bool IsHistoryLoading { get; set; } = true;
         protected string CurrentYearLabel => DateTime.UtcNow.Year.ToString();
@@ -115,7 +119,22 @@ namespace BedBrigade.Client.Components.Pages.Administration
             // National deliveries
             var ndResponse = await DashboardService.GetNationalDeliveries();
             NationalDeliveries = ndResponse.Success ? ndResponse.Data : new List<NationalDelivery>();
+
+            // Delivery Plan
+            var dpResponse = await DashboardService.GetDeliveryPlan(LocationId);
+            DeliveryPlanList = dpResponse.Success && dpResponse.Data != null ? dpResponse.Data : new List<DeliveryPlan>();
         }
+
+        private async Task DownloadDeliveryPlanExcel()
+        {
+            var response = await DeliveryPlanService.CreateDeliveryPlanExcel(LocationId);
+            if (response.Success && response.Data != null)
+            {
+                using var streamRef = new DotNetStreamReference(stream: response.Data.Stream);
+                await JS.InvokeVoidAsync("downloadFileFromStream", response.Data.FileName, streamRef);
+            }
+        }
+
         private async Task LoadBedRequestHistory(int locationId)
         {
             try
@@ -408,6 +427,46 @@ namespace BedBrigade.Client.Components.Pages.Administration
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

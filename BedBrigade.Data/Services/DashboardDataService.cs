@@ -2,6 +2,7 @@ using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.XlsIO;
 
 namespace BedBrigade.Data.Services;
 
@@ -259,6 +260,41 @@ public class DashboardDataService : IDashboardDataService
                 results);
         }
     }
+
+    public async Task<ServiceResponse<List<DeliveryPlan>>> GetDeliveryPlan(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(BedRequestEntityName, $"GetDeliveryPlan({locationId})");
+        var cachedContent = _cachingService.Get<List<DeliveryPlan>>(cacheKey);
+        if (cachedContent != null)
+            return new ServiceResponse<List<DeliveryPlan>>($"Found {cachedContent.Count} {BedRequestEntityName} records in cache for GetDeliveryPlan", true,
+                cachedContent);
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+
+            var query = await dbSet
+                .Where(o => o.LocationId == locationId && o.Status == BedRequestStatus.Scheduled && o.DeliveryDate.HasValue)
+                .GroupBy(o => new { Date = o.DeliveryDate.Value.Date, Group = o.Group ?? string.Empty, Team = o.Team ?? string.Empty })
+                .Select(g => new DeliveryPlan
+                {
+                    DeliveryDate = g.Key.Date,
+                    Group = g.Key.Group,
+                    Team = g.Key.Team,
+                    NumberOfBeds = g.Sum(x => x.NumberOfBeds),
+                    Stops = g.Count()
+                })
+                .OrderBy(d => d.DeliveryDate)
+                .ThenBy(d => d.Group)
+                .ThenBy(d => d.Team)
+                .ToListAsync();
+
+            _cachingService.Set(cacheKey, query);
+            return new ServiceResponse<List<DeliveryPlan>>($"Found {query.Count} delivery plan rows", true, query);
+        }
+    }
+
+
 
     private string GetWaitTimeCacheKey(int locationId)
         => _cachingService.BuildCacheKey(BedRequestEntityName, $"GetEstimatedWaitTime({locationId})");
