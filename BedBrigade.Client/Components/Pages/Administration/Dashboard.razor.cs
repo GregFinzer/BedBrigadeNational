@@ -22,6 +22,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
         protected List<SmsQueueSummary>? SmsQueueSummaries { get; set; }
         protected int UnreadMessages { get; set; }
         protected List<SignUp>? SignUps { get; set; }
+        protected List<DeliveryPlan>? DeliveryPlanList { get; set; }
         // Chart data for Bed Request History
         protected bool IsHistoryLoading { get; set; } = true;
         protected string CurrentYearLabel => DateTime.UtcNow.Year.ToString();
@@ -115,6 +116,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
             // National deliveries
             var ndResponse = await DashboardService.GetNationalDeliveries();
             NationalDeliveries = ndResponse.Success ? ndResponse.Data : new List<NationalDelivery>();
+
+            // Delivery Plan
+            var dpResponse = await DashboardService.GetDeliveryPlan(LocationId);
+            DeliveryPlanList = dpResponse.Success && dpResponse.Data != null ? dpResponse.Data : new List<DeliveryPlan>();
         }
         private async Task LoadBedRequestHistory(int locationId)
         {
@@ -408,6 +413,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
         }
     }
 }
+
+
+
+
 
 
 
