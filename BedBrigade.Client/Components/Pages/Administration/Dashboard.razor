@@ -145,7 +145,13 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0">Delivery Plan for @LocationName</h5>
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>Delivery Plan for @LocationName</span>
+                        @if (DeliveryPlanList != null && DeliveryPlanList.Any())
+                        {
+                            <a href="#" @onclick="DownloadDeliveryPlanExcel">Download Delivery Plan</a>
+                        }
+                    </h5>
                 </div>
                 <div class="card-body p-0">
                     @if (DeliveryPlanList == null)
@@ -494,7 +500,6 @@
             </div>
         </div>
     </div>
-
 
 
     <!-- National Deliveries -->
