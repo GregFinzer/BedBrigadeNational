@@ -352,6 +352,40 @@
             </div>
         </div>
     </div>
+    
+    <!-- Requests Versus Deliveries YTD Chart -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Requests Versus Deliveries @CurrentYearLabel YTD for @LocationName</h5>
+                </div>
+                <div class="card-body">
+                    @if (IsHistoryLoading || IsDeliveryHistoryLoading)
+                    {
+                        <div class="text-muted">Loading chart...</div>
+                    }
+                    else if (BedRequestSeriesCurrentYear == null || DeliverySeriesCurrentYear == null)
+                    {
+                        <div class="text-muted">No data available.</div>
+                    }
+                    else
+                    {
+                        <SfChart>
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Month" Interval="1"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Title="Beds"></ChartPrimaryYAxis>
+                            <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@BedRequestSeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="Beds Requested" Width="2" Fill="#FF0000"></ChartSeries>
+                                <ChartSeries DataSource="@DeliverySeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="Beds Delivered" Width="2" Fill="#008000"></ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bed Request Statistics -->
     <div class="row mt-4">
@@ -559,6 +593,8 @@
             </div>
         </div>
     </div>
+
+
 
 
 
