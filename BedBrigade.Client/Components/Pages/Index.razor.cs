@@ -129,6 +129,11 @@ public partial class Index : ComponentBase, IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            await _js.InvokeVoidAsync("initPageImageZoom");
+        }
+
         try
         {
             if (!String.IsNullOrEmpty(_bodyContent) && _bodyContent.Contains("jarallax"))
