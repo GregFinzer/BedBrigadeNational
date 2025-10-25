@@ -113,30 +113,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
             return new ServiceResponse<SignUp>($"Failed to unregister volunteer {volunteerId} from schedule {scheduleId}: {deleteSignUpResponse.Message}", false);
         }
 
-        var scheduleResponse = await _scheduleDataService.GetByIdAsync(scheduleId);
 
-        if (!scheduleResponse.Success || scheduleResponse.Data == null)
-        {
-            return new ServiceResponse<SignUp>($"Failed to retrieve schedule {scheduleId} after unregister", false);
-        }
-
-        var schedule = scheduleResponse.Data;
-        if (schedule.VolunteersRegistered > 0)
-        {
-            schedule.VolunteersRegistered -= existingSignup.Data.NumberOfVolunteers;
-        }
-
-        if (schedule.DeliveryVehiclesRegistered > 0)
-        {
-            schedule.DeliveryVehiclesRegistered--;
-        }
-
-        var updateScheduleResponse = await _scheduleDataService.UpdateAsync(schedule);
-
-        if (!updateScheduleResponse.Success)
-        {
-            return new ServiceResponse<SignUp>($"Failed to update schedule {scheduleId} after unregister: {updateScheduleResponse.Message}", false);
-        }
 
         _cachingService.ClearScheduleRelated();
         return new ServiceResponse<SignUp>($"Successfully unregistered volunteer {volunteerId} from schedule {scheduleId}", true, existingSignup.Data);
