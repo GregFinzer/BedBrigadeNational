@@ -431,24 +431,6 @@ public partial class SignUpGrid : ComponentBase
             var addResult = await _svcSignUp.CreateAsync(newSignUp);
             if (addResult.Success)
             {
-                // add Volunteer to Schedule table
-
-                var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, 
-                    Schedules, CaptionAdd,
-                    newSignUp.ScheduleId, 
-                    newVolunteer.VehicleType,
-                    newVolunteer.NumberOfVolunteers);
-                if (bUpdateSchedule)
-                {
-                    actionStatus = "success";
-                    strMessageText = "Add Successful!";
-                }
-                else
-                {
-                    actionStatus = "warning";
-                    strMessageText = "Selected volunteer was added to Event, but Schedules cannot be updated!";
-                }
-
                 CloseButtonCaption = CaptionClose;
                 await RefreshGrid(CaptionAdd);
             }
@@ -473,7 +455,7 @@ public partial class SignUpGrid : ComponentBase
         // Action Finished
         //ErrorMessage = "Delete Confirmed";
         var strMessageText = string.Empty;
-        var actionStatus = "error";
+        var actionStatus = "Delete Confirmed";
         if (selectedGridObject != null)
         {
             int signUpId = selectedGridObject.SignUpId;
@@ -483,21 +465,6 @@ public partial class SignUpGrid : ComponentBase
                 var deleteResult = await _svcSignUp.DeleteAsync(signUpId);
                 if (existingRecord.Success && deleteResult.Success)
                 {
-                    // add Volunteer to Schedule table
-                    var bUpdateSchedule = await SignUpHelper.UpdateSchedule(_svcSchedule, Schedules, "Del",
-                        selectedGridObject.ScheduleId, selectedGridObject.VehicleType, existingRecord.Data.NumberOfVolunteers);
-                    if (bUpdateSchedule)
-                    {
-                        actionStatus = "success";
-                        strMessageText = "Deletion Successful!";
-                    }
-                    else
-                    {
-                        actionStatus = "warning";
-                        strMessageText = "Deletion Successful, but Schedules cannot be updated!";
-
-                    }
-
                     CloseButtonCaption = CaptionClose;
                     await RefreshGrid(CaptionDelete);
                 }

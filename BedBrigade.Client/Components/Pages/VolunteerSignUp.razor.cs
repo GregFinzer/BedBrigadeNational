@@ -356,11 +356,6 @@ namespace BedBrigade.Client.Components.Pages
             if (!scheduleVolunteerSuccess)
                 return;
 
-            bool updateCountSuccess = await UpdateScheduleVolunteerCount();
-
-            if (!updateCountSuccess)
-                return;
-
 
             await CreateFinalMessage();
         }
@@ -617,50 +612,7 @@ namespace BedBrigade.Client.Components.Pages
 
         } // Create Final Message
 
-        private async Task<bool> UpdateScheduleVolunteerCount()
-        {
-            try
-            {
-                var existingResult = await _svcSchedule.GetByIdAsync(SelectedEvent.ScheduleId);
-                if (!existingResult.Success)
-                {
-                    await ShowMessage(existingResult.Message);
-                    return false;
-                }
 
-                var existingSchedule = existingResult.Data;
-                existingSchedule.VolunteersRegistered += newVolunteer.NumberOfVolunteers - _previousNumberOfVolunteers;
-
-                if (_previousDeliveryVehicle != null)
-                {
-                    if (_previousDeliveryVehicle != VehicleType.None && newVolunteer.VehicleType == VehicleType.None)
-                    {
-                        existingSchedule.DeliveryVehiclesRegistered -= 1;
-                    }
-                }
-                else if (newVolunteer.VehicleType != VehicleType.None)
-                {
-                    existingSchedule.DeliveryVehiclesRegistered += 1;
-                }
-
-                var updateResult = await _svcSchedule.UpdateAsync(existingSchedule);
-
-                if (!updateResult.Success)
-                {
-                    Log.Logger.Error($"Error UpdateScheduleVolunteerCount, updateResult: {updateResult.Message}");
-                    await ShowMessage(updateResult.Message);
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, $"Error UpdateScheduleVolunteerCount: {ex.Message}");
-                await ShowMessage("Error UpdateScheduleVolunteerCount: " + ex.Message);
-                return false;
-            }
-
-            return true;
-        }
 
         #endregion
 

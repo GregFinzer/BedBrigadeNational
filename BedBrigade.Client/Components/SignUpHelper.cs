@@ -244,56 +244,7 @@ namespace BedBrigade.Client.Components
 
         } // Get Location Volunteers
 
-        public static async Task<bool>  UpdateSchedule(IScheduleDataService? svcSchedule, 
-            List<Schedule> schedules, string strAction, int intScheduleId, VehicleType carType, int numberOfVolunteers)
-        {
-            var bScheduleUpdated = false;
-            var bUpdate = true;
-            var mySchedule = schedules.FirstOrDefault(s => s.ScheduleId == intScheduleId);
-            switch (strAction)
-            {
-                case "Add":
-                    if (mySchedule != null) // update 
-                    {
-                        mySchedule.VolunteersRegistered+= numberOfVolunteers;
-                        if (carType != VehicleType.None)
-                        {
-                            mySchedule.DeliveryVehiclesRegistered++;
-                        }
-                    }
-                    break;
-                case "Del":
-                    if (mySchedule != null) // update 
-                    {
-                        if (mySchedule.VolunteersRegistered > 0)
-                        {
-                            mySchedule.VolunteersRegistered-= numberOfVolunteers;
-                        }
-                        if (carType != VehicleType.None && mySchedule.DeliveryVehiclesRegistered > 0)
-                        {
-                            mySchedule.DeliveryVehiclesRegistered--;
-                        }
-                    }
-                    break;
-                default:
-                    bUpdate = false;
-                    // Do Nothing
-                    break;
-            } // switch action
-            // update Schedule Table Record                 
-            if (bUpdate && mySchedule!=null && svcSchedule != null)
-            {
-                var dataUpdate = await svcSchedule.UpdateAsync(mySchedule);
 
-                if (dataUpdate.Success)
-                {
-                    bScheduleUpdated = true;
-                }                  
-            }
-
-            return (bScheduleUpdated);
-
-        } // update Schedule
 
     } // class
 } // namespace
