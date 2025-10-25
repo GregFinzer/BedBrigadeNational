@@ -34,6 +34,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     public override async Task<ServiceResponse<SignUp>> CreateAsync(SignUp entity)
     {
         var result = await base.CreateAsync(entity);
+        await _scheduleDataService.UpdateScheduleVolunteers(entity.ScheduleId);
         _cachingService.ClearScheduleRelated();
         return result;
     }
@@ -41,13 +42,23 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     public override async Task<ServiceResponse<SignUp>> UpdateAsync(SignUp entity)
     {
         var result = await base.UpdateAsync(entity);
+        await _scheduleDataService.UpdateScheduleVolunteers(entity.ScheduleId);
         _cachingService.ClearScheduleRelated();
         return result;
     }
 
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
+        await _smsQueueDataService.DeleteBySignUpId((int) id);
+        var existingResponse = await GetByIdAsync(id);
+
         var result = await base.DeleteAsync(id);
+
+        if (existingResponse.Success && existingResponse.Data != null)
+        {
+            await _scheduleDataService.UpdateScheduleVolunteers(existingResponse.Data.ScheduleId);
+        }
+
         _cachingService.ClearScheduleRelated();
         return result;
     }
@@ -104,16 +115,12 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
             return new ServiceResponse<SignUp>($"No sign-up found for volunteer {volunteerId} and schedule {scheduleId}", false);
         }
 
-        await _smsQueueDataService.DeleteBySignUpId(existingSignup.Data.SignUpId);
-
         var deleteSignUpResponse = await DeleteAsync(existingSignup.Data.SignUpId);
 
         if (!deleteSignUpResponse.Success)
         {
             return new ServiceResponse<SignUp>($"Failed to unregister volunteer {volunteerId} from schedule {scheduleId}: {deleteSignUpResponse.Message}", false);
         }
-
-
 
         _cachingService.ClearScheduleRelated();
         return new ServiceResponse<SignUp>($"Successfully unregistered volunteer {volunteerId} from schedule {scheduleId}", true, existingSignup.Data);

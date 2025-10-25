@@ -356,11 +356,6 @@ namespace BedBrigade.Client.Components.Pages
             if (!scheduleVolunteerSuccess)
                 return;
 
-            bool updateCountSuccess = await UpdateScheduleVolunteerCount();
-
-            if (!updateCountSuccess)
-                return;
-
 
             await CreateFinalMessage();
         }

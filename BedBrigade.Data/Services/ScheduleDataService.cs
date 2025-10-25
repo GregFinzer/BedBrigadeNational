@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Common.Constants;
@@ -269,7 +268,40 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             }
         }
     }
+
+    // Updates VolunteersRegistered and DeliveryVehiclesRegistered for a specific schedule
+    public async Task UpdateScheduleVolunteers(int scheduleId)
+    {
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+
+            // Calculate totals from SignUps for this schedule
+            var signUps = await ctx.Set<SignUp>().Where(s => s.ScheduleId == scheduleId).ToListAsync();
+
+            int volunteersRegistered = signUps
+                .Select(s => (int?)s.NumberOfVolunteers)
+                .Sum() ?? 0;
+
+            int deliveryVehiclesRegistered = signUps
+                .Count(s => s.VehicleType != VehicleType.None);
+
+            // Load the schedule and update summary fields
+            var scheduleResponse = await GetByIdAsync(scheduleId);
+            if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            {
+                return;
+            }
+
+            var schedule = scheduleResponse.Data;
+            schedule.VolunteersRegistered = volunteersRegistered;
+            schedule.DeliveryVehiclesRegistered = deliveryVehiclesRegistered;
+
+            await UpdateAsync(schedule);
+        }
+    }
 }
+
 
 
 
