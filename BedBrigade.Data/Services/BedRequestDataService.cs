@@ -42,11 +42,36 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     {
         var result = await base.CreateAsync(entity);
         _cachingService.ClearScheduleRelated();
+
+        var tasks = new List<Task>();
+
+        tasks.Add(QueueForGeoLocation(entity));
+
+        var scheduled = await GetScheduledBedRequestsForLocation(entity.LocationId);
+        if (scheduled.Success && scheduled.Data != null)
+        {
+            tasks.Add(_scheduleDataService.UpdateBedRequestSummaryInformation(
+                entity.LocationId, scheduled.Data));
+        }
+
+        // Run both in parallel for performance
+        if (tasks.Count > 0)
+        {
+            await Task.WhenAll(tasks);
+        }
         return result;
     }
 
     public override async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest entity)
     {
+        var allLocationsResponse = await _locationDataService.GetAllAsync();
+        if (!allLocationsResponse.Success || allLocationsResponse.Data == null)
+        {
+            return new ServiceResponse<BedRequest>("Unable to retrieve locations for update", false, null);
+        }
+
+        //Force Get
+        _cachingService.ClearByEntityName(GetEntityName());
         var previousBedRequest = await GetByIdAsync(entity.BedRequestId);
 
         if (!previousBedRequest.Success || previousBedRequest.Data == null)
@@ -61,6 +86,20 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                                        || previousBedRequest.Data.City != entity.City
                                        || previousBedRequest.Data.State != entity.State
                                        || previousBedRequest.Data.PostalCode != entity.PostalCode;
+
+        //The user changed the group but not the associated location
+        if (previousBedRequest.Data.LocationId == entity.LocationId
+            && previousBedRequest.Data.Group != entity.Group
+            && allLocationsResponse.Data.Any(o => o.Group?.ToLower() == entity.Group?.ToLower()))
+        {
+            entity.LocationId = allLocationsResponse.Data.First(o => o.Group == entity.Group).LocationId;
+        }
+        //The user changed the location but not the associated group
+        else if (previousBedRequest.Data.LocationId != entity.LocationId
+                 && previousBedRequest.Data.Group == entity.Group)
+        {
+            entity.Group = allLocationsResponse.Data.First(o => o.LocationId == entity.LocationId).Group;
+        }
 
         var result = await base.UpdateAsync(entity);
         _cachingService.ClearScheduleRelated();

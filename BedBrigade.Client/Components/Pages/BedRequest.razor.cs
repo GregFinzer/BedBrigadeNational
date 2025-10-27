@@ -398,7 +398,6 @@ namespace BedBrigade.Client.Components.Pages
                     if (bedRequest != null)
                     {
                         await SendConfirmationEmail(bedRequest);
-                        await QueueForGeoLocation(bedRequest);
                     }
                 }
             }
@@ -408,29 +407,6 @@ namespace BedBrigade.Client.Components.Pages
             }
         }
 
-        private async Task QueueForGeoLocation(Common.Models.BedRequest bedRequest)
-        {
-            GeoLocationQueue item = new GeoLocationQueue();
-            item.Street = bedRequest.Street;
-            item.City = bedRequest.City;
-            item.State = bedRequest.State;
-            item.PostalCode = bedRequest.PostalCode;
-            item.CountryCode = Defaults.CountryCode;
-            item.TableName = TableNames.BedRequests.ToString();
-            item.TableId = bedRequest.BedRequestId;
-            item.QueueDate = DateTime.UtcNow;
-            item.Priority = 1;
-            item.Status = GeoLocationStatus.Queued.ToString();
-            var result = await _svcGeoLocation.CreateAsync(item);
-
-            if (!result.Success)
-            {
-                AlertType = AlertDanger;
-                ResultMessage = result.Message;
-                ResultDisplay = "";
-                await ScrollToResultMessage();
-            }
-        }
 
         private async Task SendConfirmationEmail(Common.Models.BedRequest bedRequest)
         {
