@@ -282,11 +282,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
             if (Model != null && Model.BedRequestId != 0)
             {
-                bool success = await QueueForGeoLocation(Model);
-                if (!success)
-                {
-                    return;
-                }
                 _toastService?.Success("BedRequest Created", "BedRequest Created Successfully!");
             }
             else
@@ -309,12 +304,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (updateResult.Success)
             {
-                bool success = await QueueForGeoLocation(BedRequest);
-                if (!success)
-                {
-                    return;
-                }
-
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
@@ -324,40 +313,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private async Task<bool> QueueForGeoLocation(Common.Models.BedRequest bedRequest)
-        {
-            if (_svcGeoLocation == null)
-            {
-                // geo queue not available
-                return true;
-            }
 
-            GeoLocationQueue item = new GeoLocationQueue();
-            item.Street = bedRequest.Street ?? string.Empty;
-            item.City = bedRequest.City ?? string.Empty;
-            item.State = bedRequest.State ?? string.Empty;
-            item.PostalCode = bedRequest.PostalCode ?? string.Empty;
-            item.CountryCode = Defaults.CountryCode;
-            item.TableName = TableNames.BedRequests.ToString();
-            item.TableId = bedRequest.BedRequestId;
-            item.QueueDate = DateTime.UtcNow;
-            item.Priority = 1;
-            item.Status = GeoLocationStatus.Queued.ToString();
-            var result = await _svcGeoLocation.CreateAsync(item);
-
-            if (!result.Success)
-            {
-                string message = "Created bed request but could not queue for Geolocation: " + result.Message;
-                Log.Error(message);
-                if (_toastService != null)
-                {
-                    _toastService.Error("GeoLocation Failure", message);
-                }
-                return false;
-            }
-
-            return true;
-        }
 
         private void HandleCancel()
         {
