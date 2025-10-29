@@ -118,6 +118,29 @@
  });
  }
 
+ // Robustly resolve the image element from any event target (works for <picture>, links, wrappers)
+ function getImageFromEvent(e){
+ const t = e && e.target;
+ if(!t) return null;
+ // Direct img
+ if(t.tagName === 'IMG') return t;
+ // Walk composed path if available
+ const path = typeof e.composedPath === 'function' ? e.composedPath() : (e.path || []);
+ if(path && path.length){
+ for(const node of path){
+ if(node && node.tagName === 'IMG') return node;
+ if(node === window || node === document) break;
+ }
+ }
+ // Find nearest likely container and search inside
+ const container = t.closest && t.closest('picture, a, figure');
+ if(container){
+ const img = container.querySelector && container.querySelector('img');
+ if(img) return img;
+ }
+ return null;
+ }
+
  function openFromImage(imgEl){
  // figure out the best source (handle responsive or lazy images)
  const src = imgEl.currentSrc || imgEl.getAttribute('src') || (imgEl.dataset ? imgEl.dataset.src : '') || '';
@@ -140,7 +163,7 @@
  // guard to ignore the synthetic click that follows pointerdown
  justOpened = true;
  if(justOpenedTimer) clearTimeout(justOpenedTimer);
- justOpenedTimer = setTimeout(() => { justOpened = false; justOpenedTimer = null; }, 350);
+ justOpenedTimer = setTimeout(() => { justOpened = false; justOpenedTimer = null; },350);
  }
 
  function onWindowClick(e){
@@ -159,8 +182,8 @@
  removeOverlay();
  return;
  }
- // Find nearest img
- const imgEl = e.target && (e.target.closest ? e.target.closest('img') : null);
+ // Resolve image from event
+ const imgEl = getImageFromEvent(e);
  if(!imgEl) return;
  // If inside a link, prevent navigation
  const link = imgEl.closest && imgEl.closest('a');
@@ -171,8 +194,8 @@
  function onPointerDown(e){
  // Ignore if overlay open; click handler will manage closing
  if(currentOverlay) return;
- // Find nearest img early in capture
- const imgEl = e.target && (e.target.closest ? e.target.closest('img') : null);
+ // Resolve image from event early in capture
+ const imgEl = getImageFromEvent(e);
  if(!imgEl) return;
  // If inside a link, prevent navigation immediately
  const link = imgEl.closest && imgEl.closest('a');
@@ -191,9 +214,15 @@
  if(!document.getElementById('zoom-body')){
  document.body.classList.add('bb-image-zoom-enabled');
  }
- // Capture to see events even if inner handlers stopPropagation; attach to window to be earliest
+ // Capture to see events even if inner handlers stopPropagation; use non-passive to allow preventDefault on touch
+ try{
+ window.addEventListener('pointerdown', onPointerDown, { capture: true, passive: false });
+ window.addEventListener('click', onWindowClick, { capture: true, passive: false });
+ } catch(_){
+ // Fallback for very old browsers
  window.addEventListener('pointerdown', onPointerDown, true);
  window.addEventListener('click', onWindowClick, true);
+ }
  // Close overlay with Escape
  document.addEventListener('keydown', function(e){
  if(e.key === 'Escape' && currentOverlay) removeOverlay();
