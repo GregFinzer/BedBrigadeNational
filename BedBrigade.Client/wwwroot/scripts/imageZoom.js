@@ -126,7 +126,7 @@
         });
     }
 
-    function init() {
+    function initImageZoom() {
         const container = document.getElementById('zoom-body') || document.body;
         // Add class to enable hover cursor only within the container
         container.classList.add('bb-image-zoom-enabled');
@@ -145,9 +145,7 @@
         }
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    // Expose the initializer globally for Blazor interop
+    window.initImageZoom = window.initImageZoom || initImageZoom;
+
 })();
