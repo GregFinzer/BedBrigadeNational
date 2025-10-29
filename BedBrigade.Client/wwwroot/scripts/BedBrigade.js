@@ -83,11 +83,15 @@ window.SetGetValue = {
     },
 
     SetInnerHtml: function (element, value) {
-        document.getElementById(element).innerHTML = value;
+        var el = document.getElementById(element);
+        if (!el) return;
+        el.innerHTML = value;
     },
 
     SetOuterHtml: function (element, value) {
-        document.getElementById(element).outerHTML = value;
+        var el = document.getElementById(element);
+        if (!el) return;
+        el.outerHTML = value;
     },
 
     SetAttribute: function (element, attr, value) {
@@ -98,15 +102,18 @@ window.SetGetValue = {
     },
 
     GetInnerHtml: function (element) {
-        return document.getElementById(element).innerHTML;
+        var el = document.getElementById(element);
+        return el ? el.innerHTML : '';
     },
 
     GetOuterHtml: function (element, value) {
-        return document.getElementById(element).outerHTML;
+        var el = document.getElementById(element);
+        return el ? el.outerHTML : '';
     },
 
     GetAttribute: function (element, attr) {
-        return document.getElementById(element).getAttribute(attr);
+        var el = document.getElementById(element);
+        return el ? el.getAttribute(attr) : null;
     }
 }
 
