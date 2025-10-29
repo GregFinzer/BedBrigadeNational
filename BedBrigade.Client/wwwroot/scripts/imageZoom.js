@@ -1,5 +1,8 @@
 (function () {
     const clickText = 'click';
+    const MOVE_THRESHOLD = 12; // px movement to treat as scroll/pan
+    const TIME_THRESHOLD = 350; // ms max tap duration
+
     function ensureStyle() {
         if (document.getElementById('bb-image-zoom-style')) return;
         const style = document.createElement('style');
@@ -69,6 +72,9 @@
     let justOpened = false;
     let justOpenedTimer = null;
     let cursorObserver = null;
+
+    // tap detection state
+    let tap = null; // { pointerId, img, link, startX, startY, startT, canceled }
 
     function ensureCursorHint() {
         const container = document.getElementById('zoom-body');
@@ -183,13 +189,15 @@
             removeOverlay();
             return;
         }
-        // Resolve image from event
-        const imgEl = getImageFromEvent(e);
-        if (!imgEl) return;
-        // If inside a link, prevent navigation
-        const link = imgEl.closest && imgEl.closest('a');
-        if (link) { e.preventDefault(); }
-        openFromImage(imgEl);
+        // Do not open from click anymore to avoid accidental opens on scroll
+    }
+
+    function clearTap() {
+        tap = null;
+    }
+
+    function cancelTap() {
+        if (tap) tap.canceled = true;
     }
 
     function onPointerDown(e) {
@@ -198,13 +206,53 @@
         // Resolve image from event early in capture
         const imgEl = getImageFromEvent(e);
         if (!imgEl) return;
+        // Create tap candidate, we'll open on pointerup if it remains a tap
+        tap = {
+            pointerId: e.pointerId,
+            img: imgEl,
+            link: imgEl.closest && imgEl.closest('a'),
+            startX: e.clientX,
+            startY: e.clientY,
+            startT: (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(),
+            canceled: false
+        };
         // If inside a link, prevent navigation immediately
-        const link = imgEl.closest && imgEl.closest('a');
-        if (link) { e.preventDefault(); }
-        // Open now to avoid other handlers swallowing the click
-        openFromImage(imgEl);
-        // Stop further propagation if we opened overlay to avoid interference
+        if (tap.link) {
+            try { e.preventDefault(); } catch (_) { }
+        }
+        // Stop further propagation to reduce interference
         e.stopPropagation();
+    }
+
+    function onPointerMove(e) {
+        if (!tap || (tap.pointerId !== undefined && e.pointerId !== tap.pointerId)) return;
+        const dx = Math.abs(e.clientX - tap.startX);
+        const dy = Math.abs(e.clientY - tap.startY);
+        if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+            cancelTap();
+        }
+    }
+
+    function onPointerUp(e) {
+        if (!tap || (tap.pointerId !== undefined && e.pointerId !== tap.pointerId)) return;
+        const elapsed = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - tap.startT;
+        if (!tap.canceled && elapsed <= TIME_THRESHOLD) {
+            if (tap.link) {
+                try { e.preventDefault(); } catch (_) { }
+            }
+            openFromImage(tap.img);
+        }
+        clearTap();
+    }
+
+    function onPointerCancel() {
+        cancelTap();
+        clearTap();
+    }
+
+    function onScroll() {
+        // Any scroll while a tap candidate is active cancels the tap
+        cancelTap();
     }
 
     function init() {
@@ -218,11 +266,19 @@
         // Capture to see events even if inner handlers stopPropagation; use non-passive to allow preventDefault on touch
         try {
             window.addEventListener('pointerdown', onPointerDown, { capture: true, passive: false });
+            window.addEventListener('pointermove', onPointerMove, { capture: true, passive: true });
+            window.addEventListener('pointerup', onPointerUp, { capture: true, passive: false });
+            window.addEventListener('pointercancel', onPointerCancel, { capture: true, passive: true });
             window.addEventListener(clickText, onWindowClick, { capture: true, passive: false });
+            window.addEventListener('scroll', onScroll, { capture: true, passive: true });
         } catch (_) {
             // Fallback for very old browsers
             window.addEventListener('pointerdown', onPointerDown, true);
+            window.addEventListener('pointermove', onPointerMove, true);
+            window.addEventListener('pointerup', onPointerUp, true);
+            window.addEventListener('pointercancel', onPointerCancel, true);
             window.addEventListener(clickText, onWindowClick, true);
+            window.addEventListener('scroll', onScroll, true);
         }
         // Close overlay with Escape
         document.addEventListener('keydown', function (e) {
