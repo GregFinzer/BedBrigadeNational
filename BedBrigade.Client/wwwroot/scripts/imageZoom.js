@@ -1,24 +1,17 @@
 (function () {
-    const clickText = 'click';
-    const MOVE_THRESHOLD = 12; // px movement to treat as scroll/pan
-    const TIME_THRESHOLD = 350; // ms max tap duration
-
     function ensureStyle() {
         if (document.getElementById('bb-image-zoom-style')) return;
         const style = document.createElement('style');
         style.id = 'bb-image-zoom-style';
         style.textContent = `
-/* Enable hover magnifier on images inside the enabled container (and fallback to #zoom-body) */
-#zoom-body img,
-#zoom-body a img,
-.bb-image-zoom-enabled img,
-.bb-image-zoom-enabled a img { cursor: zoom-in !important; }
+/* Enable hover magnifier on images inside the enabled container */
+.bb-image-zoom-enabled img { cursor: zoom-in; }
 
 /* Overlay fade/zoom transitions */
 .bb-image-zoom-overlay {
  position: fixed; inset:0; background: rgba(0,0,0,0.92);
  display: flex; align-items: center; justify-content: center;
- z-index:2147483647; cursor: zoom-out !important; opacity:0;
+ z-index:2147483647; cursor: zoom-out; opacity:0;
  transition: opacity 220ms ease;
 }
 .bb-image-zoom-overlay.open { opacity:1; }
@@ -28,7 +21,7 @@
  transform: scale(0.95); transform-origin: center center;
  transition: transform 220ms ease;
  will-change: transform;
- cursor: zoom-out !important; /* Ensure cursor shows zoom-out when zoomed */
+ cursor: zoom-out; /* Ensure cursor shows zoom-out when zoomed */
 }
 .bb-image-zoom-overlay.open img { transform: scale(1); }
 
@@ -53,13 +46,13 @@
         overlay.appendChild(img);
 
         // clicking the overlay (anywhere) closes it (zoom out)
-        overlay.addEventListener(clickText, function (e) {
+        overlay.addEventListener('click', function (e) {
             e.stopPropagation();
             removeOverlay();
         });
 
         // clicking the image also closes it (zoom out)
-        img.addEventListener(clickText, function (e) {
+        img.addEventListener('click', function (e) {
             e.stopPropagation();
             removeOverlay();
         });
@@ -69,27 +62,6 @@
 
     let currentOverlay = null;
     let isClosing = false;
-    let justOpened = false;
-    let justOpenedTimer = null;
-    let cursorObserver = null;
-
-    // tap detection state
-    let tap = null; // { pointerId, img, link, startX, startY, startT, canceled }
-
-    function ensureCursorHint() {
-        const container = document.getElementById('zoom-body');
-        if (container && !container.classList.contains('bb-image-zoom-enabled')) {
-            container.classList.add('bb-image-zoom-enabled');
-        }
-    }
-
-    function startCursorObserver() {
-        if (cursorObserver || !window.MutationObserver) return;
-        cursorObserver = new MutationObserver(() => {
-            ensureCursorHint();
-        });
-        cursorObserver.observe(document.documentElement, { childList: true, subtree: true });
-    }
 
     function removeOverlay() {
         if (!currentOverlay || isClosing) return;
@@ -125,34 +97,20 @@
         });
     }
 
-    // Robustly resolve the image element from any event target (works for <picture>, links, wrappers)
-    function getImageFromEvent(e) {
-        const t = e && e.target;
-        if (!t) return null;
-        // Direct img
-        if (t.tagName === 'IMG') return t;
-        // Walk composed path if available
-        const path = typeof e.composedPath === 'function' ? e.composedPath() : (e.path || []);
-        if (path && path.length) {
-            for (const node of path) {
-                if (node && node.tagName === 'IMG') return node;
-                if (node === window || node === document) break;
-            }
+    function onContainerClick(e) {
+        // If overlay already open, close it
+        if (currentOverlay) {
+            removeOverlay();
+            return;
         }
-        // Find nearest likely container and search inside
-        const container = t.closest && t.closest('picture, a, figure');
-        if (container) {
-            const img = container.querySelector && container.querySelector('img');
-            if (img) return img;
-        }
-        return null;
-    }
 
-    function openFromImage(imgEl) {
+        const target = e.target;
+        if (!target || target.tagName !== 'IMG') return;
+
         // figure out the best source (handle responsive or lazy images)
-        const src = imgEl.currentSrc || imgEl.getAttribute('src') || (imgEl.dataset ? imgEl.dataset.src : '') || '';
-        const srcset = imgEl.getAttribute('srcset') || '';
-        const alt = imgEl.getAttribute('alt') || '';
+        const src = target.currentSrc || target.getAttribute('src') || target.dataset.src || '';
+        const srcset = target.getAttribute('srcset') || '';
+        const alt = target.getAttribute('alt') || '';
 
         ensureStyle();
 
@@ -166,124 +124,25 @@
         requestAnimationFrame(() => {
             currentOverlay.classList.add('open');
         });
-
-        // guard to ignore the synthetic click that follows pointerdown
-        justOpened = true;
-        if (justOpenedTimer) clearTimeout(justOpenedTimer);
-        justOpenedTimer = setTimeout(() => { justOpened = false; justOpenedTimer = null; }, 350);
-    }
-
-    function onWindowClick(e) {
-        // Ignore clicks inside overlay
-        if ((e.target.closest && e.target.closest('.bb-image-zoom-overlay'))) {
-            return;
-        }
-        // Prevent immediate close if we just opened from pointerdown
-        if (justOpened) {
-            e.preventDefault();
-            return;
-        }
-        // If overlay already open, close it on any click outside overlay
-        if (currentOverlay) {
-            e.preventDefault();
-            removeOverlay();
-            return;
-        }
-        // Do not open from click anymore to avoid accidental opens on scroll
-    }
-
-    function clearTap() {
-        tap = null;
-    }
-
-    function cancelTap() {
-        if (tap) tap.canceled = true;
-    }
-
-    function onPointerDown(e) {
-        // Ignore if overlay open; click handler will manage closing
-        if (currentOverlay) return;
-        // Resolve image from event early in capture
-        const imgEl = getImageFromEvent(e);
-        if (!imgEl) return;
-        // Create tap candidate, we'll open on pointerup if it remains a tap
-        tap = {
-            pointerId: e.pointerId,
-            img: imgEl,
-            link: imgEl.closest && imgEl.closest('a'),
-            startX: e.clientX,
-            startY: e.clientY,
-            startT: (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(),
-            canceled: false
-        };
-        // If inside a link, prevent navigation immediately
-        if (tap.link) {
-            try { e.preventDefault(); } catch (_) { }
-        }
-        // Stop further propagation to reduce interference
-        e.stopPropagation();
-    }
-
-    function onPointerMove(e) {
-        if (!tap || (tap.pointerId !== undefined && e.pointerId !== tap.pointerId)) return;
-        const dx = Math.abs(e.clientX - tap.startX);
-        const dy = Math.abs(e.clientY - tap.startY);
-        if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
-            cancelTap();
-        }
-    }
-
-    function onPointerUp(e) {
-        if (!tap || (tap.pointerId !== undefined && e.pointerId !== tap.pointerId)) return;
-        const elapsed = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - tap.startT;
-        if (!tap.canceled && elapsed <= TIME_THRESHOLD) {
-            if (tap.link) {
-                try { e.preventDefault(); } catch (_) { }
-            }
-            openFromImage(tap.img);
-        }
-        clearTap();
-    }
-
-    function onPointerCancel() {
-        cancelTap();
-        clearTap();
-    }
-
-    function onScroll() {
-        // Any scroll while a tap candidate is active cancels the tap
-        cancelTap();
     }
 
     function init() {
-        ensureStyle();
-        ensureCursorHint();
-        startCursorObserver();
-        // Set cursor hint on body as best-effort fallback if container absent
-        if (!document.getElementById('zoom-body')) {
-            document.body.classList.add('bb-image-zoom-enabled');
-        }
-        // Capture to see events even if inner handlers stopPropagation; use non-passive to allow preventDefault on touch
-        try {
-            window.addEventListener('pointerdown', onPointerDown, { capture: true, passive: false });
-            window.addEventListener('pointermove', onPointerMove, { capture: true, passive: true });
-            window.addEventListener('pointerup', onPointerUp, { capture: true, passive: false });
-            window.addEventListener('pointercancel', onPointerCancel, { capture: true, passive: true });
-            window.addEventListener(clickText, onWindowClick, { capture: true, passive: false });
-            window.addEventListener('scroll', onScroll, { capture: true, passive: true });
-        } catch (_) {
-            // Fallback for very old browsers
-            window.addEventListener('pointerdown', onPointerDown, true);
-            window.addEventListener('pointermove', onPointerMove, true);
-            window.addEventListener('pointerup', onPointerUp, true);
-            window.addEventListener('pointercancel', onPointerCancel, true);
-            window.addEventListener(clickText, onWindowClick, true);
-            window.addEventListener('scroll', onScroll, true);
-        }
+        const container = document.getElementById('zoom-body') || document.body;
+        // Add class to enable hover cursor only within the container
+        container.classList.add('bb-image-zoom-enabled');
+        // Use event delegation so dynamically injected images are handled
+        container.addEventListener('click', onContainerClick);
+
         // Close overlay with Escape
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && currentOverlay) removeOverlay();
         });
+
+        // Observe DOM mutations in container to ensure newly added images are still handled (delegation covers this but keep for robustness)
+        if (window.MutationObserver && container) {
+            const mo = new MutationObserver(() => { });
+            mo.observe(container, { childList: true, subtree: true });
+        }
     }
 
     if (document.readyState === 'loading') {
