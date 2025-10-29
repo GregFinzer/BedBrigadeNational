@@ -4,14 +4,17 @@
  const style = document.createElement('style');
  style.id = 'bb-image-zoom-style';
  style.textContent = `
-/* Enable hover magnifier on images inside the enabled container */
-.bb-image-zoom-enabled img { cursor: zoom-in; }
+/* Enable hover magnifier on images inside the enabled container (and fallback to #zoom-body) */
+#zoom-body img,
+#zoom-body a img,
+.bb-image-zoom-enabled img,
+.bb-image-zoom-enabled a img { cursor: zoom-in !important; }
 
 /* Overlay fade/zoom transitions */
 .bb-image-zoom-overlay {
  position: fixed; inset:0; background: rgba(0,0,0,0.92);
  display: flex; align-items: center; justify-content: center;
- z-index:2147483647; cursor: zoom-out; opacity:0;
+ z-index:2147483647; cursor: zoom-out !important; opacity:0;
  transition: opacity 220ms ease;
 }
 .bb-image-zoom-overlay.open { opacity:1; }
@@ -21,7 +24,7 @@
  transform: scale(0.95); transform-origin: center center;
  transition: transform 220ms ease;
  will-change: transform;
- cursor: zoom-out; /* Ensure cursor shows zoom-out when zoomed */
+ cursor: zoom-out !important; /* Ensure cursor shows zoom-out when zoomed */
 }
 .bb-image-zoom-overlay.open img { transform: scale(1); }
 
@@ -62,6 +65,24 @@
 
  let currentOverlay = null;
  let isClosing = false;
+ let justOpened = false;
+ let justOpenedTimer = null;
+ let cursorObserver = null;
+
+ function ensureCursorHint(){
+ const container = document.getElementById('zoom-body');
+ if(container && !container.classList.contains('bb-image-zoom-enabled')){
+ container.classList.add('bb-image-zoom-enabled');
+ }
+ }
+
+ function startCursorObserver(){
+ if(cursorObserver || !window.MutationObserver) return;
+ cursorObserver = new MutationObserver(() => {
+ ensureCursorHint();
+ });
+ cursorObserver.observe(document.documentElement, { childList: true, subtree: true });
+ }
 
  function removeOverlay(){
  if(!currentOverlay || isClosing) return;
@@ -97,20 +118,11 @@
  });
  }
 
- function onContainerClick(e){
- // If overlay already open, close it
- if(currentOverlay){
- removeOverlay();
- return;
- }
-
- const target = e.target;
- if(!target || target.tagName !== 'IMG') return;
-
+ function openFromImage(imgEl){
  // figure out the best source (handle responsive or lazy images)
- const src = target.currentSrc || target.getAttribute('src') || target.dataset.src || '';
- const srcset = target.getAttribute('srcset') || '';
- const alt = target.getAttribute('alt') || '';
+ const src = imgEl.currentSrc || imgEl.getAttribute('src') || (imgEl.dataset ? imgEl.dataset.src : '') || '';
+ const srcset = imgEl.getAttribute('srcset') || '';
+ const alt = imgEl.getAttribute('alt') || '';
 
  ensureStyle();
 
@@ -124,25 +136,68 @@
  requestAnimationFrame(() => {
  currentOverlay.classList.add('open');
  });
+
+ // guard to ignore the synthetic click that follows pointerdown
+ justOpened = true;
+ if(justOpenedTimer) clearTimeout(justOpenedTimer);
+ justOpenedTimer = setTimeout(() => { justOpened = false; justOpenedTimer = null; }, 350);
+ }
+
+ function onWindowClick(e){
+ // Ignore clicks inside overlay
+ if((e.target.closest && e.target.closest('.bb-image-zoom-overlay'))){
+ return;
+ }
+ // Prevent immediate close if we just opened from pointerdown
+ if(justOpened){
+ e.preventDefault();
+ return;
+ }
+ // If overlay already open, close it on any click outside overlay
+ if(currentOverlay){
+ e.preventDefault();
+ removeOverlay();
+ return;
+ }
+ // Find nearest img
+ const imgEl = e.target && (e.target.closest ? e.target.closest('img') : null);
+ if(!imgEl) return;
+ // If inside a link, prevent navigation
+ const link = imgEl.closest && imgEl.closest('a');
+ if(link){ e.preventDefault(); }
+ openFromImage(imgEl);
+ }
+
+ function onPointerDown(e){
+ // Ignore if overlay open; click handler will manage closing
+ if(currentOverlay) return;
+ // Find nearest img early in capture
+ const imgEl = e.target && (e.target.closest ? e.target.closest('img') : null);
+ if(!imgEl) return;
+ // If inside a link, prevent navigation immediately
+ const link = imgEl.closest && imgEl.closest('a');
+ if(link){ e.preventDefault(); }
+ // Open now to avoid other handlers swallowing the click
+ openFromImage(imgEl);
+ // Stop further propagation if we opened overlay to avoid interference
+ e.stopPropagation();
  }
 
  function init(){
- const container = document.getElementById('zoom-body') || document.body;
- // Add class to enable hover cursor only within the container
- container.classList.add('bb-image-zoom-enabled');
- // Use event delegation so dynamically injected images are handled
- container.addEventListener('click', onContainerClick);
-
+ ensureStyle();
+ ensureCursorHint();
+ startCursorObserver();
+ // Set cursor hint on body as best-effort fallback if container absent
+ if(!document.getElementById('zoom-body')){
+ document.body.classList.add('bb-image-zoom-enabled');
+ }
+ // Capture to see events even if inner handlers stopPropagation; attach to window to be earliest
+ window.addEventListener('pointerdown', onPointerDown, true);
+ window.addEventListener('click', onWindowClick, true);
  // Close overlay with Escape
  document.addEventListener('keydown', function(e){
  if(e.key === 'Escape' && currentOverlay) removeOverlay();
  });
-
- // Observe DOM mutations in container to ensure newly added images are still handled (delegation covers this but keep for robustness)
- if(window.MutationObserver && container){
- const mo = new MutationObserver(() => {});
- mo.observe(container, { childList: true, subtree: true });
- }
  }
 
  if(document.readyState === 'loading'){
