@@ -21,9 +21,14 @@
 
             switch(RequestedView){
                 case "quick": // modal window
-                        <h3>
-                           <a class="bb-fore-primary" href="@SignUpUrl">@_translateLogic.GetTranslation(EventData.Subject)&nbsp;@_lc.Keys["ClickToSignup"]</a>
-                        </h3>
+                                      <a class="bb-fore-primary" href="@SignUpUrl">
+                                      <span style="font-size: 1.25em; font-weight: bold;">
+                                          @_translateLogic.GetTranslation(EventData.Subject)
+                                      </span>
+                                      <span style="font-size: 0.875em; font-weight: bold;">
+                                           @_lc.Keys["ClickToSignup"]
+                                       </span>
+                                      </a>                       
                         break;
                 case "agenda":
                  <h4 class="bb-fore-primary text-black">
