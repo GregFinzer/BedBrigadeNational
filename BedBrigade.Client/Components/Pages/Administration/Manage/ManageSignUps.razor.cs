@@ -1,4 +1,4 @@
-using BedBrigade.Data.Services;
+﻿using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.DropDowns;
@@ -10,9 +10,9 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using Serilog;
 
-namespace BedBrigade.Client.Components;
+namespace BedBrigade.Client.Components.Pages.Administration.Manage;
 
-public partial class SignUpGrid : ComponentBase
+public partial class ManageSignUps : ComponentBase
 {
     // data services
 
@@ -36,7 +36,7 @@ public partial class SignUpGrid : ComponentBase
     protected List<Volunteer>? lstVolunteerSelector { get; set; }
     protected List<Volunteer>? lstLocationVolunteers { get; set; } = new List<Volunteer>();
     protected List<Location>? Locations { get; set; }
-    protected List<Schedule>? Schedules { get; set; }
+    protected List<Common.Models.Schedule>? Schedules { get; set; }
     protected List<SignUp>? SignUps { get; set; }
 
     protected List<Syncfusion.Blazor.Navigations.ItemModel> Toolbaritems =
@@ -68,7 +68,7 @@ public partial class SignUpGrid : ComponentBase
     private const string CaptionAdd = "Add";
     private const string CaptionDelete = "Delete";
     private const string RegisterColumn = "SignUpId";
-    private const string Reset  = "Reset";
+    private const string Reset = "Reset";
     // Action & Dialog variables
 
     public bool ShowEditDialog { get; set; } = false;
@@ -86,14 +86,14 @@ public partial class SignUpGrid : ComponentBase
 
     public Volunteer? selectedGridObject { get; set; }
     public Volunteer? newVolunteer { get; set; }
-    
+
     public bool displayId = false;
     public string displayVolunteerData = DisplayNone;
 
     // test variables
 
     public string strHtml = string.Empty;
-    
+
     public string ManageSignUpsMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -189,21 +189,26 @@ public partial class SignUpGrid : ComponentBase
 
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         {
-            Text = CaptionAdd, Id = "add", TooltipText = "Add Volunteer to selected Event", PrefixIcon = "e-add"
+            Text = CaptionAdd,
+            Id = "add",
+            TooltipText = "Add Volunteer to selected Event",
+            PrefixIcon = "e-add"
         });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         {
-            Text = CaptionDelete, Id = "delete", TooltipText = "Delete Volunteer from selected Event",
+            Text = CaptionDelete,
+            Id = "delete",
+            TooltipText = "Delete Volunteer from selected Event",
             PrefixIcon = "e-delete"
         });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
-            { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
+        { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
-            { Text = "Excel Export", Id = "excel", TooltipText = "Export Grid Data to Excel" });
+        { Text = "Excel Export", Id = "excel", TooltipText = "Export Grid Data to Excel" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
-            { Text = "CSV Export", Id = "csv", TooltipText = "Export Grid Data to CSV" });
+        { Text = "CSV Export", Id = "csv", TooltipText = "Export Grid Data to CSV" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
-            { Text = Reset, Id = Reset, TooltipText = Reset });
+        { Text = Reset, Id = Reset, TooltipText = Reset });
 
     } // Load User Data
 
@@ -232,7 +237,7 @@ public partial class SignUpGrid : ComponentBase
             _toastService.Error("Error", dataLocations.Message);
             ErrorMessage = "Unable to load Locations. " + dataLocations.Message;
         }
-    } 
+    }
 
     private async Task LoadVolunteerData()
     {
@@ -613,5 +618,6 @@ public partial class SignUpGrid : ComponentBase
         new GridFilterOption() { ID = "all", Text = "All Events" },
     };
 
-} 
+
+}
 
