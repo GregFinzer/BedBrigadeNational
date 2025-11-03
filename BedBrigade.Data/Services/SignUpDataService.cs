@@ -196,26 +196,27 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                                 on su.VolunteerId equals vol.VolunteerId into volGroup
                             from vol in volGroup.DefaultIfEmpty() // Left join
                             where sch.LocationId == locationId
+                            && sch.EventDateScheduled.Date >= DateTime.UtcNow.Date
                             select new SignUpDisplayItem
                             {
                                 ScheduleId = sch.ScheduleId,
-                                SignUpId = su.SignUpId,
+                                SignUpId = su == null ? 0 : su.SignUpId,
                                 ScheduleLocationId = sch.LocationId,
                                 ScheduleLocationName = loc.Name,
                                 ScheduleEventName = sch.EventName,
                                 ScheduleEventDate = sch.EventDateScheduled,
                                 ScheduleEventType = sch.EventType,
-                                SignUpNumberOfVolunteers = su.NumberOfVolunteers,
-                                VolunteerId = vol.VolunteerId,
-                                VolunteerFirstName = vol.FirstName,
-                                VolunteerLastName = vol.LastName,
-                                VolunteerEmail = vol.Email,
-                                VolunteerPhone = vol.Phone,
-                                VolunteerOrganization = vol.Organization,
-                                VehicleType = su.VehicleType,
-                                SignUpNote = su.SignUpNote,
-                                CreateDate = su.CreateDate,
-                                IHaveVolunteeredBefore = vol.IHaveVolunteeredBefore
+                                SignUpNumberOfVolunteers = su == null ? 0 : su.NumberOfVolunteers,
+                                VolunteerId = vol == null ? 0 : vol.VolunteerId,
+                                VolunteerFirstName = vol == null ? string.Empty : vol.FirstName,
+                                VolunteerLastName = vol == null ? string.Empty : vol.LastName,
+                                VolunteerEmail = vol == null ? string.Empty : vol.Email,
+                                VolunteerPhone = vol == null ? string.Empty : vol.Phone,
+                                VolunteerOrganization = vol == null ? string.Empty : vol.Organization,
+                                VehicleType = su == null ? null : su.VehicleType,
+                                SignUpNote = su == null ?  null : su.SignUpNote,
+                                CreateDate = su == null ? DateTime.Now : su.CreateDate,
+                                IHaveVolunteeredBefore = vol != null && vol.IHaveVolunteeredBefore
                             };
 
                 switch (filter)
@@ -254,7 +255,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                 var volunteersNotSignedUp = await ctx.Volunteers
                     .Where(v => v.LocationId == locationId && !signedUpVolunteerIds.Contains(v.VolunteerId))
                     .ToListAsync();
-                return new ServiceResponse<List<Volunteer>>($"Found {volunteersNotSignedUp.Count} volunteers not signed up for schedule {scheduleId}", true, null);
+                return new ServiceResponse<List<Volunteer>>($"Found {volunteersNotSignedUp.Count} volunteers not signed up for schedule {scheduleId}", true, volunteersNotSignedUp);
             }
         }
         catch (DbException ex)

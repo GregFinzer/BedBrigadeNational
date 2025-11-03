@@ -156,8 +156,6 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task LoadConfiguration()
     {
-        displayId = await _svcConfiguration.GetConfigValueAsBoolAsync(ConfigSection.System,
-            ConfigNames.DisplayIdFields);
         RecordText = await _svcConfiguration.GetConfigValueAsync(ConfigSection.System, ConfigNames.EmptyGridText);
     }
 
@@ -237,6 +235,21 @@ public partial class ManageSignUps : ComponentBase
     private async Task LoadSignUpData(string filter)
     {
         var response = await _svcSignUp.GetSignUpsForSignUpGrid(_svcAuth.LocationId, filter);
+
+        if (response.Success && response.Data != null)
+        {
+            SignUpDisplayItems = response.Data;
+            RecordText = $"{SignUpDisplayItems.Count} Sign-Up Records Loaded";
+            GridDisplay = String.Empty;
+        }
+        else
+        {
+            Log.Error($"SignUpGrid, Error loading SignUp data: {response.Message}");
+            _toastService.Error("Error", response.Message);
+            ErrorMessage = "Unable to load Sign-Up Data. " + response.Message;
+            SignUpDisplayItems = new List<SignUpDisplayItem>();
+            GridDisplay = DisplayNone;
+        }
     } 
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
@@ -412,8 +425,10 @@ public partial class ManageSignUps : ComponentBase
             var addResult = await _svcSignUp.CreateAsync(newSignUp);
             if (addResult.Success)
             {
-                CloseButtonCaption = CaptionClose;
                 await RefreshGrid();
+                ShowEditDialog = false;
+                _toastService.Success("Volunteer Added", "Volunteer added to event");
+                return;
             }
             else
             {
@@ -473,36 +488,26 @@ public partial class ManageSignUps : ComponentBase
         Grid.Refresh();
     } 
 
-    public void OnVolunteerSelect(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, SignUpDisplayItem> args)
+    public void OnVolunteerSelect(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Volunteer> args)
     {
         DialogMessage = (MarkupString)"&nbps";
         DisplayAddButton = DisplayNone;
         displayVolunteerData = DisplayNone;
         newSignUp = new SignUpDisplayItem(); // empty data panel
-        try
-        {
+
             if (args.ItemData != null)
             {
                 displayVolunteerData = "";
-                newSignUp = (SignUpDisplayItem)args.ItemData;
-                if (newSignUp != null)
-                {
-                    newSignUp.VolunteerId = args.ItemData.VolunteerId;
-                    if (newSignUp.VolunteerId > 0)
-                    {
-                        DisplayAddButton = ""; //  OK button
-                        var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
-                        DialogMessage = BootstrapHelper.GetBootstrapMessage("help", strMessageText, "", false);
-                    }
-                }
+                newSignUp.VolunteerId = args.ItemData.VolunteerId;
+                newSignUp.VolunteerEmail = args.ItemData.Email;
+                newSignUp.VolunteerPhone = args.ItemData.Phone;
+                newSignUp.VolunteerFirstName = args.ItemData.FirstName;
+                newSignUp.VolunteerLastName = args.ItemData.LastName;
+            DisplayAddButton = ""; //  OK button
+                var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
+                DialogMessage = BootstrapHelper.GetBootstrapMessage("help", strMessageText, "", false);
             }
-        }
-        catch (Exception ex)
-        {
-            //TODO:  Not sure why the exception is eaten
-            // ErrorMessage = ex.ToString();
-        }
-    } // Volunteer Selected
+    } 
 
     public void GetSelectedRecords(RowSelectEventArgs<SignUpDisplayItem> args)
     {

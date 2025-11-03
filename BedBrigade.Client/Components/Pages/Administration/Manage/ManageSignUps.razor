@@ -44,7 +44,7 @@
                     ClipMode="ClipMode.EllipsisWithTooltip">
 
                 <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25, 50, 100 })" PageSize="15" />
-                <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick="ToolbarClickHandler" TValue="Volunteer" RowSelected="GetSelectedRecords"></GridEvents>
+                <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick="ToolbarClickHandler" TValue="SignUpDisplayItem" RowSelected="GetSelectedRecords"></GridEvents>
                 <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
 
                 <GridTemplates>
@@ -78,7 +78,7 @@
                     <GridColumn Field=@nameof(SignUpDisplayItem.VehicleTypeString) Width="200px" HeaderText="Vehicle Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="false" AllowFiltering="false" AutoFit="false" />
                     <GridColumn Field=@nameof(SignUpDisplayItem.SignUpNumberOfVolunteers) Width="100px" HeaderText="# Volunteers" AllowFiltering="false" AutoFit="false" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })"></GridColumn>
                     <GridColumn Field=@nameof(SignUpDisplayItem.SignUpNote) HeaderText="Notes" Width="400px" Type="ColumnType.String" HeaderTextAlign="TextAlign.Left" AllowEditing="false" AllowFiltering="false" />
-                    <GridColumn Field=@nameof(SignUpDisplayItem.SignupCreateDateLocal) Width="150px" HeaderText="Registration Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="false" />
+                    <GridColumn Field=@nameof(SignUpDisplayItem.CreateDateLocal) Width="150px" HeaderText="Registration Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" AutoFit="false" />
                     <GridColumn Field=@nameof(SignUpDisplayItem.IHaveVolunteeredBefore) Width="200px" Type="ColumnType.Boolean" HeaderText="Previous Volunteer" AllowEditing="false" AllowFiltering="true" EditType="EditType.BooleanEdit" DisplayAsCheckBox="true" AutoFit="false" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-column" } })" />
                 </GridColumns>
             </SfGrid>
@@ -154,23 +154,23 @@
                                     <table class="table table-striped table-sm" style="display: @displayVolunteerData">
                                         <tr>
                                             <td style="vertical-align: top">Name:</td>
-                                            <th style="vertical-align: top">@newSignUp.FullName</th>
+                                            <th style="vertical-align: top">@newSignUp.VolunteerFullName</th>
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top">Phone:</td>
-                                            <th style="vertical-align: top; white-space: nowrap">@newSignUp.Phone.FormatPhoneNumber()</th>
+                                            <th style="vertical-align: top; white-space: nowrap">@newSignUp.VolunteerFormattedPhone</th>
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top">Email:</td>
-                                            <th style="vertical-align: top">@newSignUp.Email</th>
+                                            <th style="vertical-align: top">@newSignUp.VolunteerEmail</th>
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top; white-space: nowrap">Vehicle Type</td>
-                                            <th style="vertical-align: top">@EnumHelper.GetEnumDescription(newSignUp.VehicleType)</th>
+                                            <th style="vertical-align: top">@(newSignUp.VehicleType.HasValue ? @EnumHelper.GetEnumDescription(newSignUp.VehicleType.Value) : string.Empty)</th>
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top; white-space: nowrap">Number of Volunteers</td>
-                                            <th style="vertical-align: top"><SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newSignUp.NumberOfVolunteers"></SfNumericTextBox></th>
+                                            <th style="vertical-align: top"><SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newSignUp.SignUpNumberOfVolunteers"></SfNumericTextBox></th>
                                         </tr>
                                     </table>
 
