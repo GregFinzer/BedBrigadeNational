@@ -14,14 +14,15 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     private readonly IScheduleDataService _scheduleDataService;
     private readonly IVolunteerDataService _volunteerDataService;
     private readonly ISmsQueueDataService _smsQueueDataService;
-
+    private readonly ITimezoneDataService _timezoneDataService;
     public SignUpDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService, 
         ICommonService commonService,
         IScheduleDataService scheduleDataService,
         IVolunteerDataService volunteerDataService,
-        ISmsQueueDataService smsQueueDataService) : base(contextFactory, cachingService, authService)
+        ISmsQueueDataService smsQueueDataService,
+        ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -29,6 +30,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         _scheduleDataService = scheduleDataService;
         _volunteerDataService = volunteerDataService;
         _smsQueueDataService = smsQueueDataService;
+        _timezoneDataService = timezoneDataService;
     }
 
     public override async Task<ServiceResponse<SignUp>> CreateAsync(SignUp entity)
@@ -168,6 +170,96 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         catch (DbException ex)
         {
             return new ServiceResponse<List<SignUp>>($"Error GetSignUpsForDashboard for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<List<SignUpDisplayItem>>> GetSignUpsForSignUpGrid(int locationId, string filter)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), locationId, $"GetSignUpsForSignUpGrid({locationId}, {filter})");
+        List<SignUpDisplayItem>? cachedContent = _cachingService.Get<List<SignUpDisplayItem>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SignUpDisplayItem>>($"Found {cachedContent.Count} GetSignUpsForSignUpGrid in cache", true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var query = from sch in ctx.Schedules
+                            join loc in ctx.Locations
+                                on sch.LocationId equals loc.LocationId
+                            join su in ctx.SignUps
+                                on sch.ScheduleId equals su.ScheduleId into suGroup
+                            from su in suGroup.DefaultIfEmpty() // Left join
+                            join vol in ctx.Volunteers
+                                on su.VolunteerId equals vol.VolunteerId into volGroup
+                            from vol in volGroup.DefaultIfEmpty() // Left join
+                            where sch.LocationId == locationId
+                            select new SignUpDisplayItem
+                            {
+                                ScheduleId = sch.ScheduleId,
+                                SignUpId = su.SignUpId,
+                                ScheduleLocationId = sch.LocationId,
+                                ScheduleLocationName = loc.Name,
+                                ScheduleEventName = sch.EventName,
+                                ScheduleEventDate = sch.EventDateScheduled,
+                                ScheduleEventType = sch.EventType,
+                                SignUpNumberOfVolunteers = su.NumberOfVolunteers,
+                                VolunteerId = vol.VolunteerId,
+                                VolunteerFirstName = vol.FirstName,
+                                VolunteerLastName = vol.LastName,
+                                VolunteerEmail = vol.Email,
+                                VolunteerPhone = vol.Phone,
+                                VolunteerOrganization = vol.Organization,
+                                VehicleType = su.VehicleType,
+                                SignUpNote = su.SignUpNote,
+                                CreateDate = su.CreateDate,
+                                IHaveVolunteeredBefore = vol.IHaveVolunteeredBefore
+                            };
+
+                switch (filter)
+                {
+                    case "reg":
+                        query = query.Where(item => item.SignUpId != 0);
+                        break;
+                    case "notreg":
+                        query = query.Where(item => item.SignUpId == 0);
+                        break;
+                }
+
+
+                var result = await query.OrderBy(item => item.ScheduleEventDate).ToListAsync();
+                _timezoneDataService.FillLocalDates(result);
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SignUpDisplayItem>>($"Found {result.Count} SignUps for SignUpGrid", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SignUpDisplayItem>>($"Error GetSignUpsForSignUpGrid for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Volunteer>>> GetVolunteersNotSignedUpForAnEvent(int locationId, int scheduleId)
+    {
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var signedUpVolunteerIds = await ctx.SignUps
+                    .Where(su => su.ScheduleId == scheduleId)
+                    .Select(su => su.VolunteerId)
+                    .ToListAsync();
+                var volunteersNotSignedUp = await ctx.Volunteers
+                    .Where(v => v.LocationId == locationId && !signedUpVolunteerIds.Contains(v.VolunteerId))
+                    .ToListAsync();
+                return new ServiceResponse<List<Volunteer>>($"Found {volunteersNotSignedUp.Count} volunteers not signed up for schedule {scheduleId}", true, null);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<Volunteer>>($"Error retrieving volunteers not signed up for schedule {scheduleId}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
     }
 }

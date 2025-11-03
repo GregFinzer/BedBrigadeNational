@@ -24,20 +24,18 @@ public partial class ManageSignUps : ComponentBase
     [Inject] private IScheduleDataService? _svcSchedule { get; set; }
     [Inject] private ISignUpDataService? _svcSignUp { get; set; }
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
-    [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ToastService _toastService { get; set; }
     [Inject] private ITimezoneDataService _svcTimezone { get; set; }
 
 
     // object lists
 
-    protected List<Volunteer>? Volunteers { get; set; }
-    protected List<Volunteer>? EventVolunteers { get; set; }
+    //protected List<Volunteer>? Volunteers { get; set; }
+    protected List<SignUpDisplayItem>? SignUpDisplayItems { get; set; }
     protected List<Volunteer>? lstVolunteerSelector { get; set; }
     protected List<Volunteer>? lstLocationVolunteers { get; set; } = new List<Volunteer>();
     protected List<Location>? Locations { get; set; }
-    protected List<Common.Models.Schedule>? Schedules { get; set; }
-    protected List<SignUp>? SignUps { get; set; }
+    //protected List<Common.Models.Schedule>? Schedules { get; set; }
 
     protected List<Syncfusion.Blazor.Navigations.ItemModel> Toolbaritems =
         new List<Syncfusion.Blazor.Navigations.ItemModel>();
@@ -58,7 +56,7 @@ public partial class ManageSignUps : ComponentBase
 
     // Grid references
 
-    protected SfGrid<Volunteer>? Grid { get; set; }
+    protected SfGrid<SignUpDisplayItem>? Grid { get; set; }
 
 
     // Constants
@@ -84,10 +82,9 @@ public partial class ManageSignUps : ComponentBase
     private string DialogTitle = string.Empty;
     private string CloseButtonCaption = CaptionClose;
 
-    public Volunteer? selectedGridObject { get; set; }
-    public Volunteer? newVolunteer { get; set; }
+    public SignUpDisplayItem? selectedGridObject { get; set; }
+    public SignUpDisplayItem? newSignUp { get; set; }
 
-    public bool displayId = false;
     public string displayVolunteerData = DisplayNone;
 
     // test variables
@@ -100,7 +97,6 @@ public partial class ManageSignUps : ComponentBase
     {
         try
         {
-            _lc.InitLocalizedComponent(this);
             await LoadGridData();
         }
         catch (Exception ex)
@@ -153,12 +149,9 @@ public partial class ManageSignUps : ComponentBase
         await LoadConfiguration();
         await LoadUserData();
         await LoadLocations();
-        await LoadVolunteerData();
-        Schedules = await SignUpHelper.GetSchedules(_svcSchedule, IsLocationAdmin, userLocationId);
-        SignUps = await SignUpHelper.GetSignUps(_svcSignUp, IsLocationAdmin, userLocationId);
         lstVehicleTypes = EnumHelper.GetVehicleTypeItems();
         DisableToolBar();
-        PrepareGridData();
+        await LoadSignUpData(CurrentFilter);
     }
 
     private async Task LoadConfiguration()
@@ -239,32 +232,12 @@ public partial class ManageSignUps : ComponentBase
         }
     }
 
-    private async Task LoadVolunteerData()
-    {
-        try // get Volunteer List ===========================================================================================
-        {
-            Volunteers = await SignUpHelper.GetVolunteers(_svcVolunteer, userLocationId);
-            if (Volunteers.Count > 0)
-            {
-                lstVolunteerSelector = Volunteers;
-            }
-            else
-            {
-                ErrorMessage = "No Volunteers Data Found";
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error loading Volunteers data");
-            ErrorMessage = "Volunteer Data: No DB Files. " + ex.Message;
-        }
-    } // Load Volunteer Data            
+         
 
-    private void PrepareGridData()
+    private async Task LoadSignUpData(string filter)
     {
-        EventVolunteers = SignUpHelper.CombineAllData(_svcTimezone, SignUps, Schedules, Volunteers, Locations);
-        EventVolunteers = EventVolunteers.OrderBy(o => o.ScheduleEventDate).ToList();
-    } // Create Grid Data Source
+        var response = await _svcSignUp.GetSignUpsForSignUpGrid(_svcAuth.LocationId, filter);
+    } 
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {
@@ -330,7 +303,7 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task ToolbarActions(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {
-        newVolunteer = new Volunteer();
+        newSignUp = new SignUpDisplayItem();
         DisplayAddButton = DisplayNone;
         DisplayDeleteButton = DisplayNone;
         DisplayDataPanel = DisplayNone;
@@ -346,11 +319,11 @@ public partial class ManageSignUps : ComponentBase
         switch (args.Item.Text.ToString())
         {
             case CaptionAdd:
-                PrepareVolunteerAddDialog();
+                await PrepareVolunteerAddDialog();
                 break;
 
             case CaptionDelete:
-                newVolunteer = SignUpHelper.PrepareVolunteerDeleteDialog(selectedGridObject, ref strMessageText,
+                newSignUp = SignUpHelper.PrepareVolunteerDeleteDialog(selectedGridObject, ref strMessageText,
                     ref DialogTitle, ref DisplayDeleteButton, ref CloseButtonCaption);
                 break;
         }
@@ -390,15 +363,18 @@ public partial class ManageSignUps : ComponentBase
 
     } // No selected grid row
 
-    private void PrepareVolunteerAddDialog()
+    private async Task PrepareVolunteerAddDialog()
     {
         DialogTitle = "Select Volunteer & Add to Event";
         // create a list to select Volunteer: Volunteers of current Location and not linked to selected event
         // Location Volunteers
 
-        lstLocationVolunteers =
-            SignUpHelper.GetLocationVolunteersSelector(selectedGridObject, lstVolunteerSelector, SignUps);
+        var response = await _svcSignUp.GetVolunteersNotSignedUpForAnEvent(_svcAuth.LocationId, selectedGridObject.ScheduleId);
 
+        if (response.Success && response.Data != null)
+        {
+            lstLocationVolunteers = response.Data;
+        }
 
         if (lstLocationVolunteers.Count > 0)
         {
@@ -425,19 +401,19 @@ public partial class ManageSignUps : ComponentBase
         AvailabilityMessage = (MarkupString)"&nbsp;";
         var strMessageText = string.Empty;
         var actionStatus = "error";
-        if (selectedGridObject != null && newVolunteer.VolunteerId > 0)
+        if (selectedGridObject != null && newSignUp.VolunteerId > 0)
         {
             var newSignUp = new SignUp();
-            newSignUp.VolunteerId = newVolunteer.VolunteerId;
+            newSignUp.VolunteerId = this.newSignUp.VolunteerId;
             newSignUp.ScheduleId = selectedGridObject.ScheduleId;
             newSignUp.LocationId = selectedGridObject.ScheduleLocationId;
-            newSignUp.NumberOfVolunteers = newVolunteer.NumberOfVolunteers;
-            newSignUp.VehicleType = newVolunteer.VehicleType;
+            newSignUp.NumberOfVolunteers = this.newSignUp.SignUpNumberOfVolunteers;
+            newSignUp.VehicleType = this.newSignUp.VehicleType ?? VehicleType.None;
             var addResult = await _svcSignUp.CreateAsync(newSignUp);
             if (addResult.Success)
             {
                 CloseButtonCaption = CaptionClose;
-                await RefreshGrid(CaptionAdd);
+                await RefreshGrid();
             }
             else
             {
@@ -471,7 +447,7 @@ public partial class ManageSignUps : ComponentBase
                 if (existingRecord.Success && deleteResult.Success)
                 {
                     CloseButtonCaption = CaptionClose;
-                    await RefreshGrid(CaptionDelete);
+                    await RefreshGrid();
                 }
                 else
                 {
@@ -490,31 +466,29 @@ public partial class ManageSignUps : ComponentBase
         DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
     } // del confirmation
 
-    public async Task RefreshGrid(string strAction)
+    public async Task RefreshGrid()
     {
-        // update Sign-Ups first        
-        SignUps = await SignUpHelper.GetSignUps(_svcSignUp, IsLocationAdmin, userLocationId);
-        PrepareGridData();
+        await LoadSignUpData(CurrentFilter);
         Grid.CallStateHasChanged();
         Grid.Refresh();
-    } // Refresh Gruid
+    } 
 
-    public void OnVolunteerSelect(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Volunteer> args)
+    public void OnVolunteerSelect(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, SignUpDisplayItem> args)
     {
         DialogMessage = (MarkupString)"&nbps";
         DisplayAddButton = DisplayNone;
         displayVolunteerData = DisplayNone;
-        newVolunteer = new Volunteer(); // empty data panel
+        newSignUp = new SignUpDisplayItem(); // empty data panel
         try
         {
             if (args.ItemData != null)
             {
                 displayVolunteerData = "";
-                newVolunteer = (Volunteer)args.ItemData;
-                if (newVolunteer != null)
+                newSignUp = (SignUpDisplayItem)args.ItemData;
+                if (newSignUp != null)
                 {
-                    newVolunteer.VolunteerId = args.ItemData.VolunteerId;
-                    if (newVolunteer.VolunteerId > 0)
+                    newSignUp.VolunteerId = args.ItemData.VolunteerId;
+                    if (newSignUp.VolunteerId > 0)
                     {
                         DisplayAddButton = ""; //  OK button
                         var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
@@ -530,38 +504,33 @@ public partial class ManageSignUps : ComponentBase
         }
     } // Volunteer Selected
 
-    public async Task GetSelectedRecords(RowSelectEventArgs<Volunteer> args)
+    public void GetSelectedRecords(RowSelectEventArgs<SignUpDisplayItem> args)
     {
         DisableToolBar();
         selectedGridObject = args.Data;
         // Enable Add - in all situations
-        var AddItem = Toolbaritems.FirstOrDefault(tb => tb.Text == CaptionAdd);
-        AddItem.Disabled = false;
+        var addItem = Toolbaritems.FirstOrDefault(tb => tb.Text == CaptionAdd);
+
+        if (addItem != null)
+        {
+            addItem.Disabled = false;
+        }
+
         //Enable Delete - if row contains Volunteer Data
         if (selectedGridObject.SignUpId > 0)
         {
-            var DelItem = Toolbaritems.FirstOrDefault(tb => tb.Text == "Delete");
-            DelItem.Disabled = false;
+            var delItem = Toolbaritems.FirstOrDefault(tb => tb.Text == "Delete");
+
+            if (delItem != null)
+            {
+                delItem.Disabled = false;
+            }
         }
-    } // get selected record
+    } 
 
     private async Task OnFilterChange(ChangeEventArgs<string, GridFilterOption> args)
     {
-        // External Grid Filtering by Event Date
-        //Debug.WriteLine("The Grid Filter DropDownList Value", args.Value);
-        switch (args.Value)
-        {
-            case "reg":
-                await Grid.FilterByColumnAsync(RegisterColumn, "greaterthan", 0);
-                break;
-            case "notreg":
-                await Grid.FilterByColumnAsync(RegisterColumn, "equal", 0);
-                break;
-            default: // all
-                await Grid.ClearFilteringAsync(RegisterColumn);
-                break;
-        }
-
+        await LoadSignUpData(args.Value);
         DisableToolBar();
     } // Filter Changed
 
@@ -609,9 +578,9 @@ public partial class ManageSignUps : ComponentBase
         public string Text { get; set; }
     }
 
-    public string DefaultFilter = "all";
+    public string CurrentFilter = "all";
 
-    List<GridFilterOption> GridDefaultFilter = new List<GridFilterOption>
+    List<GridFilterOption> GridFilterOptions = new List<GridFilterOption>
     {
         new GridFilterOption() { ID = "reg", Text = "Events with Registered Volunteers" },
         new GridFilterOption() { ID = "notreg", Text = "Events without Registered Volunteers" },

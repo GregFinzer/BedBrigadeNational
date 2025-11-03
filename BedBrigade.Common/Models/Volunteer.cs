@@ -93,31 +93,6 @@ namespace BedBrigade.Common.Models
             }
         }
 
-        // additional Schedule/Event fields for SignUpGrid
-        [NotMapped]
-        public Int32 SignUpId { get; set; } = 0;
-        [NotMapped]
-		public Int32 ScheduleId { get; set; } = 0;
-		[NotMapped]
-		public Int32 ScheduleLocationId { get; set; } = 0;
-        [NotMapped]
-        public String? ScheduleLocationName { get; set; } = string.Empty;
-        [NotMapped]
-        public String? ScheduleEventName { get; set; } = string.Empty;
-		[NotMapped]
-		public DateTime? ScheduleEventDate { get; set;}
-		[NotMapped]
-        public EventType ScheduleEventType { get; set; } = EventType.Delivery;
 
-        [NotMapped]
-        public string SignUpGridId
-        {
-            get
-            {
-                return Guid.NewGuid().ToString();
-            }
-        }
-
-        [NotMapped] public int NumberOfVolunteers { get; set; }
     }
 }
