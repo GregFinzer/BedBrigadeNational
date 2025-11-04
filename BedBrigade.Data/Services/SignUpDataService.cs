@@ -196,7 +196,6 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                                 on su.VolunteerId equals vol.VolunteerId into volGroup
                             from vol in volGroup.DefaultIfEmpty() // Left join
                             where sch.LocationId == locationId
-                            && sch.EventDateScheduled.Date >= DateTime.UtcNow.Date
                             select new SignUpDisplayItem
                             {
                                 ScheduleId = sch.ScheduleId,
@@ -222,11 +221,19 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                 switch (filter)
                 {
                     case "reg":
-                        query = query.Where(item => item.SignUpId != 0);
+                        query = query.Where(item => item.SignUpId != 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
                         break;
                     case "notreg":
-                        query = query.Where(item => item.SignUpId == 0);
+                        query = query.Where(item => item.SignUpId == 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
                         break;
+                    case "allfuture":
+                        query = query.Where(item => item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
+                        break;
+                    case "allpast":
+                        query = query.Where(item => item.ScheduleEventDate.Date < DateTime.UtcNow.Date);
+                        break;
+                    default:
+                        throw new ArgumentException($"Invalid filter for GetSignUpsForSignUpGrid: {filter}");
                 }
 
 

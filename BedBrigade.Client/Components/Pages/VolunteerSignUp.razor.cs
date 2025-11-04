@@ -652,7 +652,7 @@ namespace BedBrigade.Client.Components.Pages
                 DisplayForm = DisplayNone;
                 ResultDisplay = "";
                 FinalMessage = BootstrapHelper.GetBootstrapJumbotron("Unregisterd",
-                    "You have sucessfully unregistered for the event", string.Empty);
+                    "You have successfully unregistered for the event", string.Empty);
             }
             catch (Exception ex)
             {

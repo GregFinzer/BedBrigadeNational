@@ -25,7 +25,7 @@ namespace BedBrigade.Common.Models
         public int ScheduleLocationId { get; set; } = 0;
         public string ScheduleLocationName { get; set; } = string.Empty;
         public String? ScheduleEventName { get; set; } = string.Empty;
-        public DateTime? ScheduleEventDate { get; set; }
+        public DateTime ScheduleEventDate { get; set; }
         public EventType? ScheduleEventType { get; set; } 
         public int SignUpNumberOfVolunteers { get; set; } = 0;
         public string? VolunteerFirstName { get; set; }

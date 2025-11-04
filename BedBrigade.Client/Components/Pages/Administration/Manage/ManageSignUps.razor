@@ -9,7 +9,7 @@
         <h3>@ManageSignUpsMessage</h3>
     </div>
     <div class="col-md-4 ps-3 ps-md-0">
-        <label for="VolunteerSelector" style="display: inline-block;">Future Scheduled</label>
+        <label for="VolunteerSelector" style="display: inline-block;">Scheduled</label>
         <SfDropDownList id="VolunteerSelector" CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="Select a grid filter" DataSource="@GridFilterOptions" @bind-Value="@CurrentFilter" Width="300px">
             <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange"></DropDownListEvents>
             <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>

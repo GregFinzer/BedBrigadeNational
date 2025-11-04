@@ -1,14 +1,15 @@
-﻿using BedBrigade.Data.Services;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.DropDowns;
-using Syncfusion.Blazor.Navigations;
-using BedBrigade.Common.Logic;
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Navigations;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage;
 
@@ -26,11 +27,9 @@ public partial class ManageSignUps : ComponentBase
     [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
     [Inject] private ToastService _toastService { get; set; }
     [Inject] private ITimezoneDataService _svcTimezone { get; set; }
+    [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
+    [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
 
-
-    // object lists
-
-    //protected List<Volunteer>? Volunteers { get; set; }
     protected List<SignUpDisplayItem>? SignUpDisplayItems { get; set; }
     protected List<Volunteer>? lstVolunteerSelector { get; set; }
     protected List<Volunteer>? lstLocationVolunteers { get; set; } = new List<Volunteer>();
@@ -105,7 +104,7 @@ public partial class ManageSignUps : ComponentBase
             _toastService.Error("Error", "An error occurred while loading the Sign Up Grid data.");
         }
 
-    } // Async Init
+    } 
 
 
     /// <summary>
@@ -201,7 +200,7 @@ public partial class ManageSignUps : ComponentBase
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         { Text = Reset, Id = Reset, TooltipText = Reset });
 
-    } // Load User Data
+    } 
 
 
     private bool IsLocationAdmin
@@ -229,8 +228,6 @@ public partial class ManageSignUps : ComponentBase
             ErrorMessage = "Unable to load Locations. " + dataLocations.Message;
         }
     }
-
-         
 
     private async Task LoadSignUpData(string filter)
     {
@@ -312,7 +309,7 @@ public partial class ManageSignUps : ComponentBase
 
         this.ShowEditDialog = true;
 
-    } // ToolbarClick
+    } 
 
     private async Task ToolbarActions(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {
@@ -348,7 +345,7 @@ public partial class ManageSignUps : ComponentBase
 
         this.ShowEditDialog = true;
 
-    } // Tool Bar Clicks
+    } 
 
     private void NoSelectedGridRow(string strAction, ref string strMessageText)
     {
@@ -374,7 +371,7 @@ public partial class ManageSignUps : ComponentBase
 
         CloseButtonCaption = CaptionClose;
 
-    } // No selected grid row
+    } 
 
     private async Task PrepareVolunteerAddDialog()
     {
@@ -402,18 +399,16 @@ public partial class ManageSignUps : ComponentBase
             DisplayDataPanel = DisplayNone;
             DialogMessage = BootstrapHelper.GetBootstrapMessage(CaptionWarning,
                 "No available Volunteers for this Location & Event", "", false);
-            //this.ShowEditDialog = true;
-            //return;
         }
-    } // add dialog    
+    }  
 
 
     private async Task onConfirmAdd()
     {
         // Action Finished
         AvailabilityMessage = (MarkupString)"&nbsp;";
-        var strMessageText = string.Empty;
-        var actionStatus = "error";
+        var strMessageText = "Error";
+        var actionStatus = "Unable to Add Volunteer.";
         if (selectedGridObject != null && newSignUp.VolunteerId > 0)
         {
             var newSignUp = new SignUp();
@@ -423,35 +418,43 @@ public partial class ManageSignUps : ComponentBase
             newSignUp.NumberOfVolunteers = this.newSignUp.SignUpNumberOfVolunteers;
             newSignUp.VehicleType = this.newSignUp.VehicleType ?? VehicleType.None;
             var addResult = await _svcSignUp.CreateAsync(newSignUp);
-            if (addResult.Success)
+            if (addResult.Success && addResult.Data != null)
             {
+                string customMessage = "This is to confirm that your sign-up was created.";
+                var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(addResult.Data, customMessage);
+
+                if (!emailResponse.Success)
+                {
+                    _toastService.Error("Could not queue email", emailResponse.Message);
+                    Log.Logger.Error($"Error SendSignUpConfirmationEmail: {emailResponse.Message}");
+                    return;
+                }
+
+                var smsResponse = await _sendSmsLogic.CreateSignUpReminder(addResult.Data);
+
+                if (!smsResponse.Success)
+                {
+                    _toastService.Error("SMS Error", smsResponse.Message);
+                    Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                    return;
+                }
+
                 await RefreshGrid();
-                ShowEditDialog = false;
+                HideStuff();
                 _toastService.Success("Volunteer Added", "Volunteer added to event");
                 return;
             }
-            else
-            {
-                strMessageText = "Unable to Add Volunteer.";
-            }
-        }
-        else
-        {
-            strMessageText = "Unable to Add Volunteer.";
         }
 
-        DisplayAddButton = DisplayNone;
-        DisplayDataPanel = DisplayNone;
-        DisplaySearchPanel = DisplayNone;
+        HideStuff();
         DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
-    } // add confiormation         
+    }        
 
     private async Task onConfirmDelete()
     {
         // Action Finished
-        //ErrorMessage = "Delete Confirmed";
-        var strMessageText = string.Empty;
-        var actionStatus = "Delete Confirmed";
+        var strMessageText = "Unable to remove the volunteer signup.";
+        var actionStatus = "Error";
         if (selectedGridObject != null)
         {
             int signUpId = selectedGridObject.SignUpId;
@@ -461,32 +464,44 @@ public partial class ManageSignUps : ComponentBase
                 var deleteResult = await _svcSignUp.DeleteAsync(signUpId);
                 if (existingRecord.Success && deleteResult.Success)
                 {
-                    CloseButtonCaption = CaptionClose;
+                    string customMessage = "This is to confirm that your sign-up was removed.";
+                    var emailResponse = await _svcEmailBuilder.SendSignUpConfirmationEmail(existingRecord.Data, customMessage);
+
+                    if (!emailResponse.Success)
+                    {
+                        _toastService.Error("Could not queue email", emailResponse.Message);
+                        Log.Logger.Error($"Error SendSignUpRemovedEmail: {emailResponse.Message}");
+                        return;
+                    }
+                    HideStuff();
                     await RefreshGrid();
-                }
-                else
-                {
-                    strMessageText = "Unable to Delete Volunteer.";
+                    _toastService.Success("Volunteer Removed", "The volunteer has been removed from the event.");
+                    return;
                 }
             }
         }
-        else
-        {
-            strMessageText = "Unable to Delete Volunteer.";
-        }
 
+        HideStuff();
+        DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
+    } 
+
+    private void HideStuff()
+    {
+        ShowEditDialog = false;
+        CloseButtonCaption = CaptionClose;
         DisplayDeleteButton = DisplayNone;
         DisplayDataPanel = DisplayNone;
         DisplaySearchPanel = DisplayNone;
-        DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
-    } // del confirmation
-
+        DisplayAddButton = DisplayNone;
+        DisplayDataPanel = DisplayNone;
+        DisplaySearchPanel = DisplayNone;
+    }
     public async Task RefreshGrid()
     {
         await LoadSignUpData(CurrentFilter);
         Grid.CallStateHasChanged();
         Grid.Refresh();
-    } 
+    }
 
     public void OnVolunteerSelect(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, Volunteer> args)
     {
@@ -495,19 +510,20 @@ public partial class ManageSignUps : ComponentBase
         displayVolunteerData = DisplayNone;
         newSignUp = new SignUpDisplayItem(); // empty data panel
 
-            if (args.ItemData != null)
-            {
-                displayVolunteerData = "";
-                newSignUp.VolunteerId = args.ItemData.VolunteerId;
-                newSignUp.VolunteerEmail = args.ItemData.Email;
-                newSignUp.VolunteerPhone = args.ItemData.Phone;
-                newSignUp.VolunteerFirstName = args.ItemData.FirstName;
-                newSignUp.VolunteerLastName = args.ItemData.LastName;
+        if (args.ItemData != null)
+        {
+            displayVolunteerData = "";
+            newSignUp.VolunteerId = args.ItemData.VolunteerId;
+            newSignUp.VolunteerEmail = args.ItemData.Email;
+            newSignUp.VolunteerPhone = args.ItemData.Phone;
+            newSignUp.VolunteerFirstName = args.ItemData.FirstName;
+            newSignUp.VolunteerLastName = args.ItemData.LastName;
+            newSignUp.VehicleType = args.ItemData.VehicleType;
             DisplayAddButton = ""; //  OK button
-                var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
-                DialogMessage = BootstrapHelper.GetBootstrapMessage("help", strMessageText, "", false);
-            }
-    } 
+            var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
+            DialogMessage = BootstrapHelper.GetBootstrapMessage("help", strMessageText, "", false);
+        }
+    }
 
     public void GetSelectedRecords(RowSelectEventArgs<SignUpDisplayItem> args)
     {
@@ -537,7 +553,7 @@ public partial class ManageSignUps : ComponentBase
     {
         await LoadSignUpData(args.Value);
         DisableToolBar();
-    } // Filter Changed
+    } 
 
     protected async Task PdfExport()
     {
@@ -583,13 +599,14 @@ public partial class ManageSignUps : ComponentBase
         public string Text { get; set; }
     }
 
-    public string CurrentFilter = "all";
+    public string CurrentFilter = "allfuture";
 
     List<GridFilterOption> GridFilterOptions = new List<GridFilterOption>
     {
-        new GridFilterOption() { ID = "reg", Text = "Events with Registered Volunteers" },
-        new GridFilterOption() { ID = "notreg", Text = "Events without Registered Volunteers" },
-        new GridFilterOption() { ID = "all", Text = "All Events" },
+        new GridFilterOption() { ID = "reg", Text = "Future Events with Registered Volunteers" },
+        new GridFilterOption() { ID = "notreg", Text = "Future Events without Registered Volunteers" },
+        new GridFilterOption() { ID = "allfuture", Text = "All Future Events" },
+        new GridFilterOption() { ID = "allpast", Text = "All Past Events" },
     };
 
 
