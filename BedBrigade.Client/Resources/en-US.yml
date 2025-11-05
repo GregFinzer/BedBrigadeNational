@@ -95,10 +95,8 @@ DynamicTuesday: Tuesday
 DynamicWednesday: Wednesday
 DynamicYes: Yes
 Email: Email
-EmailColon: 'Email:'
 EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
-Event: Event
 Events: Events
 EventDateTime: Event Date & Time
 EventGroup: Event Group
@@ -113,7 +111,6 @@ FirstName: First Name
 ForgotPassword: Forgot Password
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
-FutureScheduled: Future Scheduled
 GenderAge: Gender / Age
 Gross: Gross
 Group: Group
@@ -129,7 +126,6 @@ Latitude: Latitude
 Loading: Loading....
 Location: Location
 LocationAvailableEvents: Location Available Events
-LocationColon: 'Location:'
 LocationNotActive: "We're sorry, this Bed Brigade location is no longer active: "
 LocationPathColon: 'Location Path:'
 LocationsMarkedWithAn: Locations marked with an asterisk (*) are currently inactive
@@ -173,7 +169,6 @@ Message: Message
 MilesAway: miles away
 MonthlyDonationOf: Monthly Donation of
 Name: Name
-NameColon: 'Name:'
 Names: Names
 NationalPathColon: 'National Path:'
 NewPassword: New Password
@@ -187,9 +182,7 @@ NotSent: Not Sent
 NoUpcomingBuildsScheduled: No upcoming builds scheduled.
 NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
-NumberOfVolunteers: Number of Volunteers
 NumberOfVolunteersIncludingYourself: Number of Volunteers (including yourself)
-Ok: OK
 OneTimeDonationOf: One Time Donation of
 Organization: Organization
 Organizer: Organizer
@@ -264,17 +257,14 @@ ReturnHome: Return Home
 ReturnToHome: Return to Home
 Role: Role
 Route: Route
-SeachAVolunteerBy: Seach a Volunteer by Name
 Search: Search
 SearchBedBrigadeLocations: Search Bed Brigade Locations
 SelectACampaign: Select a Campaign
-SelectAGridFilter: Select a grid filter
 SelectALocation: Select a Location
 SelectAnEvent: Select an event
 SelectANewsletter: Select a Newsletter
 SelectAnUpcomingEvent: Select an upcoming event and register to join us in either delivering or building beds!
 SelectAState: Select a state
-SelectAVolunteer: Select a Volunteer
 SelectedEventDetails: Selected Event Details
 SelectLanguages: Select Languages
 SelectMetroArea: Select Metro Area
@@ -321,7 +311,6 @@ UpcomingEvents: Upcoming Events
 UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
-VehicleTypeColon: 'Vehicle Type:'
 VehicleDescription: Please describe your vehicle
 ViewNewer: View Newer
 ViewOlder: View Older

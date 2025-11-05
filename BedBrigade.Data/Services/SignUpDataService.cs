@@ -186,56 +186,9 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
-                var query = from sch in ctx.Schedules
-                            join loc in ctx.Locations
-                                on sch.LocationId equals loc.LocationId
-                            join su in ctx.SignUps
-                                on sch.ScheduleId equals su.ScheduleId into suGroup
-                            from su in suGroup.DefaultIfEmpty() // Left join
-                            join vol in ctx.Volunteers
-                                on su.VolunteerId equals vol.VolunteerId into volGroup
-                            from vol in volGroup.DefaultIfEmpty() // Left join
-                            where sch.LocationId == locationId
-                            select new SignUpDisplayItem
-                            {
-                                ScheduleId = sch.ScheduleId,
-                                SignUpId = su == null ? 0 : su.SignUpId,
-                                ScheduleLocationId = sch.LocationId,
-                                ScheduleLocationName = loc.Name,
-                                ScheduleEventName = sch.EventName,
-                                ScheduleEventDate = sch.EventDateScheduled,
-                                ScheduleEventType = sch.EventType,
-                                SignUpNumberOfVolunteers = su == null ? 0 : su.NumberOfVolunteers,
-                                VolunteerId = vol == null ? 0 : vol.VolunteerId,
-                                VolunteerFirstName = vol == null ? string.Empty : vol.FirstName,
-                                VolunteerLastName = vol == null ? string.Empty : vol.LastName,
-                                VolunteerEmail = vol == null ? string.Empty : vol.Email,
-                                VolunteerPhone = vol == null ? string.Empty : vol.Phone,
-                                VolunteerOrganization = vol == null ? string.Empty : vol.Organization,
-                                VehicleType = su == null ? null : su.VehicleType,
-                                SignUpNote = su == null ?  null : su.SignUpNote,
-                                CreateDate = su == null ? DateTime.Now : su.CreateDate,
-                                IHaveVolunteeredBefore = vol != null && vol.IHaveVolunteeredBefore
-                            };
+                IQueryable<SignUpDisplayItem> query = BuildSignUpGridQuery(locationId, ctx);
 
-                switch (filter)
-                {
-                    case "reg":
-                        query = query.Where(item => item.SignUpId != 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
-                        break;
-                    case "notreg":
-                        query = query.Where(item => item.SignUpId == 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
-                        break;
-                    case "allfuture":
-                        query = query.Where(item => item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
-                        break;
-                    case "allpast":
-                        query = query.Where(item => item.ScheduleEventDate.Date < DateTime.UtcNow.Date);
-                        break;
-                    default:
-                        throw new ArgumentException($"Invalid filter for GetSignUpsForSignUpGrid: {filter}");
-                }
-
+                query = ApplySignUpGridFilter(filter, query);
 
                 var result = await query.OrderBy(item => item.ScheduleEventDate).ToListAsync();
                 _timezoneDataService.FillLocalDates(result);
@@ -247,6 +200,65 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         {
             return new ServiceResponse<List<SignUpDisplayItem>>($"Error GetSignUpsForSignUpGrid for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
+    }
+
+    private static IQueryable<SignUpDisplayItem> BuildSignUpGridQuery(int locationId, DataContext ctx)
+    {
+        var query = from sch in ctx.Schedules
+            join loc in ctx.Locations
+                on sch.LocationId equals loc.LocationId
+            join su in ctx.SignUps
+                on sch.ScheduleId equals su.ScheduleId into suGroup
+            from su in suGroup.DefaultIfEmpty() // Left join
+            join vol in ctx.Volunteers
+                on su.VolunteerId equals vol.VolunteerId into volGroup
+            from vol in volGroup.DefaultIfEmpty() // Left join
+            where sch.LocationId == locationId
+            select new SignUpDisplayItem
+            {
+                ScheduleId = sch.ScheduleId,
+                SignUpId = su == null ? 0 : su.SignUpId,
+                ScheduleLocationId = sch.LocationId,
+                ScheduleLocationName = loc.Name,
+                ScheduleEventName = sch.EventName,
+                ScheduleEventDate = sch.EventDateScheduled,
+                ScheduleEventType = sch.EventType,
+                SignUpNumberOfVolunteers = su == null ? 0 : su.NumberOfVolunteers,
+                VolunteerId = vol == null ? 0 : vol.VolunteerId,
+                VolunteerFirstName = vol == null ? string.Empty : vol.FirstName,
+                VolunteerLastName = vol == null ? string.Empty : vol.LastName,
+                VolunteerEmail = vol == null ? string.Empty : vol.Email,
+                VolunteerPhone = vol == null ? string.Empty : vol.Phone,
+                VolunteerOrganization = vol == null ? string.Empty : vol.Organization,
+                VehicleType = su == null ? null : su.VehicleType,
+                SignUpNote = su == null ?  null : su.SignUpNote,
+                CreateDate = su == null ? DateTime.Now : su.CreateDate,
+                IHaveVolunteeredBefore = vol != null && vol.IHaveVolunteeredBefore
+            };
+        return query;
+    }
+
+    private static IQueryable<SignUpDisplayItem> ApplySignUpGridFilter(string filter, IQueryable<SignUpDisplayItem> query)
+    {
+        switch (filter)
+        {
+            case "reg":
+                query = query.Where(item => item.SignUpId != 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
+                break;
+            case "notreg":
+                query = query.Where(item => item.SignUpId == 0 && item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
+                break;
+            case "allfuture":
+                query = query.Where(item => item.ScheduleEventDate.Date >= DateTime.UtcNow.Date);
+                break;
+            case "allpast":
+                query = query.Where(item => item.ScheduleEventDate.Date < DateTime.UtcNow.Date);
+                break;
+            default:
+                throw new ArgumentException($"Invalid filter for GetSignUpsForSignUpGrid: {filter}");
+        }
+
+        return query;
     }
 
     public async Task<ServiceResponse<List<Volunteer>>> GetVolunteersNotSignedUpForAnEvent(int locationId, int scheduleId)

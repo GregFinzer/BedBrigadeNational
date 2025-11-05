@@ -15,6 +15,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage;
 
 public partial class ManageSignUps : ComponentBase
 {
+    private const string ErrorTitle = "Error";
     // data services
 
     [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
@@ -101,7 +102,7 @@ public partial class ManageSignUps : ComponentBase
         catch (Exception ex)
         {
             Log.Error(ex, "Error initializing SignUpGrid component");
-            _toastService.Error("Error", "An error occurred while loading the Sign Up Grid data.");
+            _toastService.Error(ErrorTitle, "An error occurred while loading the Sign Up Grid data.");
         }
 
     } 
@@ -224,7 +225,7 @@ public partial class ManageSignUps : ComponentBase
         else
         {
             Log.Error($"SignUpGrid, Error loading locations: {dataLocations.Message}");
-            _toastService.Error("Error", dataLocations.Message);
+            _toastService.Error(ErrorTitle, dataLocations.Message);
             ErrorMessage = "Unable to load Locations. " + dataLocations.Message;
         }
     }
@@ -242,7 +243,7 @@ public partial class ManageSignUps : ComponentBase
         else
         {
             Log.Error($"SignUpGrid, Error loading SignUp data: {response.Message}");
-            _toastService.Error("Error", response.Message);
+            _toastService.Error(ErrorTitle, response.Message);
             ErrorMessage = "Unable to load Sign-Up Data. " + response.Message;
             SignUpDisplayItems = new List<SignUpDisplayItem>();
             GridDisplay = DisplayNone;
@@ -407,7 +408,7 @@ public partial class ManageSignUps : ComponentBase
     {
         // Action Finished
         AvailabilityMessage = (MarkupString)"&nbsp;";
-        var strMessageText = "Error";
+        var strMessageText = ErrorTitle;
         var actionStatus = "Unable to Add Volunteer.";
         if (selectedGridObject != null && newSignUp.VolunteerId > 0)
         {
@@ -440,13 +441,13 @@ public partial class ManageSignUps : ComponentBase
                 }
 
                 await RefreshGrid();
-                HideStuff();
+                HideDialogs();
                 _toastService.Success("Volunteer Added", "Volunteer added to event");
                 return;
             }
         }
 
-        HideStuff();
+        HideDialogs();
         DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
     }        
 
@@ -454,7 +455,7 @@ public partial class ManageSignUps : ComponentBase
     {
         // Action Finished
         var strMessageText = "Unable to remove the volunteer signup.";
-        var actionStatus = "Error";
+        var actionStatus = ErrorTitle;
         if (selectedGridObject != null)
         {
             int signUpId = selectedGridObject.SignUpId;
@@ -473,7 +474,7 @@ public partial class ManageSignUps : ComponentBase
                         Log.Logger.Error($"Error SendSignUpRemovedEmail: {emailResponse.Message}");
                         return;
                     }
-                    HideStuff();
+                    HideDialogs();
                     await RefreshGrid();
                     _toastService.Success("Volunteer Removed", "The volunteer has been removed from the event.");
                     return;
@@ -481,11 +482,11 @@ public partial class ManageSignUps : ComponentBase
             }
         }
 
-        HideStuff();
+        HideDialogs();
         DialogMessage = BootstrapHelper.GetBootstrapMessage(actionStatus, strMessageText, "");
     } 
 
-    private void HideStuff()
+    private void HideDialogs()
     {
         ShowEditDialog = false;
         CloseButtonCaption = CaptionClose;

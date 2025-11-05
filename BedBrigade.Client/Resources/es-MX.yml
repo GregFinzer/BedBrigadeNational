@@ -96,10 +96,8 @@ DynamicTuesday: Martes
 DynamicWednesday: Miércoles
 DynamicYes: Sí
 Email: Correo electrónico
-EmailColon: 'Correo electrónico:'
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
-Event: Evento
 Events: Eventos
 EventDateTime: Fecha y hora del evento
 EventGroup: Grupo de eventos
@@ -114,7 +112,6 @@ FirstName: Nombre
 ForgotPassword: ¿Olvidaste tu contraseña?
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
-FutureScheduled: Futuro Programado
 Gross: Bruto
 Group: Grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
@@ -129,7 +126,6 @@ Latitude: Latitud
 Loading: Carga....
 Location: Ubicación
 LocationAvailableEvents: Ubicación Disponible Eventos
-LocationColon: 'Ubicación:'
 LocationNotActive: 'Lo sentimos, esta ubicación de Bed Brigade ya no está activa: '
 LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
@@ -173,7 +169,6 @@ Message: Mensaje
 MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
-NameColon: 'Nombre:'
 Names: Nombres
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
@@ -187,9 +182,7 @@ NotSent: No enviado
 NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
-NumberOfVolunteers: Número de Voluntarios
 NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
-Ok: De acuerdo
 OneTimeDonationOf: 'Donación única de'
 Organization: Organización
 Organizer: Organizador
@@ -265,17 +258,14 @@ ReturnHome: Volver a casa
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
-SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
 SelectACampaign: Seleccione una campaña
-SelectAGridFilter: Seleccionar un filtro de cuadrícula
 SelectANewsletter: Seleccione un boletín
 SelectALocation: Seleccione una ubicación
 SelectAnEvent: Seleccione un evento
 SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse a nosotros en la entrega o construcción de camas!
 SelectAState: Seleccione un estado
-SelectAVolunteer: Selecciona un Voluntario
 SelectedEventDetails: Detalles del evento seleccionado
 SelectLanguages: Seleccionar Idiomas
 SelectMetroArea: Seleccione Área Metropolitana
@@ -323,7 +313,6 @@ UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
 VehicleDescription: Por favor describe tu vehículo
-VehicleTypeColon: 'Tipo de vehículo:'
 ViewNewer: Ver más reciente
 ViewOlder: Ver más antiguo
 Volunteer: Voluntario
