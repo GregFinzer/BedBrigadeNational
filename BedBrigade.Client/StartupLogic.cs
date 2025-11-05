@@ -211,6 +211,8 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IDonationCampaignDataService, DonationCampaignDataService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IEmailBounceService, EmailBounceService>();
+            builder.Services.AddScoped<IDashboardDataService, DashboardDataService>();
+            builder.Services.AddScoped<IDeliveryPlanService, DeliveryPlanService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

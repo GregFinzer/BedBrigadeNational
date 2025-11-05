@@ -203,6 +203,28 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
+            if (!await DeepValidation()) return false;
+
+            if (!ValidReCAPTCHA)
+            {
+                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> DeepValidation()
+        {
+            newRequest.LocationId = SearchLocation.ddlValue;
+            DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
+
+            if (nextEligibleDate.HasValue)
+            {
+                await ShowValidationMessage(_lc.Keys["RecentlyGivenBed"] + " " + nextEligibleDate.Value.ToShortDateString());
+                return false;
+            }
+
             if (newRequest.PrimaryLanguage != "English")
             {
                 if (string.IsNullOrEmpty(newRequest.SpeakEnglish))
@@ -238,12 +260,6 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            if (!ValidReCAPTCHA)
-            {
-                await ShowValidationMessage(_lc.Keys["PleaseCheckRecaptcha"]);
-                return false;
-            }
-
             string distanceMessage = await ValidateZipDistance();
 
             if (!string.IsNullOrEmpty(distanceMessage))
@@ -253,7 +269,7 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
-        } 
+        }
 
         private void ClearValidationMessage()
         {
@@ -382,7 +398,6 @@ namespace BedBrigade.Client.Components.Pages
                     if (bedRequest != null)
                     {
                         await SendConfirmationEmail(bedRequest);
-                        await QueueForGeoLocation(bedRequest);
                     }
                 }
             }
@@ -392,29 +407,6 @@ namespace BedBrigade.Client.Components.Pages
             }
         }
 
-        private async Task QueueForGeoLocation(Common.Models.BedRequest bedRequest)
-        {
-            GeoLocationQueue item = new GeoLocationQueue();
-            item.Street = bedRequest.Street;
-            item.City = bedRequest.City;
-            item.State = bedRequest.State;
-            item.PostalCode = bedRequest.PostalCode;
-            item.CountryCode = Defaults.CountryCode;
-            item.TableName = TableNames.BedRequests.ToString();
-            item.TableId = bedRequest.BedRequestId;
-            item.QueueDate = DateTime.UtcNow;
-            item.Priority = 1;
-            item.Status = GeoLocationStatus.Queued.ToString();
-            var result = await _svcGeoLocation.CreateAsync(item);
-
-            if (!result.Success)
-            {
-                AlertType = AlertDanger;
-                ResultMessage = result.Message;
-                ResultDisplay = "";
-                await ScrollToResultMessage();
-            }
-        }
 
         private async Task SendConfirmationEmail(Common.Models.BedRequest bedRequest)
         {

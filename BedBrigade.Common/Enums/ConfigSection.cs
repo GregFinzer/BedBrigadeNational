@@ -8,5 +8,6 @@ public enum ConfigSection
     GeoLocation = 4,
     Sms = 5,
     Payments = 6,
-    CustomStrings = 7
+    CustomStrings = 7,
+    Schedule = 8
 }

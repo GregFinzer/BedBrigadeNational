@@ -21,10 +21,15 @@
 
             switch(RequestedView){
                 case "quick": // modal window
-                    <h3 class="bb-fore-primary">
-                        @_translateLogic.GetTranslation(EventData.Subject)
-                    </h3>
-                    break;
+                                      <a class="bb-fore-primary" href="@SignUpUrl">
+                                      <span style="font-size: 1.25em; font-weight: bold;">
+                                          @_translateLogic.GetTranslation(EventData.Subject)
+                                      </span>
+                                      <span style="font-size: 0.875em; font-weight: bold;">
+                                           @_lc.Keys["ClickToSignup"]
+                                       </span>
+                                      </a>                       
+                        break;
                 case "agenda":
                  <h4 class="bb-fore-primary text-black">
                         @_translateLogic.GetTranslation(EventData.Subject)
@@ -48,9 +53,10 @@
             <div>
                 <p class="mb-1">
                     <i class="far fa-calendar-alt"></i>
-                        @EventData.StartTime.ToString("dddd, MMMM d, yyyy")
-                        @EventData.StartTime.ToString("hh:mm tt")
-                        - @EventData.EndTime.ToString("hh:mm tt")
+                        @EventData.StartTime.ToString("dddd, MMMM d, yyyy")                      
+                </p>
+                <p class="mb-1">
+                        <i class="far fa-clock"></i>&nbsp;@EventData.StartTime.ToString("hh:mm tt") - @EventData.EndTime.ToString("hh:mm tt")
                 </p>
             </div>
         }
@@ -64,17 +70,39 @@
  
         @if (!string.IsNullOrEmpty(EventData.Location))
     {
-        <div>
-            <i class="fas fa-map-marker-alt"></i>&nbsp;
+        <div>          
             
             @{
                 string urlEncodedAddress = System.Net.WebUtility.UrlEncode(EventData.Location);
                 string googleMapsLink = $"https://www.google.com/maps/search/?api=1&query={urlEncodedAddress}";
+                string LocationText = StringUtil.SplitTextByLength(EventData.Location, 40);
+                        var parts = EventData.Location?.Split(',', StringSplitOptions.TrimEntries) ?? Array.Empty<string>();
+                        string street = parts.Length > 0 ? parts[0] : "";
+                        string city = parts.Length > 1 ? parts[1] : "";
+                        string stateZip = parts.Length > 2 ? parts[2] : "";
              }
 
-            <a href="@googleMapsLink" target="_blank" title="View location on Google Maps" @onclick="HandleHyperlinkClick" >
-                @EventData.Location
-            </a>
+                    <table class="address-table">
+                        <tr>
+                            <td rowspan="2" class="icon-cell">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </td>
+                            <td>
+                                <a href="@googleMapsLink"
+                                   target="_blank"
+                                   title="View location on Google Maps"
+                                   class="address-link">@street</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href="@googleMapsLink"
+                                   target="_blank"
+                                   title="View location on Google Maps"
+                                   class="address-link">@($"{city}, {stateZip}")</a>
+                            </td>
+                        </tr>
+                    </table>
 
         </div>
     }
@@ -123,7 +151,7 @@
         @switch (RequestedView)
         {
             case "quick": // modal window
-                SplitDescription = StringUtil.SplitTextByLength(EventData.Description, 50);
+                SplitDescription = StringUtil.SplitTextByLength(EventData.Description, 40);
                 break;
             case "agenda":
                 SplitDescription = EventData.Description;
@@ -160,14 +188,22 @@
     public string? RequestedView { get; set; }
     [Parameter]
     public EventCallback OnHyperlinkClicked { get; set; }
+    [Parameter]
+    public string? LocationRoute { get; set; }
 
     [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ITranslateLogic _translateLogic { get; set; }
 
     public string? SplitDescription = String.Empty;
+    public string SignUpUrl = String.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        if (EventData != null)
+        {
+            SignUpUrl = $"/{LocationRoute}/volunteer/{EventData.Id}";
+        }
+
         _lc.InitLocalizedComponent(this);
     }
 
@@ -211,7 +247,29 @@
     a, a:hover {
         color: inherit;
       }
- 
- 
+
+    .address-table {
+        border-collapse: collapse;
+        margin: 0;
+        padding: 0;
+    }
+
+        .address-table td {
+            padding: 0;
+            margin: 0;
+            vertical-align: top;
+        }
+
+    .icon-cell {
+        width: 1.2em;
+        text-align: center;
+        padding-right: 0.3em;
+    }
+
+    .address-link {
+        text-decoration: underline;
+        color: inherit;
+        line-height: 1.3em;
+    }
 
 </style>

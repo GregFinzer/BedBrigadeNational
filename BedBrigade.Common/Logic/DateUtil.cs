@@ -3,11 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 namespace BedBrigade.Common.Logic
 {
     public static class DateUtil
     {
+        public static DateTime NextSaturday()
+        {
+            DateTime today = DateTime.Today;
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)today.DayOfWeek + 7) % 7;
+
+            // If today is Saturday, add 7 days
+            if (daysUntilSaturday == 0)
+                daysUntilSaturday = 7;
+
+            return today.AddDays(daysUntilSaturday);
+        }
+
+        public static bool IsFirstSaturdayOfTheMonth(DateTime date)
+        {
+            if (date.DayOfWeek != DayOfWeek.Saturday)
+                return false;
+            // Check if it's between the 1st and 7th of the month
+            return date.Day <= 7;
+        }
+
         public static string MillisecondsToTimeLapse(long milliseconds)
         {
             TimeSpan ts = TimeSpan.FromMilliseconds(milliseconds);

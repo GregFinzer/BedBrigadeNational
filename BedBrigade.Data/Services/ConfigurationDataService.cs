@@ -88,6 +88,24 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return result;
     }
 
+    public async Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key, int locationId)
+    {
+        List<Configuration> configs = (await GetAllAsync(section)).Data;
+
+        var config =
+            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId ==locationId);
+
+        if (config == null)
+            ThrowKeyNotFound(section, key, locationId);
+
+        if (!int.TryParse(config.ConfigurationValue, out int result))
+        {
+            throw new FormatException($"Configuration value is not an integer for {section} - {key} - Location {locationId}");
+        }
+
+        return result;
+    }
+
     public void ThrowKeyNotFound(ConfigSection section, string key, int locationId)
     {
         throw new KeyNotFoundException($"Configuration not found for {section} - {key}");

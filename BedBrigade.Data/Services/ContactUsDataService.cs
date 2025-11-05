@@ -1,6 +1,7 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
+using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -81,6 +82,24 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
             }
 
             return updated;
+        }
+    }
+
+    public async Task<int> ContactsRequested(int userLocationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"ContactsRequested({userLocationId})");
+        var cachedContent = _cachingService.Get<int?>(cacheKey);
+        if (cachedContent.HasValue)
+            return cachedContent.Value;
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var anyContact = await ctx.Set<ContactUs>()
+                .Where(o => o.Status == ContactUsStatus.ContactRequested)
+                .CountAsync();
+            _cachingService.Set(cacheKey, anyContact);
+
+            return anyContact;
         }
     }
 }

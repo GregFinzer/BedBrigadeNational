@@ -25,10 +25,9 @@ Campaign: Campaña
 Cancel: Cancelar
 ChangePassword: Cambiar contraseña
 ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
-ChooseADate: Escoge una fecha
-ChooseATime: Escoge una hora
 City: Ciudad
 ClickToSignup: (Haga clic para registrarse)
+Close: Cerrar
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
 ConfirmPassword: Confirmar contraseña
 ContactInformation: Información de contacto
@@ -40,7 +39,6 @@ Continue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
 DeliveryAddress: Dirección de entrega
-DeliveryDate: Fecha de entrega
 DeliveryVehicle: Vehículo de reparto
 DeliveryVehicleFullSizeVan: Tengo una camioneta de tamaño completo que está vacía sin asientos.
 DeliveryVehicleMinivan: Tengo un Minvan con los asientos retirados o doblados en el suelo
@@ -58,7 +56,6 @@ DonationFormNotCompleted: El formulario de donación no está completo
 DonationDate: Fecha de donación
 DonationDetails: Detalles de la donación
 DoYouAttendChurch: ¿Asistes a la iglesia regularmente?
-DurationHours: Duración (horas)
 DynamicALittle: Un poco
 DynamicApril: Abril
 DynamicAprilBedBuild: Construcción de cama de abril
@@ -99,19 +96,12 @@ DynamicTuesday: Martes
 DynamicWednesday: Miércoles
 DynamicYes: Sí
 Email: Correo electrónico
-EmailColon: 'Correo electrónico:'
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
-Event: Evento
 Events: Eventos
-EventDate: Fecha del evento
 EventDateTime: Fecha y hora del evento
-EventDetails: Detalles del evento
 EventGroup: Grupo de eventos
-EventName: Nombre del evento
 EventNote: Nota del evento
-EventStatus: Estado del evento
-EventTime: Hora del evento
 EventType: Tipo de evento
 Example: Ejemplo
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
@@ -122,10 +112,8 @@ FirstName: Nombre
 ForgotPassword: ¿Olvidaste tu contraseña?
 FoundLocationsWithin: Se han encontrado ubicaciones de {count} dentro de {maxMiles} millas de {postalCode}
 FromStartTimeToEndTime: de {startTime} a {endTime}
-FutureScheduled: Futuro Programado
 Gross: Bruto
 Group: Grupo
-GroupName: Nombre del grupo
 HaveYouVolunteeredFor: ¿Has sido voluntario para Bed Brigade antes?
 IfYouLikeTo: Si desea ser voluntario con Bed Brigade, seleccione nuestra ubicación y complete el formulario de registro de voluntario
 IdleLogoutMessage: 'Se ha cerrado la sesión por inactividad. Vuelva a iniciar sesión para continuar.'
@@ -138,7 +126,6 @@ Latitude: Latitud
 Loading: Carga....
 Location: Ubicación
 LocationAvailableEvents: Ubicación Disponible Eventos
-LocationColon: 'Ubicación:'
 LocationNotActive: 'Lo sentimos, esta ubicación de Bed Brigade ya no está activa: '
 LocationPathColon: 'Ruta de ubicación:'
 LocationsMarkedWithAn: Las ubicaciones marcadas con un asterisco (*) están actualmente inactivas
@@ -170,6 +157,7 @@ MaxLengthPassword255: La contraseña tiene una longitud máxima de 255 caractere
 MaxLengthPhone14: El número de teléfono tiene una longitud máxima de 14 caracteres
 MaxLengthPostalCode5: El código postal tiene una longitud máxima de 5 caracteres
 MaxLengthReference100: La referencia tiene una longitud máxima de 100 caracteres
+MaxLengthServiceZipCodes4000: Los códigos postales de servicio tienen una longitud máxima de 4000 caracteres
 MaxLengthSpecialInstructions4000: Las instrucciones especiales tienen una longitud máxima de 4000 caracteres
 MaxLengthState30: El estado tiene una longitud máxima de 30 caracteres
 MaxLengthStreet50: La dirección tiene una longitud máxima de 50 caracteres
@@ -181,7 +169,6 @@ Message: Mensaje
 MilesAway: millas
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
-NameColon: 'Nombre:'
 Names: Nombres
 NationalPathColon: 'Camino Nacional:'
 NewPassword: Nueva contraseña
@@ -190,23 +177,16 @@ NoBedBrigadeNear: No hay brigada de camas cerca de ese código postal
 NoImagesWereFound: No se encontraron imágenes
 NoLocationsFoundWithin: No se han encontrado ubicaciones dentro de {maxMiles} millas de {postalCode}
 NoLocationsHavePostalCodes: Ninguna ubicación tiene códigos postales
-NoteComment: Nota / Comentario
-Notes: Notas
 NothingToSend: Nada que enviar
 NotSent: No enviado
 NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
-NumberOfVolunteers: Número de Voluntarios
 NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
-Ok: De acuerdo
 OneTimeDonationOf: 'Donación única de'
 Organization: Organización
 Organizer: Organizador
 OrganizerColon: 'Organizador:'
-OrganizerEmail: Correo electrónico del organizador
-OrganizerName: Nombre del organizador
-OrganizerPhone: Teléfono del organizador
 OtherLanguagesSpoken: Otros idiomas hablados
 PageNext: Página siguiente
 PagePrevious: Página anterior
@@ -228,7 +208,7 @@ PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
 Processing: Procesando
 RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
-Reference: Referencia
+RecentlyGivenBed: Recientemente se le entregó una cama. Su próxima fecha elegible es
 RegisterOrUpdate: Registrarse o Actualizar
 RegularExpressionEmail: Formato de correo electrónico no válido
 RegularExpressionPassword: La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.
@@ -278,19 +258,14 @@ ReturnHome: Volver a casa
 ReturnToHome: Volver a casa
 Role: Rol
 Route: Ruta
-Schedule: Horario
-Scheduling: Planificación
-SeachAVolunteerBy: Buscar a un voluntario por su nombre
 Search: Buscar
 SearchBedBrigadeLocations: Buscar ubicaciones de Bed Brigade
 SelectACampaign: Seleccione una campaña
-SelectAGridFilter: Seleccionar un filtro de cuadrícula
 SelectANewsletter: Seleccione un boletín
 SelectALocation: Seleccione una ubicación
 SelectAnEvent: Seleccione un evento
 SelectAnUpcomingEvent: ¡Seleccione un próximo evento y regístrese para unirse a nosotros en la entrega o construcción de camas!
 SelectAState: Seleccione un estado
-SelectAVolunteer: Selecciona un Voluntario
 SelectedEventDetails: Detalles del evento seleccionado
 SelectLanguages: Seleccionar Idiomas
 SelectMetroArea: Seleccione Área Metropolitana
@@ -299,8 +274,8 @@ Send: Enviar
 SendEmail: Enviar Correo Electrónico
 SendMessage: Enviar Mensaje
 SendTaxForms: Enviar formularios de impuestos
+ServiceZipCodes: Códigos postales de servicio
 ShowPassword: Mostrar contraseña
-ShowSchedules: Mostrar horarios
 SkipToBuilds: Ir a Compilaciones
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
@@ -317,7 +292,6 @@ Subscribe: Suscribirse
 SubscribeToOurEmail: ¿Suscribirse a nuestro boletín de noticias por correo electrónico?
 SubscribeToOurText: ¿Suscribirse a nuestra lista de textos?
 TaxFormSent: Formulario de impuestos enviado
-Team: 'Equipo #'
 ThankYou: ¡Gracias!
 ThankYouForMakingADifferenceInTheLifeOfAChild: ¡Gracias por hacer una diferencia en la vida de un niño! 
 ThankYouForYourDonation: ¡Gracias por su donación!
@@ -335,12 +309,10 @@ UnsubscribeFromNewsletter: Darse de baja del boletín
 UpcomingBuilds: Próximas compilaciones
 UpcomingDeliveries: Próximas entregas
 UpcomingEvents: Próximos eventos
-Update: Actualizar
 UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
 VehicleDescription: Por favor describe tu vehículo
-VehicleTypeColon: 'Tipo de vehículo:'
 ViewNewer: Ver más reciente
 ViewOlder: Ver más antiguo
 Volunteer: Voluntario
@@ -348,7 +320,6 @@ VolunteerForAnotherEvent: Ofrécete como voluntario para otro evento
 VolunteerFormNotCompleted: ¡El formulario de voluntariado no está completo!
 VolunteerInformation: Información para voluntarios
 VolunteerInformationContinued: Continuación de la información para voluntarios
-Volunteers: Voluntarios
 VolunteerSignUpAgain: Gracias por servir de nuevo {fullName}
 VolunteerSignUpAgainSubtitle: Apreciamos que continúe sirviendo con el Equipo de Voluntarios de la Brigada de Camas.
 VolunteerSignUpNew: Bienvenido a Bed Brigade {fullName}

@@ -20,7 +20,8 @@ namespace BedBrigade.Tests.Integration
     [TestFixture]
     public class ImportBedRequestsPolaris
     {
-        private const string FilePath = @"D:\DocumentsAllUsers\Greg\_dropbox\Dropbox\Transfer\Bed_Requests_1754671557.xlsx";
+        private const string FilePath = @"C:\Users\gfinz\Downloads\Bed_Requests_1760554665.xlsx";
+
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
         private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
@@ -36,7 +37,7 @@ namespace BedBrigade.Tests.Integration
         {
             "New Requests",
             "Contacted (Waiting)",
-            "August 9th delivery",
+            "November 8th delivery",
             "Grove City requests",
             "Additional needs",
             "Unable to contact after 3 months",
@@ -45,6 +46,7 @@ namespace BedBrigade.Tests.Integration
             "Delivered"
         };
 
+        //[Test]
         [Test, Ignore("Only run locally manually")]
         public async Task Import()
         {
@@ -78,36 +80,26 @@ namespace BedBrigade.Tests.Integration
             List<BedRequest> toUpdate = new List<BedRequest>();
             foreach (BedRequest bedRequest in polaris)
             {
-                BedRequest? existingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
-                                                                              && x.FirstName == bedRequest.FirstName
-                                                                              && x.LastName == bedRequest.LastName
-                                                                              && x.Status == BedRequestStatus.Waiting 
-                                                                                      && (bedRequest.Status == BedRequestStatus.Scheduled 
-                                                                                  || bedRequest.Status == BedRequestStatus.Delivered)
-                                                                              );
+                if (bedRequest.GenderAge == "G/")
+                    continue;
+
+                BedRequest? existingBedRequest = existing.FirstOrDefault(x => !String.IsNullOrEmpty(x.Phone)
+                                                                              && x.Phone == bedRequest.Phone
+                                                                              && !String.IsNullOrEmpty(x.LastName)
+                                                                              && x.LastName.ToLower() != "unknown"
+                                                                              && x.LastName.ToLower() == bedRequest.LastName.ToLower()
+                                                                              && x.Status == bedRequest.Status);
                 if (existingBedRequest == null)
                 {
-
-                    BedRequest? waitingBedRequest = existing.FirstOrDefault(x => x.Phone == bedRequest.Phone
-                        && x.FirstName == bedRequest.FirstName
-                        && x.LastName == bedRequest.LastName
-                        && x.Status == BedRequestStatus.Waiting && bedRequest.Status == BedRequestStatus.Waiting
-                    );
-
-                    if (waitingBedRequest != null)
-                    {
-                        if (bedRequest.GenderAge == "G/")
-                            continue;
-                        ObjectUtil.CopyProperties(bedRequest, waitingBedRequest, propertiesToIgnore);
-                        toUpdate.Add(waitingBedRequest);
-                    }
-                    else
-                    {
-                        toAdd.Add(bedRequest);
-                    }
+                    toAdd.Add(bedRequest);
                 }
                 else
                 {
+                    if (bedRequest.Status != BedRequestStatus.Delivered)
+                    {
+                        Console.WriteLine("here");
+                    }
+
                     ObjectUtil.CopyProperties(bedRequest, existingBedRequest, propertiesToIgnore);
                     toUpdate.Add(existingBedRequest);
                 }
@@ -129,7 +121,7 @@ namespace BedBrigade.Tests.Integration
             BedRequest current = new BedRequest();
             current.NumberOfBeds = 0;
             DateTime createDate = new DateTime(2025, 7, 5);
-            DateTime deliveryDate = new DateTime(2025, 7, 12);
+
             foreach (PolarisBedRequest request in polarisBedRequests)
             {
                 if (request.Group == "Out of town")
@@ -153,14 +145,7 @@ namespace BedBrigade.Tests.Integration
                 SetFirstNameLastName(request, current);
                 SetCreateDate(request, current, createDate);
                 createDate = current.CreateDate.Value;
-                SetDeliveryDate(request, current, deliveryDate);
-
-                if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered
-                    && current.DeliveryDate.HasValue)
-                {
-                    deliveryDate = current.DeliveryDate.Value;
-                }
-
+                SetDeliveryDate(request, current);
                 SetGenderAge(request, current);
                 SetNames(request, current);
                 SetAddress(request, current);
@@ -366,19 +351,28 @@ namespace BedBrigade.Tests.Integration
             current.GenderAge += $"{genderLetter}/{ageLetter}";
         }
 
-        private void SetDeliveryDate(PolarisBedRequest request, BedRequest current, DateTime deliveryDate)
+        private void SetDeliveryDate(PolarisBedRequest request, BedRequest current)
         {
             if (current.Status == BedBrigade.Common.Enums.BedRequestStatus.Delivered)
             {
                 if (current.DeliveryDate == null || current.DeliveryDate == DateTime.MinValue)
                 {
+                    //Set the delivery date if it is specified in the request
                     if (request.DeliveryDate != DateTime.MinValue)
                     {
                         current.DeliveryDate = request.DeliveryDate;
                     }
                     else
                     {
-                        current.DeliveryDate = deliveryDate;
+                        //No delivery date specified, set it to a future create date
+                        if (current.CreateDate.Value.AddMonths(1) > DateTime.Now)
+                        {
+                            current.DeliveryDate = current.CreateDate.Value.AddDays(1);
+                        }
+                        else
+                        {
+                            current.DeliveryDate = current.CreateDate.Value.AddMonths(1);
+                        }
                     }
                 }
             }
@@ -422,6 +416,12 @@ namespace BedBrigade.Tests.Integration
             {
                 request.RequestersName = request.RequestersName.Replace("Red de Vida Unlimited", string.Empty,StringComparison.OrdinalIgnoreCase).Trim();
                 AddNote(current, "Red de Vida Unlimited");
+            }
+
+            if (request.RequestersName.Contains("Alice Prout Nationwide Children's Hospital Partner's for Kids"))
+            {
+                request.RequestersName = "Alice Prout";
+                AddNote(current, "Nationwide Children's Hospital Partner's for Kids");
             }
 
             var nameParts = _nameParserLogic.ParseName(request.RequestersName, NameOrder.FirstLast);
@@ -489,7 +489,7 @@ namespace BedBrigade.Tests.Integration
                     current.Status = BedBrigade.Common.Enums.BedRequestStatus.Waiting;
                     current.Contacted = true;
                     break;
-                case "August 9th delivery":
+                case "November 8th delivery":
                     current.Status = BedBrigade.Common.Enums.BedRequestStatus.Scheduled;
                     current.Contacted = true;
                     break;

@@ -13,6 +13,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     public Int32 BedRequestId { get; set; }
 
     [ForeignKey("LocationId"), Required] public Int32 LocationId { get; set; }
+    public Location Location { get; set; }
 
     [ForeignKey("ScheduleId")] public Int32? ScheduleId { get; set; }
 
@@ -117,7 +118,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [NotMapped]
     public string ContactedYes => Contacted == true ? "Yes" : string.Empty;
 
-    public void UpdateDuplicateFields(BedRequest? bedRequest, string note)
+    public void UpdateDuplicateFields(BedRequest? bedRequest, string newNote)
     {
         if (bedRequest == null) return;
 
@@ -134,7 +135,15 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
         GenderAge = bedRequest.GenderAge;
         Names = bedRequest.Names;
         Group = bedRequest.Group;
-        Notes = Notes + " " + bedRequest.Notes + " " + note;
+
+        if ((Notes??string.Empty).Contains(bedRequest.Notes))
+        {
+            Notes = Notes + " " + newNote;
+        }
+        else
+        {
+            Notes = Notes + " " + bedRequest.Notes + " " + newNote;
+        }
 
         //We intentionally do not update these fields:
         //ScheduleId, Status, Team, DeliveryDate, Contacted, SpeakEnglish, PrimaryLanguage, Reference

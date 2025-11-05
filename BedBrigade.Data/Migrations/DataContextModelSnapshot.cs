@@ -902,6 +902,10 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("ServiceZipCodes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<string>("TimeZoneId")
                         .IsRequired()
                         .HasMaxLength(40)
@@ -1026,6 +1030,9 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int>("Beds")
+                        .HasColumnType("int");
+
                     b.Property<string>("City")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
@@ -1091,6 +1098,9 @@ namespace BedBrigade.Server.Migrations
                     b.Property<string>("State")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Teams")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");

@@ -11,6 +11,9 @@
         public const string DisplayIdFields = "DisplayIdFields";
         public const string EmptyGridText = "EmptyGridText";
         public const string EventCutOffTimeDays = "EventCutOffTimeDays";
+        public const string PrimaryLanguage = "PrimaryLanguage";
+        public const string SpeakEnglish = "SpeakEnglish";
+        public const string MonthsBetweenRequests = "MonthsBetweenRequests";
 
         //Translation
         public const string TranslationApiKey = "TranslationApiKey";
@@ -48,8 +51,6 @@
         public const string EmailPort = "EmailPort";
         public const string EmailUserName = "EmailUserName";
         public const string EmailPassword = "EmailPassword";
-        public const string PrimaryLanguage = "PrimaryLanguage";
-        public const string SpeakEnglish = "SpeakEnglish";
         public const string ContactUsEmails = "ContactUsEmails";
         public const string BedRequestEmails = "BedRequestEmails";
         public const string EmailImapPort = "EmailImapPort";
@@ -87,5 +88,15 @@
 
         //Custom Strings
         public const string BedRequestNote = "BedRequestNote";
+
+        //Schedule
+        public const string DefaultBuildTime = "DefaultBuildTime";
+        public const string DefaultBuildDurationHours = "DefaultBuildDurationHours";
+        public const string DefaultBuildMaxVolunteers = "DefaultBuildMaxVolunteers";
+        public const string DefaultBuildEventNote = "DefaultBuildEventNote";
+        public const string DefaultDeliveryTime = "DefaultDeliveryTime";
+        public const string DefaultDeliveryDurationHours = "DefaultDeliveryDurationHours";
+        public const string DefaultDeliveryMaxVolunteers = "DefaultDeliveryMaxVolunteers";
+        public const string DefaultDeliveryEventNote = "DefaultDeliveryEventNote";
     }
 }

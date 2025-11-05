@@ -140,6 +140,12 @@ public partial class Index : ComponentBase, IDisposable
             {
                 await _js.InvokeVoidAsync("BedBrigadeUtil.runCarousel", 3000);
             }
+
+            // Initialize image zoom after content is rendered (run once)
+            if (firstRender)
+            {
+                await _js.InvokeVoidAsync("initImageZoom");
+            }
         }
         catch (System.Threading.Tasks.TaskCanceledException)
         {

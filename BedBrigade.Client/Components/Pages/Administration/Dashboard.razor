@@ -5,9 +5,598 @@
 
 <h3 class="w-100 text-center mt-3">Administration Dashboard</h3>
 
-<div class="text-center">
-    <h2>Bed Brigade</h2>
+<div class="container my-4">
+    <div class="row mb-4">
+        @if (ContactsNeedingResponses > 0)
+        {
+            <div class="col-md-3">
+                <div class="card shadow-sm text-dark" style="background-color: #fff3cd;">
+                    <div class="card-header fw-bold">
+                        <h5 class="mb-0"><a href="/administration/manage/contacts">Contact Requested</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/administration/manage/contacts">Contacts Needing Responses</a>: @ContactsNeedingResponses
+                    </div>
+                </div>
+            </div>
+        }
+        @if (SmsQueueSummaries != null && SmsQueueSummaries.Any(o => o.UnRead))
+        {
+            <div class="col-md-3">
+                <div class="card shadow-sm text-dark" style="background-color: #d1ecf1;">
+                    <div class="card-header fw-bold">
+                        <h5 class="mb-0"><a href="/administration/SMS/SmsSummary">SMS Queue</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="/administration/SMS/SmsSummary">Unread Messages</a>: @UnreadMessages
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <!-- Schedules Section -->
+        <div class="col-md-8 col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule for @LocationName </a></h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Schedules == null)
+                    {
+                        <div class="p-3 text-muted">Loading schedules...</div>
+                    }
+                    else if (!Schedules.Any())
+                    {
+                        <div class="p-3 text-muted">No schedules found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm mb-0">
+                                <thead class="table-secondary">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Event</th>
+                                    <th>Group</th>
+                                    <th class="text-center">Volunteers</th>
+                                    <th class="text-center">Vehicles</th>
+                                    <th class="text-center">Teams</th>
+                                    <th class="text-center">Beds</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var s in Schedules)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href=@($"/administration/admintasks/addeditschedule/{s.LocationId}/{s.ScheduleId}")>
+                                                @s.EventDateScheduled.ToString("g")
+                                            </a>
+                                        </td>
+                                        <td>@s.EventName</td>
+                                        <td>@s.GroupName</td>
+                                        <td class="text-center">@s.VolunteersRegistered</td>
+                                        <td class="text-center">@s.DeliveryVehiclesRegistered</td>
+                                        <td class="text-center">@s.Teams</td>
+                                        <td class="text-center">@s.Beds</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/bedrequests">Waiting Bed Requests</a></h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-secondary">
+                            <tr>
+                                <th>Location</th>
+                                <th class="text-center">Requests</th>
+                                <th class="text-center">Beds</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if (BedRequestsDashboard != null)
+                            {
+                                foreach (var r in BedRequestsDashboard)
+                                {
+                                    <tr>
+                                        <td>@r.LocationName</td>
+                                        <td class="text-center">@r.Requests</td>
+                                        <td class="text-center">@r.Beds</td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <strong class="p-2" >Estimated Waiting Time: @EstimatedWaitingTime</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 d-none d-xl-block">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body p-2">
+                    <p><a href="/administration/manage/bedrequests">Bed Requests</a></p>
+                    <p><a href="/administration/manage/contacts">Contacts</a></p>
+                    <p><a href="/administration/manage/schedules">Schedules</a></p>
+                    <p><a href="/administration/manage/sign-ups">Sign-Ups</a></p>
+                    <p><a href="/administration/manage/volunteers">Volunteers</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delivery Plan -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>Delivery Plan for @LocationName</span>
+                        @if (DeliveryPlanList != null && DeliveryPlanList.Any())
+                        {
+                            <a href="#" @onclick="DownloadDeliveryPlanExcel">Download Delivery Plan</a>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (DeliveryPlanList == null)
+                    {
+                        <div class="p-3 text-muted">Loading delivery plan...</div>
+                    }
+                    else if (!DeliveryPlanList.Any())
+                    {
+                        <div class="p-3 text-muted">No deliveries scheduled.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Delivery Date</th>
+                                        <th>Group</th>
+                                        <th>Team</th>
+                                        <th class="text-end">Beds</th>
+                                        <th class="text-end">Stops</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var dp in DeliveryPlanList)
+                                    {
+                                        <tr>
+                                            <td>@dp.DeliveryDate.ToString("d")</td>
+                                            <td>@dp.Group</td>
+                                            <td>@dp.Team</td>
+                                            <td class="text-end">@dp.NumberOfBeds</td>
+                                            <td class="text-end">@dp.Stops</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sign-Ups Section (full width) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><a href="/administration/manage/sign-ups">Sign-Ups for @LocationName</a></h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (SignUps == null)
+                    {
+                        <div class="p-3 text-muted">Loading sign-ups...</div>
+                    }
+                    else if (!SignUps.Any())
+                    {
+                        <div class="p-3 text-muted">No sign-ups found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Event</th>
+                                        <th>Volunteer</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Organization</th>
+                                        <th>Vehicle</th>
+                                        <th class="text-center"># Volunteers</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var su in SignUps)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (su.Schedule != null)
+                                                {
+                                                    <a href=@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")>@su.Schedule.EventDateScheduled.ToString("g")</a>
+                                                }
+                                                else
+                                                {
+                                                    @su.Schedule?.EventDateScheduled.ToString("g")
+                                                }
+                                            </td>
+                                            <td>@su.Schedule?.ScheduleName</td>
+                                            <td>
+                                                @if (su.Volunteer != null)
+                                                {
+                                                    <a href=@($"/administration/admintasks/addeditvolunteer/{su.Volunteer.LocationId}/{su.VolunteerId}")>@su.Volunteer.FullName</a>
+                                                }
+                                                else
+                                                {
+                                                    @su.Volunteer?.FullName
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Email))
+                                                {
+                                                    <a href="mailto:@su.Volunteer.Email">@su.Volunteer.Email</a>
+                                                }
+                                                else
+                                                {
+                                                    @su.Volunteer?.Email
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(su.Volunteer?.Phone))
+                                                {
+                                                    <a href="tel:@su.Volunteer.Phone">@su.Volunteer.FormattedPhone</a>
+                                                }
+                                                else
+                                                {
+                                                    @su.Volunteer?.FormattedPhone
+                                                }
+                                            </td>
+                                            <td>@su.Volunteer?.Organization</td>
+                                            <td>@su.VehicleTypeString</td>
+                                            <td class="text-center">@su.NumberOfVolunteers</td>
+                                            <td>@su.SignUpNote</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bed Request History -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Request History for @LocationName</h5>
+                </div>
+                <div class="card-body">
+                    @if (IsHistoryLoading)
+                    {
+                        <div class="text-muted">Loading history...</div>
+                    }
+                    else if (BedRequestSeriesCurrentYear == null)
+                    {
+                        <div class="text-muted">No history available.</div>
+                    }
+                    else
+                    {
+                        <SfChart>
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Month" Interval="1"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Title="Beds Requested"></ChartPrimaryYAxis>
+                            <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@BedRequestSeriesTwoYearsAgo" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@TwoYearsAgoLabel" Width="2" Fill="#008000"></ChartSeries>
+                                <ChartSeries DataSource="@BedRequestSeriesPrevYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@PrevYearLabel" Width="2" Fill="#0000FF"></ChartSeries>
+                                <ChartSeries DataSource="@BedRequestSeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Delivery History for @LocationName</h5>
+                </div>
+                <div class="card-body">
+                    @if (IsDeliveryHistoryLoading)
+                    {
+                        <div class="text-muted">Loading delivery history...</div>
+                    }
+                    else if (DeliverySeriesCurrentYear == null)
+                    {
+                        <div class="text-muted">No delivery history available.</div>
+                    }
+                    else
+                    {
+                        <SfChart>
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Month" Interval="1"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Title="Beds Delivered"></ChartPrimaryYAxis>
+                            <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@DeliverySeriesTwoYearsAgo" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@TwoYearsAgoLabel" Width="2" Fill="#008000"></ChartSeries>
+                                <ChartSeries DataSource="@DeliverySeriesPrevYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@PrevYearLabel" Width="2" Fill="#0000FF"></ChartSeries>
+                                <ChartSeries DataSource="@DeliverySeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="@CurrentYearLabel" Width="2" Fill="#FF0000"></ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Requests Versus Deliveries YTD Chart -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Requests Versus Deliveries @CurrentYearLabel YTD for @LocationName</h5>
+                </div>
+                <div class="card-body">
+                    @if (IsHistoryLoading || IsDeliveryHistoryLoading)
+                    {
+                        <div class="text-muted">Loading chart...</div>
+                    }
+                    else if (BedRequestSeriesCurrentYear == null || DeliverySeriesCurrentYear == null)
+                    {
+                        <div class="text-muted">No data available.</div>
+                    }
+                    else
+                    {
+                        <SfChart>
+                            <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Month" Interval="1"></ChartPrimaryXAxis>
+                            <ChartPrimaryYAxis Title="Beds"></ChartPrimaryYAxis>
+                            <ChartLegendSettings Visible="true"></ChartLegendSettings>
+                            <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+                            <ChartSeriesCollection>
+                                <ChartSeries DataSource="@BedRequestSeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="Beds Requested" Width="2" Fill="#FF0000"></ChartSeries>
+                                <ChartSeries DataSource="@DeliverySeriesCurrentYear" XName="Month" YName="Count" Type="ChartSeriesType.Line" Name="Beds Delivered" Width="2" Fill="#008000"></ChartSeries>
+                            </ChartSeriesCollection>
+                        </SfChart>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bed Request Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Request Statistics for @LocationName</h5>
+                    @if (LocationId == Defaults.GroveCityLocationId)
+                    {
+                        <span>* Excludes UALC and Peace</span>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (IsHistoryLoading)
+                    {
+                        <div class="p-3 text-muted">Loading statistics...</div>
+                    }
+                    else if (BedRequestSeriesCurrentYear == null)
+                    {
+                        <div class="p-3 text-muted">No statistics available.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                <tr>
+                                    <th>Statistic</th>
+                                    <th class="text-end">Families in Need</th>
+                                    <th class="text-end">Beds</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>@CurrentYearLabel YTD</td>
+                                    <td class="text-end">@CurrentYearYtdRequests</td>
+                                    <td class="text-end">@CurrentYearYtdTotal</td>
+                                </tr>
+                                <tr>
+                                    <td>@PrevYearLabel Total</td>
+                                    <td class="text-end">@PrevYearRequestsTotal</td>
+                                    <td class="text-end">@PrevYearTotal</td>
+                                </tr>
+                                <tr>
+                                    <td>@TwoYearsAgoLabel Total</td>
+                                    <td class="text-end">@TwoYearsAgoRequestsTotal</td>
+                                    <td class="text-end">@TwoYearsAgoTotal</td>
+                                </tr>
+                                <tr>
+                                    <td>Min Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@MinRequestsPerMonth</td>
+                                    <td class="text-end">@MinBedsPerMonth</td>
+                                </tr>
+                                <tr>
+                                    <td>Max Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@MaxRequestsPerMonth</td>
+                                    <td class="text-end">@MaxBedsPerMonth</td>
+                                </tr>
+                                <tr>
+                                    <td>Average Requested Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@AverageRequestsPerMonth.ToString("F1")</td>
+                                    <td class="text-end">@AverageBedsPerMonth.ToString("F1")</td>
+                                </tr>
+                                <tr>
+                                    <td>Average Requested Per Week for @PrevYearLabel/@CurrentYearLabel</td>
+                                    <td class="text-end">@AverageRequestsPerWeek.ToString("F1")</td>
+                                    <td class="text-end">@AverageBedsPerWeek.ToString("F1")</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Bed Delivery Statistics for @LocationName</h5>
+                    @if (LocationId == Defaults.GroveCityLocationId)
+                    {
+                        <span>* Excludes UALC and Peace</span>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (IsDeliveryHistoryLoading)
+                    {
+                        <div class="p-3 text-muted">Loading statistics...</div>
+                    }
+                    else if (DeliverySeriesCurrentYear == null)
+                    {
+                        <div class="p-3 text-muted">No statistics available.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th>Statistic</th>
+                                        <th class="text-end">Families Blessed</th>
+                                        <th class="text-end">Beds</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@CurrentYearLabel YTD</td>
+                                        <td class="text-end">@DeliveryCurrentYearYtdRequests</td>
+                                        <td class="text-end">@DeliveryCurrentYearYtdBeds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@PrevYearLabel Total</td>
+                                        <td class="text-end">@DeliveryPrevYearRequestsTotal</td>
+                                        <td class="text-end">@DeliveryPrevYearBeds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>@TwoYearsAgoLabel Total</td>
+                                        <td class="text-end">@DeliveryTwoYearsAgoRequestsTotal</td>
+                                        <td class="text-end">@DeliveryTwoYearsAgoBeds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Min Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMinRequestsPerMonth</td>
+                                        <td class="text-end">@DeliveryMinBedsPerMonth</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Max Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryMaxRequestsPerMonth</td>
+                                        <td class="text-end">@DeliveryMaxBedsPerMonth</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Delivered Per Month for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageRequestsPerMonth.ToString("F1")</td>
+                                        <td class="text-end">@DeliveryAverageBedsPerMonth.ToString("F1")</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Delivered Per Week for @PrevYearLabel/@CurrentYearLabel</td>
+                                        <td class="text-end">@DeliveryAverageRequestsPerWeek.ToString("F1")</td>
+                                        <td class="text-end">@DeliveryAverageBedsPerWeek.ToString("F1")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- National Deliveries -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">National Deliveries</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (NationalDeliveries == null)
+                    {
+                        <div class="p-3 text-muted">Loading national deliveries...</div>
+                    }
+                    else if (!NationalDeliveries.Any())
+                    {
+                        <div class="p-3 text-muted">No national deliveries found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-secondary">
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Group</th>
+                                    <th>Year</th>
+                                    <th class="text-end">Beds</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @{ string lastYearHeader = null; }
+                                @foreach (var nd in NationalDeliveries)
+                                {
+                                    if (!String.IsNullOrEmpty(nd.YearString) && lastYearHeader != nd.YearString)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="background-color: Gold; text-align: center;">
+                                                <strong>@nd.YearString</strong>
+                                            </td>
+                                        </tr>
+                                        lastYearHeader = nd.YearString;
+                                    }
+                                    var isTotal = string.IsNullOrWhiteSpace(nd.Group) || (nd.Location?.Contains("Total") ?? false);
+                                    <tr style=@(isTotal ? "background-color: PowderBlue;" : string.Empty)>
+                                        <td>@nd.Location</td>
+                                        <td>@nd.Group</td>
+                                        <td>@nd.YearString</td>
+                                        <td class="text-end">@nd.Beds</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
 </div>
 
-<p class="text-center">Please use the Administration menu to perform Admin functions.</p>
-<p class="text-center">A future version of this dashboard will have summary information.</p>
