@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Grids;
-using Action = Syncfusion.Blazor.Grids.Action;
-using Syncfusion.Blazor.DropDowns;
-using BedBrigade.Data.Services;
-using Serilog;
-using BedBrigade.Common.Constants;
+﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Components;
+using Serilog;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Grids;
+using Action = Syncfusion.Blazor.Grids.Action;
 
 
 namespace BedBrigade.Client.Components.Pages.Administration.Manage
@@ -22,6 +23,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private NavigationManager? _navigationManager { get; set; }
+        [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Parameter] public int? Id { get; set; }
         protected SfGrid<Common.Models.Schedule>? Grid { get; set; }
         protected List<Common.Models.Schedule>? lstSchedules { get; set; }
@@ -64,7 +66,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 await LoadUserData();
                 await LoadLocations();
                 SetupToolbar();
-                await LoadScheduleData();
+                await LoadScheduleData(FutureFilter);
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();
                 DefaultSortColumns = new List<GridSortColumn> { new GridSortColumn { Field = EventDate, Direction = SortDirection.Ascending } };
@@ -78,13 +80,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         }
 
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override void OnAfterRender(bool firstRender)
         {
-            if (firstRender)
-            {
-                await SetInitialFilter();
-            }
-            else
+            if (!firstRender)
             {
                 if (_svcAuth.UserHasRole(RoleNames.CanManageSchedule))
                 {
@@ -112,21 +110,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         }
         // Async Init
 
-        private async Task SetInitialFilter()
-        {
-            if (Grid != null)
-            {
-                try
-                {
-                    await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal",
-                        DateTime.Today); // default grid filter: future events
-                }
-                catch (Exception)
-                {
-                    //Ignore any filter errors
-                }
-            }
-        }
+
 
 
         private async Task LoadUserData()
@@ -159,49 +143,72 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
         } // Load Locations
 
-        private async Task LoadScheduleData()
+        private async Task LoadScheduleData(string filter)
         {
-            ServiceResponse<List<Common.Models.Schedule>> recordResult;
-            recordResult = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
+            ServiceResponse<List<Common.Models.Schedule>> result;
 
-            if (recordResult.Success && recordResult.Data != null)
+            switch (filter)
             {
-                lstSchedules = recordResult!.Data;
+                case FutureFilter:
+                    result = await _svcSchedule.GetFutureSchedulesByLocationId(_selectedLocationId);
+                    break;
+                case "past":
+                    result = await _svcSchedule.GetPastSchedulesByLocationId(_selectedLocationId);
+                    break;
+                default:
+                    result = await _svcSchedule.GetSchedulesByLocationId(_selectedLocationId);
+                    break;
+            }
+
+            if (result.Success && result.Data != null)
+            {
+                lstSchedules = result!.Data;
             }
             else
             {
                 lstSchedules = new List<Common.Models.Schedule>();
-                Log.Error("Error loading schedules: {ErrorMessage}", recordResult.Message);
-                _toastService.Error("Error", $"An error occurred while loading schedules: {recordResult.Message}");
+                Log.Error("Error loading future schedules: {ErrorMessage}", result.Message);
+                _toastService.Error("Error", $"An error occurred while loading future schedules: {result.Message}");
             }
         }
 
 
         protected async Task OnLoad()
         {
-            //TODO: Load the grid state for this grid
-            //It is currently not possible to load the grid state for this grid 
-            //It has to do with how we are filtering the grid client side
-            //After saving the grid state, when it is loaded there are no records shown.
+            string userName = _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Schedule };
+            var result = await _svcUserPersist.GetGridPersistence(persist);
+            if (result.Success && result.Data != null)
+            {
+                await Grid.SetPersistDataAsync(result.Data);
+            }
         }
 
         protected async Task OnDestroyed()
         {
-            //TODO: Save the grid state for this grid
-            //It is currently not possible to save the grid state for this grid 
-            //It has to do with how we are filtering the grid client side probably
-            //After saving the grid state, when it is loaded there are no records shown.
+            await SaveGridPersistence();
         }
 
+        private async Task SaveGridPersistence()
+        {
+            _state = await Grid.GetPersistData();
+            string userName = _svcUser.GetUserName();
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Schedule, Data = _state };
+            var result = await _svcUserPersist.SaveGridPersistence(persist);
+            if (!result.Success)
+            {
+                Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.Schedule} : {result.Message}");
+            }
+        }
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
             if (args.Item.Text == "Reset")
             {
+                CurrentFilterOption = FutureFilter;
+                await LoadScheduleData(CurrentFilterOption);
                 await Grid.ResetPersistDataAsync();
-                DefaultFilter = FutureFilter;
-                await SetInitialFilter();
-                //It is not possible to save the grid state for this grid for some reason
+                await SaveGridPersistence();
                 return;
             }
 
@@ -352,9 +359,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             public string Text { get; set; }
         }
 
-        public string DefaultFilter = "future";
+        public string CurrentFilterOption = "future";
 
-        private List<GridFilterOption> GridDefaultFilter = new List<GridFilterOption>
+        private List<GridFilterOption> GridFilterOptions = new List<GridFilterOption>
         {
             new GridFilterOption() { ID = FutureFilter, Text = "In the Future" },
             new GridFilterOption() { ID = "past", Text = "In the Past" },
@@ -362,22 +369,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         };
 
         private async Task OnFilterChange(ChangeEventArgs<string, GridFilterOption> args)
-        {   // External Grid Filtering by Event Date
-            //Debug.WriteLine("The Grid Filter DropDownList Value", args.Value);
-
-            switch (args.Value)
-            {
-                case FutureFilter:
-                    await Grid.FilterByColumnAsync(EventDate, "greaterthanorequal", DateTime.Today);
-                    break;
-                case "past":
-                    await Grid.FilterByColumnAsync(EventDate, "lessthan", DateTime.Today);
-                    break;
-                default:
-                    await Grid.ClearFilteringAsync(EventDate);
-                    break;
-
-            }
+        {
+            await LoadScheduleData(args.Value);
         }
 
         private string cssClass { get; set; } = "e-outline";

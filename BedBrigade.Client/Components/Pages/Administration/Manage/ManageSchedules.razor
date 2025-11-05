@@ -19,7 +19,7 @@
     </div>
     <div class="col-md-4 ps-3 ps-md-0">
         @_lc.Keys["ShowSchedules"]
-        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridDefaultFilter" @bind-Value="@DefaultFilter" Width="200px">
+        <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridFilterOptions" @bind-Value="@CurrentFilterOption" Width="200px">
             <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange"></DropDownListEvents>
             <DropDownListFieldSettings Value="ID" Text="Text"></DropDownListFieldSettings>
         </SfDropDownList>

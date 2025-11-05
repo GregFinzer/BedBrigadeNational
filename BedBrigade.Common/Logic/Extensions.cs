@@ -4,10 +4,10 @@ namespace BedBrigade.Common.Logic
 {
     public static class Extensions
     {
-        public static string FormatPhoneNumber(this string phone)
+        public static string FormatPhoneNumber(this string? phone)
         {
             if (string.IsNullOrEmpty(phone))
-                return phone;
+                return string.Empty;
 
             if (phone.StartsWith("+1") && phone.Length > 2)
                 phone = phone.Substring(2);
