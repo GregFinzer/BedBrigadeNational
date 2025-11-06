@@ -91,6 +91,18 @@ public class TimezoneDataService : ITimezoneDataService
         item.CreateDateLocal = ConvertUtcToTimeZone(item.CreateDate, timeZoneId);
         item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
     }
+
+    public void FillLocalDates(List<EmailQueue> items)
+    {
+        string timeZoneId = GetUserTimeZoneId();
+        foreach (var item in items)
+        {
+            item.CreateDateLocal = ConvertUtcToTimeZone(item.CreateDate, timeZoneId);
+            item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
+            item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+        }
+    }
 }
 
 

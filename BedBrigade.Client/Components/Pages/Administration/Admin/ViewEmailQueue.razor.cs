@@ -11,7 +11,7 @@ public partial class ViewEmailQueue : ComponentBase
 {
     [Inject] private IEmailQueueDataService EmailQueueService { get; set; } = default!;
     [Inject] private ToastService Toast { get; set; } = default!;
-    [Inject] private AuthService AuthService { get; set; } = default!;
+    [Inject] private IAuthService AuthService { get; set; } = default!;
     protected SfGrid<EmailQueue>? Grid { get; set; }
     protected List<EmailQueue>? Emails { get; set; }
 

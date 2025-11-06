@@ -42,8 +42,8 @@ else
                 <GridColumn Field="FromAddress" HeaderText="From" Width="220"></GridColumn>
                 <GridColumn Field="ToAddress" HeaderText="To" Width="220"></GridColumn>
                 <GridColumn Field="Subject" HeaderText="Subject" Width="260"></GridColumn>
-                <GridColumn Field="SentDate" HeaderText="Sent (UTC)" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
-                <GridColumn Field="CreateDate" HeaderText="Created (UTC)" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="QueueDateLocal" HeaderText="Queued" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="SentDateLocal" HeaderText="Sent" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
                 <GridColumn Field="CreateUser" HeaderText="Created By" Width="180"></GridColumn>
                 <GridColumn Field="FailureMessage" HeaderText="Failure Message" Width="300"></GridColumn>
             </GridColumns>
@@ -53,8 +53,35 @@ else
 
 <SfDialog Width="800px" ShowCloseIcon="true" IsModal="true" @bind-Visible="ViewDialogVisible">
     <DialogTemplates>
-        <Header>Queued Email</Header>
+        <Header>Email Detail</Header>
         <Content>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-4 fw-bold">Status</div>
+                    <div class="col-8">@_selected?.Status</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Queue Date</div>
+                    <div class="col-8">@(_selected?.QueueDateLocal.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Sent Date</div>
+                    <div class="col-8">@(_selected?.SentDateLocal?.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">From Address</div>
+                    <div class="col-8 text-break">@_selected?.FromAddress</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">To Address</div>
+                    <div class="col-8 text-break">@_selected?.ToAddress</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Subject</div>
+                    <div class="col-8 text-break">@_selected?.Subject</div>
+                </div>
+            </div>
+            <hr />
             <div style="white-space:pre-wrap; max-height:55vh; overflow:auto; font-family:monospace; font-size:.9rem;">@SelectedBody</div>
         </Content>
     </DialogTemplates>
