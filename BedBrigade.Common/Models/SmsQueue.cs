@@ -6,7 +6,7 @@ using BedBrigade.Common.Constants;
 namespace BedBrigade.Common.Models
 {
     [Table("SmsQueue")]
-    public class SmsQueue : BaseEntity
+    public class SmsQueue : BaseEntity, ILocationId
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

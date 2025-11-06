@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BedBrigade.Common.Constants;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Common.Models
 {
     [Table("EmailQueue")]
-    public class EmailQueue : BaseEntity
+    public class EmailQueue : BaseEntity, ILocationId
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -37,8 +39,14 @@ namespace BedBrigade.Common.Models
         [Required]
         public DateTime QueueDate { get; set; }
 
+        [NotMapped]
+        public DateTime QueueDateLocal { get; set; }
+
         public DateTime? LockDate { get; set; }
         public DateTime? SentDate { get; set; }
+
+        [NotMapped]
+        public DateTime? SentDateLocal { get; set; }
 
         [Required]
         public int Priority { get; set; }
@@ -51,5 +59,8 @@ namespace BedBrigade.Common.Models
 
         [MaxLength(100)]
         public string? FirstName { get; set; }
+
+        [Required, DefaultValue(Defaults.GroveCityLocationId)]
+        public Int32 LocationId { get; set; } = Defaults.GroveCityLocationId;
     }
 }

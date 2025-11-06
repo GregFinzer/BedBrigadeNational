@@ -24,6 +24,9 @@ namespace BedBrigade.Data.Services
         private readonly ISubscriptionDataService _subscriptionDataService;
         private readonly INewsletterDataService _newsletterDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
+        private readonly ICommonService _commonService;
+        private readonly ITimezoneDataService _timezoneDataService;
+
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -36,7 +39,9 @@ namespace BedBrigade.Data.Services
             IScheduleDataService scheduleDataService,
             ISubscriptionDataService subscriptionDataService,
             INewsletterDataService newsletterDataService,
-            IMailMergeLogic mailMergeLogic) : base(contextFactory, cachingService, authService)
+            IMailMergeLogic mailMergeLogic, 
+            ICommonService commonService, 
+            ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -50,6 +55,8 @@ namespace BedBrigade.Data.Services
             _subscriptionDataService = subscriptionDataService;
             _newsletterDataService = newsletterDataService;
             _mailMergeLogic = mailMergeLogic;
+            _commonService = commonService;
+            _timezoneDataService = timezoneDataService;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -118,6 +125,20 @@ namespace BedBrigade.Data.Services
                 _cachingService.Set(cacheKey, result);
                 return result;
             }
+        }
+
+        public async Task<ServiceResponse<List<EmailQueue>>> GetAllForLocationAsync(int locationId)
+        {
+            var result = await _commonService.GetAllForLocationAsync(this, locationId);
+
+            if (!result.Success || result.Data == null)
+            {
+                return result;
+            }
+
+            _timezoneDataService.FillLocalDates(result.Data);
+
+            return result;
         }
 
         public async Task ClearEmailQueueLock()
@@ -298,7 +319,7 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>(QueueStatus.Queued.ToString(), true);
         }
 
-        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body)
+        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body, int locationId)
         {
             if (emailList.Count == 0)
                 return new ServiceResponse<string>("No emails to send", false);
@@ -313,7 +334,8 @@ namespace BedBrigade.Data.Services
                     Status = QueueStatus.Queued.ToString(),
                     QueueDate = DateTime.UtcNow,
                     FailureMessage = string.Empty,
-                    Priority = Defaults.BulkLowPriority
+                    Priority = Defaults.BulkLowPriority,
+                    LocationId = locationId
                 }).ToList();
 
                 string userName = GetUserName();
