@@ -74,7 +74,9 @@ namespace BedBrigade.Data.Services
                 {
                     ToAddress = email,
                     Subject = BuildTaxFormSubject(location.Data, donationsForEmail.First().DonationDate),
-                    Body = BuildTaxFormBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail)
+                    Body = BuildTaxFormBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail),
+                    LocationId = location.Data.LocationId
+
                 };
                 var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -208,7 +210,8 @@ namespace BedBrigade.Data.Services
                 ToAddress = entity.Email,
                 Subject = subject,
                 Body = bodyResult.Data,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = entity.LocationId
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -227,7 +230,7 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
 
                 if (!bulkEmailResponse.Success)
                 {
@@ -245,7 +248,8 @@ namespace BedBrigade.Data.Services
                 ToAddress = volunteer.Email,
                 Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                 Body = body,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = volunteer.LocationId
             };
             ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -269,7 +273,8 @@ namespace BedBrigade.Data.Services
                     ToAddress = schedule.OrganizerEmail,
                     Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                     Body = body,
-                    Priority = Defaults.BulkHighPriority
+                    Priority = Defaults.BulkHighPriority,
+                    LocationId = volunteer.LocationId
                 };
                 ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -332,7 +337,8 @@ namespace BedBrigade.Data.Services
                 ToAddress = entity.Email,
                 Subject = subject,
                 Body = bodyResult.Data,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = entity.LocationId
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -351,7 +357,7 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
 
                 if (!bulkEmailResponse.Success)
                 {
@@ -441,7 +447,8 @@ namespace BedBrigade.Data.Services
                 ToAddress = user.Email,
                 Subject = "Bed Brigade Password Reset Request",
                 Body = body,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = user.LocationId
             };
 
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);

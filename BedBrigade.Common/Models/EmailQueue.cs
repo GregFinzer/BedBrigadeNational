@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BedBrigade.Common.Constants;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BedBrigade.Common.Models
 {
     [Table("EmailQueue")]
-    public class EmailQueue : BaseEntity
+    public class EmailQueue : BaseEntity, ILocationId
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -51,5 +53,8 @@ namespace BedBrigade.Common.Models
 
         [MaxLength(100)]
         public string? FirstName { get; set; }
+
+        [Required, DefaultValue(Defaults.GroveCityLocationId)]
+        public Int32 LocationId { get; set; } = Defaults.GroveCityLocationId;
     }
 }

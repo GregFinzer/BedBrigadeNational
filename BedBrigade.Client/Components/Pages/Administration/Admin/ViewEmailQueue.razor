@@ -1,0 +1,65 @@
+@layout Layout.AdminLayout
+@page "/administration/admin/viewemailqueue"
+@using BedBrigade.Common.Models
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+<CheckAuth Roles=@RoleNames.CanSendBulkEmail></CheckAuth>
+
+@if (Emails is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container my-5">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>Email Queue</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
+
+        <SfGrid TItem="EmailQueue" @ref="Grid" DataSource="Emails"
+                AllowPaging="true" 
+                AllowSorting="true" 
+                AllowFiltering="true"
+                AllowExcelExport="true"
+                AllowPdfExport="true"
+                Toolbar="Toolbar" Height="auto">
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field="@nameof(EmailQueue.CreateDate)" Direction="SortDirection.Descending"/>
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+            <GridPageSettings PageSize="25" PageSizes="true"/>
+            <GridEvents TValue="EmailQueue" OnToolbarClick="OnToolbarClick" RowSelected="OnRowSelected" OnRecordDoubleClick="OnRecordDoubleClick" />
+
+            <GridColumns>
+                <GridColumn Field="EmailQueueId" HeaderText="Id" Width="90" TextAlign="TextAlign.Right" Visible="false"></GridColumn>
+                <GridColumn Field="Status" HeaderText="Status" Width="130"></GridColumn>
+                <GridColumn Field="FromAddress" HeaderText="From" Width="220"></GridColumn>
+                <GridColumn Field="ToAddress" HeaderText="To" Width="220"></GridColumn>
+                <GridColumn Field="Subject" HeaderText="Subject" Width="260"></GridColumn>
+                <GridColumn Field="SentDate" HeaderText="Sent (UTC)" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="CreateDate" HeaderText="Created (UTC)" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="CreateUser" HeaderText="Created By" Width="180"></GridColumn>
+                <GridColumn Field="FailureMessage" HeaderText="Failure Message" Width="300"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
+
+<SfDialog Width="800px" ShowCloseIcon="true" IsModal="true" @bind-Visible="ViewDialogVisible">
+    <DialogTemplates>
+        <Header>Queued Email</Header>
+        <Content>
+            <div style="white-space:pre-wrap; max-height:55vh; overflow:auto; font-family:monospace; font-size:.9rem;">@SelectedBody</div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="OK" IsPrimary="true" OnClick="CloseDialog" />
+    </DialogButtons>
+</SfDialog>
+
