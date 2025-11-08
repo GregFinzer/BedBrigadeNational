@@ -10,5 +10,6 @@ namespace BedBrigade.Data.Services
         Task LockTranslationsToProcess(List<TranslationQueue> translationsToProcess);
         Task ClearTranslationQueueLock();
         Task DeleteOldTranslationQueue(int daysOld);
+        Task<List<TranslationQueueView>> GetTranslationQueueView();
     }
 }

@@ -1,0 +1,52 @@
+@layout Layout.AdminLayout
+@page "/administration/admin/viewtranslationqueue"
+@using BedBrigade.Common.Models
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+@if (Translations is null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="container my-5">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>Translation Queue</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo />
+            </div>
+        </div>
+
+        <SfGrid TItem="TranslationQueueView" @ref="Grid" DataSource="Translations"
+                AllowPaging="true"
+                AllowSorting="true"
+                AllowFiltering="true"
+                AllowExcelExport="true"
+                AllowPdfExport="true"
+                Toolbar="Toolbar" Height="auto"
+                Width="100%"
+                ClipMode="ClipMode.EllipsisWithTooltip">
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field="@nameof(TranslationQueueView.QueueDateLocal)" Direction="SortDirection.Descending" />
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+            <GridPageSettings PageSize="25" PageSizes="true" />
+            <GridEvents TValue="TranslationQueueView" OnToolbarClick="OnToolbarClick" />
+            <GridColumns>
+                <GridColumn Field="Status" HeaderText="Status" Width="130"></GridColumn>
+                <GridColumn Field="Culture" HeaderText="Culture" Width="120"></GridColumn>
+                <GridColumn Field="Content" HeaderText="Content" Width="400"></GridColumn>
+                <GridColumn Field="QueueDateLocal" HeaderText="Queued" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="SentDateLocal" HeaderText="Sent" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="LockDateLocal" HeaderText="Locked" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="CreateUser" HeaderText="Created By" Width="180"></GridColumn>
+                <GridColumn Field="FailureMessage" HeaderText="Failure Message" Width="300"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
