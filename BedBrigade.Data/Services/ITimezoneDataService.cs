@@ -12,4 +12,5 @@ public interface ITimezoneDataService
     void FillLocalDates(List<SmsQueueSummary> items);
     void FillLocalDates<T>(T item) where T : BaseEntity;
     void FillLocalDates(List<EmailQueue> items);
+    void FillLocalDates(List<TranslationQueueView> items);
 }

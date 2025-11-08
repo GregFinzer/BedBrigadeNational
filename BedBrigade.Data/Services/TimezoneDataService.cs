@@ -103,6 +103,17 @@ public class TimezoneDataService : ITimezoneDataService
             item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
         }
     }
+
+    public void FillLocalDates(List<TranslationQueueView> items)
+    {
+        string timeZoneId = GetUserTimeZoneId();
+        foreach (var item in items)
+        {
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+            item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
+            item.LockDateLocal = ConvertUtcToTimeZone(item.LockDate, timeZoneId);
+        }
+    }
 }
 
 
