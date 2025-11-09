@@ -69,9 +69,12 @@ public class TimezoneDataService : ITimezoneDataService
 
     public void FillLocalDates(List<SmsQueue> items)
     {
+        // Updated to fill all local date properties for SmsQueue
         string timeZoneId = GetUserTimeZoneId();
         foreach (var item in items)
         {
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+            item.TargetDateLocal = ConvertUtcToTimeZone(item.TargetDate, timeZoneId) ?? item.TargetDate;
             item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
         }
     }

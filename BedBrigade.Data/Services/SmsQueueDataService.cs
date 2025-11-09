@@ -703,7 +703,44 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
 
     }
+
+    public async Task<ServiceResponse<List<SmsQueue>>> GetSmsQueueView()
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetSmsQueueView()");
+
+        List<SmsQueue>? cachedContent = _cachingService.Get<List<SmsQueue>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Found {cachedContent.Count} {GetEntityName()} in cache", true,
+                cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.Set<SmsQueue>()
+                    .Include(s => s.Location)
+                    .OrderByDescending(s => s.QueueDate)
+                    .ToListAsync();
+                _svcTimeZone.FillLocalDates(result); // populate local dates
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SmsQueue>>("Retrieved SmsQueue view", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Error GetSmsQueueView for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Error GetSmsQueueView for {GetEntityName()}: {ex.Message}", false, null);
+        }
+    }
 }
+
+
 
 
 

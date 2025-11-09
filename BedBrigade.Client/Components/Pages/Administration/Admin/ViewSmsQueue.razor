@@ -1,0 +1,60 @@
+@layout Layout.AdminLayout
+@page "/administration/admin/viewsmsqueue"
+@using BedBrigade.Common.Models
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+@if (Items is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container my-5">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>SMS Queue</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
+
+        <SfGrid TItem="SmsQueue" @ref="Grid" DataSource="Items"
+                AllowPaging="true"
+                AllowSorting="true"
+                AllowFiltering="true"
+                AllowExcelExport="true"
+                AllowPdfExport="true"
+                Toolbar="Toolbar" Height="auto">
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field=@nameof(SmsQueue.QueueDateLocal) Direction="SortDirection.Descending"/>
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+            <GridPageSettings PageSize="25" PageSizes="true"/>
+            <GridEvents TValue="SmsQueue" OnToolbarClick="OnToolbarClick" />
+
+            <GridColumns>
+                <GridColumn Field=@nameof(SmsQueue.SmsQueueId) HeaderText="Id" Width="90" TextAlign="TextAlign.Right" Visible="false"></GridColumn>
+                <GridColumn HeaderText="Location" Width="200">
+                    <Template>@((context as SmsQueue)?.Location?.Name)</Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.Status) HeaderText="Status" Width="130"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.ContactType) HeaderText="Contact Type" Width="140"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.ContactName) HeaderText="Contact Name" Width="180"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.FromPhoneNumber) HeaderText="From" Width="160"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.ToPhoneNumber) HeaderText="To" Width="160"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.Body) HeaderText="Body" Width="300"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.QueueDateLocal) HeaderText="Queued" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.TargetDateLocal) HeaderText="Target" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.SentDateLocal) HeaderText="Sent" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.FailureMessage) HeaderText="Failure Message" Width="300"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.IsReply) HeaderText="Is Reply" Width="110" Type="ColumnType.Boolean"></GridColumn>
+                <GridColumn Field=@nameof(SmsQueue.IsRead) HeaderText="Is Read" Width="110" Type="ColumnType.Boolean"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
+
