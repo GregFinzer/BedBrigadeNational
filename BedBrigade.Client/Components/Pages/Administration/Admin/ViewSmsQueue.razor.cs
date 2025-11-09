@@ -22,7 +22,7 @@ public partial class ViewSmsQueue : ComponentBase
     private SmsQueue? _selected;
     protected bool ViewDialogVisible { get; set; }
     protected string SelectedBody { get; set; } = string.Empty;
-
+    private const string SmsQueueTitle = "SMS Queue";
     protected override async Task OnInitializedAsync()
     {
         try
@@ -30,7 +30,7 @@ public partial class ViewSmsQueue : ComponentBase
             if (!AuthService.IsNationalAdmin)
             {
                 Items = new List<SmsQueue>();
-                Toast.Error("SMS Queue", "Not authorized.");
+                Toast.Error(SmsQueueTitle, "Not authorized.");
                 return;
             }
 
@@ -39,7 +39,7 @@ public partial class ViewSmsQueue : ComponentBase
             {
                 Items = new List<SmsQueue>();
                 Log.Error("Failed to load SMS queue data: " + response.Message);
-                Toast.Error("SMS Queue", response.Message);
+                Toast.Error(SmsQueueTitle, response.Message);
                 return;
             }
 
@@ -48,7 +48,7 @@ public partial class ViewSmsQueue : ComponentBase
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to load SMS queue");
-            Toast.Error("SMS Queue", ex.Message);
+            Toast.Error(SmsQueueTitle, ex.Message);
             Items = new List<SmsQueue>();
         }
     }
@@ -91,7 +91,7 @@ public partial class ViewSmsQueue : ComponentBase
     {
         if (_selected == null)
         {
-            Toast.Warning("SMS Queue", "Select a row to view.");
+            Toast.Warning(SmsQueueTitle, "Select a row to view.");
             return;
         }
         SelectedBody = _selected.Body ?? string.Empty;
