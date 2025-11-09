@@ -17,7 +17,11 @@ public partial class ViewSmsQueue : ComponentBase
     protected List<SmsQueue>? Items { get; set; }
 
     protected List<string> Toolbar { get; set; } =
-        new() { "Print", "Pdf Export", "Excel Export", "Csv Export", "Search" };
+        new() { "View", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search" };
+
+    private SmsQueue? _selected;
+    protected bool ViewDialogVisible { get; set; }
+    protected string SelectedBody { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,6 +59,9 @@ public partial class ViewSmsQueue : ComponentBase
 
         switch (args.Item.Text)
         {
+            case "View":
+                ShowDialogForSelected();
+                break;
             case "Pdf Export":
                 var pdfExportProperties = new PdfExportProperties
                 {
@@ -78,5 +85,41 @@ public partial class ViewSmsQueue : ComponentBase
                 await Grid.ExportToCsvAsync(csvExportProperties);
                 break;
         }
+    }
+
+    private void ShowDialogForSelected()
+    {
+        if (_selected == null)
+        {
+            Toast.Warning("SMS Queue", "Select a row to view.");
+            return;
+        }
+        SelectedBody = _selected.Body ?? string.Empty;
+        ViewDialogVisible = true;
+    }
+
+    protected void CloseDialog()
+    {
+        ViewDialogVisible = false;
+    }
+
+    protected async Task OnRowSelected(RowSelectEventArgs<SmsQueue> args)
+    {
+        _selected = args.Data;
+        if (Grid != null)
+        {
+            await Grid.EnableToolbarItemsAsync(new List<string> { "ViewSmsQueue_View" }, true); // auto id format ComponentId_ItemText
+        }
+    }
+
+    protected void OnRecordDoubleClick(RecordDoubleClickEventArgs<SmsQueue> args)
+    {
+        _selected = args.RowData;
+        ShowDialogForSelected();
+    }
+
+    protected void OnDialogOpen(Syncfusion.Blazor.Popups.BeforeOpenEventArgs args)
+    {
+        args.MaxHeight = "90%"; // set to 75% of viewport height
     }
 }

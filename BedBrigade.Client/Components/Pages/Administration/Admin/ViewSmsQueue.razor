@@ -34,7 +34,7 @@ else
             </GridSortSettings>
             <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
             <GridPageSettings PageSize="25" PageSizes="true"/>
-            <GridEvents TValue="SmsQueue" OnToolbarClick="OnToolbarClick" />
+            <GridEvents TValue="SmsQueue" OnToolbarClick="OnToolbarClick" RowSelected="OnRowSelected" OnRecordDoubleClick="OnRecordDoubleClick" />
 
             <GridColumns>
                 <GridColumn Field=@nameof(SmsQueue.SmsQueueId) HeaderText="Id" Width="90" TextAlign="TextAlign.Right" Visible="false"></GridColumn>
@@ -57,4 +57,64 @@ else
         </SfGrid>
     </div>
 }
+
+<SfDialog Width="800px" MinHeight="90%" ShowCloseIcon="true" IsModal="true" @bind-Visible="ViewDialogVisible">
+    <DialogEvents OnOpen="OnDialogOpen"></DialogEvents>
+    <DialogTemplates>
+        <Header>SMS Detail</Header>
+        <Content>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-4 fw-bold">Location</div>
+                    <div class="col-8">@_selected?.Location?.Name</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Status</div>
+                    <div class="col-8">@_selected?.Status</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Queue Date</div>
+                    <div class="col-8">@(_selected?.QueueDateLocal?.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Target Date</div>
+                    <div class="col-8">@(_selected?.TargetDateLocal?.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Sent Date</div>
+                    <div class="col-8">@(_selected?.SentDateLocal?.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Contact Type</div>
+                    <div class="col-8">@_selected?.ContactType</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Contact Name</div>
+                    <div class="col-8">@_selected?.ContactName</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">From</div>
+                    <div class="col-8">@_selected?.FromPhoneNumber</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">To</div>
+                    <div class="col-8">@_selected?.ToPhoneNumber</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Is Reply</div>
+                    <div class="col-8">@_selected?.IsReply</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Is Read</div>
+                    <div class="col-8">@_selected?.IsRead</div>
+                </div>
+                <hr />
+                <div style="white-space:pre-wrap; max-height:55vh; overflow:auto; font-family:monospace; font-size:.9rem;">@SelectedBody</div>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="OK" IsPrimary="true" OnClick="CloseDialog" />
+    </DialogButtons>
+</SfDialog>
 
