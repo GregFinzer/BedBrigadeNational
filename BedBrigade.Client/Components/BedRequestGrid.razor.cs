@@ -29,6 +29,7 @@ namespace BedBrigade.Client.Components
         [Inject] private IDeliverySheetService? _svcDeliverySheet { get; set; }
         [Inject] private IContentDataService? _svcContent { get; set; }
         [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
+        [Inject] private ITeamSheetService? _svcTeamSheet { get; set; }
 
         [Inject] private IJSRuntime? JS { get; set; }
         [Inject] private ILanguageContainerService? _lc { get; set; }
@@ -273,13 +274,13 @@ namespace BedBrigade.Client.Components
         {
             if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Sort Waiting Closest" };
-                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Team Sheet", "Sort Waiting Closest" };
+                ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
             else
             {
-                ToolBar = new List<string> { "Search", "Reset" };
-                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" }; //, "Save", "Cancel", "PdfExport", "ExcelExport", "CsvExport", "FirstPage", "PrevPage", "LastPage", "NextPage" };
+                ToolBar = new List<string> { "Search", "Reset", "Team Sheet" };
+                ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
         }
 
@@ -393,6 +394,9 @@ namespace BedBrigade.Client.Components
                     break;
                 case "Download Delivery Sheet":
                     DownloadDeliverySheet();
+                    break;
+                case "Team Sheet":
+                    DownloadTeamSheet();
                     break;
                 case "Sort Waiting Closest":
                     await SortClosest();
@@ -697,6 +701,44 @@ namespace BedBrigade.Client.Components
                 {
                     _toastService.Error("Error", "There was an error creating the delivery sheet. Please try again later.");
                 }
+            }
+        }
+
+        private async void DownloadTeamSheet()
+        {
+            if (Grid == null || Locations == null || _svcContent == null || _svcBedRequest == null || _svcTeamSheet == null || JS == null)
+            {
+                Log.Error("Some services, required for Team Sheet are not injected.");
+                return;
+            }
+            try
+            {
+                if (!await ValidateScheduled())
+                {
+                    return;
+                }
+                var selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                int selectedLocation = selectedBedRequests.First().LocationId;
+                string? group = selectedBedRequests.First().Group;
+                var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+                string? deliveryChecklist = string.Empty;
+                var deliveryChecklistResult = await _svcContent.GetSingleByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
+                if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
+                {
+                    deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                }
+                var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+                var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                // We will include all teams present in scheduledBedRequests (group already filtered) - if need all groups remove Where above
+                string fileName = _svcTeamSheet.CreateTeamSheetFileName(location, scheduledBedRequests);
+                Stream stream = _svcTeamSheet.CreateTeamSheet(location, scheduledBedRequests, deliveryChecklist);
+                using var streamRef = new DotNetStreamReference(stream: stream);
+                await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error downloading team sheet");
+                _toastService?.Error("Error", "There was an error creating the team sheet. Please try again later.");
             }
         }
 
