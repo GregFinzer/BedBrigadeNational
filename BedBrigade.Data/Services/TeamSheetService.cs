@@ -72,11 +72,11 @@ namespace BedBrigade.Data.Services
             string teamName = teamGroup.First().Team ?? "";
             DateTime? deliveryDate = teamGroup.FirstOrDefault(b => b.DeliveryDate.HasValue)?.DeliveryDate;
             // Merge A..E for team, F..J for date (we will use 10 columns total similar style as delivery sheet minus team column)
-            sheet.Range[startRow, 1, startRow, 5].Merge();
-            sheet.Range[startRow, 6, startRow, 10].Merge();
+            sheet.Range[startRow, 1, startRow, 4].Merge();
+            sheet.Range[startRow, 5, startRow, 8].Merge();
 
             sheet.Range[startRow, 1].Text = $"Team {teamName}";
-            sheet.Range[startRow, 6].Text = deliveryDate.HasValue ? deliveryDate.Value.ToShortDateString() : string.Empty;
+            sheet.Range[startRow, 5].Text = deliveryDate.HasValue ? deliveryDate.Value.ToShortDateString() : string.Empty;
 
             // Style
             sheet.Range[startRow, 1].CellStyle.Font.FontName = "Arial";
@@ -85,11 +85,11 @@ namespace BedBrigade.Data.Services
             sheet.Range[startRow, 1].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignLeft;
             sheet.Range[startRow, 1].RowHeight = 42;
 
-            sheet.Range[startRow, 6].CellStyle.Font.FontName = "Arial";
-            sheet.Range[startRow, 6].CellStyle.Font.Size = 36;
-            sheet.Range[startRow, 6].CellStyle.Font.Bold = true;
-            sheet.Range[startRow, 6].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            sheet.Range[startRow, 6].RowHeight = 42;
+            sheet.Range[startRow, 5].CellStyle.Font.FontName = "Arial";
+            sheet.Range[startRow, 5].CellStyle.Font.Size = 24;
+            sheet.Range[startRow, 5].CellStyle.Font.Bold = true;
+            sheet.Range[startRow, 5].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+            sheet.Range[startRow, 5].RowHeight = 42;
 
             return startRow + 1; // next row
         }
@@ -103,10 +103,7 @@ namespace BedBrigade.Data.Services
             CreateHeaderCell(sheet, "Requested", row, 5, 11);
             CreateHeaderCell(sheet, "Beds", row, 6, 5.14);
             CreateHeaderCell(sheet, "Ages", row, 7, 13);
-            CreateHeaderCell(sheet, "Notes", row, 8, 42.14);
-            // Add two blank columns to keep layout (9,10) or could omit; here reserve for future
-            sheet.Range[row, 9].ColumnWidth = 2.5;
-            sheet.Range[row, 10].ColumnWidth = 2.5;
+            CreateHeaderCell(sheet, "Notes", row, 8, 47.14);
         }
 
         private static void CreateHeaderCell(IWorksheet sheet, string text, int row, int col, double width)
