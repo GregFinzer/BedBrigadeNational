@@ -76,6 +76,7 @@ namespace BedBrigade.Client.Components
         public List<BedRequestEnumItem>? BedRequestStatuses { get; private set; }
 
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
+        public bool IsGeneratingFile { get; set; } // Shows spinner overlay during delivery/team sheet generation
 
         protected override async Task OnInitializedAsync()
         {
@@ -274,12 +275,12 @@ namespace BedBrigade.Client.Components
         {
             if (_svcAuth.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Download Delivery Sheet", "Team Sheet", "Sort Waiting Closest" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Delivery Sheet", "Team Sheet", "Sort Waiting Closest" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
             else
             {
-                ToolBar = new List<string> { "Search", "Reset", "Team Sheet" };
+                ToolBar = new List<string> { "Search", "Reset", "Delivery Sheet", "Team Sheet" };
                 ContextMenu = new List<string> { FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
         }
@@ -392,7 +393,7 @@ namespace BedBrigade.Client.Components
                 case "Csv Export":
                     await CsvExportAsync();
                     break;
-                case "Download Delivery Sheet":
+                case "Delivery Sheet":
                     DownloadDeliverySheet();
                     break;
                 case "Team Sheet":
@@ -663,10 +664,14 @@ namespace BedBrigade.Client.Components
 
             try
             {
+                IsGeneratingFile = true;
+                StateHasChanged();
+
                 if (!await ValidateScheduled())
                 {
                     return;
                 }
+
 
                 selectedBedRequests = await Grid.GetSelectedRecordsAsync();
                 int selectedLocation = selectedBedRequests.First().LocationId;
@@ -684,11 +689,14 @@ namespace BedBrigade.Client.Components
                     deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
                 }
 
-                var scheduledBedRequestResult = await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
-                List<BedRequest> scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                var scheduledBedRequestResult =
+                    await _svcBedRequest.GetScheduledBedRequestsForLocation(selectedLocation);
+                List<BedRequest> scheduledBedRequests =
+                    scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
 
                 string fileName = _svcDeliverySheet.CreateDeliverySheetFileName(location, scheduledBedRequests);
-                Stream stream =  _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequests, deliveryChecklist);
+                Stream stream =
+                    _svcDeliverySheet.CreateDeliverySheet(location, scheduledBedRequests, deliveryChecklist);
                 using var streamRef = new DotNetStreamReference(stream: stream);
 
                 await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
@@ -699,8 +707,13 @@ namespace BedBrigade.Client.Components
                 Log.Error(ex, "Error downloading delivery sheet");
                 if (_toastService != null)
                 {
-                    _toastService.Error("Error", "There was an error creating the delivery sheet. Please try again later.");
+                    _toastService.Error("Error",
+                        "There was an error creating the delivery sheet. Please try again later.");
                 }
+            }
+            finally
+            {
+                IsGeneratingFile = false;
             }
         }
 
@@ -713,6 +726,8 @@ namespace BedBrigade.Client.Components
             }
             try
             {
+                IsGeneratingFile = true;
+                StateHasChanged();
                 if (!await ValidateScheduled())
                 {
                     return;
@@ -740,6 +755,10 @@ namespace BedBrigade.Client.Components
                 Log.Error(ex, "Error downloading team sheet");
                 _toastService?.Error("Error", "There was an error creating the team sheet. Please try again later.");
             }
+            finally
+            {
+                IsGeneratingFile = false;
+            }   
         }
 
         private async Task<bool> ValidateScheduled()
