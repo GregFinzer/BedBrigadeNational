@@ -6,6 +6,8 @@ namespace BedBrigade.Data.Services
 {
     public class TeamSheetService : ITeamSheetService
     {
+        private const string TargetFont = "Arial";
+
         public string CreateTeamSheetFileName(Location location, List<BedRequest> bedRequests)
         {
             string locationName = FileUtil.FilterFileName(location.Name, false);
@@ -42,7 +44,7 @@ namespace BedBrigade.Data.Services
             for (int i = 0; i < grouped.Count; i++)
             {
                 var teamGroup = grouped[i].OrderBy(b => b.FullName).ToList();
-                // Team header row: left merged half with "Team X" right merged half with date
+                // Team header row: left merged all cells but the last, then the date
                 currentRow = CreateTeamHeader(sheet, teamGroup, currentRow);
                 // Column headers
                 CreateColumnHeaders(sheet, currentRow);
@@ -72,24 +74,23 @@ namespace BedBrigade.Data.Services
             string teamName = teamGroup.First().Team ?? "";
             DateTime? deliveryDate = teamGroup.FirstOrDefault(b => b.DeliveryDate.HasValue)?.DeliveryDate;
             // Merge A..E for team, F..J for date (we will use 10 columns total similar style as delivery sheet minus team column)
-            sheet.Range[startRow, 1, startRow, 4].Merge();
-            sheet.Range[startRow, 5, startRow, 8].Merge();
+            sheet.Range[startRow, 1, startRow, 7].Merge();
 
             sheet.Range[startRow, 1].Text = $"Team {teamName}";
-            sheet.Range[startRow, 5].Text = deliveryDate.HasValue ? deliveryDate.Value.ToShortDateString() : string.Empty;
+            sheet.Range[startRow, 8].Text = deliveryDate.HasValue ? deliveryDate.Value.ToShortDateString() : string.Empty;
 
             // Style
-            sheet.Range[startRow, 1].CellStyle.Font.FontName = "Arial";
+            sheet.Range[startRow, 1].CellStyle.Font.FontName =TargetFont;
             sheet.Range[startRow, 1].CellStyle.Font.Size = 36;
             sheet.Range[startRow, 1].CellStyle.Font.Bold = true;
             sheet.Range[startRow, 1].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignLeft;
             sheet.Range[startRow, 1].RowHeight = 42;
 
-            sheet.Range[startRow, 5].CellStyle.Font.FontName = "Arial";
-            sheet.Range[startRow, 5].CellStyle.Font.Size = 24;
-            sheet.Range[startRow, 5].CellStyle.Font.Bold = true;
-            sheet.Range[startRow, 5].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
-            sheet.Range[startRow, 5].RowHeight = 42;
+            sheet.Range[startRow, 8].CellStyle.Font.FontName =TargetFont;
+            sheet.Range[startRow, 8].CellStyle.Font.Size = 24;
+            sheet.Range[startRow, 8].CellStyle.Font.Bold = true;
+            sheet.Range[startRow, 8].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
+            sheet.Range[startRow, 8].RowHeight = 42;
 
             return startRow + 1; // next row
         }
@@ -110,7 +111,7 @@ namespace BedBrigade.Data.Services
         {
             sheet.Range[row, col].Text = text;
             var style = sheet.Range[row, col].CellStyle;
-            style.Font.FontName = "Arial";
+            style.Font.FontName =TargetFont;
             style.Color = Syncfusion.Drawing.Color.Black;
             style.Font.Color = ExcelKnownColors.White;
             style.Font.Size = 11;
@@ -124,7 +125,7 @@ namespace BedBrigade.Data.Services
 
         private static int OutputTeamRows(IWorksheet sheet, List<BedRequest> bedRequests, int row)
         {
-            bool white = true;
+            bool white = false; // start with white on first row
             foreach (var b in bedRequests)
             {
                 white = !white;
@@ -150,7 +151,7 @@ namespace BedBrigade.Data.Services
             for (int col = 1; col <= 8; col++)
             {
                 var style = sheet.Range[row, col].CellStyle;
-                style.Font.FontName = "Arial";
+                style.Font.FontName =TargetFont;
                 style.Font.Size = 11;
                 style.Borders[ExcelBordersIndex.EdgeLeft].LineStyle = ExcelLineStyle.Thin;
                 style.Borders[ExcelBordersIndex.EdgeRight].LineStyle = ExcelLineStyle.Thin;
