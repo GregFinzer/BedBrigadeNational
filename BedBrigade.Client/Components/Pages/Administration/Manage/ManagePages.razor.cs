@@ -285,6 +285,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                         case ContentType.NewsletterForm:
                         case ContentType.ContactUsConfirmationForm:
                         case ContentType.ForgotPasswordForm:
+                        case ContentType.DeliveryDayBeforeReminderForm:
                             CurrentValues = args.Data;
                             await SetLocationName();
                             TextDialogHeading = "Edit " + EnumHelper.GetEnumDescription(args.Data.ContentType);

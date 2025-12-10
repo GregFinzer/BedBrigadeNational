@@ -27,4 +27,6 @@ public enum ContentType
     ContactUsConfirmationForm = 14,
     [Description("Forgot Password Form")]
     ForgotPasswordForm = 15,
+    [Description("Delivery Day Before Reminder Form")]
+    DeliveryDayBeforeReminderForm = 16
 }

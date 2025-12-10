@@ -30,6 +30,9 @@ public class MailMergeLogic : IMailMergeLogic
         "%%Schedule.EventNote%%",
         "%%Schedule.EventDateScheduled%%",
         "%%Schedule.EventDurationHours%%",
+        "%%Schedule.EventDateOnly%%",
+        "%%Schedule.StartTime%%",
+        "%%Schedule.EndTime%%",
         "%%Schedule.Address%%",
         "%%Schedule.City%%",
         "%%Schedule.State%%",
@@ -195,6 +198,9 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Schedule.OrganizerName%%", entity.OrganizerName);
         sb = sb.Replace("%%Schedule.OrganizerEmail%%", entity.OrganizerEmail);
         sb = sb.Replace("%%Schedule.OrganizerPhone%%", entity.OrganizerPhone.FormatPhoneNumber());
+        sb = sb.Replace("%%Schedule.EventDateOnly%%", entity.EventDateScheduled.ToString("MM/dd/yyyy"));
+        sb = sb.Replace("%%Schedule.StartTime%%", entity.EventDateScheduled.ToString("h:mm tt"));
+        sb = sb.Replace("%%Schedule.EndTime%%", entity.EventDateScheduled.AddHours(entity.EventDurationHours).ToString("h:mm tt"));
         return sb;
     }
 

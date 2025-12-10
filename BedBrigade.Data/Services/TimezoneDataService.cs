@@ -13,6 +13,13 @@ public class TimezoneDataService : ITimezoneDataService
         _authService = authService;
     }
 
+    public DateTime GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(DateTime originalDate)
+    {
+        DateTime dayBefore = originalDate.Date.AddDays(-1);
+        dayBefore = dayBefore.AddHours(12);
+        return dayBefore.ToUniversalTime();
+    }
+
     public string GetUserTimeZoneId()
     {
         if (string.IsNullOrWhiteSpace(_userTimeZoneId))

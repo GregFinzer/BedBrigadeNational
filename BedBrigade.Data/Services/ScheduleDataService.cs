@@ -331,6 +331,27 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             await UpdateAsync(schedule);
         }
     }
+
+    public async Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    {
+        if (!bedRequest.DeliveryDate.HasValue)
+            return new ServiceResponse<Schedule>("bedRequest.DeliveryDate is null");
+
+        var scheduleResponse = await GetFutureSchedulesByLocationId(bedRequest.LocationId);
+
+        if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            return new ServiceResponse<Schedule>(scheduleResponse.Message);
+
+        var schedule = scheduleResponse.Data
+            .FirstOrDefault(o => o.EventDateScheduled.Date == bedRequest.DeliveryDate.Value.Date
+            && o.EventType == EventType.Delivery);
+
+        if (schedule != null)
+            return new ServiceResponse<Schedule>("Found schedule", true, schedule);
+
+        return new ServiceResponse<Schedule>(
+            $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
+    }
 }
 
 

@@ -291,7 +291,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private async Task UpdateBedRequest(BedBrigade.Common.Models.BedRequest BedRequest)
+        private async Task UpdateBedRequest(BedBrigade.Common.Models.BedRequest bedRequest)
         {
             if (_svcBedRequest == null)
             {
@@ -300,15 +300,16 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return;
             }
 
-            var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
+            var updateResult = await _svcBedRequest.UpdateAsync(bedRequest);
 
             if (updateResult.Success)
             {
+                Model = updateResult.Data;
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
             {
-                Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
+                Log.Error($"Unable to update BedRequest {bedRequest.BedRequestId} : {updateResult.Message}");
                 _toastService?.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
             }
         }

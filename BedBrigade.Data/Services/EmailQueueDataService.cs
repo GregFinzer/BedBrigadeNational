@@ -173,7 +173,8 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString())
+                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString()
+                                                    && DateTime.UtcNow >= o.TargetDate)
                     .OrderByDescending(o => o.Priority)
                     .ThenBy(o => o.QueueDate)
                     .Take(maxPerChunk)
