@@ -302,9 +302,25 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        private async Task<EmailQueue?> GetEmailByAddressAndTargetDate(EmailQueue email)
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<EmailQueue>();
+                return await dbSet.Where(o => o.ToAddress == email.ToAddress && o.TargetDate == email.TargetDate)
+                    .FirstOrDefaultAsync();
+            }
+        }
 
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
+            var duplicate = await GetEmailByAddressAndTargetDate(email);
+
+            if (duplicate != null)
+            {
+                return new ServiceResponse<string>("Email already queued", true);
+            }
+
             try
             {
                 email.Status = QueueStatus.Queued.ToString();

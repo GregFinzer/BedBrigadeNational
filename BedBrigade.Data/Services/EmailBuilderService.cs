@@ -444,7 +444,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<bool>(locationResult.Message, false);
             }
 
-            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(user.LocationId, ContentType.DeliveryDayBeforeReminderForm);
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(user.LocationId, ContentType.DeliveryDayBeforeEmailForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {

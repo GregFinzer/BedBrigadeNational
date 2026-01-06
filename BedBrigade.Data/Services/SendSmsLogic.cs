@@ -47,7 +47,7 @@ public class SendSmsLogic : ISendSmsLogic
     {
         ServiceResponse<Content> templateResult =
             await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId,
-                ContentType.DeliveryDayBeforeReminderForm);
+                ContentType.DeliveryDayBeforeSmsForm);
 
         if (!templateResult.Success)
         {
@@ -96,7 +96,7 @@ public class SendSmsLogic : ISendSmsLogic
             Status = QueueStatus.Queued.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
-            TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled)
+            TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled),
             IsRead = true,
             IsReply = false,
             LocationId = bedRequest.LocationId,
