@@ -12,7 +12,7 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
-using static OfficeOpenXml.ExcelErrorValue;
+
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages

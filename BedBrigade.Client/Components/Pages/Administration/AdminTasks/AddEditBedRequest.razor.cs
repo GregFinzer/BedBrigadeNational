@@ -33,6 +33,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IJSRuntime? JS { get; set; }
         [Inject] private ILanguageContainerService? _lc { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private IScheduleDataService _svcSchedule { get; set; }
+        
         [Parameter] public string? Id { get; set; }
 
         protected BedBrigade.Common.Models.BedRequest? Model { get; set; }
@@ -156,30 +159,30 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task HandleValidSubmit()
         {
+            if (Model == null)
+                return;
+                
             // Normalize phone
-            if (Model != null && !string.IsNullOrEmpty(Model.Phone))
+            if (!string.IsNullOrEmpty(Model.Phone))
             {
                 Model.Phone = Model.Phone.FormatPhoneNumber();
             }
 
             // Set SpeakEnglish default if primary is English
-            if (Model != null && Model.PrimaryLanguage == "English")
+            if (Model.PrimaryLanguage == "English")
             {
                 Model.SpeakEnglish = "Yes";
             }
             else
             {
-                if (Model != null)
+                if (String.IsNullOrEmpty(Model.SpeakEnglish))
                 {
-                    if (String.IsNullOrEmpty(Model.SpeakEnglish))
-                    {
-                        Model.SpeakEnglish = "No";
-                    }
+                    Model.SpeakEnglish = "No";
                 }
             }
 
             // If combine duplicate happened and updated an existing record, just return to grid
-            if (Model != null && await CombineDuplicate(Model))
+            if (await CombineDuplicate(Model))
             {
                 if (_nav != null)
                 {
@@ -188,17 +191,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return;
             }
 
-
-            if (Model != null){
-           
-                    if (Model.BedRequestId != 0)
-                    {
-                        await UpdateBedRequest(Model);
-                    }
-                    else 
-                    {
-                        await CreateBedRequest(Model);
-                    }
+            if (Model.BedRequestId != 0)
+            {
+                await UpdateBedRequest(Model);
+            }
+            else 
+            {
+                await CreateBedRequest(Model);
             }
 
             // After save navigate back to main grid page
@@ -305,6 +304,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             if (updateResult.Success)
             {
                 Model = updateResult.Data;
+
+                if (Model.Status == BedRequestStatus.Scheduled)
+                {
+                    await SendDeliveryReminderEmail(Model);
+                }
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
@@ -314,6 +318,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
+        private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model)
+        {
+            var schedule = await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
+            var emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model);
+        }
 
 
         private void HandleCancel()
