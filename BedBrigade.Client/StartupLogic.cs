@@ -78,7 +78,17 @@ namespace BedBrigade.Client
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlBuilder =>
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                if (OperatingSystem.IsLinux())
+                {
+                    var linuxConnectionString = Environment.GetEnvironmentVariable("BedBrigadeConnectionString");
+                    if (!string.IsNullOrWhiteSpace(linuxConnectionString))
+                    {
+                        connectionString = linuxConnectionString;
+                    }
+                }
+
+                options.UseSqlServer(connectionString, sqlBuilder =>
                 {
                     sqlBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
