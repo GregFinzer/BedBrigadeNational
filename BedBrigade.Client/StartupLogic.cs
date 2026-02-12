@@ -400,7 +400,9 @@ namespace BedBrigade.Client
 
             string remainder = requestPath.Substring(MediaPrefix.Length).TrimStart('/');
             string mediaRoot = Path.Combine(webRootPath, "Media");
-            string? physicalPath = FileUtil.ResolveCaseInsensitivePath(mediaRoot, remainder);
+            string combinedPath = Path.Combine(mediaRoot, remainder);
+            string? physicalPath = FileUtil.ResolveCaseInsensitivePath(combinedPath);
+            
             if (string.IsNullOrWhiteSpace(physicalPath))
             {
                 return null;

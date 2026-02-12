@@ -6,6 +6,8 @@ namespace BedBrigade.Common.Logic
 {
     public static class FileUtil
     {
+        private static Dictionary<string, string> _caseInsensitiveCache = new Dictionary<string, string>();
+        
         public static string BuildFileNameWithDate(string prefix, string extension)
         {
             if (string.IsNullOrEmpty(prefix))
@@ -320,137 +322,120 @@ namespace BedBrigade.Common.Logic
                 .Select(p => Path.Combine(p, "Microsoft VS Code", "Code.exe"))
                 .Any(File.Exists);
         }
-
-        public static string? ResolveDirectoryCaseInsensitive(string directory)
+        
+        public static string? ResolveCaseInsensitivePath(string path)
         {
-            if (string.IsNullOrWhiteSpace(directory))
+            if (_caseInsensitiveCache.TryGetValue(path, out string? cached))
+            {
+                if (Directory.Exists(cached) || File.Exists(cached))
+                {
+                    return cached;
+                }
+
+                _caseInsensitiveCache.Remove(path);
+            }
+            
+            if (string.IsNullOrWhiteSpace(path))
             {
                 return null;
             }
 
-            if (Directory.Exists(directory))
-            {
-                return directory;
-            }
-
-            string normalized = directory.Replace('\\', '/');
-            string rootPath;
-            List<string> segments;
-
-            if (Path.IsPathRooted(normalized))
-            {
-                rootPath = Path.GetPathRoot(normalized) ?? string.Empty;
-                if (string.IsNullOrEmpty(rootPath))
-                {
-                    return null;
-                }
-
-                string remainder = normalized.Substring(rootPath.Length);
-                segments = remainder.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
-                rootPath = rootPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                if (string.IsNullOrEmpty(rootPath))
-                {
-                    rootPath = Path.DirectorySeparatorChar.ToString();
-                }
-            }
-            else
-            {
-                rootPath = Directory.GetCurrentDirectory();
-                segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
-
-            string currentPath = rootPath;
-            foreach (string segment in segments)
-            {
-                string? match = FindDirectoryMatch(currentPath, segment);
-                if (match == null)
-                {
-                    return null;
-                }
-
-                currentPath = match;
-            }
-
-            return currentPath;
-        }
-
-        public static string? ResolveCaseInsensitivePath(string rootDirectory, string relativePath)
-        {
-            if (string.IsNullOrWhiteSpace(rootDirectory))
+            bool endsWithSeparator = EndsWithDirectorySeparator(path);
+            string fullPath = GetFullPathOrNull(path);
+            if (string.IsNullOrWhiteSpace(fullPath))
             {
                 return null;
             }
 
-            if (!Directory.Exists(rootDirectory))
+            if (Directory.Exists(fullPath) || File.Exists(fullPath))
+            {
+                return fullPath;
+            }
+
+            string? root = Path.GetPathRoot(fullPath);
+            if (string.IsNullOrWhiteSpace(root))
             {
                 return null;
             }
 
-            string normalized = relativePath.Replace('\\', '/');
-            var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string currentPath = rootDirectory;
-
-            for (int index = 0; index < segments.Length; index++)
+            string? resolved = ResolveByEnumeratingSegments(root, fullPath);
+            if (string.IsNullOrWhiteSpace(resolved))
             {
-                string segment = segments[index];
-                bool isLast = index == segments.Length - 1;
-
-                if (isLast)
-                {
-                    string? fileMatch = FindFileMatch(currentPath, segment);
-                    if (!string.IsNullOrWhiteSpace(fileMatch))
-                    {
-                        return fileMatch;
-                    }
-
-                    string? directoryMatch = FindDirectoryMatch(currentPath, segment);
-                    if (!string.IsNullOrWhiteSpace(directoryMatch))
-                    {
-                        currentPath = directoryMatch;
-                        continue;
-                    }
-
-                    return null;
-                }
-
-                string? nextDirectory = FindDirectoryMatch(currentPath, segment);
-                if (string.IsNullOrWhiteSpace(nextDirectory))
-                {
-                    return null;
-                }
-
-                currentPath = nextDirectory;
+                return null;
             }
 
-            return currentPath;
+            string? result = endsWithSeparator
+                ? (Directory.Exists(resolved) ? resolved : null)
+                : ((Directory.Exists(resolved) || File.Exists(resolved)) ? resolved : null);
+
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                _caseInsensitiveCache.Add(path, result);
+            }
+            return result;
         }
 
-        private static string? FindDirectoryMatch(string parentDirectory, string segment)
+        private static bool EndsWithDirectorySeparator(string path)
         {
-            foreach (string child in Directory.EnumerateDirectories(parentDirectory))
-            {
-                string name = Path.GetFileName(child);
-                if (string.Equals(name, segment, StringComparison.OrdinalIgnoreCase))
-                {
-                    return child;
-                }
-            }
-
-            return null;
+            return path.EndsWith(Path.DirectorySeparatorChar)
+                || path.EndsWith(Path.AltDirectorySeparatorChar)
+                || path.EndsWith('/')
+                || path.EndsWith('\\');
         }
 
-        private static string? FindFileMatch(string parentDirectory, string segment)
+        private static string GetFullPathOrNull(string path)
         {
-            foreach (string child in Directory.EnumerateFiles(parentDirectory))
+            string normalized = path.Replace('\\', Path.DirectorySeparatorChar)
+                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+            try
             {
-                string name = Path.GetFileName(child);
-                if (string.Equals(name, segment, StringComparison.OrdinalIgnoreCase))
+                return Path.GetFullPath(normalized);
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string? ResolveByEnumeratingSegments(string root, string fullPath)
+        {
+            // IMPORTANT: On Linux, Path.GetPathRoot("/a/b") is "/". We must keep "/" as the current directory.
+            string current = root;
+            string remainder = fullPath.Substring(root.Length);
+
+            var parts = remainder.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+            {
+                return Directory.Exists(root) ? root : null;
+            }
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                current = ResolveNextSegment(current, parts[i]);
+                if (string.IsNullOrWhiteSpace(current))
                 {
-                    return child;
+                    return null;
                 }
             }
 
-            return null;
+            return current;
+        }
+
+        private static string ResolveNextSegment(string currentDirectory, string segment)
+        {
+            if (!Directory.Exists(currentDirectory))
+            {
+                return string.Empty;
+            }
+
+            string? match = Directory.EnumerateFileSystemEntries(currentDirectory)
+                .Select(Path.GetFileName)
+                .FirstOrDefault(name =>
+                    !string.IsNullOrWhiteSpace(name)
+                    && string.Equals(name, segment, StringComparison.OrdinalIgnoreCase));
+
+            return match is null ? string.Empty : Path.Combine(currentDirectory, match);
         }
     }
 }
