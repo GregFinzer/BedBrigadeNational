@@ -116,6 +116,91 @@ namespace BedBrigade.Tests
             return Environment.OSVersion.Platform == PlatformID.Win32NT;
         }
 
+        public static void TryOpenFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(filePath));
+
+            // Don't fail tests for UX niceties.
+            try
+            {
+                // Avoid trying to open a browser in CI/headless environments.
+                if (RunningInPipeline)
+                    return;
+
+                // Ensure we hand the OS a fully-qualified path.
+                string fullPath = Path.GetFullPath(filePath);
+
+                if (IsWindows())
+                {
+                    Process.Start(new ProcessStartInfo(fullPath) { UseShellExecute = true });
+                    return;
+                }
+
+                // For macOS/Linux, a file:// URI is more reliable than a raw path.
+                string fileUri = new Uri(fullPath).AbsoluteUri;
+
+                if (OperatingSystem.IsMacOS())
+                {
+                    Process.Start(new ProcessStartInfo("open", fileUri) { UseShellExecute = false });
+                    return;
+                }
+
+                if (OperatingSystem.IsLinux())
+                {
+                    // Many Linux desktops rely on xdg-open.
+                    // If DISPLAY/WAYLAND_DISPLAY aren't set, it's likely headless; just skip.
+                    string? display = Environment.GetEnvironmentVariable("DISPLAY");
+                    string? waylandDisplay = Environment.GetEnvironmentVariable("WAYLAND_DISPLAY");
+                    if (string.IsNullOrWhiteSpace(display) && string.IsNullOrWhiteSpace(waylandDisplay))
+                        return;
+
+                    // Some browsers (e.g., Brave with certain sandbox/permissions) may not be able to read /tmp.
+                    // Prefer opening with Google Chrome if it's available.
+                    string? chromePath = FindLinuxExecutableInPath("google-chrome")
+                                         ?? FindLinuxExecutableInPath("google-chrome-stable")
+                                         ?? FindLinuxExecutableInPath("chrome")
+                                         ?? FindLinuxExecutableInPath("chromium")
+                                         ?? FindLinuxExecutableInPath("chromium-browser");
+
+                    if (!string.IsNullOrWhiteSpace(chromePath))
+                    {
+                        Process.Start(new ProcessStartInfo(chromePath, fileUri) { UseShellExecute = false });
+                        return;
+                    }
+
+                    Process.Start(new ProcessStartInfo("xdg-open", fileUri) { UseShellExecute = false });
+                    return;
+                }
+
+                // Fallback: best-effort shell execute.
+                Process.Start(new ProcessStartInfo(fullPath) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to open file '{filePath}'. {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private static string? FindLinuxExecutableInPath(string executableName)
+        {
+            if (!OperatingSystem.IsLinux())
+                return null;
+
+            string? path = Environment.GetEnvironmentVariable("PATH");
+            if (string.IsNullOrWhiteSpace(path))
+                return null;
+
+            foreach (string dir in path.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                string candidate = Path.Combine(dir, executableName);
+                if (File.Exists(candidate))
+                    return candidate;
+            }
+
+            return null;
+        }
+
         public static bool ThisComputerHasExcelInstalled()
         {
             try
@@ -130,6 +215,130 @@ namespace BedBrigade.Tests
         }
 
 
+
+        public static bool IsRiderInstalled()
+        {
+            try
+            {
+                if (IsWindows())
+                    return IsRiderInstalledOnWindows();
+
+                if (OperatingSystem.IsLinux())
+                    return IsRiderInstalledOnLinux();
+
+                if (OperatingSystem.IsMacOS())
+                    return Directory.Exists("/Applications/Rider.app");
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsRiderInstalledOnLinux()
+        {
+            // Snap install (common): /snap/rider/current/bin/rider or /var/lib/snapd/snap/rider
+            if (File.Exists("/snap/rider/current/bin/rider"))
+                return true;
+
+            if (Directory.Exists("/var/lib/snapd/snap/rider"))
+                return true;
+
+            // Toolbox install (common): ~/.local/share/JetBrains/Toolbox/apps/Rider
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (!string.IsNullOrWhiteSpace(home))
+            {
+                string toolboxApps = Path.Combine(home, ".local", "share", "JetBrains", "Toolbox", "apps", "Rider");
+                if (Directory.Exists(toolboxApps))
+                    return true;
+
+                // Older/hypothetical location
+                string jetBrainsLocal = Path.Combine(home, ".local", "share", "JetBrains", "Rider");
+                if (Directory.Exists(jetBrainsLocal))
+                    return true;
+            }
+
+            // Apt/manual installs often land under /opt
+            if (Directory.Exists("/opt/JetBrains"))
+            {
+                if (Directory.GetDirectories("/opt/JetBrains", "Rider*", SearchOption.TopDirectoryOnly).Any())
+                    return true;
+            }
+
+            if (Directory.Exists("/opt"))
+            {
+                if (Directory.GetDirectories("/opt", "rider*", SearchOption.TopDirectoryOnly).Any())
+                    return true;
+            }
+
+            // PATH check: some installs provide a 'rider' launcher
+            return FindLinuxExecutableInPath("rider") != null;
+        }
+
+        private static bool IsRiderInstalledOnWindows()
+        {
+            // Check common install folders first (fast).
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            if (Directory.Exists(Path.Combine(programFiles, "JetBrains")) ||
+                Directory.Exists(Path.Combine(programFilesX86, "JetBrains")))
+            {
+                return true;
+            }
+
+            // Toolbox (default): %LocalAppData%\JetBrains\Toolbox\apps\Rider
+            if (!string.IsNullOrWhiteSpace(localAppData))
+            {
+                string toolboxRider = Path.Combine(localAppData, "JetBrains", "Toolbox", "apps", "Rider");
+                if (Directory.Exists(toolboxRider))
+                    return true;
+            }
+
+            // Registry uninstall keys: look for "JetBrains Rider" display name.
+            // Best-effort only; if registry access fails, we still return false.
+            try
+            {
+                using Microsoft.Win32.RegistryKey? localMachine = Microsoft.Win32.Registry.LocalMachine;
+                if (localMachine != null)
+                {
+                    string[] uninstallPaths =
+                    [
+                        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                        @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                    ];
+
+                    foreach (string uninstallPath in uninstallPaths)
+                    {
+                        using Microsoft.Win32.RegistryKey? uninstallKey = localMachine.OpenSubKey(uninstallPath);
+                        if (uninstallKey == null)
+                            continue;
+
+                        foreach (string subKeyName in uninstallKey.GetSubKeyNames())
+                        {
+                            using Microsoft.Win32.RegistryKey? subKey = uninstallKey.OpenSubKey(subKeyName);
+                            string? displayName = subKey?.GetValue("DisplayName") as string;
+
+                            if (!string.IsNullOrWhiteSpace(displayName) &&
+                                displayName.Contains("Rider", StringComparison.OrdinalIgnoreCase) &&
+                                displayName.Contains("JetBrains", StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            return false;
+        }
 
     }
 }

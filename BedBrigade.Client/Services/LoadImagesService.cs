@@ -3,6 +3,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Hosting;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
@@ -14,14 +15,22 @@ namespace BedBrigade.Client.Services
     {
         private readonly IConfigurationDataService _configurationDataService;
         private readonly ICachingService _cachingService;
+        private readonly IWebHostEnvironment _hostingEnv;
+        private readonly string _mediaDirectory;
+        private readonly string _webRootPath;
         private const string imageRotatorTag = "ImageRotator";
-        private const string mediaDirectory = "wwwroot/media";
 
         public LoadImagesService(IConfigurationDataService configurationDataService, 
-            ICachingService cachingService)
+            ICachingService cachingService,
+            IWebHostEnvironment hostingEnv)
         {
             _configurationDataService = configurationDataService;
             _cachingService = cachingService;
+            _hostingEnv = hostingEnv;
+            _webRootPath = !string.IsNullOrWhiteSpace(_hostingEnv.WebRootPath)
+                ? _hostingEnv.WebRootPath
+                : Path.Combine(_hostingEnv.ContentRootPath, "wwwroot");
+            _mediaDirectory = Path.Combine(_webRootPath, "media");
         }
 
         public async Task<string> ConvertToWebp(string targetPath)
@@ -110,8 +119,9 @@ namespace BedBrigade.Client.Services
 
         public void EnsureDirectoriesExist(string path, string html)
         {
+            string normalizedPath = NormalizeMediaPath(path);
             //Ensure directory exists for the path
-            string directory = $"{mediaDirectory}/{path}";
+            string directory = Path.Combine(_mediaDirectory, normalizedPath);
             directory = directory.Replace("//", "/");
             if (!Directory.Exists(directory))
             {
@@ -122,7 +132,7 @@ namespace BedBrigade.Client.Services
             List<string> imgIds = GetImgIdsWithRotator(html);
             foreach (var imgId in imgIds)
             {
-                directory = $"{mediaDirectory}/{path}/{imgId}";
+                directory = Path.Combine(_mediaDirectory, normalizedPath, imgId);
                 directory = directory.Replace("//", "/");
 
                 if (!Directory.Exists(directory))
@@ -239,22 +249,40 @@ namespace BedBrigade.Client.Services
         public List<string> GetImagesForArea(string path, string area)
         {
             string directory = GetDirectoryForPathAndArea(path, area);
-            string cacheKey = _cachingService.BuildCacheKey(Defaults.GetFilesCacheKey, directory);
+            string? resolvedDirectory = FileUtil.ResolveCaseInsensitivePath(directory);
+            string cacheKey = _cachingService.BuildCacheKey(Defaults.GetFilesCacheKey, resolvedDirectory ?? directory);
             List<string>? cachedFiles = _cachingService.Get<List<string>?>(cacheKey);
             if (cachedFiles != null)
             {
                 return cachedFiles;
             }
 
-            if (Directory.Exists(directory))
+            if (!string.IsNullOrWhiteSpace(resolvedDirectory) && Directory.Exists(resolvedDirectory))
             {
-                var fileNames = Directory.GetFiles(directory).ToList();
+                var fileNames = Directory.GetFiles(resolvedDirectory)
+                    .Select(ToWebRelativePath)
+                    .Where(pathValue => !string.IsNullOrWhiteSpace(pathValue))
+                    .ToList();
                 _cachingService.Set(cacheKey, fileNames);
                 return fileNames;
             }
 
             _cachingService.Set(cacheKey, new List<string>());
             return new List<string>();
+        }
+
+        private string ToWebRelativePath(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return string.Empty;
+            }
+
+            string relativePath = Path.GetRelativePath(_webRootPath, filePath)
+                .Replace('\\', '/');
+
+
+            return relativePath;
         }
 
         public List<string> GetImagesForLocationWithDefault(string path, string area)
@@ -271,9 +299,20 @@ namespace BedBrigade.Client.Services
 
         public string GetDirectoryForPathAndArea(string path, string area)
         {
-            string directory = $"{mediaDirectory}/{path}/{area}";
+            string normalizedPath = NormalizeMediaPath(path);
+            string directory = Path.Combine(_mediaDirectory, normalizedPath, area);
             directory = directory.Replace("//", "/");
             return directory;
+        }
+
+        private static string NormalizeMediaPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            return path.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '/', '\\');
         }
     }
 }

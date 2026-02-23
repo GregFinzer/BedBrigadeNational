@@ -24,7 +24,21 @@ namespace BedBrigade.Common.Logic
 
         public static string GetSeedingFile(string fileName)
         {
-            string filePath = $"{FileUtil.GetSeedingDirectory()}/SeedHtml/{fileName}";
+            var seedingDirectory = FileUtil.GetSeedingDirectory();
+            var seedHtmlDirectory = Path.Combine(seedingDirectory, "SeedHtml");
+            string filePath = Path.Combine(seedHtmlDirectory, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                // Case-insensitive fallback for Linux file systems.
+                var matchedFile = Directory.EnumerateFiles(seedHtmlDirectory)
+                    .FirstOrDefault(path => string.Equals(Path.GetFileName(path), fileName, StringComparison.OrdinalIgnoreCase));
+
+                if (!string.IsNullOrWhiteSpace(matchedFile))
+                {
+                    filePath = matchedFile;
+                }
+            }
 
             if (!File.Exists(filePath))
             {

@@ -78,7 +78,17 @@ namespace BedBrigade.Client
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlBuilder =>
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                if (OperatingSystem.IsLinux())
+                {
+                    var linuxConnectionString = Environment.GetEnvironmentVariable("BedBrigadeConnectionString");
+                    if (!string.IsNullOrWhiteSpace(linuxConnectionString))
+                    {
+                        connectionString = linuxConnectionString;
+                    }
+                }
+
+                options.UseSqlServer(connectionString, sqlBuilder =>
                 {
                     sqlBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
@@ -237,6 +247,21 @@ namespace BedBrigade.Client
             //Possible fix for AT&T Mobile Data            
             app.UseResponseCompression();
 
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.HasValue)
+                {
+                    string requestPath = context.Request.Path.Value;
+                    string? resolvedPath = ResolveMediaRequestPath(app.Environment.WebRootPath, requestPath);
+                    if (!string.IsNullOrWhiteSpace(resolvedPath))
+                    {
+                        context.Request.Path = new PathString(resolvedPath);
+                    }
+                }
+
+                await next();
+            });
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAntiforgery();
@@ -360,7 +385,33 @@ namespace BedBrigade.Client
             }
         }
 
+        private static string? ResolveMediaRequestPath(string webRootPath, string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(webRootPath) || string.IsNullOrWhiteSpace(requestPath))
+            {
+                return null;
+            }
 
+            const string MediaPrefix = "/media";
+            if (!requestPath.StartsWith(MediaPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
 
+            string remainder = requestPath.Substring(MediaPrefix.Length).TrimStart('/');
+            string mediaRoot = Path.Combine(webRootPath, "Media");
+            string combinedPath = Path.Combine(mediaRoot, remainder);
+            string? physicalPath = FileUtil.ResolveCaseInsensitivePath(combinedPath);
+            
+            if (string.IsNullOrWhiteSpace(physicalPath))
+            {
+                return null;
+            }
+
+            string relativePath = Path.GetRelativePath(webRootPath, physicalPath).Replace('\\', '/');
+            return relativePath.StartsWith("/", StringComparison.Ordinal)
+                ? relativePath
+                : "/" + relativePath;
+        }
     }
 }
