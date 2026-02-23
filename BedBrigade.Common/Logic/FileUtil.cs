@@ -337,14 +337,14 @@ namespace BedBrigade.Common.Logic
             
             if (string.IsNullOrWhiteSpace(path))
             {
-                return null;
+                return path;
             }
 
             bool endsWithSeparator = EndsWithDirectorySeparator(path);
             string fullPath = GetFullPathOrNull(path);
             if (string.IsNullOrWhiteSpace(fullPath))
             {
-                return null;
+                return path;
             }
 
             if (Directory.Exists(fullPath) || File.Exists(fullPath))
@@ -355,13 +355,13 @@ namespace BedBrigade.Common.Logic
             string? root = Path.GetPathRoot(fullPath);
             if (string.IsNullOrWhiteSpace(root))
             {
-                return null;
+                return path;
             }
 
             string? resolved = ResolveByEnumeratingSegments(root, fullPath);
             if (string.IsNullOrWhiteSpace(resolved))
             {
-                return null;
+                return path;
             }
 
             string? result = endsWithSeparator
