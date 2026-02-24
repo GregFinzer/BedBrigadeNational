@@ -1,4 +1,4 @@
-﻿using BedBrigade.Common.Models;
+﻿﻿using BedBrigade.Common.Models;
 using System.Text;
 using BedBrigade.Common.Constants;
 
@@ -6,6 +6,8 @@ namespace BedBrigade.Common.Logic
 {
     public static class FileUtil
     {
+        private static Dictionary<string, string> _caseInsensitiveCache = new Dictionary<string, string>();
+        
         public static string BuildFileNameWithDate(string prefix, string extension)
         {
             if (string.IsNullOrEmpty(prefix))
@@ -115,25 +117,41 @@ namespace BedBrigade.Common.Logic
 
         public static string GetSeedingDirectory()
         {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            Console.WriteLine($"DEBUG: AppDomain.CurrentDomain.BaseDirectory = {baseDirectory}");
+            
+            baseDirectory = GetPathBeforeBin(baseDirectory);
+            Console.WriteLine($"DEBUG: After GetPathBeforeBin = {baseDirectory}");
+            
+            // Try the standard seeding directory path relative to the solution root
+            string seedingPath = Path.Combine(baseDirectory, "BedBrigade.Data", "Data", "Seeding");
+            Console.WriteLine($"DEBUG: Trying seedingPath = {seedingPath}, exists = {Directory.Exists(seedingPath)}");
+
+            if (Directory.Exists(seedingPath))
+            {
+                return seedingPath;
+            }
+
+            // Fallback: try relative path for local development
             string localFilePath = "../BedBrigade.Data/Data/Seeding";
+            Console.WriteLine($"DEBUG: Trying localFilePath = {localFilePath}, exists = {Directory.Exists(localFilePath)}");
 
             if (Directory.Exists(localFilePath))
             {
+                Console.WriteLine($"DEBUG: Returning localFilePath");
                 return localFilePath;
             }
 
-           // Debug.WriteLine("Directory does not exist: " + localFilePath);
-
+            // Fallback: try deployed path in bin directory
             string deployedFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeding");
+            Console.WriteLine($"DEBUG: Trying deployedFilePath = {deployedFilePath}, exists = {Directory.Exists(deployedFilePath)}");
 
             if (Directory.Exists(deployedFilePath))
             {
                 return deployedFilePath;
             }
 
-            Console.WriteLine("Directory does not exist: " + deployedFilePath);
-
-            throw new DirectoryNotFoundException("Seeding directory not found. Current directory is : " + AppDomain.CurrentDomain.BaseDirectory);
+            throw new DirectoryNotFoundException($"Seeding directory not found. Tried: {seedingPath}, {localFilePath}, {deployedFilePath}. Current directory is: {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
         public static void CreateLocationMediaDirectory(Location location)
@@ -303,6 +321,121 @@ namespace BedBrigade.Common.Logic
             return programDirs
                 .Select(p => Path.Combine(p, "Microsoft VS Code", "Code.exe"))
                 .Any(File.Exists);
+        }
+        
+        public static string? ResolveCaseInsensitivePath(string path)
+        {
+            if (_caseInsensitiveCache.TryGetValue(path, out string? cached))
+            {
+                if (Directory.Exists(cached) || File.Exists(cached))
+                {
+                    return cached;
+                }
+
+                _caseInsensitiveCache.Remove(path);
+            }
+            
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+
+            bool endsWithSeparator = EndsWithDirectorySeparator(path);
+            string fullPath = GetFullPathOrNull(path);
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                return path;
+            }
+
+            if (Directory.Exists(fullPath) || File.Exists(fullPath))
+            {
+                return fullPath;
+            }
+
+            string? root = Path.GetPathRoot(fullPath);
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                return path;
+            }
+
+            string? resolved = ResolveByEnumeratingSegments(root, fullPath);
+            if (string.IsNullOrWhiteSpace(resolved))
+            {
+                return path;
+            }
+
+            string? result = endsWithSeparator
+                ? (Directory.Exists(resolved) ? resolved : null)
+                : ((Directory.Exists(resolved) || File.Exists(resolved)) ? resolved : null);
+
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                _caseInsensitiveCache.Add(path, result);
+            }
+            return result;
+        }
+
+        private static bool EndsWithDirectorySeparator(string path)
+        {
+            return path.EndsWith(Path.DirectorySeparatorChar)
+                || path.EndsWith(Path.AltDirectorySeparatorChar)
+                || path.EndsWith('/')
+                || path.EndsWith('\\');
+        }
+
+        private static string GetFullPathOrNull(string path)
+        {
+            string normalized = path.Replace('\\', Path.DirectorySeparatorChar)
+                .Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+            try
+            {
+                return Path.GetFullPath(normalized);
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string? ResolveByEnumeratingSegments(string root, string fullPath)
+        {
+            // IMPORTANT: On Linux, Path.GetPathRoot("/a/b") is "/". We must keep "/" as the current directory.
+            string current = root;
+            string remainder = fullPath.Substring(root.Length);
+
+            var parts = remainder.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+            {
+                return Directory.Exists(root) ? root : null;
+            }
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                current = ResolveNextSegment(current, parts[i]);
+                if (string.IsNullOrWhiteSpace(current))
+                {
+                    return null;
+                }
+            }
+
+            return current;
+        }
+
+        private static string ResolveNextSegment(string currentDirectory, string segment)
+        {
+            if (!Directory.Exists(currentDirectory))
+            {
+                return string.Empty;
+            }
+
+            string? match = Directory.EnumerateFileSystemEntries(currentDirectory)
+                .Select(Path.GetFileName)
+                .FirstOrDefault(name =>
+                    !string.IsNullOrWhiteSpace(name)
+                    && string.Equals(name, segment, StringComparison.OrdinalIgnoreCase));
+
+            return match is null ? string.Empty : Path.Combine(currentDirectory, match);
         }
     }
 }
