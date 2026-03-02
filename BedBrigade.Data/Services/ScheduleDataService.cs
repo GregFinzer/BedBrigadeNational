@@ -357,15 +357,15 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
     }
 
-    public async Task<ServiceResponse<bool>> AddMissingScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
     {
         if (!bedRequest.DeliveryDate.HasValue)
-            return  new ServiceResponse<bool>("BedRequest DeliveryDate is null");
+            return  new ServiceResponse<Schedule>("BedRequest DeliveryDate is null");
         
         var locationResponse = await _locationDataService.GetByIdAsync(bedRequest.LocationId);
         
         if (!locationResponse.Success || locationResponse.Data == null)
-            return new ServiceResponse<bool>(locationResponse.Message);
+            return new ServiceResponse<Schedule>(locationResponse.Message);
         
         Schedule schedule = new  Schedule();
         schedule.LocationId = bedRequest.LocationId;
@@ -410,9 +410,9 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         schedule.Beds = 0;
         var createResponse = await CreateAsync(schedule);
         if (!createResponse.Success || createResponse.Data == null)
-            return new ServiceResponse<bool>(createResponse.Message);
+            return new ServiceResponse<Schedule>(createResponse.Message);
 
-        return new ServiceResponse<bool>("Schedule created successfully", true, true);
+        return new ServiceResponse<Schedule>("Success", true, createResponse.Data);
     }
     
 

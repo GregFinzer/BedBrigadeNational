@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Syncfusion.Blazor.Schedule;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -35,6 +36,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private NavigationManager? _nav { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private IScheduleDataService _svcSchedule { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
         
         [Parameter] public string? Id { get; set; }
 
@@ -307,7 +309,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
                 if (Model.Status == BedRequestStatus.Scheduled)
                 {
-                    await SendDeliveryReminderEmail(Model);
+                    var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
+                    if (scheduleResult.Success && scheduleResult.Data != null)
+                    {
+                        await SendDeliveryReminderEmail(Model, scheduleResult.Data);
+                        await SendDeliveryReminderSms(Model, scheduleResult.Data);
+                    }
                 }
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
@@ -318,12 +325,58 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model)
+        private async Task SendDeliveryReminderSms(Common.Models.BedRequest model, Common.Models.Schedule scheduleResultData)
         {
-            var scheduleResponse = await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
-            //@@@HERE
+            ServiceResponse<bool> smsResult = await _sendSmsLogic.QueueDeliveryDayBeforeReminder(model, scheduleResultData);
+            if (!smsResult.Success)
+            {
+                Log.Error($"Failed to queue delivery reminder SMS for BedRequest {model.BedRequestId} : {smsResult.Message}");
+                _toastService?.Error("SMS Not Queued", "The delivery reminder SMS was not queued successfully");
+            }
+        }
 
-            //var emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model);
+        private bool ConfirmAddSchedule(string dialogTitle, string dialogMessage)
+        {
+            if (JS != null)
+            {
+                return JS.InvokeAsync<bool>("confirm", $"{dialogTitle}\n\n{dialogMessage}").Result;
+            }
+            return false;
+        }
+
+        private async Task<ServiceResponse<Common.Models.Schedule>> GetOrCreateScheduleForBedRequestDeliveryDate(
+            Common.Models.BedRequest model)
+        {
+            ServiceResponse<Common.Models.Schedule> scheduleResponse =
+                await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
+
+            if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            {
+                if (ConfirmAddSchedule("Schedule Not Found",
+                        "No schedule was found for the delivery date of this Bed Request. Would you like to add a schedule for this delivery date?"))
+                {
+                    scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDate(model);
+                }
+            }
+
+            if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            {
+                _toastService?.Error("Schedule Not Found",
+                    "No schedule was found for the delivery date of this Bed Request, and a new schedule was not be created. The delivery reminder email was not queued.");
+
+            }
+
+            return scheduleResponse;
+        }
+
+        private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
+        {
+            ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model, schedule);
+            if (!emailResult.Success)
+            {
+                Log.Error($"Failed to queue delivery reminder email for BedRequest {model.BedRequestId} : {emailResult.Message}");
+                _toastService?.Error("Email Not Queued", "The delivery reminder email was not queued successfully");
+            }
         }
 
 
