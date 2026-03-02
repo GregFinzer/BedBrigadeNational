@@ -236,6 +236,22 @@ else
     </div>
 }
 
+<SfDialog ID="confirmAddScheduleDialog" Width="400px" IsModal="true" ShowCloseIcon="true" Visible="@_showConfirmAddScheduleDialog"
+          OnClose="HandleConfirmAddScheduleClose">
+    <DialogTemplates>
+        <Header>
+            <h3>@_confirmAddScheduleTitle</h3>
+        </Header>
+        <Content>
+            <p>@_confirmAddScheduleMessage</p>
+        </Content>
+        <FooterTemplate>
+            <button id="confirmAddScheduleYes" type="button" class="btn btn-primary me-2" @onclick="() => HandleConfirmAddScheduleSelection(true)">Yes</button>
+            <button id="confirmAddScheduleNo" type="button" class="btn btn-secondary" @onclick="() => HandleConfirmAddScheduleSelection(false)">No</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
 <style>
     .custom-textbox-height {
         height: 80px;

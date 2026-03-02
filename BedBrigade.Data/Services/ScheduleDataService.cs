@@ -375,6 +375,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         schedule.EventDateScheduled = bedRequest.DeliveryDate.Value.Date;
         schedule.Address = locationResponse.Data.BuildAddress;
         schedule.City = locationResponse.Data.BuildCity;
+        schedule.State = locationResponse.Data.BuildState;
         schedule.PostalCode = locationResponse.Data.BuildPostalCode;
 
         var lastScheduleResponse = await GetLastScheduledByLocationId(bedRequest.LocationId);

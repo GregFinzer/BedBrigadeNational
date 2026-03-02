@@ -53,6 +53,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private const string IsError = "Error";
         private const string BRService = "_svcBedRequest service is not available.";
 
+        private bool _showConfirmAddScheduleDialog;
+        private string _confirmAddScheduleTitle = string.Empty;
+        private string _confirmAddScheduleMessage = string.Empty;
+        private TaskCompletionSource<bool>? _confirmAddScheduleTcs;
+
         protected bool OnlyRead { get; set; } = false;
         public string SpeakEnglishVisibility = "hidden";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
@@ -312,7 +317,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
                     if (scheduleResult.Success && scheduleResult.Data != null)
                     {
+                        //@@@HERE The email is not queued at all
                         await SendDeliveryReminderEmail(Model, scheduleResult.Data);
+
+                        //@@@HERE The SMS is queued but the body is blank
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
                 }
@@ -335,13 +343,27 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private bool ConfirmAddSchedule(string dialogTitle, string dialogMessage)
+        private Task<bool> ConfirmAddScheduleAsync(string dialogTitle, string dialogMessage)
         {
-            if (JS != null)
-            {
-                return JS.InvokeAsync<bool>("confirm", $"{dialogTitle}\n\n{dialogMessage}").Result;
-            }
-            return false;
+            _confirmAddScheduleTitle = dialogTitle;
+            _confirmAddScheduleMessage = dialogMessage;
+            _showConfirmAddScheduleDialog = true;
+            _confirmAddScheduleTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            StateHasChanged();
+            return _confirmAddScheduleTcs.Task;
+        }
+
+        private void HandleConfirmAddScheduleSelection(bool isConfirmed)
+        {
+            _showConfirmAddScheduleDialog = false;
+            _confirmAddScheduleTcs?.TrySetResult(isConfirmed);
+            _confirmAddScheduleTcs = null;
+            StateHasChanged();
+        }
+
+        private void HandleConfirmAddScheduleClose()
+        {
+            HandleConfirmAddScheduleSelection(false);
         }
 
         private async Task<ServiceResponse<Common.Models.Schedule>> GetOrCreateScheduleForBedRequestDeliveryDate(
@@ -352,8 +374,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (!scheduleResponse.Success || scheduleResponse.Data == null)
             {
-                if (ConfirmAddSchedule("Schedule Not Found",
-                        "No schedule was found for the delivery date of this Bed Request. Would you like to add a schedule for this delivery date?"))
+                if (await ConfirmAddScheduleAsync("Schedule Not Found",
+                        $"No schedule was found for the delivery date {model.DeliveryDate.Value.ToShortDateString()} of this Bed Request. Would you like to add a schedule for this delivery date?"))
                 {
                     scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDate(model);
                 }
