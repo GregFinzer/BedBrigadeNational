@@ -404,7 +404,15 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         string defaultEventNote = await _configurationDataService.GetConfigValueAsync(ConfigSection.Schedule,
             ConfigNames.DefaultDeliveryEventNote, schedule.LocationId);
         schedule.EventNote = defaultEventNote;
-        @@@HERE
+        schedule.VolunteersRegistered = 0;
+        schedule.DeliveryVehiclesRegistered = 0;
+        schedule.Teams = 0;
+        schedule.Beds = 0;
+        var createResponse = await CreateAsync(schedule);
+        if (!createResponse.Success || createResponse.Data == null)
+            return new ServiceResponse<bool>(createResponse.Message);
+
+        return new ServiceResponse<bool>("Schedule created successfully", true, true);
     }
     
 

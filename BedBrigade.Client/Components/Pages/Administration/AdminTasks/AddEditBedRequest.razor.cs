@@ -320,8 +320,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model)
         {
-            var schedule = await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
-            var emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model);
+            var scheduleResponse = await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
+            //@@@HERE
+
+            //var emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model);
         }
 
 
