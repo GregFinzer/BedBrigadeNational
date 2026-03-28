@@ -31,8 +31,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private IScheduleDataService _svcSchedule { get; set; }
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
-        [Inject] private IEmailQueueDataService? _emailQueueDataService { get; set; }
-        
+        [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
+
         [Parameter] public string? Id { get; set; }
 
         protected BedBrigade.Common.Models.BedRequest? Model { get; set; }
@@ -319,6 +319,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
                 }
+                else if (Model.Status == BedRequestStatus.Cancelled 
+                         || Model.Status == BedRequestStatus.Waiting)
+                {
+                    await _emailQueueDataService.DeleteQueuedEmail(Model.Email);
+                }
+                
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
