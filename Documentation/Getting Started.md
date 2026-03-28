@@ -42,6 +42,41 @@ In order to run the NUnit Tests and check for Quality Locally, please set a Wind
 * Download the Secrets Folder.
 * Open the file Bed Brigade National Website Information.docx to see the Gold Suite License Key.
 
+**Setting Environment Variables in Linux**
+In a terminal edit the file
+```bash
+nano ~/.bashrc
+```
+
+Add these at the end of the file with the actual key
+```bash
+export Syncfusion="zzz"
+export GOLD="zzz"
+export BedBrigadeConnectionString="Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;"
+```
+
+Refresh the changes
+```bash
+source ~/.bashrc
+```
+
+Do the same for the profile
+```bash
+nano ~/.profile
+```
+
+Add these at the end of the file with the actual key
+```bash
+export Syncfusion="zzz"
+export GOLD="zzz"
+export BedBrigadeConnectionString="Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;"
+```
+Refresh the changes
+```bash
+source ~/.profile
+```
+
+
 ### 7. Set Syncfusion License Key
 * Set an environment variable of Syncfusion to your community license.
 
