@@ -17,10 +17,12 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Syncfusion.Blazor;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Reflection;
 using Microsoft.AspNetCore.ResponseCompression;
-
+using System;
+using System.Data.SqlClient;
 
 namespace BedBrigade.Client
 {
@@ -87,7 +89,13 @@ namespace BedBrigade.Client
                         connectionString = linuxConnectionString;
                     }
                 }
-
+                
+                if (!IsValidSqlServerConnectionString(connectionString))
+                {
+                    Log.Logger.Error("Invalid SQL Server connection string: " + connectionString);
+                    throw new InvalidOperationException("Invalid SQL Server connection string. Please check the configuration. If you are running under Linux then set the environment variable BedBrigadeConnectionString with a valid connection string.");
+                }
+                
                 options.UseSqlServer(connectionString, sqlBuilder =>
                 {
                     sqlBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
@@ -412,6 +420,41 @@ namespace BedBrigade.Client
             return relativePath.StartsWith("/", StringComparison.Ordinal)
                 ? relativePath
                 : "/" + relativePath;
+        }
+
+
+
+        private static bool IsValidSqlServerConnectionString(string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return false;
+
+            try
+            {
+                var builder = new SqlConnectionStringBuilder(connectionString);
+
+                // Optional: enforce required fields
+                if (string.IsNullOrWhiteSpace(builder.DataSource))
+                    return false;
+
+                // Either Integrated Security OR UserID/Password should be present
+                if (!builder.IntegratedSecurity)
+                {
+                    if (string.IsNullOrWhiteSpace(builder.UserID) ||
+                        string.IsNullOrWhiteSpace(builder.Password))
+                        return false;
+                }
+
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false; // Invalid format
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

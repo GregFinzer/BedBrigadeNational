@@ -1,5 +1,4 @@
-﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.EnumModels;
+﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -9,11 +8,6 @@ using Microsoft.JSInterop;
 using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Syncfusion.Blazor.Schedule;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -37,7 +31,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private IScheduleDataService _svcSchedule { get; set; }
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
-        
+        [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
+
         [Parameter] public string? Id { get; set; }
 
         protected BedBrigade.Common.Models.BedRequest? Model { get; set; }
@@ -324,6 +319,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
                 }
+                else if (Model.Status == BedRequestStatus.Cancelled 
+                         || Model.Status == BedRequestStatus.Waiting)
+                {
+                    await _emailQueueDataService.DeleteQueuedEmail(Model.Email);
+                }
+                
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
@@ -393,6 +394,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
         {
+            ServiceResponse<string> deleteResult = await _emailQueueDataService.DeleteQueuedEmail(model.Email);
+
+            if (!deleteResult.Success)
+            {
+                Log.Error(deleteResult.Message);
+                _toastService?.Error("Email Not Deleted", "An existing delivery reminder email for this Bed Request was not deleted successfully.");
+            }
+            
             ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model, schedule);
             if (!emailResult.Success)
             {
