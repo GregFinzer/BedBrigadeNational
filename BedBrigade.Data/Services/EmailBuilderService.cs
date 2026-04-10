@@ -428,37 +428,21 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
         {
-            var userResult = await _userDataService.GetByEmail(bedRequest.Email ?? string.Empty);
-
-            if (!userResult.Success || userResult.Data == null)
-            {
-                Log.Information($"User not found for QueueDeliveryDayBeforeReminder: {bedRequest.Email}");
-                return new ServiceResponse<bool>(userResult.Message, false);
-            }
-
-            User user = userResult.Data;
-            var locationResult = await _locationDataService.GetByIdAsync(user.LocationId);
-
-            if (!locationResult.Success || locationResult.Data == null)
-            {
-                return new ServiceResponse<bool>(locationResult.Message, false);
-            }
-
-            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(user.LocationId, ContentType.DeliveryDayBeforeEmailForm);
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryDayBeforeEmailForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
-                return new ServiceResponse<bool>("ForgotPasswordForm not found", false);
+                return new ServiceResponse<bool>("DeliveryDayBeforeEmailForm not found", false);
             }
 
             string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);
             EmailQueue emailQueue = new()
             {
-                ToAddress = user.Email,
+                ToAddress = bedRequest.Email,
                 Subject = "Your bed(s) will be delivered tomorrow",
                 Body = body,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = user.LocationId,
+                LocationId = bedRequest.LocationId,
                 TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled)
             };
 

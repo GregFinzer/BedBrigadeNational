@@ -738,6 +738,35 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             return new ServiceResponse<List<SmsQueue>>($"Error GetSmsQueueView for {GetEntityName()}: {ex.Message}", false, null);
         }
     }
+
+    public async Task<ServiceResponse<string>> DeleteQueuedSmsMessage(string phone)
+    {
+        try
+        {
+            string phoneNumbersOnly = StringUtil.ExtractDigits(phone);
+            string formattedPhone = phone.FormatPhoneNumber();
+            
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                var messagesToDelete = await dbSet.Where(o => (o.ToPhoneNumber == formattedPhone
+                                                               || o.ToPhoneNumber == phoneNumbersOnly)
+                                                              && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
+                if (messagesToDelete.Count == 0)
+                {
+                    return new ServiceResponse<string>($"No queued messages found for phone number {phone}", true, $"No queued messages found for phone number {phone}");
+                }
+                dbSet.RemoveRange(messagesToDelete);
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for phone number {phone}", true, $"Deleted {messagesToDelete.Count} queued messages for phone number {phone}");
+            }
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<string>(ex.Message, false);
+        }
+    }
 }
 
 

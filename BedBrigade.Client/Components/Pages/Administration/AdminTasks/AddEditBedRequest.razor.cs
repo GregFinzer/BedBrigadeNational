@@ -32,6 +32,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IScheduleDataService _svcSchedule { get; set; }
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
+        [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
 
         [Parameter] public string? Id { get; set; }
 
@@ -303,10 +304,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             var updateResult = await _svcBedRequest.UpdateAsync(bedRequest);
 
-            if (updateResult.Success)
+            if (updateResult.Success && updateResult.Data != null)
             {
                 Model = updateResult.Data;
 
+                await _emailQueueDataService.DeleteQueuedEmail(Model.Email);
+                await _smsQueueDataService.DeleteQueuedSmsMessage(Model.Phone);
+                
                 if (Model.Status == BedRequestStatus.Scheduled)
                 {
                     var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
@@ -318,11 +322,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         //@@@HERE The SMS is queued but the body is blank
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
-                }
-                else if (Model.Status == BedRequestStatus.Cancelled 
-                         || Model.Status == BedRequestStatus.Waiting)
-                {
-                    await _emailQueueDataService.DeleteQueuedEmail(Model.Email);
                 }
                 
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
@@ -394,14 +393,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
         {
-            ServiceResponse<string> deleteResult = await _emailQueueDataService.DeleteQueuedEmail(model.Email);
-
-            if (!deleteResult.Success)
-            {
-                Log.Error(deleteResult.Message);
-                _toastService?.Error("Email Not Deleted", "An existing delivery reminder email for this Bed Request was not deleted successfully.");
-            }
-            
             ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model, schedule);
             if (!emailResult.Success)
             {
