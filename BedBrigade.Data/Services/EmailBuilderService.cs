@@ -453,7 +453,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<bool>(emailResult.Message, false);
             }
 
-            return new ServiceResponse<bool>("Successfully queued Forgot Password Email", true);
+            return new ServiceResponse<bool>("Successfully queued Delivery Reminder Email", true);
         }
 
         

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using Syncfusion.Blazor;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -54,10 +55,25 @@ namespace BedBrigade.Client
         {
             //Read logging configuration from appsettings.json
             //See https://www.codeproject.com/Articles/5344667/Logging-with-Serilog-in-ASP-NET-Core-Web-API
-            var logger = new LoggerConfiguration()
+            if (OperatingSystem.IsLinux())
+            {
+                Console.ForegroundColor = ResolveLinuxConsoleForegroundColor();
+            }
+
+            var loggerConfiguration = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                .Enrich.FromLogContext()
-                .CreateLogger();
+                .Enrich.FromLogContext();
+
+            if (OperatingSystem.IsLinux())
+            {
+                loggerConfiguration.WriteTo.Console(theme: SystemConsoleTheme.None);
+            }
+            else
+            {
+                loggerConfiguration.WriteTo.Console();
+            }
+
+            var logger = loggerConfiguration.CreateLogger();
 
             Log.Logger = logger;
             builder.Logging.ClearProviders();
@@ -455,6 +471,40 @@ namespace BedBrigade.Client
             {
                 return false;
             }
+        }
+
+        private static ConsoleColor ResolveLinuxConsoleForegroundColor()
+        {
+            string? colorFgBg = Environment.GetEnvironmentVariable("COLORFGBG");
+            if (!string.IsNullOrWhiteSpace(colorFgBg))
+            {
+                string[] parts = colorFgBg.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (parts.Length > 0 && int.TryParse(parts[^1], out int backgroundCode))
+                {
+                    // ANSI 0-6 is generally dark backgrounds, 7+ is generally light backgrounds.
+                    return backgroundCode <= 6 ? ConsoleColor.White : ConsoleColor.Black;
+                }
+            }
+
+            return IsDarkConsoleBackground(Console.BackgroundColor)
+                ? ConsoleColor.White
+                : ConsoleColor.Black;
+        }
+
+        private static bool IsDarkConsoleBackground(ConsoleColor backgroundColor)
+        {
+            return backgroundColor switch
+            {
+                ConsoleColor.Black => true,
+                ConsoleColor.DarkBlue => true,
+                ConsoleColor.DarkGreen => true,
+                ConsoleColor.DarkCyan => true,
+                ConsoleColor.DarkRed => true,
+                ConsoleColor.DarkMagenta => true,
+                ConsoleColor.DarkYellow => true,
+                ConsoleColor.DarkGray => true,
+                _ => false
+            };
         }
     }
 }

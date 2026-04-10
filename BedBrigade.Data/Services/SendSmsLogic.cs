@@ -81,8 +81,8 @@ public class SendSmsLogic : ISendSmsLogic
         Schedule schedule,
         ServiceResponse<Content> templateResult)
     {
-        string template = templateResult.Data.ContentHtml;
-        StringBuilder sb = new StringBuilder(template.Length * 2);
+        string template = templateResult.Data?.ContentHtml ?? string.Empty;
+        StringBuilder sb = new StringBuilder(template, template.Length * 2);
         sb = _mailMergeLogic.ReplaceBedRequestFields(bedRequest, sb);
         sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
 
