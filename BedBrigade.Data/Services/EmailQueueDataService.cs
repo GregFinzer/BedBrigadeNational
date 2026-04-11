@@ -27,6 +27,7 @@ namespace BedBrigade.Data.Services
         private readonly ICommonService _commonService;
         private readonly ITimezoneDataService _timezoneDataService;
 
+        
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -41,7 +42,8 @@ namespace BedBrigade.Data.Services
             INewsletterDataService newsletterDataService,
             IMailMergeLogic mailMergeLogic, 
             ICommonService commonService, 
-            ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
+            ITimezoneDataService timezoneDataService
+            ) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -173,7 +175,8 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString())
+                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString()
+                                                    && DateTime.UtcNow >= o.TargetDate)
                     .OrderByDescending(o => o.Priority)
                     .ThenBy(o => o.QueueDate)
                     .Take(maxPerChunk)
@@ -301,9 +304,52 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        private async Task<EmailQueue?> GetEmailByAddressAndTargetDate(EmailQueue email)
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<EmailQueue>();
+                return await dbSet.Where(o => o.ToAddress == email.ToAddress && o.TargetDate == email.TargetDate)
+                    .FirstOrDefaultAsync();
+            }
+        }
 
+        public async Task<ServiceResponse<string>> DeleteQueuedEmail(string email)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    var queuedEmails = await dbSet.Where(o => o.ToAddress == email && o.Status == QueueStatus.Queued.ToString())
+                        .ToListAsync();
+
+                    if (!queuedEmails.Any())
+                    {
+                        return new ServiceResponse<string>("No queued email found for that address", true);
+                    }
+
+                    dbSet.RemoveRange(queuedEmails);
+                    await ctx.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(GetEntityName());
+                    return new ServiceResponse<string>("Deleted queued email", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>(ex.Message, false);
+            }
+        }
+        
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
+            var duplicate = await GetEmailByAddressAndTargetDate(email);
+
+            if (duplicate != null)
+            {
+                return new ServiceResponse<string>("Email already queued", true);
+            }
+
             try
             {
                 email.Status = QueueStatus.Queued.ToString();

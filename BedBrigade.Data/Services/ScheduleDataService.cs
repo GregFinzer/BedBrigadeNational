@@ -3,6 +3,7 @@ using System.Data.Common;
 using AKSoftware.Localization.MultiLanguages;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.SpeakIt;
 
@@ -16,17 +17,20 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
     private readonly IConfigurationDataService _configurationDataService;
     private readonly ITranslateLogic _translateLogic;
     private readonly ILanguageContainerService _lc;
-
+    private readonly ILocationDataService _locationDataService;
+    
     public ScheduleDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService,
         IConfigurationDataService configurationDataService,
-        ITranslateLogic translateLogic) : base(contextFactory, cachingService, authService)
+        ITranslateLogic translateLogic, 
+        ILocationDataService locationDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _configurationDataService = configurationDataService;
         _translateLogic = translateLogic;
+        _locationDataService = locationDataService;
     }
 
     public override async Task<ServiceResponse<Schedule>> GetByIdAsync(object? id)
@@ -331,6 +335,88 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             await UpdateAsync(schedule);
         }
     }
+
+    public async Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    {
+        if (!bedRequest.DeliveryDate.HasValue)
+            return new ServiceResponse<Schedule>("bedRequest.DeliveryDate is null");
+
+        var scheduleResponse = await GetFutureSchedulesByLocationId(bedRequest.LocationId);
+
+        if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            return new ServiceResponse<Schedule>(scheduleResponse.Message);
+
+        var schedule = scheduleResponse.Data
+            .FirstOrDefault(o => o.EventDateScheduled.Date == bedRequest.DeliveryDate.Value.Date
+            && o.EventType == EventType.Delivery);
+
+        if (schedule != null)
+            return new ServiceResponse<Schedule>("Found schedule", true, schedule);
+
+        return new ServiceResponse<Schedule>(
+            $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
+    }
+
+    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    {
+        if (!bedRequest.DeliveryDate.HasValue)
+            return  new ServiceResponse<Schedule>("BedRequest DeliveryDate is null");
+        
+        var locationResponse = await _locationDataService.GetByIdAsync(bedRequest.LocationId);
+        
+        if (!locationResponse.Success || locationResponse.Data == null)
+            return new ServiceResponse<Schedule>(locationResponse.Message);
+        
+        Schedule schedule = new  Schedule();
+        schedule.LocationId = bedRequest.LocationId;
+        schedule.EventName = "Delivery";
+        schedule.EventType = EventType.Delivery;
+        schedule.EventStatus = EventStatus.Scheduled;
+        schedule.EventDateScheduled = bedRequest.DeliveryDate.Value.Date;
+        schedule.Address = locationResponse.Data.BuildAddress;
+        schedule.City = locationResponse.Data.BuildCity;
+        schedule.State = locationResponse.Data.BuildState;
+        schedule.PostalCode = locationResponse.Data.BuildPostalCode;
+
+        var lastScheduleResponse = await GetLastScheduledByLocationId(bedRequest.LocationId);
+
+        if (lastScheduleResponse.Success && lastScheduleResponse.Data != null)
+        {
+            schedule.OrganizerName = lastScheduleResponse.Data.OrganizerName;
+            schedule.OrganizerEmail = lastScheduleResponse.Data.OrganizerEmail;
+            schedule.OrganizerPhone = lastScheduleResponse.Data.OrganizerPhone.FormatPhoneNumber();
+        }
+        else //This will only happen if there is no previous schedule
+        {
+            schedule.OrganizerName = StringUtil.InsertSpaces(GetUserName());
+            schedule.OrganizerEmail = GetUserEmail();
+            schedule.OrganizerPhone = GetUserPhone().FormatPhoneNumber();
+        }
+
+        int defaultHour = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+            ConfigNames.DefaultDeliveryTime, schedule.LocationId);
+        schedule.EventDateScheduled = schedule.EventDateScheduled.AddHours(defaultHour);
+        int defaultDuration = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+            ConfigNames.DefaultDeliveryDurationHours, schedule.LocationId);
+        schedule.EventDurationHours = defaultDuration;
+        int defaultMaxVolunteers = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+            ConfigNames.DefaultDeliveryMaxVolunteers, schedule.LocationId);
+        schedule.VolunteersMax = defaultMaxVolunteers;
+        string defaultEventNote = await _configurationDataService.GetConfigValueAsync(ConfigSection.Schedule,
+            ConfigNames.DefaultDeliveryEventNote, schedule.LocationId);
+        schedule.EventNote = defaultEventNote;
+        schedule.VolunteersRegistered = 0;
+        schedule.DeliveryVehiclesRegistered = 0;
+        schedule.Teams = 0;
+        schedule.Beds = 0;
+        var createResponse = await CreateAsync(schedule);
+        if (!createResponse.Success || createResponse.Data == null)
+            return new ServiceResponse<Schedule>(createResponse.Message);
+
+        return new ServiceResponse<Schedule>("Success", true, createResponse.Data);
+    }
+    
+
 }
 
 
