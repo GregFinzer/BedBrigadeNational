@@ -7,4 +7,5 @@ public interface ISendSmsLogic
     Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp);
     Task<ServiceResponse<bool>> SendTextMessage(int locationId, string phone, string body);
     Task<ServiceResponse<bool>> SendTextMessage(SmsQueue smsQueue);
+    Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule);
 }

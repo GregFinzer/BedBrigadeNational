@@ -9,5 +9,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> SendSignUpConfirmationEmail(SignUp signUp, string customMessage);
         Task<ServiceResponse<bool>> SendContactUsConfirmationEmail(ContactUs contactUs);
         Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl);
+        Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule);
     }
 }

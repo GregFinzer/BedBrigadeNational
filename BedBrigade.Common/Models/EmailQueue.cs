@@ -42,6 +42,12 @@ namespace BedBrigade.Common.Models
         [NotMapped]
         public DateTime QueueDateLocal { get; set; }
 
+        [Required]
+        public DateTime TargetDate { get; set; }
+
+        [NotMapped]
+        public DateTime? TargetDateLocal { get; set; }
+
         public DateTime? LockDate { get; set; }
         public DateTime? SentDate { get; set; }
 

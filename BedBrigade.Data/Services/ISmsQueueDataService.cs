@@ -23,5 +23,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<SmsQueue>>> GetOldUnreadMessages();
         Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId);
         Task<ServiceResponse<List<SmsQueue>>> GetSmsQueueView();
+        Task<ServiceResponse<string>> DeleteQueuedSmsMessage(string phone);
     }
 }

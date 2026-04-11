@@ -43,6 +43,8 @@ public static class SeedContentsLogic
             await SeedForm(context, locations, ContentType.NewsletterForm);
             await SeedForm(context, locations, ContentType.ContactUsConfirmationForm);
             await SeedForm(context, locations, ContentType.ForgotPasswordForm);
+            await SeedForm(context, locations, ContentType.DeliveryDayBeforeSmsForm);
+            await SeedForm(context, locations, ContentType.DeliveryDayBeforeEmailForm);
         }
     }
 

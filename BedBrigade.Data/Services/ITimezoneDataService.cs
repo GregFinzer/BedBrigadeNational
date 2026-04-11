@@ -13,4 +13,5 @@ public interface ITimezoneDataService
     void FillLocalDates<T>(T item) where T : BaseEntity;
     void FillLocalDates(List<EmailQueue> items);
     void FillLocalDates(List<TranslationQueueView> items);
+    DateTime GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(DateTime originalDate);
 }

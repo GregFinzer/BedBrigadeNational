@@ -2,8 +2,11 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using System.Text;
+using BedBrigade.Data.Migrations;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Serilog;
+using System.Text;
+using Log = Serilog.Log;
 
 namespace BedBrigade.Data.Services
 {
@@ -18,6 +21,7 @@ namespace BedBrigade.Data.Services
         private readonly IVolunteerDataService _volunteerDataService;
         private readonly IScheduleDataService _scheduleDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
+        private readonly ITimezoneDataService _timezoneDataService;
 
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
@@ -27,7 +31,8 @@ namespace BedBrigade.Data.Services
             IDonationDataService donationDataService,
             IVolunteerDataService volunteerDataService,
             IScheduleDataService scheduleDataService,
-            IMailMergeLogic mailMergeLogic)
+            IMailMergeLogic mailMergeLogic,
+            ITimezoneDataService timezoneDataService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -38,6 +43,7 @@ namespace BedBrigade.Data.Services
             _volunteerDataService = volunteerDataService;
             _scheduleDataService = scheduleDataService;
             _mailMergeLogic = mailMergeLogic;
+            _timezoneDataService = timezoneDataService;
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)
@@ -75,8 +81,8 @@ namespace BedBrigade.Data.Services
                     ToAddress = email,
                     Subject = BuildTaxFormSubject(location.Data, donationsForEmail.First().DonationDate),
                     Body = BuildTaxFormBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail),
-                    LocationId = location.Data.LocationId
-
+                    LocationId = location.Data.LocationId,
+                    TargetDate = DateTime.UtcNow
                 };
                 var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -211,7 +217,8 @@ namespace BedBrigade.Data.Services
                 Subject = subject,
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = entity.LocationId
+                LocationId = entity.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -249,7 +256,8 @@ namespace BedBrigade.Data.Services
                 Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                 Body = body,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = volunteer.LocationId
+                LocationId = volunteer.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -274,7 +282,8 @@ namespace BedBrigade.Data.Services
                     Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                     Body = body,
                     Priority = Defaults.BulkHighPriority,
-                    LocationId = volunteer.LocationId
+                    LocationId = volunteer.LocationId,
+                    TargetDate = DateTime.UtcNow
                 };
                 ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -338,7 +347,8 @@ namespace BedBrigade.Data.Services
                 Subject = subject,
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = entity.LocationId
+                LocationId = entity.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -416,6 +426,45 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
+        public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
+        {
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryDayBeforeEmailForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("DeliveryDayBeforeEmailForm not found", false);
+            }
+
+            string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = bedRequest.Email,
+                Subject = "Your bed(s) will be delivered tomorrow",
+                Body = body,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = bedRequest.LocationId,
+                TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled)
+            };
+
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Delivery Reminder Email", true);
+        }
+
+        
+        private string BuildDeliveryDayBeforeReminderBody(string template, BedRequest bedRequest, Schedule schedule)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(bedRequest, sb);
+            sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
+            return sb.ToString();
+        }
+
         public async Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl)
         {
             var userResult = await _userDataService.GetByEmail(email);
@@ -448,7 +497,8 @@ namespace BedBrigade.Data.Services
                 Subject = "Bed Brigade Password Reset Request",
                 Body = body,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = user.LocationId
+                LocationId = user.LocationId,
+                TargetDate = DateTime.UtcNow
             };
 
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);

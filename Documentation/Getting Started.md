@@ -8,7 +8,7 @@ https://www.syncfusion.com/sales/communitylicense
 ### 2.  Sign Up with Location IQ (this is used for Geolocation lookup)
 https://my.locationiq.com/
 
-### 3.  Install This Software
+### 3a.  Install Development Software for Windows (see 3b if installing on Linux)
 * Git:  https://git-scm.com/downloads
 * Chocolatey package manager:  https://chocolatey.org/install
 * <a href="https://community.chocolatey.org/packages/drawio" target="_blank">Draw.io</a> for the diagrams
@@ -20,6 +20,97 @@ https://my.locationiq.com/
 * Install SyncFusion:  https://www.syncfusion.com/account/downloads
 * Install Web Compiler Visual Studio Extension.  This is required for right clicking on the theme.scss and generating the theme.css and theme.min.css
 * Install your favorite database editor for SQL Server Express such as <a href="https://community.chocolatey.org/packages/sql-server-management-studio">SQL Server Management Studio</a> or <a href="https://community.chocolatey.org/packages/databasenet">Database .NET</a>
+
+### 3b.  Installing Development Software for Linux
+Here is my desktop environment setup if you want to install a bunch of stuff.  
+https://github.com/GregFinzer/Linux/blob/main/Documentation/MySetup.md
+
+The minimum is below.
+
+```bash
+# Git command line
+sudo apt install git -y
+
+# GitHub Desktop (Like TortoiseGit)
+sudo flatpak install flathub io.github.shiftey.Desktop -y
+
+# All the drawings are in this
+sudo flatpak install flathub drawio -y
+
+# Like Visual Studio but better
+sudo snap install rider --classic 
+
+# Data Beaver (Like Database.NET or SQL Server Management Studio)
+sudo flatpak install flathub io.dbeaver.DBeaverCommunity -y
+
+# Install .NET Version 8 SDK 
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh 
+chmod +x ./dotnet-install.sh 
+./dotnet-install.sh --channel 8.0 
+
+# Install VS Code from Microsoft Official 
+# From here:  https://code.visualstudio.com/docs/setup/linux
+sudo apt-get install wget gpg &&
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg &&
+sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg &&
+rm -f microsoft.gpg
+
+sudo tee /etc/apt/sources.list.d/vscode.sources > /dev/null <<EOF
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64,arm64,armhf
+Signed-By: /usr/share/keyrings/microsoft.gpg
+EOF
+
+sudo apt install apt-transport-https &&
+sudo apt update &&
+sudo apt install code -y
+```
+
+**Install SQL Server in a Docker Container**
+https://github.com/GregFinzer/Linux/blob/main/Scripts/InstallSqlServerOnKUbuntu.sh
+
+**Add dotnet to the path and set other environment variables**
+
+```bash
+nano ~/.bashrc
+```
+
+Add this at the end
+
+```bash
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
+export Syncfusion="Replace With Your Key"
+export GOLD="Replace With Your Key"
+export BedBrigadeConnectionString="Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;"
+
+```
+
+Reload
+
+```bash
+source ~/.bashrc
+```
+
+**Add dotnet to VS Code**
+
+In the VS Code Terminal
+
+```bash
+nano ~/.profile
+```
+
+Add to the end
+
+```bash
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
+```
+
+Close and reopen VS Code
 
 ### 4.  Clone the repository
 On the command line run as administrator in the directory you want to clone it to:
@@ -41,6 +132,41 @@ In order to run the NUnit Tests and check for Quality Locally, please set a Wind
 * Login to the SmarterAsp.NET FTP Site using credentials given.
 * Download the Secrets Folder.
 * Open the file Bed Brigade National Website Information.docx to see the Gold Suite License Key.
+
+**Setting Environment Variables in Linux**
+In a terminal edit the file
+```bash
+nano ~/.bashrc
+```
+
+Add these at the end of the file with the actual key
+```bash
+export Syncfusion="zzz"
+export GOLD="zzz"
+export BedBrigadeConnectionString="Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;"
+```
+
+Refresh the changes
+```bash
+source ~/.bashrc
+```
+
+Do the same for the profile
+```bash
+nano ~/.profile
+```
+
+Add these at the end of the file with the actual key
+```bash
+export Syncfusion="zzz"
+export GOLD="zzz"
+export BedBrigadeConnectionString="Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;"
+```
+Refresh the changes
+```bash
+source ~/.profile
+```
+
 
 ### 7. Set Syncfusion License Key
 * Set an environment variable of Syncfusion to your community license.
