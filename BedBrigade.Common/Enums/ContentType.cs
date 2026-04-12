@@ -30,5 +30,7 @@ public enum ContentType
     [Description("Delivery Day Before SMS Reminder Form")]
     DeliveryDayBeforeSmsForm = 16,
     [Description("Delivery Day Before Email Reminder Form")]
-    DeliveryDayBeforeEmailForm = 17
+    DeliveryDayBeforeEmailForm = 17,
+    [Description("SignUp Email Reminder Form")]
+    SignUpEmailReminderForm = 18
 }

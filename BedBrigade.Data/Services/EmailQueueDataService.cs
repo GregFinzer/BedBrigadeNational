@@ -340,7 +340,31 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>(ex.Message, false);
             }
         }
-        
+
+        public async Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    var emailsToDelete = await dbSet.Where(o => o.SignUpId == signUpId).ToListAsync();
+                    if (emailsToDelete.Count == 0)
+                    {
+                        return new ServiceResponse<bool>($"No emails found for SignUpId {signUpId}", true, false);
+                    }
+                    dbSet.RemoveRange(emailsToDelete);
+                    await ctx.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(GetEntityName());
+                    return new ServiceResponse<bool>($"Deleted {emailsToDelete.Count} emails for SignUpId {signUpId}", true, true);
+                }
+            }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<bool>($"Could not delete emails for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+            }
+        }
+
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
             var duplicate = await GetEmailByAddressAndTargetDate(email);

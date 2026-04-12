@@ -440,6 +440,15 @@ public partial class ManageSignUps : ComponentBase
                     return;
                 }
 
+                var emailReminderResponse = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(addResult.Data);
+
+                if (!emailReminderResponse.Success)
+                {
+                    _toastService.Error("Could not queue email reminder", emailReminderResponse.Message);
+                    Log.Logger.Error($"Error QueueSignUpEmailReminderAsync: {emailReminderResponse.Message}");
+                    return;
+                }
+
                 await RefreshGrid();
                 HideDialogs();
                 _toastService.Success("Volunteer Added", "Volunteer added to event");

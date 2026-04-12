@@ -448,6 +448,15 @@ namespace BedBrigade.Client.Components.Pages
                 Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
                 return false;
             }
+
+            var emailReminderResponse = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(createResult.Data);
+
+            if (!emailReminderResponse.Success)
+            {
+                await ShowMessage(emailReminderResponse.Message);
+                Log.Logger.Error($"Error QueueSignUpEmailReminderAsync: {emailReminderResponse.Message}");
+                return false;
+            }
             return true;
         }
 

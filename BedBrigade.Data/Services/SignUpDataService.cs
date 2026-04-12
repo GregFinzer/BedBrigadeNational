@@ -14,6 +14,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     private readonly IScheduleDataService _scheduleDataService;
     private readonly IVolunteerDataService _volunteerDataService;
     private readonly ISmsQueueDataService _smsQueueDataService;
+    private readonly IEmailQueueDataService _emailQueueDataService;
     private readonly ITimezoneDataService _timezoneDataService;
     public SignUpDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -22,6 +23,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         IScheduleDataService scheduleDataService,
         IVolunteerDataService volunteerDataService,
         ISmsQueueDataService smsQueueDataService,
+        IEmailQueueDataService emailQueueDataService,
         ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
@@ -30,6 +32,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         _scheduleDataService = scheduleDataService;
         _volunteerDataService = volunteerDataService;
         _smsQueueDataService = smsQueueDataService;
+        _emailQueueDataService = emailQueueDataService;
         _timezoneDataService = timezoneDataService;
     }
 
@@ -52,6 +55,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
         await _smsQueueDataService.DeleteBySignUpId((int) id);
+        await _emailQueueDataService.DeleteBySignUpId((int) id);
         var existingResponse = await GetByIdAsync(id);
 
         var result = await base.DeleteAsync(id);

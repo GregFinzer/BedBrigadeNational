@@ -14,4 +14,5 @@ public interface ITimezoneDataService
     void FillLocalDates(List<EmailQueue> items);
     void FillLocalDates(List<TranslationQueueView> items);
     DateTime GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(DateTime originalDate);
+    DateTime GetDayBeforeAt8amLocalTimeAndReturnAsUtc(DateTime originalDate);
 }
