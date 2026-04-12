@@ -428,11 +428,11 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
         {
-            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryDayBeforeEmailForm);
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryEmailReminderForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
-                return new ServiceResponse<bool>("DeliveryDayBeforeEmailForm not found", false);
+                return new ServiceResponse<bool>("DeliveryEmailReminderForm not found", false);
             }
 
             string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);

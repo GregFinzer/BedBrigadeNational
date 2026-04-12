@@ -1,4 +1,4 @@
-%%Volunteer.FirstName%%, we are looking forward to seeing you today.  Here is the information for the event:
+%%Volunteer.FirstName%%, we are looking forward to seeing you tomorrow.  Here is the information for the event:
 
 %%Location.Name%%
 %%Schedule.GroupName%%

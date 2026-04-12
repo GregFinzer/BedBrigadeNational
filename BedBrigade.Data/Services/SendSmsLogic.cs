@@ -47,7 +47,7 @@ public class SendSmsLogic : ISendSmsLogic
     {
         ServiceResponse<Content> templateResult =
             await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId,
-                ContentType.DeliveryDayBeforeSmsForm);
+                ContentType.DeliverySmsReminderForm);
 
         if (!templateResult.Success)
         {
@@ -109,11 +109,11 @@ public class SendSmsLogic : ISendSmsLogic
     {
         ServiceResponse<Content> templateResult =
             await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId,
-                ContentType.SignUpSmsConfirmationForm);
+                ContentType.SignUpSmsReminderForm);
 
         if (!templateResult.Success)
         {
-            return new ServiceResponse<bool>("Failed to get SignUpSmsConfirmationForm: " + templateResult.Message);
+            return new ServiceResponse<bool>("Failed to get SignUpSmsReminderForm: " + templateResult.Message);
         }
 
         string fromPhone;
