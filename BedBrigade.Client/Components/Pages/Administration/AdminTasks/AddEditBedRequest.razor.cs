@@ -308,8 +308,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 Model = updateResult.Data;
 
-                await _emailQueueDataService.DeleteQueuedEmail(Model.Email);
-                await _smsQueueDataService.DeleteQueuedSmsMessage(Model.Phone);
+                await _emailQueueDataService.DeleteQueuedByBedRequestId(Model.BedRequestId);
+                await _smsQueueDataService.DeleteQueuedSmsByBedRequestId(Model.BedRequestId);
                 
                 if (Model.Status == BedRequestStatus.Scheduled)
                 {

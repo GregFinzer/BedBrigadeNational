@@ -314,25 +314,26 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<string>> DeleteQueuedEmail(string email)
+        public async Task<ServiceResponse<string>> DeleteQueuedByBedRequestId(int bedRequestId)
         {
             try
             {
                 using (var ctx = _contextFactory.CreateDbContext())
                 {
                     var dbSet = ctx.Set<EmailQueue>();
-                    var queuedEmails = await dbSet.Where(o => o.ToAddress == email && o.Status == QueueStatus.Queued.ToString())
+                    var queuedEmails = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                              && o.Status == QueueStatus.Queued.ToString())
                         .ToListAsync();
 
                     if (!queuedEmails.Any())
                     {
-                        return new ServiceResponse<string>("No queued email found for that address", true);
+                        return new ServiceResponse<string>($"No queued email found for BedRequestId {bedRequestId}", true);
                     }
 
                     dbSet.RemoveRange(queuedEmails);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    return new ServiceResponse<string>("Deleted queued email", true);
+                    return new ServiceResponse<string>($"Deleted queued email for BedRequestId {bedRequestId}", true);
                 }
             }
             catch (Exception ex)

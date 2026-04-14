@@ -739,27 +739,23 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
-    public async Task<ServiceResponse<string>> DeleteQueuedSmsMessage(string phone)
+    public async Task<ServiceResponse<string>> DeleteQueuedSmsByBedRequestId(int bedRequestId)
     {
         try
         {
-            string phoneNumbersOnly = StringUtil.ExtractDigits(phone);
-            string formattedPhone = phone.FormatPhoneNumber();
-            
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<SmsQueue>();
-                var messagesToDelete = await dbSet.Where(o => (o.ToPhoneNumber == formattedPhone
-                                                               || o.ToPhoneNumber == phoneNumbersOnly)
-                                                              && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
+                var messagesToDelete = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                               && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
                 if (messagesToDelete.Count == 0)
                 {
-                    return new ServiceResponse<string>($"No queued messages found for phone number {phone}", true, $"No queued messages found for phone number {phone}");
+                    return new ServiceResponse<string>($"No queued messages found for BedRequestId {bedRequestId}", true, $"No queued messages found for BedRequestId {bedRequestId}");
                 }
                 dbSet.RemoveRange(messagesToDelete);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
-                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for phone number {phone}", true, $"Deleted {messagesToDelete.Count} queued messages for phone number {phone}");
+                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}", true, $"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}");
             }
         }
         catch (Exception ex)

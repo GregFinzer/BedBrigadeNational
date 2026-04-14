@@ -66,6 +66,10 @@ namespace BedBrigade.Common.Models
         [MaxLength(100)]
         public string? FirstName { get; set; }
 
+        [ForeignKey(nameof(BedRequestId))]
+        public Int32? BedRequestId { get; set; }
+        public BedRequest? BedRequest { get; set; }
+
         [ForeignKey("SignUpId")]
         public Int32? SignUpId { get; set; }
         public SignUp? SignUp { get; set; }

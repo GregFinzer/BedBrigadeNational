@@ -644,6 +644,9 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmailQueueId"));
 
+                    b.Property<int?>("BedRequestId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -733,6 +736,8 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("EmailQueueId");
+
+                    b.HasIndex("BedRequestId");
 
                     b.HasIndex("SignUpId");
 
@@ -1197,6 +1202,9 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SmsQueueId"));
 
+                    b.Property<int?>("BedRequestId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1600)
@@ -1277,6 +1285,8 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("SmsQueueId");
+
+                    b.HasIndex("BedRequestId");
 
                     b.HasIndex("LocationId");
 
@@ -1809,9 +1819,15 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.EmailQueue", b =>
                 {
+                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
+                        .WithMany()
+                        .HasForeignKey("BedRequestId");
+
                     b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
                         .WithMany()
                         .HasForeignKey("SignUpId");
+
+                    b.Navigation("BedRequest");
 
                     b.Navigation("SignUp");
                 });
@@ -1846,6 +1862,10 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.SmsQueue", b =>
                 {
+                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
+                        .WithMany()
+                        .HasForeignKey("BedRequestId");
+
                     b.HasOne("BedBrigade.Common.Models.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
@@ -1855,6 +1875,8 @@ namespace BedBrigade.Server.Migrations
                     b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
                         .WithMany()
                         .HasForeignKey("SignUpId");
+
+                    b.Navigation("BedRequest");
 
                     b.Navigation("Location");
 

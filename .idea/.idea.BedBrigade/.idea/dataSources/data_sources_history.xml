@@ -1,0 +1,14 @@
+<DataSourcesHistory>
+  <DataSourceFromHistory isRemovedFromProject="false">
+    <data-source source="LOCAL" name="bedbrigade@localhost" uuid="d34ec5c7-1d90-4cea-b25b-73ebe8ffc4ab">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" />
+      <driver-ref>sqlserver.jb</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>com.jetbrains.jdbc.sqlserver.SqlServerDriver</jdbc-driver>
+      <jdbc-url>Server=localhost,1433;Database=bedbrigade;User Id=sa;Password=Str0ng!Passw0rd123;TrustServerCertificate=True;</jdbc-url>
+      <schema-mapping />
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </DataSourceFromHistory>
+</DataSourcesHistory>

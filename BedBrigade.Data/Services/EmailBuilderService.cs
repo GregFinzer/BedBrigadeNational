@@ -438,6 +438,7 @@ namespace BedBrigade.Data.Services
             string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);
             EmailQueue emailQueue = new()
             {
+                BedRequestId = bedRequest.BedRequestId,
                 ToAddress = bedRequest.Email,
                 Subject = "Your bed(s) will be delivered tomorrow",
                 Body = body,

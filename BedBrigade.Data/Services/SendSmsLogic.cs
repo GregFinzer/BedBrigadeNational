@@ -89,6 +89,7 @@ public class SendSmsLogic : ISendSmsLogic
         SmsQueue smsQueue = new SmsQueue()
         {
             SignUpId = null,
+            BedRequestId = bedRequest.BedRequestId,
             FromPhoneNumber = fromPhone.FormatPhoneNumber(),
             ToPhoneNumber = bedRequest.Phone.FormatPhoneNumber(),
             Body = sb.ToString(),
