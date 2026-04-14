@@ -54,8 +54,8 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
 
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
-        await _smsQueueDataService.DeleteBySignUpId((int) id);
-        await _emailQueueDataService.DeleteBySignUpId((int) id);
+        await _smsQueueDataService.DeleteQueuedBySignUpId((int) id);
+        await _emailQueueDataService.DeleteQueuedBySignUpId((int) id);
         var existingResponse = await GetByIdAsync(id);
 
         var result = await base.DeleteAsync(id);

@@ -342,27 +342,29 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId)
+        public async Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId)
         {
             try
             {
                 using (var ctx = _contextFactory.CreateDbContext())
                 {
                     var dbSet = ctx.Set<EmailQueue>();
-                    var emailsToDelete = await dbSet.Where(o => o.SignUpId == signUpId).ToListAsync();
+                    var emailsToDelete = await dbSet.Where(o => o.SignUpId == signUpId
+                                                                && o.Status == QueueStatus.Queued.ToString())
+                        .ToListAsync();
                     if (emailsToDelete.Count == 0)
                     {
-                        return new ServiceResponse<bool>($"No emails found for SignUpId {signUpId}", true, false);
+                        return new ServiceResponse<bool>($"No queued emails found for SignUpId {signUpId}", true, false);
                     }
                     dbSet.RemoveRange(emailsToDelete);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    return new ServiceResponse<bool>($"Deleted {emailsToDelete.Count} emails for SignUpId {signUpId}", true, true);
+                    return new ServiceResponse<bool>($"Deleted {emailsToDelete.Count} queued emails for SignUpId {signUpId}", true, true);
                 }
             }
             catch (DbException ex)
             {
-                return new ServiceResponse<bool>($"Could not delete emails for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+                return new ServiceResponse<bool>($"Could not delete queued emails for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
             }
         }
 

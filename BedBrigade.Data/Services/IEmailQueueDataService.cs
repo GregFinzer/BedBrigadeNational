@@ -12,7 +12,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<string>> GetSendPlanMessage(EmailsToSendParms parms);
         Task<ServiceResponse<List<string>>> GetEmailsToSend(EmailsToSendParms parms);
         Task<ServiceResponse<string>> DeleteQueuedByBedRequestId(int bedRequestId);
-        Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId);
+        Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId);
         Task<ServiceResponse<string>> QueueEmail(EmailQueue email);
         Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body, int locationId);
         Task<int> GetEmailsSentTodayCount();
