@@ -679,27 +679,29 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
-    public async Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId)
+    public async Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId)
     {
         try
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<SmsQueue>();
-                var messagesToDelete = await dbSet.Where(o => o.SignUpId == signUpId).ToListAsync();
+                var messagesToDelete = await dbSet.Where(o => o.SignUpId == signUpId
+                                                              && o.Status == QueueStatus.Queued.ToString())
+                    .ToListAsync();
                 if (messagesToDelete.Count == 0)
                 {
-                    return new ServiceResponse<bool>($"No messages found for SignUpId {signUpId}", true, false);
+                    return new ServiceResponse<bool>($"No queued messages found for SignUpId {signUpId}", true, false);
                 }
                 dbSet.RemoveRange(messagesToDelete);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
-                return new ServiceResponse<bool>($"Deleted {messagesToDelete.Count} messages for SignUpId {signUpId}", true, true);
+                return new ServiceResponse<bool>($"Deleted {messagesToDelete.Count} queued messages for SignUpId {signUpId}", true, true);
             }
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"Could not delete messages for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+            return new ServiceResponse<bool>($"Could not delete queued messages for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
         }
 
     }
@@ -739,27 +741,23 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
-    public async Task<ServiceResponse<string>> DeleteQueuedSmsMessage(string phone)
+    public async Task<ServiceResponse<string>> DeleteQueuedSmsByBedRequestId(int bedRequestId)
     {
         try
         {
-            string phoneNumbersOnly = StringUtil.ExtractDigits(phone);
-            string formattedPhone = phone.FormatPhoneNumber();
-            
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<SmsQueue>();
-                var messagesToDelete = await dbSet.Where(o => (o.ToPhoneNumber == formattedPhone
-                                                               || o.ToPhoneNumber == phoneNumbersOnly)
-                                                              && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
+                var messagesToDelete = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                               && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
                 if (messagesToDelete.Count == 0)
                 {
-                    return new ServiceResponse<string>($"No queued messages found for phone number {phone}", true, $"No queued messages found for phone number {phone}");
+                    return new ServiceResponse<string>($"No queued messages found for BedRequestId {bedRequestId}", true, $"No queued messages found for BedRequestId {bedRequestId}");
                 }
                 dbSet.RemoveRange(messagesToDelete);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
-                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for phone number {phone}", true, $"Deleted {messagesToDelete.Count} queued messages for phone number {phone}");
+                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}", true, $"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}");
             }
         }
         catch (Exception ex)

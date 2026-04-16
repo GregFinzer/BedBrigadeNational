@@ -20,6 +20,13 @@ public class TimezoneDataService : ITimezoneDataService
         return dayBefore.ToUniversalTime();
     }
 
+    public DateTime GetDayBeforeAt8amLocalTimeAndReturnAsUtc(DateTime originalDate)
+    {
+        DateTime dayBefore = originalDate.Date.AddDays(-1);
+        dayBefore = dayBefore.AddHours(8);
+        return dayBefore.ToUniversalTime();
+    }
+
     public string GetUserTimeZoneId()
     {
         if (string.IsNullOrWhiteSpace(_userTimeZoneId))

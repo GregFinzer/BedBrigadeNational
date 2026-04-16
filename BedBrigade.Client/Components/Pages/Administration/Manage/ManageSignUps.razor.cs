@@ -431,12 +431,21 @@ public partial class ManageSignUps : ComponentBase
                     return;
                 }
 
-                var smsResponse = await _sendSmsLogic.CreateSignUpReminder(addResult.Data);
+                var smsResponse = await _sendSmsLogic.QueueSignUpSmsReminder(addResult.Data);
 
                 if (!smsResponse.Success)
                 {
                     _toastService.Error("SMS Error", smsResponse.Message);
-                    Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                    Log.Logger.Error($"Error QueueSignUpSmsReminder: {smsResponse.Message}");
+                    return;
+                }
+
+                var emailReminderResponse = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(addResult.Data);
+
+                if (!emailReminderResponse.Success)
+                {
+                    _toastService.Error("Could not queue email reminder", emailReminderResponse.Message);
+                    Log.Logger.Error($"Error QueueSignUpEmailReminderAsync: {emailReminderResponse.Message}");
                     return;
                 }
 

@@ -314,25 +314,26 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<ServiceResponse<string>> DeleteQueuedEmail(string email)
+        public async Task<ServiceResponse<string>> DeleteQueuedByBedRequestId(int bedRequestId)
         {
             try
             {
                 using (var ctx = _contextFactory.CreateDbContext())
                 {
                     var dbSet = ctx.Set<EmailQueue>();
-                    var queuedEmails = await dbSet.Where(o => o.ToAddress == email && o.Status == QueueStatus.Queued.ToString())
+                    var queuedEmails = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                              && o.Status == QueueStatus.Queued.ToString())
                         .ToListAsync();
 
                     if (!queuedEmails.Any())
                     {
-                        return new ServiceResponse<string>("No queued email found for that address", true);
+                        return new ServiceResponse<string>($"No queued email found for BedRequestId {bedRequestId}", true);
                     }
 
                     dbSet.RemoveRange(queuedEmails);
                     await ctx.SaveChangesAsync();
                     _cachingService.ClearByEntityName(GetEntityName());
-                    return new ServiceResponse<string>("Deleted queued email", true);
+                    return new ServiceResponse<string>($"Deleted queued email for BedRequestId {bedRequestId}", true);
                 }
             }
             catch (Exception ex)
@@ -340,7 +341,33 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>(ex.Message, false);
             }
         }
-        
+
+        public async Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    var emailsToDelete = await dbSet.Where(o => o.SignUpId == signUpId
+                                                                && o.Status == QueueStatus.Queued.ToString())
+                        .ToListAsync();
+                    if (emailsToDelete.Count == 0)
+                    {
+                        return new ServiceResponse<bool>($"No queued emails found for SignUpId {signUpId}", true, false);
+                    }
+                    dbSet.RemoveRange(emailsToDelete);
+                    await ctx.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(GetEntityName());
+                    return new ServiceResponse<bool>($"Deleted {emailsToDelete.Count} queued emails for SignUpId {signUpId}", true, true);
+                }
+            }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<bool>($"Could not delete queued emails for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+            }
+        }
+
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
             var duplicate = await GetEmailByAddressAndTargetDate(email);

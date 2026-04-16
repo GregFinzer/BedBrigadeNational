@@ -4,16 +4,19 @@ using BedBrigade.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BedBrigade.Server.Migrations
+namespace BedBrigade.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260412184149_AddSignUpIdToEmailQueue")]
+    partial class AddSignUpIdToEmailQueue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -644,9 +647,6 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmailQueueId"));
 
-                    b.Property<int?>("BedRequestId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -736,8 +736,6 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("EmailQueueId");
-
-                    b.HasIndex("BedRequestId");
 
                     b.HasIndex("SignUpId");
 
@@ -1202,9 +1200,6 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SmsQueueId"));
 
-                    b.Property<int?>("BedRequestId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1600)
@@ -1285,8 +1280,6 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("SmsQueueId");
-
-                    b.HasIndex("BedRequestId");
 
                     b.HasIndex("LocationId");
 
@@ -1819,15 +1812,9 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.EmailQueue", b =>
                 {
-                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
-                        .WithMany()
-                        .HasForeignKey("BedRequestId");
-
                     b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
                         .WithMany()
                         .HasForeignKey("SignUpId");
-
-                    b.Navigation("BedRequest");
 
                     b.Navigation("SignUp");
                 });
@@ -1862,10 +1849,6 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.SmsQueue", b =>
                 {
-                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
-                        .WithMany()
-                        .HasForeignKey("BedRequestId");
-
                     b.HasOne("BedBrigade.Common.Models.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
@@ -1875,8 +1858,6 @@ namespace BedBrigade.Server.Migrations
                     b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
                         .WithMany()
                         .HasForeignKey("SignUpId");
-
-                    b.Navigation("BedRequest");
 
                     b.Navigation("Location");
 

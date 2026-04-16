@@ -54,6 +54,10 @@ namespace BedBrigade.Common.Models
         public Int32? SignUpId { get; set; }
         public SignUp? SignUp { get; set; }
 
+        [ForeignKey(nameof(BedRequestId))]
+        public Int32? BedRequestId { get; set; }
+        public BedRequest? BedRequest { get; set; }
+
         [Required, DefaultValue(false)]
         public bool IsReply { get; set; }
 

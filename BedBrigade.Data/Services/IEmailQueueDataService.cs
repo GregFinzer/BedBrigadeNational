@@ -11,7 +11,8 @@ namespace BedBrigade.Data.Services
         Task LockEmailsToProcess(List<EmailQueue> emailsToProcess);
         Task<ServiceResponse<string>> GetSendPlanMessage(EmailsToSendParms parms);
         Task<ServiceResponse<List<string>>> GetEmailsToSend(EmailsToSendParms parms);
-        Task<ServiceResponse<string>> DeleteQueuedEmail(string email);
+        Task<ServiceResponse<string>> DeleteQueuedByBedRequestId(int bedRequestId);
+        Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId);
         Task<ServiceResponse<string>> QueueEmail(EmailQueue email);
         Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body, int locationId);
         Task<int> GetEmailsSentTodayCount();

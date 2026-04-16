@@ -426,18 +426,25 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
-        public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
+        /// <summary>
+        /// Create a delivery email reminder that is sent the day before at 12pm
+        /// </summary>
+        /// <param name="bedRequest"></param>
+        /// <param name="schedule"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> QueueDeliveryEmailReminder(BedRequest bedRequest, Schedule schedule)
         {
-            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryDayBeforeEmailForm);
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryEmailReminderForm);
 
             if (!templateResult.Success || templateResult.Data == null)
             {
-                return new ServiceResponse<bool>("DeliveryDayBeforeEmailForm not found", false);
+                return new ServiceResponse<bool>("DeliveryEmailReminderForm not found", false);
             }
 
             string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);
             EmailQueue emailQueue = new()
             {
+                BedRequestId = bedRequest.BedRequestId,
                 ToAddress = bedRequest.Email,
                 Subject = "Your bed(s) will be delivered tomorrow",
                 Body = body,
@@ -463,6 +470,67 @@ namespace BedBrigade.Data.Services
             sb = _mailMergeLogic.ReplaceBedRequestFields(bedRequest, sb);
             sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Create a sign up email reminder that sends at 8am the day before 
+        /// </summary>
+        /// <param name="signUp"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> QueueSignUpEmailReminderAsync(SignUp signUp)
+        {
+            ServiceResponse<Content> templateResult = await _contentDataService.GetSingleByLocationAndContentType(
+                signUp.LocationId, ContentType.SignUpEmailReminderForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("SignUpEmailReminderForm not found", false);
+            }
+
+            ServiceResponse<Volunteer> volunteerResult = await _volunteerDataService.GetByIdAsync(signUp.VolunteerId);
+
+            if (!volunteerResult.Success || volunteerResult.Data == null)
+            {
+                return new ServiceResponse<bool>($"Volunteer not found {signUp.VolunteerId}", false);
+            }
+
+            ServiceResponse<Schedule> scheduleResult = await _scheduleDataService.GetByIdAsync(signUp.ScheduleId);
+
+            if (!scheduleResult.Success || scheduleResult.Data == null)
+            {
+                return new ServiceResponse<bool>($"Schedule not found {signUp.ScheduleId}", false);
+            }
+
+            ServiceResponse<string> bodyResult = await BuildSignUpConfirmationBody(signUp,
+                volunteerResult.Data,
+                scheduleResult.Data,
+                templateResult.Data.ContentHtml,
+                string.Empty);
+
+            if (!bodyResult.Success)
+            {
+                return new ServiceResponse<bool>(bodyResult.Message, false);
+            }
+
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = volunteerResult.Data.Email,
+                Subject = $"Reminder: Volunteer Event Tomorrow for {volunteerResult.Data.FirstName} {volunteerResult.Data.LastName}",
+                Body = bodyResult.Data,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = signUp.LocationId,
+                SignUpId = signUp.SignUpId,
+                TargetDate = _timezoneDataService.GetDayBeforeAt8amLocalTimeAndReturnAsUtc(scheduleResult.Data.EventDateScheduled)
+            };
+
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Sign Up Email Reminder", true);
         }
 
         public async Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl)

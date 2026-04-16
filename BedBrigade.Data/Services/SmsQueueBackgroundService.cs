@@ -265,6 +265,12 @@ public class SmsQueueBackgroundService : BackgroundService
                 await _smsQueueDataService.ClearSmsQueueLock();
                 return;
             }
+            
+            if (DateTime.UtcNow < smsQueue.TargetDate)
+            {
+                await UnlockMessage(smsQueue);
+                continue;
+            }
 
             if (!(await TimeToSendMessage(smsQueue.LocationId)))
             {
@@ -307,6 +313,8 @@ public class SmsQueueBackgroundService : BackgroundService
         message.UpdateDate = DateTime.UtcNow;
         await _smsQueueDataService.UpdateAsync(message);
     }
+
+
 
 
 
