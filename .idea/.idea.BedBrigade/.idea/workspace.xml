@@ -7,12 +7,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources/data_sources_history.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/IEmailQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/IEmailQueueDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/ISmsQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/ISmsQueueDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SignUpDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SignUpDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SendSmsLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SendSmsLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +54,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.BedBrigade.Client: http.executor": "Debug",
+    ".NET Launch Settings Profile.BedBrigade.Client: http.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -133,7 +131,8 @@
       <workItem from="1775240523567" duration="900000" />
       <workItem from="1775306885327" duration="45000" />
       <workItem from="1775843147309" duration="6864000" />
-      <workItem from="1776110282784" duration="3430000" />
+      <workItem from="1776110282784" duration="5315000" />
+      <workItem from="1776259889720" duration="1275000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />
@@ -167,7 +166,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776173947865</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Rename DeleteBySignUpId to DeleteQueuedBySignUpId">
+      <option name="closed" value="true" />
+      <created>1776175062354</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1776175062354</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,7 +194,8 @@
     <MESSAGE value="Serilog should not be colorized on Linux.  Fix for SendSmsLogic.cs.  Documentation for getting started with Linux." />
     <MESSAGE value="Delete queued emails and sms by BedRequestId" />
     <MESSAGE value="Data migration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Data migration" />
+    <MESSAGE value="Rename DeleteBySignUpId to DeleteQueuedBySignUpId" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rename DeleteBySignUpId to DeleteQueuedBySignUpId" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

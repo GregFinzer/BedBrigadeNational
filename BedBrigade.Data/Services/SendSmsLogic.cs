@@ -176,7 +176,7 @@ public class SendSmsLogic : ISendSmsLogic
         return await SendTextMessage(smsQueue);
     }
 
-    private static SmsQueue BuildSignUpQueueRecord(SignUp signUp, string fromPhone, 
+    private SmsQueue BuildSignUpQueueRecord(SignUp signUp, string fromPhone, 
         ServiceResponse<Volunteer> volunteerResult,
         ServiceResponse<Content> templateResult, 
         ServiceResponse<Schedule> scheduleResult)
@@ -356,6 +356,8 @@ public class SendSmsLogic : ISendSmsLogic
 
         return new ServiceResponse<bool>("SMS Message Failed: " + message.FailureMessage);
     }
+
+
 }
 
 
