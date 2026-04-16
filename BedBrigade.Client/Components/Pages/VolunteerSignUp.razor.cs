@@ -440,12 +440,12 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
+            var smsResponse = await _sendSmsLogic.QueueSignUpSmsReminder(createResult.Data);
 
             if (!smsResponse.Success)
             {
                 await ShowMessage(smsResponse.Message);
-                Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                Log.Logger.Error($"Error QueueSignUpSmsReminder: {smsResponse.Message}");
                 return false;
             }
 

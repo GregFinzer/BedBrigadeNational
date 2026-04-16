@@ -335,7 +335,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task SendDeliveryReminderSms(Common.Models.BedRequest model, Common.Models.Schedule scheduleResultData)
         {
-            ServiceResponse<bool> smsResult = await _sendSmsLogic.QueueDeliveryDayBeforeReminder(model, scheduleResultData);
+            ServiceResponse<bool> smsResult = await _sendSmsLogic.QueueDeliverySmsReminder(model, scheduleResultData);
             if (!smsResult.Success)
             {
                 Log.Error($"Failed to queue delivery reminder SMS for BedRequest {model.BedRequestId} : {smsResult.Message}");
@@ -393,7 +393,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
         {
-            ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryDayBeforeReminder(model, schedule);
+            ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryEmailReminder(model, schedule);
             if (!emailResult.Success)
             {
                 Log.Error($"Failed to queue delivery reminder email for BedRequest {model.BedRequestId} : {emailResult.Message}");

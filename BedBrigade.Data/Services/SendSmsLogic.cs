@@ -43,7 +43,13 @@ public class SendSmsLogic : ISendSmsLogic
         _timezoneDataService = timezoneDataService;
     }
 
-    public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
+    /// <summary>
+    /// Create a delivery SMS Reminder that is sent at 12pm the day before
+    /// </summary>
+    /// <param name="bedRequest"></param>
+    /// <param name="schedule"></param>
+    /// <returns></returns>
+    public async Task<ServiceResponse<bool>> QueueDeliverySmsReminder(BedRequest bedRequest, Schedule schedule)
     {
         ServiceResponse<Content> templateResult =
             await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId,
@@ -106,7 +112,13 @@ public class SendSmsLogic : ISendSmsLogic
         };
         return smsQueue;
     }
-    public async Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp)
+    
+    /// <summary>
+    /// Create SignUp SMS Reminder for Volunteer that is sent the day of the event
+    /// </summary>
+    /// <param name="signUp"></param>
+    /// <returns></returns>
+    public async Task<ServiceResponse<bool>> QueueSignUpSmsReminder(SignUp signUp)
     {
         ServiceResponse<Content> templateResult =
             await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId,

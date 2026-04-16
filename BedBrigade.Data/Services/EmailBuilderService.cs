@@ -426,7 +426,13 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
-        public async Task<ServiceResponse<bool>> QueueDeliveryDayBeforeReminder(BedRequest bedRequest, Schedule schedule)
+        /// <summary>
+        /// Create a delivery email reminder that is sent the day before at 12pm
+        /// </summary>
+        /// <param name="bedRequest"></param>
+        /// <param name="schedule"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> QueueDeliveryEmailReminder(BedRequest bedRequest, Schedule schedule)
         {
             var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryEmailReminderForm);
 
@@ -466,6 +472,11 @@ namespace BedBrigade.Data.Services
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Create a sign up email reminder that sends at 8am the day before 
+        /// </summary>
+        /// <param name="signUp"></param>
+        /// <returns></returns>
         public async Task<ServiceResponse<bool>> QueueSignUpEmailReminderAsync(SignUp signUp)
         {
             ServiceResponse<Content> templateResult = await _contentDataService.GetSingleByLocationAndContentType(
