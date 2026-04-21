@@ -357,4 +357,4 @@ MigrationBackup/
 /Documentation/*.bak.md
 /*.bak
 /*.bak.md
-Log*.txt
+[Ll]og*.txt
