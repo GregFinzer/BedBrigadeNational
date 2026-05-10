@@ -148,6 +148,20 @@ namespace BedBrigade.Data
 
             modelBuilder.Entity<SignUp>()
                 .HasIndex(o => o.VolunteerId);
+
+            // Configure FK delete behavior to avoid multiple cascade paths
+            modelBuilder.Entity<SignUp>()
+                .HasOne(su => su.Schedule)
+                .WithMany()
+                .HasForeignKey(su => su.ScheduleId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Keeping Volunteer relationship as NoAction as well to be explicit and safe
+            modelBuilder.Entity<SignUp>()
+                .HasOne(su => su.Volunteer)
+                .WithMany()
+                .HasForeignKey(su => su.VolunteerId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         private static void CreateScheduleIndexes(ModelBuilder modelBuilder)

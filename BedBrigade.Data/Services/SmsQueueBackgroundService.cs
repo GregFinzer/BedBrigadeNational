@@ -181,7 +181,8 @@ public class SmsQueueBackgroundService : BackgroundService
                 QueueDate = DateTime.UtcNow,
                 FailureMessage = string.Empty,
                 Status = QueueStatus.Queued.ToString(),
-                Priority = Defaults.BulkMediumPriority
+                Priority = Defaults.BulkMediumPriority,
+                LocationId = smsQueue.LocationId
             };
             await _emailQueueDataService.QueueEmail(emailQueue);
             _logger.LogInformation($"Queued Missed SMS Message to Email: {email}:\r\n{body}");
@@ -264,6 +265,12 @@ public class SmsQueueBackgroundService : BackgroundService
                 await _smsQueueDataService.ClearSmsQueueLock();
                 return;
             }
+            
+            if (DateTime.UtcNow < smsQueue.TargetDate)
+            {
+                await UnlockMessage(smsQueue);
+                continue;
+            }
 
             if (!(await TimeToSendMessage(smsQueue.LocationId)))
             {
@@ -306,6 +313,8 @@ public class SmsQueueBackgroundService : BackgroundService
         message.UpdateDate = DateTime.UtcNow;
         await _smsQueueDataService.UpdateAsync(message);
     }
+
+
 
 
 

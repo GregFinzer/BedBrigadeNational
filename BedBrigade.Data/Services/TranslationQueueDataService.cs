@@ -14,13 +14,16 @@ namespace BedBrigade.Data.Services
     {
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ICachingService _cachingService;
+        private readonly ITimezoneDataService _timezoneDataService; // new
 
         public TranslationQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService, 
-            IAuthService authService) : base(contextFactory, cachingService, authService)
+            IAuthService authService,
+            ITimezoneDataService timezoneDataService) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
+            _timezoneDataService = timezoneDataService; // new
         }
 
         public async Task<ServiceResponse<string>> QueueTranslation(TranslationQueue translation)
@@ -128,6 +131,44 @@ namespace BedBrigade.Data.Services
                 dbSet.RemoveRange(oldTranslationQueue);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
+            }
+        }
+
+        public async Task<List<TranslationQueueView>> GetTranslationQueueView()
+        {
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetTranslationQueueView()");
+            var cached = _cachingService.Get<List<TranslationQueueView>>(cacheKey);
+            if (cached != null)
+            {
+                return cached;
+            }
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var translationQueues = ctx.Set<TranslationQueue>().AsNoTracking();
+                var translations = ctx.Set<Translation>().AsNoTracking();
+
+                // Left join to handle any orphaned rows safely
+                var query =
+                    from tq in translationQueues
+                    join t in translations on tq.TranslationId equals t.TranslationId into tgrp
+                    from t in tgrp.DefaultIfEmpty()
+                    select new TranslationQueueView
+                    {
+                        Status = tq.Status,
+                        Culture = tq.Culture,
+                        Content = t != null ? t.Content : string.Empty,
+                        CreateUser = tq.CreateUser,
+                        QueueDate = tq.QueueDate,
+                        SentDate = tq.SentDate,
+                        LockDate = tq.LockDate,
+                        FailureMessage = tq.FailureMessage
+                    };
+
+                var result = await query.ToListAsync();
+                _timezoneDataService.FillLocalDates(result); // populate local times
+                _cachingService.Set(cacheKey, result);
+                return result;
             }
         }
     }

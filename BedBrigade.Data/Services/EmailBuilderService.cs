@@ -2,8 +2,11 @@
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
-using System.Text;
+using BedBrigade.Data.Migrations;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Serilog;
+using System.Text;
+using Log = Serilog.Log;
 
 namespace BedBrigade.Data.Services
 {
@@ -18,6 +21,7 @@ namespace BedBrigade.Data.Services
         private readonly IVolunteerDataService _volunteerDataService;
         private readonly IScheduleDataService _scheduleDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
+        private readonly ITimezoneDataService _timezoneDataService;
 
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
@@ -27,7 +31,8 @@ namespace BedBrigade.Data.Services
             IDonationDataService donationDataService,
             IVolunteerDataService volunteerDataService,
             IScheduleDataService scheduleDataService,
-            IMailMergeLogic mailMergeLogic)
+            IMailMergeLogic mailMergeLogic,
+            ITimezoneDataService timezoneDataService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -38,6 +43,7 @@ namespace BedBrigade.Data.Services
             _volunteerDataService = volunteerDataService;
             _scheduleDataService = scheduleDataService;
             _mailMergeLogic = mailMergeLogic;
+            _timezoneDataService = timezoneDataService;
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)
@@ -74,7 +80,9 @@ namespace BedBrigade.Data.Services
                 {
                     ToAddress = email,
                     Subject = BuildTaxFormSubject(location.Data, donationsForEmail.First().DonationDate),
-                    Body = BuildTaxFormBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail)
+                    Body = BuildTaxFormBody(templateResult.Data.ContentHtml, location.Data, userResult.Data, donationsForEmail),
+                    LocationId = location.Data.LocationId,
+                    TargetDate = DateTime.UtcNow
                 };
                 var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -208,7 +216,9 @@ namespace BedBrigade.Data.Services
                 ToAddress = entity.Email,
                 Subject = subject,
                 Body = bodyResult.Data,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = entity.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -227,7 +237,7 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
 
                 if (!bulkEmailResponse.Success)
                 {
@@ -245,7 +255,9 @@ namespace BedBrigade.Data.Services
                 ToAddress = volunteer.Email,
                 Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                 Body = body,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = volunteer.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -269,7 +281,9 @@ namespace BedBrigade.Data.Services
                     ToAddress = schedule.OrganizerEmail,
                     Subject = BuildSignUpConfirmationSubject(volunteer, customMessage),
                     Body = body,
-                    Priority = Defaults.BulkHighPriority
+                    Priority = Defaults.BulkHighPriority,
+                    LocationId = volunteer.LocationId,
+                    TargetDate = DateTime.UtcNow
                 };
                 ServiceResponse<string> emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -332,7 +346,9 @@ namespace BedBrigade.Data.Services
                 ToAddress = entity.Email,
                 Subject = subject,
                 Body = bodyResult.Data,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = entity.LocationId,
+                TargetDate = DateTime.UtcNow
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -351,7 +367,7 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data);
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
 
                 if (!bulkEmailResponse.Success)
                 {
@@ -410,6 +426,113 @@ namespace BedBrigade.Data.Services
             return $"Contact Us Confirmation for {entity.FirstName} {entity.LastName}";
         }
 
+        /// <summary>
+        /// Create a delivery email reminder that is sent the day before at 12pm
+        /// </summary>
+        /// <param name="bedRequest"></param>
+        /// <param name="schedule"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> QueueDeliveryEmailReminder(BedRequest bedRequest, Schedule schedule)
+        {
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId, ContentType.DeliveryEmailReminderForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("DeliveryEmailReminderForm not found", false);
+            }
+
+            string body = BuildDeliveryDayBeforeReminderBody(templateResult.Data.ContentHtml, bedRequest, schedule);
+            EmailQueue emailQueue = new()
+            {
+                BedRequestId = bedRequest.BedRequestId,
+                ToAddress = bedRequest.Email,
+                Subject = "Your bed(s) will be delivered tomorrow",
+                Body = body,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = bedRequest.LocationId,
+                TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled)
+            };
+
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Delivery Reminder Email", true);
+        }
+
+        
+        private string BuildDeliveryDayBeforeReminderBody(string template, BedRequest bedRequest, Schedule schedule)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(bedRequest, sb);
+            sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Create a sign up email reminder that sends at 8am the day before 
+        /// </summary>
+        /// <param name="signUp"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> QueueSignUpEmailReminderAsync(SignUp signUp)
+        {
+            ServiceResponse<Content> templateResult = await _contentDataService.GetSingleByLocationAndContentType(
+                signUp.LocationId, ContentType.SignUpEmailReminderForm);
+
+            if (!templateResult.Success || templateResult.Data == null)
+            {
+                return new ServiceResponse<bool>("SignUpEmailReminderForm not found", false);
+            }
+
+            ServiceResponse<Volunteer> volunteerResult = await _volunteerDataService.GetByIdAsync(signUp.VolunteerId);
+
+            if (!volunteerResult.Success || volunteerResult.Data == null)
+            {
+                return new ServiceResponse<bool>($"Volunteer not found {signUp.VolunteerId}", false);
+            }
+
+            ServiceResponse<Schedule> scheduleResult = await _scheduleDataService.GetByIdAsync(signUp.ScheduleId);
+
+            if (!scheduleResult.Success || scheduleResult.Data == null)
+            {
+                return new ServiceResponse<bool>($"Schedule not found {signUp.ScheduleId}", false);
+            }
+
+            ServiceResponse<string> bodyResult = await BuildSignUpConfirmationBody(signUp,
+                volunteerResult.Data,
+                scheduleResult.Data,
+                templateResult.Data.ContentHtml,
+                string.Empty);
+
+            if (!bodyResult.Success)
+            {
+                return new ServiceResponse<bool>(bodyResult.Message, false);
+            }
+
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = volunteerResult.Data.Email,
+                Subject = $"Reminder: Volunteer Event Tomorrow for {volunteerResult.Data.FirstName} {volunteerResult.Data.LastName}",
+                Body = bodyResult.Data,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = signUp.LocationId,
+                SignUpId = signUp.SignUpId,
+                TargetDate = _timezoneDataService.GetDayBeforeAt8amLocalTimeAndReturnAsUtc(scheduleResult.Data.EventDateScheduled)
+            };
+
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Sign Up Email Reminder", true);
+        }
+
         public async Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl)
         {
             var userResult = await _userDataService.GetByEmail(email);
@@ -441,7 +564,9 @@ namespace BedBrigade.Data.Services
                 ToAddress = user.Email,
                 Subject = "Bed Brigade Password Reset Request",
                 Body = body,
-                Priority = Defaults.BulkHighPriority
+                Priority = Defaults.BulkHighPriority,
+                LocationId = user.LocationId,
+                TargetDate = DateTime.UtcNow
             };
 
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);

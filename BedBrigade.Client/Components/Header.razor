@@ -1,5 +1,5 @@
 @if (Cultures != null && SelectedCulture != null)
-{    
+{ 
     <div class="language-wrapper">
         <i class="fas fa-globe"></i>
         <select id="languageSelect" @bind="SelectedCulture" @bind:event="onchange" data-location="@_locationState.Location">
@@ -8,7 +8,7 @@
                 <option value="@culture.Name">@RemoveTextAfterParenthesis(culture.EnglishName)</option>
             }
         </select>
-    </div>    
+    </div> 
 }
 
 @((MarkupString)_headerContent) 
@@ -60,6 +60,13 @@
         border-radius: 4px;
     }
 
+    /* Make admin dropdown scrollable up to80% of viewport height */
+    .scroll-dropdown {
+        max-height: 90vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     @@media screen and (max-width: 1500px) {
         .language-wrapper {
             top: 60px;
@@ -103,4 +110,3 @@
     }
 
 </style>
- 

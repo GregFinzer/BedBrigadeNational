@@ -114,10 +114,16 @@ namespace BedBrigade.Client.Services
                 ("Text Messages", "administration/SMS/SmsSummary", "fas fa-sms",
                     _auth.UserHasRole(RoleNames.CanViewSmsSummary)),
                 ("Users", "administration/manage/users", "fas fa-users", _auth.UserHasRole(RoleNames.CanViewUsers)),
-                ("View Logs", "administration/admin/viewlogs", "fas fa-clipboard-list",
-                    _auth.UserHasRole(RoleNames.NationalAdmin)),
                 ("Volunteers", "administration/manage/Volunteers", "fas fa-user-friends",
                     _auth.UserHasRole(RoleNames.CanViewVolunteers)),
+                ("View Logs", "administration/admin/viewlogs", "fas fa-clipboard-list",
+                    _auth.UserHasRole(RoleNames.NationalAdmin)),
+                ("View Email Queue", "administration/admin/viewemailqueue", "fas fa-envelope",
+                    _auth.UserHasRole(RoleNames.CanSendBulkEmail)),
+                ("View SMS Queue", "administration/admin/viewsmsqueue", "fas fa-sms",
+                    _auth.UserHasRole(RoleNames.NationalAdmin)),
+                ("View Translation Queue", "administration/admin/viewtranslationqueue", "fas fa-language",
+                    _auth.UserHasRole(RoleNames.NationalAdmin)),
             };
             return items;
         }

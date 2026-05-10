@@ -18,6 +18,7 @@ public class SendSmsLogic : ISendSmsLogic
     private readonly ISmsQueueDataService _smsQueueDataService;
     private readonly IScheduleDataService _scheduleDataService;
     private ILocationDataService _locationDataService;
+    private readonly ITimezoneDataService _timezoneDataService;
     private IMailMergeLogic _mailMergeLogic;
     private ISignUpDataService _signUpDataService;
 
@@ -25,7 +26,11 @@ public class SendSmsLogic : ISendSmsLogic
         IConfigurationDataService configurationDataService, 
         IVolunteerDataService volunteerDataService,
         ISmsQueueDataService smsQueueDataService,
-        IScheduleDataService scheduleDataService, IMailMergeLogic mailMergeLogic, ISignUpDataService signUpDataService, ILocationDataService locationDataService)
+        IScheduleDataService scheduleDataService, 
+        IMailMergeLogic mailMergeLogic, 
+        ISignUpDataService signUpDataService, 
+        ILocationDataService locationDataService,
+        ITimezoneDataService timezoneDataService)
     {
         _contentDataService = contentDataService;
         _configurationDataService = configurationDataService;
@@ -35,17 +40,93 @@ public class SendSmsLogic : ISendSmsLogic
         _mailMergeLogic = mailMergeLogic;
         _signUpDataService = signUpDataService;
         _locationDataService = locationDataService;
+        _timezoneDataService = timezoneDataService;
     }
 
-    public async Task<ServiceResponse<bool>> CreateSignUpReminder(SignUp signUp)
+    /// <summary>
+    /// Create a delivery SMS Reminder that is sent at 12pm the day before
+    /// </summary>
+    /// <param name="bedRequest"></param>
+    /// <param name="schedule"></param>
+    /// <returns></returns>
+    public async Task<ServiceResponse<bool>> QueueDeliverySmsReminder(BedRequest bedRequest, Schedule schedule)
     {
         ServiceResponse<Content> templateResult =
-            await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId,
-                ContentType.SignUpSmsConfirmationForm);
+            await _contentDataService.GetSingleByLocationAndContentType(bedRequest.LocationId,
+                ContentType.DeliverySmsReminderForm);
 
         if (!templateResult.Success)
         {
-            return new ServiceResponse<bool>("Failed to get SignUpSmsConfirmationForm: " + templateResult.Message);
+            return new ServiceResponse<bool>("Failed to get DeliveryDayBeforeReminderForm: " + templateResult.Message);
+        }
+
+        string fromPhone;
+        try
+        {
+            fromPhone = await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone,
+                bedRequest.LocationId);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<bool>(ex.Message);
+        }
+
+        SmsQueue smsQueue = BuildDeliveryDayBeforeReminderQueueRecord(fromPhone, bedRequest, schedule, templateResult);
+
+        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
+        if (createResult.Success)
+        {
+            return new ServiceResponse<bool>("SMS Message queued", true);
+        }
+
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
+    }
+
+    private SmsQueue BuildDeliveryDayBeforeReminderQueueRecord(string fromPhone,
+        BedRequest bedRequest,
+        Schedule schedule,
+        ServiceResponse<Content> templateResult)
+    {
+        string template = templateResult.Data?.ContentHtml ?? string.Empty;
+        StringBuilder sb = new StringBuilder(template, template.Length * 2);
+        sb = _mailMergeLogic.ReplaceBedRequestFields(bedRequest, sb);
+        sb = _mailMergeLogic.ReplaceScheduleFields(schedule, sb);
+
+        SmsQueue smsQueue = new SmsQueue()
+        {
+            SignUpId = null,
+            BedRequestId = bedRequest.BedRequestId,
+            FromPhoneNumber = fromPhone.FormatPhoneNumber(),
+            ToPhoneNumber = bedRequest.Phone.FormatPhoneNumber(),
+            Body = sb.ToString(),
+            Priority = Defaults.BulkHighPriority,
+            Status = QueueStatus.Queued.ToString(),
+            QueueDate = DateTime.UtcNow,
+            FailureMessage = string.Empty,
+            TargetDate = _timezoneDataService.GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(schedule.EventDateScheduled),
+            IsRead = true,
+            IsReply = false,
+            LocationId = bedRequest.LocationId,
+            ContactType = ContactTypes.BedRequestor,
+            ContactName = bedRequest.FullName
+        };
+        return smsQueue;
+    }
+    
+    /// <summary>
+    /// Create SignUp SMS Reminder for Volunteer that is sent the day of the event
+    /// </summary>
+    /// <param name="signUp"></param>
+    /// <returns></returns>
+    public async Task<ServiceResponse<bool>> QueueSignUpSmsReminder(SignUp signUp)
+    {
+        ServiceResponse<Content> templateResult =
+            await _contentDataService.GetSingleByLocationAndContentType(signUp.LocationId,
+                ContentType.SignUpSmsReminderForm);
+
+        if (!templateResult.Success)
+        {
+            return new ServiceResponse<bool>("Failed to get SignUpSmsReminderForm: " + templateResult.Message);
         }
 
         string fromPhone;
@@ -74,7 +155,7 @@ public class SendSmsLogic : ISendSmsLogic
                                              scheduleResult.Message);
         }
 
-        SmsQueue smsQueue = BuildQueueRecord(signUp, fromPhone, volunteerResult, templateResult, scheduleResult);
+        SmsQueue smsQueue = BuildSignUpQueueRecord(signUp, fromPhone, volunteerResult, templateResult, scheduleResult);
 
         var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
         if (createResult.Success)
@@ -107,7 +188,7 @@ public class SendSmsLogic : ISendSmsLogic
         return await SendTextMessage(smsQueue);
     }
 
-    private static SmsQueue BuildQueueRecord(SignUp signUp, string fromPhone, 
+    private SmsQueue BuildSignUpQueueRecord(SignUp signUp, string fromPhone, 
         ServiceResponse<Volunteer> volunteerResult,
         ServiceResponse<Content> templateResult, 
         ServiceResponse<Schedule> scheduleResult)
@@ -287,6 +368,8 @@ public class SendSmsLogic : ISendSmsLogic
 
         return new ServiceResponse<bool>("SMS Message Failed: " + message.FailureMessage);
     }
+
+
 }
 
 

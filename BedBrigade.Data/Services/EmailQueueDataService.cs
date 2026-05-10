@@ -24,6 +24,10 @@ namespace BedBrigade.Data.Services
         private readonly ISubscriptionDataService _subscriptionDataService;
         private readonly INewsletterDataService _newsletterDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
+        private readonly ICommonService _commonService;
+        private readonly ITimezoneDataService _timezoneDataService;
+
+        
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
             IAuthService authService,
@@ -36,7 +40,10 @@ namespace BedBrigade.Data.Services
             IScheduleDataService scheduleDataService,
             ISubscriptionDataService subscriptionDataService,
             INewsletterDataService newsletterDataService,
-            IMailMergeLogic mailMergeLogic) : base(contextFactory, cachingService, authService)
+            IMailMergeLogic mailMergeLogic, 
+            ICommonService commonService, 
+            ITimezoneDataService timezoneDataService
+            ) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
             _cachingService = cachingService;
@@ -50,6 +57,8 @@ namespace BedBrigade.Data.Services
             _subscriptionDataService = subscriptionDataService;
             _newsletterDataService = newsletterDataService;
             _mailMergeLogic = mailMergeLogic;
+            _commonService = commonService;
+            _timezoneDataService = timezoneDataService;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -120,6 +129,20 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        public async Task<ServiceResponse<List<EmailQueue>>> GetAllForLocationAsync(int locationId)
+        {
+            var result = await _commonService.GetAllForLocationAsync(this, locationId);
+
+            if (!result.Success || result.Data == null)
+            {
+                return result;
+            }
+
+            _timezoneDataService.FillLocalDates(result.Data);
+
+            return result;
+        }
+
         public async Task ClearEmailQueueLock()
         {
             var lockedEmails = await GetLockedEmails();
@@ -152,7 +175,8 @@ namespace BedBrigade.Data.Services
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString())
+                var result = await dbSet.Where(o => o.Status == QueueStatus.Queued.ToString()
+                                                    && DateTime.UtcNow >= o.TargetDate)
                     .OrderByDescending(o => o.Priority)
                     .ThenBy(o => o.QueueDate)
                     .Take(maxPerChunk)
@@ -280,9 +304,79 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        private async Task<EmailQueue?> GetEmailByAddressAndTargetDate(EmailQueue email)
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<EmailQueue>();
+                return await dbSet.Where(o => o.ToAddress == email.ToAddress && o.TargetDate == email.TargetDate)
+                    .FirstOrDefaultAsync();
+            }
+        }
+
+        public async Task<ServiceResponse<string>> DeleteQueuedByBedRequestId(int bedRequestId)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    var queuedEmails = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                              && o.Status == QueueStatus.Queued.ToString())
+                        .ToListAsync();
+
+                    if (!queuedEmails.Any())
+                    {
+                        return new ServiceResponse<string>($"No queued email found for BedRequestId {bedRequestId}", true);
+                    }
+
+                    dbSet.RemoveRange(queuedEmails);
+                    await ctx.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(GetEntityName());
+                    return new ServiceResponse<string>($"Deleted queued email for BedRequestId {bedRequestId}", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<string>(ex.Message, false);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId)
+        {
+            try
+            {
+                using (var ctx = _contextFactory.CreateDbContext())
+                {
+                    var dbSet = ctx.Set<EmailQueue>();
+                    var emailsToDelete = await dbSet.Where(o => o.SignUpId == signUpId
+                                                                && o.Status == QueueStatus.Queued.ToString())
+                        .ToListAsync();
+                    if (emailsToDelete.Count == 0)
+                    {
+                        return new ServiceResponse<bool>($"No queued emails found for SignUpId {signUpId}", true, false);
+                    }
+                    dbSet.RemoveRange(emailsToDelete);
+                    await ctx.SaveChangesAsync();
+                    _cachingService.ClearByEntityName(GetEntityName());
+                    return new ServiceResponse<bool>($"Deleted {emailsToDelete.Count} queued emails for SignUpId {signUpId}", true, true);
+                }
+            }
+            catch (DbException ex)
+            {
+                return new ServiceResponse<bool>($"Could not delete queued emails for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+            }
+        }
 
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
+            var duplicate = await GetEmailByAddressAndTargetDate(email);
+
+            if (duplicate != null)
+            {
+                return new ServiceResponse<string>("Email already queued", true);
+            }
+
             try
             {
                 email.Status = QueueStatus.Queued.ToString();
@@ -298,7 +392,7 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>(QueueStatus.Queued.ToString(), true);
         }
 
-        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body)
+        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body, int locationId)
         {
             if (emailList.Count == 0)
                 return new ServiceResponse<string>("No emails to send", false);
@@ -313,7 +407,8 @@ namespace BedBrigade.Data.Services
                     Status = QueueStatus.Queued.ToString(),
                     QueueDate = DateTime.UtcNow,
                     FailureMessage = string.Empty,
-                    Priority = Defaults.BulkLowPriority
+                    Priority = Defaults.BulkLowPriority,
+                    LocationId = locationId
                 }).ToList();
 
                 string userName = GetUserName();

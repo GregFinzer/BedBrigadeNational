@@ -114,9 +114,13 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
             await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
-            await CreateContent(location, ContentType.SignUpSmsConfirmationForm, "SignUpSmsConfirmationForm.txt", "SignUpSmsConfirmationForm");
+            await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
             await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
+            await CreateContent(location, ContentType.ContactUsConfirmationForm, "ContactUsConfirmationForm.txt", "ContactUsConfirmationForm");
             await CreateContent(location, ContentType.ForgotPasswordForm, "ForgotPasswordForm.txt", "ForgotPasswordForm");
+            await CreateContent(location, ContentType.DeliverySmsReminderForm, "DeliverySmsReminderForm.txt", "DeliverySmsReminderForm");
+            await CreateContent(location, ContentType.DeliveryEmailReminderForm, "DeliveryEmailReminderForm.txt", "DeliveryEmailReminderForm");
+            await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
 
             //Config
             await CreateConfig(location);

@@ -679,31 +679,95 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
     }
 
-    public async Task<ServiceResponse<bool>> DeleteBySignUpId(int signUpId)
+    public async Task<ServiceResponse<bool>> DeleteQueuedBySignUpId(int signUpId)
     {
         try
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<SmsQueue>();
-                var messagesToDelete = await dbSet.Where(o => o.SignUpId == signUpId).ToListAsync();
+                var messagesToDelete = await dbSet.Where(o => o.SignUpId == signUpId
+                                                              && o.Status == QueueStatus.Queued.ToString())
+                    .ToListAsync();
                 if (messagesToDelete.Count == 0)
                 {
-                    return new ServiceResponse<bool>($"No messages found for SignUpId {signUpId}", true, false);
+                    return new ServiceResponse<bool>($"No queued messages found for SignUpId {signUpId}", true, false);
                 }
                 dbSet.RemoveRange(messagesToDelete);
                 await ctx.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
-                return new ServiceResponse<bool>($"Deleted {messagesToDelete.Count} messages for SignUpId {signUpId}", true, true);
+                return new ServiceResponse<bool>($"Deleted {messagesToDelete.Count} queued messages for SignUpId {signUpId}", true, true);
             }
         }
         catch (DbException ex)
         {
-            return new ServiceResponse<bool>($"Could not delete messages for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
+            return new ServiceResponse<bool>($"Could not delete queued messages for SignUpId {signUpId}: {ex.Message} ({ex.ErrorCode})", false, false);
         }
 
     }
+
+    public async Task<ServiceResponse<List<SmsQueue>>> GetSmsQueueView()
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetSmsQueueView()");
+
+        List<SmsQueue>? cachedContent = _cachingService.Get<List<SmsQueue>>(cacheKey);
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Found {cachedContent.Count} {GetEntityName()} in cache", true,
+                cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var result = await ctx.Set<SmsQueue>()
+                    .Include(s => s.Location)
+                    .OrderByDescending(s => s.QueueDate)
+                    .ToListAsync();
+                _svcTimeZone.FillLocalDates(result); // populate local dates
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<SmsQueue>>("Retrieved SmsQueue view", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Error GetSmsQueueView for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<List<SmsQueue>>($"Error GetSmsQueueView for {GetEntityName()}: {ex.Message}", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<string>> DeleteQueuedSmsByBedRequestId(int bedRequestId)
+    {
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<SmsQueue>();
+                var messagesToDelete = await dbSet.Where(o => o.BedRequestId == bedRequestId
+                                                               && o.Status == QueueStatus.Queued.ToString()).ToListAsync();
+                if (messagesToDelete.Count == 0)
+                {
+                    return new ServiceResponse<string>($"No queued messages found for BedRequestId {bedRequestId}", true, $"No queued messages found for BedRequestId {bedRequestId}");
+                }
+                dbSet.RemoveRange(messagesToDelete);
+                await ctx.SaveChangesAsync();
+                _cachingService.ClearByEntityName(GetEntityName());
+                return new ServiceResponse<string>($"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}", true, $"Deleted {messagesToDelete.Count} queued messages for BedRequestId {bedRequestId}");
+            }
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<string>(ex.Message, false);
+        }
+    }
 }
+
+
 
 
 

@@ -17,7 +17,7 @@ namespace BedBrigade.Server.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -533,8 +533,7 @@ namespace BedBrigade.Server.Migrations
                     b.Property<int>("DonationCampaignId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DonationDate")
-                        .IsRequired()
+                    b.Property<DateTime>("DonationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -571,8 +570,7 @@ namespace BedBrigade.Server.Migrations
                     b.Property<bool>("TaxFormSent")
                         .HasColumnType("bit");
 
-                    b.Property<decimal?>("TransactionFee")
-                        .IsRequired()
+                    b.Property<decimal>("TransactionFee")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TransactionId")
@@ -646,6 +644,9 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmailQueueId"));
 
+                    b.Property<int?>("BedRequestId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -679,6 +680,9 @@ namespace BedBrigade.Server.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("LockDate")
                         .HasColumnType("datetime2");
 
@@ -699,6 +703,9 @@ namespace BedBrigade.Server.Migrations
                     b.Property<DateTime?>("SentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("SignUpId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -708,6 +715,9 @@ namespace BedBrigade.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("TargetDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ToAddress")
                         .IsRequired()
@@ -726,6 +736,10 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("EmailQueueId");
+
+                    b.HasIndex("BedRequestId");
+
+                    b.HasIndex("SignUpId");
 
                     b.ToTable("EmailQueue");
                 });
@@ -1188,6 +1202,9 @@ namespace BedBrigade.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SmsQueueId"));
 
+                    b.Property<int?>("BedRequestId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasMaxLength(1600)
@@ -1268,6 +1285,8 @@ namespace BedBrigade.Server.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("SmsQueueId");
+
+                    b.HasIndex("BedRequestId");
 
                     b.HasIndex("LocationId");
 
@@ -1762,11 +1781,13 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.BedRequest", b =>
                 {
-                    b.HasOne("BedBrigade.Common.Models.Location", null)
+                    b.HasOne("BedBrigade.Common.Models.Location", "Location")
                         .WithMany("BedRequests")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BedBrigade.Common.Models.ContactUs", b =>
@@ -1796,6 +1817,21 @@ namespace BedBrigade.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BedBrigade.Common.Models.EmailQueue", b =>
+                {
+                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
+                        .WithMany()
+                        .HasForeignKey("BedRequestId");
+
+                    b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
+                        .WithMany()
+                        .HasForeignKey("SignUpId");
+
+                    b.Navigation("BedRequest");
+
+                    b.Navigation("SignUp");
+                });
+
             modelBuilder.Entity("BedBrigade.Common.Models.Schedule", b =>
                 {
                     b.HasOne("BedBrigade.Common.Models.Location", null)
@@ -1807,20 +1843,42 @@ namespace BedBrigade.Server.Migrations
 
             modelBuilder.Entity("BedBrigade.Common.Models.SignUp", b =>
                 {
+                    b.HasOne("BedBrigade.Common.Models.Schedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("BedBrigade.Common.Models.Volunteer", "Volunteer")
                         .WithMany()
                         .HasForeignKey("VolunteerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Schedule");
 
                     b.Navigation("Volunteer");
                 });
 
             modelBuilder.Entity("BedBrigade.Common.Models.SmsQueue", b =>
                 {
+                    b.HasOne("BedBrigade.Common.Models.BedRequest", "BedRequest")
+                        .WithMany()
+                        .HasForeignKey("BedRequestId");
+
+                    b.HasOne("BedBrigade.Common.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BedBrigade.Common.Models.SignUp", "SignUp")
                         .WithMany()
                         .HasForeignKey("SignUpId");
+
+                    b.Navigation("BedRequest");
+
+                    b.Navigation("Location");
 
                     b.Navigation("SignUp");
                 });

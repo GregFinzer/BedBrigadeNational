@@ -1,0 +1,1 @@
+Good afternoon %%BedRequest.FirstName%%. This is a reminder that your bed delivery is scheduled for tomorrow %%Schedule.EventDateOnly%% between %%Schedule.StartTime%% and %%Schedule.EndTime%%.  Please have the space available and clear to assemble your bed(s).  Please secure any pets.  An adult must be present to receive the bed.  

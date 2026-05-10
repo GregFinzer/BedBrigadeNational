@@ -1,5 +1,4 @@
-﻿using BedBrigade.Common.Constants;
-using BedBrigade.Common.EnumModels;
+﻿using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -9,10 +8,6 @@ using Microsoft.JSInterop;
 using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -33,6 +28,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IJSRuntime? JS { get; set; }
         [Inject] private ILanguageContainerService? _lc { get; set; }
         [Inject] private NavigationManager? _nav { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private IScheduleDataService _svcSchedule { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
+        [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
+        [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
+
         [Parameter] public string? Id { get; set; }
 
         protected BedBrigade.Common.Models.BedRequest? Model { get; set; }
@@ -47,6 +48,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private const string IsError = "Error";
         private const string BRService = "_svcBedRequest service is not available.";
+
+        private bool _showConfirmAddScheduleDialog;
+        private string _confirmAddScheduleTitle = string.Empty;
+        private string _confirmAddScheduleMessage = string.Empty;
+        private TaskCompletionSource<bool>? _confirmAddScheduleTcs;
 
         protected bool OnlyRead { get; set; } = false;
         public string SpeakEnglishVisibility = "hidden";
@@ -156,30 +162,30 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private async Task HandleValidSubmit()
         {
+            if (Model == null)
+                return;
+                
             // Normalize phone
-            if (Model != null && !string.IsNullOrEmpty(Model.Phone))
+            if (!string.IsNullOrEmpty(Model.Phone))
             {
                 Model.Phone = Model.Phone.FormatPhoneNumber();
             }
 
             // Set SpeakEnglish default if primary is English
-            if (Model != null && Model.PrimaryLanguage == "English")
+            if (Model.PrimaryLanguage == "English")
             {
                 Model.SpeakEnglish = "Yes";
             }
             else
             {
-                if (Model != null)
+                if (String.IsNullOrEmpty(Model.SpeakEnglish))
                 {
-                    if (String.IsNullOrEmpty(Model.SpeakEnglish))
-                    {
-                        Model.SpeakEnglish = "No";
-                    }
+                    Model.SpeakEnglish = "No";
                 }
             }
 
             // If combine duplicate happened and updated an existing record, just return to grid
-            if (Model != null && await CombineDuplicate(Model))
+            if (await CombineDuplicate(Model))
             {
                 if (_nav != null)
                 {
@@ -188,17 +194,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return;
             }
 
-
-            if (Model != null){
-           
-                    if (Model.BedRequestId != 0)
-                    {
-                        await UpdateBedRequest(Model);
-                    }
-                    else 
-                    {
-                        await CreateBedRequest(Model);
-                    }
+            if (Model.BedRequestId != 0)
+            {
+                await UpdateBedRequest(Model);
+            }
+            else 
+            {
+                await CreateBedRequest(Model);
             }
 
             // After save navigate back to main grid page
@@ -291,7 +293,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private async Task UpdateBedRequest(BedBrigade.Common.Models.BedRequest BedRequest)
+        private async Task UpdateBedRequest(BedBrigade.Common.Models.BedRequest bedRequest)
         {
             if (_svcBedRequest == null)
             {
@@ -300,19 +302,104 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return;
             }
 
-            var updateResult = await _svcBedRequest.UpdateAsync(BedRequest);
+            var updateResult = await _svcBedRequest.UpdateAsync(bedRequest);
 
-            if (updateResult.Success)
+            if (updateResult.Success && updateResult.Data != null)
             {
+                Model = updateResult.Data;
+
+                await _emailQueueDataService.DeleteQueuedByBedRequestId(Model.BedRequestId);
+                await _smsQueueDataService.DeleteQueuedSmsByBedRequestId(Model.BedRequestId);
+                
+                if (Model.Status == BedRequestStatus.Scheduled)
+                {
+                    var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
+                    if (scheduleResult.Success && scheduleResult.Data != null)
+                    {
+                        //@@@HERE The email is not queued at all
+                        await SendDeliveryReminderEmail(Model, scheduleResult.Data);
+
+                        //@@@HERE The SMS is queued but the body is blank
+                        await SendDeliveryReminderSms(Model, scheduleResult.Data);
+                    }
+                }
+                
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
             {
-                Log.Error($"Unable to update BedRequest {BedRequest.BedRequestId} : {updateResult.Message}");
+                Log.Error($"Unable to update BedRequest {bedRequest.BedRequestId} : {updateResult.Message}");
                 _toastService?.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
             }
         }
 
+        private async Task SendDeliveryReminderSms(Common.Models.BedRequest model, Common.Models.Schedule scheduleResultData)
+        {
+            ServiceResponse<bool> smsResult = await _sendSmsLogic.QueueDeliverySmsReminder(model, scheduleResultData);
+            if (!smsResult.Success)
+            {
+                Log.Error($"Failed to queue delivery reminder SMS for BedRequest {model.BedRequestId} : {smsResult.Message}");
+                _toastService?.Error("SMS Not Queued", "The delivery reminder SMS was not queued successfully");
+            }
+        }
+
+        private Task<bool> ConfirmAddScheduleAsync(string dialogTitle, string dialogMessage)
+        {
+            _confirmAddScheduleTitle = dialogTitle;
+            _confirmAddScheduleMessage = dialogMessage;
+            _showConfirmAddScheduleDialog = true;
+            _confirmAddScheduleTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            StateHasChanged();
+            return _confirmAddScheduleTcs.Task;
+        }
+
+        private void HandleConfirmAddScheduleSelection(bool isConfirmed)
+        {
+            _showConfirmAddScheduleDialog = false;
+            _confirmAddScheduleTcs?.TrySetResult(isConfirmed);
+            _confirmAddScheduleTcs = null;
+            StateHasChanged();
+        }
+
+        private void HandleConfirmAddScheduleClose()
+        {
+            HandleConfirmAddScheduleSelection(false);
+        }
+
+        private async Task<ServiceResponse<Common.Models.Schedule>> GetOrCreateScheduleForBedRequestDeliveryDate(
+            Common.Models.BedRequest model)
+        {
+            ServiceResponse<Common.Models.Schedule> scheduleResponse =
+                await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
+
+            if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            {
+                if (await ConfirmAddScheduleAsync("Schedule Not Found",
+                        $"No schedule was found for the delivery date {model.DeliveryDate.Value.ToShortDateString()} of this Bed Request. Would you like to add a schedule for this delivery date?"))
+                {
+                    scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDate(model);
+                }
+            }
+
+            if (!scheduleResponse.Success || scheduleResponse.Data == null)
+            {
+                _toastService?.Error("Schedule Not Found",
+                    "No schedule was found for the delivery date of this Bed Request, and a new schedule was not be created. The delivery reminder email was not queued.");
+
+            }
+
+            return scheduleResponse;
+        }
+
+        private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
+        {
+            ServiceResponse<bool> emailResult = await _svcEmailBuilder.QueueDeliveryEmailReminder(model, schedule);
+            if (!emailResult.Success)
+            {
+                Log.Error($"Failed to queue delivery reminder email for BedRequest {model.BedRequestId} : {emailResult.Message}");
+                _toastService?.Error("Email Not Queued", "The delivery reminder email was not queued successfully");
+            }
+        }
 
 
         private void HandleCancel()

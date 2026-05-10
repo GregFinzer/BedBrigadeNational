@@ -109,16 +109,21 @@ namespace BedBrigade.Tests
 
         private void ReportViolations(QualityResult result)
         {
-            if (TestHelper.RunningInPipeline)
-            {
-                Console.WriteLine(_qualityLogic.ExportViolationsToString(result));
+            // Always write violations to console
+            Console.WriteLine(_qualityLogic.ExportViolationsToString(result));
+
+            //Match Windows experience on Linux/macOS too: export HTML and best-effort open it.
+            bool shouldOpenReport = Debugger.IsAttached
+                                    || (TestHelper.IsWindows() && FileUtil.IsVSCodeInstalledOnWindows())
+                                    || TestHelper.IsRiderInstalled();
+            
+            if (!shouldOpenReport)
                 return;
-            }
 
             TestHelper.DeleteOldHtmlFiles();
             string tempFilePath = Path.GetTempFileName() + ".html";
-            _qualityLogic.ExportViolationsToHtmlReportFile(result, TemplateName.BlackAndBlue,tempFilePath);
-            TestHelper.Shell(tempFilePath, string.Empty, ProcessWindowStyle.Normal, false);
+            _qualityLogic.ExportViolationsToHtmlReportFile(result, TemplateName.BlackAndBlue, tempFilePath);
+            TestHelper.TryOpenFile(tempFilePath);
         }
     }
 

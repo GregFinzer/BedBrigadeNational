@@ -16,7 +16,7 @@ else
             <UserInfo />
         </div>
     </div>
-    <div class="col-md-12 control-sec">
+    <div class="col-md-12 control-sec position-relative">
         <div class="content-wrapper">
             <div class="row">
 
@@ -40,12 +40,12 @@ else
                         ClipMode="ClipMode.EllipsisWithTooltip">
                     <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15" />
                     <GridEditSettings ShowDeleteConfirmDialog="true"></GridEditSettings>
-                    <GridEvents DataBound=@DataBound
+                    <GridEvents TValue="BedRequest"
+                                DataBound=@DataBound
                                 Destroyed=@OnDestroyed
                                 OnLoad=@OnLoad
                                 OnToolbarClick=@OnToolBarClick
-                                OnActionBegin=@OnActionBegin
-                                TValue="BedRequest" />
+                                OnActionBegin=@OnActionBegin />
                     <GridTemplates>
                         <EmptyRecordTemplate>
                             <span>@RecordText</span>
@@ -85,6 +85,12 @@ else
                 </SfGrid>
             </div>
         </div>
+        @if (IsGeneratingFile)
+        {
+            <div class="loading-overlay">
+                <Spinner />
+            </div>
+        }
     </div>
 }
 
@@ -144,6 +150,19 @@ else
 
     .center-column {
         text-align: center;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
     }
 
 </style>

@@ -13,6 +13,20 @@ public class TimezoneDataService : ITimezoneDataService
         _authService = authService;
     }
 
+    public DateTime GetDayBeforeAtNoonLocalTimeAndReturnAsUtc(DateTime originalDate)
+    {
+        DateTime dayBefore = originalDate.Date.AddDays(-1);
+        dayBefore = dayBefore.AddHours(12);
+        return dayBefore.ToUniversalTime();
+    }
+
+    public DateTime GetDayBeforeAt8amLocalTimeAndReturnAsUtc(DateTime originalDate)
+    {
+        DateTime dayBefore = originalDate.Date.AddDays(-1);
+        dayBefore = dayBefore.AddHours(8);
+        return dayBefore.ToUniversalTime();
+    }
+
     public string GetUserTimeZoneId()
     {
         if (string.IsNullOrWhiteSpace(_userTimeZoneId))
@@ -69,9 +83,12 @@ public class TimezoneDataService : ITimezoneDataService
 
     public void FillLocalDates(List<SmsQueue> items)
     {
+        // Updated to fill all local date properties for SmsQueue
         string timeZoneId = GetUserTimeZoneId();
         foreach (var item in items)
         {
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+            item.TargetDateLocal = ConvertUtcToTimeZone(item.TargetDate, timeZoneId) ?? item.TargetDate;
             item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
         }
     }
@@ -90,6 +107,29 @@ public class TimezoneDataService : ITimezoneDataService
         string timeZoneId = GetUserTimeZoneId();
         item.CreateDateLocal = ConvertUtcToTimeZone(item.CreateDate, timeZoneId);
         item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
+    }
+
+    public void FillLocalDates(List<EmailQueue> items)
+    {
+        string timeZoneId = GetUserTimeZoneId();
+        foreach (var item in items)
+        {
+            item.CreateDateLocal = ConvertUtcToTimeZone(item.CreateDate, timeZoneId);
+            item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
+            item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+        }
+    }
+
+    public void FillLocalDates(List<TranslationQueueView> items)
+    {
+        string timeZoneId = GetUserTimeZoneId();
+        foreach (var item in items)
+        {
+            item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+            item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
+            item.LockDateLocal = ConvertUtcToTimeZone(item.LockDate, timeZoneId);
+        }
     }
 }
 

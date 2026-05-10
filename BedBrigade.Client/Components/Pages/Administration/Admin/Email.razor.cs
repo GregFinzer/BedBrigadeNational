@@ -128,7 +128,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                     NewsletterId = Model.CurrentNewsletterId
                 };
                 var emails = await _svcEmailQueueDataService.GetEmailsToSend(parms);
-                var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body);
+                var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body, Model.CurrentLocationId);
                 if (result.Success)
                 {
                     Log.Information($"{_svcAuth.UserName} queued some Bulk Emails");

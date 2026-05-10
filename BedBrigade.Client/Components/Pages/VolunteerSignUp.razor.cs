@@ -440,12 +440,21 @@ namespace BedBrigade.Client.Components.Pages
                 return false;
             }
 
-            var smsResponse = await _sendSmsLogic.CreateSignUpReminder(createResult.Data);
+            var smsResponse = await _sendSmsLogic.QueueSignUpSmsReminder(createResult.Data);
 
             if (!smsResponse.Success)
             {
                 await ShowMessage(smsResponse.Message);
-                Log.Logger.Error($"Error CreateSignUpReminder: {smsResponse.Message}");
+                Log.Logger.Error($"Error QueueSignUpSmsReminder: {smsResponse.Message}");
+                return false;
+            }
+
+            var emailReminderResponse = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(createResult.Data);
+
+            if (!emailReminderResponse.Success)
+            {
+                await ShowMessage(emailReminderResponse.Message);
+                Log.Logger.Error($"Error QueueSignUpEmailReminderAsync: {emailReminderResponse.Message}");
                 return false;
             }
             return true;

@@ -39,10 +39,13 @@ public static class SeedContentsLogic
             await SeedForm(context, locations, ContentType.EmailTaxForm);
             await SeedForm(context, locations, ContentType.BedRequestConfirmationForm);
             await SeedForm(context, locations, ContentType.SignUpEmailConfirmationForm);
-            await SeedForm(context, locations, ContentType.SignUpSmsConfirmationForm);
+            await SeedForm(context, locations, ContentType.SignUpSmsReminderForm);
             await SeedForm(context, locations, ContentType.NewsletterForm);
             await SeedForm(context, locations, ContentType.ContactUsConfirmationForm);
             await SeedForm(context, locations, ContentType.ForgotPasswordForm);
+            await SeedForm(context, locations, ContentType.DeliverySmsReminderForm);
+            await SeedForm(context, locations, ContentType.DeliveryEmailReminderForm);
+            await SeedForm(context, locations, ContentType.SignUpEmailReminderForm);
         }
     }
 

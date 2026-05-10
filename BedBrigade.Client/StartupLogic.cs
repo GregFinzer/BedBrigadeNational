@@ -15,12 +15,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using Syncfusion.Blazor;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Reflection;
 using Microsoft.AspNetCore.ResponseCompression;
-
+using System;
+using System.Data.SqlClient;
 
 namespace BedBrigade.Client
 {
@@ -52,10 +55,25 @@ namespace BedBrigade.Client
         {
             //Read logging configuration from appsettings.json
             //See https://www.codeproject.com/Articles/5344667/Logging-with-Serilog-in-ASP-NET-Core-Web-API
-            var logger = new LoggerConfiguration()
+            if (OperatingSystem.IsLinux())
+            {
+                Console.ForegroundColor = ResolveLinuxConsoleForegroundColor();
+            }
+
+            var loggerConfiguration = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                .Enrich.FromLogContext()
-                .CreateLogger();
+                .Enrich.FromLogContext();
+
+            if (OperatingSystem.IsLinux())
+            {
+                loggerConfiguration.WriteTo.Console(theme: SystemConsoleTheme.None);
+            }
+            else
+            {
+                loggerConfiguration.WriteTo.Console();
+            }
+
+            var logger = loggerConfiguration.CreateLogger();
 
             Log.Logger = logger;
             builder.Logging.ClearProviders();
@@ -78,7 +96,23 @@ namespace BedBrigade.Client
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlBuilder =>
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                if (OperatingSystem.IsLinux())
+                {
+                    var linuxConnectionString = Environment.GetEnvironmentVariable("BedBrigadeConnectionString");
+                    if (!string.IsNullOrWhiteSpace(linuxConnectionString))
+                    {
+                        connectionString = linuxConnectionString;
+                    }
+                }
+                
+                if (!IsValidSqlServerConnectionString(connectionString))
+                {
+                    Log.Logger.Error("Invalid SQL Server connection string: " + connectionString);
+                    throw new InvalidOperationException("Invalid SQL Server connection string. Please check the configuration. If you are running under Linux then set the environment variable BedBrigadeConnectionString with a valid connection string.");
+                }
+                
+                options.UseSqlServer(connectionString, sqlBuilder =>
                 {
                     sqlBuilder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
@@ -213,6 +247,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IEmailBounceService, EmailBounceService>();
             builder.Services.AddScoped<IDashboardDataService, DashboardDataService>();
             builder.Services.AddScoped<IDeliveryPlanService, DeliveryPlanService>();
+            builder.Services.AddScoped<ITeamSheetService, TeamSheetService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)
@@ -235,6 +270,21 @@ namespace BedBrigade.Client
 
             //Possible fix for AT&T Mobile Data            
             app.UseResponseCompression();
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.HasValue)
+                {
+                    string requestPath = context.Request.Path.Value;
+                    string? resolvedPath = ResolveMediaRequestPath(app.Environment.WebRootPath, requestPath);
+                    if (!string.IsNullOrWhiteSpace(resolvedPath))
+                    {
+                        context.Request.Path = new PathString(resolvedPath);
+                    }
+                }
+
+                await next();
+            });
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -359,7 +409,102 @@ namespace BedBrigade.Client
             }
         }
 
+        private static string? ResolveMediaRequestPath(string webRootPath, string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(webRootPath) || string.IsNullOrWhiteSpace(requestPath))
+            {
+                return null;
+            }
+
+            const string MediaPrefix = "/media";
+            if (!requestPath.StartsWith(MediaPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            string remainder = requestPath.Substring(MediaPrefix.Length).TrimStart('/');
+            string mediaRoot = Path.Combine(webRootPath, "Media");
+            string combinedPath = Path.Combine(mediaRoot, remainder);
+            string? physicalPath = FileUtil.ResolveCaseInsensitivePath(combinedPath);
+            
+            if (string.IsNullOrWhiteSpace(physicalPath))
+            {
+                return null;
+            }
+
+            string relativePath = Path.GetRelativePath(webRootPath, physicalPath).Replace('\\', '/');
+            return relativePath.StartsWith("/", StringComparison.Ordinal)
+                ? relativePath
+                : "/" + relativePath;
+        }
 
 
+
+        private static bool IsValidSqlServerConnectionString(string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return false;
+
+            try
+            {
+                var builder = new SqlConnectionStringBuilder(connectionString);
+
+                // Optional: enforce required fields
+                if (string.IsNullOrWhiteSpace(builder.DataSource))
+                    return false;
+
+                // Either Integrated Security OR UserID/Password should be present
+                if (!builder.IntegratedSecurity)
+                {
+                    if (string.IsNullOrWhiteSpace(builder.UserID) ||
+                        string.IsNullOrWhiteSpace(builder.Password))
+                        return false;
+                }
+
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false; // Invalid format
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static ConsoleColor ResolveLinuxConsoleForegroundColor()
+        {
+            string? colorFgBg = Environment.GetEnvironmentVariable("COLORFGBG");
+            if (!string.IsNullOrWhiteSpace(colorFgBg))
+            {
+                string[] parts = colorFgBg.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (parts.Length > 0 && int.TryParse(parts[^1], out int backgroundCode))
+                {
+                    // ANSI 0-6 is generally dark backgrounds, 7+ is generally light backgrounds.
+                    return backgroundCode <= 6 ? ConsoleColor.White : ConsoleColor.Black;
+                }
+            }
+
+            return IsDarkConsoleBackground(Console.BackgroundColor)
+                ? ConsoleColor.White
+                : ConsoleColor.Black;
+        }
+
+        private static bool IsDarkConsoleBackground(ConsoleColor backgroundColor)
+        {
+            return backgroundColor switch
+            {
+                ConsoleColor.Black => true,
+                ConsoleColor.DarkBlue => true,
+                ConsoleColor.DarkGreen => true,
+                ConsoleColor.DarkCyan => true,
+                ConsoleColor.DarkRed => true,
+                ConsoleColor.DarkMagenta => true,
+                ConsoleColor.DarkYellow => true,
+                ConsoleColor.DarkGray => true,
+                _ => false
+            };
+        }
     }
 }
