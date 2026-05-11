@@ -6,7 +6,11 @@
     <projectFile profileName="BedBrigade.Tests">BedBrigade.Tests/BedBrigade.Tests.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="" />
+    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/dataSources/data_sources_history.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,7 +63,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "finzer/BedRequestUserDoc",
+    "git-widget-placeholder": "finzer/howToSchedule",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
@@ -130,6 +134,8 @@
       <workItem from="1776110282784" duration="5315000" />
       <workItem from="1776259889720" duration="6096000" />
       <workItem from="1776790852842" duration="620000" />
+      <workItem from="1777582637421" duration="51000" />
+      <workItem from="1778526373138" duration="2081000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />
