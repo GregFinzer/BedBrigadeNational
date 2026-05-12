@@ -17,6 +17,8 @@ namespace BedBrigade.Client.Components
 
     public partial class UsersGrid : ComponentBase
     {
+        private const string ChangePassword = "Change Password";
+        
         [Inject] private IUserDataService _svcUser { get; set; }
         [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
         [Inject] private IAuthService _svcAuth { get; set; }
@@ -49,7 +51,7 @@ namespace BedBrigade.Client.Components
         public bool PasswordVisible { get; private set; }
         public string displayError { get; private set; } = "none;";
         private string? _selectedUserName;
-        public string PasswordDialogTitle { get; private set; } = "Change Password";
+        public string PasswordDialogTitle { get; private set; } = ChangePassword;
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
         public required SfMaskedTextBox phoneTextBox;
@@ -277,7 +279,7 @@ namespace BedBrigade.Client.Components
             var selectedUser = await GetSelectedUserAsync();
             if (selectedUser == null)
             {
-                _toastService.Warning("Change Password", "Select a row to change the password for a user");
+                _toastService.Warning(ChangePassword, "Select a row to change the password for a user");
                 return;
             }
 
@@ -303,7 +305,7 @@ namespace BedBrigade.Client.Components
                 var result = await _svcAuthData.ChangePassword(changePassword.UserId, changePassword.Password, mustChangePassword:true);
                 if (result.Success)
                 {
-                    _toastService.Success("Change Password", "Password Changed Successfully!");
+                    _toastService.Success(ChangePassword, "Password Changed Successfully!");
                     displayError = "none;";
                     PasswordVisible = false;
                     PasswordDialogTitle = _lc.Keys["ChangePassword"];
@@ -311,7 +313,7 @@ namespace BedBrigade.Client.Components
                 else
                 {
                     Log.Error($"Unable to change password for user {changePassword.UserId}: {result.Message}");
-                    _toastService.Error("Change Password", $"Unable to change password!<br/>Correct the following errors:<br/>{result.Message}");
+                    _toastService.Error(ChangePassword, $"Unable to change password!<br/>Correct the following errors:<br/>{result.Message}");
                     displayError = "block;";
                 }
 

@@ -6,14 +6,7 @@
     <projectFile profileName="BedBrigade.Tests">BedBrigade.Tests/BedBrigade.Tests.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/UsersGrid.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/UsersGrid.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/UsersGrid.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/UsersGrid.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/wwwroot/css/bedBrigade/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/wwwroot/css/bedBrigade/theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/wwwroot/css/bedBrigade/theme.scss" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/wwwroot/css/bedBrigade/theme.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/EndUserDocumentation/HowToScheduleBedRequests.md" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/EndUserDocumentation/HowToScheduleBedRequests.md" afterDir="false" />
-    </list>
+    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -195,7 +188,7 @@
       <workItem from="1777582637421" duration="51000" />
       <workItem from="1778526373138" duration="2081000" />
       <workItem from="1778530679544" duration="2304000" />
-      <workItem from="1778606321919" duration="5051000" />
+      <workItem from="1778606321919" duration="5661000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />
