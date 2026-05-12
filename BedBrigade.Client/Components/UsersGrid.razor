@@ -60,7 +60,7 @@ else
                                   OnActionComplete="@OnActionComplete"
                                   TValue="User"/>
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
-                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
+                        <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="false" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <Validator>
                                 <DataAnnotationsValidator/>
                             </Validator>
@@ -132,7 +132,7 @@ else
                         </GridSortSettings>
                         <GridGroupSettings Columns=@groupColumns ShowDropArea="true" EnableLazyLoading="true" />
                         <GridColumns>
-                            <GridColumn Field=@nameof(User.UserName) Visible="false" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
+                            <GridColumn Field=@nameof(User.UserName) IsPrimaryKey="true" Visible="false" ShowColumnMenu="false" AllowFiltering="true" HeaderText="User Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String"/>
                             <GridColumn Field=@nameof(User.FullName) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Name" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="250px" AutoFit="false" />
                             <GridColumn Field=@nameof(User.FormattedPhone) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Phone" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="150px" AutoFit="false" />
                             <GridColumn Field=@nameof(User.Email) ShowColumnMenu="false" AllowFiltering="true" HeaderText="Email" HeaderTextAlign="TextAlign.Center" Type="ColumnType.String" Width="300px" AutoFit="false" />
@@ -146,9 +146,9 @@ else
     </div>
 }
 
-<SfDialog Target="#target" Width="350px" Height="300px" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@PasswordVisible">
+<SfDialog Target="#target" Width="1050px" Height="300px" AllowDragging="true" IsModal="true" ShowCloseIcon="true" @bind-Visible="@PasswordVisible">
     <DialogTemplates>
-        <Header>@_lc.Keys["ChangePassword"]</Header>
+        <Header>@PasswordDialogTitle</Header>
         <Content>
             <EditForm Model="@userRegister" OnValidSubmit="@NewPassword">
                 <DataAnnotationsValidator />
