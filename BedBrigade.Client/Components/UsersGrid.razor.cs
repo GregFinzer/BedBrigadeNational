@@ -48,6 +48,8 @@ namespace BedBrigade.Client.Components
         protected List<Role> Roles { get; private set; }
         public bool PasswordVisible { get; private set; }
         public string displayError { get; private set; } = "none;";
+        private string? _selectedUserName;
+        public string PasswordDialogTitle { get; private set; } = "Change Password";
 
         protected DialogSettings DialogParams = new DialogSettings { Width = "900px", MinHeight = "550px" };
         public required SfMaskedTextBox phoneTextBox;
@@ -60,6 +62,7 @@ namespace BedBrigade.Client.Components
 
                 _lc.InitLocalizedComponent(this);
                 PasswordVisible = false;
+                PasswordDialogTitle = _lc.Keys["ChangePassword"];
 
                 Identity = _svcAuth.CurrentUser;
 
@@ -221,10 +224,14 @@ namespace BedBrigade.Client.Components
             {
                 await Grid.EnableToolbarItemsAsync(new List<string>() { "UserGrid_Password" }, false);
             }
+
+            _selectedUserName = null;
         }
 
         protected async Task OnRowSelected(RowSelectEventArgs<User> args)
         {
+            _selectedUserName = args.Data?.UserName;
+
             var record = await Grid.GetSelectedRecordsAsync();
             if (record != null)
             {
@@ -267,16 +274,15 @@ namespace BedBrigade.Client.Components
 
         private async Task ChangePasswordAsync()
         {
-            var records = await Grid.GetSelectedRecords();
-            if (records != null && records.Count > 0)
-            {
-                userRegister.user = records[0];
-            }
-            else
+            var selectedUser = await GetSelectedUserAsync();
+            if (selectedUser == null)
             {
                 _toastService.Warning("Change Password", "Select a row to change the password for a user");
                 return;
             }
+
+            userRegister.user = selectedUser;
+            PasswordDialogTitle = BuildPasswordDialogTitle(selectedUser);
 
             userRegister.ConfirmPassword = userRegister.Password = string.Empty;
             displayError = "none;";
@@ -284,10 +290,10 @@ namespace BedBrigade.Client.Components
         }
         private async Task NewPassword()
         {
-            var records = await Grid.GetSelectedRecords();
-            if (records != null && records.Count > 0)
+            var selectedUser = await GetSelectedUserAsync();
+            if (selectedUser != null)
             {
-                userRegister.user = records[0];
+                userRegister.user = selectedUser;
             }
 
             string passwordChanged = string.Empty;
@@ -300,6 +306,7 @@ namespace BedBrigade.Client.Components
                     _toastService.Success("Change Password", "Password Changed Successfully!");
                     displayError = "none;";
                     PasswordVisible = false;
+                    PasswordDialogTitle = _lc.Keys["ChangePassword"];
                 }
                 else
                 {
@@ -322,7 +329,19 @@ namespace BedBrigade.Client.Components
             switch (requestType)
             {
                 case Action.Delete:
-                    await Delete();
+                    args.Cancel = true;
+                    var userToDelete = await GetSelectedUserAsync(args.Data);
+                    if (userToDelete == null)
+                    {
+                        _toastService.Warning("Delete User", "Select a row to delete a user");
+                        break;
+                    }
+
+                    var confirmDelete = await ConfirmDeleteAsync(userToDelete);
+                    if (confirmDelete)
+                    {
+                        await Delete(userToDelete);
+                    }
                     break;
 
                 case Action.Add:
@@ -333,6 +352,15 @@ namespace BedBrigade.Client.Components
                     await Save(args);
                     break;
                 case Action.BeginEdit:
+                    var userToEdit = await GetSelectedUserAsync(args.Data);
+                    if (userToEdit == null)
+                    {
+                        args.Cancel = true;
+                        _toastService.Warning("Edit User", "Select a row to edit a user");
+                        break;
+                    }
+
+                    args.Data = userToEdit;
                     BeginEdit();
                     break;
             }
@@ -439,26 +467,73 @@ namespace BedBrigade.Client.Components
             UserPass = true;
         }
 
-        private async Task Delete()
+        private async Task Delete(User selectedUser)
         {
-            List<User> records = await Grid.GetSelectedRecords();
-            foreach (var rec in records)
+            var deleted = await _svcUser.DeleteAsync(selectedUser.UserName);
+            if (deleted.Success)
             {
-                var deleted = await _svcUser.DeleteAsync(rec.UserName);
-                if (deleted.Success)
-                {
-                    _toastService.Success("Delete User", $"User {rec.UserName} deleted successfully!");
-                }
-                else
-                {
-                    Log.Error($"Unable to delete user {rec.UserName}: {deleted.Message}");
-                    _toastService.Error("Delete User", $"Unable to delete user {rec.UserName}! {deleted.Message}");
-                }
+                _toastService.Success("Delete User", $"User {selectedUser.UserName} deleted successfully!");
+            }
+            else
+            {
+                Log.Error($"Unable to delete user {selectedUser.UserName}: {deleted.Message}");
+                _toastService.Error("Delete User", $"Unable to delete user {selectedUser.UserName}! {deleted.Message}");
             }
 
             await LoadUsers();
+            _selectedUserName = null;
 
             await Grid.Refresh();
+        }
+
+        private async Task<User?> GetSelectedUserAsync(User? fallbackUser = null)
+        {
+            if (Grid != null)
+            {
+                var records = await Grid.GetSelectedRecordsAsync();
+                var selectedUser = records?.FirstOrDefault();
+                if (selectedUser != null)
+                {
+                    _selectedUserName = selectedUser.UserName;
+                    return selectedUser;
+                }
+            }
+
+            if (fallbackUser != null)
+            {
+                var fallbackSelectedUser = BBUsers?.FirstOrDefault(u => u.UserName == fallbackUser.UserName) ?? fallbackUser;
+                _selectedUserName = fallbackSelectedUser.UserName;
+                return fallbackSelectedUser;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_selectedUserName))
+            {
+                return BBUsers?.FirstOrDefault(u => u.UserName == _selectedUserName);
+            }
+
+            return null;
+        }
+
+        private async Task<bool> ConfirmDeleteAsync(User selectedUser)
+        {
+            var deleteMessage = BuildDeleteDialogMessage(selectedUser);
+            return await JS.InvokeAsync<bool>("confirm", deleteMessage);
+        }
+
+        private static string BuildDeleteDialogMessage(User selectedUser)
+        {
+            var fullName = $"{selectedUser.FirstName} {selectedUser.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                fullName = selectedUser.UserName;
+            }
+
+            return $"Delete {fullName}?";
+        }
+
+        private static string BuildPasswordDialogTitle(User selectedUser)
+        {
+            return $"Changing the Password for {selectedUser.FirstName} {selectedUser.LastName}";
         }
 
         protected async Task Save(User user)
