@@ -739,6 +739,7 @@ span.field-validation-error {
   font-family: "Stencil Std";
   font-size: 72px;
   color: #fff;
+  padding-left: 10%;
 }
 
 .slide-left-content .widget-body p {
@@ -748,6 +749,7 @@ span.field-validation-error {
   line-height: 46px;
   margin: 30px 0 0;
   color: #fff;
+  padding-left: 10%;
 }
 
 .request-form-section .validation-summary-errors ul li:last-child {
