@@ -233,9 +233,9 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
         int maxMiles;
         var milesResult = await _configurationDataService.GetByIdAsync(ConfigNames.BedBrigadeNearMeMaxMiles);
-        if (milesResult.Success && milesResult.Data != null && milesResult.Data.ConfigurationValue != null)
+        if (milesResult.Success && milesResult.Data != null)
         {
-            maxMiles = int.Parse(milesResult.Data.ConfigurationValue);
+            maxMiles = int.Parse(milesResult.Data.DecryptedValue);
         }
         else
         {

@@ -3,14 +3,8 @@
 
 <CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
 
-@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Buttons
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
-@using EditMode = Syncfusion.Blazor.Grids.EditMode
-@using BedBrigade.Common
-@using BedBrigade.Common.Logic;
 @using BedBrigade.Common.Models
 
 @if (ConfigRecs == null)
@@ -54,44 +48,7 @@ else
                             <span>@RecordText</span>
                         </EmptyRecordTemplate>
                     </GridTemplates>
-                    <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="true" Mode="@EditMode.Dialog">
-                        <HeaderTemplate>
-                            @{
-                                @HeaderTitle
-                            }
-                        </HeaderTemplate>
-                        <FooterTemplate>
-                            <button class="btn btn-primary" @onclick=@(() => Save(context as Configuration)) IsPrimary="true">@ButtonTitle</button>
-                            <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                        </FooterTemplate>
-                        <Template>
-                            @{
-                                Configuration configRec = (context as Configuration)!;
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <SfDropDownList TItem="Location" TValue="Int32" Enabled=@AddKey DataSource="Locations" @bind-Value=@configRec.LocationId Placeholder="Location" FloatLabelType="FloatLabelType.Auto">
-                                                <DropDownListFieldSettings Text="Name" Value="LocationId" />
-                                            </SfDropDownList>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <SfDropDownList TItem="ConfigSectionEnumItem" TValue="ConfigSection" Enabled=@AddKey DataSource=@ConfigSectionEnumItems @bind-Value=@configRec.Section Placeholder="Configuration Section" FloatLabelType="FloatLabelType.Auto">
-                                            <DropDownListFieldSettings Text="Name" Value="Value" />
-                                        </SfDropDownList>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <SfTextBox ID="name" @bind-Value=@configRec.ConfigurationKey Enabled=@AddKey Placeholder="Configuration Key" FloatLabelType="FloatLabelType.Auto" />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <SfTextBox ID="desciption" @bind-Value=@configRec.ConfigurationValue Enabled="true" Placeholder="Configuration Value" FloatLabelType="FloatLabelType.Auto" />
-                                    </div>
-                                </div>
-                            }
-                        </Template>
-                    </GridEditSettings>
+                    <GridEditSettings ShowDeleteConfirmDialog="true"></GridEditSettings>
                     <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
                     <GridSortSettings>
                         <GridSortColumns>
@@ -103,7 +60,8 @@ else
                         <GridForeignColumn Field=@nameof(Configuration.LocationId) ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Configuration.SectionDescription) ShowColumnMenu="false" HeaderText="Section" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="true" />
                         <GridColumn Field=@nameof(Configuration.ConfigurationKey) HeaderText="Key" ShowColumnMenu="false" AllowFiltering="true" ShowInColumnChooser="false" />
-                        <GridColumn Field=@nameof(Configuration.ConfigurationValue) ShowColumnMenu="false" HeaderText="Value" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
+                        <GridColumn Field=@nameof(Configuration.Encrypted) ShowColumnMenu="false" HeaderText="Encrypted" Type="ColumnType.Boolean" DisplayAsCheckBox="true" AllowEditing="false" AllowFiltering="true" Width="140" />
+                        <GridColumn Field=@nameof(Configuration.GridDisplayValue) ShowColumnMenu="false" HeaderText="Value" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                     </GridColumns>
                 </SfGrid>
 
@@ -134,10 +92,6 @@ else
         box-shadow: none;
     }
 
-    .e-dialog .e-dlg-header {
-        font-size: 1.75rem;
-        font-weight: 700;
-    }
 
 </style>
 

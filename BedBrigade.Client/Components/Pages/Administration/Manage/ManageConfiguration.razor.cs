@@ -3,8 +3,8 @@ using Syncfusion.Blazor.Grids;
 using BedBrigade.Data.Services;
 using Serilog;
 using Action = Syncfusion.Blazor.Grids.Action;
-using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 
@@ -12,15 +12,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 {
     public partial class ManageConfiguration : ComponentBase
     {
-        [Inject] private IConfigurationDataService? _svcConfiguration { get; set; }
-        [Inject] private IUserDataService? _svcUser { get; set; }
-        [Inject] private IUserPersistDataService? _svcUserPersist { get; set; }
-        [Inject] private IAuthService? _svcAuth { get; set; }
+        private const string AddEditConfigurationPageBaseUrl = "/administration/admintasks/addeditconfiguration/";
 
-        [Inject] private ILocationDataService _svcLocation { get; set; }
-        [Inject] private ToastService _toastService { get; set; }
-
-        [Parameter] public string? Id { get; set; }
+        [Inject] private IConfigurationDataService _svcConfiguration { get; set; } = default!;
+        [Inject] private IUserDataService _svcUser { get; set; } = default!;
+        [Inject] private IUserPersistDataService _svcUserPersist { get; set; } = default!;
+        [Inject] private IAuthService _svcAuth { get; set; } = default!;
+        [Inject] private NavigationManager _navigationManager { get; set; } = default!;
+        [Inject] private ILocationDataService _svcLocation { get; set; } = default!;
+        [Inject] private ToastService _toastService { get; set; } = default!;
 
         private const string LastPage = "LastPage";
         private const string PrevPage = "PrevPage";
@@ -29,19 +29,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected IEnumerable<Configuration>? ConfigRecs { get; set; }
         protected SfGrid<Configuration>? Grid { get; set; }
-        protected List<string>? ToolBar;
-        protected List<string>? ContextMenu;
-        protected string? _state { get; set; }
-        protected string? HeaderTitle { get; set; }
-        protected string? ButtonTitle { get; private set; }
+        protected List<string> ToolBar { get; set; } = new();
+        protected List<string> ContextMenu { get; set; } = new();
+        protected string? GridState { get; set; }
 
         protected bool NoPaging { get; private set; }
-        protected bool AddKey { get; set; } = false;
         protected string? RecordText { get; set; } = "Loading Configuration ...";
-        protected string? Hide { get; private set; } = "true";
-        public List<ConfigSectionEnumItem> ConfigSectionEnumItems { get; private set; }
-
-        protected DialogSettings DialogParams = new DialogSettings { Width = "800px", MinHeight = "200px" };
 
         protected List<Location> Locations { get; set; } = new List<Location>();
         /// <summary>
@@ -79,8 +72,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
                 await LoadData();
 
-                ConfigSectionEnumItems = EnumHelper.GetConfigSectionItems();
-
             }
             catch (Exception ex)
             {
@@ -117,17 +108,20 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
+            if (!firstRender || Grid == null)
             {
-                if (_svcAuth.IsNationalAdmin)
-                {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
-                    Grid.EditSettings.AllowDeleting = true;
-                    Grid.EditSettings.AllowAdding = true;
-                    Grid.EditSettings.AllowEditing = true;
-                    StateHasChanged();
-                }
+                return base.OnAfterRenderAsync(firstRender);
             }
+
+            if (_svcAuth.IsNationalAdmin)
+            {
+                Grid.EditSettings.AllowEditOnDblClick = true;
+                Grid.EditSettings.AllowDeleting = true;
+                Grid.EditSettings.AllowAdding = true;
+                Grid.EditSettings.AllowEditing = true;
+                StateHasChanged();
+            }
+
             return base.OnAfterRenderAsync(firstRender);
         }
 
@@ -140,7 +134,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration };
             var result = await _svcUserPersist.GetGridPersistence(persist);
-            if (result.Success && result.Data != null)
+            if (result.Success && result.Data != null && Grid != null)
             {
                 await Grid.SetPersistDataAsync(result.Data);
             }
@@ -157,9 +151,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task SaveGridPersistence()
         {
-            _state = await Grid.GetPersistData();
+            if (Grid == null)
+            {
+                return;
+            }
+
+            GridState = await Grid.GetPersistDataAsync();
             string userName = _svcUser.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration, Data = _state };
+            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration, Data = GridState };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
             if (!result.Success)
             {
@@ -170,9 +169,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected async Task OnToolBarClick(Syncfusion.Blazor.Navigations.ClickEventArgs args)
         {
+            if (Grid == null)
+            {
+                return;
+            }
+
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
+                await Grid.ResetPersistDataAsync();
                 await SaveGridPersistence();
                 return;
             }
@@ -180,7 +184,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             if (args.Item.Text == "Pdf Export")
             {
                 await PdfExport();
+                return;
             }
+
             if (args.Item.Text == "Excel Export")
             {
                 await ExcelExport();
@@ -208,14 +214,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     break;
 
                 case Action.Add:
+                    args.Cancel = true;
                     Add();
                     break;
 
-                case Action.Save:
-                    await Save(args);
-                    break;
                 case Action.BeginEdit:
-                    BeginEdit();
+                    await EditAsync(args);
                     break;
             }
 
@@ -225,6 +229,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             try
             {
+                if (Grid == null)
+                {
+                    args.Cancel = true;
+                    return;
+                }
+
                 List<Configuration> records = await Grid.GetSelectedRecordsAsync();
                 foreach (var rec in records)
                 {
@@ -232,6 +242,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     if (deleteResult.Success)
                     {
                         _toastService.Success("Delete Configuration", "Configuration Deleted Successfully!");
+                        await RefreshGridAsync();
                     }
                     else
                     {
@@ -250,91 +261,54 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private void Add()
         {
-            HeaderTitle = "Add Configuration";
-            ButtonTitle = "Add Configuration";
-            AddKey = true;
+            _navigationManager.NavigateTo($"{AddEditConfigurationPageBaseUrl}{Defaults.NationalLocationId}");
         }
 
-        private async Task Save(ActionEventArgs<Configuration> args)
+        private async Task EditAsync(ActionEventArgs<Configuration> args)
         {
-            try
+            args.Cancel = true;
+
+            Configuration? configuration = args.Data;
+            if (configuration == null && Grid != null)
             {
-
-                Configuration Configuration = args.Data;
-                if (!string.IsNullOrEmpty(Configuration.ConfigurationKey) && !AddKey)
-                {
-                    //Update Configuration Record
-                    var updateResult = await _svcConfiguration.UpdateAsync(Configuration);
-                    if (updateResult.Success)
-                    {
-                        _toastService.Success("Update Configuration Success", "Configuration Updated Successfully!");
-                    }
-                    else
-                    {
-                        _toastService.Error("Update Configuration Error", "Unable to update configuration!");
-                    }
-                }
-                else
-                {
-                    var existing = await _svcConfiguration.GetAllForLocationAsync(Configuration.LocationId);
-
-                    if (existing.Success
-                        && existing.Data != null
-                        && existing.Data.Any(c => c.ConfigurationKey == Configuration.ConfigurationKey))
-                    {
-                        _toastService.Error("Add Configuration Error", "Configuration Key already exists for this location!");
-                        args.Cancel = true;
-                        return;
-                    }
-
-                    // new Configuration
-                    var createResult = await _svcConfiguration.CreateAsync(Configuration);
-                    if (createResult.Success)
-                    {
-                        _toastService.Success("Add Configuration Success", "Configuration Added Successfully!");
-                    }
-                    else
-                    {
-                        _toastService.Error("Add Configuration Error", "Unable to add configuration!");
-                    }
-                }
-
+                List<Configuration> records = await Grid.GetSelectedRecordsAsync();
+                configuration = records.FirstOrDefault();
             }
-            catch (Exception ex)
+
+            if (configuration == null)
             {
-                Log.Error(ex, "Error saving configuration");
-                _toastService.Error("Save Configuration", "An error occurred while saving the configuration.");
+                _toastService.Error("Edit Configuration", "Select a configuration record to edit.");
+                return;
             }
+
+            _navigationManager.NavigateTo($"{AddEditConfigurationPageBaseUrl}{configuration.LocationId}/{configuration.ConfigurationId}");
         }
 
-        private void BeginEdit()
+        private async Task RefreshGridAsync()
         {
-            HeaderTitle = "Update Configuration";
-            ButtonTitle = "Update Configuration";
-            AddKey = false;
-        }
+            await LoadData();
 
-        protected async Task Save(Configuration need)
-        {
-            await Grid.EndEdit();
-        }
+            if (Grid != null)
+            {
+                await Grid.Refresh();
+            }
 
-        protected async Task Cancel()
-        {
-            await Grid.CloseEdit();
+            StateHasChanged();
         }
 
         protected void DataBound()
         {
-            if (ConfigRecs.ToList().Count == 0) RecordText = "No configurations found";
-            if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)
+            if (ConfigRecs?.Any() != true)
             {
-                NoPaging = true;
+                RecordText = "No configurations found";
             }
-            else
+
+            if (Grid == null)
             {
-                NoPaging = false;
+                return;
             }
+
+            NoPaging = Grid.TotalItemCount <= Grid.PageSettings.PageSize;
 
             // await Grid.AutoFitColumns();
         }
@@ -372,7 +346,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                     FileName = FileUtil.BuildFileNameWithDate("Configuration", ".csv"),
                 };
 
-                await Grid.CsvExport(exportProperties);
+                await Grid.ExportToCsvAsync(exportProperties);
             }
         }
 

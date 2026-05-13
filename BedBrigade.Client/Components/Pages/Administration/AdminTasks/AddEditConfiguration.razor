@@ -1,0 +1,171 @@
+@page "/administration/admintasks/addeditconfiguration/{LocationId:int}"
+@page "/administration/admintasks/addeditconfiguration/{LocationId:int}/{ConfigurationId:int}"
+@layout Layout.AdminLayout
+
+@using BedBrigade.Common.EnumModels
+@using BedBrigade.Common.Enums
+@using BedBrigade.Common.Models
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+@if (IsLoading)
+{
+    <Spinner />
+}
+else
+{
+    <div class="container my-4">
+        <div class="row mt-3">
+            <div class="col-md-10 ps-3">
+                <h3>@HeaderText</h3>
+            </div>
+            <div class="col-md-2 ps-3 ps-md-0">
+                <UserInfo />
+            </div>
+        </div>
+
+        <div class="content-wrapper mt-3">
+            <EditForm Model="Model" OnValidSubmit="HandleValidSubmitAsync">
+                <DataAnnotationsValidator />
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header fw-bold">Configuration Details</div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="configuration-location" class="formlabel required">Location</label>
+                                    <SfDropDownList ID="configuration-location"
+                                                    TItem="Location"
+                                                    TValue="Int32"
+                                                    DataSource="Locations"
+                                                    @bind-Value="Model.LocationId"
+                                                    Enabled="@IsNew"
+                                                    Placeholder="Location"
+                                                    FloatLabelType="FloatLabelType.Never">
+                                        <DropDownListFieldSettings Text="Name" Value="LocationId" />
+                                    </SfDropDownList>
+                                    <div style="font-size: smaller">
+                                        <ValidationMessage For="@(() => Model.LocationId)" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="configuration-section" class="formlabel required">Section</label>
+                                    <SfDropDownList ID="configuration-section"
+                                                    TItem="ConfigSectionEnumItem"
+                                                    TValue="ConfigSection"
+                                                    DataSource="ConfigSectionEnumItems"
+                                                    @bind-Value="Model.Section"
+                                                    Enabled="@IsNew"
+                                                    Placeholder="Configuration Section"
+                                                    FloatLabelType="FloatLabelType.Never">
+                                        <DropDownListFieldSettings Text="Name" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="configuration-key" class="formlabel required">Configuration Key</label>
+                                    <SfTextBox ID="configuration-key"
+                                               @bind-Value="Model.ConfigurationKey"
+                                               Enabled="@IsNew"
+                                               Placeholder="Configuration Key"
+                                               FloatLabelType="FloatLabelType.Never"
+                                               maxlength="50" />
+                                    <div style="font-size: smaller">
+                                        <ValidationMessage For="@(() => Model.ConfigurationKey)" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-0">
+                                    <SfCheckBox ID="configuration-encrypted"
+                                                Label="Encrypted"
+                                                @bind-Checked="Model.Encrypted">
+                                    </SfCheckBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 mt-3 mt-md-0">
+                        <div class="card h-100">
+                            <div class="card-header fw-bold">Configuration Value</div>
+                            <div class="card-body">
+                                <div class="form-group mb-2">
+                                    <label for="configuration-value" class="formlabel required">Value</label>
+                                    <div class="configuration-value-editor d-flex align-items-end">
+                                        <div class="flex-grow-1">
+                                            <SfTextBox ID="configuration-value"
+                                                       @bind-Value="ConfigurationValueEditor"
+                                                       CssClass="@GetConfigurationValueCssClass()"
+                                                       Placeholder="Configuration Value"
+                                                       FloatLabelType="FloatLabelType.Never"
+                                                       Multiline="true">
+                                            </SfTextBox>
+                                        </div>
+                                        @if (CanToggleValueVisibility)
+                                        {
+                                            <button id="configuration-value-eye"
+                                                    type="button"
+                                                    class="btn btn-outline-secondary ms-2 mb-1"
+                                                    title="@ValueVisibilityButtonTitle"
+                                                    @onclick="ToggleDecryptedValueVisibility">
+                                                <i class="@ValueVisibilityIconCssClass"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                    <div style="font-size: smaller">
+                                        <ValidationMessage For="@(() => Model.ConfigurationValue)" />
+                                    </div>
+                                </div>
+
+                                @if (Model.Encrypted)
+                                {
+                                    <div class="text-muted small">
+                                        @(IsDecryptedValueVisible ? "Value is visible in plain text." : "Value is masked. Use the eye icon to reveal it.")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        @ErrorMessage
+                    </div>
+                }
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-left">
+                        <ValidationSummary />
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12 text-left">
+                        <button id="save-configuration" class="btn btn-primary me-2 px-3 text-nowrap" type="submit">@ButtonText</button>
+                        <button id="cancel-configuration" class="btn btn-secondary px-3 text-nowrap" type="button" @onclick="HandleCancel">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<style>
+    .configuration-value-editor .btn {
+        height: 38px;
+    }
+
+    .encrypted-value input,
+    .encrypted-value textarea {
+        -webkit-text-security: disc;
+    }
+</style>
+
+
+

@@ -5,8 +5,29 @@
     <projectFile profileName="https">BedBrigade.Client/BedBrigade.Client.csproj</projectFile>
     <projectFile profileName="BedBrigade.Tests">BedBrigade.Tests/BedBrigade.Tests.csproj</projectFile>
   </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="" />
+    <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/EncryptUtil.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/ConfigurationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/EncryptUtilTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Models/Configuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Models/Configuration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/ConfigurationDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/ConfigurationDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueBackgroundService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueBackgroundService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/LocationDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/LocationDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,7 +36,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="68edbccf-e3c0-4c83-8f0e-492c060eac91" />
+        <option name="activeSessionId" value="c1eabaf6-2a2b-4f4e-81d4-43653f18b6be" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -42,6 +63,40 @@
             <option name="status" value="Completed" />
             <option name="targetType" value="LOCAL" />
           </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="fba0feb2-e07b-4afb-a275-a8b07dac5caf" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="c1eabaf6-2a2b-4f4e-81d4-43653f18b6be" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="e0ceda97-ab64-4ae6-8b2a-8c313876880b" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="d4446f48-bd22-4d65-9abb-0c0f90e2489e" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="targetType" value="LOCAL" />
+          </session>
         </option>
         <option name="type" value="PANEL" />
       </chat>
@@ -54,8 +109,8 @@
   </component>
   <component name="CopilotUserSelectedModel">
     <selectedModels>
-      <entry key="agent-panel" value="Auto" />
-      <entry key="chat-panel" value="Auto" />
+      <entry key="agent-panel" value="GPT-5.4" />
+      <entry key="chat-panel" value="GPT-5.4" />
     </selectedModels>
   </component>
   <component name="DpaMonitoringSettings">
@@ -76,6 +131,12 @@
     &quot;accountId&quot;: &quot;f159e90c-985b-425e-84cd-9c466944d334&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Common/Logic/EncryptUtil.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/ConfigurationTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/EncryptUtilTests.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="Toolset" />
@@ -91,7 +152,7 @@
         <option name="model">
           <model>
             <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
+            <option name="modelValue" value="gpt-5.4" />
           </model>
         </option>
         <option name="targetType" value="LOCAL" />
@@ -102,24 +163,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.BedBrigade.Client: http.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;finzer/howToSchedule&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.BedBrigade.Client: http.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "finzer/encryptConfig",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.BedBrigade.Client: http">
     <configuration name="BedBrigade.Client: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/BedBrigade.Client/BedBrigade.Client.csproj" />
@@ -188,7 +249,8 @@
       <workItem from="1777582637421" duration="51000" />
       <workItem from="1778526373138" duration="2081000" />
       <workItem from="1778530679544" duration="2304000" />
-      <workItem from="1778606321919" duration="5661000" />
+      <workItem from="1778606321919" duration="7143000" />
+      <workItem from="1778673418561" duration="9103000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />

@@ -468,7 +468,7 @@ namespace BedBrigade.Data.Services
 
         private async Task<bool> IsLiveEmail()
         {
-            string configValue = (await _configurationDataService.GetByIdAsync(ConfigNames.EmailUseFileMock)).Data.ConfigurationValue;
+            string configValue = (await _configurationDataService.GetByIdAsync(ConfigNames.EmailUseFileMock)).Data.DecryptedValue;
             return configValue != "true";
         }
 
@@ -530,8 +530,8 @@ namespace BedBrigade.Data.Services
         public async Task<string> GetEstimatedTime(int queueCount, int emailCount)
         {
             int totalCount = queueCount + emailCount;
-            int maxEmailsPerMinute = Convert.ToInt32((await _configurationDataService.GetByIdAsync(ConfigNames.EmailMaxSendPerMinute)).Data.ConfigurationValue);
-            int maxEmailsPerHour = Convert.ToInt32((await _configurationDataService.GetByIdAsync(ConfigNames.EmailMaxSendPerHour)).Data.ConfigurationValue);
+            int maxEmailsPerMinute = Convert.ToInt32((await _configurationDataService.GetByIdAsync(ConfigNames.EmailMaxSendPerMinute)).Data.DecryptedValue);
+            int maxEmailsPerHour = Convert.ToInt32((await _configurationDataService.GetByIdAsync(ConfigNames.EmailMaxSendPerHour)).Data.DecryptedValue);
 
             if (totalCount <= maxEmailsPerMinute)
             {
