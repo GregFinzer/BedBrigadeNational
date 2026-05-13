@@ -396,7 +396,7 @@ namespace BedBrigade.Client
                         cachingService.IsCachingEnabled = true;
                         bool isCachingEnabled;
 
-                        if (bool.TryParse(config.ConfigurationValue, out isCachingEnabled))
+                        if (bool.TryParse(config.DecryptedValue, out isCachingEnabled))
                         {
                             cachingService.IsCachingEnabled = isCachingEnabled;
                         }

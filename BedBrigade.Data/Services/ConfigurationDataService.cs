@@ -10,7 +10,6 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 {
     private readonly ICachingService _cachingService;
     private readonly IDbContextFactory<DataContext> _contextFactory;
-    private readonly IAuthService _authService;
     private readonly ICommonService _commonService;
     public ConfigurationDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
@@ -18,7 +17,6 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
-        _authService = authService;
         _commonService = commonService;
     }
 
@@ -35,7 +33,6 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         if (cachedContent != null)
             return new ServiceResponse<List<Configuration>>($"Found {cachedContent.Count} records in cache", true,
                 cachedContent);
-        ;
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
@@ -46,20 +43,30 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         }
     }
 
+    /// <summary>
+    /// This will get by the ConfigurationId or the ConfigurationKey depending upon if it is an int or a string
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public override async Task<ServiceResponse<Configuration>> GetByIdAsync(object? id)
     {
         if (id == null)
         {
-            return new ServiceResponse<Configuration>("Configuration.GetByIdAsync id is null", false);
+            return new ServiceResponse<Configuration>("Configuration.GetByIdAsync id is null");
+        }
+
+        if (id is int configurationId)
+        {
+            return await base.GetByIdAsync(configurationId);
         }
 
         //This GetAllAsync should always have less than 1000 records
         var response = await base.GetAllAsync();
 
         if (!response.Success || response.Data == null)
-            return new ServiceResponse<Configuration>(response.Message, false);
+            return new ServiceResponse<Configuration>(response.Message);
 
-        Configuration result = response.Data.FirstOrDefault(o =>
+        Configuration? result = response.Data.FirstOrDefault(o =>
             o.ConfigurationKey == id.ToString() && o.LocationId == Defaults.NationalLocationId);
 
         if (result == null)
@@ -72,15 +79,9 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 
     public async Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, Defaults.NationalLocationId);
 
-        var config =
-            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
-
-        if (config == null)
-            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
-
-        if (!int.TryParse(config.ConfigurationValue, out int result))
+        if (!int.TryParse(config.DecryptedValue, out int result))
         {
             throw new FormatException($"Configuration value is not an integer for {section} - {key}");
         }
@@ -90,15 +91,9 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 
     public async Task<int> GetConfigValueAsIntAsync(ConfigSection section, string key, int locationId)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, locationId);
 
-        var config =
-            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId ==locationId);
-
-        if (config == null)
-            ThrowKeyNotFound(section, key, locationId);
-
-        if (!int.TryParse(config.ConfigurationValue, out int result))
+        if (!int.TryParse(config.DecryptedValue, out int result))
         {
             throw new FormatException($"Configuration value is not an integer for {section} - {key} - Location {locationId}");
         }
@@ -113,38 +108,21 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 
     public async Task<string> GetConfigValueAsync(ConfigSection section, string key)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
-
-        var config =
-            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
-
-        if (config == null)
-            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
-
-        return config.ConfigurationValue;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, Defaults.NationalLocationId);
+        return config.DecryptedValue;
     }
 
     public async Task<string> GetConfigValueAsync(ConfigSection section, string key, int locationId)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == locationId);
-        if (config == null)
-            throw new KeyNotFoundException($"Configuration not found for {section} - {key} for location {locationId}");
-
-        return config.ConfigurationValue;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, locationId);
+        return config.DecryptedValue;
     }
 
     public async Task<decimal> GetConfigValueAsDecimalAsync(ConfigSection section, string key)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, Defaults.NationalLocationId);
 
-        var config =
-            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
-
-        if (config == null)
-            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
-
-        if (!decimal.TryParse(config.ConfigurationValue, out decimal result))
+        if (!decimal.TryParse(config.DecryptedValue, out decimal result))
         {
             throw new FormatException($"Configuration value is not an decimal for {section} - {key}");
         }
@@ -154,24 +132,16 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
 
     public async Task<bool> GetConfigValueAsBoolAsync(ConfigSection section, string key)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
+        Configuration config = await GetRequiredConfigurationAsync(section, key, Defaults.NationalLocationId);
 
-        var config =
-            configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == Defaults.NationalLocationId);
-
-        if (config == null)
-            ThrowKeyNotFound(section, key, Defaults.NationalLocationId);
-
-        return config.ConfigurationValue.ToLower() == "true" || config.ConfigurationValue.ToLower() == "yes";
+        return config.DecryptedValue.ToLower() == "true" || config.DecryptedValue.ToLower() == "yes";
     }
 
     public async Task<List<decimal>> GetAmounts(ConfigSection section, string key, int locationId)
     {
-        List<Configuration> configs = (await GetAllAsync(section)).Data;
-        var config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == locationId);
-        if (config == null)
-            ThrowKeyNotFound(section, key, locationId);
-        var amounts = config.ConfigurationValue.Split('|', StringSplitOptions.RemoveEmptyEntries)
+        Configuration config = await GetRequiredConfigurationAsync(section, key, locationId);
+
+        var amounts = config.DecryptedValue.Split('|', StringSplitOptions.RemoveEmptyEntries)
             .Select(s =>
                 decimal.TryParse(s.Trim(), out decimal value)
                     ? value
@@ -180,8 +150,15 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
         return amounts;
     }
 
+    public override async Task<ServiceResponse<Configuration>> CreateAsync(Configuration entity)
+    {
+        entity.PrepareValueForSave();
+        return await base.CreateAsync(entity);
+    }
+
     public override async Task<ServiceResponse<Configuration>> UpdateAsync(Configuration entity)
     {
+        entity.PrepareValueForSave();
         ServiceResponse<Configuration> updateResult;
 
         if (entity.ConfigurationKey == ConfigNames.IsCachingEnabled)
@@ -191,8 +168,8 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
             if (updateResult.Success)
             {
                 bool previousValue = _cachingService.IsCachingEnabled;
-                _cachingService.IsCachingEnabled = entity.ConfigurationValue.ToLower() == "true"
-                                                   || entity.ConfigurationValue.ToLower() == "yes";
+                _cachingService.IsCachingEnabled = entity.DecryptedValue.ToLower() == "true"
+                                                   || entity.DecryptedValue.ToLower() == "yes";
 
                 Log.Information($"Caching enabled went from {previousValue} to {_cachingService.IsCachingEnabled}");
                 _cachingService.ForceClearAll();
@@ -221,6 +198,30 @@ public class ConfigurationDataService : Repository<Configuration>, IConfiguratio
     {
         string delimitedString = await GetConfigValueAsync(ConfigSection.System, ConfigNames.SpeakEnglish);
         return new List<string>(delimitedString.Split(';'));
+    }
+
+    private async Task<Configuration> GetRequiredConfigurationAsync(ConfigSection section, string key, int locationId)
+    {
+        List<Configuration> configs = await GetConfigurationsAsync(section);
+        Configuration? config = configs.FirstOrDefault(c => c.ConfigurationKey == key && c.LocationId == locationId);
+
+        if (config == null)
+        {
+            ThrowKeyNotFound(section, key, locationId);
+        }
+
+        return config!;
+    }
+
+    private async Task<List<Configuration>> GetConfigurationsAsync(ConfigSection section)
+    {
+        ServiceResponse<List<Configuration>> response = await GetAllAsync(section);
+        if (!response.Success || response.Data == null)
+        {
+            throw new KeyNotFoundException($"Configuration not found for section {section}");
+        }
+
+        return response.Data;
     }
 }
 

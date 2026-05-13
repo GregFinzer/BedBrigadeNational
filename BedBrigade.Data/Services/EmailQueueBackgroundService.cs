@@ -151,21 +151,21 @@ namespace BedBrigade.Data.Services
                 throw new ArgumentException("Could not find Config setting: " + id);
             }
 
-            if ((configResult.Data.ConfigurationValue ?? string.Empty) == "true")
+            if (configResult.Data.DecryptedValue == "true")
             {
                 return 1;
             }
 
-            if ((configResult.Data.ConfigurationValue ?? string.Empty) == "false")
+            if (configResult.Data.DecryptedValue == "false")
             {
                 return 0;
             }
 
-            if (int.TryParse(configResult.Data.ConfigurationValue, out int response))
+            if (int.TryParse(configResult.Data.DecryptedValue, out int response))
                 return response;
 
             throw new ArgumentException(
-                $"Expected Config setting {id} to be an integer: {configResult.Data.ConfigurationValue}");
+                $"Expected Config setting {id} to be an integer: {configResult.Data.DecryptedValue}");
         }
 
         private async Task<string> LoadEmailConfigString(string id)
@@ -177,7 +177,7 @@ namespace BedBrigade.Data.Services
                 throw new ArgumentException("Could not find Config setting: " + id);
             }
 
-            return configResult.Data.ConfigurationValue ?? string.Empty;
+            return configResult.Data.DecryptedValue;
         }
 
         private async Task ProcessQueue(CancellationToken cancellationToken)
