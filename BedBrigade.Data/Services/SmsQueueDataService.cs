@@ -412,7 +412,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         }
 
         var config = result.Data.FirstOrDefault(c => c.ConfigurationKey == ConfigNames.SmsPhone 
-                                                     && StringUtil.ExtractDigits(c.ConfigurationValue) == StringUtil.ExtractDigits(smsQueue.FromPhoneNumber));
+                                                     && StringUtil.ExtractDigits(c.DecryptedValue) == StringUtil.ExtractDigits(smsQueue.FromPhoneNumber));
 
         if (config == null)
         {
@@ -606,7 +606,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     public async Task<string> GetEstimatedTime(int queueCount, int phoneNumberCount)
     {
         int totalCount = queueCount + phoneNumberCount;
-        int maxTextMessagesPerSecond = Convert.ToInt32((await _configDataService.GetByIdAsync(ConfigNames.SmsMaxSendPerSecond)).Data.ConfigurationValue);
+        int maxTextMessagesPerSecond = Convert.ToInt32((await _configDataService.GetByIdAsync(ConfigNames.SmsMaxSendPerSecond)).Data.DecryptedValue);
 
         if (totalCount <= maxTextMessagesPerSecond)
         {
@@ -623,7 +623,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<bool> IsLiveSms()
     {
-        string configValue = (await _configDataService.GetByIdAsync(ConfigNames.SmsUseFileMock)).Data.ConfigurationValue;
+        string configValue = (await _configDataService.GetByIdAsync(ConfigNames.SmsUseFileMock)).Data.DecryptedValue;
         return configValue != "true";
     }
 
