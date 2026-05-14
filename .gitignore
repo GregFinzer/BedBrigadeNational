@@ -358,3 +358,4 @@ MigrationBackup/
 /*.bak
 /*.bak.md
 [Ll]og*.txt
+DataProtection-Keys/
