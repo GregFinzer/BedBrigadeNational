@@ -167,7 +167,6 @@ namespace BedBrigade.Client.Components.Pages
             }
             else
             {
-                Log.Logger.Information($"User {_authService.UserName} logged in");
                 NavigationManager.NavigateTo("/Administration/Dashboard");
             }
         }
