@@ -1,7 +1,6 @@
 ﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
-using BedBrigade.SpeakIt;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
@@ -25,6 +24,7 @@ public partial class ChangePassword : ComponentBase
     protected bool _isBusy = false;
     protected bool _success = false;
     protected string? _errorMessage;
+    protected string? _lockoutMessage;
     protected bool _showPassword = false;
 
     protected ChangePasswordModel _model = new();
@@ -49,7 +49,7 @@ public partial class ChangePassword : ComponentBase
             {
                 email = EncryptionLogic.DecryptEmail(encryptedEmail);
                 var userResp = await UserDataService.GetByEmail(email);
-                _user = (userResp?.Success ?? false) ? userResp!.Data : null;
+                _user = userResp.Success ? userResp.Data : null;
             }
             else
             {
@@ -89,6 +89,7 @@ public partial class ChangePassword : ComponentBase
 
         _isBusy = true;
         _errorMessage = null;
+        _lockoutMessage = null;
 
         try
         {
@@ -96,11 +97,20 @@ public partial class ChangePassword : ComponentBase
             var result =
                 await AuthDataService.ChangePassword(_user.UserName, _model.Password!, mustChangePassword: false);
 
-            if (result is not null && (result.Success && result.Data is not null))
+            if (result.Success && result.Data is not null)
             {
-                _success = true;
                 _oneTimePasswordValid = false; // hide the form after success
                 await AuthService.LogoutAsync();
+
+                if (LoginLockoutLogic.IsLocked(result.Data.LockoutEndUtc))
+                {
+                    _lockoutMessage = LoginLockoutLogic.BuildLockoutMessage(result.Data.LockoutEndUtc!.Value);
+                    _success = false;
+                }
+                else
+                {
+                    _success = true;
+                }
             }
             else
             {

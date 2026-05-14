@@ -284,6 +284,20 @@ namespace BedBrigade.Data.Data.Seeding
                 },
                 new()
                 {
+                    ConfigurationKey = ConfigNames.MaxLoginAttempts,
+                    ConfigurationValue = "3",
+                    Section = ConfigSection.System,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
+                    ConfigurationKey = ConfigNames.LockoutMinutes,
+                    ConfigurationValue = "30",
+                    Section = ConfigSection.System,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
                     ConfigurationKey = ConfigNames.TranslationApiKey,
                     ConfigurationValue = "",
                     Section = ConfigSection.System,
