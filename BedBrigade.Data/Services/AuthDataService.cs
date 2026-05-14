@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using Serilog;
 using System.Data.Common;
 using System.Security;
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,15 +14,21 @@ namespace BedBrigade.Data.Services
 {
     public class AuthDataService : IAuthDataService
     {
+        private const int DefaultMaxLoginAttempts = 3;
+        private const int DefaultLockoutMinutes = 30;
         private readonly IDbContextFactory<DataContext> _contextFactory;
         private readonly ILocationDataService _locationDataService;
         private readonly ICachingService _cachingService;
+        private readonly IConfigurationDataService _configurationDataService;
         public AuthDataService(IDbContextFactory<DataContext> dbContextFactory, 
-            ILocationDataService locationDataService, ICachingService cachingService)
+            ILocationDataService locationDataService,
+            ICachingService cachingService,
+            IConfigurationDataService configurationDataService)
         {
             _contextFactory = dbContextFactory;
             _locationDataService = locationDataService;
             _cachingService = cachingService;
+            _configurationDataService = configurationDataService;
         }
 
         public async Task<ServiceResponse<ClaimsPrincipal>> Login(string email, string password)
@@ -32,44 +40,143 @@ namespace BedBrigade.Data.Services
 
             using (var context = _contextFactory.CreateDbContext())
             {
-                ServiceResponse<ClaimsPrincipal> response = null;
-                var user = await context.Users
-                    .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.ToLower()));
-                if (user == null)
+                try
                 {
-                    response = new ServiceResponse<ClaimsPrincipal>("User not found.");
-                }
-                else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                {
-                    response = new ServiceResponse<ClaimsPrincipal>("Wrong password.");
-                }
-                else
-                {
-                    var claimsPrincipal = await BuildClaimsPrincipalFromUser(user);
-                    response = new ServiceResponse<ClaimsPrincipal>("User logged in", true, claimsPrincipal);
-                }
+                    var user = await GetUserByEmailAsync(context, email);
+                    if (user == null)
+                    {
+                        return new ServiceResponse<ClaimsPrincipal>("User not found.");
+                    }
 
-                return response;
+                    var (maxLoginAttempts, lockoutMinutes) = await GetLoginLockoutSettingsAsync();
+                    var lockoutResponse = await GetLockoutResponseAsync(context, user);
+                    if (lockoutResponse != null)
+                    {
+                        return lockoutResponse;
+                    }
+
+                    if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                    {
+                        return await HandleFailedLoginAsync(context, user, maxLoginAttempts, lockoutMinutes);
+                    }
+
+                    await ClearLoginFailureStateIfNeededAsync(context, user);
+                    var claimsPrincipal = await BuildClaimsPrincipalFromUser(user);
+                    return new ServiceResponse<ClaimsPrincipal>("User logged in", true, claimsPrincipal);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Error(ex, "Error while logging in user {Email}", email);
+                    return new ServiceResponse<ClaimsPrincipal>("There was an error logging in, try again later.");
+                }
             }
+        }
+
+        private async Task<User?> GetUserByEmailAsync(DataContext context, string email)
+        {
+            string normalizedEmail = email.Trim().ToLowerInvariant();
+            return await context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == normalizedEmail);
+        }
+
+        private async Task<(int MaxLoginAttempts, int LockoutMinutes)> GetLoginLockoutSettingsAsync()
+        {
+            try
+            {
+                int maxLoginAttempts = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                    ConfigNames.MaxLoginAttempts);
+                int lockoutMinutes = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System,
+                    ConfigNames.LockoutMinutes);
+
+                return (Math.Max(1, maxLoginAttempts), Math.Max(1, lockoutMinutes));
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex,
+                    "Unable to load login lockout configuration. Falling back to defaults MaxLoginAttempts={MaxLoginAttempts}, LockoutMinutes={LockoutMinutes}",
+                    DefaultMaxLoginAttempts,
+                    DefaultLockoutMinutes);
+
+                return (DefaultMaxLoginAttempts, DefaultLockoutMinutes);
+            }
+        }
+
+        private async Task<ServiceResponse<ClaimsPrincipal>?> GetLockoutResponseAsync(DataContext context, User user)
+        {
+            if (!user.LockoutEndUtc.HasValue)
+            {
+                return null;
+            }
+
+            if (user.LockoutEndUtc.Value <= DateTime.UtcNow)
+            {
+                await ClearLoginFailureStateAsync(context, user);
+                return null;
+            }
+
+            return new ServiceResponse<ClaimsPrincipal>(LoginLockoutLogic.BuildLockoutMessage(user.LockoutEndUtc.Value));
+        }
+
+        private async Task<ServiceResponse<ClaimsPrincipal>> HandleFailedLoginAsync(DataContext context,
+            User user,
+            int maxLoginAttempts,
+            int lockoutMinutes)
+        {
+            user.FailedLoginAttempts = Math.Max(0, user.FailedLoginAttempts) + 1;
+
+            if (user.FailedLoginAttempts >= maxLoginAttempts)
+            {
+                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(lockoutMinutes);
+                await SaveUserAsync(context, user);
+                return new ServiceResponse<ClaimsPrincipal>(LoginLockoutLogic.BuildLockoutMessage(user.LockoutEndUtc.Value));
+            }
+
+            await SaveUserAsync(context, user);
+            return new ServiceResponse<ClaimsPrincipal>("Wrong password.");
+        }
+
+        private async Task ClearLoginFailureStateIfNeededAsync(DataContext context, User user)
+        {
+            if (user.FailedLoginAttempts == 0 && !user.LockoutEndUtc.HasValue)
+            {
+                return;
+            }
+
+            await ClearLoginFailureStateAsync(context, user);
+        }
+
+        private async Task ClearLoginFailureStateAsync(DataContext context, User user)
+        {
+            user.FailedLoginAttempts = 0;
+            user.LockoutEndUtc = null;
+            await SaveUserAsync(context, user);
+        }
+
+        private async Task SaveUserAsync(DataContext context, User user)
+        {
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
+            _cachingService.ClearByEntityName(nameof(User));
         }
 
         private async Task<ClaimsPrincipal> BuildClaimsPrincipalFromUser(User user)
         {
             var location = await _locationDataService.GetByIdAsync(user.LocationId);
 
-            if (!location.Success) 
+            if (!location.Success || location.Data == null) 
             {
                 throw new SecurityException($"LocationId {user.LocationId} not found for user {user.Email}.");
             }
+
+            Location locationData = location.Data;
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
                 new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
                 new Claim("LocationId", user.LocationId.ToString()),
-                new Claim("UserRoute", location.Data.Route),
-                new Claim("TimeZoneId", location.Data.TimeZoneId),
+                new Claim("UserRoute", locationData.Route),
+                new Claim("TimeZoneId", locationData.TimeZoneId),
                 new Claim("Phone", (user.Phone ?? string.Empty).FormatPhoneNumber())
             };
 
@@ -84,7 +191,7 @@ namespace BedBrigade.Data.Services
             using (var context = _contextFactory.CreateDbContext())
             {
 
-                User entity = await context.Users.FindAsync(request.user.UserName);
+                User? entity = await context.Users.FindAsync(request.user.UserName);
                 if (entity != null)
                 {
                     if (!string.IsNullOrEmpty(request.Password))
@@ -171,8 +278,13 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[]? passwordHash, byte[]? passwordSalt)
         {
+            if (string.IsNullOrWhiteSpace(password) || passwordHash == null || passwordSalt == null)
+            {
+                return false;
+            }
+
             using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash =
@@ -213,7 +325,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
             using (var context = _contextFactory.CreateDbContext())
             {
