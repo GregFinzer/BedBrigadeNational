@@ -40,10 +40,11 @@ public static class DataProtectionKeyDirectoryLogic
         {
             if (TryCreateDataProtectionKeysDirectory(candidatePath, out DirectoryInfo? keysDirectory, out Exception? exception))
             {
+                Log.Logger.Information("Using {KeysPath} as the data protection key directory.", candidatePath);
                 return keysDirectory;
             }
 
-            Log.Logger.Warning(exception,
+            Log.Logger.Debug(exception,
                 "Unable to use data protection key directory candidate {KeysPath}. Trying the next candidate.",
                 candidatePath);
         }
