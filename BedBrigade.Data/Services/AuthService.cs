@@ -3,6 +3,7 @@ using System.Security.Claims;
 using BedBrigade.Common.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace BedBrigade.Data.Services
 {
@@ -165,6 +166,10 @@ namespace BedBrigade.Data.Services
 
         public async Task LogoutAsync()
         {
+            bool wasLoggedIn = IsLoggedIn;
+            string userName = UserName;
+            string email = Email;
+
             //Update the Blazor Server State for the user to an anonymous user
             CurrentUser = new();
 
@@ -181,6 +186,11 @@ namespace BedBrigade.Data.Services
             catch (System.InvalidOperationException)
             {
                 //This happens if the component is statically rendered
+            }
+
+            if (wasLoggedIn)
+            {
+                Log.Logger.Information("User {Email} ({UserName}) logged out", email, userName);
             }
         }
 

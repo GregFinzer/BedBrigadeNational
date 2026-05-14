@@ -10,20 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/LoginLockoutLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests.Integration/AuthDataServiceLockoutTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests.Integration/TestDataContextFactory.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/LoginLockoutLogicTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/ChangePassword.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/ChangePassword.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/ChangePassword.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/ChangePassword.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Constants/ConfigNames.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Constants/ConfigNames.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedConfigLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedConfigLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Login.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Login.razor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/AuthDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/AuthDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/IAuthDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/IAuthDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Tests.Integration/BedBrigade.Tests.Integration.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Tests.Integration/BedBrigade.Tests.Integration.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -177,7 +165,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "finzer/AccountLockout",
+    "git-widget-placeholder": "finzer/logLogins",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"

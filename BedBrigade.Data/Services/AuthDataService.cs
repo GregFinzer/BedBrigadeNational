@@ -33,8 +33,11 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<ClaimsPrincipal>> Login(string email, string password)
         {
+            string normalizedEmail = NormalizeEmail(email);
+
             if (String.IsNullOrWhiteSpace(email) || String.IsNullOrWhiteSpace(password))
             {
+                LogFailedLoginAttempt(normalizedEmail, "Missing email or password.");
                 return new ServiceResponse<ClaimsPrincipal>("Please enter your email and password.");
             }
 
@@ -45,6 +48,7 @@ namespace BedBrigade.Data.Services
                     var user = await GetUserByEmailAsync(context, email);
                     if (user == null)
                     {
+                        LogFailedLoginAttempt(normalizedEmail, "User not found.");
                         return new ServiceResponse<ClaimsPrincipal>("User not found.");
                     }
 
@@ -62,6 +66,7 @@ namespace BedBrigade.Data.Services
 
                     await ClearLoginFailureStateIfNeededAsync(context, user);
                     var claimsPrincipal = await BuildClaimsPrincipalFromUser(user);
+                    Log.Logger.Information("Successful login for {Email} ({UserName})", user.Email, user.UserName);
                     return new ServiceResponse<ClaimsPrincipal>("User logged in", true, claimsPrincipal);
                 }
                 catch (Exception ex)
@@ -74,7 +79,7 @@ namespace BedBrigade.Data.Services
 
         private async Task<User?> GetUserByEmailAsync(DataContext context, string email)
         {
-            string normalizedEmail = email.Trim().ToLowerInvariant();
+            string normalizedEmail = NormalizeEmail(email);
             return await context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == normalizedEmail);
         }
 
@@ -113,6 +118,10 @@ namespace BedBrigade.Data.Services
                 return null;
             }
 
+            Log.Logger.Warning("Locked out login attempt for {Email} ({UserName}). {Message}",
+                user.Email,
+                user.UserName,
+                LoginLockoutLogic.BuildLockoutMessage(user.LockoutEndUtc.Value));
             return new ServiceResponse<ClaimsPrincipal>(LoginLockoutLogic.BuildLockoutMessage(user.LockoutEndUtc.Value));
         }
 
@@ -127,11 +136,28 @@ namespace BedBrigade.Data.Services
             {
                 user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(lockoutMinutes);
                 await SaveUserAsync(context, user);
+                Log.Logger.Warning("User {Email} ({UserName}) locked out after {FailedLoginAttempts} failed login attempts.",
+                    user.Email,
+                    user.UserName,
+                    user.FailedLoginAttempts);
                 return new ServiceResponse<ClaimsPrincipal>(LoginLockoutLogic.BuildLockoutMessage(user.LockoutEndUtc.Value));
             }
 
             await SaveUserAsync(context, user);
+            LogFailedLoginAttempt(user.Email, $"Wrong password. Failed attempts: {user.FailedLoginAttempts}.");
             return new ServiceResponse<ClaimsPrincipal>("Wrong password.");
+        }
+
+        private static string NormalizeEmail(string? email)
+        {
+            return string.IsNullOrWhiteSpace(email)
+                ? string.Empty
+                : email.Trim().ToLowerInvariant();
+        }
+
+        private static void LogFailedLoginAttempt(string? email, string reason)
+        {
+            Log.Logger.Warning("Unsuccessful login attempt for {Email}. {Reason}", email ?? string.Empty, reason);
         }
 
         private async Task ClearLoginFailureStateIfNeededAsync(DataContext context, User user)
