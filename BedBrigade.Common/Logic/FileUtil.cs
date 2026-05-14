@@ -7,6 +7,8 @@ namespace BedBrigade.Common.Logic
     public static class FileUtil
     {
         private static Dictionary<string, string> _caseInsensitiveCache = new Dictionary<string, string>();
+        private const string BinDirectoryName = "bin";
+        private const string LocalDirectoryName = ".local";
         
         public static string BuildFileNameWithDate(string prefix, string extension)
         {
@@ -33,7 +35,7 @@ namespace BedBrigade.Common.Logic
 
         private static string GetPathBeforeBin(string filePath)
         {
-            string searchText = Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar;
+            string searchText = Path.DirectorySeparatorChar + BinDirectoryName + Path.DirectorySeparatorChar;
 
             int index = filePath.IndexOf(searchText, StringComparison.OrdinalIgnoreCase);
 
@@ -305,6 +307,48 @@ namespace BedBrigade.Common.Logic
             return Path.GetDirectoryName(fullPath);
         }
 
+        public static bool IsVSCodeInstalledOnLinux()
+        {
+            if (!OperatingSystem.IsLinux())
+            {
+                return false;
+            }
+
+            string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string[] candidatePaths =
+            [
+                "/usr/bin/code",
+                "/usr/local/bin/code",
+                "/snap/bin/code",
+                "/usr/bin/code-insiders",
+                "/usr/local/bin/code-insiders",
+                "/snap/bin/code-insiders",
+                "/var/lib/flatpak/exports/bin/com.visualstudio.code",
+                "/var/lib/flatpak/exports/bin/com.visualstudio.code-insiders",
+                string.IsNullOrWhiteSpace(homeDirectory) ? string.Empty : Path.Combine(homeDirectory, LocalDirectoryName, BinDirectoryName, "code"),
+                string.IsNullOrWhiteSpace(homeDirectory) ? string.Empty : Path.Combine(homeDirectory, LocalDirectoryName, BinDirectoryName, "code-insiders"),
+                string.IsNullOrWhiteSpace(homeDirectory) ? string.Empty : Path.Combine(homeDirectory, LocalDirectoryName, "share", "flatpak", "exports", BinDirectoryName, "com.visualstudio.code"),
+                string.IsNullOrWhiteSpace(homeDirectory) ? string.Empty : Path.Combine(homeDirectory, LocalDirectoryName, "share", "flatpak", "exports", BinDirectoryName, "com.visualstudio.code-insiders")
+            ];
+
+            if (candidatePaths.Any(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path)))
+            {
+                return true;
+            }
+
+            string? environmentPath = Environment.GetEnvironmentVariable("PATH");
+            if (string.IsNullOrWhiteSpace(environmentPath))
+            {
+                return false;
+            }
+
+            string[] executableNames = ["code", "code-insiders", "com.visualstudio.code", "com.visualstudio.code-insiders"];
+
+            return environmentPath
+                .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Any(directory => executableNames.Any(executableName => File.Exists(Path.Combine(directory, executableName))));
+        }
+        
         public static bool IsVSCodeInstalledOnWindows()
         {
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
