@@ -10,23 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/EncryptUtil.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/ConfigurationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/EncryptUtilTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Manage/ManageConfiguration.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Models/Configuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Models/Configuration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Migrations/DataContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/ConfigurationDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/ConfigurationDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueBackgroundService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueBackgroundService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/EmailQueueDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/LocationDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/LocationDataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueBackgroundService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/SmsQueueDataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Login.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Login.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Services/AuthDataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Services/AuthDataService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +80,7 @@
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="gpt-5.4" />
+            <option name="status" value="Completed" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -134,8 +120,12 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/AdminTasks/AddEditConfiguration.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/BedBrigade.Common/Logic/EncryptUtil.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Common/Logic/LoginLockoutLogic.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests.Integration/AuthDataServiceLockoutTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests.Integration/TestDataContextFactory.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/ConfigurationTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/EncryptUtilTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/LoginLockoutLogicTests.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -175,7 +165,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "finzer/encryptConfig",
+    "git-widget-placeholder": "finzer/logLogins",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
@@ -250,7 +240,7 @@
       <workItem from="1778526373138" duration="2081000" />
       <workItem from="1778530679544" duration="2304000" />
       <workItem from="1778606321919" duration="7143000" />
-      <workItem from="1778673418561" duration="9103000" />
+      <workItem from="1778673418561" duration="12600000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />

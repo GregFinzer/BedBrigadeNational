@@ -50,6 +50,11 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [DefaultValue(false)]
     public bool MustChangePassword { get; set; } = false;
 
+    [DefaultValue(0)]
+    public int FailedLoginAttempts { get; set; }
+
+    public DateTime? LockoutEndUtc { get; set; }
+
     public string FullName
     {
         get

@@ -33,7 +33,7 @@ namespace BedBrigade.Client
 
         public static void LoadConfiguration(WebApplicationBuilder builder)
         {
-            if (Debugger.IsAttached || FileUtil.IsVSCodeInstalledOnWindows())
+            if (Debugger.IsAttached || FileUtil.IsVSCodeInstalledOnWindows() || FileUtil.IsVSCodeInstalledOnLinux())
             {
                 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
             }
@@ -93,6 +93,8 @@ namespace BedBrigade.Client
                 .AddInteractiveServerComponents();
 
             builder.Services.AddHttpContextAccessor();
+
+            DataProtectionKeyDirectoryLogic.Configure(builder);
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -181,6 +183,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
         }
+
 
         private static void CommonLogic(WebApplicationBuilder builder)
         {

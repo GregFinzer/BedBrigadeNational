@@ -11,6 +11,8 @@
         public const string DisplayIdFields = "DisplayIdFields";
         public const string EmptyGridText = "EmptyGridText";
         public const string EventCutOffTimeDays = "EventCutOffTimeDays";
+        public const string MaxLoginAttempts = "MaxLoginAttempts";
+        public const string LockoutMinutes = "LockoutMinutes";
         public const string PrimaryLanguage = "PrimaryLanguage";
         public const string SpeakEnglish = "SpeakEnglish";
         public const string MonthsBetweenRequests = "MonthsBetweenRequests";
