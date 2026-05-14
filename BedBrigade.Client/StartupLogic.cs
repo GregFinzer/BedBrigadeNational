@@ -10,6 +10,7 @@ using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,10 @@ namespace BedBrigade.Client
 {
     public static class StartupLogic
     {
+        private const string DataProtectionApplicationName = "BedBrigadeNational";
+        private const string DataProtectionKeysDirectoryName = "DataProtection-Keys";
+        private const string DataProtectionKeysPathConfigKey = "DataProtection:KeysPath";
+        private const string DataProtectionKeysPathEnvironmentVariable = "BedBrigadeDataProtectionKeysPath";
         private static ServiceProvider _svcProvider;
 
         public static void LoadConfiguration(WebApplicationBuilder builder)
@@ -93,6 +98,8 @@ namespace BedBrigade.Client
                 .AddInteractiveServerComponents();
 
             builder.Services.AddHttpContextAccessor();
+
+            ConfigureDataProtection(builder);
 
             builder.Services.AddDbContextFactory<DataContext>(options =>
             {
@@ -180,6 +187,71 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+        }
+
+        private static void ConfigureDataProtection(WebApplicationBuilder builder)
+        {
+            ArgumentNullException.ThrowIfNull(builder);
+
+            Log.Logger.Information("ConfigureDataProtection");
+            string keysPath = ResolveDataProtectionKeysPath(builder);
+
+            try
+            {
+                DirectoryInfo keysDirectory = Directory.CreateDirectory(keysPath);
+                builder.Services
+                    .AddDataProtection()
+                    .SetApplicationName(DataProtectionApplicationName)
+                    .PersistKeysToFileSystem(keysDirectory);
+
+                Log.Logger.Information("ASP.NET Core data protection keys persisted to {KeysPath}", keysDirectory.FullName);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Unable to initialize the ASP.NET Core data protection key directory at {KeysPath}", keysPath);
+                throw;
+            }
+        }
+
+        private static string ResolveDataProtectionKeysPath(WebApplicationBuilder builder)
+        {
+            ArgumentNullException.ThrowIfNull(builder);
+
+            string? configuredPath = Environment.GetEnvironmentVariable(DataProtectionKeysPathEnvironmentVariable);
+            if (string.IsNullOrWhiteSpace(configuredPath))
+            {
+                configuredPath = builder.Configuration[DataProtectionKeysPathConfigKey];
+            }
+
+            if (!string.IsNullOrWhiteSpace(configuredPath))
+            {
+                return NormalizeDataProtectionKeysPath(builder, configuredPath);
+            }
+
+            string parentDirectory = Directory.GetParent(builder.Environment.ContentRootPath)?.FullName
+                ?? builder.Environment.ContentRootPath;
+            return Path.GetFullPath(Path.Combine(parentDirectory, DataProtectionKeysDirectoryName));
+        }
+
+        private static string NormalizeDataProtectionKeysPath(WebApplicationBuilder builder, string configuredPath)
+        {
+            ArgumentNullException.ThrowIfNull(builder);
+            ArgumentException.ThrowIfNullOrWhiteSpace(configuredPath);
+
+            string expandedPath = configuredPath.Trim();
+            if (expandedPath == "~")
+            {
+                expandedPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
+            else if (expandedPath.StartsWith("~/", StringComparison.Ordinal))
+            {
+                string relativeToHome = expandedPath[2..].Replace('/', Path.DirectorySeparatorChar);
+                expandedPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), relativeToHome);
+            }
+
+            return Path.IsPathRooted(expandedPath)
+                ? Path.GetFullPath(expandedPath)
+                : Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, expandedPath));
         }
 
         private static void CommonLogic(WebApplicationBuilder builder)
