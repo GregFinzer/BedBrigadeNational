@@ -62,4 +62,9 @@
     </Content>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\Administration\Schedule\Deliveries.razor" />
+  </ItemGroup>
+
 </Project>

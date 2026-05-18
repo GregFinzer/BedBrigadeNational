@@ -203,6 +203,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IIFrameControlService, IFrameControlService>();
             builder.Services.AddScoped<IdleLogoutService>();
             builder.Services.AddScoped<IAdminMenuService, AdminMenuService>();
+            builder.Services.AddScoped<IUploadAuthorizationService, UploadAuthorizationService>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)

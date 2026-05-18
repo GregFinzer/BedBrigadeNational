@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using BedBrigade.Client.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using Serilog;
 
 namespace ImageUpload.Controllers
 {
@@ -15,22 +16,22 @@ namespace ImageUpload.Controllers
     public class ImageController : ControllerBase
     {
         private readonly IWebHostEnvironment hostingEnv;
-        private readonly IAuthService _authService;
         private readonly ILoadImagesService _loadImageService;
         private readonly ILocationDataService _svcLocation;
         private readonly ICachingService _cachingService;
+        private readonly IUploadAuthorizationService _uploadAuthorizationService;
 
         public ImageController(IWebHostEnvironment env, 
             ILocationDataService location, 
             ICachingService cachingService, 
-            IAuthService authService,
-            ILoadImagesService loadImageService)
+            ILoadImagesService loadImageService,
+            IUploadAuthorizationService uploadAuthorizationService)
         {
             hostingEnv = env;
             _svcLocation = location;
             _cachingService = cachingService;
-            _authService = authService;
             _loadImageService = loadImageService;
+            _uploadAuthorizationService = uploadAuthorizationService;
         }
 
         [Route("Save/{id:int}/{contentType}/{contentName}")]
@@ -40,9 +41,27 @@ namespace ImageUpload.Controllers
             int id,
             string contentType,
             string contentName,
-            [FromQuery] bool convertImages = true)
+            [FromQuery] bool convertImages = true,
+            [FromQuery] string? uploadToken = null)
         {
+            if (!_uploadAuthorizationService.TryValidateImageUploadToken(uploadToken ?? string.Empty, id, contentType,
+                    contentName, out string errorMessage))
+            {
+                Log.Warning("Unauthorized image upload attempt for location {LocationId}, contentType {ContentType}, contentName {ContentName}", id, contentType, contentName);
+                return Unauthorized(new { message = errorMessage });
+            }
+
+            if (!IsSafePathSegment(contentType) || !IsSafePathSegment(contentName))
+            {
+                return BadRequest(new { message = "Invalid upload target path." });
+            }
+
             var result = await _svcLocation.GetByIdAsync(id);
+            if (!result.Success || result.Data == null)
+            {
+                return NotFound(new { message = "Location not found." });
+            }
+
             var locationRoute = result.Success ? result.Data.Route.TrimStart('/') : string.Empty;
 
             var targetDir = Path.Combine(
@@ -55,9 +74,15 @@ namespace ImageUpload.Controllers
             IFormFile file = uploadFiles.FirstOrDefault();
             if (file is null) return BadRequest(new { message = "No file." });
 
-            var rawFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+            var rawFileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName?.Trim('"') ?? file.FileName;
+            var safeFileName = Path.GetFileName(rawFileName);
 
-            var targetPath = Path.Combine(targetDir, rawFileName);
+            if (string.IsNullOrWhiteSpace(safeFileName) || !string.Equals(rawFileName, safeFileName, StringComparison.Ordinal))
+            {
+                return BadRequest(new { message = "Invalid file name." });
+            }
+
+            var targetPath = Path.Combine(targetDir, safeFileName);
 
             using (var targetStream = new FileStream(targetPath, FileMode.Create))
             {
@@ -147,6 +172,18 @@ namespace ImageUpload.Controllers
 
             _cachingService.ClearByEntityName(Defaults.GetFilesCacheKey);
             return filename;
+        }
+
+        private static bool IsSafePathSegment(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Contains("..", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return string.Equals(value, Path.GetFileName(value), StringComparison.Ordinal)
+                   && !value.Contains('/')
+                   && !value.Contains('\\');
         }
 
 

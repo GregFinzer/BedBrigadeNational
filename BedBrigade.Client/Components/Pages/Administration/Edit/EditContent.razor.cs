@@ -26,6 +26,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         [Inject] private ICachingService _svcCaching { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
         [Inject] private ITranslationProcessorDataService _svcTranslationProcessorDataService { get; set; }
+        [Inject] private IUploadAuthorizationService UploadAuthorizationService { get; set; }
 
         [Parameter] public int LocationId { get; set; }
         [Parameter] public string ContentName { get; set; }
@@ -51,6 +52,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private string _mediaFolder;
         private List<string> _allowedImageExtensions = new List<string>();
         private bool _enableFolderOperations = false;
+        private string _uploadToken = string.Empty;
 
         private List<ToolbarItemModel> Tools = new List<ToolbarItemModel>()
         {
@@ -167,6 +169,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                     {
                         _subdirectory = "pages";
                     }
+
+                    _uploadToken = UploadAuthorizationService.CreateImageUploadToken(LocationId, _subdirectory, ContentName);
                    
                     SetPaths();
                     _contentRootPath = FileUtil.GetMediaDirectory(LocationRoute);
@@ -223,12 +227,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
         private void SetPaths()
         {
             ImagePath = $"media/{LocationRoute}/{_subdirectory}/{ContentName}/"; // VS 8/25/2024
-            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}&uploadToken={Uri.EscapeDataString(_uploadToken)}";
         }
 
         private void UpdateSaveUrl()
         {
-            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}";
+            SaveUrl = $"api/image/save/{LocationId}/{_subdirectory}/{ContentName}?convertImages={(ConvertImages ? TrueConst : FalseConst)}&uploadToken={Uri.EscapeDataString(_uploadToken)}";
         }
 
         private void OnImageUploadSuccess(ImageSuccessEventArgs args)
