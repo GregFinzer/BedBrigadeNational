@@ -10,23 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/DirectorySyncLogic.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/HtmlContentPathNormalizer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/CarouselServiceTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/DirectorySyncLogicTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Footer.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Footer.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Header.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Header.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Donations.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Donations.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Index.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Index.razor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Services/CarouselService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Services/CarouselService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Logic/FileUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/FileUtil.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedContentsLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedContentsLogic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisAboutUs.html" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisAboutUs.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisFooter.html" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisFooter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisHeader.html" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisHeader.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisHome.html" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Data/Data/Seeding/SeedHtml/PolarisHome.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BedBrigade.Tests/BedBrigade.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Tests/BedBrigade.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/ImageRotator.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/ImageRotator.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/ImageRotator.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/ImageRotator.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Blog.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Blog.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/RotatorContainer.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/RotatorContainer.razor" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +24,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="c9cb7fc1-0dcf-4fea-a532-7de5925ce61f" />
+        <option name="activeSessionId" value="88580f48-139b-4a7c-b8de-7f914f01cba6" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -126,6 +114,15 @@
           <session>
             <option name="chatType" value="PANEL" />
             <option name="id" value="c9cb7fc1-0dcf-4fea-a532-7de5925ce61f" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="88580f48-139b-4a7c-b8de-7f914f01cba6" />
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="gpt-5.4" />
@@ -295,7 +292,7 @@
       <workItem from="1778530679544" duration="2304000" />
       <workItem from="1778606321919" duration="7143000" />
       <workItem from="1778673418561" duration="12600000" />
-      <workItem from="1779112552742" duration="4438000" />
+      <workItem from="1779112552742" duration="5284000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />
