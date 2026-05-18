@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Data.Seeding;
 using BedBrigade.Data.Services;
@@ -74,7 +75,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success)
             {
-                footerContent = contentResult.Data.ContentHtml;
+                footerContent = HtmlContentPathNormalizer.NormalizeSeededPaths(contentResult.Data.ContentHtml);
             }
             else
             {
@@ -94,7 +95,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                footerContent = contentResult.Data.ContentHtml;
+                footerContent = HtmlContentPathNormalizer.NormalizeSeededPaths(contentResult.Data.ContentHtml);
             }
             else
             {

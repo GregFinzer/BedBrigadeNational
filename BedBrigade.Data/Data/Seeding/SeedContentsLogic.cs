@@ -144,6 +144,7 @@ public static class SeedContentsLogic
         {
             seedHtml = seedHtml.Replace("%%LocationRoute%%", location.Route.TrimStart('/'));
             seedHtml = seedHtml.Replace("%%LocationName%%", location.Name);
+            seedHtml = HtmlContentPathNormalizer.NormalizeSeededPaths(seedHtml);
             seedHtml = seedHtml.Replace("Bed Brigade Bed Brigade", "Bed Brigade");
             seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
         }
@@ -181,12 +182,11 @@ public static class SeedContentsLogic
             Directory.CreateDirectory(mediaPath);
         }
 
-        string logoPath = Path.Combine(mediaPath, "national", "logo.png");
-        if (!File.Exists(logoPath))
-        {
-            string seedDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
-            FileUtil.CopyDirectory($"{seedDirectory}/SeedImages", mediaPath);
-        }
+        string seedDirectory = Common.Logic.FileUtil.GetSeedingDirectory();
+        string seedImagesPath = Path.Combine(seedDirectory, "SeedImages");
+        string resolvedSeedImagesPath = FileUtil.ResolveCaseInsensitivePath(seedImagesPath) ?? seedImagesPath;
+
+        DirectorySyncLogic.CopyMissingFilesAndDirectories(resolvedSeedImagesPath, mediaPath);
     }
 
     private static async Task SeedHeader(DataContext context, List<Location> locations)

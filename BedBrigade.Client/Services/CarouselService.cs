@@ -1,7 +1,10 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Hosting;
+using Serilog;
 
 namespace BedBrigade.Client.Services
 {
@@ -10,16 +13,25 @@ namespace BedBrigade.Client.Services
     public class CarouselService : ICarouselService
     {
         private readonly ICachingService _cachingService;
+        private readonly string _webRootPath;
         private const string _pattern = "<div\\s+data-component=\\\"bbcarousel\\\"\\s+id=\\\"(.*?)\\\"\\s+src=\\\"(.*?)\\\".*?>.*?</div>";
         private static readonly Regex _regex = new Regex(_pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public CarouselService(ICachingService cachingService)
+        public CarouselService(ICachingService cachingService, IWebHostEnvironment hostingEnv)
         {
             _cachingService = cachingService;
+            _webRootPath = !string.IsNullOrWhiteSpace(hostingEnv.WebRootPath)
+                ? hostingEnv.WebRootPath
+                : Path.Combine(hostingEnv.ContentRootPath, "wwwroot");
         }
 
         public string ReplaceCarousel(string htmlText)
         {
+            if (string.IsNullOrWhiteSpace(htmlText))
+            {
+                return string.Empty;
+            }
+
             var tags = GetBbCarouselTags(htmlText);
 
             if (!tags.Any())
@@ -28,6 +40,12 @@ namespace BedBrigade.Client.Services
             foreach (var tag in tags)
             {
                 var images = GetImages(tag.Src);
+                if (images.Count == 0)
+                {
+                    Log.Warning("Carousel directory not found or empty for {CarouselSource}", tag.Src);
+                    continue;
+                }
+
                 htmlText = htmlText.Replace(tag.Tag, GenerateCarouselHtml(tag.Id, images));
             }
 
@@ -36,7 +54,10 @@ namespace BedBrigade.Client.Services
 
         private List<string> GetImages(string subDirectory)
         {
-            string directory = Path.Combine("wwwroot", subDirectory.Replace('/', Path.DirectorySeparatorChar));
+            string normalizedSubDirectory = NormalizeSubDirectory(subDirectory);
+            string contentRootPath = Path.GetDirectoryName(_webRootPath) ?? string.Empty;
+            string directory = MediaPathUtil.ResolveExistingMediaPath(contentRootPath, normalizedSubDirectory)
+                               ?? Path.Combine(_webRootPath, normalizedSubDirectory.Replace('/', Path.DirectorySeparatorChar));
             string cacheKey = _cachingService.BuildCacheKey(Defaults.GetFilesCacheKey, directory);
 
             List<string>? cachedFiles = _cachingService.Get<List<string>?>(cacheKey);
@@ -47,13 +68,48 @@ namespace BedBrigade.Client.Services
 
             if (Directory.Exists(directory))
             {
-                var fileNames = Directory.GetFiles(directory).ToList();
+                var fileNames = Directory.GetFiles(directory)
+                    .Select(ToWebRelativePath)
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .ToList();
                 _cachingService.Set(cacheKey, fileNames);
                 return fileNames;
             }
 
             _cachingService.Set(cacheKey, new List<string>());
             return new List<string>();
+        }
+
+        private string ToWebRelativePath(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return string.Empty;
+            }
+
+            string relativePath = Path.GetRelativePath(_webRootPath, filePath)
+                .Replace('\\', '/');
+
+            return relativePath.StartsWith("/", StringComparison.Ordinal)
+                ? relativePath
+                : "/" + relativePath;
+        }
+
+        private static string NormalizeSubDirectory(string subDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(subDirectory))
+            {
+                return string.Empty;
+            }
+
+            string normalized = subDirectory.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '/', '\\');
+
+            if (normalized.StartsWith("media/", StringComparison.OrdinalIgnoreCase))
+            {
+                return normalized.Substring("media/".Length);
+            }
+
+            return normalized;
         }
 
         private List<(string Tag, string Id, string Src)> GetBbCarouselTags(string htmlText)
@@ -105,11 +161,7 @@ namespace BedBrigade.Client.Services
             for (int i = 0; i < imagePaths.Count; i++)
             {
                 html.AppendLine($"    <div class=\"carousel-item{(i == 0 ? " active" : "")}\">");
-                string imagePath = imagePaths[i];
-                imagePath = imagePath.Replace("wwwroot\\", "");
-                imagePath = imagePath.Replace("\\", "/");
-
-                html.AppendLine($"      <img src=\"{imagePath}\" class=\"d-block w-100\" alt=\"Slide {i + 1}\">");
+                html.AppendLine($"      <img src=\"{imagePaths[i]}\" class=\"d-block w-100\" alt=\"Slide {i + 1}\">");
                 html.AppendLine("    </div>");
             }
 
