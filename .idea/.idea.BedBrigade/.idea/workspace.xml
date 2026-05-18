@@ -10,7 +10,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7834d8be-2d20-4e10-8861-0a9e335d87ab" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/MediaPathUtil.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BedBrigade.Tests/MediaPathUtilTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BedBrigade/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/MediaManager.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/MediaManager.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Edit/EditContent.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Components/Pages/Administration/Edit/EditContent.razor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Controllers/ImageController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Controllers/ImageController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/Services/LoadImagesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/Services/LoadImagesService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Client/StartupLogic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BedBrigade.Common/Logic/FileUtil.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BedBrigade.Common/Logic/FileUtil.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Documentation/DeleteAllData.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/DeleteAllData.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +29,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="c1eabaf6-2a2b-4f4e-81d4-43653f18b6be" />
+        <option name="activeSessionId" value="ccf83fd1-f791-43b0-a5b3-3d6f65511151" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -82,6 +91,31 @@
             <option name="status" value="Completed" />
             <option name="targetType" value="LOCAL" />
           </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="eb9f4e93-bae2-480b-9e6d-c21773176f64" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="c6266820-e68d-4d7a-8f9f-2e103934b530" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="ccf83fd1-f791-43b0-a5b3-3d6f65511151" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="gpt-5.4" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
         </option>
         <option name="type" value="PANEL" />
       </chat>
@@ -125,6 +159,7 @@
     <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/ConfigurationTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/EncryptUtilTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/LoginLockoutLogicTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BedBrigade.Tests/MediaPathUtilTests.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -240,6 +275,7 @@
       <workItem from="1778530679544" duration="2304000" />
       <workItem from="1778606321919" duration="7143000" />
       <workItem from="1778673418561" duration="12600000" />
+      <workItem from="1779112552742" duration="1847000" />
     </task>
     <task id="LOCAL-00001" summary="Fixes for queue delivery reminder email">
       <option name="closed" value="true" />

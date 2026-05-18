@@ -345,8 +345,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
 
         private async Task HandleImageButtonClick(string itemValue)
         {
-            FolderPath = _contentRootPath + $"\\{_subdirectory}\\{ContentName}\\{itemValue}";
-            FolderPath = FolderPath.TrimEnd('\\');
+            FolderPath = Path.Combine(_contentRootPath, _subdirectory, ContentName, itemValue)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             await OpenDialog();
         }
 
@@ -391,7 +391,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.Edit
                 }
 
                 string fileName = file.Name;
-                string path = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName, fileName);
+                string targetDirectory = Path.Combine(FileUtil.GetMediaDirectory(LocationRoute.TrimStart('/')), _subdirectory, ContentName);
+                Directory.CreateDirectory(targetDirectory);
+                string path = Path.Combine(targetDirectory, fileName);
                 using (FileStream fs = System.IO.File.Create(path))
                     await file.OpenReadStream(_maxFileSize).CopyToAsync(fs);
 

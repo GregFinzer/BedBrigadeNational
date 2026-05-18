@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp.Formats.Webp;
 using System.Net.Http.Headers;
 using BedBrigade.Client.Services;
+using BedBrigade.Common.Logic;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Serilog;
@@ -64,11 +65,7 @@ namespace ImageUpload.Controllers
 
             var locationRoute = result.Success ? result.Data.Route.TrimStart('/') : string.Empty;
 
-            var targetDir = Path.Combine(
-                hostingEnv.ContentRootPath, "wwwroot", "media", locationRoute, contentType, contentName);
-
-            if (!Directory.Exists(targetDir))
-                Directory.CreateDirectory(targetDir);
+            var targetDir = MediaPathUtil.GetMediaDirectory(hostingEnv.ContentRootPath, locationRoute, contentType, contentName);
 
             // Syncfusion uploader may batch; return the first (or build an array if you want)
             IFormFile file = uploadFiles.FirstOrDefault();

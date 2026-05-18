@@ -29,8 +29,7 @@ namespace BedBrigade.Common.Logic
             directoryName = directoryName.TrimStart('/').TrimStart('\\');
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             baseDirectory = GetPathBeforeBin(baseDirectory);
-            string result = Path.Combine(baseDirectory, "wwwroot", "Media", directoryName);
-            return result;
+            return MediaPathUtil.GetMediaDirectory(baseDirectory, directoryName);
         }
 
         private static string GetPathBeforeBin(string filePath)
