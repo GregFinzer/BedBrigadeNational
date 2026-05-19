@@ -8,7 +8,9 @@ namespace BedBrigade.Common.Logic
     {
         private static Dictionary<string, string> _caseInsensitiveCache = new Dictionary<string, string>();
         private const string BinDirectoryName = "bin";
+        private const string DataDirectoryName = "Data";
         private const string LocalDirectoryName = ".local";
+        private const string SeedingDirectoryName = "Seeding";
         
         public static string BuildFileNameWithDate(string prefix, string extension)
         {
@@ -122,15 +124,15 @@ namespace BedBrigade.Common.Logic
             baseDirectory = GetPathBeforeBin(baseDirectory);
             List<string> candidatePaths =
             [
-                Path.Combine(baseDirectory, "BedBrigade.Data", "Data", "Seeding"),
-                Path.Combine(baseDirectory, "Data", "Seeding"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeding"),
-                Path.Combine(Environment.CurrentDirectory, "BedBrigade.Data", "Data", "Seeding")
+                Path.Combine(baseDirectory, "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(baseDirectory, DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(Environment.CurrentDirectory, "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName)
             ];
 
             try
             {
-                candidatePaths.Insert(0, Path.Combine(GetSolutionPath(), "BedBrigade.Data", "Data", "Seeding"));
+                candidatePaths.Insert(0, Path.Combine(GetSolutionPath(), "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName));
             }
             catch (DirectoryNotFoundException)
             {

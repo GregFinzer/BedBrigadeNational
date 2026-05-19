@@ -7,6 +7,7 @@ namespace BedBrigade.Common.Logic
     {
         private const string LowerMediaDirectoryName = "media";
         private const string UpperMediaDirectoryName = "Media";
+        private const string WebRootDirectoryName = "wwwroot";
 
         /// <summary>
         /// Gets an existing media directory or file path when one can be resolved, otherwise creates the target directory under the preferred media root.
@@ -75,13 +76,13 @@ namespace BedBrigade.Common.Logic
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(baseDirectory);
 
-            string lowercaseMediaRoot = Path.Combine(baseDirectory, "wwwroot", LowerMediaDirectoryName);
+            string lowercaseMediaRoot = Path.Combine(baseDirectory, WebRootDirectoryName, LowerMediaDirectoryName);
             if (Directory.Exists(lowercaseMediaRoot))
             {
                 return lowercaseMediaRoot;
             }
 
-            string uppercaseMediaRoot = Path.Combine(baseDirectory, "wwwroot", UpperMediaDirectoryName);
+            string uppercaseMediaRoot = Path.Combine(baseDirectory, WebRootDirectoryName, UpperMediaDirectoryName);
             if (Directory.Exists(uppercaseMediaRoot))
             {
                 return uppercaseMediaRoot;
@@ -99,8 +100,8 @@ namespace BedBrigade.Common.Logic
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(baseDirectory);
 
-            string lowercaseMediaRoot = Path.Combine(baseDirectory, "wwwroot", LowerMediaDirectoryName);
-            string uppercaseMediaRoot = Path.Combine(baseDirectory, "wwwroot", UpperMediaDirectoryName);
+            string lowercaseMediaRoot = Path.Combine(baseDirectory, WebRootDirectoryName, LowerMediaDirectoryName);
+            string uppercaseMediaRoot = Path.Combine(baseDirectory, WebRootDirectoryName, UpperMediaDirectoryName);
 
             if (string.Equals(lowercaseMediaRoot, uppercaseMediaRoot, StringComparison.Ordinal))
             {
