@@ -152,7 +152,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                _headerContent = contentResult.Data.ContentHtml;
+                _headerContent = HtmlContentPathNormalizer.NormalizeSeededPaths(contentResult.Data.ContentHtml);
             }
             else
             {
@@ -172,7 +172,7 @@ namespace BedBrigade.Client.Components
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                _headerContent = contentResult.Data.ContentHtml;
+                _headerContent = HtmlContentPathNormalizer.NormalizeSeededPaths(contentResult.Data.ContentHtml);
             }
             else
             {

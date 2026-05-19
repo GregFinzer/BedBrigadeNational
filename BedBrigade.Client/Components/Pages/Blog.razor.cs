@@ -25,6 +25,7 @@ namespace BedBrigade.Client.Components.Pages
         
         private string? previousLocation;
         private string? previousBlogType;
+        private string? previousFilter;
 
         [Parameter]
         public string LocationRoute { get; set; } = default!;
@@ -103,25 +104,29 @@ namespace BedBrigade.Client.Components.Pages
         protected override async Task OnParametersSetAsync()
         {
             _locationState.Location = LocationRoute;
+            SetParameters();
 
             //Set to current values first time through
             if (String.IsNullOrEmpty(previousLocation) || String.IsNullOrEmpty(previousBlogType))
             {
                 previousLocation = LocationRoute;
                 previousBlogType = BlogType;
+                previousFilter = Filter;
                 return;
             }   
 
-            bool anythingChanged = LocationRoute != previousLocation || BlogType != previousBlogType;
+            bool anythingChanged = LocationRoute != previousLocation
+                                   || BlogType != previousBlogType
+                                   || Filter != previousFilter;
 
             if (anythingChanged)
             {
                 previousLocation = LocationRoute;
                 previousBlogType = BlogType;
+                previousFilter = Filter;
 
                 await LoadData();
                 await PerformTranslations();
-                StateHasChanged();
             }
         }
 

@@ -68,6 +68,14 @@ namespace BedBrigade.Client.Components
             get { return _mediaFolderPath + @CurrentFolderPath.Replace(RootFolder, ""); }
         }
 
+        private bool IsProtectedFolder(string folderPath)
+        {
+            string normalizedPath = Path.TrimEndingDirectorySeparator(folderPath);
+            string folderName = Path.GetFileName(normalizedPath);
+            return _protectedFolders.Any(protectedFolder =>
+                string.Equals(folderName, protectedFolder, StringComparison.OrdinalIgnoreCase));
+        }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -298,7 +306,7 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-                if (_protectedFolders.Any(o => CurrentFolderPath.EndsWith("\\" + o)))
+                if (IsProtectedFolder(CurrentFolderPath))
                 {
                     await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,
                         "This is a protected folder and cannot be deleted.");
@@ -441,7 +449,9 @@ namespace BedBrigade.Client.Components
         {
             var targetPath = Path.Combine(CurrentFolderPath, file.Name);
 
-            if (!AllowedExtensions.Contains(Path.GetExtension(file.Name)))
+            string extension = Path.GetExtension(file.Name).ToLowerInvariant();
+            if (!AllowedExtensions.Any(allowedExtension =>
+                    string.Equals(allowedExtension, extension, StringComparison.OrdinalIgnoreCase)))
             {
                 IsUploading = false;
                 await MyModal.Show(Modal.ModalType.Alert, Modal.ModalIcon.Warning, ErrorTitle,

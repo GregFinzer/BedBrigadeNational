@@ -4,21 +4,21 @@
             <div class="slider-angle slider-angle-1 widget widget-align-justify widget-size-33">
                 <div class="Container carousel-inner" style="background-color:#ffffff;">
                     <section class="flow">
-                        <ImageRotator myId="leftImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                        <ImageRotator ImageId="leftImageRotator" Location="@LocationId.ToString()" ImagePath="@(ImagePath ?? string.Empty)"></ImageRotator>
                     </section>
                 </div>
             </div>
             <div class="slider-angle slider-angle-2 widget widget-align-justify widget-size-33">
                 <div class="Container carousel-inner" style="background-color:#ffffff;">
                     <section class="flow">
-                        <ImageRotator myId="middleImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                        <ImageRotator ImageId="middleImageRotator" Location="@LocationId.ToString()" ImagePath="@(ImagePath ?? string.Empty)"></ImageRotator>
                     </section>
                 </div>
             </div>
             <div class="slider-angle slider-angle-3 widget widget-align-justify widget-size-33">
                 <div class="Container carousel-inner" style="background-color:#ffffff;">
                     <section class="flow">
-                        <ImageRotator myId="rightImageRotator" mylocation="@LocationId.ToString()" myPath="@ImagePath"></ImageRotator>
+                        <ImageRotator ImageId="rightImageRotator" Location="@LocationId.ToString()" ImagePath="@(ImagePath ?? string.Empty)"></ImageRotator>
                     </section>
                 </div>
             </div>
@@ -47,7 +47,7 @@
     [Parameter]
     public string? ImagePath { get; set; }
     [Parameter]
-    public bool SmallHeaderMobile { get; set; } = false;
+    public bool SmallHeaderMobile { get; set; }
 
     public string HideOnSmallClass { get; set; } = string.Empty;
     public string ShowOnSmallClass { get; set; } = string.Empty;

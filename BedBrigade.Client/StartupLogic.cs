@@ -203,6 +203,7 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IIFrameControlService, IFrameControlService>();
             builder.Services.AddScoped<IdleLogoutService>();
             builder.Services.AddScoped<IAdminMenuService, AdminMenuService>();
+            builder.Services.AddScoped<IUploadAuthorizationService, UploadAuthorizationService>();
         }
 
         private static void DataServices(WebApplicationBuilder builder)
@@ -425,10 +426,12 @@ namespace BedBrigade.Client
                 return null;
             }
 
+            string baseDirectory = Path.GetDirectoryName(webRootPath) ?? string.Empty;
             string remainder = requestPath.Substring(MediaPrefix.Length).TrimStart('/');
-            string mediaRoot = Path.Combine(webRootPath, "Media");
-            string combinedPath = Path.Combine(mediaRoot, remainder);
-            string? physicalPath = FileUtil.ResolveCaseInsensitivePath(combinedPath);
+            string[] segments = string.IsNullOrWhiteSpace(remainder)
+                ? []
+                : remainder.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string? physicalPath = MediaPathUtil.ResolveExistingMediaPath(baseDirectory, segments);
             
             if (string.IsNullOrWhiteSpace(physicalPath))
             {
