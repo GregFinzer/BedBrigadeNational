@@ -7,6 +7,7 @@ using Serilog;
 using System.Globalization;
 using BedBrigade.Common.Models;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Client.Components.Pages;
 
@@ -278,6 +279,7 @@ public partial class Index : ComponentBase, IDisposable
 
     private async Task<string> ReplaceHtmlControls(string path, ServiceResponse<Location> locationResponse, string html)
     {
+        html = HtmlContentPathNormalizer.NormalizeSeededPaths(html);
         html = _loadImagesService.SetImagesForHtml(path, html);
         html = _carouselService.ReplaceCarousel(html);
         html = await _scheduleControlService.ReplaceScheduleControl(html, locationResponse.Data.LocationId);

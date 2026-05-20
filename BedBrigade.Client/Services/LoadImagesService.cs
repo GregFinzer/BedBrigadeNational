@@ -16,7 +16,6 @@ namespace BedBrigade.Client.Services
         private readonly IConfigurationDataService _configurationDataService;
         private readonly ICachingService _cachingService;
         private readonly IWebHostEnvironment _hostingEnv;
-        private readonly string _mediaDirectory;
         private readonly string _webRootPath;
         private const string imageRotatorTag = "ImageRotator";
 
@@ -30,7 +29,6 @@ namespace BedBrigade.Client.Services
             _webRootPath = !string.IsNullOrWhiteSpace(_hostingEnv.WebRootPath)
                 ? _hostingEnv.WebRootPath
                 : Path.Combine(_hostingEnv.ContentRootPath, "wwwroot");
-            _mediaDirectory = Path.Combine(_webRootPath, "media");
         }
 
         public async Task<string> ConvertToWebp(string targetPath)
@@ -120,25 +118,13 @@ namespace BedBrigade.Client.Services
         public void EnsureDirectoriesExist(string path, string html)
         {
             string normalizedPath = NormalizeMediaPath(path);
-            //Ensure directory exists for the path
-            string directory = Path.Combine(_mediaDirectory, normalizedPath);
-            directory = directory.Replace("//", "/");
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
+            MediaPathUtil.GetMediaDirectory(_hostingEnv.ContentRootPath, normalizedPath);
 
             //Ensure directory exists for each image rotator
             List<string> imgIds = GetImgIdsWithRotator(html);
             foreach (var imgId in imgIds)
             {
-                directory = Path.Combine(_mediaDirectory, normalizedPath, imgId);
-                directory = directory.Replace("//", "/");
-
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+                MediaPathUtil.GetMediaDirectory(_hostingEnv.ContentRootPath, normalizedPath, imgId);
             }
         }
 
@@ -300,9 +286,8 @@ namespace BedBrigade.Client.Services
         public string GetDirectoryForPathAndArea(string path, string area)
         {
             string normalizedPath = NormalizeMediaPath(path);
-            string directory = Path.Combine(_mediaDirectory, normalizedPath, area);
-            directory = directory.Replace("//", "/");
-            return directory;
+            return MediaPathUtil.ResolveExistingMediaPath(_hostingEnv.ContentRootPath, normalizedPath, area)
+                   ?? Path.Combine(MediaPathUtil.GetPreferredMediaRoot(_hostingEnv.ContentRootPath), normalizedPath, area);
         }
 
         private static string NormalizeMediaPath(string path)

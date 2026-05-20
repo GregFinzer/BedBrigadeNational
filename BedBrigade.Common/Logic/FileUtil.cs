@@ -8,7 +8,9 @@ namespace BedBrigade.Common.Logic
     {
         private static Dictionary<string, string> _caseInsensitiveCache = new Dictionary<string, string>();
         private const string BinDirectoryName = "bin";
+        private const string DataDirectoryName = "Data";
         private const string LocalDirectoryName = ".local";
+        private const string SeedingDirectoryName = "Seeding";
         
         public static string BuildFileNameWithDate(string prefix, string extension)
         {
@@ -29,8 +31,7 @@ namespace BedBrigade.Common.Logic
             directoryName = directoryName.TrimStart('/').TrimStart('\\');
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             baseDirectory = GetPathBeforeBin(baseDirectory);
-            string result = Path.Combine(baseDirectory, "wwwroot", "Media", directoryName);
-            return result;
+            return MediaPathUtil.GetMediaDirectory(baseDirectory, directoryName);
         }
 
         private static string GetPathBeforeBin(string filePath)
@@ -120,40 +121,35 @@ namespace BedBrigade.Common.Logic
         public static string GetSeedingDirectory()
         {
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            Console.WriteLine($"DEBUG: AppDomain.CurrentDomain.BaseDirectory = {baseDirectory}");
-            
             baseDirectory = GetPathBeforeBin(baseDirectory);
-            Console.WriteLine($"DEBUG: After GetPathBeforeBin = {baseDirectory}");
-            
-            // Try the standard seeding directory path relative to the solution root
-            string seedingPath = Path.Combine(baseDirectory, "BedBrigade.Data", "Data", "Seeding");
-            Console.WriteLine($"DEBUG: Trying seedingPath = {seedingPath}, exists = {Directory.Exists(seedingPath)}");
+            List<string> candidatePaths =
+            [
+                Path.Combine(baseDirectory, "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(baseDirectory, DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectoryName, SeedingDirectoryName),
+                Path.Combine(Environment.CurrentDirectory, "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName)
+            ];
 
-            if (Directory.Exists(seedingPath))
+            try
             {
-                return seedingPath;
+                candidatePaths.Insert(0, Path.Combine(GetSolutionPath(), "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName));
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Ignore solution lookup failures and continue with deployment/runtime fallbacks.
             }
 
-            // Fallback: try relative path for local development
-            string localFilePath = "../BedBrigade.Data/Data/Seeding";
-            Console.WriteLine($"DEBUG: Trying localFilePath = {localFilePath}, exists = {Directory.Exists(localFilePath)}");
-
-            if (Directory.Exists(localFilePath))
+            foreach (string candidatePath in candidatePaths.Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                Console.WriteLine($"DEBUG: Returning localFilePath");
-                return localFilePath;
+                string? resolvedPath = ResolveCaseInsensitivePath(candidatePath);
+                if (!string.IsNullOrWhiteSpace(resolvedPath) && Directory.Exists(resolvedPath))
+                {
+                    return resolvedPath;
+                }
             }
 
-            // Fallback: try deployed path in bin directory
-            string deployedFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Seeding");
-            Console.WriteLine($"DEBUG: Trying deployedFilePath = {deployedFilePath}, exists = {Directory.Exists(deployedFilePath)}");
-
-            if (Directory.Exists(deployedFilePath))
-            {
-                return deployedFilePath;
-            }
-
-            throw new DirectoryNotFoundException($"Seeding directory not found. Tried: {seedingPath}, {localFilePath}, {deployedFilePath}. Current directory is: {AppDomain.CurrentDomain.BaseDirectory}");
+            throw new DirectoryNotFoundException(
+                $"Seeding directory not found. Tried: {string.Join(", ", candidatePaths)}. Current directory is: {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
         public static void CreateLocationMediaDirectory(Location location)

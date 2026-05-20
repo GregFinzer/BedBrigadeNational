@@ -162,6 +162,7 @@ public partial class Donations : ComponentBase, IDisposable
 
     private async Task<string> ReplaceHtmlControls(string path, string html)
     {
+        html = HtmlContentPathNormalizer.NormalizeSeededPaths(html);
         html = _loadImagesService.SetImagesForHtml(path, html);
         html = _carouselService.ReplaceCarousel(html);
         html = _iFrameControlService.ReplaceiFrames(html);

@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BedBrigade.Client\BedBrigade.Client.csproj" />
     <ProjectReference Include="..\BedBrigade.Common\BedBrigade.Common.csproj" />
   </ItemGroup>
 
