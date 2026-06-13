@@ -192,6 +192,14 @@ else
                             <div class="form-group">
                                 <SfDropDownList TItem="BedRequestEnumItem" TValue="BedRequestStatus" DataSource=@BedRequestStatuses @bind-Value=@Model.Status Enabled="true" Placeholder="@_lc.Keys["Status"]" FloatLabelType="FloatLabelType.Auto">
                                     <DropDownListFieldSettings Text="Name" Value="Value" />
+                                    <DropDownListEvents TValue="BedRequestStatus" TItem="BedRequestEnumItem" ValueChange="OnStatusChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            </div>
+                            <div class="form-group">
+                                <label for="scheduleId" class="formlabel">Delivery Event</label>
+                                <SfDropDownList ID="scheduleId" TItem="Schedule" TValue="int?" DataSource="FutureDeliverySchedules" @bind-Value="Model.ScheduleId" Enabled="true" Placeholder="Select Delivery Event" FloatLabelType="FloatLabelType.Never">
+                                    <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect" />
+                                    <DropDownListEvents TValue="int?" TItem="Schedule" ValueChange="OnScheduleChange"></DropDownListEvents>
                                 </SfDropDownList>
                             </div>
                             <div class="form-group">

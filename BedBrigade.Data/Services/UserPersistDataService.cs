@@ -91,7 +91,14 @@ namespace BedBrigade.Data.Services
                         return new ServiceResponse<string>("No persist data found", false, null);
                     }
 
-                    _cachingService.Set(cacheKey, result.Data);
+                    // Keep cache type consistent with Get<UserPersist> above.
+                    _cachingService.Set(cacheKey, new UserPersist
+                    {
+                        UserName = result.UserName,
+                        Grid = result.Grid,
+                        Data = result.Data
+                    });
+
                     return new ServiceResponse<string>(
                         $"Found persist data for {persist.UserName} for Grid {persist.Grid}", true,
                         result.Data);
