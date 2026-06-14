@@ -395,10 +395,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
                     if (scheduleResult.Success && scheduleResult.Data != null)
                     {
-                        //@@@HERE The email is not queued at all
                         await SendDeliveryReminderEmail(Model, scheduleResult.Data);
-
-                        //@@@HERE The SMS is queued but the body is blank
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
                 }

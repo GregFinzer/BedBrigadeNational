@@ -11,7 +11,6 @@ drop table if exists Donations
 drop table if exists GeoLocationQueue
 drop table if exists Media
 drop table if exists Roles
-drop table if exists Schedules
 drop table if exists Templates
 drop table if exists UserPersist
 drop table if exists Users
@@ -25,6 +24,7 @@ drop table if exists TranslationQueue
 drop table if exists SpokenLanguages
 drop table if exists Subscriptions
 drop table if exists Newsletters
+drop table if exists Schedules
 drop table if exists Locations
 drop table if exists MetroAreas
 drop table if exists __EFMigrationsHistory
