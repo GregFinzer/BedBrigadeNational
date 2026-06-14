@@ -24,7 +24,7 @@ else
     </div>
 
     <div class="content-wrapper mt-3">
-        <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+        <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             
             <div class="row">
@@ -204,7 +204,12 @@ else
                             </div>
                             <div class="form-group">
                                 <label for="txtdelierydate" class="formlabel">Delivery Date</label>
-                                <SfDatePicker ID="txtdeliverydate" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Never" />
+                                <SfDatePicker ID="txtdeliverydate" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="Delivery Date" FloatLabelType="FloatLabelType.Never">
+                                    <DatePickerEvents TValue="DateTime?" ValueChange="OnDeliveryDateChange"></DatePickerEvents>
+                                </SfDatePicker>
+                                <div style="font-size: smaller">
+                                    <ValidationMessage For="@(() => Model.DeliveryDate)"></ValidationMessage>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="txtteam" class="formlabel">Team</label>

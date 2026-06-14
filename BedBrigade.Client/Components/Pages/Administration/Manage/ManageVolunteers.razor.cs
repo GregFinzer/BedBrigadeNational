@@ -152,18 +152,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
 
         /// <summary>
+        /// <summary>
         /// On loading of the Grid get the user grid persisted data
         /// </summary>
         /// <returns></returns>
         protected async Task OnLoad()
         {
             string userName = _svcUser.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Volunteer };
-            var result = await _svcUserPersist.GetGridPersistence(persist);
-            if (result.Success && result.Data != null)
-            {
-                await Grid.SetPersistDataAsync(result.Data);
-            }
+            await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.Volunteer);
         }
 
 

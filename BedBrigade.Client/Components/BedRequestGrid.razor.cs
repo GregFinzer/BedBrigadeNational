@@ -258,16 +258,8 @@ namespace BedBrigade.Client.Components
         protected async Task OnLoad()
         {
             string userName = UserDataService.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest };
-            var result = await UserPersistDataService.GetGridPersistence(persist);
-            if (result.Success && !string.IsNullOrWhiteSpace(result.Data))
-            {
-                if (Grid != null)
-                {
-                    await Grid.SetPersistDataAsync(result.Data);
-                }
-            }
-            else
+            bool persistenceApplied = await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, UserPersistDataService, userName, PersistGrid.BedRequest);
+            if (!persistenceApplied)
             {
                 await FilterWaiting();
             }

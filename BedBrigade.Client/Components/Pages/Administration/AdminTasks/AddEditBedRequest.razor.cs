@@ -4,14 +4,16 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Serilog;
+using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
-    public partial class AddEditBedRequest : ComponentBase
+    public partial class AddEditBedRequest : ComponentBase, IDisposable
     {
         [Parameter] public int LocationId { get; set; }
         [Parameter] public int? BedRequestId { get; set; }
@@ -43,6 +45,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         protected List<string>? lstPrimaryLanguage;
         protected List<string>? lstSpeakEnglish;
         protected List<BedRequestEnumItem>? BedRequestStatuses { get; private set; }
+        private EditContext? _editContext;
+        private ValidationMessageStore? _validationMessageStore;
         private List<UsState>? StateList = AddressHelper.GetStateList();
         public required SfMaskedTextBox zipTextBox;
         public required SfMaskedTextBox phoneTextBox;
@@ -75,6 +79,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 await LoadConfiguration();
                 await LoadLocations();
                 await LoadModel();
+                InitializeValidationContext();
                 await LoadDeliverySchedules(Model?.LocationId ?? LocationId);
 
                 // Ensure required members are set to avoid CS9035
@@ -166,6 +171,27 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 _originalStatus = Model.Status;
                 _lastSelectedStatus = Model.Status;
             }
+        }
+
+        private void InitializeValidationContext()
+        {
+            if (_editContext != null)
+            {
+                _editContext.OnValidationRequested -= HandleValidationRequested;
+                _editContext.OnFieldChanged -= HandleFieldChanged;
+            }
+
+            if (Model == null)
+            {
+                _editContext = null;
+                _validationMessageStore = null;
+                return;
+            }
+
+            _editContext = new EditContext(Model);
+            _validationMessageStore = new ValidationMessageStore(_editContext);
+            _editContext.OnValidationRequested += HandleValidationRequested;
+            _editContext.OnFieldChanged += HandleFieldChanged;
         }
 
         private async Task LoadDeliverySchedules(int locationId)
@@ -321,6 +347,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 // set to returned object
                 Model = result.Data;
+                InitializeValidationContext();
             }
             if (Model != null && Model.BedRequestId != 0)
             {
@@ -349,6 +376,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             if (updateResult.Success && updateResult.Data != null)
             {
                 Model = updateResult.Data;
+                InitializeValidationContext();
                 _originalStatus = Model.Status;
                 _lastSelectedStatus = Model.Status;
 
@@ -357,6 +385,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 
                 if (Model.Status == BedRequestStatus.Scheduled)
                 {
+                    if (!Model.DeliveryDate.HasValue)
+                    {
+                        Log.Error($"BedRequest {Model.BedRequestId} is scheduled but DeliveryDate is null.");
+                        _toastService?.Error("Delivery Date Required", "A scheduled BedRequest must have a delivery date before delivery reminders can be queued.");
+                        return;
+                    }
+
                     var scheduleResult = await GetOrCreateScheduleForBedRequestDeliveryDate(Model);
                     if (scheduleResult.Success && scheduleResult.Data != null)
                     {
@@ -413,6 +448,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private async Task<ServiceResponse<Common.Models.Schedule>> GetOrCreateScheduleForBedRequestDeliveryDate(
             Common.Models.BedRequest model)
         {
+            if (!model.DeliveryDate.HasValue)
+            {
+                Log.Error($"BedRequest {model.BedRequestId} is missing a delivery date.");
+                _toastService?.Error("Delivery Date Required", "A delivery date is required before delivery reminders can be queued.");
+                return new ServiceResponse<Common.Models.Schedule>("BedRequest DeliveryDate is null");
+            }
+
             ServiceResponse<Common.Models.Schedule> scheduleResponse =
                 await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
 
@@ -433,6 +475,61 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
 
             return scheduleResponse;
+        }
+
+        private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+        {
+            if (Model == null || _validationMessageStore == null)
+            {
+                return;
+            }
+
+            ApplyScheduledDeliveryDateValidation(Model);
+        }
+
+        private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+        {
+            if (Model == null || _editContext == null || _validationMessageStore == null)
+            {
+                return;
+            }
+
+            if (args.FieldIdentifier.FieldName != nameof(BedBrigade.Common.Models.BedRequest.DeliveryDate) &&
+                args.FieldIdentifier.FieldName != nameof(BedBrigade.Common.Models.BedRequest.Status))
+            {
+                return;
+            }
+
+            ApplyScheduledDeliveryDateValidation(Model);
+            _editContext.NotifyValidationStateChanged();
+        }
+
+        private void ApplyScheduledDeliveryDateValidation(BedBrigade.Common.Models.BedRequest bedRequest)
+        {
+            if (_validationMessageStore == null)
+            {
+                return;
+            }
+
+            var fieldIdentifier = new FieldIdentifier(bedRequest, nameof(BedBrigade.Common.Models.BedRequest.DeliveryDate));
+            _validationMessageStore.Clear(fieldIdentifier);
+
+            if (bedRequest.Status == BedRequestStatus.Scheduled && !bedRequest.DeliveryDate.HasValue)
+            {
+                const string validationMessage = "A scheduled BedRequest must have a delivery date before it can be saved.";
+                _validationMessageStore.Add(fieldIdentifier, validationMessage);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_editContext == null)
+            {
+                return;
+            }
+
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+            _editContext.OnFieldChanged -= HandleFieldChanged;
         }
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)
@@ -481,8 +578,43 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.ScheduleId = null;
                 Model.DeliveryDate = null;
             }
+            else if (args.Value == BedRequestStatus.Scheduled)
+            {
+                SyncScheduleIdFromDeliveryDate();
+            }
 
             _lastSelectedStatus = args.Value;
+        }
+
+        public void OnDeliveryDateChange(ChangedEventArgs<DateTime?> args)
+        {
+            if (Model == null)
+            {
+                return;
+            }
+
+            Model.DeliveryDate = args.Value;
+            SyncScheduleIdFromDeliveryDate();
+        }
+
+        private void SyncScheduleIdFromDeliveryDate()
+        {
+            if (Model == null || Model.Status != BedRequestStatus.Scheduled)
+            {
+                return;
+            }
+
+            if (!Model.DeliveryDate.HasValue)
+            {
+                Model.ScheduleId = null;
+                return;
+            }
+
+            var matchingSchedule = FutureDeliverySchedules
+                .FirstOrDefault(schedule => schedule.EventType == EventType.Delivery &&
+                                            schedule.EventDateScheduled.Date == Model.DeliveryDate.Value.Date);
+
+            Model.ScheduleId = matchingSchedule?.ScheduleId;
         }
 
         private void ApplyStatusTransitionRules(BedBrigade.Common.Models.BedRequest bedRequest)
