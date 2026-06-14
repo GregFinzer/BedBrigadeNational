@@ -464,6 +464,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         $"No schedule was found for the delivery date {model.DeliveryDate.Value.ToShortDateString()} of this Bed Request. Would you like to add a schedule for this delivery date?"))
                 {
                     scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDate(model);
+                    
+                    if (scheduleResponse.Success && scheduleResponse.Data != null)
+                    {
+                        model.ScheduleId = scheduleResponse.Data.ScheduleId;
+                        await UpdateBedRequest(model);
+                    }
                 }
             }
 
@@ -471,7 +477,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 _toastService?.Error("Schedule Not Found",
                     "No schedule was found for the delivery date of this Bed Request, and a new schedule was not be created. The delivery reminder email was not queued.");
-
             }
 
             return scheduleResponse;
