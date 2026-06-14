@@ -132,12 +132,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected async Task OnLoad()
         {
             string userName = _svcUser.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Configuration };
-            var result = await _svcUserPersist.GetGridPersistence(persist);
-            if (result.Success && result.Data != null && Grid != null)
-            {
-                await Grid.SetPersistDataAsync(result.Data);
-            }
+            await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.Configuration);
         }
 
         /// <summary>
