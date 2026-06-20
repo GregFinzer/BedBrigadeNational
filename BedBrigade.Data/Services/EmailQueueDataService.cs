@@ -306,10 +306,19 @@ namespace BedBrigade.Data.Services
 
         private async Task<EmailQueue?> GetEmailByAddressAndTargetDate(EmailQueue email)
         {
+            string queued = QueueStatus.Queued.ToString();
+            string locked = QueueStatus.Locked.ToString();
+            string sent = QueueStatus.Sent.ToString();
+
             using (var ctx = _contextFactory.CreateDbContext())
             {
                 var dbSet = ctx.Set<EmailQueue>();
-                return await dbSet.Where(o => o.ToAddress == email.ToAddress && o.TargetDate == email.TargetDate)
+                return await dbSet.Where(o => o.ToAddress == email.ToAddress
+                                              && (o.Status == queued || o.Status == locked || o.Status == sent)
+                                              && (o.Body == email.Body)
+                                              && (o.TargetDate == email.TargetDate
+                                                  || (email.SignUpId.HasValue && o.SignUpId == email.SignUpId)
+                                                  || (email.BedRequestId.HasValue && o.BedRequestId == email.BedRequestId)))
                     .FirstOrDefaultAsync();
             }
         }
@@ -399,7 +408,17 @@ namespace BedBrigade.Data.Services
 
             try
             {
-                var emailQueueList = emailList.Select(email => new EmailQueue
+                var uniqueEmailList = emailList
+                    .Where(email => !string.IsNullOrWhiteSpace(email))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (uniqueEmailList.Count == 0)
+                {
+                    return new ServiceResponse<string>("No emails to send", false);
+                }
+
+                var emailQueueList = uniqueEmailList.Select(email => new EmailQueue
                 {
                     ToAddress = email,
                     Subject = subject,
@@ -428,7 +447,7 @@ namespace BedBrigade.Data.Services
 
                 _cachingService.ClearByEntityName(GetEntityName());
 
-                return new ServiceResponse<string>($"Queued {emailList.Count} emails", true, QueueStatus.Queued.ToString());
+                return new ServiceResponse<string>($"Queued {uniqueEmailList.Count} emails", true, QueueStatus.Queued.ToString());
             }
             catch (Exception ex)
             {

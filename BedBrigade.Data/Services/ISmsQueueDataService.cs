@@ -17,6 +17,7 @@ namespace BedBrigade.Data.Services
         Task MarkMessagesAsRead(int locationId, string toPhoneNumber);
 
         Task<ServiceResponse<List<string>>> GetPhoneNumbersToSend(int locationId, SmsRecipientOption option, int scheduleId);
+        Task<ServiceResponse<string>> QueueSms(SmsQueue smsQueue);
         Task<ServiceResponse<string>> QueueBulkSms(int locationId, List<string> phoneNumberList, string body);
         Task<ServiceResponse<string>> GetSendPlanMessage(int locationId, SmsRecipientOption option, int scheduleId);
 

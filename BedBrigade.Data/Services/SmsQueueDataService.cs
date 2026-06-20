@@ -513,7 +513,15 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
         try
         {
-            var smsQueueList = phoneNumberList.Select(phone => new SmsQueue()
+            var uniquePhoneNumbers = phoneNumberList
+                .Where(phone => !string.IsNullOrWhiteSpace(phone))
+                .Select(phone => phone.FormatPhoneNumber())
+                .GroupBy(phone => StringUtil.ExtractDigits(phone))
+                .Where(group => !string.IsNullOrWhiteSpace(group.Key))
+                .Select(group => group.First())
+                .ToList();
+
+            var smsQueueList = uniquePhoneNumbers.Select(phone => new SmsQueue()
             {
                 FromPhoneNumber = fromPhoneNumber,
                 ToPhoneNumber = phone.FormatPhoneNumber(),
@@ -549,6 +557,50 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         catch (Exception ex)
         {
             return new ServiceResponse<string>($"Failed to queue bulk text messages: {ex.Message}", false);
+        }
+    }
+
+    //This is currently only used by QueueDeliverySmsReminder and QueueSignUpSmsReminder
+    public async Task<ServiceResponse<string>> QueueSms(SmsQueue smsQueue)
+    {
+        var duplicate = await GetDuplicateSms(smsQueue);
+
+        if (duplicate != null)
+        {
+            return new ServiceResponse<string>("SMS already queued", true);
+        }
+
+        try
+        {
+            smsQueue.Status = QueueStatus.Queued.ToString();
+            smsQueue.QueueDate = DateTime.UtcNow;
+            smsQueue.FailureMessage = string.Empty;
+            await CreateAsync(smsQueue);
+            return new ServiceResponse<string>(QueueStatus.Queued.ToString(), true);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<string>(ex.Message, false);
+        }
+    }
+
+    //This is currently only used by QueueDeliverySmsReminder and QueueSignUpSmsReminder
+    private async Task<SmsQueue?> GetDuplicateSms(SmsQueue smsQueue)
+    {
+        string toPhoneNumber = smsQueue.ToPhoneNumber.FormatPhoneNumber();
+        string queued = QueueStatus.Queued.ToString();
+        string locked = QueueStatus.Locked.ToString();
+        string sent = QueueStatus.Sent.ToString();
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<SmsQueue>();
+            return await dbSet
+                .Where(o => o.ToPhoneNumber == toPhoneNumber
+                            && (o.Status == queued || o.Status == locked || o.Status == sent)
+                            && (o.Body == smsQueue.Body)
+                            && (o.TargetDate == smsQueue.TargetDate))
+                .FirstOrDefaultAsync();
         }
     }
 
