@@ -304,7 +304,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        private async Task<EmailQueue?> GetEmailByAddressAndTargetDate(EmailQueue email)
+        private async Task<EmailQueue?> GetDuplicateEmails(EmailQueue email)
         {
             string queued = QueueStatus.Queued.ToString();
             string locked = QueueStatus.Locked.ToString();
@@ -316,9 +316,7 @@ namespace BedBrigade.Data.Services
                 return await dbSet.Where(o => o.ToAddress == email.ToAddress
                                               && (o.Status == queued || o.Status == locked || o.Status == sent)
                                               && (o.Body == email.Body)
-                                              && (o.TargetDate == email.TargetDate
-                                                  || (email.SignUpId.HasValue && o.SignUpId == email.SignUpId)
-                                                  || (email.BedRequestId.HasValue && o.BedRequestId == email.BedRequestId)))
+                                              && (o.TargetDate == email.TargetDate))
                     .FirstOrDefaultAsync();
             }
         }
@@ -379,7 +377,7 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
-            var duplicate = await GetEmailByAddressAndTargetDate(email);
+            var duplicate = await GetDuplicateEmails(email);
 
             if (duplicate != null)
             {
