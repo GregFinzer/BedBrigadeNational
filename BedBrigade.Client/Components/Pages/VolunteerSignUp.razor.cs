@@ -547,23 +547,53 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task<Volunteer?> GetExistingVolunteer()
         {
-            Volunteer existingVolunteer = null;
-            ServiceResponse<Volunteer> emailResult = await _svcVolunteer.GetByEmail(newVolunteer.Email);
+            ServiceResponse<List<Volunteer>> volunteersResponse = await _svcVolunteer.GetAllForLocationAsync(selectedLocation);
 
-            if (emailResult.Success && emailResult.Data != null)
+            if (!volunteersResponse.Success || volunteersResponse.Data == null)
             {
-                existingVolunteer = emailResult.Data;
+                Log.Logger.Error("Error loading volunteers for matching: {Message}", volunteersResponse.Message);
+                return null;
             }
-            else
-            {
-                ServiceResponse<Volunteer> phoneResult = await _svcVolunteer.GetByPhone(newVolunteer.Phone);
-                if (phoneResult.Success && phoneResult.Data != null)
-                {
-                    existingVolunteer = phoneResult.Data;
-                }
-            }
+
+            string firstName = (newVolunteer.FirstName ?? string.Empty).Trim();
+            string lastName = (newVolunteer.LastName ?? string.Empty).Trim();
+            string email = (newVolunteer.Email ?? string.Empty).Trim();
+            string phoneDigits = StringUtil.ExtractDigits(newVolunteer.Phone ?? string.Empty);
+
+            var existingVolunteer = volunteersResponse.Data
+                .Where(volunteer => IsNameMatch(volunteer, firstName, lastName)
+                                    && (IsEmailMatch(volunteer, email) || IsPhoneMatch(volunteer, phoneDigits)))
+                .OrderByDescending(volunteer => volunteer.UpdateDate ?? volunteer.CreateDate ?? DateTime.MinValue)
+                .ThenByDescending(volunteer => volunteer.VolunteerId)
+                .FirstOrDefault();
 
             return existingVolunteer;
+        }
+
+        private static bool IsNameMatch(Volunteer volunteer, string firstName, string lastName)
+        {
+            return string.Equals(volunteer.FirstName?.Trim(), firstName, StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(volunteer.LastName?.Trim(), lastName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsEmailMatch(Volunteer volunteer, string email)
+        {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(volunteer.Email))
+            {
+                return false;
+            }
+
+            return string.Equals(volunteer.Email.Trim(), email, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPhoneMatch(Volunteer volunteer, string phoneDigits)
+        {
+            if (string.IsNullOrWhiteSpace(phoneDigits) || string.IsNullOrWhiteSpace(volunteer.Phone))
+            {
+                return false;
+            }
+
+            return string.Equals(StringUtil.ExtractDigits(volunteer.Phone), phoneDigits, StringComparison.Ordinal);
         }
 
 
