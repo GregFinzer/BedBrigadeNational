@@ -218,14 +218,12 @@ namespace BedBrigade.Client
                     }
                 });
 
-                string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                if (File.Exists(xmlPath))
+                foreach (string xmlPath in Directory.EnumerateFiles(AppContext.BaseDirectory, "BedBrigade*.xml", SearchOption.TopDirectoryOnly))
                 {
                     options.IncludeXmlComments(xmlPath);
                 }
 
-                options.SchemaFilter<UserLoginSchemaExampleFilter>();
+                options.SchemaFilter<XmlDocumentationSchemaExampleFilter>();
             });
         }
 
