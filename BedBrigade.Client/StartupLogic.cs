@@ -1,6 +1,7 @@
 ﻿using AKSoftware.Localization.MultiLanguages;
 using AKSoftware.Localization.MultiLanguages.Providers;
 using BedBrigade.Client.Components;
+using BedBrigade.Client.Swagger;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Logic;
@@ -223,6 +224,8 @@ namespace BedBrigade.Client
                 {
                     options.IncludeXmlComments(xmlPath);
                 }
+
+                options.SchemaFilter<UserLoginSchemaExampleFilter>();
             });
         }
 
