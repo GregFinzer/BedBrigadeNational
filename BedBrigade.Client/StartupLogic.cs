@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Syncfusion.Blazor;
@@ -88,6 +89,7 @@ namespace BedBrigade.Client
 
             // Add services to the container.
             builder.Services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            SetupSwagger(builder);
 
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -182,6 +184,46 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
+            builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        }
+
+        private static void SetupSwagger(WebApplicationBuilder builder)
+        {
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Bed Brigade National API",
+                    Version = "v1",
+                    Description = "API endpoints for Bed Brigade National Website."
+                });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+
+                options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecuritySchemeReference("Bearer", null, null),
+                        []
+                    }
+                });
+
+                string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                {
+                    options.IncludeXmlComments(xmlPath);
+                }
+            });
         }
 
 
@@ -292,6 +334,12 @@ namespace BedBrigade.Client
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("v1/swagger.json", "Bed Brigade National API v1");
+                options.RoutePrefix = "swagger";
+            });
             app.UseAntiforgery();
 
             app.UseEndpoints(endpoints =>

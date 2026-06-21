@@ -13,6 +13,7 @@ using Serilog;
 namespace ImageUpload.Controllers
 {
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     public class ImageController : ControllerBase
     {

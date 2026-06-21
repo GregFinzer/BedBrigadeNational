@@ -1,8 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using BedBrigade.Common.Constants;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace BedBrigade.Data.Services
@@ -15,13 +12,13 @@ namespace BedBrigade.Data.Services
         const string AuthTokenName = "auth_token";
         private ClaimsPrincipal _currentUser;
         private readonly ICustomSessionService _sessionService;
-        private readonly IConfiguration _configuration;
+        private readonly IJwtTokenService _jwtTokenService;
         public event Func<ClaimsPrincipal, Task>? AuthChanged;
 
-        public AuthService(ICustomSessionService sessionService, IConfiguration configuration)
+        public AuthService(ICustomSessionService sessionService, IJwtTokenService jwtTokenService)
         {
             _sessionService = sessionService;
-            _configuration = configuration;
+            _jwtTokenService = jwtTokenService;
             _currentUser = new();
         }
 
@@ -211,21 +208,8 @@ namespace BedBrigade.Data.Services
             {
                 try
                 {
-                    //Ensure the JWT is valid
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value);
-
-                    tokenHandler.ValidateToken(authToken, new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    }, out SecurityToken validatedToken);
-
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
+                    ClaimsPrincipal principal = _jwtTokenService.ValidateToken(authToken);
+                    identity = principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Claims, "jwt");
                     result = true;
                 }
                 catch
@@ -256,19 +240,7 @@ namespace BedBrigade.Data.Services
             //Update the Blazor Server State for the user
             CurrentUser = user;
 
-            //Build a JWT for the user
-            var tokenEncryptionKey = _configuration.GetSection("AppSettings:Token").Value;
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes(tokenEncryptionKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            var tokenHoursString = _configuration.GetSection("AppSettings:TokenHours").Value;
-            int.TryParse(tokenHoursString, out int tokenHours);
-            var token = new JwtSecurityToken(
-                claims: user.Claims,
-                expires: DateTime.Now.AddHours(tokenHours),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            string jwt = _jwtTokenService.GenerateToken(user).Token;
 
             //Write a JWT to the browser session
             await _sessionService.SetItemAsStringAsync(AuthTokenName, jwt);

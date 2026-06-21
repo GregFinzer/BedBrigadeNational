@@ -8,6 +8,7 @@ using Stripe;
 namespace BedBrigade.Client.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
 public class StripeController : ControllerBase
 {

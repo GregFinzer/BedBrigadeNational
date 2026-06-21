@@ -8,6 +8,7 @@ using Twilio.TwiML;
 namespace BedBrigade.Client.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
 public class SmsController : TwilioController
 {
