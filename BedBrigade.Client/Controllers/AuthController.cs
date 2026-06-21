@@ -1,5 +1,6 @@
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Security.Claims;
@@ -13,12 +14,14 @@ public class AuthController : ControllerBase
 {
     private const string LockedMessagePrefix = "Your account is locked for";
     private readonly IAuthDataService _authDataService;
+    private readonly IAuthService _authService;
     private readonly IJwtTokenService _jwtTokenService;
 
-    public AuthController(IAuthDataService authDataService, IJwtTokenService jwtTokenService)
+    public AuthController(IAuthDataService authDataService, IJwtTokenService jwtTokenService, IAuthService authService)
     {
         _authDataService = authDataService ?? throw new ArgumentNullException(nameof(authDataService));
         _jwtTokenService = jwtTokenService ?? throw new ArgumentNullException(nameof(jwtTokenService));
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
 
     /// <summary>
@@ -74,6 +77,60 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Logs out the currently authenticated user.
+    /// </summary>
+    /// <returns>A successful response when logout completes, or an <see cref="ApiError"/> if an unexpected error occurs.</returns>
+    /// <response code="200">Logout was successful.</response>
+    /// <response code="500">Returns an <see cref="ApiError"/> when an unexpected error occurs.</response>
+    [Authorize]
+    [HttpPost("logout")]
+    [Produces("application/json")]
+    [SwaggerOperation("Logout")]
+    [SwaggerResponse(statusCode: 200, description: "Successful operation")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Logout()
+    {
+        try
+        {
+            await _authService.LogoutAsync(false);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in {Controller}.{Action}", nameof(AuthController), nameof(Logout));
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError("There was an error logging out, try again later."));
+        }
+    }
+
+    /// <summary>
+    /// Temporary diagnostic endpoint to verify JWT bearer authentication.
+    /// </summary>
+    /// <returns>The authenticated user's claims as seen by the API.</returns>
+    [Authorize]
+    [HttpGet("me")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetCurrentUser")]
+    [SwaggerResponse(statusCode: 200, type: typeof(AuthenticatedUserResponse), description: "Successful operation")]
+    [ProducesResponseType(typeof(AuthenticatedUserResponse), StatusCodes.Status200OK)]
+    public ActionResult<AuthenticatedUserResponse> Me()
+    {
+        return Ok(new AuthenticatedUserResponse
+        {
+            IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
+            UserName = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
+            Email = User.FindFirstValue(ClaimTypes.Name) ?? string.Empty,
+            Role = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            UserRoute = User.FindFirstValue("UserRoute") ?? string.Empty,
+            TimeZoneId = User.FindFirstValue("TimeZoneId") ?? string.Empty,
+            Phone = User.FindFirstValue("Phone") ?? string.Empty,
+            LocationId = ParseLocationId(User.FindFirstValue("LocationId"))
+        });
+    }
+
     private ActionResult<AuthTokenResponse> CreateFailureResponse(string message)
     {
         ApiError response = CreateApiError(message);
@@ -92,6 +149,13 @@ public class AuthController : ControllerBase
     private static ApiError CreateApiError(string message)
     {
         return new ApiError { Message = message };
+    }
+
+    private static int ParseLocationId(string? locationIdValue)
+    {
+        return int.TryParse(locationIdValue, out int locationId)
+            ? locationId
+            : 0;
     }
 
     private string GetValidationMessage(UserLogin request)

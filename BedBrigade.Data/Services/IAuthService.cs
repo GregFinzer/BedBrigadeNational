@@ -16,7 +16,7 @@ namespace BedBrigade.Data.Services
         bool IsNationalAdmin { get; }
 
         Task<bool> GetStateFromTokenAsync();
-        Task LogoutAsync(); 
+        Task LogoutAsync(bool removeFromBrowser); 
         Task Login(ClaimsPrincipal? user);
 
         event Func<ClaimsPrincipal, Task> AuthChanged;

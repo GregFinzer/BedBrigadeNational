@@ -161,7 +161,7 @@ namespace BedBrigade.Data.Services
             }
         }
 
-        public async Task LogoutAsync()
+        public async Task LogoutAsync(bool removeFromBrowser)
         {
             bool wasLoggedIn = IsLoggedIn;
             string userName = UserName;
@@ -170,19 +170,22 @@ namespace BedBrigade.Data.Services
             //Update the Blazor Server State for the user to an anonymous user
             CurrentUser = new();
 
-            //Remove the JWT from the browser session
-            try
+            if (removeFromBrowser)
             {
-                string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
-
-                if (!string.IsNullOrEmpty(authToken))
+                //Remove the JWT from the browser session
+                try
                 {
-                    await _sessionService.RemoveItemAsync(AuthTokenName);
+                    string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
+
+                    if (!string.IsNullOrEmpty(authToken))
+                    {
+                        await _sessionService.RemoveItemAsync(AuthTokenName);
+                    }
                 }
-            }
-            catch (System.InvalidOperationException)
-            {
-                //This happens if the component is statically rendered
+                catch (Exception)
+                {
+                    //This happens if the component is statically rendered
+                }
             }
 
             if (wasLoggedIn)

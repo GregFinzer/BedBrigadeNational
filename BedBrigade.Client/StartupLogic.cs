@@ -11,10 +11,12 @@ using BedBrigade.Data.Services;
 using BedBrigade.SpeakIt;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -26,6 +28,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.ResponseCompression;
 using System;
 using System.Data.SqlClient;
+using System.Text;
 
 namespace BedBrigade.Client
 {
@@ -181,11 +184,64 @@ namespace BedBrigade.Client
         private static void SetupAuth(WebApplicationBuilder builder)
         {
             Log.Logger.Information("SetupAuth");
+            string tokenEncryptionKey = builder.Configuration["AppSettings:Token"]
+                ?? throw new InvalidOperationException("Missing configuration value 'AppSettings:Token'.");
+
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenEncryptionKey)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    options.Events = CreateJwtBearerEvents();
+                });
+
+            builder.Services.AddAuthorization();
             builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddScoped<ICustomSessionService, CustomSessionService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAuthDataService, AuthDataService>();
             builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        }
+
+        private static JwtBearerEvents CreateJwtBearerEvents()
+        {
+            return new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    bool hasAuthorizationHeader = context.Request.Headers.ContainsKey("Authorization");
+                    Log.Logger.Information("JWT auth header present for {Path}: {HasAuthorizationHeader}",
+                        context.Request.Path,
+                        hasAuthorizationHeader);
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    Log.Logger.Error(context.Exception,
+                        "JWT authentication failed for {Path}",
+                        context.Request.Path);
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    Log.Logger.Warning("JWT challenge for {Path}. Error={Error}. Description={Description}",
+                        context.Request.Path,
+                        context.Error ?? string.Empty,
+                        context.ErrorDescription ?? string.Empty);
+                    return Task.CompletedTask;
+                }
+            };
         }
 
         private static void SetupSwagger(WebApplicationBuilder builder)
@@ -202,7 +258,7 @@ namespace BedBrigade.Client
 
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
+                    Description = "Paste only the JWT token here. Do not include the 'Bearer' prefix.",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -210,10 +266,10 @@ namespace BedBrigade.Client
                     BearerFormat = "JWT"
                 });
 
-                options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecuritySchemeReference("Bearer", null, null),
+                        new OpenApiSecuritySchemeReference("Bearer", document, null),
                         []
                     }
                 });
@@ -335,6 +391,8 @@ namespace BedBrigade.Client
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {

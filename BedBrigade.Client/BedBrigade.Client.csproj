@@ -35,6 +35,7 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="BlazorMonaco" Version="3.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.5" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
