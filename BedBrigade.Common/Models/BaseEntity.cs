@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Models
@@ -8,6 +9,7 @@ namespace BedBrigade.Common.Models
     {
         public DateTime? CreateDate { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public DateTime? CreateDateLocal { get; set; }
 
@@ -16,6 +18,7 @@ namespace BedBrigade.Common.Models
 
         public DateTime? UpdateDate { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public DateTime? UpdateDateLocal { get; set; }
 
