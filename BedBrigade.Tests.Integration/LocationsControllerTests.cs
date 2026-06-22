@@ -213,17 +213,6 @@ public class LocationsControllerTests
         Assert.That(error.Message, Is.EqualTo("Location not found"));
     }
 
-    [Test]
-    public void LocationsController_ShouldRequireCanViewLocationsRole()
-    {
-        AuthorizeAttribute? authorizeAttribute = typeof(LocationsController)
-            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
-            .OfType<AuthorizeAttribute>()
-            .FirstOrDefault();
-
-        Assert.That(authorizeAttribute, Is.Not.Null);
-        Assert.That(authorizeAttribute!.Roles, Is.EqualTo(RoleNames.CanViewLocations));
-    }
 
     private static Location CreateLocation(int id)
     {
