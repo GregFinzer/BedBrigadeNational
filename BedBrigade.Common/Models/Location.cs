@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Models;
@@ -65,12 +66,25 @@ public class Location : BaseEntity
     [MaxLength(4000, ErrorMessage = "Service Zip Codes has a maximum length of 4000 characters")]
     public string? ServiceZipCodes { get; set; } = string.Empty;
 
+    [JsonIgnore]
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
+    
+    [JsonIgnore]
     public ICollection<ContactUs> ContactUs { get; set; } = new List<ContactUs>();
+    
+    [JsonIgnore]
     public ICollection<Content> Contents { get; set; } = new List<Content>();
+    
+    [JsonIgnore]
     public ICollection<Donation> Donations { get; set; } = new List<Donation>();
+    
+    [JsonIgnore]
     public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+    
+    [JsonIgnore]
     public ICollection<User> Users { get; set; } = new List<User>();
+    
+    [JsonIgnore]
     public ICollection<Volunteer> Volunteers { get; set; } = new List<Volunteer>();
 
     public bool IsMetroLocation()
