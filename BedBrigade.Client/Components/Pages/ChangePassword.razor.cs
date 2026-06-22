@@ -100,7 +100,7 @@ public partial class ChangePassword : ComponentBase
             if (result.Success && result.Data is not null)
             {
                 _oneTimePasswordValid = false; // hide the form after success
-                await AuthService.LogoutAsync();
+                await AuthService.LogoutAsync(true);
 
                 if (LoginLockoutLogic.IsLocked(result.Data.LockoutEndUtc))
                 {

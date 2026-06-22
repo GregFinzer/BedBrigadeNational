@@ -26,7 +26,7 @@ public partial class Logout : ComponentBase
             if (AuthService.IsLoggedIn)
             {
                 string locationRoute = AuthService.UserRoute.TrimStart('/');
-                await AuthService.LogoutAsync();
+                await AuthService.LogoutAsync(true);
 
                 //This will force the header to update and remove the admin menu
                 await _locationState.NotifyStateChangedAsync();
@@ -38,7 +38,7 @@ public partial class Logout : ComponentBase
             }
             else
             {
-                await AuthService.LogoutAsync();
+                await AuthService.LogoutAsync(true);
                 if (reason == "idle")
                 {
                     await _locationState.NotifyStateChangedAsync();

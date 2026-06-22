@@ -5,6 +5,7 @@ using Serilog;
 namespace BedBrigade.Client.Controllers
 {
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     public class ShutdownController : Controller
     {

@@ -3,6 +3,7 @@ using Serilog;
 using BedBrigade.Data.Services;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
 public class DatabaseSetupController : ControllerBase
 {
