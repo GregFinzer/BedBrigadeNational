@@ -280,6 +280,7 @@ namespace BedBrigade.Client
                 }
 
                 options.SchemaFilter<XmlDocumentationSchemaExampleFilter>();
+                options.SchemaFilter<BedRequestStatusSchemaFilter>();
             });
         }
 
