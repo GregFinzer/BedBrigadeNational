@@ -5,6 +5,7 @@ namespace BedBrigade.Data.Services
     public interface IBedRequestDataService : IRepository<BedRequest>
     {
         Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId);
+        Task<ServiceResponse<List<BedRequest>>> LoadBedRequests(Location? userLocation, List<Location>? metroLocations);
         Task<ServiceResponse<List<string>>> GetDistinctEmail();
         Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
         Task<ServiceResponse<List<string>>> EmailsForNotReceivedABed(int locationId);

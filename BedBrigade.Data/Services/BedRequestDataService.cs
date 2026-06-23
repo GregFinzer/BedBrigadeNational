@@ -165,6 +165,28 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
+    public async Task<ServiceResponse<List<BedRequest>>> LoadBedRequests(Location? userLocation,
+        List<Location>? metroLocations)
+    {
+        if (metroLocations != null)
+        {
+            var metroAreaLocationIds = metroLocations.Select(location => location.LocationId).ToList();
+            var metroAreaBedRequestResult = await GetAllForLocationList(metroAreaLocationIds);
+            if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+            {
+                return metroAreaBedRequestResult;
+            }
+        }
+
+        if (userLocation != null)
+        {
+            return await GetAllForLocationAsync(userLocation.LocationId);
+        }
+
+        return new ServiceResponse<List<BedRequest>>("Unable to load bed requests without a user location",
+            false, null);
+    }
+
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
     {
         return await _commonService.GetDistinctEmail(this);
@@ -612,7 +634,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 }
-
 
 
 
