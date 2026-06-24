@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 
@@ -12,6 +13,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Int32 BedRequestId { get; set; }
 
+    [JsonIgnore]
     [ForeignKey("LocationId"), Required] public Int32 LocationId { get; set; }
     public Location Location { get; set; }
 
@@ -30,6 +32,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
     public String? Phone { get; set; } = string.Empty;
 
+    [JsonIgnore]
     [NotMapped]
     public String? FormattedPhone
     {
@@ -58,6 +61,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [Required] 
     public BedRequestStatus Status { get; set; } = BedRequestStatus.Waiting;
 
+    [JsonIgnore]
     [NotMapped]
     public string? StatusString
     {
@@ -95,6 +99,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(100, ErrorMessage = "Reference has a maximum length of 100 characters")]
     public string? Reference { get; set; }
 
+    [JsonIgnore]
     [NotMapped]
     public string FullName
     {
@@ -104,6 +109,7 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     /// <summary>
     /// This is used for ordering of the Delivery Sheet
     /// </summary>
+    [JsonIgnore]
     [NotMapped]
     public double Distance { get; set; }
 
@@ -115,8 +121,9 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [MaxLength(255, ErrorMessage = "Names has a maximum length of 255 characters")]
     public string? Names { get; set; }
 
+    [JsonIgnore]
     [NotMapped]
-    public string ContactedYes => Contacted == true ? "Yes" : string.Empty;
+    public string ContactedYes => Contacted == true ? "Yes" : "No";
 
     public void UpdateDuplicateFields(BedRequest? bedRequest, string newNote)
     {

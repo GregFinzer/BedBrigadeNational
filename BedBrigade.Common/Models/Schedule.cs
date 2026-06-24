@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 
@@ -12,18 +13,23 @@ namespace BedBrigade.Common.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]                
         public Int32 ScheduleId { get; set; }
+        
         [ForeignKey("LocationId")]
         [Required]
         public Int32 LocationId { get; set; }
-        // Event Description (3)
+        
+        
         [Required, MaxLength(50)]
         public string? EventName { get; set; } = string.Empty;
-          [MaxLength(4000)]
+        
+        [MaxLength(4000)]
         public String? EventNote { get; set; } = string.Empty;
+        
         [MaxLength(50)]
         public string? GroupName { get; set; } = string.Empty;
-        // Event Type & Status (2)
+        
         public EventType EventType { get; set; } = EventType.Delivery; // default value
+        
         public EventStatus EventStatus { get; set; } = EventStatus.Scheduled;
         
         [Required]
@@ -60,9 +66,11 @@ namespace BedBrigade.Common.Models
         public int Teams { get; set; } = 0;
         public int Beds { get; set; } = 0;
 
+        [JsonIgnore]
         [NotMapped]
         public string? EventSelect { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string? ScheduleName
         {
