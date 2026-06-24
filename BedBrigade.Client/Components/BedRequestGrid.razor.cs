@@ -96,8 +96,14 @@ namespace BedBrigade.Client.Components
                 SetupToolbar();
                 await LoadConfiguration();
                 await LoadLocations();
-                await LoadUser();                
-                await LoadBedRequests();
+                await LoadUser();
+
+                var bedRequestResult = await BedRequestDataService.LoadBedRequests(UserLocation, metroLocations);
+                if (bedRequestResult.Success && bedRequestResult.Data != null)
+                {
+                    BedRequests = bedRequestResult.Data.ToList();
+                    SetManageBedRequestsMessage();
+                }
 
                 BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
             }
@@ -168,37 +174,20 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task LoadBedRequests()
+        private void SetManageBedRequestsMessage()
         {
-            if (metroLocations != null)
+            if (UserLocation != null && metroLocations == null)
             {
-                var metroAreaLocationIds = metroLocations.Select(l => l.LocationId).ToList();
-                var metroAreaBedRequestResult = await BedRequestDataService.GetAllForLocationList(metroAreaLocationIds);
-                if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+                if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
                 {
-                    BedRequests = metroAreaBedRequestResult.Data.ToList();
-                    return;
+                    ManageBedRequestsMessage = $"Manage Bed Requests for {UserLocation.Name}";
+                }
+                else
+                {
+                    ManageBedRequestsMessage = $"View Bed Requests for {UserLocation.Name}";
                 }
             }
-
-            if (UserLocation != null && BedRequestDataService != null)
-            {
-                var locationResult = await BedRequestDataService.GetAllForLocationAsync(UserLocation.LocationId);
-                if (locationResult.Success && locationResult.Data != null)
-                {
-                    BedRequests = locationResult.Data.ToList();
-                    if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
-                    {
-                        ManageBedRequestsMessage = $"Manage Bed Requests for {UserLocation.Name}";
-                    }
-                    else
-                    {
-                        ManageBedRequestsMessage = $"View Bed Requests for {UserLocation.Name}";
-                    }
-                }
-            }
-
-        } // LoadBedRequests
+        }
 
         private async Task LoadLocations()
         {
@@ -803,4 +792,3 @@ namespace BedBrigade.Client.Components
         }
     }
 }
-
