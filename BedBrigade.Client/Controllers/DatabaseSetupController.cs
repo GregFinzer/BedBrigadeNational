@@ -5,6 +5,9 @@ using BedBrigade.Data.Services;
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides a hidden maintenance endpoint for applying database migrations and seed data.
+/// </summary>
 public class DatabaseSetupController : ControllerBase
 {
     private readonly IMigrationDataService _migrationDataService;
@@ -14,6 +17,9 @@ public class DatabaseSetupController : ControllerBase
         _migrationDataService = migrationDataService;
     }
 
+    /// <summary>
+    /// Applies pending database migrations and seed data after validating the setup password in production.
+    /// </summary>
     [HttpGet("PerformSetup")]
     public async Task<IActionResult> PerformSetup([FromQuery] string? password)
     {

@@ -15,6 +15,9 @@ namespace ImageUpload.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Provides hidden endpoints for uploading and processing location media images.
+    /// </summary>
     public class ImageController : ControllerBase
     {
         private readonly IWebHostEnvironment hostingEnv;
@@ -36,6 +39,9 @@ namespace ImageUpload.Controllers
             _uploadAuthorizationService = uploadAuthorizationService;
         }
 
+        /// <summary>
+        /// Saves an uploaded image for a location content target and returns the final media URL.
+        /// </summary>
         [Route("Save/{id:int}/{contentType}/{contentName}")]
         [HttpPost]
         public async Task<IActionResult> Save(

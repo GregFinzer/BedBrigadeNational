@@ -20,7 +20,8 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
     protected Func<TEntity, TKey> GetId { get; }
 
     protected async Task<ActionResult<List<TEntity>>> GetAllCoreAsync(
-        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null)
+        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        string? errorDisplayName = null)
     {
         try
         {
@@ -37,7 +38,7 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         {
             Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetAllCoreAsync));
             return StatusCode(StatusCodes.Status500InternalServerError,
-                CreateApiError($"There was an error getting {GetEntityDisplayName()}, try again later."));
+                CreateApiError($"There was an error getting {errorDisplayName ?? GetEntityDisplayName()}, try again later."));
         }
     }
 

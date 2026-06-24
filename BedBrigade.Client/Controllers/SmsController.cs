@@ -10,6 +10,9 @@ namespace BedBrigade.Client.Controllers;
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides hidden endpoints for receiving inbound SMS callbacks.
+/// </summary>
 public class SmsController : TwilioController
 {
     private ISmsQueueDataService _smsQueueDataService;
@@ -19,7 +22,9 @@ public class SmsController : TwilioController
         _smsQueueDataService = smsQueueDataService;
     }
 
-    // This action will be called by Twilio via an HTTP POST when a message is received.
+    /// <summary>
+    /// Receives an inbound Twilio SMS callback and queues the reply handling.
+    /// </summary>
     [HttpPost("receive")]
     public async Task<IActionResult> ReceiveSms()
     {
@@ -40,4 +45,3 @@ public class SmsController : TwilioController
         return TwiML(messagingResponse);
     }
 }
-

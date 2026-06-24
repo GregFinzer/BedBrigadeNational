@@ -10,6 +10,9 @@ namespace BedBrigade.Client.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides authentication endpoints for login, logout, and current-user identity details.
+/// </summary>
 public class AuthController : ControllerBase
 {
     private const string LockedMessagePrefix = "Your account is locked for";
@@ -178,5 +181,4 @@ public class AuthController : ControllerBase
         return "The login request is invalid.";
     }
 }
-
 

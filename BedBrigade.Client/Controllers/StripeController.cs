@@ -10,6 +10,9 @@ namespace BedBrigade.Client.Controllers;
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides hidden endpoints for processing Stripe webhook callbacks.
+/// </summary>
 public class StripeController : ControllerBase
 {
     private readonly IConfigurationDataService _configurationDataService;
@@ -26,6 +29,9 @@ public class StripeController : ControllerBase
         _locationDataService = locationDataService;
     }
 
+    /// <summary>
+    /// Processes a Stripe webhook for the location route in the request URL.
+    /// </summary>
     [HttpPost("webhook/{locationRoute}")]
     public async Task<IActionResult> Index(string locationRoute)
     {

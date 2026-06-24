@@ -7,6 +7,9 @@ namespace BedBrigade.Client.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Provides a hidden maintenance endpoint for stopping background services.
+    /// </summary>
     public class ShutdownController : Controller
     {
         private TranslationBackgroundService _translationBackgroundService;
@@ -24,6 +27,9 @@ namespace BedBrigade.Client.Controllers
             _smsQueueBackgroundService = smsQueueBackgroundService;
         }
 
+        /// <summary>
+        /// Stops background services after validating the shutdown password in production.
+        /// </summary>
         [HttpGet("PerformShutdown")]
         public async Task<IActionResult> PerformShutdown([FromQuery] string? password)
         {

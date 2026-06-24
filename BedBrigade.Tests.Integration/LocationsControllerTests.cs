@@ -15,6 +15,30 @@ public class LocationsControllerTests
     private const int InternalServerErrorStatusCode = 500;
 
     [Test]
+    public void LocationsController_ShouldUseRepositoryControllerPattern()
+    {
+        Assert.That(typeof(LocationsController).BaseType,
+            Is.EqualTo(typeof(RepositoryControllerBase<Location, int, ILocationDataService>)));
+    }
+
+    [TestCase(nameof(LocationsController.GetAllAsync), RoleNames.CanViewLocations)]
+    [TestCase(nameof(LocationsController.GetByIdAsync), RoleNames.CanViewLocations)]
+    [TestCase(nameof(LocationsController.CreateAsync), RoleNames.NationalAdmin)]
+    [TestCase(nameof(LocationsController.UpdateAsync), $"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}")]
+    [TestCase(nameof(LocationsController.DeleteAsync), RoleNames.NationalAdmin)]
+    public void ControllerAction_ShouldUseExpectedRole(string actionName, string expectedRoles)
+    {
+        var method = typeof(LocationsController).GetMethods()
+            .Single(method => method.Name == actionName);
+
+        AuthorizeAttribute authorizeAttribute = method.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>()
+            .Single();
+
+        Assert.That(authorizeAttribute.Roles, Is.EqualTo(expectedRoles));
+    }
+
+    [Test]
     public async Task GetAllAsync_ShouldReturnOk_WhenLocationServiceSucceeds()
     {
         List<Location> locations =
