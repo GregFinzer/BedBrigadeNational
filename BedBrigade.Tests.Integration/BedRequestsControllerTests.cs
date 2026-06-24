@@ -1,6 +1,8 @@
 using BedBrigade.Client.Controllers;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -10,6 +12,30 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class BedRequestsControllerTests
 {
+    [Test]
+    public void BedRequestsController_ShouldUseLocationScopedRepositoryControllerPattern()
+    {
+        Assert.That(typeof(BedRequestsController).BaseType,
+            Is.EqualTo(typeof(LocationScopedRepositoryControllerBase<BedRequest, int, IBedRequestDataService>)));
+    }
+
+    [TestCase(nameof(BedRequestsController.GetBedRequests), RoleNames.CanViewBedRequests)]
+    [TestCase(nameof(BedRequestsController.GetByIdAsync), RoleNames.CanViewBedRequests)]
+    [TestCase(nameof(BedRequestsController.CreateAsync), RoleNames.CanManageBedRequests)]
+    [TestCase(nameof(BedRequestsController.UpdateAsync), RoleNames.CanManageBedRequests)]
+    [TestCase(nameof(BedRequestsController.DeleteAsync), RoleNames.CanManageBedRequests)]
+    public void ControllerAction_ShouldUseExpectedRole(string actionName, string expectedRoles)
+    {
+        var method = typeof(BedRequestsController).GetMethods()
+            .Single(method => method.Name == actionName);
+
+        AuthorizeAttribute authorizeAttribute = method.GetCustomAttributes(typeof(AuthorizeAttribute), false)
+            .Cast<AuthorizeAttribute>()
+            .Single();
+
+        Assert.That(authorizeAttribute.Roles, Is.EqualTo(expectedRoles));
+    }
+
     [Test]
     public async Task GetBedRequests_ShouldReturnRequestsForUserLocation()
     {

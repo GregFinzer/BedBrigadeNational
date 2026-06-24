@@ -1,12 +1,17 @@
-﻿using BedBrigade.Data.Services;
+﻿using BedBrigade.Common.Models;
+using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BedBrigade.Client.Controllers
 {
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Provides a hidden maintenance endpoint for stopping background services.
+    /// </summary>
     public class ShutdownController : Controller
     {
         private TranslationBackgroundService _translationBackgroundService;
@@ -24,7 +29,19 @@ namespace BedBrigade.Client.Controllers
             _smsQueueBackgroundService = smsQueueBackgroundService;
         }
 
+        /// <summary>
+        /// Stops background services after validating the shutdown password in production.
+        /// </summary>
         [HttpGet("PerformShutdown")]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: 200, type: typeof(object), description: "Background services stopped")]
+        [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Shutdown request failed")]
+        [SwaggerResponse(statusCode: 401, type: typeof(ApiError), description: "Invalid shutdown password")]
+        [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PerformShutdown([FromQuery] string? password)
         {
             try

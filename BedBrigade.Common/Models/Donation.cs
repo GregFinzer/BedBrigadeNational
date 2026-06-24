@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BedBrigade.Common.Models
 {
@@ -51,12 +52,15 @@ namespace BedBrigade.Common.Models
         [MaxLength(50)]
         public string? Currency { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
 		public string FullName => $"{FirstName} {LastName}";
 
+		[JsonIgnore]
         [NotMapped]
         public string NameAndDate => $"{FullName} - {DonationDate?.ToString("yyyy-MM-dd")}";
 
+        [JsonIgnore]
         [NotMapped]
         public decimal NetAmount => Gross.HasValue ? Math.Max(0, Gross.Value - TransactionFee ?? 0) : 0;
     }

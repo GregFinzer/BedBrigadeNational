@@ -1,15 +1,20 @@
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Stripe;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BedBrigade.Client.Controllers;
 
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides hidden endpoints for processing Stripe webhook callbacks.
+/// </summary>
 public class StripeController : ControllerBase
 {
     private readonly IConfigurationDataService _configurationDataService;
@@ -26,7 +31,15 @@ public class StripeController : ControllerBase
         _locationDataService = locationDataService;
     }
 
+    /// <summary>
+    /// Processes a Stripe webhook for the location route in the request URL.
+    /// </summary>
     [HttpPost("webhook/{locationRoute}")]
+    [Produces("application/json")]
+    [SwaggerResponse(statusCode: 200, description: "Webhook processed")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid webhook request")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Index(string locationRoute)
     {
         try

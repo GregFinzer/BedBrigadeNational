@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models;
@@ -38,6 +39,7 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "Phone Number is required")]
     public String? Phone { get; set; } = string.Empty;
 
+    [JsonIgnore]
     [NotMapped]
     public String? FormattedPhone => Phone.FormatPhoneNumber();
 
@@ -55,6 +57,7 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
 
     public DateTime? LockoutEndUtc { get; set; }
 
+    [JsonIgnore]
     public string FullName
     {
         get
