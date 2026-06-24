@@ -1,4 +1,5 @@
 ﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using BedBrigade.Common.Logic;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Serilog;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ImageUpload.Controllers
 {
@@ -44,6 +46,17 @@ namespace ImageUpload.Controllers
         /// </summary>
         [Route("Save/{id:int}/{contentType}/{contentName}")]
         [HttpPost]
+        [Produces("application/json")]
+        [SwaggerResponse(statusCode: 200, type: typeof(object), description: "Image saved")]
+        [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid image upload")]
+        [SwaggerResponse(statusCode: 401, type: typeof(ApiError), description: "Invalid upload token")]
+        [SwaggerResponse(statusCode: 404, type: typeof(ApiError), description: "Location not found")]
+        [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Save(
             IList<IFormFile> uploadFiles,
             int id,

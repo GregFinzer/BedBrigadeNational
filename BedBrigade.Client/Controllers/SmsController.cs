@@ -2,6 +2,7 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Swashbuckle.AspNetCore.Annotations;
 using Twilio.AspNet.Core;
 using Twilio.TwiML;
 
@@ -26,6 +27,9 @@ public class SmsController : TwilioController
     /// Receives an inbound Twilio SMS callback and queues the reply handling.
     /// </summary>
     [HttpPost("receive")]
+    [Produces("application/json")]
+    [SwaggerResponse(statusCode: 200, type: typeof(string), description: "Twilio callback processed")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReceiveSms()
     {
         // Extract parameters sent by Twilio (sent as form POST data).

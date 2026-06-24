@@ -24,7 +24,12 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     /// </summary>
     [Authorize(Roles = RoleNames.CanViewSchedule)]
     [HttpGet]
+    [Produces("application/json")]
     [SwaggerOperation("GetSchedules")]
+    [SwaggerResponse(statusCode: 200, type: typeof(List<Schedule>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(List<Schedule>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<Schedule>>> GetAllAsync() => await GetScopedAllCoreAsync();
 
     /// <summary>
@@ -32,7 +37,16 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     /// </summary>
     [Authorize(Roles = RoleNames.CanViewSchedule)]
     [HttpGet("{id:int}")]
+    [Produces("application/json")]
     [SwaggerOperation("GetSchedule")]
+    [SwaggerResponse(statusCode: 200, type: typeof(Schedule), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 403, description: "The schedule is outside the user's location scope")]
+    [SwaggerResponse(statusCode: 404, type: typeof(ApiError), description: "Schedule not found")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(Schedule), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Schedule>> GetByIdAsync(int id) => await GetScopedByIdCoreAsync(id);
 
     /// <summary>
@@ -40,7 +54,17 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageSchedule)]
     [HttpPost]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [SwaggerOperation("CreateSchedule")]
+    [SwaggerResponse(statusCode: 201, type: typeof(Schedule), description: "Schedule created")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid schedule")]
+    [SwaggerResponse(statusCode: 403, description: "The location is outside the user's location scope")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(Schedule), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Schedule>> CreateAsync([FromBody] Schedule schedule) =>
         await CreateScopedCoreAsync(schedule);
 
@@ -49,7 +73,19 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageSchedule)]
     [HttpPut("{id:int}")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [SwaggerOperation("UpdateSchedule")]
+    [SwaggerResponse(statusCode: 200, type: typeof(Schedule), description: "Schedule updated")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid schedule")]
+    [SwaggerResponse(statusCode: 403, description: "The schedule is outside the user's location scope")]
+    [SwaggerResponse(statusCode: 404, type: typeof(ApiError), description: "Schedule not found")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(Schedule), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Schedule>> UpdateAsync(int id, [FromBody] Schedule schedule) =>
         await UpdateScopedCoreAsync(id, schedule);
 
@@ -58,6 +94,15 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageSchedule)]
     [HttpDelete("{id:int}")]
+    [Produces("application/json")]
     [SwaggerOperation("DeleteSchedule")]
+    [SwaggerResponse(statusCode: 204, description: "Schedule deleted")]
+    [SwaggerResponse(statusCode: 403, description: "The schedule is outside the user's location scope")]
+    [SwaggerResponse(statusCode: 404, type: typeof(ApiError), description: "Schedule not found")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id) => await DeleteScopedCoreAsync(id);
 }

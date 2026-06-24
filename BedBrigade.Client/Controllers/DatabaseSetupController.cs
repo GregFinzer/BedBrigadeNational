@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BedBrigade.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using BedBrigade.Data.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
 [ApiExplorerSettings(IgnoreApi = true)]
@@ -21,6 +23,15 @@ public class DatabaseSetupController : ControllerBase
     /// Applies pending database migrations and seed data after validating the setup password in production.
     /// </summary>
     [HttpGet("PerformSetup")]
+    [Produces("application/json")]
+    [SwaggerResponse(statusCode: 200, type: typeof(object), description: "Database setup completed")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Database setup request failed")]
+    [SwaggerResponse(statusCode: 401, type: typeof(ApiError), description: "Invalid setup password")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PerformSetup([FromQuery] string? password)
     {
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
