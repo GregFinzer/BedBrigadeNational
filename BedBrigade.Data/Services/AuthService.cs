@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using BedBrigade.Common.Constants;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace BedBrigade.Data.Services
@@ -13,12 +14,15 @@ namespace BedBrigade.Data.Services
         private ClaimsPrincipal _currentUser;
         private readonly ICustomSessionService _sessionService;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public event Func<ClaimsPrincipal, Task>? AuthChanged;
 
-        public AuthService(ICustomSessionService sessionService, IJwtTokenService jwtTokenService)
+        public AuthService(ICustomSessionService sessionService, IJwtTokenService jwtTokenService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _sessionService = sessionService;
             _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
             _currentUser = new();
         }
 
@@ -36,14 +40,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? Defaults.DefaultUserNameAndEmail;
-                }
-
-                return Defaults.DefaultUserNameAndEmail;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.Name) ?? Defaults.DefaultUserNameAndEmail;
             }
         }
 
@@ -51,14 +49,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-                }
-
-                return null;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.Role);
             }
         }
 
@@ -66,14 +58,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == "UserRoute")?.Value;
-                }
-
-                return null;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue("UserRoute");
             }
         }
 
@@ -81,14 +67,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-                }
-
-                return Defaults.DefaultUserNameAndEmail;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Defaults.DefaultUserNameAndEmail;
             }
         }
 
@@ -96,11 +76,10 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                if (user != null)
                 {
-                    string? locationId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "LocationId")?.Value;
+                    string? locationId = user.FindFirstValue("LocationId");
                     if (int.TryParse(locationId, out int result))
                     {
                         return result;
@@ -111,22 +90,25 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        private ClaimsPrincipal? GetAuthenticatedUser()
+        {
+            return GetAuthenticatedHttpContextUser()
+                   ?? (CurrentUser.Identity?.IsAuthenticated == true ? CurrentUser : null);
+        }
+
+        private ClaimsPrincipal? GetAuthenticatedHttpContextUser()
+        {
+            ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
+            return user?.Identity?.IsAuthenticated == true ? user : null;
+        }
+
         public string TimeZoneId
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "TimeZoneId")?.Value;
-                    if (!String.IsNullOrEmpty(timeZoneId))
-                    {
-                        return timeZoneId;
-                    }
-                }
-
-                return Defaults.DefaultTimeZoneId;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                string? timeZoneId = user?.FindFirstValue("TimeZoneId");
+                return string.IsNullOrEmpty(timeZoneId) ? Defaults.DefaultTimeZoneId : timeZoneId;
             }
         }
 
@@ -134,30 +116,20 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "Phone")?.Value;
-                    if (!String.IsNullOrEmpty(timeZoneId))
-                    {
-                        return timeZoneId;
-                    }
-                }
-
-                return Defaults.DefaultTimeZoneId;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                string? phone = user?.FindFirstValue("Phone");
+                return string.IsNullOrEmpty(phone) ? Defaults.DefaultTimeZoneId : phone;
             }
         }
 
-        public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
+        public bool IsLoggedIn => GetAuthenticatedUser() != null;
 
         public bool IsNationalAdmin
         {
             get
             {
-                string roleName = UserRole ?? string.Empty;
-
-                return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
+                return string.Equals(UserRole, RoleNames.NationalAdmin,
+                    StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -262,7 +234,8 @@ namespace BedBrigade.Data.Services
 
         public bool UserHasRole(string roles)
         {
-            if (!IsLoggedIn)
+            ClaimsPrincipal? user = GetAuthenticatedUser();
+            if (user == null)
             {
                 return false;
             }
@@ -271,7 +244,7 @@ namespace BedBrigade.Data.Services
 
             foreach (var role in rolesToLookFor)
             {
-                if (CurrentUser.IsInRole(role))
+                if (user.IsInRole(role))
                 {
                     return true;
                 }
