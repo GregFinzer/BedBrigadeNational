@@ -17,6 +17,7 @@ public class BedRequestsController
     : LocationScopedRepositoryControllerBase<BedRequest, int, IBedRequestDataService>
 {
     private readonly ILocationDataService _locationDataService;
+    private const int MaxItemsPerPage = 1000;
 
     public BedRequestsController(IBedRequestDataService bedRequestDataService,
         ILocationDataService locationDataService) : base(bedRequestDataService, locationDataService,
@@ -28,18 +29,20 @@ public class BedRequestsController
     /// <summary>
     /// Gets the bed requests for the authenticated user's location or metro area.
     /// </summary>
-    /// <returns>A list of bed requests visible to the current user.</returns>
-    /// <response code="200">Returns the list of bed requests.</response>
+    /// <returns>A page of bed requests visible to the current user.</returns>
+    /// <response code="200">Returns a page of bed requests.</response>
     /// <response code="500">Returns an <see cref="ApiError"/> when the bed requests cannot be loaded.</response>
     [Authorize(Roles = RoleNames.CanViewBedRequests)]
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetBedRequests")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<BedRequest>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<BedRequest>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<BedRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<BedRequest>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<BedRequest>>> GetBedRequests()
+    public async Task<ActionResult<PageResponse<BedRequest>>> GetBedRequests(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int itemsPerPage = MaxItemsPerPage)
     {
         try
         {
@@ -60,7 +63,10 @@ public class BedRequestsController
                     CreateApiError(bedRequestsResult.Message));
             }
 
-            return Ok(bedRequestsResult.Data);
+            PageResponse<BedRequest> pageResponse =
+                CreatePageResponse(bedRequestsResult.Data, pageNumber, itemsPerPage);
+
+            return Ok(pageResponse);
         }
         catch (Exception ex)
         {
@@ -69,6 +75,33 @@ public class BedRequestsController
             return StatusCode(StatusCodes.Status500InternalServerError,
                 CreateApiError("There was an error getting bed requests, try again later."));
         }
+    }
+
+    private static PageResponse<BedRequest> CreatePageResponse(List<BedRequest> bedRequests,
+        int pageNumber, int itemsPerPage)
+    {
+        int normalizedPageNumber = Math.Max(pageNumber, 1);
+        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, MaxItemsPerPage);
+        int numberOfItems = bedRequests.Count;
+        int maxPage = numberOfItems == 0
+            ? 0
+            : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
+        long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
+        List<BedRequest> pageItems = itemsToSkip > int.MaxValue
+            ? []
+            : bedRequests
+                .Skip((int)itemsToSkip)
+                .Take(normalizedItemsPerPage)
+                .ToList();
+
+        return new PageResponse<BedRequest>
+        {
+            PageNumber = normalizedPageNumber,
+            MaxPage = maxPage,
+            NumberOfItems = numberOfItems,
+            ItemsPerPage = normalizedItemsPerPage,
+            Items = pageItems
+        };
     }
 
     /// <summary>

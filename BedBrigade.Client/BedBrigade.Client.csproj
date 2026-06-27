@@ -41,7 +41,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.19.1" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="4.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
     <PackageReference Include="Syncfusion.Blazor" Version="33.2.15" />
     <PackageReference Include="System.ClientModel" Version="1.14.0" />

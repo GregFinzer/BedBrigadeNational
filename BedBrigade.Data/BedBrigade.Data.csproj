@@ -31,6 +31,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Enrichers.RequestUserId" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Stripe.net" Version="52.1.0" />
     <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="33.2.15" />
     <PackageReference Include="System.ClientModel" Version="1.14.0" />

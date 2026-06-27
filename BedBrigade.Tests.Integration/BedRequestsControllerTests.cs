@@ -57,11 +57,21 @@ public class BedRequestsControllerTests
         BedRequestsController controller =
             new(bedRequestDataService.Object, locationDataService.Object);
 
-        ActionResult<List<BedRequest>> result = await controller.GetBedRequests();
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests();
 
         OkObjectResult okResult = result.Result as OkObjectResult
             ?? throw new AssertionException("Expected an OK response.");
-        Assert.That(okResult.Value, Is.SameAs(bedRequests));
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.PageNumber, Is.EqualTo(1));
+            Assert.That(payload.MaxPage, Is.EqualTo(1));
+            Assert.That(payload.NumberOfItems, Is.EqualTo(1));
+            Assert.That(payload.ItemsPerPage, Is.EqualTo(1000));
+            Assert.That(payload.Items, Is.EqualTo(bedRequests));
+        });
         locationDataService.Verify(x => x.GetLocationsByMetroAreaId(It.IsAny<int>()), Times.Never);
     }
 
@@ -94,15 +104,87 @@ public class BedRequestsControllerTests
         BedRequestsController controller =
             new(bedRequestDataService.Object, locationDataService.Object);
 
-        ActionResult<List<BedRequest>> result = await controller.GetBedRequests();
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests();
 
         OkObjectResult okResult = result.Result as OkObjectResult
             ?? throw new AssertionException("Expected an OK response.");
-        List<BedRequest> payload = okResult.Value as List<BedRequest>
-            ?? throw new AssertionException("Expected a bed request list payload.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
 
-        Assert.That(payload, Has.Count.EqualTo(2));
+        Assert.That(payload.Items, Has.Count.EqualTo(2));
         bedRequestDataService.Verify(x => x.LoadBedRequests(userLocation, metroLocations), Times.Once);
+    }
+
+    [Test]
+    public async Task GetBedRequests_ShouldReturnRequestedPage()
+    {
+        Location userLocation = CreateLocation(10);
+        List<BedRequest> bedRequests =
+        [
+            CreateBedRequest(100, userLocation.LocationId),
+            CreateBedRequest(200, userLocation.LocationId),
+            CreateBedRequest(300, userLocation.LocationId)
+        ];
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests(2, 2);
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.PageNumber, Is.EqualTo(2));
+            Assert.That(payload.MaxPage, Is.EqualTo(2));
+            Assert.That(payload.NumberOfItems, Is.EqualTo(3));
+            Assert.That(payload.ItemsPerPage, Is.EqualTo(2));
+            Assert.That(payload.Items.Select(x => x.BedRequestId), Is.EqualTo(new[] { 300 }));
+        });
+    }
+
+    [Test]
+    public async Task GetBedRequests_ShouldCapItemsPerPageAtOneThousand()
+    {
+        Location userLocation = CreateLocation(10);
+        List<BedRequest> bedRequests =
+        [
+            CreateBedRequest(100, userLocation.LocationId),
+            CreateBedRequest(200, userLocation.LocationId)
+        ];
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests(1, 1001);
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.That(payload.ItemsPerPage, Is.EqualTo(1000));
     }
 
     [Test]
@@ -118,7 +200,7 @@ public class BedRequestsControllerTests
         BedRequestsController controller =
             new(bedRequestDataService.Object, locationDataService.Object);
 
-        ActionResult<List<BedRequest>> result = await controller.GetBedRequests();
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests();
 
         ApiError error = AssertApiErrorResponse(result.Result);
         Assert.That(error.Message, Is.EqualTo("Unable to load user location"));
@@ -143,7 +225,7 @@ public class BedRequestsControllerTests
         BedRequestsController controller =
             new(bedRequestDataService.Object, locationDataService.Object);
 
-        ActionResult<List<BedRequest>> result = await controller.GetBedRequests();
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests();
 
         ApiError error = AssertApiErrorResponse(result.Result);
         Assert.That(error.Message, Is.EqualTo("Unable to load bed requests"));
