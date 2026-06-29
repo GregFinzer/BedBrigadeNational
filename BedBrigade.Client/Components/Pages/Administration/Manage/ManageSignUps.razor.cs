@@ -129,7 +129,7 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task SaveGridPersistence()
     {
-        string state = await Grid.GetPersistData();
+        string state = await Grid.GetPersistDataAsync();
         string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);

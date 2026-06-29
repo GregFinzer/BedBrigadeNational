@@ -8,6 +8,7 @@ using KellermanSoftware.AddressParser;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Location = BedBrigade.Common.Models.Location;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Data.Services;
 

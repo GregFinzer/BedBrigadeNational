@@ -8,6 +8,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.SpeakIt
 {

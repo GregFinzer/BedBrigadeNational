@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,15 @@ public class BedRequestsController
     : LocationScopedRepositoryControllerBase<BedRequest, int, IBedRequestDataService>
 {
     private readonly ILocationDataService _locationDataService;
-    private const int MaxItemsPerPage = 1000;
-
+    private readonly IConfigurationDataService _configurationDataService;
+    
     public BedRequestsController(IBedRequestDataService bedRequestDataService,
-        ILocationDataService locationDataService) : base(bedRequestDataService, locationDataService,
+        ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService) : base(bedRequestDataService, locationDataService,
         x => x.BedRequestId)
     {
         _locationDataService = locationDataService ?? throw new ArgumentNullException(nameof(locationDataService));
+        _configurationDataService = configurationDataService  ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -41,9 +44,21 @@ public class BedRequestsController
     [ProducesResponseType(typeof(PageResponse<BedRequest>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PageResponse<BedRequest>>> GetBedRequests(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int itemsPerPage = MaxItemsPerPage)
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
     {
+
+        if (pageNumber < 1)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError("pageNumber must be greater than or equal to 1."));
+        }
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
+        }
         try
         {
             ServiceResponse<LocationScope> scopeResult = await GetLocationScope();
@@ -64,7 +79,7 @@ public class BedRequestsController
             }
 
             PageResponse<BedRequest> pageResponse =
-                CreatePageResponse(bedRequestsResult.Data, pageNumber, itemsPerPage);
+                CreatePageResponse(bedRequestsResult.Data, pageNumber, itemsPerPage, maxItemsPerPage);
 
             return Ok(pageResponse);
         }
@@ -78,10 +93,10 @@ public class BedRequestsController
     }
 
     private static PageResponse<BedRequest> CreatePageResponse(List<BedRequest> bedRequests,
-        int pageNumber, int itemsPerPage)
+        int pageNumber, int itemsPerPage, int maxItemsPerPage)
     {
         int normalizedPageNumber = Math.Max(pageNumber, 1);
-        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, MaxItemsPerPage);
+        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
         int numberOfItems = bedRequests.Count;
         int maxPage = numberOfItems == 0
             ? 0
