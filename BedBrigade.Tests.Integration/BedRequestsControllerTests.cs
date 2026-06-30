@@ -196,12 +196,15 @@ public class BedRequestsControllerTests
 
         ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests(1, 1001);
 
-        OkObjectResult okResult = result.Result as OkObjectResult
-            ?? throw new AssertionException("Expected an OK response.");
-        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
-            ?? throw new AssertionException("Expected a page response payload.");
-
-        Assert.That(payload.ItemsPerPage, Is.EqualTo(1000));
+        ObjectResult objectResult = result.Result as ObjectResult
+                                    ?? throw new AssertionException("Expected an error response.");
+        
+        Assert.That(objectResult.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
+        
+        ApiError apiError = objectResult.Value as ApiError
+               ?? throw new AssertionException("Expected an ApiError payload.");
+        
+        Assert.That(apiError.Message, Is.EqualTo("itemsPerPage must be between 1 and 1000."));
     }
 
     [Test]

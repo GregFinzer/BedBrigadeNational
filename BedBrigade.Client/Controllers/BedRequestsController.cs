@@ -42,6 +42,7 @@ public class BedRequestsController
     [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<BedRequest>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
     [ProducesResponseType(typeof(PageResponse<BedRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PageResponse<BedRequest>>> GetBedRequests(
         [FromQuery] int pageNumber,
@@ -50,13 +51,13 @@ public class BedRequestsController
 
         if (pageNumber < 1)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
+            return StatusCode(StatusCodes.Status400BadRequest,
                 CreateApiError("pageNumber must be greater than or equal to 1."));
         }
         int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage);
         if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
+            return StatusCode(StatusCodes.Status400BadRequest,
                 CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
         }
         try
