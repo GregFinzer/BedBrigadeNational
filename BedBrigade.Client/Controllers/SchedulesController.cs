@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class SchedulesController : LocationScopedRepositoryControllerBase<Schedule, int, IScheduleDataService>
 {
-    public SchedulesController(IScheduleDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public SchedulesController(IScheduleDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ScheduleId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +30,15 @@ public class SchedulesController : LocationScopedRepositoryControllerBase<Schedu
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetSchedules")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Schedule>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Schedule>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Schedule>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Schedule>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Schedule>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<Schedule>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage) =>
+        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
     /// Gets a schedule by its identifier.

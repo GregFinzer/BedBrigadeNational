@@ -103,15 +103,17 @@ public class RepositoryControllersTests
         locationDataService.Setup(x => x.GetLocationsByMetroAreaId(2))
             .ReturnsAsync(new ServiceResponse<List<Location>>("Found metro locations", true,
                 [userLocation, metroLocation]));
-        VolunteersController controller = new(dataService.Object, locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        VolunteersController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
-        ActionResult<List<Volunteer>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Volunteer>> result = await controller.GetAllAsync(1, 10);
 
         OkObjectResult okResult = result.Result as OkObjectResult
             ?? throw new AssertionException("Expected an OK response.");
-        List<Volunteer> payload = okResult.Value as List<Volunteer>
-            ?? throw new AssertionException("Expected volunteer list payload.");
-        Assert.That(payload.Select(x => x.VolunteerId), Is.EquivalentTo(new[] { 1, 2 }));
+        PageResponse<Volunteer> payload = okResult.Value as PageResponse<Volunteer>
+            ?? throw new AssertionException("Expected volunteer page payload.");
+        Assert.That(payload.Items.Select(x => x.VolunteerId), Is.EquivalentTo(new[] { 1, 2 }));
     }
 
     [Test]
@@ -124,7 +126,9 @@ public class RepositoryControllersTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
             .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
-        VolunteersController controller = new(dataService.Object, locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        VolunteersController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
         ActionResult<Volunteer> result = await controller.CreateAsync(volunteer);
 
@@ -141,14 +145,26 @@ public class RepositoryControllersTests
         dataService.Setup(x => x.GetAllExceptBlogTypes())
             .ReturnsAsync(new ServiceResponse<List<Content>>("Found content", true, contents));
         Mock<ILocationDataService> locationDataService = new();
-        ContentsController controller = new(dataService.Object, locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        ContentsController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
-        ActionResult<List<Content>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Content>> result = await controller.GetAllAsync(1, 10);
 
-        Assert.That((result.Result as OkObjectResult)?.Value, Is.SameAs(contents));
+        PageResponse<Content> payload = (result.Result as OkObjectResult)?.Value as PageResponse<Content>
+            ?? throw new AssertionException("Expected content page payload.");
+        Assert.That(payload.Items, Is.EqualTo(contents));
         dataService.Verify(x => x.GetAllExceptBlogTypes(), Times.Once);
     }
     
+    private static Mock<IConfigurationDataService> CreatePagingConfigurationDataService()
+    {
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        return configurationDataService;
+    }
+
 
     private static Location CreateLocation(int locationId, int? metroAreaId = null)
     {

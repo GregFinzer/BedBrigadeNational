@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class VolunteersController : LocationScopedRepositoryControllerBase<Volunteer, int, IVolunteerDataService>
 {
-    public VolunteersController(IVolunteerDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public VolunteersController(IVolunteerDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.VolunteerId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +30,15 @@ public class VolunteersController : LocationScopedRepositoryControllerBase<Volun
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetVolunteers")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Volunteer>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Volunteer>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Volunteer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Volunteer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Volunteer>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<Volunteer>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage) =>
+        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
     /// Gets a volunteer by its identifier.

@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class UsersController : LocationScopedRepositoryControllerBase<User, string, IUserDataService>
 {
-    public UsersController(IUserDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public UsersController(IUserDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.UserName)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +30,15 @@ public class UsersController : LocationScopedRepositoryControllerBase<User, stri
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetUsers")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<User>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<User>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<User>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<User>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<User>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<User>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage) =>
+        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
     /// Gets a user by username.

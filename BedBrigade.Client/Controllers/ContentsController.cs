@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class ContentsController : LocationScopedRepositoryControllerBase<Content, int, IContentDataService>
 {
-    public ContentsController(IContentDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public ContentsController(IContentDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ContentId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,18 +30,23 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetContents")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Content>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Content>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Content>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Content>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Content>>> GetAllAsync()
+    public async Task<ActionResult<PageResponse<Content>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
     {
         if (DataService.IsUserNationalAdmin())
         {
-            return await GetAllCoreAsync(() => DataService.GetAllExceptBlogTypes());
+            return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService,
+                () => DataService.GetAllExceptBlogTypes());
         }
 
-        return await GetAllCoreAsync(() => DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId()));
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService,
+            () => DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId()));
     }
 
     /// <summary>

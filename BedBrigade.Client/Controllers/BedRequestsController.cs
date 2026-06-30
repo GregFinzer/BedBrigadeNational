@@ -1,10 +1,8 @@
 using BedBrigade.Common.Constants;
-using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace BedBrigade.Client.Controllers;
@@ -48,76 +46,17 @@ public class BedRequestsController
         [FromQuery] int pageNumber,
         [FromQuery] int itemsPerPage)
     {
-
-        if (pageNumber < 1)
-        {
-            return StatusCode(StatusCodes.Status400BadRequest,
-                CreateApiError("pageNumber must be greater than or equal to 1."));
-        }
-        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage);
-        if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
-        {
-            return StatusCode(StatusCodes.Status400BadRequest,
-                CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
-        }
-        try
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, async () =>
         {
             ServiceResponse<LocationScope> scopeResult = await GetLocationScope();
             if (!scopeResult.Success || scopeResult.Data == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    CreateApiError(scopeResult.Message));
+                return new ServiceResponse<List<BedRequest>>(scopeResult.Message);
             }
 
-            ServiceResponse<List<BedRequest>> bedRequestsResult =
-                await DataService.LoadBedRequests(scopeResult.Data.UserLocation,
-                    scopeResult.Data.MetroLocations);
-
-            if (!bedRequestsResult.Success || bedRequestsResult.Data == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    CreateApiError(bedRequestsResult.Message));
-            }
-
-            PageResponse<BedRequest> pageResponse =
-                CreatePageResponse(bedRequestsResult.Data, pageNumber, itemsPerPage, maxItemsPerPage);
-
-            return Ok(pageResponse);
-        }
-        catch (Exception ex)
-        {
-            Log.Logger.Error(ex, "Error in {Controller}.{Action}", nameof(BedRequestsController),
-                nameof(GetBedRequests));
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                CreateApiError("There was an error getting bed requests, try again later."));
-        }
-    }
-
-    private static PageResponse<BedRequest> CreatePageResponse(List<BedRequest> bedRequests,
-        int pageNumber, int itemsPerPage, int maxItemsPerPage)
-    {
-        int normalizedPageNumber = Math.Max(pageNumber, 1);
-        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
-        int numberOfItems = bedRequests.Count;
-        int maxPage = numberOfItems == 0
-            ? 0
-            : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
-        long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
-        List<BedRequest> pageItems = itemsToSkip > int.MaxValue
-            ? []
-            : bedRequests
-                .Skip((int)itemsToSkip)
-                .Take(normalizedItemsPerPage)
-                .ToList();
-
-        return new PageResponse<BedRequest>
-        {
-            PageNumber = normalizedPageNumber,
-            MaxPage = maxPage,
-            NumberOfItems = numberOfItems,
-            ItemsPerPage = normalizedItemsPerPage,
-            Items = pageItems
-        };
+            return await DataService.LoadBedRequests(scopeResult.Data.UserLocation,
+                scopeResult.Data.MetroLocations);
+        });
     }
 
     /// <summary>

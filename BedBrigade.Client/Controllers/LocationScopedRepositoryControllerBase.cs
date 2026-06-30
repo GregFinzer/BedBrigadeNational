@@ -48,6 +48,41 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         });
     }
 
+    protected async Task<ActionResult<PageResponse<TEntity>>> GetScopedPageCoreAsync(
+        int pageNumber,
+        int itemsPerPage,
+        IConfigurationDataService configurationDataService,
+        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        string? errorDisplayName = null)
+    {
+        if (DataService.IsUserNationalAdmin())
+        {
+            return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, getAll, errorDisplayName);
+        }
+
+        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
+        if (locationIdsResult.Result != null)
+        {
+            return locationIdsResult.Result;
+        }
+
+        List<int> locationIds = locationIdsResult.Value!;
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, async () =>
+        {
+            ServiceResponse<List<TEntity>> result =
+                getAll == null ? await DataService.GetAllAsync() : await getAll();
+            if (!result.Success || result.Data == null)
+            {
+                return result;
+            }
+
+            List<TEntity> scopedEntities = result.Data
+                .Where(entity => locationIds.Contains(entity.LocationId))
+                .ToList();
+            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
+        }, errorDisplayName);
+    }
+
     protected async Task<ActionResult<TEntity>> GetScopedByIdCoreAsync(TKey id)
     {
         ActionResult<TEntity> result = await GetByIdCoreAsync(id);

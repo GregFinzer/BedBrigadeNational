@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, int, ISignUpDataService>
 {
-    public SignUpsController(ISignUpDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public SignUpsController(ISignUpDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.SignUpId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +30,15 @@ public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, 
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetSignUps")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<SignUp>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUp>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<SignUp>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<SignUp>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<SignUp>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<SignUp>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage) =>
+        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
     /// Gets a sign-up by its identifier.

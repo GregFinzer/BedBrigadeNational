@@ -1,3 +1,5 @@
+using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +39,42 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         catch (Exception ex)
         {
             Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetAllCoreAsync));
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError($"There was an error getting {errorDisplayName ?? GetEntityDisplayName()}, try again later."));
+        }
+    }
+
+    protected async Task<ActionResult<PageResponse<TEntity>>> GetPageCoreAsync(
+        int pageNumber,
+        int itemsPerPage,
+        IConfigurationDataService configurationDataService,
+        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        string? errorDisplayName = null)
+    {
+        ArgumentNullException.ThrowIfNull(configurationDataService);
+
+        try
+        {
+            int maxItemsPerPage = await configurationDataService.GetConfigValueAsIntAsync(
+                ConfigSection.System, ConfigNames.MaxItemsPerPage);
+            ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            ServiceResponse<List<TEntity>> result =
+                getAll == null ? await DataService.GetAllAsync() : await getAll();
+            if (!result.Success || result.Data == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+            }
+
+            return Ok(CreatePageResponse(result.Data, pageNumber, itemsPerPage, maxItemsPerPage));
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetPageCoreAsync));
             return StatusCode(StatusCodes.Status500InternalServerError,
                 CreateApiError($"There was an error getting {errorDisplayName ?? GetEntityDisplayName()}, try again later."));
         }
@@ -140,6 +178,50 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
     protected static ApiError CreateApiError(string message)
     {
         return new ApiError { Message = message };
+    }
+
+    private ActionResult? ValidatePagingParameters(int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        if (pageNumber < 1)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                CreateApiError("pageNumber must be greater than or equal to 1."));
+        }
+
+        if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest,
+                CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
+        }
+
+        return null;
+    }
+
+    private static PageResponse<TEntity> CreatePageResponse(List<TEntity> entities,
+        int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        int normalizedPageNumber = Math.Max(pageNumber, 1);
+        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
+        int numberOfItems = entities.Count;
+        int maxPage = numberOfItems == 0
+            ? 0
+            : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
+        long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
+        List<TEntity> pageItems = itemsToSkip > int.MaxValue
+            ? []
+            : entities
+                .Skip((int)itemsToSkip)
+                .Take(normalizedItemsPerPage)
+                .ToList();
+
+        return new PageResponse<TEntity>
+        {
+            PageNumber = normalizedPageNumber,
+            MaxPage = maxPage,
+            NumberOfItems = numberOfItems,
+            ItemsPerPage = normalizedItemsPerPage,
+            Items = pageItems
+        };
     }
 
     protected virtual string GetEntityDisplayName()

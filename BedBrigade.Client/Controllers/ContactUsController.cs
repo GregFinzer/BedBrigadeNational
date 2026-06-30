@@ -14,9 +14,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class ContactUsController : LocationScopedRepositoryControllerBase<ContactUs, int, IContactUsDataService>
 {
-    public ContactUsController(IContactUsDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public ContactUsController(IContactUsDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ContactUsId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +30,15 @@ public class ContactUsController : LocationScopedRepositoryControllerBase<Contac
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetContactUs")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<ContactUs>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<ContactUs>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<ContactUs>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<ContactUs>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<ContactUs>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<ContactUs>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage) =>
+        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
     /// Gets a contact-us request by its identifier.
