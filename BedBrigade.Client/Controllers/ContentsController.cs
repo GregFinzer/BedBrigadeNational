@@ -1,8 +1,10 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace BedBrigade.Client.Controllers;
@@ -47,6 +49,51 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
 
         return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService,
             () => DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId()));
+    }
+
+    /// <summary>
+    /// Gets paged blog items for the authenticated user's location.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanViewPages)]
+    [HttpGet("blog-items")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetBlogItems")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<BlogItem>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid paging parameters")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<BlogItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<BlogItem>>> GetBlogItems(
+        [FromQuery] ContentType contentType,
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        try
+        {
+            int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+                ConfigSection.System, ConfigNames.MaxItemsPerPage);
+            ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            ServiceResponse<List<BlogItem>> result =
+                await DataService.GetBlogItems(DataService.GetUserLocationId(), contentType);
+            if (!result.Success || result.Data == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+            }
+
+            return Ok(CreatePageResponse(result.Data, pageNumber, itemsPerPage, maxItemsPerPage));
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetBlogItems));
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError("There was an error getting blog items, try again later."));
+        }
     }
 
     /// <summary>
@@ -122,4 +169,47 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id) => await DeleteScopedCoreAsync(id);
+
+    private static ActionResult? ValidatePagingParameters(int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        if (pageNumber < 1)
+        {
+            return new BadRequestObjectResult(CreateApiError("pageNumber must be greater than or equal to 1."));
+        }
+
+        if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
+        {
+            return new BadRequestObjectResult(
+                CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
+        }
+
+        return null;
+    }
+
+    private static PageResponse<BlogItem> CreatePageResponse(List<BlogItem> entities,
+        int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        int normalizedPageNumber = Math.Max(pageNumber, 1);
+        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
+        int numberOfItems = entities.Count;
+        int maxPage = numberOfItems == 0
+            ? 0
+            : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
+        long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
+        List<BlogItem> pageItems = itemsToSkip > int.MaxValue
+            ? []
+            : entities
+                .Skip((int)itemsToSkip)
+                .Take(normalizedItemsPerPage)
+                .ToList();
+
+        return new PageResponse<BlogItem>
+        {
+            PageNumber = normalizedPageNumber,
+            MaxPage = maxPage,
+            NumberOfItems = numberOfItems,
+            ItemsPerPage = normalizedItemsPerPage,
+            Items = pageItems
+        };
+    }
 }

@@ -41,6 +41,30 @@ public class DonationsController : LocationScopedRepositoryControllerBase<Donati
         await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
 
     /// <summary>
+    /// Gets donations for a specific four-digit donation year.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanManageDonations)]
+    [HttpGet("year/{year:int}")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetDonationsByYear")]
+    [SwaggerResponse(statusCode: 200, type: typeof(List<Donation>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Year must be a four-digit number")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(List<Donation>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<Donation>>> GetByYearAsync([FromRoute] int year)
+    {
+        ActionResult? validationResult = ValidateYear(year);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        return await GetScopedAllCoreAsync(() => DataService.GetByYearAsync(year), "donations");
+    }
+
+    /// <summary>
     /// Gets a donation by its identifier.
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageDonations)]
@@ -113,4 +137,14 @@ public class DonationsController : LocationScopedRepositoryControllerBase<Donati
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id) => await DeleteScopedCoreAsync(id);
+
+    private static ActionResult? ValidateYear(int year)
+    {
+        if (year >= 1000 && year <= 9999)
+        {
+            return null;
+        }
+
+        return new BadRequestObjectResult(CreateApiError("year must be a four-digit number."));
+    }
 }

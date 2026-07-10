@@ -31,7 +31,7 @@ public class DonationCampaignsController
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
     [ProducesResponseType(typeof(List<DonationCampaign>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<DonationCampaign>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<List<DonationCampaign>>> GetAllAsync() => await GetLocationAllCoreAsync();
 
     /// <summary>
     /// Gets a donation campaign by its identifier.

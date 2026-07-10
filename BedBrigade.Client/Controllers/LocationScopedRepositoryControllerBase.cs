@@ -19,11 +19,13 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         _locationDataService = locationDataService ?? throw new ArgumentNullException(nameof(locationDataService));
     }
 
-    protected async Task<ActionResult<List<TEntity>>> GetScopedAllCoreAsync()
+    protected async Task<ActionResult<List<TEntity>>> GetScopedAllCoreAsync(
+        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        string? errorDisplayName = null)
     {
         if (DataService.IsUserNationalAdmin())
         {
-            return await GetAllCoreAsync();
+            return await GetAllCoreAsync(getAll, errorDisplayName);
         }
 
         ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
@@ -35,7 +37,8 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         List<int> locationIds = locationIdsResult.Value!;
         return await GetAllCoreAsync(async () =>
         {
-            ServiceResponse<List<TEntity>> result = await DataService.GetAllAsync();
+            ServiceResponse<List<TEntity>> result =
+                getAll == null ? await DataService.GetAllAsync() : await getAll();
             if (!result.Success || result.Data == null)
             {
                 return result;
@@ -45,9 +48,55 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
                 .Where(entity => locationIds.Contains(entity.LocationId))
                 .ToList();
             return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-        });
+        }, errorDisplayName);
     }
 
+    protected async Task<ActionResult<List<TEntity>>> GetLocationAllCoreAsync(
+        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        string? errorDisplayName = null)
+    {
+        int locationId = DataService.GetUserLocationId();
+        return await GetAllCoreAsync(async () =>
+        {
+            ServiceResponse<List<TEntity>> result =
+                getAll == null ? await DataService.GetAllAsync() : await getAll();
+            if (!result.Success || result.Data == null)
+            {
+                return result;
+            }
+
+            List<TEntity> scopedEntities = result.Data
+                .Where(entity => entity.LocationId == locationId)
+                .ToList();
+            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
+        }, errorDisplayName);
+    }
+    
+    // protected async Task<ActionResult<PageResponse<TEntity>>> GetLocationPageCoreAsync(
+    //     int pageNumber,
+    //     int itemsPerPage,
+    //     IConfigurationDataService configurationDataService,
+    //     Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+    //     string? errorDisplayName = null)
+    // {
+    //
+    //     int locationId = configurationDataService.GetUserLocationId();
+    //     return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, async () =>
+    //     {
+    //         ServiceResponse<List<TEntity>> result =
+    //             getAll == null ? await DataService.GetAllAsync() : await getAll();
+    //         if (!result.Success || result.Data == null)
+    //         {
+    //             return result;
+    //         }
+    //
+    //         List<TEntity> scopedEntities = result.Data
+    //             .Where(entity => entity.LocationId == locationId)
+    //             .ToList();
+    //         return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
+    //     }, errorDisplayName);
+    // }
+    
     protected async Task<ActionResult<PageResponse<TEntity>>> GetScopedPageCoreAsync(
         int pageNumber,
         int itemsPerPage,
