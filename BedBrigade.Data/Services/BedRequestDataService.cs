@@ -633,6 +633,41 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
+
+    public async Task<ServiceResponse<List<BedRequest>>> LoadBedRequestsByStatus(Location? userLocation,
+        List<Location>? metroLocations, List<BedRequestStatus> statuses)
+    {
+        if (metroLocations != null)
+        {
+            var metroAreaLocationIds = metroLocations.Select(location => location.LocationId).ToList();
+            var metroAreaBedRequestResult = await GetAllForLocationList(metroAreaLocationIds);
+            if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+            {
+                var filteredResult = metroAreaBedRequestResult.Data
+                    .Where(br => statuses.Contains(br.Status))
+                    .ToList();
+                return new ServiceResponse<List<BedRequest>>(
+                    $"Found {filteredResult.Count} bed requests with matching statuses", true, filteredResult);
+            }
+        }
+
+        if (userLocation != null)
+        {
+            var locationResult = await GetAllForLocationAsync(userLocation.LocationId);
+            if (locationResult.Success && locationResult.Data != null)
+            {
+                var filteredResult = locationResult.Data
+                    .Where(br => statuses.Contains(br.Status))
+                    .ToList();
+                return new ServiceResponse<List<BedRequest>>(
+                    $"Found {filteredResult.Count} bed requests with matching statuses", true, filteredResult);
+            }
+            return locationResult;
+        }
+
+        return new ServiceResponse<List<BedRequest>>("Unable to load bed requests without a user location",
+            false, null);
+    }
 }
 
 

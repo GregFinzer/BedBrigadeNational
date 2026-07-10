@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -25,5 +26,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone);
         Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
+        Task<ServiceResponse<List<BedRequest>>> LoadBedRequestsByStatus(Location? userLocation, List<Location>? metroLocations, List<BedRequestStatus> statuses);
     }
 }

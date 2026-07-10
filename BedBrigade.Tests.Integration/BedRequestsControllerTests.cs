@@ -21,6 +21,7 @@ public class BedRequestsControllerTests
     }
 
     [TestCase(nameof(BedRequestsController.GetBedRequests), RoleNames.CanViewBedRequests)]
+    [TestCase(nameof(BedRequestsController.GetBedRequestsByStatus), RoleNames.CanViewBedRequests)]
     [TestCase(nameof(BedRequestsController.GetByIdAsync), RoleNames.CanViewBedRequests)]
     [TestCase(nameof(BedRequestsController.CreateAsync), RoleNames.CanManageBedRequests)]
     [TestCase(nameof(BedRequestsController.UpdateAsync), RoleNames.CanManageBedRequests)]
@@ -254,6 +255,213 @@ public class BedRequestsControllerTests
             new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
 
         ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequests(1, 1000);
+
+        ApiError error = AssertApiErrorResponse(result.Result);
+        Assert.That(error.Message, Is.EqualTo("Unable to load bed requests"));
+    }
+
+    [Test]
+    public async Task GetBedRequestsByStatus_ShouldReturnRequestsFilteredByStatusForUserLocation()
+    {
+        Location userLocation = CreateLocation(10);
+        List<BedRequest> allBedRequests =
+        [
+            new BedRequest { BedRequestId = 100, LocationId = userLocation.LocationId, Status = BedRequestStatus.Waiting },
+            new BedRequest { BedRequestId = 200, LocationId = userLocation.LocationId, Status = BedRequestStatus.Scheduled },
+            new BedRequest { BedRequestId = 300, LocationId = userLocation.LocationId, Status = BedRequestStatus.Delivered }
+        ];
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
+                allBedRequests.Where(br => br.Status == BedRequestStatus.Waiting).ToList()));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequestsByStatus(1, 1000, 
+            new List<BedRequestStatus> { BedRequestStatus.Waiting });
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.PageNumber, Is.EqualTo(1));
+            Assert.That(payload.NumberOfItems, Is.EqualTo(1));
+            Assert.That(payload.Items, Has.Count.EqualTo(1));
+            Assert.That(payload.Items.First().Status, Is.EqualTo(BedRequestStatus.Waiting));
+        });
+        bedRequestDataService.Verify(x => x.LoadBedRequestsByStatus(userLocation, null, 
+            It.Is<List<BedRequestStatus>>(s => s.Contains(BedRequestStatus.Waiting))), Times.Once);
+    }
+
+    [Test]
+    public async Task GetBedRequestsByStatus_ShouldReturnRequestsFilteredByStatusForMetroArea()
+    {
+        Location userLocation = CreateLocation(10, 5);
+        List<Location> metroLocations =
+        [
+            userLocation,
+            CreateLocation(20, 5)
+        ];
+        List<BedRequest> allBedRequests =
+        [
+            new BedRequest { BedRequestId = 100, LocationId = 10, Status = BedRequestStatus.Waiting },
+            new BedRequest { BedRequestId = 200, LocationId = 10, Status = BedRequestStatus.Scheduled },
+            new BedRequest { BedRequestId = 300, LocationId = 20, Status = BedRequestStatus.Waiting },
+            new BedRequest { BedRequestId = 400, LocationId = 20, Status = BedRequestStatus.Delivered }
+        ];
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, metroLocations, It.IsAny<List<BedRequestStatus>>()))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
+                allBedRequests.Where(br => br.Status == BedRequestStatus.Waiting).ToList()));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+        locationDataService.Setup(x => x.GetLocationsByMetroAreaId(5))
+            .ReturnsAsync(new ServiceResponse<List<Location>>("Found metro locations", true, metroLocations));
+
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequestsByStatus(1, 1000, 
+            new List<BedRequestStatus> { BedRequestStatus.Waiting });
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.That(payload.Items, Has.Count.EqualTo(2));
+        Assert.That(payload.Items.All(br => br.Status == BedRequestStatus.Waiting), Is.True);
+        bedRequestDataService.Verify(x => x.LoadBedRequestsByStatus(userLocation, metroLocations, 
+            It.Is<List<BedRequestStatus>>(s => s.Contains(BedRequestStatus.Waiting))), Times.Once);
+    }
+
+    [Test]
+    public async Task GetBedRequestsByStatus_ShouldReturnRequestsWithMultipleStatuses()
+    {
+        Location userLocation = CreateLocation(10);
+        List<BedRequest> allBedRequests =
+        [
+            new BedRequest { BedRequestId = 100, LocationId = userLocation.LocationId, Status = BedRequestStatus.Waiting },
+            new BedRequest { BedRequestId = 200, LocationId = userLocation.LocationId, Status = BedRequestStatus.Scheduled },
+            new BedRequest { BedRequestId = 300, LocationId = userLocation.LocationId, Status = BedRequestStatus.Delivered }
+        ];
+        
+        List<BedRequestStatus> requestedStatuses = new() { BedRequestStatus.Waiting, BedRequestStatus.Scheduled };
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
+                allBedRequests.Where(br => requestedStatuses.Contains(br.Status)).ToList()));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequestsByStatus(1, 1000, requestedStatuses);
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.NumberOfItems, Is.EqualTo(2));
+            Assert.That(payload.Items, Has.Count.EqualTo(2));
+            Assert.That(payload.Items.Select(x => x.BedRequestId), Is.EqualTo(new[] { 100, 200 }));
+        });
+    }
+
+    [Test]
+    public async Task GetBedRequestsByStatus_ShouldReturnEmptyListWhenNoMatchingStatuses()
+    {
+        Location userLocation = CreateLocation(10);
+        List<BedRequest> allBedRequests =
+        [
+            new BedRequest { BedRequestId = 100, LocationId = userLocation.LocationId, Status = BedRequestStatus.Waiting }
+        ];
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, new List<BedRequest>()));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequestsByStatus(1, 1000, 
+            new List<BedRequestStatus> { BedRequestStatus.Cancelled });
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<BedRequest> payload = okResult.Value as PageResponse<BedRequest>
+            ?? throw new AssertionException("Expected a page response payload.");
+
+        Assert.That(payload.Items, Is.Empty);
+        Assert.That(payload.NumberOfItems, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task GetBedRequestsByStatus_ShouldReturnInternalServerError_WhenBedRequestServiceFails()
+    {
+        Location userLocation = CreateLocation(10);
+
+        Mock<IBedRequestDataService> bedRequestDataService = new();
+        bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
+        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Unable to load bed requests"));
+
+        Mock<ILocationDataService> locationDataService = new();
+        locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
+            .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        
+        BedRequestsController controller =
+            new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
+
+        ActionResult<PageResponse<BedRequest>> result = await controller.GetBedRequestsByStatus(1, 1000, 
+            new List<BedRequestStatus> { BedRequestStatus.Waiting });
 
         ApiError error = AssertApiErrorResponse(result.Result);
         Assert.That(error.Message, Is.EqualTo("Unable to load bed requests"));
