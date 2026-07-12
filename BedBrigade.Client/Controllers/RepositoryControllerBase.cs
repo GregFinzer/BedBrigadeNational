@@ -48,10 +48,11 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         int pageNumber,
         int itemsPerPage,
         IConfigurationDataService configurationDataService,
-        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
+        List<TEntity> entities,
         string? errorDisplayName = null)
     {
         ArgumentNullException.ThrowIfNull(configurationDataService);
+        ArgumentNullException.ThrowIfNull(entities);
 
         try
         {
@@ -63,14 +64,7 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
                 return validationResult;
             }
 
-            ServiceResponse<List<TEntity>> result =
-                getAll == null ? await DataService.GetAllAsync() : await getAll();
-            if (!result.Success || result.Data == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
-            }
-
-            return Ok(CreatePageResponse(result.Data, pageNumber, itemsPerPage, maxItemsPerPage));
+            return Ok(CreatePageResponse(entities, pageNumber, itemsPerPage, maxItemsPerPage));
         }
         catch (Exception ex)
         {
@@ -180,7 +174,7 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         return new ApiError { Message = message };
     }
 
-    private ActionResult? ValidatePagingParameters(int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    protected ActionResult? ValidatePagingParameters(int pageNumber, int itemsPerPage, int maxItemsPerPage)
     {
         if (pageNumber < 1)
         {
@@ -197,7 +191,7 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         return null;
     }
 
-    private static PageResponse<TEntity> CreatePageResponse(List<TEntity> entities,
+    protected static PageResponse<TEntity> CreatePageResponse(List<TEntity> entities,
         int pageNumber, int itemsPerPage, int maxItemsPerPage)
     {
         int normalizedPageNumber = Math.Max(pageNumber, 1);

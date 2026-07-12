@@ -47,10 +47,13 @@ public class BedRequestsController
         [FromQuery] int pageNumber,
         [FromQuery] int itemsPerPage)
     {
-        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, async () =>
+        ServiceResponse<List<BedRequest>> result = await DataService.GetBedRequestsForUser();
+        if (!result.Success || result.Data == null)
         {
-            return await DataService.GetBedRequestsForUser();
-        });
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
 
     /// <summary>
@@ -79,10 +82,13 @@ public class BedRequestsController
         [FromQuery] int itemsPerPage,
         [FromQuery(Name = "statuses")] List<BedRequestStatus> statuses)
     {
-        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, async () =>
+        ServiceResponse<List<BedRequest>> result = await DataService.GetBedRequestsByUserAndStatus(statuses);
+        if (!result.Success || result.Data == null)
         {
-            return await DataService.GetBedRequestsByUserAndStatus(statuses);
-        });
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
 
     /// <summary>

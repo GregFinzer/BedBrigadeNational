@@ -41,14 +41,22 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
         [FromQuery] int pageNumber,
         [FromQuery] int itemsPerPage)
     {
+        ServiceResponse<List<Content>> result;
         if (DataService.IsUserNationalAdmin())
         {
-            return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService,
-                () => DataService.GetAllExceptBlogTypes());
+            result = await DataService.GetAllExceptBlogTypes();
+        }
+        else
+        {
+            result = await DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId());
         }
 
-        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService,
-            () => DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId()));
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
 
     /// <summary>

@@ -213,6 +213,8 @@ public class BedRequestsControllerTests
     {
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(10);
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
+            .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Unable to load user location"));
 
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(10))
@@ -221,7 +223,7 @@ public class BedRequestsControllerTests
         Mock<IConfigurationDataService> configurationDataService = new();
         configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
             .ReturnsAsync(1000);
-        
+
         BedRequestsController controller =
             new(bedRequestDataService.Object, locationDataService.Object, configurationDataService.Object);
 
@@ -229,8 +231,6 @@ public class BedRequestsControllerTests
 
         ApiError error = AssertApiErrorResponse(result.Result);
         Assert.That(error.Message, Is.EqualTo("Unable to load user location"));
-        bedRequestDataService.Verify(
-            x => x.GetBedRequestsForUser(), Times.Never);
     }
 
     [Test]

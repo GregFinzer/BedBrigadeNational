@@ -104,9 +104,16 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
         string? errorDisplayName = null)
     {
+        ServiceResponse<List<TEntity>> result =
+            getAll == null ? await DataService.GetAllAsync() : await getAll();
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
         if (DataService.IsUserNationalAdmin())
         {
-            return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, getAll, errorDisplayName);
+            return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, result.Data, errorDisplayName);
         }
 
         ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
@@ -116,20 +123,11 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         }
 
         List<int> locationIds = locationIdsResult.Value!;
-        return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, async () =>
-        {
-            ServiceResponse<List<TEntity>> result =
-                getAll == null ? await DataService.GetAllAsync() : await getAll();
-            if (!result.Success || result.Data == null)
-            {
-                return result;
-            }
+        List<TEntity> scopedEntities = result.Data
+            .Where(entity => locationIds.Contains(entity.LocationId))
+            .ToList();
 
-            List<TEntity> scopedEntities = result.Data
-                .Where(entity => locationIds.Contains(entity.LocationId))
-                .ToList();
-            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-        }, errorDisplayName);
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, scopedEntities, errorDisplayName);
     }
 
     protected async Task<ActionResult<TEntity>> GetScopedByIdCoreAsync(TKey id)
