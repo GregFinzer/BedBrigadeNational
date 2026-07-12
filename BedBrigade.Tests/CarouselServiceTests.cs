@@ -38,7 +38,7 @@ public class CarouselServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Does.Contain("carousel-inner"));
-            Assert.That(result, Does.Contain("/media/polaris/pages/Home/carousel/"));
+            Assert.That(result, Does.Contain("/media/polaris/pages/home/carousel/"));
             Assert.That(result, Does.Not.Contain("data-component=\"bbcarousel\""));
         });
     }
