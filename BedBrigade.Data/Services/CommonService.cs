@@ -1,7 +1,9 @@
 ﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Stripe.Terminal;
 using System.Numerics;
+using Location = BedBrigade.Common.Models.Location;
 
 namespace BedBrigade.Data.Services
 {
@@ -9,13 +11,17 @@ namespace BedBrigade.Data.Services
     {
         private readonly ICachingService _cachingService;
         private readonly IDbContextFactory<DataContext> _contextFactory;
+        private readonly ILocationDataService _locationDataService;
 
-        public CommonService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService)
+        public CommonService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService, ILocationDataService locationDataService)
         {
             _cachingService = cachingService;
             _contextFactory = contextFactory;
+            _locationDataService = locationDataService;
         }
-        
+
+
+
         public async Task<ServiceResponse<List<TEntity>>> GetAllForLocationAsync<TEntity>(IRepository<TEntity> repository, int locationId) where TEntity : class, ILocationId
         {
             string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetAllForLocationAsync with LocationId {locationId}");

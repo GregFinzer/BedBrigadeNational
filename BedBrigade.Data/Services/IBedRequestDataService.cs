@@ -6,7 +6,7 @@ namespace BedBrigade.Data.Services
     public interface IBedRequestDataService : IRepository<BedRequest>
     {
         Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId);
-        Task<ServiceResponse<List<BedRequest>>> LoadBedRequests(Location? userLocation, List<Location>? metroLocations);
+        Task<ServiceResponse<List<BedRequest>>> GetBedRequestsForUser();
         Task<ServiceResponse<List<string>>> GetDistinctEmail();
         Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId);
         Task<ServiceResponse<List<string>>> EmailsForNotReceivedABed(int locationId);
@@ -26,6 +26,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<BedRequest>> GetWaitingByPhone(string phone);
         Task<int> CancelWaitingForBouncedEmail(List<string> emailList);
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
-        Task<ServiceResponse<List<BedRequest>>> LoadBedRequestsByStatus(Location? userLocation, List<Location>? metroLocations, List<BedRequestStatus> statuses);
+        Task<ServiceResponse<List<BedRequest>>> GetBedRequestsByUserAndStatus(List<BedRequestStatus> statuses);
     }
 }

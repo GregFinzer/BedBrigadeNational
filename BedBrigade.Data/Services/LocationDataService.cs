@@ -35,6 +35,38 @@ public class LocationDataService : Repository<Location>, ILocationDataService
         _donationCampaignDataService = donationCampaignDataService;
     }
 
+    public async Task<ServiceResponse<List<int>>> GetValidLocationIdsForUser()
+    {
+        int userLocationId = GetUserLocationId();
+        List<int> locations = new List<int>(userLocationId);
+
+        ServiceResponse<Location> userLocationResult =  await GetByIdAsync(userLocationId);
+
+        if (!userLocationResult.Success || userLocationResult.Data == null)
+        {
+            return new ServiceResponse<List<int>>(userLocationResult.Message);
+        }
+
+        Location userLocation = userLocationResult.Data;
+        List<Location>? metroLocations = null;
+
+        if (userLocation.IsMetroLocation() && userLocation.MetroAreaId.HasValue)
+        {
+            ServiceResponse<List<Location>> metroLocationsResult =
+                await GetLocationsByMetroAreaId(userLocation.MetroAreaId.Value);
+
+            if (!metroLocationsResult.Success || metroLocationsResult.Data == null)
+            {
+                return new ServiceResponse<List<int>>(metroLocationsResult.Message);
+            }
+
+            locations = metroLocationsResult.Data.Select(o => o.LocationId).ToList();
+            return new ServiceResponse<List<int>>("User is in a metro area", true, locations);
+        }
+
+        return new ServiceResponse<List<int>>("User is not in a metro area", true, locations);
+    }
+
     public async Task<ServiceResponse<List<Location>>> GetActiveLocations()
     {
         var allResult = await GetAllAsync();

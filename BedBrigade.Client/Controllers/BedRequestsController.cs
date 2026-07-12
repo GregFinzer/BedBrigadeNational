@@ -49,14 +49,7 @@ public class BedRequestsController
     {
         return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, async () =>
         {
-            ServiceResponse<LocationScope> scopeResult = await GetLocationScope();
-            if (!scopeResult.Success || scopeResult.Data == null)
-            {
-                return new ServiceResponse<List<BedRequest>>(scopeResult.Message);
-            }
-
-            return await DataService.LoadBedRequests(scopeResult.Data.UserLocation,
-                scopeResult.Data.MetroLocations);
+            return await DataService.GetBedRequestsForUser();
         });
     }
 
@@ -88,14 +81,7 @@ public class BedRequestsController
     {
         return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, async () =>
         {
-            ServiceResponse<LocationScope> scopeResult = await GetLocationScope();
-            if (!scopeResult.Success || scopeResult.Data == null)
-            {
-                return new ServiceResponse<List<BedRequest>>(scopeResult.Message);
-            }
-
-            return await DataService.LoadBedRequestsByStatus(scopeResult.Data.UserLocation,
-                scopeResult.Data.MetroLocations, statuses);
+            return await DataService.GetBedRequestsByUserAndStatus(statuses);
         });
     }
 

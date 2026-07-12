@@ -49,7 +49,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -98,7 +98,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, metroLocations))
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -122,7 +122,7 @@ public class BedRequestsControllerTests
             ?? throw new AssertionException("Expected a page response payload.");
 
         Assert.That(payload.Items, Has.Count.EqualTo(2));
-        bedRequestDataService.Verify(x => x.LoadBedRequests(userLocation, metroLocations), Times.Once);
+        bedRequestDataService.Verify(x => x.GetBedRequestsForUser(), Times.Once);
     }
 
     [Test]
@@ -138,7 +138,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -181,7 +181,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, bedRequests));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -230,7 +230,7 @@ public class BedRequestsControllerTests
         ApiError error = AssertApiErrorResponse(result.Result);
         Assert.That(error.Message, Is.EqualTo("Unable to load user location"));
         bedRequestDataService.Verify(
-            x => x.LoadBedRequests(It.IsAny<Location>(), It.IsAny<List<Location>?>()), Times.Never);
+            x => x.GetBedRequestsForUser(), Times.Never);
     }
 
     [Test]
@@ -240,7 +240,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequests(userLocation, null))
+        bedRequestDataService.Setup(x => x.GetBedRequestsForUser())
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Unable to load bed requests"));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -273,7 +273,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+        bedRequestDataService.Setup(x => x.GetBedRequestsByUserAndStatus(It.IsAny<List<BedRequestStatus>>()))
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
                 allBedRequests.Where(br => br.Status == BedRequestStatus.Waiting).ToList()));
 
@@ -303,7 +303,7 @@ public class BedRequestsControllerTests
             Assert.That(payload.Items, Has.Count.EqualTo(1));
             Assert.That(payload.Items.First().Status, Is.EqualTo(BedRequestStatus.Waiting));
         });
-        bedRequestDataService.Verify(x => x.LoadBedRequestsByStatus(userLocation, null, 
+        bedRequestDataService.Verify(x => x.GetBedRequestsByUserAndStatus(
             It.Is<List<BedRequestStatus>>(s => s.Contains(BedRequestStatus.Waiting))), Times.Once);
     }
 
@@ -326,7 +326,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, metroLocations, It.IsAny<List<BedRequestStatus>>()))
+        bedRequestDataService.Setup(x => x.GetBedRequestsByUserAndStatus(It.IsAny<List<BedRequestStatus>>()))
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
                 allBedRequests.Where(br => br.Status == BedRequestStatus.Waiting).ToList()));
 
@@ -353,7 +353,7 @@ public class BedRequestsControllerTests
 
         Assert.That(payload.Items, Has.Count.EqualTo(2));
         Assert.That(payload.Items.All(br => br.Status == BedRequestStatus.Waiting), Is.True);
-        bedRequestDataService.Verify(x => x.LoadBedRequestsByStatus(userLocation, metroLocations, 
+        bedRequestDataService.Verify(x => x.GetBedRequestsByUserAndStatus(
             It.Is<List<BedRequestStatus>>(s => s.Contains(BedRequestStatus.Waiting))), Times.Once);
     }
 
@@ -372,7 +372,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+        bedRequestDataService.Setup(x => x.GetBedRequestsByUserAndStatus(It.IsAny<List<BedRequestStatus>>()))
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, 
                 allBedRequests.Where(br => requestedStatuses.Contains(br.Status)).ToList()));
 
@@ -413,7 +413,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+        bedRequestDataService.Setup(x => x.GetBedRequestsByUserAndStatus(It.IsAny<List<BedRequestStatus>>()))
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Found bed requests", true, new List<BedRequest>()));
 
         Mock<ILocationDataService> locationDataService = new();
@@ -446,7 +446,7 @@ public class BedRequestsControllerTests
 
         Mock<IBedRequestDataService> bedRequestDataService = new();
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        bedRequestDataService.Setup(x => x.LoadBedRequestsByStatus(userLocation, null, It.IsAny<List<BedRequestStatus>>()))
+        bedRequestDataService.Setup(x => x.GetBedRequestsByUserAndStatus(It.IsAny<List<BedRequestStatus>>()))
             .ReturnsAsync(new ServiceResponse<List<BedRequest>>("Unable to load bed requests"));
 
         Mock<ILocationDataService> locationDataService = new();
