@@ -169,45 +169,12 @@ public class BedRequestsController
         return await DeleteScopedCoreAsync(id);
     }
 
-    private async Task<ServiceResponse<LocationScope>> GetLocationScope()
-    {
-        int userLocationId = DataService.GetUserLocationId();
-        ServiceResponse<Location> userLocationResult =
-            await _locationDataService.GetByIdAsync(userLocationId);
 
-        if (!userLocationResult.Success || userLocationResult.Data == null)
-        {
-            return new ServiceResponse<LocationScope>(userLocationResult.Message);
-        }
-
-        Location userLocation = userLocationResult.Data;
-        List<Location>? metroLocations = null;
-
-        if (userLocation.IsMetroLocation() && userLocation.MetroAreaId.HasValue)
-        {
-            ServiceResponse<List<Location>> metroLocationsResult =
-                await _locationDataService.GetLocationsByMetroAreaId(userLocation.MetroAreaId.Value);
-
-            if (!metroLocationsResult.Success || metroLocationsResult.Data == null)
-            {
-                return new ServiceResponse<LocationScope>(metroLocationsResult.Message);
-            }
-
-            metroLocations = metroLocationsResult.Data;
-        }
-
-        HashSet<int> locationIds = metroLocations?.Select(location => location.LocationId).ToHashSet()
-                                   ?? [userLocation.LocationId];
-
-        return new ServiceResponse<LocationScope>("Found user location scope", true,
-            new LocationScope(userLocation, metroLocations, locationIds));
-    }
 
     protected override string GetEntityDisplayName()
     {
         return "bed request";
     }
 
-    private sealed record LocationScope(Location UserLocation, List<Location>? MetroLocations,
-        HashSet<int> LocationIds);
+
 }
