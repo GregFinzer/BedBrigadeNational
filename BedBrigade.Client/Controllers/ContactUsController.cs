@@ -15,12 +15,14 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class ContactUsController : LocationScopedRepositoryControllerBase<ContactUs, int, IContactUsDataService>
 {
+    private readonly ILocationDataService _locationDataService;
     private readonly IConfigurationDataService _configurationDataService;
 
     public ContactUsController(IContactUsDataService dataService, ILocationDataService locationDataService,
         IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ContactUsId)
     {
+        _locationDataService = locationDataService;
         _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
@@ -38,8 +40,24 @@ public class ContactUsController : LocationScopedRepositoryControllerBase<Contac
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PageResponse<ContactUs>>> GetAllAsync(
         [FromQuery] int pageNumber,
-        [FromQuery] int itemsPerPage) =>
-        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
+        [FromQuery] int itemsPerPage)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<ContactUs>> result = await DataService.GetContactUsByUser();
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
 
     /// <summary>
     /// Gets the contact-us requests for the authenticated user's location or metro area filtered by status.
@@ -67,6 +85,14 @@ public class ContactUsController : LocationScopedRepositoryControllerBase<Contac
         [FromQuery] int itemsPerPage,
         [FromQuery(Name = "statuses")] List<ContactUsStatus> statuses)
     {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
         ServiceResponse<List<ContactUs>> result = await DataService.GetContactUsByUserAndStatus(statuses);
         if (!result.Success || result.Data == null)
         {

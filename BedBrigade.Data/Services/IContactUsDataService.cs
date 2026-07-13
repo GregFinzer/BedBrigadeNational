@@ -14,7 +14,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<ContactUs>>> GetAllForLocationList(List<int> locationIds);
         Task<int> CancelContactRequestedForBouncedEmail(List<string> emailList);
         Task<int> ContactsRequested(int userLocationId);
-        Task<ServiceResponse<List<ContactUs>>> GetContactUsForUser();
         Task<ServiceResponse<List<ContactUs>>> GetContactUsByUserAndStatus(List<ContactUsStatus> statuses);
     }
 }

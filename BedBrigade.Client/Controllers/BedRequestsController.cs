@@ -16,7 +16,6 @@ namespace BedBrigade.Client.Controllers;
 public class BedRequestsController
     : LocationScopedRepositoryControllerBase<BedRequest, int, IBedRequestDataService>
 {
-    private readonly ILocationDataService _locationDataService;
     private readonly IConfigurationDataService _configurationDataService;
     
     public BedRequestsController(IBedRequestDataService bedRequestDataService,
@@ -24,7 +23,6 @@ public class BedRequestsController
         IConfigurationDataService configurationDataService) : base(bedRequestDataService, locationDataService,
         x => x.BedRequestId)
     {
-        _locationDataService = locationDataService ?? throw new ArgumentNullException(nameof(locationDataService));
         _configurationDataService = configurationDataService  ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
@@ -47,6 +45,14 @@ public class BedRequestsController
         [FromQuery] int pageNumber,
         [FromQuery] int itemsPerPage)
     {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
         ServiceResponse<List<BedRequest>> result = await DataService.GetBedRequestsForUser();
         if (!result.Success || result.Data == null)
         {

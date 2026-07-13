@@ -1,9 +1,7 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BedBrigade.Data.Services;
 
@@ -106,21 +104,10 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
         }
     }
 
-    public async Task<ServiceResponse<List<ContactUs>>> GetContactUsForUser()
-    {
-        ServiceResponse<List<int>> locationsResponse = await _locationDataService.GetValidLocationIdsForUser();
-
-        if (!locationsResponse.Success || locationsResponse.Data == null)
-        {
-            return new ServiceResponse<List<ContactUs>>(locationsResponse.Message);
-        }
-
-        return await GetAllForLocationList(locationsResponse.Data);
-    }
 
     public async Task<ServiceResponse<List<ContactUs>>> GetContactUsByUserAndStatus(List<ContactUsStatus> statuses)
     {
-        ServiceResponse<List<ContactUs>> contactUsRequests = await GetContactUsForUser();
+        ServiceResponse<List<ContactUs>> contactUsRequests = await GetAllForLocationAsync(GetUserLocationId());
 
         if (!contactUsRequests.Success || contactUsRequests.Data == null)
         {

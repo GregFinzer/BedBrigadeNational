@@ -19,117 +19,6 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         _locationDataService = locationDataService ?? throw new ArgumentNullException(nameof(locationDataService));
     }
 
-    protected async Task<ActionResult<List<TEntity>>> GetScopedAllCoreAsync(
-        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
-        string? errorDisplayName = null)
-    {
-        if (DataService.IsUserNationalAdmin())
-        {
-            return await GetAllCoreAsync(getAll, errorDisplayName);
-        }
-
-        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
-        if (locationIdsResult.Result != null)
-        {
-            return locationIdsResult.Result;
-        }
-
-        List<int> locationIds = locationIdsResult.Value!;
-        return await GetAllCoreAsync(async () =>
-        {
-            ServiceResponse<List<TEntity>> result =
-                getAll == null ? await DataService.GetAllAsync() : await getAll();
-            if (!result.Success || result.Data == null)
-            {
-                return result;
-            }
-
-            List<TEntity> scopedEntities = result.Data
-                .Where(entity => locationIds.Contains(entity.LocationId))
-                .ToList();
-            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-        }, errorDisplayName);
-    }
-
-    protected async Task<ActionResult<List<TEntity>>> GetLocationAllCoreAsync(
-        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
-        string? errorDisplayName = null)
-    {
-        int locationId = DataService.GetUserLocationId();
-        return await GetAllCoreAsync(async () =>
-        {
-            ServiceResponse<List<TEntity>> result =
-                getAll == null ? await DataService.GetAllAsync() : await getAll();
-            if (!result.Success || result.Data == null)
-            {
-                return result;
-            }
-
-            List<TEntity> scopedEntities = result.Data
-                .Where(entity => entity.LocationId == locationId)
-                .ToList();
-            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-        }, errorDisplayName);
-    }
-    
-    // protected async Task<ActionResult<PageResponse<TEntity>>> GetLocationPageCoreAsync(
-    //     int pageNumber,
-    //     int itemsPerPage,
-    //     IConfigurationDataService configurationDataService,
-    //     Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
-    //     string? errorDisplayName = null)
-    // {
-    //
-    //     int locationId = configurationDataService.GetUserLocationId();
-    //     return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, async () =>
-    //     {
-    //         ServiceResponse<List<TEntity>> result =
-    //             getAll == null ? await DataService.GetAllAsync() : await getAll();
-    //         if (!result.Success || result.Data == null)
-    //         {
-    //             return result;
-    //         }
-    //
-    //         List<TEntity> scopedEntities = result.Data
-    //             .Where(entity => entity.LocationId == locationId)
-    //             .ToList();
-    //         return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-    //     }, errorDisplayName);
-    // }
-    
-    protected async Task<ActionResult<PageResponse<TEntity>>> GetScopedPageCoreAsync(
-        int pageNumber,
-        int itemsPerPage,
-        IConfigurationDataService configurationDataService,
-        Func<Task<ServiceResponse<List<TEntity>>>>? getAll = null,
-        string? errorDisplayName = null)
-    {
-        ServiceResponse<List<TEntity>> result =
-            getAll == null ? await DataService.GetAllAsync() : await getAll();
-        if (!result.Success || result.Data == null)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
-        }
-
-        if (DataService.IsUserNationalAdmin())
-        {
-            return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, result.Data, errorDisplayName);
-        }
-
-        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
-        if (locationIdsResult.Result != null)
-        {
-            return locationIdsResult.Result;
-        }
-
-        List<int> locationIds = locationIdsResult.Value!;
-        List<TEntity> scopedEntities = result.Data
-            .Where(entity => locationIds.Contains(entity.LocationId))
-            .ToList();
-
-        return await GetPageCoreAsync(pageNumber, itemsPerPage, configurationDataService, scopedEntities, errorDisplayName);
-    }
-
     protected async Task<ActionResult<TEntity>> GetScopedByIdCoreAsync(TKey id)
     {
         ActionResult<TEntity> result = await GetByIdCoreAsync(id);
@@ -202,34 +91,15 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
             return true;
         }
 
-        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
-        return locationIdsResult.Result == null && locationIdsResult.Value!.Contains(locationId);
-    }
+        var locationResult = await _locationDataService.GetValidLocationIdsForUser();
 
-    private async Task<ActionResult<List<int>>> GetAllowedLocationIdsAsync()
-    {
-        int userLocationId = DataService.GetUserLocationId();
-        ServiceResponse<Location> userLocationResult = await _locationDataService.GetByIdAsync(userLocationId);
-        if (!userLocationResult.Success || userLocationResult.Data == null)
+        if (!locationResult.Success || locationResult.Data == null)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                CreateApiError(userLocationResult.Message));
+            throw new Exception($"Failed to retrieve valid location IDs for user. Message: {locationResult.Message}");
         }
 
-        Location userLocation = userLocationResult.Data;
-        if (userLocation.IsMetroLocation() && userLocation.MetroAreaId.HasValue)
-        {
-            ServiceResponse<List<Location>> metroLocationsResult =
-                await _locationDataService.GetLocationsByMetroAreaId(userLocation.MetroAreaId.Value);
-            if (!metroLocationsResult.Success || metroLocationsResult.Data == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    CreateApiError(metroLocationsResult.Message));
-            }
-
-            return metroLocationsResult.Data.Select(location => location.LocationId).Distinct().ToList();
-        }
-
-        return new List<int> { userLocation.LocationId };
+        return locationResult.Data.Contains(locationId);
     }
+
+
 }

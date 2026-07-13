@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,57 @@ public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, 
         : base(dataService, locationDataService, x => x.SignUpId)
     {
         _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
+    }
+
+    /// <summary>
+    ///  Gets the signups visible to the authenticated user.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanViewSignUps)]
+    [HttpGet]
+    [Produces("application/json")]
+    [SwaggerOperation("GetSignUps")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUp>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<SignUp>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<SignUp>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage,
+        [FromQuery] TimePeriod timePeriod)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<SignUp>> result = await DataService.GetSignUpsForDashboard(DataService.GetUserLocationId());
+
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        switch (timePeriod)
+        {
+            case TimePeriod.All:
+                break;
+            case TimePeriod.Future:
+                result = result.Data.Where(s => s.Si.ScheduleDate >= DateTime.Today).ToList();
+                break;
+            case TimePeriod.Past:
+                result = await DataService.GetPastSchedulesByLocationId(DataService.GetUserLocationId());
+                break;
+            default:
+                return StatusCode(StatusCodes.Status400BadRequest, CreateApiError("Invalid Time Period"));
+        }
+
+
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ public class DonationsController : LocationScopedRepositoryControllerBase<Donati
     }
 
     /// <summary>
-    /// Gets the donations visible to the authenticated user.
+    ///  Gets the donations visible to the authenticated user.
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageDonations)]
     [HttpGet]
@@ -37,8 +38,26 @@ public class DonationsController : LocationScopedRepositoryControllerBase<Donati
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PageResponse<Donation>>> GetAllAsync(
         [FromQuery] int pageNumber,
-        [FromQuery] int itemsPerPage) =>
-        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
+        [FromQuery] int itemsPerPage)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<Donation>> result = await DataService.GetAllForLocationAsync(DataService.GetUserLocationId());
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
+
+
 
     /// <summary>
     /// Gets donations for a specific four-digit donation year.
