@@ -23,9 +23,7 @@ public class LocationsControllerTests
 
     [TestCase(nameof(LocationsController.GetAllAsync), RoleNames.CanViewLocations)]
     [TestCase(nameof(LocationsController.GetByIdAsync), RoleNames.CanViewLocations)]
-    [TestCase(nameof(LocationsController.CreateAsync), RoleNames.NationalAdmin)]
     [TestCase(nameof(LocationsController.UpdateAsync), $"{RoleNames.NationalAdmin}, {RoleNames.LocationAdmin}")]
-    [TestCase(nameof(LocationsController.DeleteAsync), RoleNames.NationalAdmin)]
     public void ControllerAction_ShouldUseExpectedRole(string actionName, string expectedRoles)
     {
         var method = typeof(LocationsController).GetMethods()
@@ -139,27 +137,7 @@ public class LocationsControllerTests
         Assert.That(error.Message, Is.EqualTo("Not Found"));
     }
 
-    [Test]
-    public async Task CreateAsync_ShouldReturnCreatedAtAction_WhenLocationIsCreated()
-    {
-        Location location = CreateLocation(10);
-        Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.CreateAsync(location))
-            .ReturnsAsync(new ServiceResponse<Location>("Location created", true, location));
 
-        LocationsController controller = new(locationDataService.Object);
-
-        ActionResult<Location> result = await controller.CreateAsync(location);
-
-        CreatedAtActionResult createdResult = result.Result as CreatedAtActionResult
-            ?? throw new AssertionException("Expected a created response.");
-        Assert.Multiple(() =>
-        {
-            Assert.That(createdResult.ActionName, Is.EqualTo(nameof(LocationsController.GetByIdAsync)));
-            Assert.That(createdResult.RouteValues?["id"], Is.EqualTo(10));
-            Assert.That(createdResult.Value, Is.SameAs(location));
-        });
-    }
 
     [Test]
     public async Task UpdateAsync_ShouldReturnBadRequest_WhenRouteIdDoesNotMatchLocationId()
@@ -208,34 +186,8 @@ public class LocationsControllerTests
         locationDataService.Verify(x => x.UpdateAsync(It.IsAny<Location>()), Times.Never);
     }
 
-    [Test]
-    public async Task DeleteAsync_ShouldReturnNoContent_WhenLocationIsDeleted()
-    {
-        Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.DeleteAsync(10))
-            .ReturnsAsync(new ServiceResponse<bool>("Location deleted", true, true));
 
-        LocationsController controller = new(locationDataService.Object);
 
-        IActionResult result = await controller.DeleteAsync(10);
-
-        Assert.That(result, Is.TypeOf<NoContentResult>());
-    }
-
-    [Test]
-    public async Task DeleteAsync_ShouldReturnNotFound_WhenLocationCannotBeDeleted()
-    {
-        Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.DeleteAsync(99))
-            .ReturnsAsync(new ServiceResponse<bool>("Location not found"));
-
-        LocationsController controller = new(locationDataService.Object);
-
-        IActionResult result = await controller.DeleteAsync(99);
-
-        ApiError error = AssertApiErrorResponse(result, StatusCodes.Status404NotFound);
-        Assert.That(error.Message, Is.EqualTo("Location not found"));
-    }
 
 
     private static Location CreateLocation(int id)

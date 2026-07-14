@@ -44,12 +44,12 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         }
     }
 
-    protected async Task<ActionResult<PageResponse<TEntity>>> GetPageCoreAsync(
+    protected async Task<ActionResult<PageResponse<GEntity>>> GetPageCoreAsync<GEntity>(
         int pageNumber,
         int itemsPerPage,
         IConfigurationDataService configurationDataService,
-        List<TEntity> entities,
-        string? errorDisplayName = null)
+        List<GEntity> entities,
+        string? errorDisplayName = null) where GEntity : class
     {
         ArgumentNullException.ThrowIfNull(configurationDataService);
         ArgumentNullException.ThrowIfNull(entities);
@@ -191,8 +191,8 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
         return null;
     }
 
-    protected static PageResponse<TEntity> CreatePageResponse(List<TEntity> entities,
-        int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    protected static PageResponse<GEntity> CreatePageResponse<GEntity>(List<GEntity> entities,
+        int pageNumber, int itemsPerPage, int maxItemsPerPage) where GEntity : class
     {
         int normalizedPageNumber = Math.Max(pageNumber, 1);
         int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
@@ -201,14 +201,14 @@ public abstract class RepositoryControllerBase<TEntity, TKey, TService> : Contro
             ? 0
             : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
         long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
-        List<TEntity> pageItems = itemsToSkip > int.MaxValue
+        List<GEntity> pageItems = itemsToSkip > int.MaxValue
             ? []
             : entities
                 .Skip((int)itemsToSkip)
                 .Take(normalizedItemsPerPage)
                 .ToList();
 
-        return new PageResponse<TEntity>
+        return new PageResponse<GEntity>
         {
             PageNumber = normalizedPageNumber,
             MaxPage = maxPage,
