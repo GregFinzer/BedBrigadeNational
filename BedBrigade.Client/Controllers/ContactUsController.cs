@@ -50,7 +50,7 @@ public class ContactUsController : LocationScopedRepositoryControllerBase<Contac
             return validationResult;
         }
 
-        ServiceResponse<List<ContactUs>> result = await DataService.GetContactUsByUser();
+        ServiceResponse<List<ContactUs>> result = await DataService.GetAllForLocationAsync(DataService.GetUserLocationId());
         if (!result.Success || result.Data == null)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));

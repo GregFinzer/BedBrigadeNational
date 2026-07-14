@@ -31,12 +31,12 @@ public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, 
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetSignUps")]
-    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUp>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUpDisplayItem>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(PageResponse<SignUp>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<SignUpDisplayItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<PageResponse<SignUp>>> GetAllAsync(
+    public async Task<ActionResult<PageResponse<SignUpDisplayItem>>> GetAllAsync(
         [FromQuery] int pageNumber,
         [FromQuery] int itemsPerPage,
         [FromQuery] TimePeriod timePeriod)
@@ -49,48 +49,25 @@ public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, 
             return validationResult;
         }
 
-        ServiceResponse<List<SignUp>> result = await DataService.GetSignUpsForDashboard(DataService.GetUserLocationId());
+        ServiceResponse<List<SignUpDisplayItem>> result;
 
-        if (!result.Success || result.Data == null)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
-        }
 
         switch (timePeriod)
         {
-            case TimePeriod.All:
-                break;
             case TimePeriod.Future:
-                result = result.Data.Where(s => s.Si.ScheduleDate >= DateTime.Today).ToList();
+                result = await DataService.GetSignUpsForSignUpGrid(DataService.GetUserLocationId(), "allfuture");
                 break;
             case TimePeriod.Past:
-                result = await DataService.GetPastSchedulesByLocationId(DataService.GetUserLocationId());
+                result = await DataService.GetSignUpsForSignUpGrid(DataService.GetUserLocationId(), "allpast");
                 break;
             default:
                 return StatusCode(StatusCodes.Status400BadRequest, CreateApiError("Invalid Time Period"));
         }
 
-
-
         return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
 
-    /// <summary>
-    /// Gets the sign-ups visible to the authenticated user.
-    /// </summary>
-    [Authorize(Roles = RoleNames.CanViewSignUps)]
-    [HttpGet]
-    [Produces("application/json")]
-    [SwaggerOperation("GetSignUps")]
-    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUp>), description: "Successful operation")]
-    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(PageResponse<SignUp>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<PageResponse<SignUp>>> GetAllAsync(
-        [FromQuery] int pageNumber,
-        [FromQuery] int itemsPerPage) =>
-        await GetScopedPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService);
+
 
     /// <summary>
     /// Gets a sign-up by its identifier.
