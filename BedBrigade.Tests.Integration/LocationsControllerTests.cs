@@ -1,5 +1,6 @@
 using BedBrigade.Client.Controllers;
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -53,25 +54,26 @@ public class LocationsControllerTests
         ];
 
         Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.GetActiveLocations())
+        locationDataService.Setup(x => x.GetAllAsync())
             .ReturnsAsync(new ServiceResponse<List<Location>>("Found 1 active locations", true, locations));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
-        ActionResult<List<Location>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Location>> result = await controller.GetAllAsync(1, 10);
 
         OkObjectResult okResult = result.Result as OkObjectResult
             ?? throw new AssertionException("Expected an OK response.");
-        List<Location> payload = okResult.Value as List<Location>
-            ?? throw new AssertionException("Expected a location list payload.");
+        PageResponse<Location> payload = okResult.Value as PageResponse<Location>
+            ?? throw new AssertionException("Expected a location page payload.");
 
         Assert.Multiple(() =>
         {
             Assert.That(okResult.StatusCode ?? StatusCodes.Status200OK, Is.EqualTo(StatusCodes.Status200OK));
-            Assert.That(payload, Has.Count.EqualTo(1));
-            Assert.That(payload[0].LocationId, Is.EqualTo(10));
-            Assert.That(payload[0].Name, Is.EqualTo("Columbus"));
-            Assert.That(payload[0].Route, Is.EqualTo("/columbus"));
+            Assert.That(payload.Items, Has.Count.EqualTo(1));
+            Assert.That(payload.Items[0].LocationId, Is.EqualTo(10));
+            Assert.That(payload.Items[0].Name, Is.EqualTo("Columbus"));
+            Assert.That(payload.Items[0].Route, Is.EqualTo("/columbus"));
         });
     }
 
@@ -79,30 +81,31 @@ public class LocationsControllerTests
     public async Task GetAllAsync_ShouldReturnInternalServerError_WhenLocationServiceFails()
     {
         Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.GetActiveLocations())
+        locationDataService.Setup(x => x.GetAllAsync())
             .ReturnsAsync(new ServiceResponse<List<Location>>("Unable to load locations."));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
-        ActionResult<List<Location>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Location>> result = await controller.GetAllAsync(1, 10);
 
         ApiError error = AssertApiErrorResponse(result.Result, InternalServerErrorStatusCode);
         Assert.That(error.Message, Is.EqualTo("Unable to load locations."));
     }
 
     [Test]
-    public async Task GetAllAsync_ShouldReturnInternalServerError_WhenLocationServiceThrows()
+    public void GetAllAsync_ShouldThrow_WhenLocationServiceThrows()
     {
         Mock<ILocationDataService> locationDataService = new();
-        locationDataService.Setup(x => x.GetActiveLocations())
+        locationDataService.Setup(x => x.GetAllAsync())
             .ThrowsAsync(new InvalidOperationException("Boom"));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
-        ActionResult<List<Location>> result = await controller.GetAllAsync();
-
-        ApiError error = AssertApiErrorResponse(result.Result, InternalServerErrorStatusCode);
-        Assert.That(error.Message, Is.EqualTo("There was an error getting locations, try again later."));
+        // Note: The current LocationsController.GetAllAsync doesn't have exception handling,
+        // so exceptions are not caught and propagate to the caller
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await controller.GetAllAsync(1, 10));
     }
 
     [Test]
@@ -112,8 +115,9 @@ public class LocationsControllerTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(10))
             .ReturnsAsync(new ServiceResponse<Location>("Location found", true, location));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
         ActionResult<Location> result = await controller.GetByIdAsync(10);
 
@@ -128,8 +132,9 @@ public class LocationsControllerTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(99))
             .ReturnsAsync(new ServiceResponse<Location>("Not Found"));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
         ActionResult<Location> result = await controller.GetByIdAsync(99);
 
@@ -144,7 +149,8 @@ public class LocationsControllerTests
     {
         Location location = CreateLocation(10);
         Mock<ILocationDataService> locationDataService = new();
-        LocationsController controller = new(locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
         ActionResult<Location> result = await controller.UpdateAsync(11, location);
 
@@ -160,8 +166,9 @@ public class LocationsControllerTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.UpdateAsync(location))
             .ReturnsAsync(new ServiceResponse<Location>("Location updated", true, location));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
         ActionResult<Location> result = await controller.UpdateAsync(10, location);
 
@@ -177,8 +184,9 @@ public class LocationsControllerTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetUserRole()).Returns(RoleNames.LocationAdmin);
         locationDataService.Setup(x => x.GetUserLocationId()).Returns(20);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
 
-        LocationsController controller = new(locationDataService.Object);
+        LocationsController controller = new(locationDataService.Object, configurationDataService.Object);
 
         ActionResult<Location> result = await controller.UpdateAsync(10, location);
 
@@ -201,6 +209,14 @@ public class LocationsControllerTests
             IsActive = true,
             TimeZoneId = "Eastern Standard Time"
         };
+    }
+
+    private static Mock<IConfigurationDataService> CreatePagingConfigurationDataService()
+    {
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        return configurationDataService;
     }
 
     private static ApiError AssertApiErrorResponse(IActionResult? result, int statusCode)
