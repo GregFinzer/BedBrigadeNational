@@ -28,8 +28,8 @@ public class CarouselServiceTests
     [Test]
     public void ReplaceCarousel_ShouldResolveDirectoryCaseInsensitive_ForPolarisHomeCarousel()
     {
-        CreateCarouselImage("media", "polaris", "pages", "Home", "carousel", "1.webp");
-        CreateCarouselImage("media", "polaris", "pages", "Home", "carousel", "2.webp");
+        CreateCarouselImage("media", "polaris", "pages", "home", "carousel", "1.webp");
+        CreateCarouselImage("media", "polaris", "pages", "home", "carousel", "2.webp");
         CarouselService service = CreateService();
         string html = "<div data-component=\"bbcarousel\" id=\"polaris-home-carousel\" src=\"/media/polaris/pages/home/carousel\"></div>";
 
