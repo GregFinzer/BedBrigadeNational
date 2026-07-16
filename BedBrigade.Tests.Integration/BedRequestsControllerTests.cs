@@ -631,6 +631,8 @@ public class BedRequestsControllerTests
         bedRequestDataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
         locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
             .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
+        locationDataService.Setup(x => x.GetValidLocationIdsForUser())
+            .ReturnsAsync(new ServiceResponse<List<int>>("Found valid location ids", true, [userLocation.LocationId]));
     }
 
     private static BedRequest CreateBedRequest(int bedRequestId, int locationId)
