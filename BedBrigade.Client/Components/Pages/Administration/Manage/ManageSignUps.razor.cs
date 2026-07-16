@@ -115,12 +115,7 @@ public partial class ManageSignUps : ComponentBase
     protected async Task OnLoad()
     {
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp };
-        var result = await _svcUserPersist.GetGridPersistence(persist);
-        if (result.Success && result.Data != null)
-        {
-            await Grid.SetPersistDataAsync(result.Data);
-        }
+        await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.SignUp);
     }
 
     /// <summary>
@@ -134,7 +129,7 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task SaveGridPersistence()
     {
-        string state = await Grid.GetPersistData();
+        string state = await Grid.GetPersistDataAsync();
         string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.SignUp, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);

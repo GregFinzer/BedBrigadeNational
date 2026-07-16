@@ -73,13 +73,13 @@ public class SendSmsLogic : ISendSmsLogic
 
         SmsQueue smsQueue = BuildDeliveryDayBeforeReminderQueueRecord(fromPhone, bedRequest, schedule, templateResult);
 
-        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
-        if (createResult.Success)
+        var queueResult = await _smsQueueDataService.QueueSms(smsQueue);
+        if (queueResult.Success)
         {
             return new ServiceResponse<bool>("SMS Message queued", true);
         }
 
-        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + queueResult.Message);
     }
 
     private SmsQueue BuildDeliveryDayBeforeReminderQueueRecord(string fromPhone,
@@ -157,13 +157,13 @@ public class SendSmsLogic : ISendSmsLogic
 
         SmsQueue smsQueue = BuildSignUpQueueRecord(signUp, fromPhone, volunteerResult, templateResult, scheduleResult);
 
-        var createResult = await _smsQueueDataService.CreateAsync(smsQueue);
-        if (createResult.Success)
+        var queueResult = await _smsQueueDataService.QueueSms(smsQueue);
+        if (queueResult.Success)
         {
             return new ServiceResponse<bool>("SMS Message queued", true);
         }
 
-        return new ServiceResponse<bool>("Failed to create SMS Queue: " + createResult.Message);
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + queueResult.Message);
     }
 
     public async Task<ServiceResponse<bool>> SendTextMessage(int locationId, string phone, string body)

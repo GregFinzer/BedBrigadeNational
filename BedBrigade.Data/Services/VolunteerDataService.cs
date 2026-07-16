@@ -49,12 +49,44 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
     {
-        return await _commonService.GetDistinctEmail(this);
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetDistinctEmail()");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => !string.IsNullOrWhiteSpace(o.Email))
+                .ToListAsync();
+            var result = BuildDistinctEmailsByMostRecentVolunteer(volunteers);
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
     }
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmailByLocation(int locationId)
     {
-        return await _commonService.GetDistinctEmailByLocation(this, locationId);
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetDistinctEmailByLocation({locationId})");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => o.LocationId == locationId && !string.IsNullOrWhiteSpace(o.Email))
+                .ToListAsync();
+            var result = BuildDistinctEmailsByMostRecentVolunteer(volunteers);
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
     }
 
     public async Task<ServiceResponse<List<string>>> GetVolunteerEmailsWithDeliveryVehicles(int locationId)
@@ -67,11 +99,14 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
 
         using (var ctx = _contextFactory.CreateDbContext())
         {
-            var dbSet = ctx.Set<Volunteer>();
-            var result = await dbSet.Where(o => o.LocationId == locationId
-                && (o.VehicleType != VehicleType.None)).Select(b => b.Email).Distinct().ToListAsync();
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => o.LocationId == locationId
+                            && o.VehicleType != VehicleType.None
+                            && !string.IsNullOrWhiteSpace(o.Email))
+                .ToListAsync();
+            var result = BuildDistinctEmailsByMostRecentVolunteer(volunteers);
             _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
 
@@ -89,13 +124,16 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
-                var result = await ctx.SignUps
+                var volunteers = await ctx.SignUps
                     .Where(o => o.ScheduleId == scheduleId)
-                    .Select(b => b.Volunteer.Email)
-                    .Distinct().ToListAsync();
+                    .Select(b => b.Volunteer!)
+                    .Where(b => b != null && !string.IsNullOrWhiteSpace(b.Email))
+                    .ToListAsync();
+
+                var result = BuildDistinctEmailsByMostRecentVolunteer(volunteers);
 
                 _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true,
+                return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true,
                     result);
             }
         }
@@ -149,12 +187,44 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
 
     public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
     {
-        return await _commonService.GetDistinctPhone(this);
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), "GetDistinctPhone()");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => !string.IsNullOrWhiteSpace(o.Phone))
+                .ToListAsync();
+            var result = BuildDistinctPhonesByMostRecentVolunteer(volunteers);
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
     }
 
     public async Task<ServiceResponse<List<string>>> GetDistinctPhoneByLocation(int locationId)
     {
-        return await _commonService.GetDistinctPhoneByLocation(this, locationId);
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetDistinctPhoneByLocation({locationId})");
+        var cachedContent = _cachingService.Get<List<string>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent);
+        }
+
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => o.LocationId == locationId && !string.IsNullOrWhiteSpace(o.Phone))
+                .ToListAsync();
+            var result = BuildDistinctPhonesByMostRecentVolunteer(volunteers);
+            _cachingService.Set(cacheKey, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
+        }
     }
 
     public async Task<ServiceResponse<List<string>>> GetVolunteerPhonesWithDeliveryVehicles(int locationId)
@@ -165,12 +235,14 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
             return new ServiceResponse<List<string>>($"Found {cachedContent.Count} {GetEntityName()} records in cache", true, cachedContent); ;
         using (var ctx = _contextFactory.CreateDbContext())
         {
-            var dbSet = ctx.Set<Volunteer>();
-            var result = await dbSet.Where(o => o.LocationId == locationId
-                && !String.IsNullOrEmpty(o.Phone)
-                && (o.VehicleType != VehicleType.None)).Select(b => b.Phone.FormatPhoneNumber()).Distinct().ToListAsync();
+            var volunteers = await ctx.Set<Volunteer>()
+                .Where(o => o.LocationId == locationId
+                    && !string.IsNullOrWhiteSpace(o.Phone)
+                    && o.VehicleType != VehicleType.None)
+                .ToListAsync();
+            var result = BuildDistinctPhonesByMostRecentVolunteer(volunteers);
             _cachingService.Set(cacheKey, result);
-            return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true, result);
+            return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
 
@@ -187,13 +259,15 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
         {
             using (var ctx = _contextFactory.CreateDbContext())
             {
-                var result = await ctx.SignUps
+                var volunteers = await ctx.SignUps
                     .Where(o => o.ScheduleId == scheduleId)
-                    .Select(b => b.Volunteer.Phone.FormatPhoneNumber())
-                    .Where(b => !String.IsNullOrEmpty(b))
-                    .Distinct().ToListAsync();
+                    .Select(b => b.Volunteer!)
+                    .Where(b => b != null && !string.IsNullOrWhiteSpace(b.Phone))
+                    .ToListAsync();
+
+                var result = BuildDistinctPhonesByMostRecentVolunteer(volunteers);
                 _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<List<string>>($"Found {result.Count()} {GetEntityName()} records", true,
+                return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true,
                     result);
             }
         }
@@ -203,6 +277,41 @@ public class VolunteerDataService : Repository<Volunteer>, IVolunteerDataService
                 $"Could not GetVolunteerPhonesForASchedule {GetEntityName()}  with scheduleId {scheduleId}: {ex.Message} ({ex.ErrorCode})",
                 false);
         }
+    }
+
+    private static DateTime GetSortDate(Volunteer volunteer)
+    {
+        return volunteer.UpdateDate ?? volunteer.CreateDate ?? DateTime.MinValue;
+    }
+
+    private static List<string> BuildDistinctEmailsByMostRecentVolunteer(IEnumerable<Volunteer> volunteers)
+    {
+        return volunteers
+            .Where(o => !string.IsNullOrWhiteSpace(o.Email))
+            .GroupBy(o => o.Email.Trim().ToLowerInvariant())
+            .Select(group => group
+                .OrderByDescending(GetSortDate)
+                .ThenByDescending(o => o.VolunteerId)
+                .First()
+                .Email
+                .Trim())
+            .ToList();
+    }
+
+    private static List<string> BuildDistinctPhonesByMostRecentVolunteer(IEnumerable<Volunteer> volunteers)
+    {
+        return volunteers
+            .Where(o => !string.IsNullOrWhiteSpace(o.Phone))
+            .GroupBy(o => StringUtil.ExtractDigits(o.Phone))
+            .Where(group => !string.IsNullOrWhiteSpace(group.Key))
+            .Select(group => group
+                .OrderByDescending(GetSortDate)
+                .ThenByDescending(o => o.VolunteerId)
+                .First()
+                .Phone
+                .FormatPhoneNumber())
+            .Where(o => !string.IsNullOrWhiteSpace(o))
+            .ToList();
     }
 }
 

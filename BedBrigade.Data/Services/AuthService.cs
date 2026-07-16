@@ -1,8 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using BedBrigade.Common.Constants;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace BedBrigade.Data.Services
@@ -15,13 +13,16 @@ namespace BedBrigade.Data.Services
         const string AuthTokenName = "auth_token";
         private ClaimsPrincipal _currentUser;
         private readonly ICustomSessionService _sessionService;
-        private readonly IConfiguration _configuration;
+        private readonly IJwtTokenService _jwtTokenService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public event Func<ClaimsPrincipal, Task>? AuthChanged;
 
-        public AuthService(ICustomSessionService sessionService, IConfiguration configuration)
+        public AuthService(ICustomSessionService sessionService, IJwtTokenService jwtTokenService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _sessionService = sessionService;
-            _configuration = configuration;
+            _jwtTokenService = jwtTokenService;
+            _httpContextAccessor = httpContextAccessor;
             _currentUser = new();
         }
 
@@ -39,14 +40,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? Defaults.DefaultUserNameAndEmail;
-                }
-
-                return Defaults.DefaultUserNameAndEmail;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.Name) ?? Defaults.DefaultUserNameAndEmail;
             }
         }
 
@@ -54,14 +49,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-                }
-
-                return null;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.Role);
             }
         }
 
@@ -69,14 +58,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == "UserRoute")?.Value;
-                }
-
-                return null;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue("UserRoute");
             }
         }
 
@@ -84,14 +67,8 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    return CurrentUser.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? Defaults.DefaultUserNameAndEmail;
-                }
-
-                return Defaults.DefaultUserNameAndEmail;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                return user?.FindFirstValue(ClaimTypes.NameIdentifier) ?? Defaults.DefaultUserNameAndEmail;
             }
         }
 
@@ -99,11 +76,10 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                if (user != null)
                 {
-                    string? locationId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "LocationId")?.Value;
+                    string? locationId = user.FindFirstValue("LocationId");
                     if (int.TryParse(locationId, out int result))
                     {
                         return result;
@@ -114,22 +90,25 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        private ClaimsPrincipal? GetAuthenticatedUser()
+        {
+            return GetAuthenticatedHttpContextUser()
+                   ?? (CurrentUser.Identity?.IsAuthenticated == true ? CurrentUser : null);
+        }
+
+        private ClaimsPrincipal? GetAuthenticatedHttpContextUser()
+        {
+            ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
+            return user?.Identity?.IsAuthenticated == true ? user : null;
+        }
+
         public string TimeZoneId
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "TimeZoneId")?.Value;
-                    if (!String.IsNullOrEmpty(timeZoneId))
-                    {
-                        return timeZoneId;
-                    }
-                }
-
-                return Defaults.DefaultTimeZoneId;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                string? timeZoneId = user?.FindFirstValue("TimeZoneId");
+                return string.IsNullOrEmpty(timeZoneId) ? Defaults.DefaultTimeZoneId : timeZoneId;
             }
         }
 
@@ -137,34 +116,24 @@ namespace BedBrigade.Data.Services
         {
             get
             {
-                if (CurrentUser != null
-                    && CurrentUser.Identity != null
-                    && CurrentUser.Identity.IsAuthenticated)
-                {
-                    string? timeZoneId = CurrentUser.Claims.FirstOrDefault(c => c.Type == "Phone")?.Value;
-                    if (!String.IsNullOrEmpty(timeZoneId))
-                    {
-                        return timeZoneId;
-                    }
-                }
-
-                return Defaults.DefaultTimeZoneId;
+                ClaimsPrincipal? user = GetAuthenticatedUser();
+                string? phone = user?.FindFirstValue("Phone");
+                return string.IsNullOrEmpty(phone) ? Defaults.DefaultTimeZoneId : phone;
             }
         }
 
-        public bool IsLoggedIn => CurrentUser.Identity?.IsAuthenticated ?? false;
+        public bool IsLoggedIn => GetAuthenticatedUser() != null;
 
         public bool IsNationalAdmin
         {
             get
             {
-                string roleName = UserRole ?? string.Empty;
-
-                return roleName.ToLower() == RoleNames.NationalAdmin.ToLower();
+                return string.Equals(UserRole, RoleNames.NationalAdmin,
+                    StringComparison.OrdinalIgnoreCase);
             }
         }
 
-        public async Task LogoutAsync()
+        public async Task LogoutAsync(bool removeFromBrowser)
         {
             bool wasLoggedIn = IsLoggedIn;
             string userName = UserName;
@@ -173,19 +142,22 @@ namespace BedBrigade.Data.Services
             //Update the Blazor Server State for the user to an anonymous user
             CurrentUser = new();
 
-            //Remove the JWT from the browser session
-            try
+            if (removeFromBrowser)
             {
-                string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
-
-                if (!string.IsNullOrEmpty(authToken))
+                //Remove the JWT from the browser session
+                try
                 {
-                    await _sessionService.RemoveItemAsync(AuthTokenName);
+                    string authToken = await _sessionService.GetItemAsStringAsync(AuthTokenName);
+
+                    if (!string.IsNullOrEmpty(authToken))
+                    {
+                        await _sessionService.RemoveItemAsync(AuthTokenName);
+                    }
                 }
-            }
-            catch (System.InvalidOperationException)
-            {
-                //This happens if the component is statically rendered
+                catch (Exception)
+                {
+                    //This happens if the component is statically rendered
+                }
             }
 
             if (wasLoggedIn)
@@ -211,21 +183,8 @@ namespace BedBrigade.Data.Services
             {
                 try
                 {
-                    //Ensure the JWT is valid
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value);
-
-                    tokenHandler.ValidateToken(authToken, new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    }, out SecurityToken validatedToken);
-
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    identity = new ClaimsIdentity(jwtToken.Claims, "jwt");
+                    ClaimsPrincipal principal = _jwtTokenService.ValidateToken(authToken);
+                    identity = principal.Identity as ClaimsIdentity ?? new ClaimsIdentity(principal.Claims, "jwt");
                     result = true;
                 }
                 catch
@@ -256,19 +215,7 @@ namespace BedBrigade.Data.Services
             //Update the Blazor Server State for the user
             CurrentUser = user;
 
-            //Build a JWT for the user
-            var tokenEncryptionKey = _configuration.GetSection("AppSettings:Token").Value;
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes(tokenEncryptionKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            var tokenHoursString = _configuration.GetSection("AppSettings:TokenHours").Value;
-            int.TryParse(tokenHoursString, out int tokenHours);
-            var token = new JwtSecurityToken(
-                claims: user.Claims,
-                expires: DateTime.Now.AddHours(tokenHours),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            string jwt = _jwtTokenService.GenerateToken(user).Token;
 
             //Write a JWT to the browser session
             await _sessionService.SetItemAsStringAsync(AuthTokenName, jwt);
@@ -287,7 +234,8 @@ namespace BedBrigade.Data.Services
 
         public bool UserHasRole(string roles)
         {
-            if (!IsLoggedIn)
+            ClaimsPrincipal? user = GetAuthenticatedUser();
+            if (user == null)
             {
                 return false;
             }
@@ -296,7 +244,7 @@ namespace BedBrigade.Data.Services
 
             foreach (var role in rolesToLookFor)
             {
-                if (CurrentUser.IsInRole(role))
+                if (user.IsInRole(role))
                 {
                     return true;
                 }

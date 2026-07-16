@@ -265,12 +265,12 @@ public partial class ManageMetroAreas : ComponentBase
 
     protected async Task Save(MetroArea metroArea)
     {
-        await Grid.EndEdit();
+        await Grid.EndEditAsync();
     }
 
     protected async Task Cancel()
     {
-        await Grid.CloseEdit();
+        await Grid.CloseEditAsync();
     }
 
     protected void DataBound()
@@ -329,12 +329,7 @@ public partial class ManageMetroAreas : ComponentBase
     protected async Task OnLoad()
     {
         string userName = _svcUser.GetUserName();
-        UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas };
-        var result = await _svcUserPersist.GetGridPersistence(persist);
-        if (result.Success && result.Data != null)
-        {
-            await Grid.SetPersistDataAsync(result.Data);
-        }
+        await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.MetroAreas);
     }
 
     /// <summary>
@@ -348,7 +343,7 @@ public partial class ManageMetroAreas : ComponentBase
 
     private async Task SaveGridPersistence()
     {
-        string state = await Grid.GetPersistData();
+        string state = await Grid.GetPersistDataAsync();
         string userName = _svcUser.GetUserName();
         UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.MetroAreas, Data = state };
         var result = await _svcUserPersist.SaveGridPersistence(persist);

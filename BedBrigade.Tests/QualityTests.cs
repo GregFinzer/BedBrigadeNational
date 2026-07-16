@@ -17,7 +17,8 @@ namespace BedBrigade.Tests
             _qualityLogic = LibraryFactory.CreateQualityLogic();
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
             _qualityLogic.Config.SetConfig("MaxFileLength", 700);
-
+            _qualityLogic.Config.SetConfig("MaxDuplicateStrings", -1);
+            
             //This has duplicate strings but it is okay since roles have multiple similar permissions
             _qualityLogic.Config.FilesToExclude.Add("RoleNames.cs");
 

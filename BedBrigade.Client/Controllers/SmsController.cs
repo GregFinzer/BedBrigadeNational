@@ -2,13 +2,18 @@
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Swashbuckle.AspNetCore.Annotations;
 using Twilio.AspNet.Core;
 using Twilio.TwiML;
 
 namespace BedBrigade.Client.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/[controller]")]
+/// <summary>
+/// Provides hidden endpoints for receiving inbound SMS callbacks.
+/// </summary>
 public class SmsController : TwilioController
 {
     private ISmsQueueDataService _smsQueueDataService;
@@ -18,8 +23,13 @@ public class SmsController : TwilioController
         _smsQueueDataService = smsQueueDataService;
     }
 
-    // This action will be called by Twilio via an HTTP POST when a message is received.
+    /// <summary>
+    /// Receives an inbound Twilio SMS callback and queues the reply handling.
+    /// </summary>
     [HttpPost("receive")]
+    [Produces("application/json")]
+    [SwaggerResponse(statusCode: 200, type: typeof(string), description: "Twilio callback processed")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReceiveSms()
     {
         // Extract parameters sent by Twilio (sent as form POST data).
@@ -39,4 +49,3 @@ public class SmsController : TwilioController
         return TwiML(messagingResponse);
     }
 }
-

@@ -110,12 +110,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         protected async Task OnLoad()
         {
             string userName = _svcUser.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter };
-            var result = await _svcUserPersist.GetGridPersistence(persist);
-            if (result.Success && result.Data != null)
-            {
-                await Grid.SetPersistDataAsync(result.Data);
-            }
+            await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.Newsletter);
         }
 
         /// <summary>
@@ -129,7 +124,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task SaveGridPersistence()
         {
-            _state = await Grid.GetPersistData();
+            _state = await Grid.GetPersistDataAsync();
             string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.Newsletter, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
@@ -143,7 +138,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
+                await Grid.ResetPersistDataAsync();
                 await SaveGridPersistence();
                 return;
             }
@@ -260,12 +255,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         }
         protected async Task Save(Newsletter need)
         {
-            await Grid.EndEdit();
+            await Grid.EndEditAsync();
         }
 
         protected async Task Cancel()
         {
-            await Grid.CloseEdit();
+            await Grid.CloseEditAsync();
         }
 
         protected void DataBound()

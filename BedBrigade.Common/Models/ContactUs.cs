@@ -2,6 +2,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BedBrigade.Common.Models
 {
@@ -23,6 +24,7 @@ namespace BedBrigade.Common.Models
 		[MaxLength(25, ErrorMessage = "Last Name has a maximum length of 25 characters")]
 		public String LastName { get; set; } = string.Empty;
 
+		[JsonIgnore]
         [NotMapped]
         public string FullName
         {

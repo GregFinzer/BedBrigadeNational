@@ -165,6 +165,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
+    public async Task<ServiceResponse<List<BedRequest>>> GetBedRequestsForUser()
+    {
+        ServiceResponse<List<int>> locationsResponse = await _locationDataService.GetValidLocationIdsForUser();
+
+        if (!locationsResponse.Success || locationsResponse.Data == null)
+        {
+            return new ServiceResponse<List<BedRequest>>(locationsResponse.Message);
+        }
+
+        return await GetAllForLocationList(locationsResponse.Data);
+    }
+
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
     {
         return await _commonService.GetDistinctEmail(this);
@@ -611,8 +623,23 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
     }
-}
 
+    public async Task<ServiceResponse<List<BedRequest>>> GetBedRequestsByUserAndStatus(List<BedRequestStatus> statuses)
+    {
+        ServiceResponse<List<BedRequest>> bedRequests = await GetBedRequestsForUser();
+
+        if (!bedRequests.Success || bedRequests.Data == null)
+        {
+            return new ServiceResponse<List<BedRequest>>(bedRequests.Message);
+        }
+
+        var filteredResult = bedRequests.Data
+            .Where(br => statuses.Contains(br.Status))
+            .ToList();
+        return new ServiceResponse<List<BedRequest>>(
+            $"Found {filteredResult.Count} bed requests with matching statuses", true, filteredResult);
+    }
+}
 
 
 

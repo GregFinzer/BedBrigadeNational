@@ -1,9 +1,7 @@
 ﻿using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
-using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BedBrigade.Data.Services;
 
@@ -12,15 +10,18 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
     private readonly IDbContextFactory<DataContext> _contextFactory;
     private readonly ICachingService _cachingService;
     private readonly ICommonService _commonService;
+    private readonly ILocationDataService _locationDataService;
 
     public ContactUsDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService,
-        ICommonService commonService) : base(contextFactory, cachingService, authService)
+        ICommonService commonService,
+        ILocationDataService locationDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _commonService = commonService;
+        _locationDataService = locationDataService;
     }
 
     public async Task<ServiceResponse<List<ContactUs>>> GetAllForLocationAsync(int locationId)
@@ -101,6 +102,23 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
 
             return anyContact;
         }
+    }
+
+
+    public async Task<ServiceResponse<List<ContactUs>>> GetContactUsByUserAndStatus(List<ContactUsStatus> statuses)
+    {
+        ServiceResponse<List<ContactUs>> contactUsRequests = await GetAllForLocationAsync(GetUserLocationId());
+
+        if (!contactUsRequests.Success || contactUsRequests.Data == null)
+        {
+            return new ServiceResponse<List<ContactUs>>(contactUsRequests.Message);
+        }
+
+        var filteredResult = contactUsRequests.Data
+            .Where(cu => statuses.Contains(cu.Status))
+            .ToList();
+        return new ServiceResponse<List<ContactUs>>(
+            $"Found {filteredResult.Count} contact requests with matching statuses", true, filteredResult);
     }
 }
 

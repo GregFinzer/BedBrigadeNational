@@ -6,6 +6,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.SpeakIt;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 
 namespace BedBrigade.Data.Services;
@@ -222,6 +223,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
 
         if (cachedContent != null)
         {
+            FillEventSelects(cachedContent);
             return new ServiceResponse<List<Schedule>>($"Found {cachedContent.Count()} GetFutureSchedulesByLocationId in cache",
                 true, cachedContent);
         }
@@ -234,6 +236,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
                 var result = await dbSet
                     .Where(o => o.LocationId == locationId && o.EventDateScheduled.Date >= DateTime.UtcNow.Date)
                     .OrderBy(o => o.EventDateScheduled).ToListAsync();
+                FillEventSelects(result);
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<List<Schedule>>($"Found {result.Count()} {GetEntityName()}", true, result);
             }

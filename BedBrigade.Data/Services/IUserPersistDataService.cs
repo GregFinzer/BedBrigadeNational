@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -7,5 +8,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> SaveGridPersistence(UserPersist persist);
         Task<ServiceResponse<string>> GetGridPersistence(UserPersist persist);
         Task<ServiceResponse<bool>> DeleteByUserName(string userName);
+        Task<ServiceResponse<bool>> DeleteGridPersistenceAsync(string userName, PersistGrid grid);
     }
 }

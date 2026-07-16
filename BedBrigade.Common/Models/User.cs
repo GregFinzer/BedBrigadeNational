@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BedBrigade.Common.Logic;
 
 namespace BedBrigade.Common.Models;
@@ -27,10 +28,12 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "Email Address is required")]
     [MaxLength(255)]
     public String Email { get; set; } = string.Empty;
-    
+
+    [JsonIgnore]
     [MaxLength(255)]
     public byte[]? PasswordHash { get; set; }
 
+    [JsonIgnore]
     [MaxLength(255)]
     public byte[]? PasswordSalt { get; set; }
 
@@ -38,6 +41,7 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "Phone Number is required")]
     public String? Phone { get; set; } = string.Empty;
 
+    [JsonIgnore]
     [NotMapped]
     public String? FormattedPhone => Phone.FormatPhoneNumber();
 
@@ -55,6 +59,7 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
 
     public DateTime? LockoutEndUtc { get; set; }
 
+    [JsonIgnore]
     public string FullName
     {
         get

@@ -96,8 +96,14 @@ namespace BedBrigade.Client.Components
                 SetupToolbar();
                 await LoadConfiguration();
                 await LoadLocations();
-                await LoadUser();                
-                await LoadBedRequests();
+                await LoadUser();
+
+                var bedRequestResult = await BedRequestDataService.GetBedRequestsForUser();
+                if (bedRequestResult.Success && bedRequestResult.Data != null)
+                {
+                    BedRequests = bedRequestResult.Data.ToList();
+                    SetManageBedRequestsMessage();
+                }
 
                 BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
             }
@@ -168,37 +174,20 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private async Task LoadBedRequests()
+        private void SetManageBedRequestsMessage()
         {
-            if (metroLocations != null)
+            if (UserLocation != null && metroLocations == null)
             {
-                var metroAreaLocationIds = metroLocations.Select(l => l.LocationId).ToList();
-                var metroAreaBedRequestResult = await BedRequestDataService.GetAllForLocationList(metroAreaLocationIds);
-                if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+                if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
                 {
-                    BedRequests = metroAreaBedRequestResult.Data.ToList();
-                    return;
+                    ManageBedRequestsMessage = $"Manage Bed Requests for {UserLocation.Name}";
+                }
+                else
+                {
+                    ManageBedRequestsMessage = $"View Bed Requests for {UserLocation.Name}";
                 }
             }
-
-            if (UserLocation != null && BedRequestDataService != null)
-            {
-                var locationResult = await BedRequestDataService.GetAllForLocationAsync(UserLocation.LocationId);
-                if (locationResult.Success && locationResult.Data != null)
-                {
-                    BedRequests = locationResult.Data.ToList();
-                    if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
-                    {
-                        ManageBedRequestsMessage = $"Manage Bed Requests for {UserLocation.Name}";
-                    }
-                    else
-                    {
-                        ManageBedRequestsMessage = $"View Bed Requests for {UserLocation.Name}";
-                    }
-                }
-            }
-
-        } // LoadBedRequests
+        }
 
         private async Task LoadLocations()
         {
@@ -258,16 +247,8 @@ namespace BedBrigade.Client.Components
         protected async Task OnLoad()
         {
             string userName = UserDataService.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest };
-            var result = await UserPersistDataService.GetGridPersistence(persist);
-            if (result.Success && result.Data != null)
-            {
-                if (Grid != null)
-                {
-                    await Grid.SetPersistDataAsync(result.Data);
-                }
-            }
-            else
+            bool persistenceApplied = await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, UserPersistDataService, userName, PersistGrid.BedRequest);
+            if (!persistenceApplied)
             {
                 await FilterWaiting();
             }
@@ -296,16 +277,36 @@ namespace BedBrigade.Client.Components
 
         private async Task SaveGridPersistence()
         {
+            string? state = _state;
             if (Grid != null)
             {
-                _state = await Grid.GetPersistDataAsync();
+                state = await Grid.GetPersistDataAsync();
             }
+
+            if (string.IsNullOrWhiteSpace(state))
+            {
+                return;
+            }
+
+            _state = state;
             string userName = UserDataService.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.BedRequest, Data = _state };
             var result = await UserPersistDataService.SaveGridPersistence(persist);
             if (!result.Success)
             {
                 Log.Error($"Unable to save grid state for {userName} for grid {PersistGrid.BedRequest} : {result.Message}");
+            }
+        }
+
+        private async Task SaveGridPersistenceForNavigationAsync()
+        {
+            try
+            {
+                await SaveGridPersistence();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Unable to save BedRequest grid state before navigation.");
             }
         }
 
@@ -393,7 +394,7 @@ namespace BedBrigade.Client.Components
 
                 case Action.Add:
                     // navigate to Add page
-                    NavigateToAdd();
+                    await NavigateToAdd();
                     args.Cancel = true;
                     break;
 
@@ -461,8 +462,9 @@ namespace BedBrigade.Client.Components
             }
         }
 
-        private void NavigateToAdd()
+        private async Task NavigateToAdd()
         {
+            await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
             Nav.NavigateTo($"{EditPagePath}{loc}");
         }
@@ -497,6 +499,7 @@ namespace BedBrigade.Client.Components
                 return;
             }
 
+            await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
             Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
         }
@@ -789,4 +792,3 @@ namespace BedBrigade.Client.Components
         }
     }
 }
-

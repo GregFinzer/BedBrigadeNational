@@ -1,6 +1,7 @@
-﻿using BedBrigade.Common.Models;
-
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BedBrigade.Data.Services
 {
@@ -91,7 +92,14 @@ namespace BedBrigade.Data.Services
                         return new ServiceResponse<string>("No persist data found", false, null);
                     }
 
-                    _cachingService.Set(cacheKey, result.Data);
+                    // Keep cache type consistent with Get<UserPersist> above.
+                    _cachingService.Set(cacheKey, new UserPersist
+                    {
+                        UserName = result.UserName,
+                        Grid = result.Grid,
+                        Data = result.Data
+                    });
+
                     return new ServiceResponse<string>(
                         $"Found persist data for {persist.UserName} for Grid {persist.Grid}", true,
                         result.Data);
@@ -115,6 +123,35 @@ namespace BedBrigade.Data.Services
                 await context.SaveChangesAsync();
                 _cachingService.ClearByEntityName(GetEntityName());
                 return new ServiceResponse<bool>("Persist data deleted", true, true);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteGridPersistenceAsync(string userName, PersistGrid grid)
+        {
+            try
+            {
+                using (var context = _contextFactory.CreateDbContext())
+                {
+                    var entity = await context.UserPersist
+                        .FirstOrDefaultAsync(o => o.UserName == userName && o.Grid == grid);
+
+                    if (entity != null)
+                    {
+                        context.UserPersist.Remove(entity);
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                string persistKey = $"{userName}_{grid}";
+                string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), persistKey);
+                _cachingService.Set(cacheKey, new UserPersist());
+
+                return new ServiceResponse<bool>("Grid persistence data cleared", true, true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error deleting grid persistence for {UserName}/{Grid}", userName, grid);
+                return new ServiceResponse<bool>($"Error: {ex.Message}");
             }
         }
     }

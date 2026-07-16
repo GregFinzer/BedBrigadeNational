@@ -2,6 +2,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BedBrigade.Common.Models
 {
@@ -30,6 +31,7 @@ namespace BedBrigade.Common.Models
         [MaxLength(14, ErrorMessage = "Phone Number has a maximum length of 14 characters")]
         public String? Phone { get; set; } = string.Empty;
 
+        [JsonIgnore]
         [NotMapped]
         public String? FormattedPhone
         {
@@ -44,6 +46,7 @@ namespace BedBrigade.Common.Models
 
         public VehicleType VehicleType { get; set; } = VehicleType.None; // default value
 
+        [JsonIgnore]
         [NotMapped]
         public string VehicleTypeString => StringUtil.InsertSpaces(VehicleType.ToString());
 
@@ -73,6 +76,7 @@ namespace BedBrigade.Common.Models
 
         public CanYouTranslate? CanYouTranslate { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string FullName {
 			get
@@ -84,6 +88,7 @@ namespace BedBrigade.Common.Models
 			}
 		}
 
+		[JsonIgnore]
         [NotMapped]
         public string SearchName
         {

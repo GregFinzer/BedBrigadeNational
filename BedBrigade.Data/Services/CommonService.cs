@@ -1,7 +1,6 @@
 ﻿using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Numerics;
 
 namespace BedBrigade.Data.Services
 {
@@ -15,7 +14,7 @@ namespace BedBrigade.Data.Services
             _cachingService = cachingService;
             _contextFactory = contextFactory;
         }
-        
+
         public async Task<ServiceResponse<List<TEntity>>> GetAllForLocationAsync<TEntity>(IRepository<TEntity> repository, int locationId) where TEntity : class, ILocationId
         {
             string cacheKey = _cachingService.BuildCacheKey(repository.GetEntityName(), $"GetAllForLocationAsync with LocationId {locationId}");

@@ -190,12 +190,7 @@ namespace BedBrigade.Client.Components
         protected async Task OnLoad()
         {
             string userName = _svcUser.GetUserName();
-            UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.User };
-            var result = await _svcUserPersist.GetGridPersistence(persist);
-            if (result.Success && result.Data != null)
-            {
-                await Grid.SetPersistDataAsync(result.Data);
-            }
+            await GridPersistenceHelper.LoadGridPersistenceAsync(Grid, _svcUserPersist, userName, PersistGrid.User);
         }
 
         /// <summary>
@@ -209,7 +204,7 @@ namespace BedBrigade.Client.Components
 
         private async Task SaveGridPersistence()
         {
-            _state = await Grid.GetPersistData();
+            _state = await Grid.GetPersistDataAsync();
             string userName = _svcUser.GetUserName();
             UserPersist persist = new UserPersist { UserName = userName, Grid = PersistGrid.User, Data = _state };
             var result = await _svcUserPersist.SaveGridPersistence(persist);
@@ -245,7 +240,7 @@ namespace BedBrigade.Client.Components
         {
             if (args.Item.Text == "Reset")
             {
-                await Grid.ResetPersistData();
+                await Grid.ResetPersistDataAsync();
                 await SaveGridPersistence();
                 return;
             }
