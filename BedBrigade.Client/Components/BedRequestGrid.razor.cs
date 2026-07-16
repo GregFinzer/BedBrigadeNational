@@ -98,7 +98,7 @@ namespace BedBrigade.Client.Components
                 await LoadLocations();
                 await LoadUser();
 
-                var bedRequestResult = await BedRequestDataService.LoadBedRequests(UserLocation, metroLocations);
+                var bedRequestResult = await BedRequestDataService.GetBedRequestsForUser();
                 if (bedRequestResult.Success && bedRequestResult.Data != null)
                 {
                     BedRequests = bedRequestResult.Data.ToList();

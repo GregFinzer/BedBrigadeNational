@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,23 +15,84 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class DonationsController : LocationScopedRepositoryControllerBase<Donation, int, IDonationDataService>
 {
-    public DonationsController(IDonationDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public DonationsController(IDonationDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.DonationId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
-    /// Gets the donations visible to the authenticated user.
+    ///  Gets the donations visible to the authenticated user.
     /// </summary>
     [Authorize(Roles = RoleNames.CanManageDonations)]
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetDonations")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Donation>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Donation>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Donation>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Donation>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Donation>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<Donation>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<Donation>> result = await DataService.GetAllForLocationAsync(DataService.GetUserLocationId());
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
+
+
+
+    /// <summary>
+    /// Gets donations for a specific four-digit donation year.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanManageDonations)]
+    [HttpGet("year")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetDonationsByYear")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Donation>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Year must be a four-digit number")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<Donation>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<Donation>>> GetByYear(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage,
+        [FromQuery] int year)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<Donation>> result = await DataService.GetByYearAsync(year);
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
 
     /// <summary>
     /// Gets a donation by its identifier.
@@ -105,4 +167,14 @@ public class DonationsController : LocationScopedRepositoryControllerBase<Donati
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id) => await DeleteScopedCoreAsync(id);
+
+    private static ActionResult? ValidateYear(int year)
+    {
+        if (year >= 1000 && year <= 9999)
+        {
+            return null;
+        }
+
+        return new BadRequestObjectResult(CreateApiError("year must be a four-digit number."));
+    }
 }

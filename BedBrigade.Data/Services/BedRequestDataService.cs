@@ -165,26 +165,16 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
-    public async Task<ServiceResponse<List<BedRequest>>> LoadBedRequests(Location? userLocation,
-        List<Location>? metroLocations)
+    public async Task<ServiceResponse<List<BedRequest>>> GetBedRequestsForUser()
     {
-        if (metroLocations != null)
+        ServiceResponse<List<int>> locationsResponse = await _locationDataService.GetValidLocationIdsForUser();
+
+        if (!locationsResponse.Success || locationsResponse.Data == null)
         {
-            var metroAreaLocationIds = metroLocations.Select(location => location.LocationId).ToList();
-            var metroAreaBedRequestResult = await GetAllForLocationList(metroAreaLocationIds);
-            if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
-            {
-                return metroAreaBedRequestResult;
-            }
+            return new ServiceResponse<List<BedRequest>>(locationsResponse.Message);
         }
 
-        if (userLocation != null)
-        {
-            return await GetAllForLocationAsync(userLocation.LocationId);
-        }
-
-        return new ServiceResponse<List<BedRequest>>("Unable to load bed requests without a user location",
-            false, null);
+        return await GetAllForLocationList(locationsResponse.Data);
     }
 
     public async Task<ServiceResponse<List<string>>> GetDistinctEmail()
@@ -632,6 +622,22 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<string>>($"Found {result.Count} {GetEntityName()} records", true, result);
         }
+    }
+
+    public async Task<ServiceResponse<List<BedRequest>>> GetBedRequestsByUserAndStatus(List<BedRequestStatus> statuses)
+    {
+        ServiceResponse<List<BedRequest>> bedRequests = await GetBedRequestsForUser();
+
+        if (!bedRequests.Success || bedRequests.Data == null)
+        {
+            return new ServiceResponse<List<BedRequest>>(bedRequests.Message);
+        }
+
+        var filteredResult = bedRequests.Data
+            .Where(br => statuses.Contains(br.Status))
+            .ToList();
+        return new ServiceResponse<List<BedRequest>>(
+            $"Found {filteredResult.Count} bed requests with matching statuses", true, filteredResult);
     }
 }
 

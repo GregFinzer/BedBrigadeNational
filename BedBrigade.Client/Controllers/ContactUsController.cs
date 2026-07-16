@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,9 +15,15 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class ContactUsController : LocationScopedRepositoryControllerBase<ContactUs, int, IContactUsDataService>
 {
-    public ContactUsController(IContactUsDataService dataService, ILocationDataService locationDataService)
+    private readonly ILocationDataService _locationDataService;
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public ContactUsController(IContactUsDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ContactUsId)
     {
+        _locationDataService = locationDataService;
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,11 +33,74 @@ public class ContactUsController : LocationScopedRepositoryControllerBase<Contac
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetContactUs")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<ContactUs>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<ContactUs>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<ContactUs>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<ContactUs>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<ContactUs>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<ContactUs>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<ContactUs>> result = await DataService.GetAllForLocationAsync(DataService.GetUserLocationId());
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
+
+    /// <summary>
+    /// Gets the contact-us requests for the authenticated user's location or metro area filtered by status.
+    /// </summary>
+    /// <param name="pageNumber">The page number to retrieve (1-based indexing).</param>
+    /// <param name="itemsPerPage">The number of items per page (maximum 1000).</param>
+    /// <param name="statuses">List of <see cref="ContactUsStatus"/> values to filter by. Multiple statuses can be provided as query parameters.</param>
+    /// <returns>A page of contact-us requests matching the specified statuses.</returns>
+    /// <response code="200">Returns a page of contact-us requests.</response>
+    /// <response code="400">Returns an <see cref="ApiError"/> when pagination parameters are invalid.</response>
+    /// <response code="500">Returns an <see cref="ApiError"/> when the contact-us requests cannot be loaded.</response>
+    [Authorize(Roles = RoleNames.CanViewContacts)]
+    [HttpGet("by-status")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetContactUsByStatus", 
+        Description = "Retrieves contact-us requests filtered by one or more statuses. Respects the authenticated user's location scope (single location or metro area).")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<ContactUs>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid pagination parameters")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<ContactUs>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<ContactUs>>> GetContactUsByStatus(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage,
+        [FromQuery(Name = "statuses")] List<ContactUsStatus> statuses)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<ContactUs>> result = await DataService.GetContactUsByUserAndStatus(statuses);
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
 
     /// <summary>
     /// Gets a contact-us request by its identifier.

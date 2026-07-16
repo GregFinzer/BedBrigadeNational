@@ -25,5 +25,6 @@ namespace BedBrigade.Data.Services
             where TEntity : class, IPhone, ILocationId;
 
         Task<ServiceResponse<TEntity>> GetByEmail<TEntity>(IRepository<TEntity> repository, string email) where TEntity : class, IEmail, ILocationId;
+
     }
 }

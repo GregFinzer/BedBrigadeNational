@@ -28,8 +28,8 @@ public class CarouselServiceTests
     [Test]
     public void ReplaceCarousel_ShouldResolveDirectoryCaseInsensitive_ForPolarisHomeCarousel()
     {
-        CreateCarouselImage("media", "polaris", "pages", "Home", "carousel", "1.webp");
-        CreateCarouselImage("media", "polaris", "pages", "Home", "carousel", "2.webp");
+        CreateCarouselImage("media", "polaris", "pages", "home", "carousel", "1.webp");
+        CreateCarouselImage("media", "polaris", "pages", "home", "carousel", "2.webp");
         CarouselService service = CreateService();
         string html = "<div data-component=\"bbcarousel\" id=\"polaris-home-carousel\" src=\"/media/polaris/pages/home/carousel\"></div>";
 
@@ -38,7 +38,7 @@ public class CarouselServiceTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Does.Contain("carousel-inner"));
-            Assert.That(result, Does.Contain("/media/polaris/pages/Home/carousel/"));
+            Assert.That(result, Does.Contain("/media/polaris/pages/home/carousel/"));
             Assert.That(result, Does.Not.Contain("data-component=\"bbcarousel\""));
         });
     }

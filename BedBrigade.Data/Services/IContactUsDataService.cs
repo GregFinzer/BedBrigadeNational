@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Models;
+﻿using BedBrigade.Common.Enums;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.Data.Services
 {
@@ -13,5 +14,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<ContactUs>>> GetAllForLocationList(List<int> locationIds);
         Task<int> CancelContactRequestedForBouncedEmail(List<string> emailList);
         Task<int> ContactsRequested(int userLocationId);
+        Task<ServiceResponse<List<ContactUs>>> GetContactUsByUserAndStatus(List<ContactUsStatus> statuses);
     }
 }

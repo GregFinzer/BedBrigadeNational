@@ -1,8 +1,10 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace BedBrigade.Client.Controllers;
@@ -14,9 +16,13 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class ContentsController : LocationScopedRepositoryControllerBase<Content, int, IContentDataService>
 {
-    public ContentsController(IContentDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public ContentsController(IContentDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.ContentId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
@@ -26,18 +32,125 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetContents")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Content>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Content>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Content>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Content>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Content>>> GetAllAsync()
+    public async Task<ActionResult<PageResponse<Content>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
     {
-        if (DataService.IsUserNationalAdmin())
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
         {
-            return await GetAllCoreAsync(() => DataService.GetAllExceptBlogTypes());
+            return validationResult;
         }
 
-        return await GetAllCoreAsync(() => DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId()));
+        ServiceResponse<List<Content>> result;
+        if (DataService.IsUserNationalAdmin())
+        {
+            result = await DataService.GetAllExceptBlogTypes();
+        }
+        else
+        {
+            result = await DataService.GetForLocationExceptBlogTypes(DataService.GetUserLocationId());
+        }
+
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
+
+    /// <summary>
+    /// Gets paged stories for the authenticated user's location.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanViewPages)]
+    [HttpGet("stories")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetStories")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<BlogItem>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid paging parameters")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<BlogItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<BlogItem>>> GetStories(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        try
+        {
+            int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+                ConfigSection.System, ConfigNames.MaxItemsPerPage);
+            ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            ServiceResponse<List<BlogItem>> result = await DataService.GetBlogItems(DataService.GetUserLocationId(), ContentType.Stories);
+            if (!result.Success || result.Data == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+            }
+
+            return Ok(CreatePageResponse(result.Data, pageNumber, itemsPerPage, maxItemsPerPage));
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetStories));
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError("There was an error getting stories, try again later."));
+        }
+    }
+
+    /// <summary>
+    /// Gets paged stories for the authenticated user's location.
+    /// </summary>
+    [Authorize(Roles = RoleNames.CanViewPages)]
+    [HttpGet("news")]
+    [Produces("application/json")]
+    [SwaggerOperation("GetNews")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<BlogItem>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid paging parameters")]
+    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
+    [ProducesResponseType(typeof(PageResponse<BlogItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<PageResponse<BlogItem>>> GetNews(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        try
+        {
+            int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+                ConfigSection.System, ConfigNames.MaxItemsPerPage);
+            ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
+            ServiceResponse<List<BlogItem>> result = await DataService.GetBlogItems(DataService.GetUserLocationId(), ContentType.News);
+            if (!result.Success || result.Data == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+            }
+
+            return Ok(CreatePageResponse(result.Data, pageNumber, itemsPerPage, maxItemsPerPage));
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error in {Controller}.{Action}", GetType().Name, nameof(GetNews));
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                CreateApiError("There was an error getting news, try again later."));
+        }
     }
 
     /// <summary>
@@ -113,4 +226,47 @@ public class ContentsController : LocationScopedRepositoryControllerBase<Content
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id) => await DeleteScopedCoreAsync(id);
+
+    private static ActionResult? ValidatePagingParameters(int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        if (pageNumber < 1)
+        {
+            return new BadRequestObjectResult(CreateApiError("pageNumber must be greater than or equal to 1."));
+        }
+
+        if (itemsPerPage < 1 || itemsPerPage > maxItemsPerPage)
+        {
+            return new BadRequestObjectResult(
+                CreateApiError($"itemsPerPage must be between 1 and {maxItemsPerPage}."));
+        }
+
+        return null;
+    }
+
+    private static PageResponse<BlogItem> CreatePageResponse(List<BlogItem> entities,
+        int pageNumber, int itemsPerPage, int maxItemsPerPage)
+    {
+        int normalizedPageNumber = Math.Max(pageNumber, 1);
+        int normalizedItemsPerPage = Math.Clamp(itemsPerPage, 1, maxItemsPerPage);
+        int numberOfItems = entities.Count;
+        int maxPage = numberOfItems == 0
+            ? 0
+            : (int)Math.Ceiling(numberOfItems / (double)normalizedItemsPerPage);
+        long itemsToSkip = ((long)normalizedPageNumber - 1) * normalizedItemsPerPage;
+        List<BlogItem> pageItems = itemsToSkip > int.MaxValue
+            ? []
+            : entities
+                .Skip((int)itemsToSkip)
+                .Take(normalizedItemsPerPage)
+                .ToList();
+
+        return new PageResponse<BlogItem>
+        {
+            PageNumber = normalizedPageNumber,
+            MaxPage = maxPage,
+            NumberOfItems = numberOfItems,
+            ItemsPerPage = normalizedItemsPerPage,
+            Items = pageItems
+        };
+    }
 }

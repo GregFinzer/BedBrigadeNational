@@ -16,6 +16,7 @@
         public const string PrimaryLanguage = "PrimaryLanguage";
         public const string SpeakEnglish = "SpeakEnglish";
         public const string MonthsBetweenRequests = "MonthsBetweenRequests";
+        public const string MaxItemsPerPage = "MaxItemsPerPage";
 
         //Translation
         public const string TranslationApiKey = "TranslationApiKey";
