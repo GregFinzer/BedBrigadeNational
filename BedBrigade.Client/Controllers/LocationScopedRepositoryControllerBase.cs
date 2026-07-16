@@ -95,7 +95,7 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
 
         if (!locationResult.Success || locationResult.Data == null)
         {
-            throw new Exception($"Failed to retrieve valid location IDs for user. Message: {locationResult.Message}");
+            return false;
         }
 
         return locationResult.Data.Contains(locationId);
