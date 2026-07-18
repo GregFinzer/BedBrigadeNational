@@ -52,6 +52,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private ValidationMessageStore _validationMessageStore;
         private bool _isBusy = false;
+        private bool _shouldForceLocation;
         #endregion
 
         #region Initialization
@@ -59,39 +60,54 @@ namespace BedBrigade.Client.Components.Pages
         protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
-            
+
             newRequest = new Common.Models.ContactUs();
             EC = new EditContext(newRequest);
             _validationMessageStore = new ValidationMessageStore(EC);
             await SetLocationState();
+            UpdateRouteDisplayState();
         }
 
         private async Task SetLocationState()
         {
             if (!string.IsNullOrEmpty(LocationRoute))
             {
-                if (await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}") is { Success: true, Data: { } location })
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}");
+
+                if (locationResponse.Success && locationResponse.Data != null)
                 {
                     _locationState.Location = LocationRoute;
+
+                    if (!string.IsNullOrEmpty(locationResponse.Data.ExternalContactUs) &&
+                        Validation.IsValidUrl(locationResponse.Data.ExternalContactUs))
+                    {
+                        _nav.NavigateTo(locationResponse.Data.ExternalContactUs, true);
+                    }
                 }
             }
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            await SetLocationState();
+            UpdateRouteDisplayState();
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            if (_shouldForceLocation && !string.IsNullOrEmpty(LocationRoute) && SearchLocation is not null)
             {
-                if (!string.IsNullOrEmpty(LocationRoute))
+                var result = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}");
+
+                if (!result.Success || result.Data == null)
                 {
-                    await SearchLocation.ForceLocationByName(LocationRoute);
-                    DisplayForm = "";
-                    StateHasChanged();
+                    _nav.NavigateTo($"/Sorry/{LocationRoute}/contact-us", true);
+                    return;
                 }
-                else
-                {
-                    DisplaySearch = "";
-                    StateHasChanged();
-                }
+
+                await SearchLocation.ForceLocationByName(LocationRoute);
+                _shouldForceLocation = false;
+                StateHasChanged();
             }
         }
 
@@ -161,6 +177,21 @@ namespace BedBrigade.Client.Components.Pages
         private void CheckChildData(string SearchZipCode)  // from Search Location Component
         {
             DisplayForm = "";
+        }
+
+        private void UpdateRouteDisplayState()
+        {
+            if (string.IsNullOrWhiteSpace(LocationRoute))
+            {
+                DisplaySearch = "";
+                DisplayForm = DisplayNone;
+                _shouldForceLocation = false;
+                return;
+            }
+
+            DisplaySearch = DisplayNone;
+            DisplayForm = "";
+            _shouldForceLocation = true;
         }
 
         #endregion
