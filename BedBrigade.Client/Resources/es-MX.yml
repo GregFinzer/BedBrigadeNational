@@ -104,6 +104,12 @@ EventGroup: Grupo de eventos
 EventNote: Nota del evento
 EventType: Tipo de evento
 Example: Ejemplo
+ExternalContactUs: Contáctenos externamente
+ExternalContent: Contenido externo
+ExternalDonate: Donar externamente
+ExternalHome: Inicio externo
+ExternalRequestABed: Solicitar una cama externamente
+ExternalVolunteer: Voluntariado externo
 FillOutTheRecaptcha: Rellena la casilla de verificación recaptcha y envía el formulario.
 FilteredTotalColon: 'Total Filtrado:'
 FindABedBrigade: Encuentra una brigada de camas

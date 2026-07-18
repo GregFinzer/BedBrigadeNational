@@ -231,8 +231,18 @@ public class MailMergeLogic : IMailMergeLogic
     public StringBuilder ReplaceBedRequestFields(BedRequest entity, StringBuilder sb)
     {
         sb = sb.Replace("%%BedRequest.FirstName%%", entity.FirstName);
+        sb = sb.Replace("%%BedRequest.LastName%%", entity.LastName);
+        sb = sb.Replace("%%BedRequest.Email%%", entity.Email);
+        sb = sb.Replace("%%BedRequest.Phone%%", entity.Phone.FormatPhoneNumber());
+        sb = sb.Replace("%%BedRequest.Street%%", entity.Street);
+        sb = sb.Replace("%%BedRequest.City%%", entity.City);
+        sb = sb.Replace("%%BedRequest.State%%", entity.State);
+        sb = sb.Replace("%%BedRequest.PostalCode%%", entity.PostalCode);
         sb = sb.Replace("%%BedRequest.NumberOfBeds%%", entity.NumberOfBeds.ToString());
         sb = sb.Replace("%%BedRequest.GenderAge%%", entity.GenderAge);
+        sb = sb.Replace("%%BedRequest.Names%%", entity.Names);
+        sb = sb.Replace("%%BedRequest.PrimaryLanguage%%", entity.PrimaryLanguage);
+        sb = sb.Replace("%%BedRequest.Notes%%", entity.Notes);
         return sb;
     }
 

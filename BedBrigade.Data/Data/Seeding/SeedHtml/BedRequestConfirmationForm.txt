@@ -1,7 +1,60 @@
-﻿%%BedRequest.FirstName%%,
+﻿<p>%%BedRequest.FirstName%%,</p>
 
-We have received your Bed Request for %%BedRequest.NumberOfBeds%% bed(s) with Gender/Age of %%BedRequest.GenderAge%%
+<p>We have received your Bed Request for %%BedRequest.NumberOfBeds%% bed(s) with Gender/Age of %%BedRequest.GenderAge%%</p>
 
-Your request has been assigned to this location:  %%Location.Name%%
+<p>Your request has been assigned to this location:  %%Location.Name%%</p>
 
-There are currently %%BedRequest.NumberOfBedsWaitingSum%% Bed Requests in line ahead of you.
+<p>There are currently %%BedRequest.NumberOfBedsWaitingSum%% Bed Requests in line ahead of you.</p>
+
+<table width="600" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+       <tbody>
+		   <tr>
+		       <td width="250">First Name</td>
+			   <td width="350">%%BedRequest.FirstName%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Last Name</td>
+			   <td width="350">%%BedRequest.LastName%%</td>
+		   </tr>         
+		   <tr>
+		       <td width="250">Email</td>
+			   <td width="350">%%BedRequest.Email%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Phone</td>
+			   <td width="350">%%BedRequest.Phone%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Street</td>
+			   <td width="350">%%BedRequest.Street%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">City</td>
+			   <td width="350">%%BedRequest.City%% </td>
+		   </tr>
+		   <tr>
+		       <td width="250">Zip</td>
+			   <td width="350">%%BedRequest.PostalCode%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Number of Beds</td>
+			   <td width="350">%%BedRequest.NumberOfBeds%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Ages</td>
+			   <td width="350">%%BedRequest.GenderAge%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Names</td>
+			   <td width="350">%%BedRequest.Names%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Primary Language</td>
+			   <td width="350">%%BedRequest.PrimaryLanguage%%</td>
+		   </tr>		  
+		   <tr>
+		       <td width="250">Any Special Instructions</td>
+			   <td width="350">%%BedRequest.Notes%%</td>
+		   </tr>
+	   </tbody>
+</table>

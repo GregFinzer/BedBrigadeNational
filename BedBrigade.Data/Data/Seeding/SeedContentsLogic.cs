@@ -198,7 +198,8 @@ public static class SeedContentsLogic
         foreach (var location in locations)
         {
             if (location.LocationId == Defaults.GroveCityLocationId
-                || location.LocationId == Defaults.PolarisLocationId)
+                || location.LocationId == Defaults.PolarisLocationId
+                || location.ExternalContent)
             {
                 continue;
             }
@@ -257,7 +258,8 @@ public static class SeedContentsLogic
 
         foreach (var location in locations)
         {
-            if (location.LocationId == Defaults.PolarisLocationId)
+            if (location.LocationId == Defaults.PolarisLocationId
+                || location.ExternalContent)
             {
                 continue;
             }
@@ -315,7 +317,8 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
                 if (location.LocationId == Defaults.GroveCityLocationId 
-                    || location.LocationId == Defaults.PolarisLocationId)
+                    || location.LocationId == Defaults.PolarisLocationId
+                    || location.ExternalContent)
                 {
                     continue;
                 }
@@ -475,7 +478,8 @@ public static class SeedContentsLogic
             foreach (var location in locations)
             {
                 if (location.LocationId == Defaults.GroveCityLocationId
-                    || location.LocationId == Defaults.PolarisLocationId)
+                    || location.LocationId == Defaults.PolarisLocationId
+                    || location.ExternalContent)
                 {
                     continue;
                 }
@@ -531,7 +535,8 @@ public static class SeedContentsLogic
             //We have different pages for National, Grove City and Polaris
             if (location.LocationId == Defaults.NationalLocationId
                 || location.LocationId == Defaults.GroveCityLocationId
-                || location.LocationId == Defaults.PolarisLocationId)
+                || location.LocationId == Defaults.PolarisLocationId
+                || location.ExternalContent)
                 continue;
 
             await SeedContentItem(context, ContentType.Body, location, name, "LocationDonations.html");

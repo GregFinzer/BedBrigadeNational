@@ -16,6 +16,7 @@
     <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,7 +34,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Stripe.net" Version="52.1.0" />
-    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="33.2.15" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="26.2.13" />
     <PackageReference Include="System.ClientModel" Version="1.14.0" />
     <PackageReference Include="System.Runtime.Caching" Version="10.0.9" />
     <PackageReference Include="Twilio" Version="7.14.9" />
