@@ -77,18 +77,31 @@ public partial class Index : ComponentBase, IDisposable
             //Example:  /grove-city/donations
             else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
             {
+                var locationsResponse = await _svcLocation.GetActiveLocations();
+                Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
+
+                if (PageName.ToLower() == "home" && foundLocation != null && !String.IsNullOrEmpty(foundLocation.ExternalHome))
+                {
+                    _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
+                    return;
+                }
                 _currentLocation = LocationRoute;
                 _currentPageName = PageName;
             }
             else if (string.IsNullOrEmpty(PageName))
             {
                 var locationsResponse = await _svcLocation.GetActiveLocations();
+                Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
 
                 //This is a location home page
                 //Example: /grove-city
-                if (locationsResponse.Success && locationsResponse.Data != null &&
-                    locationsResponse.Data.Any(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower()))
+                if (foundLocation != null)
                 {
+                    if (!String.IsNullOrEmpty(foundLocation.ExternalHome))
+                    {
+                        _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
+                        return;
+                    }
                     _currentLocation = LocationRoute;
                     _currentPageName = DefaultPageName;
                 }
