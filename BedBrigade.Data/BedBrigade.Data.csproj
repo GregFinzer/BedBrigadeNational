@@ -32,7 +32,7 @@
     <PackageReference Include="Serilog.Enrichers.RequestUserId" Version="1.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Stripe.net" Version="48.1.0" />
-    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="26.2.13" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="30.1.42" />
     <PackageReference Include="System.ClientModel" Version="1.6.1" />
     <PackageReference Include="System.Runtime.Caching" Version="10.0.5" />
     <PackageReference Include="Twilio" Version="7.8.2" />

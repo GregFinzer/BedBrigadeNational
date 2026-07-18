@@ -135,7 +135,34 @@ else
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <SfTextArea @bind-Value=@location.ServiceZipCodes Enabled="true" Placeholder="@_lc.Keys["ServiceZipCodes"]" FloatLabelType="FloatLabelType.Auto" RowCount="10" ColumnCount="50" Width="100%" />
+                                        <SfTextArea @bind-Value=@location.ServiceZipCodes Enabled="true" Placeholder="@_lc.Keys["ServiceZipCodes"]" FloatLabelType="FloatLabelType.Auto" RowCount="2" ColumnCount="50" Width="100%" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-3">
+                                        <div class="important-box">
+                                            <label for="externalContent" style="font-weight: bold">External Content</label>
+                                            <SfSwitch ID="externalContent" @bind-Checked="@location.ExternalContent"></SfSwitch>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <SfTextBox ID="externalHome" @bind-Value=@location.ExternalHome Enabled="true" Placeholder="External Home URL" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalRequestABed" @bind-Value=@location.ExternalRequestABed Enabled="true" Placeholder="External Request A Bed URL" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalVolunteer" @bind-Value=@location.ExternalVolunteer Enabled="true" Placeholder="External Volunteer URL" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalDonate" @bind-Value=@location.ExternalDonate Enabled="true" Placeholder="External Donate URL" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalContactUs" @bind-Value=@location.ExternalContactUs Enabled="true" Placeholder="External Contact Us URL" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                             }
@@ -151,6 +178,7 @@ else
                         <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
                         <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Location.Group) ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Location.ExternalContent) HeaderText="External Content" Width="150" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
                         <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
                         <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
