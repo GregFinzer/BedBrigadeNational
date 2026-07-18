@@ -141,28 +141,28 @@ else
                                 <div class="row mt-2">
                                     <div class="col-md-3">
                                         <div class="important-box">
-                                            <label for="externalContent" style="font-weight: bold">External Content</label>
+                                            <label for="externalContent" style="font-weight: bold">@_lc.Keys["ExternalContent"]</label>
                                             <SfSwitch ID="externalContent" @bind-Checked="@location.ExternalContent"></SfSwitch>
                                         </div>
                                     </div>
                                     <div class="col-md-9">
-                                        <SfTextBox ID="externalHome" @bind-Value=@location.ExternalHome Enabled="true" Placeholder="External Home URL" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="externalHome" @bind-Value=@location.ExternalHome Enabled="true" Placeholder="@_lc.Keys["ExternalHome"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-md-6">
-                                        <SfTextBox ID="externalRequestABed" @bind-Value=@location.ExternalRequestABed Enabled="true" Placeholder="External Request A Bed URL" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="externalRequestABed" @bind-Value=@location.ExternalRequestABed Enabled="true" Placeholder="@_lc.Keys["ExternalRequestABed"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                     <div class="col-md-6">
-                                        <SfTextBox ID="externalVolunteer" @bind-Value=@location.ExternalVolunteer Enabled="true" Placeholder="External Volunteer URL" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="externalVolunteer" @bind-Value=@location.ExternalVolunteer Enabled="true" Placeholder="@_lc.Keys["ExternalVolunteer"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                                 <div class="row mt-2">
                                     <div class="col-md-6">
-                                        <SfTextBox ID="externalDonate" @bind-Value=@location.ExternalDonate Enabled="true" Placeholder="External Donate URL" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="externalDonate" @bind-Value=@location.ExternalDonate Enabled="true" Placeholder="@_lc.Keys["ExternalDonate"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                     <div class="col-md-6">
-                                        <SfTextBox ID="externalContactUs" @bind-Value=@location.ExternalContactUs Enabled="true" Placeholder="External Contact Us URL" FloatLabelType="FloatLabelType.Auto" />
+                                        <SfTextBox ID="externalContactUs" @bind-Value=@location.ExternalContactUs Enabled="true" Placeholder="@_lc.Keys["ExternalContactUs"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                             }
