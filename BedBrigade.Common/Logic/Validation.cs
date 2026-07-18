@@ -11,6 +11,16 @@ namespace BedBrigade.Common.Logic
         public const string PasswordRegexPattern =
             @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$";
 
+        public static bool IsValidUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return false;
+
+            return Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
+                   && (uri.Scheme == Uri.UriSchemeHttp ||
+                       uri.Scheme == Uri.UriSchemeHttps);
+        }
+
         public static Result IsValidEmail(string? email)
         {
             var emailValidation = LibraryFactory.CreateEmailValidation();

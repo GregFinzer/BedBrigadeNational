@@ -17,6 +17,8 @@ namespace BedBrigade.Client.Components
         [Parameter]
         public string? ResultType { get; set; } // default is HyperlinkList, other found list of locations
         [Parameter]
+        public string ResultPath { get; set; } = "/home";
+        [Parameter]
         public EventCallback<string> ParentMethod { get; set; }
         [Parameter]
         public EventCallback<string> LocationChanged { get; set; }        [Inject] private ILocationDataService? _svcLocation { get; set; }
@@ -238,6 +240,18 @@ namespace BedBrigade.Client.Components
         public async Task HandleMaskFocus()
         {
             await JS.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", maskObj.ID, 0);
+        }
+
+        private string BuildLocationResultUrl(string route)
+        {
+            if (string.IsNullOrWhiteSpace(route))
+            {
+                return ResultPath.StartsWith('/') ? ResultPath : $"/{ResultPath}";
+            }
+
+            string normalizedRoute = route.TrimEnd('/');
+            string normalizedResultPath = ResultPath.StartsWith('/') ? ResultPath : $"/{ResultPath}";
+            return $"{normalizedRoute}{normalizedResultPath}";
         }
 
     }

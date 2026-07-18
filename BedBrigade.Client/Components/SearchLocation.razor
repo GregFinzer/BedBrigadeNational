@@ -70,7 +70,7 @@
                             @foreach (var location in Locations)
 
                             {
-                                <tr><td nowrap style="text-align: left"><a href="javascript: location.href = '@location.Route/home'">@location.Name</a> @location.MilesAwayString</td></tr>
+                                <tr><td nowrap style="text-align: left"><a href="@BuildLocationResultUrl(location.Route)">@location.Name</a> @location.MilesAwayString</td></tr>
                             }
                         </table>
                         break;
