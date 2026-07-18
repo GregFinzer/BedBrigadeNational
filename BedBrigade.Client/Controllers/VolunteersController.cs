@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,23 +15,47 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class VolunteersController : LocationScopedRepositoryControllerBase<Volunteer, int, IVolunteerDataService>
 {
-    public VolunteersController(IVolunteerDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public VolunteersController(IVolunteerDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.VolunteerId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
-    /// Gets the volunteers visible to the authenticated user.
+    ///  Gets the Volunteers visible to the authenticated user.
     /// </summary>
     [Authorize(Roles = RoleNames.CanViewVolunteers)]
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetVolunteers")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Volunteer>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Volunteer>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Volunteer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Volunteer>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Volunteer>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<Volunteer>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<Volunteer>> result = await DataService.GetAllForLocationAsync(DataService.GetUserLocationId());
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
 
     /// <summary>
     /// Gets a volunteer by its identifier.

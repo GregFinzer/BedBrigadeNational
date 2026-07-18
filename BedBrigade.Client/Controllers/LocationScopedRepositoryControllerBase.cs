@@ -19,35 +19,6 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
         _locationDataService = locationDataService ?? throw new ArgumentNullException(nameof(locationDataService));
     }
 
-    protected async Task<ActionResult<List<TEntity>>> GetScopedAllCoreAsync()
-    {
-        if (DataService.IsUserNationalAdmin())
-        {
-            return await GetAllCoreAsync();
-        }
-
-        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
-        if (locationIdsResult.Result != null)
-        {
-            return locationIdsResult.Result;
-        }
-
-        List<int> locationIds = locationIdsResult.Value!;
-        return await GetAllCoreAsync(async () =>
-        {
-            ServiceResponse<List<TEntity>> result = await DataService.GetAllAsync();
-            if (!result.Success || result.Data == null)
-            {
-                return result;
-            }
-
-            List<TEntity> scopedEntities = result.Data
-                .Where(entity => locationIds.Contains(entity.LocationId))
-                .ToList();
-            return new ServiceResponse<List<TEntity>>(result.Message, true, scopedEntities);
-        });
-    }
-
     protected async Task<ActionResult<TEntity>> GetScopedByIdCoreAsync(TKey id)
     {
         ActionResult<TEntity> result = await GetByIdCoreAsync(id);
@@ -120,34 +91,15 @@ public abstract class LocationScopedRepositoryControllerBase<TEntity, TKey, TSer
             return true;
         }
 
-        ActionResult<List<int>> locationIdsResult = await GetAllowedLocationIdsAsync();
-        return locationIdsResult.Result == null && locationIdsResult.Value!.Contains(locationId);
-    }
+        var locationResult = await _locationDataService.GetValidLocationIdsForUser();
 
-    private async Task<ActionResult<List<int>>> GetAllowedLocationIdsAsync()
-    {
-        int userLocationId = DataService.GetUserLocationId();
-        ServiceResponse<Location> userLocationResult = await _locationDataService.GetByIdAsync(userLocationId);
-        if (!userLocationResult.Success || userLocationResult.Data == null)
+        if (!locationResult.Success || locationResult.Data == null)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                CreateApiError(userLocationResult.Message));
+            return false;
         }
 
-        Location userLocation = userLocationResult.Data;
-        if (userLocation.IsMetroLocation() && userLocation.MetroAreaId.HasValue)
-        {
-            ServiceResponse<List<Location>> metroLocationsResult =
-                await _locationDataService.GetLocationsByMetroAreaId(userLocation.MetroAreaId.Value);
-            if (!metroLocationsResult.Success || metroLocationsResult.Data == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    CreateApiError(metroLocationsResult.Message));
-            }
-
-            return metroLocationsResult.Data.Select(location => location.LocationId).Distinct().ToList();
-        }
-
-        return new List<int> { userLocation.LocationId };
+        return locationResult.Data.Contains(locationId);
     }
+
+
 }

@@ -12,6 +12,13 @@ namespace BedBrigade.Data.Data.Seeding
             {
                 new()
                 {
+                    ConfigurationKey = ConfigNames.MaxItemsPerPage,
+                    ConfigurationValue = "1000",
+                    Section = ConfigSection.System,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
                     ConfigurationKey = ConfigNames.TokenExpiration,
                     ConfigurationValue = "24",
                     Section = ConfigSection.System,
@@ -613,7 +620,7 @@ namespace BedBrigade.Data.Data.Seeding
                     ConfigurationValue = "40",
                     Section = ConfigSection.Schedule,
                     LocationId = locationId
-                },
+                }
             };
 
             if (locationId == Defaults.GroveCityLocationId)

@@ -8,5 +8,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string zipCode);
         Task<ServiceResponse<List<Location>>> GetLocationsByMetroAreaId(int metroAreaId);
         Task<ServiceResponse<List<Location>>> GetActiveLocations();
+        Task<ServiceResponse<List<int>>> GetValidLocationIdsForUser();
     }
 }

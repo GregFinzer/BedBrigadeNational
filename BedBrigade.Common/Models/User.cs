@@ -28,10 +28,12 @@ public class User : BaseEntity, ILocationId, IEmail, IPhone
     [Required(ErrorMessage = "Email Address is required")]
     [MaxLength(255)]
     public String Email { get; set; } = string.Empty;
-    
+
+    [JsonIgnore]
     [MaxLength(255)]
     public byte[]? PasswordHash { get; set; }
 
+    [JsonIgnore]
     [MaxLength(255)]
     public byte[]? PasswordSalt { get; set; }
 

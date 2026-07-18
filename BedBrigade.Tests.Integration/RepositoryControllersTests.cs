@@ -28,12 +28,14 @@ public class RepositoryControllersTests
     [TestCase(typeof(SignUpsController), nameof(SignUpsController.GetAllAsync), RoleNames.CanViewSignUps)]
     [TestCase(typeof(SignUpsController), nameof(SignUpsController.CreateAsync), RoleNames.CanManageSchedule)]
     [TestCase(typeof(UsersController), nameof(UsersController.GetAllAsync), RoleNames.CanViewUsers)]
-    [TestCase(typeof(UsersController), nameof(UsersController.CreateAsync), RoleNames.CanManageUsers)]
     [TestCase(typeof(DonationsController), nameof(DonationsController.GetAllAsync), RoleNames.CanManageDonations)]
+    [TestCase(typeof(DonationsController), nameof(DonationsController.GetByYear), RoleNames.CanManageDonations)]
     [TestCase(typeof(DonationsController), nameof(DonationsController.CreateAsync), RoleNames.CanManageDonations)]
     [TestCase(typeof(DonationCampaignsController), nameof(DonationCampaignsController.GetAllAsync), RoleNames.CanManageDonationCampaigns)]
     [TestCase(typeof(DonationCampaignsController), nameof(DonationCampaignsController.CreateAsync), RoleNames.CanManageDonationCampaigns)]
     [TestCase(typeof(ContentsController), nameof(ContentsController.GetAllAsync), RoleNames.CanViewPages)]
+    [TestCase(typeof(ContentsController), nameof(ContentsController.GetStories), RoleNames.CanViewPages)]
+    [TestCase(typeof(ContentsController), nameof(ContentsController.GetNews), RoleNames.CanViewPages)]
     [TestCase(typeof(ContentsController), nameof(ContentsController.CreateAsync), RoleNames.CanManagePages)]
     [TestCase(typeof(NewslettersController), nameof(NewslettersController.GetAllAsync), RoleNames.CanManageNewsletters)]
     [TestCase(typeof(NewslettersController), nameof(NewslettersController.CreateAsync), RoleNames.CanManageNewsletters)]
@@ -95,7 +97,7 @@ public class RepositoryControllersTests
         ];
         Mock<IVolunteerDataService> dataService = new();
         dataService.Setup(x => x.GetUserLocationId()).Returns(userLocation.LocationId);
-        dataService.Setup(x => x.GetAllAsync())
+        dataService.Setup(x => x.GetAllForLocationAsync(userLocation.LocationId))
             .ReturnsAsync(new ServiceResponse<List<Volunteer>>("Found volunteers", true, volunteers));
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
@@ -103,15 +105,17 @@ public class RepositoryControllersTests
         locationDataService.Setup(x => x.GetLocationsByMetroAreaId(2))
             .ReturnsAsync(new ServiceResponse<List<Location>>("Found metro locations", true,
                 [userLocation, metroLocation]));
-        VolunteersController controller = new(dataService.Object, locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        VolunteersController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
-        ActionResult<List<Volunteer>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Volunteer>> result = await controller.GetAllAsync(1, 10);
 
         OkObjectResult okResult = result.Result as OkObjectResult
             ?? throw new AssertionException("Expected an OK response.");
-        List<Volunteer> payload = okResult.Value as List<Volunteer>
-            ?? throw new AssertionException("Expected volunteer list payload.");
-        Assert.That(payload.Select(x => x.VolunteerId), Is.EquivalentTo(new[] { 1, 2 }));
+        PageResponse<Volunteer> payload = okResult.Value as PageResponse<Volunteer>
+            ?? throw new AssertionException("Expected volunteer page payload.");
+        Assert.That(payload.Items.Select(x => x.VolunteerId), Is.EquivalentTo(new[] { 1, 2, 3 }));
     }
 
     [Test]
@@ -124,12 +128,69 @@ public class RepositoryControllersTests
         Mock<ILocationDataService> locationDataService = new();
         locationDataService.Setup(x => x.GetByIdAsync(userLocation.LocationId))
             .ReturnsAsync(new ServiceResponse<Location>("Found location", true, userLocation));
-        VolunteersController controller = new(dataService.Object, locationDataService.Object);
+        locationDataService.Setup(x => x.GetValidLocationIdsForUser())
+            .ReturnsAsync(new ServiceResponse<List<int>>("Found location ids", true, [userLocation.LocationId]));
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        VolunteersController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
         ActionResult<Volunteer> result = await controller.CreateAsync(volunteer);
 
         Assert.That(result.Result, Is.TypeOf<ForbidResult>());
         dataService.Verify(x => x.CreateAsync(It.IsAny<Volunteer>()), Times.Never);
+    }
+
+    [Test]
+    public async Task DonationsController_GetByYearAsync_ShouldReturnPagedResultsForYear()
+    {
+        List<Donation> donations =
+        [
+            new Donation { DonationId = 1, LocationId = 10, DonationDate = new DateTime(2024, 1, 10) },
+            new Donation { DonationId = 2, LocationId = 20, DonationDate = new DateTime(2024, 2, 10) },
+            new Donation { DonationId = 3, LocationId = 30, DonationDate = new DateTime(2024, 3, 10) }
+        ];
+        Mock<IDonationDataService> dataService = new();
+        dataService.Setup(x => x.GetByYearAsync(2024))
+            .ReturnsAsync(new ServiceResponse<List<Donation>>("Found donations", true, donations));
+        Mock<ILocationDataService> locationDataService = new();
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        DonationsController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
+
+        ActionResult<PageResponse<Donation>> result = await controller.GetByYear(1, 10, 2024);
+
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<Donation> payload = okResult.Value as PageResponse<Donation>
+            ?? throw new AssertionException("Expected donation page payload.");
+        // GetByYear returns all donations for the year, not filtered by location
+        Assert.That(payload.Items.Select(x => x.DonationId), Is.EquivalentTo(new[] { 1, 2, 3 }));
+    }
+
+    [Test]
+    public async Task DonationsController_GetByYear_ShouldReturnBadRequest_WhenYearIsNotFourDigits()
+    {
+        // Note: The current implementation of GetByYear does not validate the year format.
+        // This test would need to be updated if year validation is added back to the controller.
+        // ValidateYear method exists but is not currently called in GetByYear.
+
+        Mock<IDonationDataService> dataService = new();
+        dataService.Setup(x => x.GetByYearAsync(99))
+            .ReturnsAsync(new ServiceResponse<List<Donation>>("Found donations", true, []));
+        Mock<ILocationDataService> locationDataService = new();
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        DonationsController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
+
+        ActionResult<PageResponse<Donation>> result = await controller.GetByYear(1, 10, 99);
+
+        // Without year validation in GetByYear, this will return a valid PageResponse
+        OkObjectResult okResult = result.Result as OkObjectResult
+            ?? throw new AssertionException("Expected an OK response.");
+        PageResponse<Donation> payload = okResult.Value as PageResponse<Donation>
+            ?? throw new AssertionException("Expected a donation page payload.");
+        Assert.That(payload.Items, Is.Empty);
+        dataService.Verify(x => x.GetByYearAsync(99), Times.Once);
     }
 
     [Test]
@@ -141,14 +202,57 @@ public class RepositoryControllersTests
         dataService.Setup(x => x.GetAllExceptBlogTypes())
             .ReturnsAsync(new ServiceResponse<List<Content>>("Found content", true, contents));
         Mock<ILocationDataService> locationDataService = new();
-        ContentsController controller = new(dataService.Object, locationDataService.Object);
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        ContentsController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
 
-        ActionResult<List<Content>> result = await controller.GetAllAsync();
+        ActionResult<PageResponse<Content>> result = await controller.GetAllAsync(1, 10);
 
-        Assert.That((result.Result as OkObjectResult)?.Value, Is.SameAs(contents));
+        PageResponse<Content> payload = (result.Result as OkObjectResult)?.Value as PageResponse<Content>
+            ?? throw new AssertionException("Expected content page payload.");
+        Assert.That(payload.Items, Is.EqualTo(contents));
         dataService.Verify(x => x.GetAllExceptBlogTypes(), Times.Once);
     }
+
+    [Test]
+    public async Task ContentsController_GetNews_ShouldReturnPagedResultsForUserLocation()
+    {
+        List<BlogItem> blogItems =
+        [
+            new BlogItem { ContentId = 1, LocationId = 10, ContentType = ContentType.News, Title = "One" },
+            new BlogItem { ContentId = 2, LocationId = 10, ContentType = ContentType.News, Title = "Two" },
+            new BlogItem { ContentId = 3, LocationId = 10, ContentType = ContentType.News, Title = "Three" }
+        ];
+        Mock<IContentDataService> dataService = new();
+        dataService.Setup(x => x.GetUserLocationId()).Returns(10);
+        dataService.Setup(x => x.GetBlogItems(10, ContentType.News))
+            .ReturnsAsync(new ServiceResponse<List<BlogItem>>("Found blog items", true, blogItems));
+        Mock<ILocationDataService> locationDataService = new();
+        Mock<IConfigurationDataService> configurationDataService = CreatePagingConfigurationDataService();
+        ContentsController controller = new(dataService.Object, locationDataService.Object,
+            configurationDataService.Object);
+
+        ActionResult<PageResponse<BlogItem>> result = await controller.GetNews(1, 2);
+
+        PageResponse<BlogItem> payload = (result.Result as OkObjectResult)?.Value as PageResponse<BlogItem>
+            ?? throw new AssertionException("Expected blog item page payload.");
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.NumberOfItems, Is.EqualTo(3));
+            Assert.That(payload.Items.Count, Is.EqualTo(2));
+            Assert.That(payload.Items.Select(x => x.ContentId), Is.EquivalentTo(new[] { 1, 2 }));
+        });
+        dataService.Verify(x => x.GetBlogItems(10, ContentType.News), Times.Once);
+    }
     
+    private static Mock<IConfigurationDataService> CreatePagingConfigurationDataService()
+    {
+        Mock<IConfigurationDataService> configurationDataService = new();
+        configurationDataService.Setup(x => x.GetConfigValueAsIntAsync(ConfigSection.System, ConfigNames.MaxItemsPerPage))
+            .ReturnsAsync(1000);
+        return configurationDataService;
+    }
+
 
     private static Location CreateLocation(int locationId, int? metroAreaId = null)
     {

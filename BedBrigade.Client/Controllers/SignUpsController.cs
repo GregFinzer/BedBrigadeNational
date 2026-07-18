@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,23 +15,59 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class SignUpsController : LocationScopedRepositoryControllerBase<SignUp, int, ISignUpDataService>
 {
-    public SignUpsController(ISignUpDataService dataService, ILocationDataService locationDataService)
+    private readonly IConfigurationDataService _configurationDataService;
+
+    public SignUpsController(ISignUpDataService dataService, ILocationDataService locationDataService,
+        IConfigurationDataService configurationDataService)
         : base(dataService, locationDataService, x => x.SignUpId)
     {
+        _configurationDataService = configurationDataService ?? throw new ArgumentNullException(nameof(configurationDataService));
     }
 
     /// <summary>
-    /// Gets the sign-ups visible to the authenticated user.
+    ///  Gets the signups visible to the authenticated user.
     /// </summary>
     [Authorize(Roles = RoleNames.CanViewSignUps)]
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetSignUps")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<SignUp>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<SignUpDisplayItem>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<SignUp>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<SignUpDisplayItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<SignUp>>> GetAllAsync() => await GetScopedAllCoreAsync();
+    public async Task<ActionResult<PageResponse<SignUpDisplayItem>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage,
+        [FromQuery] TimePeriod timePeriod)
+    {
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        ServiceResponse<List<SignUpDisplayItem>> result;
+
+
+        switch (timePeriod)
+        {
+            case TimePeriod.Future:
+                result = await DataService.GetSignUpsForSignUpGrid(DataService.GetUserLocationId(), "allfuture");
+                break;
+            case TimePeriod.Past:
+                result = await DataService.GetSignUpsForSignUpGrid(DataService.GetUserLocationId(), "allpast");
+                break;
+            default:
+                return StatusCode(StatusCodes.Status400BadRequest, CreateApiError("Invalid Time Period"));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
+    }
+
+
 
     /// <summary>
     /// Gets a sign-up by its identifier.

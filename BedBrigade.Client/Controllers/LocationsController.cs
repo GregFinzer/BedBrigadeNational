@@ -1,4 +1,5 @@
 using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,26 +15,48 @@ namespace BedBrigade.Client.Controllers;
 /// </summary>
 public class LocationsController : RepositoryControllerBase<Location, int, ILocationDataService>
 {
-    public LocationsController(ILocationDataService locationDataService)
+    private IConfigurationDataService _configurationDataService;
+
+    public LocationsController(ILocationDataService locationDataService, IConfigurationDataService configurationDataService)
         : base(locationDataService, x => x.LocationId)
     {
+        _configurationDataService = configurationDataService;
     }
 
     /// <summary>
-    /// Gets the locations available to the authenticated user.
+    ///  Gets the locations available to the authenticated user.
     /// </summary>
     [Authorize(Roles = RoleNames.CanViewLocations)]
     [HttpGet]
     [Produces("application/json")]
     [SwaggerOperation("GetLocations")]
-    [SwaggerResponse(statusCode: 200, type: typeof(List<Location>), description: "Successful operation")]
+    [SwaggerResponse(statusCode: 200, type: typeof(PageResponse<Location>), description: "Successful operation")]
     [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(List<Location>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PageResponse<Location>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<Location>>> GetAllAsync()
+    public async Task<ActionResult<PageResponse<Location>>> GetAllAsync(
+        [FromQuery] int pageNumber,
+        [FromQuery] int itemsPerPage)
     {
-        return await GetAllCoreAsync(() => DataService.GetActiveLocations(), "locations");
+        int maxItemsPerPage = await _configurationDataService.GetConfigValueAsIntAsync(
+            ConfigSection.System, ConfigNames.MaxItemsPerPage);
+        ActionResult? validationResult = ValidatePagingParameters(pageNumber, itemsPerPage, maxItemsPerPage);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
+        //This is correct that all authenticated users can see all locations, as the locations are not sensitive information.
+        ServiceResponse<List<Location>> result = await DataService.GetAllAsync();
+        if (!result.Success || result.Data == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, CreateApiError(result.Message));
+        }
+
+        return await GetPageCoreAsync(pageNumber, itemsPerPage, _configurationDataService, result.Data);
     }
+
 
     /// <summary>
     /// Gets a location by its identifier.
@@ -53,24 +76,6 @@ public class LocationsController : RepositoryControllerBase<Location, int, ILoca
         return await GetByIdCoreAsync(id);
     }
 
-    /// <summary>
-    /// Creates a location.
-    /// </summary>
-    [Authorize(Roles = RoleNames.NationalAdmin)]
-    [HttpPost]
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [SwaggerOperation("CreateLocation")]
-    [SwaggerResponse(statusCode: 201, type: typeof(Location), description: "Location created")]
-    [SwaggerResponse(statusCode: 400, type: typeof(ApiError), description: "Invalid location")]
-    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(typeof(Location), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Location>> CreateAsync([FromBody] Location location)
-    {
-        return await CreateCoreAsync(location);
-    }
 
     /// <summary>
     /// Updates a location.
@@ -99,21 +104,5 @@ public class LocationsController : RepositoryControllerBase<Location, int, ILoca
         return await UpdateCoreAsync(id, location);
     }
 
-    /// <summary>
-    /// Deletes a location.
-    /// </summary>
-    [Authorize(Roles = RoleNames.NationalAdmin)]
-    [HttpDelete("{id:int}")]
-    [Produces("application/json")]
-    [SwaggerOperation("DeleteLocation")]
-    [SwaggerResponse(statusCode: 204, description: "Location deleted")]
-    [SwaggerResponse(statusCode: 404, type: typeof(ApiError), description: "Location not found")]
-    [SwaggerResponse(statusCode: 500, type: typeof(ApiError), description: "An unexpected error occurred")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ApiError), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        return await DeleteCoreAsync(id);
-    }
+
 }
