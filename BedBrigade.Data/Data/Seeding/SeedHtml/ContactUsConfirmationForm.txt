@@ -1,13 +1,31 @@
-%%ContactUs.FirstName%%,
+<p>%%ContactUs.FirstName%%,</p>
 
-We have received your contact request.
+<p>We have received your contact request.</p>
 
-First Name:  %%ContactUs.FirstName%%
-Last Name:  %%ContactUs.LastName%%
-Phone:  %%ContactUs.Phone%%
-Email:  %%ContactUs.Email%%
+<table width="600" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+       <tbody>
+		   <tr>
+		       <td width="250">First Name</td>
+			   <td width="350">%%ContactUs.FirstName%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Last Name</td>
+			   <td width="350"> %%ContactUs.LastName%%</td>
+		   </tr>   
+		   <tr>
+		       <td width="250">Email</td>
+			   <td width="350">%%ContactUs.Email%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Phone</td>
+			   <td width="350">%%ContactUs.Phone%%</td>
+		   </tr>
+		   <tr>
+		       <td width="250">Message</td>
+			   <td width="350">%%ContactUs.Message%%</td>
+		   </tr>
+	   </tbody>
+</table>
 
-Message: 
-%%ContactUs.Message%%
 
-Your Contact Request has been assigned to this location:  %%Location.Name%%
+<p>Your Contact Request has been assigned to this location:  %%Location.Name%%</p>

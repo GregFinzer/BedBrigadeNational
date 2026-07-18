@@ -89,32 +89,36 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
             await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
 
-            //Home Page
-            await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); 
-            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Home");
+            if (!location.ExternalContent)
+            {
+                //Home Page
+                await CreateContent(location, ContentType.Body, "LocationHome.html", "Home");
+                FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Home");
 
-            //Donations
-            await CreateContent(location, ContentType.Body, "LocationDonations.html", "Donations");
-            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Donations");
+                //Donations
+                await CreateContent(location, ContentType.Body, "LocationDonations.html", "Donations");
+                FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Donations");
 
-            //About Us
-            await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
-            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
+                //About Us
+                await CreateContent(location, ContentType.Body, "LocationAboutUs.html", "AboutUs");
+                FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "AboutUs");
 
-            //History
-            await CreateContent(location, ContentType.Body, "LocationHistory.html", "History");
-            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "History");
+                //History
+                await CreateContent(location, ContentType.Body, "LocationHistory.html", "History");
+                FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "History");
 
-            //Assembly Instructions
-            await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
-            FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
+                //Assembly Instructions
+                await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",
+                    "Assembly-Instructions");
+                FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
+            }
 
             //Forms
             await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
             await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
             await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
             await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
-            await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
+            await CreateContent(location, ContentType.SignUpEmailReminderForm, "SignUpEmailReminderForm.txt", "SignUpEmailReminderForm");
             await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
             await CreateContent(location, ContentType.ContactUsConfirmationForm, "ContactUsConfirmationForm.txt", "ContactUsConfirmationForm");
             await CreateContent(location, ContentType.ForgotPasswordForm, "ForgotPasswordForm.txt", "ForgotPasswordForm");
