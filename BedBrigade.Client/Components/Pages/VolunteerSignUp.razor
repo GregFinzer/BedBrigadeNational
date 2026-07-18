@@ -9,10 +9,8 @@
 
 <div class="container-fluid" style="display: @DisplaySearch">
     <SearchLocation @ref="SearchLocation"
-                    Title="@_lc.Keys["FindABedBrigade"]"
-                    ResultType="DropDownList"
-                    ParentMethod="(childData)=>CheckChildData(childData)"
-                    LocationChanged="(ddlValue)=>HandleSelectedValueChanged(ddlValue)" />
+                    Title="@_lc.Keys["FindABedBrigadeNearMe"]"
+                    ResultPath="/volunteer" />
 </div>
 
 <div class="container-fluid" style="display: @DisplayForm">

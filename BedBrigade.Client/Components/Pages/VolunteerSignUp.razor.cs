@@ -85,6 +85,7 @@ namespace BedBrigade.Client.Components.Pages
         private VehicleType? _previousDeliveryVehicle;
         private List<EnumNameValue<CanYouTranslate>> TranslationOptions { get; set; }
         protected bool _isBusy = false;
+        private bool _shouldForceLocation;
         #endregion
 
         #region Initialization
@@ -96,49 +97,56 @@ namespace BedBrigade.Client.Components.Pages
             EC = new EditContext(newVolunteer);
             _validationMessageStore = new ValidationMessageStore(EC);
             await SetLocationState();
+            UpdateRouteDisplayState();
             TranslationOptions = EnumHelper.GetEnumNameValues<CanYouTranslate>();
+
+            //This GetAllAsync should always have less than 1000 records
+            SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
         }
 
         private async Task SetLocationState()
         {
             if (!string.IsNullOrEmpty(LocationRoute))
             {
-                if (await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}") is { Success: true, Data: { } location })
+                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}");
+
+                if (locationResponse.Success && locationResponse.Data != null)
                 {
                     _locationState.Location = LocationRoute;
+
+                    if (!string.IsNullOrEmpty(locationResponse.Data.ExternalVolunteer) &&
+                        Validation.IsValidUrl(locationResponse.Data.ExternalVolunteer))
+                    {
+                        _nav.NavigateTo(locationResponse.Data.ExternalVolunteer, true);
+                    }
                 }
             }
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            await SetLocationState();
+            UpdateRouteDisplayState();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             try
             {
-                if (firstRender)
+                if (_shouldForceLocation && !string.IsNullOrEmpty(LocationRoute) && SearchLocation is not null)
                 {
-                    //This GetAllAsync should always have less than 1000 records
-                    SpokenLanguages = (await _svcSpokenLanguage.GetAllAsync()).Data;
+                    var result = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute.ToLower()}");
 
-                    if (!string.IsNullOrEmpty(LocationRoute))
+                    if (!result.Success || result.Data == null)
                     {
-                        var result = await _svcLocation.GetLocationByRouteAsync(LocationRoute);
-
-                        if (!result.Success || result.Data == null)
-                        {
-                            _nav.NavigateTo($"/Sorry/{LocationRoute}/Volunteer");
-                            return;
-                        }
-
-                        await SearchLocation.ForceLocationByName(LocationRoute);
-                        await HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
-                        DisplayForm = "";
-                        StateHasChanged();
+                        _nav.NavigateTo($"/Sorry/{LocationRoute}/Volunteer", true);
+                        return;
                     }
-                    else
-                    {
-                        DisplaySearch = "";
-                        StateHasChanged();
-                    }
+
+                    await SearchLocation.ForceLocationByName(LocationRoute);
+                    await HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
+                    _shouldForceLocation = false;
+                    StateHasChanged();
                 }
 
             }
@@ -157,6 +165,21 @@ namespace BedBrigade.Client.Components.Pages
                 HandleSelectedValueChanged(SearchLocation.ddlValue.ToString());
             }
         } // check child component data
+
+        private void UpdateRouteDisplayState()
+        {
+            if (string.IsNullOrWhiteSpace(LocationRoute))
+            {
+                DisplaySearch = "";
+                DisplayForm = DisplayNone;
+                _shouldForceLocation = false;
+                return;
+            }
+
+            DisplaySearch = DisplayNone;
+            DisplayForm = "";
+            _shouldForceLocation = true;
+        }
 
 
         #endregion
