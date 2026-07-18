@@ -66,6 +66,25 @@ public class Location : BaseEntity
     [MaxLength(4000, ErrorMessage = "Service Zip Codes has a maximum length of 4000 characters")]
     public string? ServiceZipCodes { get; set; } = string.Empty;
 
+    public bool ExternalContent { get; set; } = false;
+
+    [MaxLength(256)]
+    public string? ExternalHome { get; set; } = string.Empty;
+
+    [MaxLength(256)]
+    public string? ExternalRequestABed { get; set; } = string.Empty;
+
+    [MaxLength(256)]
+    public string? ExternalVolunteer { get; set; } = string.Empty;
+
+    [MaxLength(256)]
+    public string? ExternalDonate { get; set; } = string.Empty;
+
+    [MaxLength(256)]
+    public string? ExternalContactUs { get; set; } = string.Empty;
+
+
+
     [JsonIgnore]
     public ICollection<BedRequest> BedRequests { get; set; } = new List<BedRequest>();
     
