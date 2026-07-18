@@ -77,41 +77,11 @@ public partial class Index : ComponentBase, IDisposable
             //Example:  /grove-city/donations
             else if (!string.IsNullOrEmpty(LocationRoute) && !string.IsNullOrEmpty(PageName))
             {
-                var locationsResponse = await _svcLocation.GetActiveLocations();
-                Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
-
-                if (PageName.ToLower() == "home" && foundLocation != null && !String.IsNullOrEmpty(foundLocation.ExternalHome))
-                {
-                    _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
-                    return;
-                }
-                _currentLocation = LocationRoute;
-                _currentPageName = PageName;
+                await HandleLocationWithPage();
             }
             else if (string.IsNullOrEmpty(PageName))
             {
-                var locationsResponse = await _svcLocation.GetActiveLocations();
-                Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
-
-                //This is a location home page
-                //Example: /grove-city
-                if (foundLocation != null)
-                {
-                    if (!String.IsNullOrEmpty(foundLocation.ExternalHome))
-                    {
-                        _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
-                        return;
-                    }
-                    _currentLocation = LocationRoute;
-                    _currentPageName = DefaultPageName;
-                }
-                //This is a national level page
-                //Example:  /AboutUs
-                else
-                {
-                    _currentLocation = DefaultLocation;
-                    _currentPageName = LocationRoute;
-                }
+                await HandleNationalPageOrLocationRoot();
             }
             else
             {
@@ -124,6 +94,46 @@ public partial class Index : ComponentBase, IDisposable
             Log.Logger.Error(ex, $"Index.PopulateCurrentLocationAndPageName");
             _toastService.Error(ErrorTitle, ErrorMessage);
         }
+    }
+
+    private async Task HandleNationalPageOrLocationRoot()
+    {
+        var locationsResponse = await _svcLocation.GetActiveLocations();
+        Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
+
+        //This is a location home page
+        //Example: /grove-city
+        if (foundLocation != null)
+        {
+            if (!String.IsNullOrEmpty(foundLocation.ExternalHome))
+            {
+                _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
+                return;
+            }
+            _currentLocation = LocationRoute;
+            _currentPageName = DefaultPageName;
+        }
+        //This is a national level page
+        //Example:  /AboutUs
+        else
+        {
+            _currentLocation = DefaultLocation;
+            _currentPageName = LocationRoute;
+        }
+    }
+
+    private async Task HandleLocationWithPage()
+    {
+        var locationsResponse = await _svcLocation.GetActiveLocations();
+        Location? foundLocation = locationsResponse.Data?.FirstOrDefault(x => x.Route.ToLower().TrimStart('/') == LocationRoute?.ToLower());
+
+        if (PageName.ToLower() == "home" && foundLocation != null && !String.IsNullOrEmpty(foundLocation.ExternalHome))
+        {
+            _navigationManager.NavigateTo(foundLocation.ExternalHome, true);
+            return;
+        }
+        _currentLocation = LocationRoute;
+        _currentPageName = PageName;
     }
 
 

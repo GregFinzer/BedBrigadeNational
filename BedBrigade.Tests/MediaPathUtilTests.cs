@@ -37,7 +37,7 @@ namespace BedBrigade.Tests
         public void ResolveExistingMediaPath_ShouldFallbackToUppercaseDirectory_WhenNeeded()
         {
             Directory.CreateDirectory(Path.Combine(_testRoot, "wwwroot", "media"));
-            string uppercaseFile = CreateFile("Media", "national", "pages", "home", "hero.webp");
+            string uppercaseFile = CreateFile("media", "national", "pages", "home", "hero.webp");
 
             string? resolvedPath = MediaPathUtil.ResolveExistingMediaPath(_testRoot, "national\\pages\\home", "hero.webp");
 
