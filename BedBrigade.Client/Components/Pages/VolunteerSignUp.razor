@@ -124,14 +124,14 @@
                             </div>
                             <div class="form-group">
                                 <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
-                                <SfTextBox ID="firstname" @bind-Value="newVolunteer.FirstName"></SfTextBox>
+                                <SfTextBox ID="firstname" @bind-Value="newVolunteer.FirstName" Blur="OnFirstNameBlur"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.FirstName)"></ValidationMessage>
                                 </div>
                             </div>
                             <div class="form-group ">
                                 <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
-                                <SfTextBox ID="lastname" @bind-Value="newVolunteer.LastName"></SfTextBox>
+                                <SfTextBox ID="lastname" @bind-Value="newVolunteer.LastName" Blur="OnLastNameBlur"></SfTextBox>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => newVolunteer.LastName)"></ValidationMessage>
                                 </div>
@@ -155,7 +155,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="organization" class="formlabel">@_lc.Keys["Organization"]</label>
-                                <SfTextBox ID="organization" @bind-Value="newVolunteer.Organization"></SfTextBox>
+                                <SfTextBox ID="organization" @bind-Value="newVolunteer.Organization" Blur="OnOrganizationBlur"></SfTextBox>
                             </div>
                             <div class="form-group">
                                 <label for="numberOfVolunteers" class="formlabel">@_lc.Keys["NumberOfVolunteersIncludingYourself"]</label>

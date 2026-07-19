@@ -53,6 +53,9 @@ public partial class Donations : ComponentBase, IDisposable
     public string BodyContent { get; set; } = string.Empty;
     public string PreviousBodyContent { get; set; } = string.Empty;
     public required SfMaskedTextBox phoneTextBox;
+    public bool StripeEnabled { get; set; } = false;
+    public bool IsLoading { get; set; } = true;
+
     protected override async Task OnInitializedAsync()
     {
         _lc.InitLocalizedComponent(this);
@@ -78,10 +81,29 @@ public partial class Donations : ComponentBase, IDisposable
             RotatorTitle = $"{locationResponse.Data.Name} {DonationName}";
 
             await LoadBodyContent();
-            DonationAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeLocationDonationAmounts,
+
+            await SetupStripe();
+        }
+        else
+        {
+            Log.Error($"Donations, Could not load location {LocationRoute}: " + locationResponse.Message);
+            await ShowValidationMessage($"Could not load location {LocationRoute}:" + locationResponse.Message);
+        }
+    }
+
+    private async Task SetupStripe()
+    {
+        string stripeSecretKey = await _configSvc.GetConfigValueAsync(ConfigSection.Payments, ConfigNames.StripeLocationSecretKey, LocationId.Value);
+        StripeEnabled = !string.IsNullOrEmpty(stripeSecretKey);
+
+        if (StripeEnabled)
+        {
+            DonationAmounts = await _configSvc.GetAmounts(ConfigSection.Payments,
+                ConfigNames.StripeLocationDonationAmounts,
                 LocationId.Value);
 
-            SubscriptionAmounts = await _configSvc.GetAmounts(ConfigSection.Payments, ConfigNames.StripeLocationSubscriptionAmounts,
+            SubscriptionAmounts = await _configSvc.GetAmounts(ConfigSection.Payments,
+                ConfigNames.StripeLocationSubscriptionAmounts,
                 LocationId.Value);
 
             var donationCampaignsResponse = await _donationCampaignService.GetAllForLocationAsync(LocationId.Value);
@@ -107,11 +129,8 @@ public partial class Donations : ComponentBase, IDisposable
             EC = new EditContext(PaymentSession);
             _validationMessageStore = new ValidationMessageStore(EC);
         }
-        else
-        {
-            Log.Error($"Donations, Could not load location {LocationRoute}: " + locationResponse.Message);
-            await ShowValidationMessage($"Could not load location {LocationRoute}:" + locationResponse.Message);
-        }
+
+        IsLoading = false;
     }
 
     private async Task LoadBodyContent()
