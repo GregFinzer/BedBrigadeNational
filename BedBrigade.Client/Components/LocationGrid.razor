@@ -2,7 +2,6 @@
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Buttons
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 
@@ -72,8 +71,8 @@ else
                                     </div>
                                     <div class="col-md-3">
                                         <div class="important-box">
-                                            <label for="checked" style="font-weight: bold">@_lc.Keys["Active"]</label>
-                                            <SfSwitch @bind-Checked="@location.IsActive"></SfSwitch>
+                                            <label for="isActive" style="font-weight: bold">@_lc.Keys["Active"]</label>
+                                            <input id="isActive" type="checkbox" class="form-check-input" @bind="location.IsActive" />
                                         </div>
                                     </div>
                                 </div>
@@ -142,7 +141,7 @@ else
                                     <div class="col-md-3">
                                         <div class="important-box">
                                             <label for="externalContent" style="font-weight: bold">@_lc.Keys["ExternalContent"]</label>
-                                            <SfSwitch ID="externalContent" @bind-Checked="@location.ExternalContent"></SfSwitch>
+                                            <input id="externalContent" type="checkbox" class="form-check-input" @bind="location.ExternalContent" />
                                         </div>
                                     </div>
                                     <div class="col-md-9">
