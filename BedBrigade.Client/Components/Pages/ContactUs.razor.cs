@@ -299,5 +299,25 @@ namespace BedBrigade.Client.Components.Pages
             await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
         }
 
+        private void OnFirstNameBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.FirstName = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(newRequest.FirstName);
+        }
+
+        private void OnLastNameBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.LastName = BedBrigade.Common.Logic.StringUtil.FormatLastName(newRequest.LastName);
+        }
+
     }
 }

@@ -1,9 +1,12 @@
 ﻿using BedBrigade.Common.EnumModels;
+using KellermanSoftware.USPSStandardization;
 
 namespace BedBrigade.Common.Logic
 {
     public static class AddressHelper
     {
+        private static StandardizationLogic _standardizationLogic = LibraryFactory.CreateStandardizationLogic();
+
         public static List<UsState> GetStateList()
         {
             List<UsState> StateList = new List<UsState>
@@ -90,7 +93,13 @@ namespace BedBrigade.Common.Logic
             return null;
         } //FindStateAbbreviation
 
-
+        public static string FormatStreet(string street)
+        {
+            street = _standardizationLogic.StandardizeStreetAddress(street);
+            street = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(street);
+            street = StringUtil.MakeWholeWordsUpperCase(street, new[] { "NE", "NW", "SE", "SW", "RR", "HC", "FL", "PH", "RM", "PO", "STE" });
+            return street;
+        }
     } // class
 
 } // namespace

@@ -5,6 +5,7 @@ using KellermanSoftware.NetCachingLibrary.CacheProviders;
 using KellermanSoftware.NetEmailValidation;
 using KellermanSoftware.NetEncryptionLibrary;
 using KellermanSoftware.StaticCodeAnalysis;
+using KellermanSoftware.USPSStandardization;
 
 namespace BedBrigade.Common.Logic
 {
@@ -47,6 +48,12 @@ namespace BedBrigade.Common.Logic
         {
             NameParserLogic nameParser = new NameParserLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
             return nameParser;
+        }
+
+        public static StandardizationLogic CreateStandardizationLogic()
+        {
+            StandardizationLogic standardizationLogic = new StandardizationLogic(LicenseLogic.KellermanUserName, LicenseLogic.KellermanLicenseKey);
+            return standardizationLogic;
         }
     }
 }

@@ -12,7 +12,8 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
-
+using KellermanSoftware.AddressParser;
+using KellermanSoftware.USPSStandardization;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -33,6 +34,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
+
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -571,6 +573,66 @@ namespace BedBrigade.Client.Components.Pages
         public async Task HandleZipMaskFocus()
         {
             await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", zipTextBox.ID, 0);
+        }
+
+        private void OnFirstNameBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.FirstName = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(newRequest.FirstName);
+        }
+
+        private void OnLastNameBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.LastName = BedBrigade.Common.Logic.StringUtil.FormatLastName(newRequest.LastName);
+        }
+
+        private void OnCityBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.City = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(newRequest.City);
+        }
+
+        private void OnNamesBlur(FocusOutEventArgs args)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.Names = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(newRequest.Names);
+        }
+
+        private void OnGenderAgeBlur(FocusOutEventArgs obj)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.GenderAge = BedBrigade.Common.Logic.StringUtil.ProperCaseWords(newRequest.GenderAge);
+        }
+
+        private void OnStreetBlur(FocusOutEventArgs obj)
+        {
+            if (newRequest is null)
+            {
+                return;
+            }
+
+            newRequest.Street = AddressHelper.FormatStreet(newRequest.Street);
         }
     }
 }

@@ -191,6 +191,36 @@ namespace BedBrigade.Client.Components.Pages
             await _js.InvokeVoidAsync("BedBrigadeUtil.SelectMaskedText", phoneTextBox.ID, 0);
         }
 
+        private void OnFirstNameBlur(FocusOutEventArgs args)
+        {
+            if (newVolunteer is null)
+            {
+                return;
+            }
+
+            newVolunteer.FirstName = StringUtil.ProperCaseWords(newVolunteer.FirstName);
+        }
+
+        private void OnLastNameBlur(FocusOutEventArgs args)
+        {
+            if (newVolunteer is null)
+            {
+                return;
+            }
+
+            newVolunteer.LastName = StringUtil.FormatLastName(newVolunteer.LastName);
+        }
+
+        private void OnOrganizationBlur(FocusOutEventArgs args)
+        {
+            if (newVolunteer is null)
+            {
+                return;
+            }
+
+            newVolunteer.Organization = StringUtil.ProperCaseWords(newVolunteer.Organization);
+        }
+
         private async Task HandleSelectedValueChanged(string locationIdString)
         {
             selectedLocation = Convert.ToInt32(locationIdString);
