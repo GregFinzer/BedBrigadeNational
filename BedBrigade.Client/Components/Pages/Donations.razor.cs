@@ -66,6 +66,13 @@ public partial class Donations : ComponentBase, IDisposable
         ServiceResponse<Location>? locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{LocationRoute}");
         if (locationResponse.Success && locationResponse.Data != null)
         {
+            if (!string.IsNullOrEmpty(locationResponse.Data.ExternalDonate) &&
+                Validation.IsValidUrl(locationResponse.Data.ExternalDonate))
+            {
+                _nav.NavigateTo(locationResponse.Data.ExternalDonate, true);
+                return;
+            }
+
             LocationId = locationResponse.Data.LocationId;
             LocationName = locationResponse.Data.Name;
             RotatorTitle = $"{locationResponse.Data.Name} {DonationName}";

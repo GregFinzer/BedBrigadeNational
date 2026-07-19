@@ -103,6 +103,12 @@ EventGroup: Event Group
 EventNote: Event Note
 EventType: Event Type
 Example: Example
+ExternalContactUs: External Contact Us
+ExternalContent: External Content
+ExternalDonate: External Donate
+ExternalHome: External Home
+ExternalRequestABed: External Request a Bed
+ExternalVolunteer: External Volunteer
 FillOutTheRecaptcha: Fill out the recaptcha checkbox and submit the form.
 FilteredTotalColon: 'Filtered Total:'
 FindABedBrigade: Find a Bed Brigade

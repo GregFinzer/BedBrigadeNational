@@ -118,12 +118,28 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             await CreateGeneralDonationCampaign(location);
             FileUtil.CreateLocationMediaDirectory(location);
 
-            //Header and Footer
-            await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
-            await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
+            await CreateContent(location, groveCityLocation);
 
+            //Config
+            await CreateConfig(location);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<Location>("Error creating location: " + ex.Message);
+        }
+    }
+
+    private async Task CreateContent(Location location, ServiceResponse<Location> groveCityLocation)
+    {
+        //Header and Footer
+        await CreateContent(location, ContentType.Header, "LocationHeader.html", "Header");
+        await CreateContent(location, ContentType.Footer, "LocationFooter.html", "Footer");
+
+        if (!location.ExternalContent)
+        {
             //Home Page
-            await CreateContent(location, ContentType.Body, "LocationHome.html", "Home"); 
+            await CreateContent(location, ContentType.Body, "LocationHome.html", "Home");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Home");
 
             //Donations
@@ -139,30 +155,23 @@ public class LocationDataService : Repository<Location>, ILocationDataService
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "History");
 
             //Assembly Instructions
-            await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",  "Assembly-Instructions");
+            await CreateContent(location, ContentType.Body, "LocationAssemblyInstructions.html",
+                "Assembly-Instructions");
             FileUtil.CopyMediaFromLocation(groveCityLocation.Data, location, "Assembly-Instructions");
-
-            //Forms
-            await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
-            await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
-            await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
-            await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
-            await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
-            await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
-            await CreateContent(location, ContentType.ContactUsConfirmationForm, "ContactUsConfirmationForm.txt", "ContactUsConfirmationForm");
-            await CreateContent(location, ContentType.ForgotPasswordForm, "ForgotPasswordForm.txt", "ForgotPasswordForm");
-            await CreateContent(location, ContentType.DeliverySmsReminderForm, "DeliverySmsReminderForm.txt", "DeliverySmsReminderForm");
-            await CreateContent(location, ContentType.DeliveryEmailReminderForm, "DeliveryEmailReminderForm.txt", "DeliveryEmailReminderForm");
-            await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
-
-            //Config
-            await CreateConfig(location);
-            return result;
         }
-        catch (Exception ex)
-        {
-            return new ServiceResponse<Location>("Error creating location: " + ex.Message);
-        }
+
+        //Forms
+        await CreateContent(location, ContentType.DeliveryCheckList, "DeliveryCheckList.txt", "DeliveryCheckList");
+        await CreateContent(location, ContentType.EmailTaxForm, "EmailTaxForm.txt", "EmailTaxForm");
+        await CreateContent(location, ContentType.BedRequestConfirmationForm, "BedRequestConfirmationForm.txt", "BedRequestConfirmationForm");
+        await CreateContent(location, ContentType.SignUpEmailConfirmationForm, "SignUpEmailConfirmationForm.txt", "SignUpEmailConfirmationForm");
+        await CreateContent(location, ContentType.SignUpEmailReminderForm, "SignUpEmailReminderForm.txt", "SignUpEmailReminderForm");
+        await CreateContent(location, ContentType.NewsletterForm, "NewsletterForm.txt", "NewsletterForm");
+        await CreateContent(location, ContentType.ContactUsConfirmationForm, "ContactUsConfirmationForm.txt", "ContactUsConfirmationForm");
+        await CreateContent(location, ContentType.ForgotPasswordForm, "ForgotPasswordForm.txt", "ForgotPasswordForm");
+        await CreateContent(location, ContentType.DeliverySmsReminderForm, "DeliverySmsReminderForm.txt", "DeliverySmsReminderForm");
+        await CreateContent(location, ContentType.DeliveryEmailReminderForm, "DeliveryEmailReminderForm.txt", "DeliveryEmailReminderForm");
+        await CreateContent(location, ContentType.SignUpSmsReminderForm, "SignUpSmsReminderForm.txt", "SignUpSmsReminderForm");
     }
 
     private async Task CreateConfig(Location location)

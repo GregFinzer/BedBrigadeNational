@@ -11,6 +11,17 @@ namespace BedBrigade.Common.Logic
         private static Regex _hrefRegex = new Regex(hrefExpression, RegexOptions.Compiled);
         private const string javaScriptExpression = @"<a.+javascript[^>]+>[^>]+>";
         private static Regex _javaScriptRegex = new Regex(javaScriptExpression, RegexOptions.Compiled);
+        private static readonly Regex HtmlTagRegex = new(
+            @"</?(?:a|abbr|address|area|article|aside|audio|b|base|bdi|bdo|blockquote|body|br|button|canvas|caption|cite|code|col|colgroup|data|datalist|dd|del|details|dfn|dialog|div|dl|dt|em|embed|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|head|header|hgroup|hr|html|i|iframe|img|input|ins|kbd|label|legend|li|link|main|map|mark|meta|meter|nav|noscript|object|ol|optgroup|option|output|p|param|picture|pre|progress|q|rp|rt|ruby|s|samp|script|section|select|slot|small|source|span|strong|style|sub|summary|sup|svg|table|tbody|td|template|textarea|tfoot|th|thead|time|title|tr|track|u|ul|var|video|wbr)\b[^>]*>",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        public static bool ContainsHtml(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            return HtmlTagRegex.IsMatch(text);
+        }
 
         public static string ProperCase(string input)
         {

@@ -2,7 +2,6 @@
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Buttons
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 @using EditMode = Syncfusion.Blazor.Grids.EditMode
 
@@ -72,8 +71,8 @@ else
                                     </div>
                                     <div class="col-md-3">
                                         <div class="important-box">
-                                            <label for="checked" style="font-weight: bold">@_lc.Keys["Active"]</label>
-                                            <SfSwitch @bind-Checked="@location.IsActive"></SfSwitch>
+                                            <label for="isActive" style="font-weight: bold">@_lc.Keys["Active"]</label>
+                                            <input id="isActive" type="checkbox" class="form-check-input" @bind="location.IsActive" />
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +134,34 @@ else
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <SfTextArea @bind-Value=@location.ServiceZipCodes Enabled="true" Placeholder="@_lc.Keys["ServiceZipCodes"]" FloatLabelType="FloatLabelType.Auto" RowCount="10" ColumnCount="50" Width="100%" />
+                                        <SfTextArea @bind-Value=@location.ServiceZipCodes Enabled="true" Placeholder="@_lc.Keys["ServiceZipCodes"]" FloatLabelType="FloatLabelType.Auto" RowCount="2" ColumnCount="50" Width="100%" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-3">
+                                        <div class="important-box">
+                                            <label for="externalContent" style="font-weight: bold">@_lc.Keys["ExternalContent"]</label>
+                                            <input id="externalContent" type="checkbox" class="form-check-input" @bind="location.ExternalContent" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <SfTextBox ID="externalHome" @bind-Value=@location.ExternalHome Enabled="true" Placeholder="@_lc.Keys["ExternalHome"]" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalRequestABed" @bind-Value=@location.ExternalRequestABed Enabled="true" Placeholder="@_lc.Keys["ExternalRequestABed"]" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalVolunteer" @bind-Value=@location.ExternalVolunteer Enabled="true" Placeholder="@_lc.Keys["ExternalVolunteer"]" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalDonate" @bind-Value=@location.ExternalDonate Enabled="true" Placeholder="@_lc.Keys["ExternalDonate"]" FloatLabelType="FloatLabelType.Auto" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <SfTextBox ID="externalContactUs" @bind-Value=@location.ExternalContactUs Enabled="true" Placeholder="@_lc.Keys["ExternalContactUs"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                 </div>
                             }
@@ -151,6 +177,7 @@ else
                         <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
                         <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Location.Group) ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
+                        <GridColumn Field=@nameof(Location.ExternalContent) HeaderText="External Content" Width="150" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
                         <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Location.IsActive) HeaderText="Active" Width="130" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
                         <GridColumn Field=@nameof(Location.MailingAddress) ShowColumnMenu="false" HeaderText="Mailing Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>

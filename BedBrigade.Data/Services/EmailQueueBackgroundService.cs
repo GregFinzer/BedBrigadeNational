@@ -443,6 +443,7 @@ namespace BedBrigade.Data.Services
 
             mailMessage.Subject = email.Subject;
             mailMessage.Body = email.Body;
+            mailMessage.IsBodyHtml = StringUtil.ContainsHtml(email.Body);
             return mailMessage;
         }
     }
