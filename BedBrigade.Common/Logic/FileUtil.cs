@@ -134,7 +134,7 @@ namespace BedBrigade.Common.Logic
             {
                 candidatePaths.Insert(0, Path.Combine(GetSolutionPath(), "BedBrigade.Data", DataDirectoryName, SeedingDirectoryName));
             }
-            catch (DirectoryNotFoundException)
+            catch (Exception ex) when (ex is DirectoryNotFoundException or UnauthorizedAccessException or IOException)
             {
                 // Ignore solution lookup failures and continue with deployment/runtime fallbacks.
             }
@@ -237,11 +237,18 @@ namespace BedBrigade.Common.Logic
 
             while (count < maxDepth)
             {
-                string[] files = Directory.GetFiles(currentPath, "*.sln");
-
-                if (files.Any())
+                try
                 {
-                    return currentPath;
+                    string[] files = Directory.GetFiles(currentPath, "*.sln");
+
+                    if (files.Any())
+                    {
+                        return currentPath;
+                    }
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+                {
+                    // Ignore inaccessible directories while traversing upward.
                 }
 
                 string? parentPath = Path.GetDirectoryName(currentPath);
