@@ -18,7 +18,7 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="firstname" class="formlabel required">@_lc.Keys["FirstName"]</label>
-                            <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName"></SfTextBox>
+                            <SfTextBox ID="firstname" @bind-Value="newRequest.FirstName" Blur="OnFirstNameBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.FirstName)"></ValidationMessage>
                             </div>
@@ -26,7 +26,7 @@
                         </div>
                         <div class="form-group ">
                             <label for="lastname" class="formlabel required">@_lc.Keys["LastName"]</label>
-                            <SfTextBox ID="lastname" @bind-Value="newRequest.LastName"></SfTextBox>
+                            <SfTextBox ID="lastname" @bind-Value="newRequest.LastName" Blur="OnLastNameBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.LastName)"></ValidationMessage>
                             </div>
@@ -58,14 +58,14 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="street" class="formlabel required">@_lc.Keys["Street"]</label>
-                            <SfTextBox ID="street" @bind-Value="newRequest.Street"></SfTextBox>
+                            <SfTextBox ID="street" @bind-Value="newRequest.Street" Blur="OnStreetBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.Street)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group ">
                             <label for="city" class="formlabel required">@_lc.Keys["City"]</label>
-                            <SfTextBox ID="city" @bind-Value="newRequest.City"></SfTextBox>
+                            <SfTextBox ID="city" @bind-Value="newRequest.City" Blur="OnCityBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.City)"></ValidationMessage>
                             </div>
@@ -105,14 +105,14 @@
                         </div>
                         <div class="form-group ">
                             <label for="genderAge" class="formlabel required">@_lc.Keys["GenderAge"]</label>
-                            <SfTextBox ID="genderAge" @bind-Value="newRequest.GenderAge" Placeholder='@(_lc.Keys["Example"] + ": B/7 G/6")'></SfTextBox>
+                            <SfTextBox ID="genderAge" @bind-Value="newRequest.GenderAge" Placeholder='@(_lc.Keys["Example"] + ": B/7 G/6")' Blur="OnGenderAgeBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.GenderAge)"></ValidationMessage>
                             </div>
                         </div>
                         <div class="form-group ">
                             <label for="names" class="formlabel required">@_lc.Keys["Names"]</label>
-                            <SfTextBox ID="names" @bind-Value="newRequest.Names" Placeholder='@(_lc.Keys["Example"] + ": Noah, Emma")'></SfTextBox>
+                            <SfTextBox ID="names" @bind-Value="newRequest.Names" Placeholder='@(_lc.Keys["Example"] + ": Noah, Emma")' Blur="OnNamesBlur"></SfTextBox>
                             <div style="font-size: smaller">
                                 <ValidationMessage For="@(() => newRequest.Names)"></ValidationMessage>
                             </div>

@@ -1,5 +1,4 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BedBrigade.Common.Logic
@@ -14,6 +13,126 @@ namespace BedBrigade.Common.Logic
         private static readonly Regex HtmlTagRegex = new(
             @"</?(?:a|abbr|address|area|article|aside|audio|b|base|bdi|bdo|blockquote|body|br|button|canvas|caption|cite|code|col|colgroup|data|datalist|dd|del|details|dfn|dialog|div|dl|dt|em|embed|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|head|header|hgroup|hr|html|i|iframe|img|input|ins|kbd|label|legend|li|link|main|map|mark|meta|meter|nav|noscript|object|ol|optgroup|option|output|p|param|picture|pre|progress|q|rp|rt|ruby|s|samp|script|section|select|slot|small|source|span|strong|style|sub|summary|sup|svg|table|tbody|td|template|textarea|tfoot|th|thead|time|title|tr|track|u|ul|var|video|wbr)\b[^>]*>",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        // Lower-case prefix -> properly cased prefix
+        private static readonly Dictionary<string, string> Prefixes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "mc", "Mc" },
+            { "mac", "Mac" },
+            { "o'", "O'" },
+            { "ap", "Ap" },
+            { "ab", "Ab" },
+            { "ibn", "Ibn" },
+            { "bin", "Bin" },
+            { "ben", "Ben" },
+            { "st", "St" },
+            { "st.", "St." },
+            { "fitz", "Fitz" },
+            { "van", "Van" },
+            { "von", "Von" },
+            { "de", "De" },
+            { "del", "Del" },
+            { "della", "Della" },
+            { "di", "Di" },
+            { "da", "Da" },
+            { "dos", "Dos" },
+            { "das", "Das" },
+            { "du", "Du" },
+            { "le", "Le" },
+            { "la", "La" }
+        };
+
+        public static string MakeWholeWordsUpperCase(string sentence, IEnumerable<string> words)
+        {
+            if (string.IsNullOrWhiteSpace(sentence) || words == null)
+                return sentence;
+
+            foreach (string word in words.Where(w => !string.IsNullOrWhiteSpace(w)))
+            {
+                sentence = Regex.Replace(
+                    sentence,
+                    $@"\b{Regex.Escape(word)}\b",
+                    word.ToUpperInvariant(),
+                    RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            }
+
+            return sentence;
+        }
+
+        public static string FormatLastName(string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+                return lastName;
+
+            bool hasUpper = lastName.Any(char.IsUpper);
+            bool hasLower = lastName.Any(char.IsLower);
+
+            // Already intentionally formatted
+            if (hasUpper && hasLower)
+                return lastName;
+
+            // Only process all-lowercase names
+            if (!hasLower || hasUpper)
+                return lastName;
+
+            return FormatLastNamePart(lastName.ToLowerInvariant());
+        }
+
+        private static string FormatLastNamePart(string text)
+        {
+            // Handle hyphenated names
+            if (text.Contains('-'))
+            {
+                return string.Join('-',
+                    text.Split('-').Select(FormatLastNamePart));
+            }
+
+            // Handle apostrophes
+            if (text.Contains('\''))
+            {
+                return string.Join('\'',
+                    text.Split('\'').Select(FormatLastNamePart));
+            }
+
+            // Check prefixes (longest first)
+            foreach (var prefix in Prefixes.Keys.OrderByDescending(k => k.Length))
+            {
+                if (text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                    && text.Length > prefix.Length)
+                {
+                    return Prefixes[prefix] +
+                           ProperCase(text.Substring(prefix.Length));
+                }
+            }
+
+            return ProperCase(text);
+        }
+
+        public static string ProperCaseWords(string sentence)
+        {
+            if (string.IsNullOrWhiteSpace(sentence))
+                return sentence;
+
+            string[] words = sentence.Split(' ');
+
+            for (int i = 0; i < words.Length; i++)
+            {
+                string word = words[i];
+
+                bool hasUpper = word.Any(char.IsUpper);
+                bool hasLower = word.Any(char.IsLower);
+
+                // If the word already contains both uppercase and lowercase letters,
+                // leave it unchanged.
+                if (hasUpper && hasLower)
+                    continue;
+
+                words[i] = char.ToUpper(word[0]) +
+                           (word.Length > 1 ? word.Substring(1).ToLower() : "");
+            }
+
+            return string.Join(" ", words);
+        }
 
         public static bool ContainsHtml(string? text)
         {
