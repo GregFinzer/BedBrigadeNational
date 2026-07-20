@@ -20,6 +20,16 @@ namespace BedBrigade.Tests
         }
 
         [Test]
+        public void EncryptStringOneTime()
+        {
+            string stringToEncrypt = "test@test.com";
+            string encryptedValue = EncryptUtil.EncryptString(stringToEncrypt);
+            string decryptedValue = EncryptUtil.DecryptString(encryptedValue);
+            Assert.AreEqual(stringToEncrypt, decryptedValue);
+            Console.WriteLine(encryptedValue);
+        }
+
+        [Test]
         public void EncryptString_ShortPassword_ReturnsEncryptedValue()
         {
             AssertEncrypts(ShortPassword);
