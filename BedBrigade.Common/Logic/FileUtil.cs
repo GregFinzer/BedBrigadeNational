@@ -476,13 +476,24 @@ namespace BedBrigade.Common.Logic
                 return string.Empty;
             }
 
-            string? match = Directory.EnumerateFileSystemEntries(currentDirectory)
-                .Select(Path.GetFileName)
-                .FirstOrDefault(name =>
-                    !string.IsNullOrWhiteSpace(name)
-                    && string.Equals(name, segment, StringComparison.OrdinalIgnoreCase));
+            try
+            {
+                string? match = Directory.EnumerateFileSystemEntries(currentDirectory)
+                    .Select(Path.GetFileName)
+                    .FirstOrDefault(name =>
+                        !string.IsNullOrWhiteSpace(name)
+                        && string.Equals(name, segment, StringComparison.OrdinalIgnoreCase));
 
-            return match is null ? string.Empty : Path.Combine(currentDirectory, match);
+                return match is null ? string.Empty : Path.Combine(currentDirectory, match);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return string.Empty;
+            }
+            catch (IOException)
+            {
+                return string.Empty;
+            }
         }
     }
 }
