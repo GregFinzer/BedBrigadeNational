@@ -20,7 +20,7 @@
         public const int BulkMediumPriority = 2;
         public const int BulkHighPriority = 3;
         public const string CountryCode = "US";
-        public const string DefaultTimeZoneId = "America/New_York";
+        public const string DefaultTimeZoneId = "Eastern Standard Time";
         public const string DefaultDonationCampaignName = "General";
 
         public const string DefaultBedType = "Single Bed";
