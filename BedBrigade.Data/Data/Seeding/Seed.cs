@@ -108,30 +108,6 @@ public static class Seed
                 },
                 new Location
                 {
-                    Name = "Greensburg United Methodist Church Bed Brigade",
-                    Route = "/greensburgumc",
-                    MailingAddress = "2161 Greensburg Road",
-                    MailingCity = "North Canton",
-                    MailingState = "OH",
-                    MailingPostalCode = "44720",
-                    BuildAddress = "2161 Greensburg Road",
-                    BuildCity = "North Canton",
-                    BuildState = "OH",
-                    BuildPostalCode = "44720",
-                    IsActive = true,
-                    Latitude = 40.931528M,
-                    Longitude = -81.468217M,
-                    TimeZoneId = Defaults.DefaultTimeZoneId,
-                    Group = "GUMC",
-                    ExternalHome = "http://greensburgumc.net/Bed%20Brigade.aspx",
-                    ExternalDonate = "http://greensburgumc.net/Give.aspx",
-                    ExternalVolunteer =
-                        "https://docs.google.com/forms/d/e/1FAIpQLSceE0_cAkwgL_Csfx2V0ToRZqUOM-XFrqp3qhwgQKiG11tijA/viewform",
-                    ExternalRequestABed =
-                        "https://docs.google.com/forms/d/e/1FAIpQLSdLiK8if-NjwoPuKC6Tm3qYnApkgFQncyneaN9Qhn7VsHgWgw/viewform"
-                },
-                new Location
-                {
                     Name = "Bed Brigade Vineyard Church Circleville",
                     Route = "/circleville",
                     MailingAddress = "911 S Pickaway St",
@@ -149,8 +125,34 @@ public static class Seed
                     Group = "CIR",
                     ExternalHome = "https://www.facebook.com/BedBrigade/",
                     ExternalDonate = "https://www.vineyardcircleville.com/give",
+                    ServiceZipCodes = "43113,43154,43164,43103,43156,45644,43115,43116,43137,43146,43145,43135,43125,43117,43143",
+                    //Tom Remick
                     ExternalVolunteer = WebHelper.CreateMailToLink(EncryptUtil.DecryptString("@KS@~2uTzEW,53|)!yD1,+u"), "Volunteer", "I would like to volunteer with Bed Brigade"),
-                }
+                },
+                new Location
+                {
+                    Name = "Hardbarger Impact Ministries",
+                    Route = "/hardbarger",
+                    MailingAddress = "2950 Thrush Avenue SW",
+                    MailingCity = "Lancaster",
+                    MailingState = "OH",
+                    MailingPostalCode = "43130",
+                    BuildAddress = "2950 Thrush Avenue SW",
+                    BuildCity = "Lancaster",
+                    BuildState = "OH",
+                    BuildPostalCode = "43130",
+                    IsActive = true,
+                    Latitude = 39.718515M,
+                    Longitude = -82.654239M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = "HRD",
+                    ExternalHome = "https://himohio.org/bed-brigade",
+                    ExternalDonate = "https://himohio.org/give",
+                    ExternalVolunteer =
+                        "https://himohio.org/i-m-new",
+                    ExternalRequestABed =
+                        "https://himohio.org/bed-brigade"
+                },                
             };
         }
     }

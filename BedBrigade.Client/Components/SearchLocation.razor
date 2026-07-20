@@ -18,11 +18,11 @@
             <p>                
                 <SfMaskedTextBox @ref="maskObj"
                                  Mask="00000"
-                                 Value="@PostalCode"
+                                 @bind-Value="@PostalCode"
                                  Created="OnCreateInput"
                                  Placeholder="@_lc.Keys["ZipCode"]"
-                                 OnInput="ZipCodeInputChange"
-                                 @onkeyup="@HandleKeyDown"
+                                 @onkeyup="@ZipCodeInputChange"
+                                 @onkeydown="@HandleKeyDown"
                                  Focus="HandleMaskFocus"
                                  Width="200px">
                 </SfMaskedTextBox>

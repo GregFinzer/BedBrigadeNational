@@ -30,7 +30,7 @@ namespace BedBrigade.Client.Components
 
         public int ddlValue { get; set; } = 0;
 
-        private string? PostalCode { get; set; } = string.Empty;
+        private string PostalCode { get; set; } = string.Empty;
         private string PostalCodeResult { get; set; } = string.Empty;
         private const string DisplayNone = "none";
         private string strAlertDisplay = DisplayNone;
@@ -222,19 +222,10 @@ namespace BedBrigade.Client.Components
 
         } // Search Result
 
-        private void ZipCodeInputChange(ChangeEventArgs e)
+        private void ZipCodeInputChange()
         {
-            PostalCode = String.Empty;
-            SubmitDisabled = true;
-            if (e.Value != null && e.Value.ToString().Length == 5)
-            {
-                var isNumber = e.Value.ToString().All(c => Char.IsNumber(c));
-                if (isNumber)
-                {
-                    PostalCode = e.Value.ToString();
-                    SubmitDisabled = false;
-                }
-            }
+            SubmitDisabled = PostalCode.Length != 5 || !PostalCode.All(c => Char.IsNumber(c));
+            StateHasChanged();
         }        
         
         public async Task HandleMaskFocus()
@@ -253,7 +244,7 @@ namespace BedBrigade.Client.Components
             string normalizedResultPath = ResultPath.StartsWith('/') ? ResultPath : $"/{ResultPath}";
             return $"{normalizedRoute}{normalizedResultPath}";
         }
-
+        
     }
 
 
