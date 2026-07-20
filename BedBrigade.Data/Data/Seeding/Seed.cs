@@ -7,6 +7,7 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.Models;
 using Bogus;
+using Twilio.Rest.Iam.V1;
 
 namespace BedBrigade.Data.Seeding;
 
@@ -30,54 +31,132 @@ public static class Seed
         new Role {Name = RoleNames.LocationCommunications},
     };
 
-    private static readonly List<Location> _locations = new()
+    private static List<Location> Locations
     {
-        new Location
+        get
         {
-            Name = SeedConstants.SeedNationalName, 
-            Route = "/national", 
-            MailingCity = "Columbus", 
-            MailingState = "Ohio", 
-            IsActive = true,
-            TimeZoneId = Defaults.DefaultTimeZoneId
-        },
-        new Location
-        {
-            Name = "Grove City Bed Brigade", 
-            Route = "/grove-city", 
-            MailingAddress = "1788 Killdeer Rd", 
-            MailingCity = "Grove City",
-            MailingState = "OH", 
-            MailingPostalCode = "43123",
-            BuildAddress = "4004 Thistlewood Dr",
-            BuildCity = "Grove City",
-            BuildState= "OH",
-            BuildPostalCode= "43123",
-            IsActive = true,
-            Latitude = 39.882527M,
-            Longitude = -83.042266M,
-            TimeZoneId = Defaults.DefaultTimeZoneId,
-            Group= Defaults.GroupGroveCity
-        },
-        new Location
-        {
-            Name = "Polaris Bed Brigade", Route = "/polaris", 
-            MailingAddress = "171 E. Fifth Ave", 
-            MailingCity = "Columbus",
-            MailingState = "OH", 
-            MailingPostalCode = "43201",
-            BuildAddress = "171 E. Fifth Ave",
-            BuildCity = "Columbus",
-            BuildState = "OH",
-            BuildPostalCode = "43201",
-            IsActive = true,
-            Latitude = 39.986799M,
-            Longitude = -83.0006655M,
-            TimeZoneId = Defaults.DefaultTimeZoneId,
-            Group = "Polaris"
+            return new List<Location>
+            {
+                new Location
+                {
+                    Name = SeedConstants.SeedNationalName,
+                    Route = "/national",
+                    MailingCity = "Columbus",
+                    MailingState = "Ohio",
+                    IsActive = true,
+                    TimeZoneId = Defaults.DefaultTimeZoneId
+                },
+                new Location
+                {
+                    Name = "Grove City Bed Brigade",
+                    Route = "/grove-city",
+                    MailingAddress = "1788 Killdeer Rd",
+                    MailingCity = "Grove City",
+                    MailingState = "OH",
+                    MailingPostalCode = "43123",
+                    BuildAddress = "4004 Thistlewood Dr",
+                    BuildCity = "Grove City",
+                    BuildState = "OH",
+                    BuildPostalCode = "43123",
+                    IsActive = true,
+                    Latitude = 39.882527M,
+                    Longitude = -83.042266M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = Defaults.GroupGroveCity
+                },
+                new Location
+                {
+                    Name = "Polaris Bed Brigade",
+                    Route = "/polaris",
+                    MailingAddress = "171 E. Fifth Ave",
+                    MailingCity = "Columbus",
+                    MailingState = "OH",
+                    MailingPostalCode = "43201",
+                    BuildAddress = "171 E. Fifth Ave",
+                    BuildCity = "Columbus",
+                    BuildState = "OH",
+                    BuildPostalCode = "43201",
+                    IsActive = true,
+                    Latitude = 39.986799M,
+                    Longitude = -83.0006655M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = "Polaris"
+                },
+                new Location
+                {
+                    Name = "Greensburg United Methodist Church Bed Brigade",
+                    Route = "/greensburgumc",
+                    MailingAddress = "2161 Greensburg Road",
+                    MailingCity = "North Canton",
+                    MailingState = "OH",
+                    MailingPostalCode = "44720",
+                    BuildAddress = "2161 Greensburg Road",
+                    BuildCity = "North Canton",
+                    BuildState = "OH",
+                    BuildPostalCode = "44720",
+                    IsActive = true,
+                    Latitude = 40.931528M,
+                    Longitude = -81.468217M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = "GUMC",
+                    ExternalHome = "http://greensburgumc.net/Bed%20Brigade.aspx",
+                    ExternalDonate = "http://greensburgumc.net/Give.aspx",
+                    ExternalVolunteer =
+                        "https://docs.google.com/forms/d/e/1FAIpQLSceE0_cAkwgL_Csfx2V0ToRZqUOM-XFrqp3qhwgQKiG11tijA/viewform",
+                    ExternalRequestABed =
+                        "https://docs.google.com/forms/d/e/1FAIpQLSdLiK8if-NjwoPuKC6Tm3qYnApkgFQncyneaN9Qhn7VsHgWgw/viewform"
+                },
+                new Location
+                {
+                    Name = "Bed Brigade Vineyard Church Circleville",
+                    Route = "/circleville",
+                    MailingAddress = "911 S Pickaway St",
+                    MailingCity = "Circleville",
+                    MailingState = "OH",
+                    MailingPostalCode = "43113",
+                    BuildAddress = "911 S Pickaway St",
+                    BuildCity = "Circleville",
+                    BuildState = "OH",
+                    BuildPostalCode = "43113",
+                    IsActive = true,
+                    Latitude = 39.592566M,
+                    Longitude = -82.947221M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = "CIR",
+                    ExternalHome = "https://www.facebook.com/BedBrigade/",
+                    ExternalDonate = "https://www.vineyardcircleville.com/give",
+                    ServiceZipCodes = "43113,43154,43164,43103,43156,45644,43115,43116,43137,43146,43145,43135,43125,43117,43143",
+                    //Tom Remick
+                    ExternalVolunteer = WebHelper.CreateMailToLink(EncryptUtil.DecryptString("@KS@~2uTzEW,53|)!yD1,+u"), "Volunteer", "I would like to volunteer with Bed Brigade"),
+                },
+                new Location
+                {
+                    Name = "Hardbarger Impact Ministries",
+                    Route = "/hardbarger",
+                    MailingAddress = "2950 Thrush Avenue SW",
+                    MailingCity = "Lancaster",
+                    MailingState = "OH",
+                    MailingPostalCode = "43130",
+                    BuildAddress = "2950 Thrush Avenue SW",
+                    BuildCity = "Lancaster",
+                    BuildState = "OH",
+                    BuildPostalCode = "43130",
+                    IsActive = true,
+                    Latitude = 39.718515M,
+                    Longitude = -82.654239M,
+                    TimeZoneId = Defaults.DefaultTimeZoneId,
+                    Group = "HRD",
+                    ExternalHome = "https://himohio.org/bed-brigade",
+                    ExternalDonate = "https://himohio.org/give",
+                    ExternalVolunteer =
+                        "https://himohio.org/i-m-new",
+                    ExternalRequestABed =
+                        "https://himohio.org/bed-brigade"
+                },                
+            };
         }
+    }
 
-    };
 
     private static List<Configuration> _configurations = SeedConfigLogic.AllConfigurationForSeeding();
 
@@ -567,7 +646,7 @@ public static class Seed
 
             var locationsToAdd = new List<Location>();
 
-            foreach (var newLocation in _locations)
+            foreach (var newLocation in Locations)
             {
                 if (!existingLocations.Any(l => l.Name == newLocation.Name || l.Route == newLocation.Route))
                 {
