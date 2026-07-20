@@ -22,6 +22,49 @@ namespace BedBrigade.Common.Logic
             return environment == "Development";
         }
 
+        public static bool IsMailToLink(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+            return text.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Creates a valid mailto link.
+        /// </summary>
+        /// <param name="email">Email address.</param>
+        /// <param name="subject">Optional subject.</param>
+        /// <param name="body">Optional body.</param>
+        /// <returns>A valid mailto URI.</returns>
+        /// <exception cref="ArgumentException">Thrown when email is null or empty.</exception>
+        public static string CreateMailToLink(
+            string email,
+            string? subject = null,
+            string? body = null)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+
+            var queryParameters = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(subject))
+            {
+                queryParameters.Add($"subject={Uri.EscapeDataString(subject)}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                queryParameters.Add($"body={Uri.EscapeDataString(body)}");
+            }
+
+            if (queryParameters.Count == 0)
+            {
+                return $"mailto:{email}";
+            }
+
+            return $"mailto:{email}?{string.Join("&", queryParameters)}";
+        }
+
         public static string GetSeedingFile(string fileName)
         {
             var seedingDirectory = FileUtil.GetSeedingDirectory();
