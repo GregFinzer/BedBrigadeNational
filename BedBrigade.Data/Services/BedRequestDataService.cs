@@ -4,6 +4,7 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.AddressParser;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BedBrigade.Data.Services;
 
@@ -313,38 +314,46 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public List<BedRequest> SortBedRequestClosestToAddress(List<BedRequest> bedRequests, int bedRequestId)
     {
-        var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
-        if (targetBedRequest == null)
+        try
         {
+            var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
+            if (targetBedRequest == null)
+            {
+                return bedRequests;
+            }
+
+            targetBedRequest.Distance = -1;
+            var addressParser = LibraryFactory.CreateAddressParser();
+
+            var waitingRequests = bedRequests
+                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
+                .ToList();
+
+            var routeOrderedWaitingRequests = OrderByBestRoute(
+                waitingRequests,
+                targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
+                targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null,
+                targetBedRequest.PostalCode,
+                addressParser);
+
+            var remainingRequests = bedRequests
+                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status != BedRequestStatus.Waiting)
+                .OrderBy(b => b.CreateDate)
+                .ToList();
+
+            remainingRequests.ForEach(b => b.Distance = 999);
+
+            var result = new List<BedRequest> { targetBedRequest };
+            result.AddRange(routeOrderedWaitingRequests);
+            result.AddRange(remainingRequests);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error occurred while sorting bed requests closest to address");
             return bedRequests;
         }
-
-        targetBedRequest.Distance = -1;
-        var addressParser = LibraryFactory.CreateAddressParser();
-
-        var waitingRequests = bedRequests
-            .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
-            .ToList();
-
-        var routeOrderedWaitingRequests = OrderByBestRoute(
-            waitingRequests,
-            targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
-            targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null,
-            targetBedRequest.PostalCode,
-            addressParser);
-
-        var remainingRequests = bedRequests
-            .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status != BedRequestStatus.Waiting)
-            .OrderBy(b => b.CreateDate)
-            .ToList();
-
-        remainingRequests.ForEach(b => b.Distance = 999);
-
-        var result = new List<BedRequest> { targetBedRequest };
-        result.AddRange(routeOrderedWaitingRequests);
-        result.AddRange(remainingRequests);
-
-        return result;
     }
 
     public async Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email)
@@ -441,36 +450,44 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<List<BedRequest>> SortScheduledBedRequests(int locationId, List<BedRequest> bedRequests)
     {
-        var locationResult = await _locationDataService.GetByIdAsync(locationId);
-
-        if (!locationResult.Success || locationResult.Data == null ||
-            !Validation.IsValidZipCode(locationResult.Data.BuildPostalCode))
+        try
         {
-            return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
+            var locationResult = await _locationDataService.GetByIdAsync(locationId);
+
+            if (!locationResult.Success || locationResult.Data == null ||
+                !Validation.IsValidZipCode(locationResult.Data.BuildPostalCode))
+            {
+                return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
+            }
+
+            var location = locationResult.Data;
+            var addressParser = LibraryFactory.CreateAddressParser();
+            var sortedRequests = new List<BedRequest>();
+
+            var groupedByTeam = bedRequests
+                .GroupBy(o => o.Team)
+                .OrderBy(o => o.Key)
+                .ToList();
+
+            foreach (var teamGroup in groupedByTeam)
+            {
+                var routeOrdered = OrderByBestRoute(
+                    teamGroup.ToList(),
+                    location.Latitude.HasValue ? (double?)location.Latitude.Value : null,
+                    location.Longitude.HasValue ? (double?)location.Longitude.Value : null,
+                    location.BuildPostalCode,
+                    addressParser);
+
+                sortedRequests.AddRange(routeOrdered);
+            }
+
+            return sortedRequests;
         }
-
-        var location = locationResult.Data;
-        var addressParser = LibraryFactory.CreateAddressParser();
-        var sortedRequests = new List<BedRequest>();
-
-        var groupedByTeam = bedRequests
-            .GroupBy(o => o.Team)
-            .OrderBy(o => o.Key)
-            .ToList();
-
-        foreach (var teamGroup in groupedByTeam)
+        catch (Exception ex)
         {
-            var routeOrdered = OrderByBestRoute(
-                teamGroup.ToList(),
-                location.Latitude.HasValue ? (double?)location.Latitude.Value : null,
-                location.Longitude.HasValue ? (double?)location.Longitude.Value : null,
-                location.BuildPostalCode,
-                addressParser);
-
-            sortedRequests.AddRange(routeOrdered);
+            Log.Error(ex, "Error sorting scheduled bed requests.");
+            return bedRequests;
         }
-
-        return sortedRequests;
     }
 
     private List<BedRequest> OrderByBestRoute(List<BedRequest> bedRequests,
