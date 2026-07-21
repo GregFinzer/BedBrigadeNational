@@ -376,6 +376,7 @@ namespace BedBrigade.Client.Components
                     new SortColumn { Field = "Distance", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending },
                     new SortColumn { Field = "CreateDate", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending }
                 });
+                StateHasChanged();
             }
         }
 
