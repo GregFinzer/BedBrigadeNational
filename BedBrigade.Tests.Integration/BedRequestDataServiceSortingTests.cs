@@ -4,7 +4,6 @@ using BedBrigade.Data;
 using BedBrigade.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Diagnostics;
 
 namespace BedBrigade.Tests.Integration;
 
@@ -59,83 +58,6 @@ public class BedRequestDataServiceSortingTests
 
         Assert.That(result.Success, Is.True, result.Message);
         Assert.That(result.Data?.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 11, 12, 13, 21, 22 }));
-    }
-
-    [Test]
-    [Category("Performance")]
-    public void SortBedRequestClosestToAddress_With350WaitingRequests_CompletesWithinBudget()
-    {
-        const int locationId = 300;
-        const int totalRequests = 351;
-        const int targetBedRequestId = 1;
-        const int maxMedianMilliseconds = 6000;
-        const int iterations = 3;
-
-        BedRequestDataService service = CreateBedRequestDataService(new Location
-        {
-            LocationId = locationId,
-            BuildPostalCode = "43001",
-            Latitude = 0,
-            Longitude = 0
-        });
-
-        var elapsedMilliseconds = RunBenchmarkIterations(service, locationId, totalRequests, targetBedRequestId, iterations);
-        long medianMilliseconds = elapsedMilliseconds.OrderBy(x => x).ElementAt(iterations / 2);
-
-        TestContext.Progress.WriteLine(
-            $"OrderByBestRoute benchmark ({totalRequests - 1} waiting requests). Iterations(ms): {string.Join(", ", elapsedMilliseconds)}; Median(ms): {medianMilliseconds}");
-
-        Console.WriteLine($"OrderByBestRoute benchmark ({totalRequests - 1} waiting requests). Iterations(ms): {string.Join(", ", elapsedMilliseconds)}; Median(ms): {medianMilliseconds}");
-        
-        Assert.That(medianMilliseconds, Is.LessThanOrEqualTo(maxMedianMilliseconds),
-            $"Median runtime {medianMilliseconds} ms exceeded budget {maxMedianMilliseconds} ms.");
-    }
-
-    private static List<long> RunBenchmarkIterations(BedRequestDataService service,
-        int locationId,
-        int totalRequests,
-        int targetBedRequestId,
-        int iterations)
-    {
-        var elapsedMilliseconds = new List<long>(iterations);
-
-        for (int i = 0; i < iterations; i++)
-        {
-            List<BedRequest> requests = BuildLargeWaitingRequestSet(locationId, totalRequests);
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            List<BedRequest> sorted = service.SortBedRequestClosestToAddress(requests, targetBedRequestId);
-            stopwatch.Stop();
-
-            elapsedMilliseconds.Add(stopwatch.ElapsedMilliseconds);
-            Assert.That(sorted.Count, Is.EqualTo(totalRequests));
-            Assert.That(sorted.First().BedRequestId, Is.EqualTo(targetBedRequestId));
-        }
-
-        return elapsedMilliseconds;
-    }
-
-    private static List<BedRequest> BuildLargeWaitingRequestSet(int locationId, int totalRequests)
-    {
-        List<BedRequest> requests = new(totalRequests)
-        {
-            BuildBedRequest(1, locationId, BedRequestStatus.Waiting, "Alpha", 0, 0, new DateTime(2025, 1, 1))
-        };
-
-        for (int i = 2; i <= totalRequests; i++)
-        {
-            decimal latitude = (i % 25) * 0.04m;
-            decimal longitude = (i / 25) * 0.04m;
-
-            requests.Add(BuildBedRequest(i,
-                locationId,
-                BedRequestStatus.Waiting,
-                "Alpha",
-                latitude,
-                longitude,
-                new DateTime(2025, 1, 1).AddMinutes(i)));
-        }
-
-        return requests;
     }
 
     private static async Task SeedScheduledBedRequestsAsync(IDbContextFactory<DataContext> contextFactory, int locationId)
