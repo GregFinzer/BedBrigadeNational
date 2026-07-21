@@ -364,19 +364,26 @@ namespace BedBrigade.Client.Components
             // Fix for CS8604: Ensure BedRequests is not null before passing to SortBedRequestClosestToAddress
             if (BedRequests != null && BedRequestDataService != null && Grid != null)
             {
-                BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedBedRequests.First().BedRequestId);
-                await Grid.Refresh();
-
-                // Clear existing sorts before applying new ones
-                await Grid.ClearSortingAsync();
-
-                // Sort first by Distance, then by CreateDate
-                await Grid.SortColumnsAsync(new List<SortColumn>
-                {
-                    new SortColumn { Field = "Distance", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending },
-                    new SortColumn { Field = "CreateDate", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending }
-                });
+                IsGeneratingFile = true;
                 StateHasChanged();
+
+                try
+                {
+                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedBedRequests.First().BedRequestId);
+
+                    // Clear any column sorts so the grid respects the pre-sorted data source order.
+                    // Do NOT re-sort by Distance — OrderByBestRoute assigns each record's Distance
+                    // as the leg distance from the previous stop (nearest-neighbor), so a global
+                    // Distance ASC sort would scramble the intended route sequence.
+                    await Grid.ClearSortingAsync();
+                    await Grid.GoToPageAsync(1);
+                    await Grid.Refresh();
+                }
+                finally
+                {
+                    IsGeneratingFile = false;
+                    StateHasChanged();
+                }
             }
         }
 
