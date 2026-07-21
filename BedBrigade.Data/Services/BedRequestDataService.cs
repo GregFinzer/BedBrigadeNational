@@ -4,7 +4,6 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using KellermanSoftware.AddressParser;
 using Microsoft.EntityFrameworkCore;
-using Location = BedBrigade.Common.Models.Location;
 
 namespace BedBrigade.Data.Services;
 
@@ -314,22 +313,38 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public List<BedRequest> SortBedRequestClosestToAddress(List<BedRequest> bedRequests, int bedRequestId)
     {
-        var addressParser = LibraryFactory.CreateAddressParser();
         var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
-
         if (targetBedRequest == null)
-            return bedRequests;
-
-        var (targetLatitude, targetLongitude) = GetTargetCoordinates(targetBedRequest, addressParser);
-        if (targetLatitude == null || targetLongitude == null)
-            return bedRequests;
-
-        foreach (var bedRequest in bedRequests)
         {
-            SetDistance(bedRequest, targetBedRequest, targetLatitude.Value, targetLongitude.Value, addressParser);
+            return bedRequests;
         }
 
-        return bedRequests.OrderBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+        targetBedRequest.Distance = -1;
+        var addressParser = LibraryFactory.CreateAddressParser();
+
+        var waitingRequests = bedRequests
+            .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
+            .ToList();
+
+        var routeOrderedWaitingRequests = OrderByBestRoute(
+            waitingRequests,
+            targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
+            targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null,
+            targetBedRequest.PostalCode,
+            addressParser);
+
+        var remainingRequests = bedRequests
+            .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status != BedRequestStatus.Waiting)
+            .OrderBy(b => b.CreateDate)
+            .ToList();
+
+        remainingRequests.ForEach(b => b.Distance = 999);
+
+        var result = new List<BedRequest> { targetBedRequest };
+        result.AddRange(routeOrderedWaitingRequests);
+        result.AddRange(remainingRequests);
+
+        return result;
     }
 
     public async Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email)
@@ -424,102 +439,109 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-    private (double? Latitude, double? Longitude) GetTargetCoordinates(BedRequest request, AddressParser addressParser)
-    {
-        if (request.Latitude.HasValue && request.Longitude.HasValue)
-            return ((double)request.Latitude.Value, (double)request.Longitude.Value);
-
-        try
-        {
-            var zipInfo = addressParser.GetInfoForZipCode(request.PostalCode);
-            if (zipInfo?.Latitude != null && zipInfo?.Longitude != null)
-            {
-                return ((double)zipInfo.Latitude.Value, (double)zipInfo.Longitude.Value);
-            }
-        }
-        catch
-        {
-            // Swallow and fall through
-        }
-
-        return (null, null);
-    }
-
-    private void SetDistance(BedRequest request, BedRequest target, double targetLatitude, double targetLongitude,
-        AddressParser addressParser)
-    {
-        const double defaultDistance = 999;
-        request.Distance = defaultDistance;
-
-        if (request.BedRequestId == target.BedRequestId)
-        {
-            request.Distance = -1;
-            return;
-        }
-
-        if (request.Status != BedRequestStatus.Waiting)
-            return;
-
-        if (request.Latitude.HasValue && request.Longitude.HasValue)
-        {
-            request.Distance = CalculateDistance(targetLatitude, targetLongitude, (double)request.Latitude.Value,
-                (double)request.Longitude.Value);
-        }
-        else if (Validation.IsValidZipCode(request.PostalCode))
-        {
-            try
-            {
-                request.Distance =
-                    addressParser.GetDistanceInMilesBetweenTwoZipCodes(target.PostalCode, request.PostalCode);
-            }
-            catch
-            {
-                // Leave default distance
-            }
-        }
-    }
-
-    private async Task<List<BedRequest>> SortScheduledBedRequests(int locationId, List<BedRequest> bedRequests)
+    public async Task<List<BedRequest>> SortScheduledBedRequests(int locationId, List<BedRequest> bedRequests)
     {
         var locationResult = await _locationDataService.GetByIdAsync(locationId);
 
         if (!locationResult.Success || locationResult.Data == null ||
-            !Validation.IsValidZipCode(locationResult.Data.MailingPostalCode))
+            !Validation.IsValidZipCode(locationResult.Data.BuildPostalCode))
         {
             return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
         }
 
         var location = locationResult.Data;
         var addressParser = LibraryFactory.CreateAddressParser();
+        var sortedRequests = new List<BedRequest>();
 
-        foreach (var bedRequest in bedRequests)
+        var groupedByTeam = bedRequests
+            .GroupBy(o => o.Team)
+            .OrderBy(o => o.Key)
+            .ToList();
+
+        foreach (var teamGroup in groupedByTeam)
         {
-            bedRequest.Distance = 0;
+            var routeOrdered = OrderByBestRoute(
+                teamGroup.ToList(),
+                location.Latitude.HasValue ? (double?)location.Latitude.Value : null,
+                location.Longitude.HasValue ? (double?)location.Longitude.Value : null,
+                location.BuildPostalCode,
+                addressParser);
 
-            if (location.Latitude.HasValue && location.Longitude.HasValue && bedRequest.Latitude.HasValue &&
-                bedRequest.Longitude.HasValue)
-            {
-                bedRequest.Distance = CalculateDistance((double)location.Latitude.Value,
-                    (double)location.Longitude.Value,
-                    (double)bedRequest.Latitude.Value, (double)bedRequest.Longitude.Value);
-            }
-            else if (location.MailingPostalCode != bedRequest.PostalCode &&
-                     Validation.IsValidZipCode(bedRequest.PostalCode))
-            {
-                try
-                {
-                    bedRequest.Distance =
-                        addressParser.GetDistanceInMilesBetweenTwoZipCodes(location.MailingPostalCode,
-                            bedRequest.PostalCode);
-                }
-                catch (Exception)
-                {
-                    // Can't determine distance, default to distance of zero 
-                }
-            }
+            sortedRequests.AddRange(routeOrdered);
         }
 
-        return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.Distance).ThenBy(o => o.CreateDate).ToList();
+        return sortedRequests;
+    }
+
+    private List<BedRequest> OrderByBestRoute(List<BedRequest> bedRequests,
+        double? startLatitude,
+        double? startLongitude,
+        string? startPostalCode,
+        AddressParser addressParser)
+    {
+        var ordered = new List<BedRequest>();
+        var remaining = new List<BedRequest>(bedRequests);
+        var currentLatitude = startLatitude;
+        var currentLongitude = startLongitude;
+        var currentPostalCode = startPostalCode;
+
+        while (remaining.Count > 0)
+        {
+            var nextRequest = remaining
+                .Select(request => new
+                {
+                    Request = request,
+                    Distance = GetDistanceFromPointToBedRequest(currentLatitude, currentLongitude, currentPostalCode,
+                        request, addressParser)
+                })
+                .OrderBy(item => item.Distance)
+                .ThenBy(item => item.Request.CreateDate)
+                .First();
+
+            nextRequest.Request.Distance = nextRequest.Distance;
+            ordered.Add(nextRequest.Request);
+            remaining.Remove(nextRequest.Request);
+
+            currentLatitude = nextRequest.Request.Latitude.HasValue ? (double?)nextRequest.Request.Latitude.Value : null;
+            currentLongitude = nextRequest.Request.Longitude.HasValue ? (double?)nextRequest.Request.Longitude.Value : null;
+            currentPostalCode = nextRequest.Request.PostalCode;
+        }
+
+        return ordered;
+    }
+
+    private double GetDistanceFromPointToBedRequest(double? startLatitude,
+        double? startLongitude,
+        string? startPostalCode,
+        BedRequest request,
+        AddressParser addressParser)
+    {
+        const double defaultDistance = 999;
+
+        if (startLatitude.HasValue && startLongitude.HasValue && request.Latitude.HasValue && request.Longitude.HasValue)
+        {
+            return CalculateDistance(startLatitude.Value, startLongitude.Value, (double)request.Latitude.Value,
+                (double)request.Longitude.Value);
+        }
+
+        if (!Validation.IsValidZipCode(startPostalCode) || !Validation.IsValidZipCode(request.PostalCode))
+        {
+            return defaultDistance;
+        }
+
+        if (startPostalCode == request.PostalCode)
+        {
+            return 0;
+        }
+
+        try
+        {
+            return addressParser.GetDistanceInMilesBetweenTwoZipCodes(startPostalCode, request.PostalCode);
+        }
+        catch
+        {
+            return defaultDistance;
+        }
     }
 
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
