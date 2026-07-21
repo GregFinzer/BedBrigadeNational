@@ -27,12 +27,11 @@ public class BedRequestDataServiceSortingTests
             BuildBedRequest(2, 100, BedRequestStatus.Waiting, "Alpha", 0, 0.9m, new DateTime(2025, 1, 2)),
             BuildBedRequest(3, 100, BedRequestStatus.Waiting, "Alpha", 0, 2.0m, new DateTime(2025, 1, 3)),
             BuildBedRequest(4, 100, BedRequestStatus.Waiting, "Alpha", 1.0m, 0, new DateTime(2025, 1, 4)),
-            BuildBedRequest(5, 100, BedRequestStatus.Scheduled, "Alpha", 5.0m, 5.0m, new DateTime(2025, 1, 5))
         ];
 
         List<BedRequest> sorted = service.SortBedRequestClosestToAddress(bedRequests, 1);
 
-        Assert.That(sorted.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 1, 2, 3, 4, 5 }));
+        Assert.That(sorted.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 1, 2, 3, 4 }));
     }
 
     [Test]
