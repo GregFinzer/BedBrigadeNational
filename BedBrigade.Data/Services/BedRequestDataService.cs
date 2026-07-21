@@ -317,6 +317,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         try
         {
             var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
+            PerfLog.Log("SortClosest FirstOrDefault completed");
             if (targetBedRequest == null)
             {
                 return bedRequests;
@@ -324,11 +325,14 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
             targetBedRequest.Distance = -1;
             var addressParser = LibraryFactory.CreateAddressParser();
-
+            PerfLog.Log("SortClosest AddressParser created");
+            
             var waitingRequests = bedRequests
                 .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
                 .ToList();
 
+            PerfLog.Log("SortClosest WaitingRequests filtered");
+            
             var routeOrderedWaitingRequests = OrderByBestRoute(
                 waitingRequests,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
@@ -336,9 +340,10 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 targetBedRequest.PostalCode,
                 addressParser);
 
+            PerfLog.Log("SortClosest OrderByBestRoute completed");
             var result = new List<BedRequest> { targetBedRequest };
             result.AddRange(routeOrderedWaitingRequests);
-
+            PerfLog.Log("SortClosest AddRange completed");
             return result;
         }
         catch (Exception ex)

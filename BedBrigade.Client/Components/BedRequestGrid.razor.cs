@@ -346,6 +346,7 @@ namespace BedBrigade.Client.Components
 
         private async Task SortClosest()
         {
+            PerfLog.Log("SortClosest started");
             ShowSpinner = true;
             StateHasChanged();
             List<BedRequest> selectedBedRequests = new List<BedRequest>();
@@ -357,7 +358,7 @@ namespace BedBrigade.Client.Components
                 if (Grid != null)
                 {
                     selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-
+                    PerfLog.Log("SortClosest GetSelectedRecordsAsync completed");
                     if (!selectedBedRequests.Any())
                     {
                         DialogHeader = "Select Row";
@@ -373,14 +374,18 @@ namespace BedBrigade.Client.Components
                     BedRequests =
                         BedRequestDataService.SortBedRequestClosestToAddress(BedRequests,
                             selectedBedRequests.First().BedRequestId);
+                    PerfLog.Log("SortClosest SortBedRequestClosestToAddress completed");
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
                     // Do NOT re-sort by Distance � OrderByBestRoute assigns each record's Distance
                     // as the leg distance from the previous stop (nearest-neighbor), so a global
                     // Distance ASC sort would scramble the intended route sequence.
                     await Grid.ClearSortingAsync();
+                    PerfLog.Log("SortClosest ClearSortingAsync completed");
                     await Grid.GoToPageAsync(1);
+                    PerfLog.Log("SortClosest GoToPageAsync completed");
                     await Grid.Refresh();
+                    PerfLog.Log("SortClosest Refresh completed");
                 }
             }
             finally
