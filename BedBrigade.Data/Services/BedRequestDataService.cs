@@ -561,33 +561,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
-        const double EarthRadiusMiles = 3958.8; // Mean radius of the Earth in miles
-
-        double lat1Rad = DegreesToRadians(lat1);
-        double lon1Rad = DegreesToRadians(lon1);
-        double lat2Rad = DegreesToRadians(lat2);
-        double lon2Rad = DegreesToRadians(lon2);
-
-        double dLat = lat2Rad - lat1Rad;
-        double dLon = lat2Rad - lon1Rad;
-
-        double a = Math.Pow(Math.Sin(dLat / 2), 2) +
-                   Math.Cos(lat1Rad) * Math.Cos(lat2Rad) *
-                   Math.Pow(Math.Sin(dLon / 2), 2);
-
-        double c = 2 * Math.Asin(Math.Sqrt(a));
-        double distance = EarthRadiusMiles * c;
-
-        return Math.Round(distance, 2); // Rounded to 2 decimal places
+        double R = 3956; // miles
+        double dLat = (lat2 - lat1) * Math.PI / 180;
+        double dLon = (lon2 - lon1) * Math.PI / 180;
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        double d = R * c;
+        return d;
     }
-
-    private static double DegreesToRadians(double degrees)
-    {
-        return degrees * Math.PI / 180.0;
-    }
-    
 
     public async Task<ServiceResponse<List<string>>> GetDistinctPhone()
     {
