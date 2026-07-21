@@ -10,7 +10,7 @@ namespace BedBrigade.Common.Models
     [Table("Configurations")]
     public class Configuration : BaseEntity, ILocationId
     {
-            private const string MaskedGridValuePlaceholder = "••••••••";
+        private const string MaskedGridValuePlaceholder = "••••••••";
         private string _configurationValue = string.Empty;
         private string? _decryptedValue;
 
@@ -24,8 +24,8 @@ namespace BedBrigade.Common.Models
         [Required, DefaultValue(1)]
         public int LocationId { get; set; } = Defaults.NationalLocationId;
 
-        [MaxLength(255), Required]
-        public String? ConfigurationValue
+        [MaxLength(255)]
+        public string ConfigurationValue
         {
             get => _configurationValue;
             set
