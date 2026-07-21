@@ -80,7 +80,7 @@ else
                         <GridColumn Field=@nameof(BedRequest.PrimaryLanguage) Width="150" ShowColumnMenu="false" HeaderText="Language" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AllowGrouping="false" />
                         <GridColumn Field=@nameof(BedRequest.SpeakEnglish) Width="200" ShowColumnMenu="false" HeaderText="Speak English" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.UpdateDateLocal) Width="150" Format="g" ShowColumnMenu="false" HeaderText="Updated" Type="ColumnType.Date" AllowEditing="false" AllowFiltering="false" />
-                        <GridColumn Field=@nameof(BedRequest.Distance) ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Double" AllowEditing="false" AllowFiltering="false" />
+                        <GridColumn Field=@nameof(BedRequest.Distance) Width="110" Visible="true" ShowColumnMenu="false" HeaderText="Distance" Format="N3" Type="ColumnType.Double" AllowEditing="false" AllowFiltering="false" />
                     </GridColumns>
                 </SfGrid>
             </div>
