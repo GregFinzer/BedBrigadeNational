@@ -18,7 +18,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private readonly ITimezoneDataService _timezoneDataService;
     private readonly IConfigurationDataService _configurationDataService;
     private readonly IScheduleDataService _scheduleDataService;
-
+    private readonly AddressParser _addressParser;
+    
     public BedRequestDataService(IDbContextFactory<DataContext> contextFactory, ICachingService cachingService,
         IAuthService authService,
         ICommonService commonService,
@@ -36,6 +37,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _timezoneDataService = timezoneDataService;
         _configurationDataService = configurationDataService;
         _scheduleDataService = scheduleDataService;
+        _addressParser = LibraryFactory.CreateAddressParser();
     }
 
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
@@ -324,7 +326,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
 
             targetBedRequest.Distance = -1;
-            var addressParser = LibraryFactory.CreateAddressParser();
             PerfLog.Log("SortClosest AddressParser created");
             
             var waitingRequests = bedRequests
@@ -337,8 +338,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 waitingRequests,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
                 targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null,
-                targetBedRequest.PostalCode,
-                addressParser);
+                targetBedRequest.PostalCode);
 
             PerfLog.Log("SortClosest OrderByBestRoute completed");
             var result = new List<BedRequest> { targetBedRequest };
@@ -472,8 +472,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                     teamGroup.ToList(),
                     location.Latitude.HasValue ? (double?)location.Latitude.Value : null,
                     location.Longitude.HasValue ? (double?)location.Longitude.Value : null,
-                    location.BuildPostalCode,
-                    addressParser);
+                    location.BuildPostalCode);
 
                 sortedRequests.AddRange(routeOrdered);
             }
@@ -490,45 +489,87 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
     private List<BedRequest> OrderByBestRoute(List<BedRequest> bedRequests,
         double? startLatitude,
         double? startLongitude,
-        string? startPostalCode,
-        AddressParser addressParser)
+        string? startPostalCode)
     {
-        var ordered = new List<BedRequest>();
-        var remaining = new List<BedRequest>(bedRequests);
+        ArgumentNullException.ThrowIfNull(bedRequests);
+
+        var ordered = new List<BedRequest>(bedRequests.Count);
+        var remaining = new HashSet<BedRequest>(bedRequests);
+        var postalCodeDistanceCache = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
         var currentLatitude = startLatitude;
         var currentLongitude = startLongitude;
         var currentPostalCode = startPostalCode;
 
         while (remaining.Count > 0)
         {
-            var nextRequest = remaining
-                .Select(request => new
+            BedRequest? nextRequest = null;
+            double nextDistance = double.MaxValue;
+            DateTime nextCreateDate = DateTime.MaxValue;
+            int nextBedRequestId = int.MaxValue;
+
+            foreach (var request in remaining)
+            {
+                var distance = GetDistanceFromPointToBedRequest(currentLatitude, currentLongitude, currentPostalCode,
+                    request, postalCodeDistanceCache);
+                var createDate = request.CreateDate ?? DateTime.MaxValue;
+
+                if (IsBetterRouteCandidate(distance, createDate, request.BedRequestId, nextDistance, nextCreateDate,
+                        nextBedRequestId))
                 {
-                    Request = request,
-                    Distance = GetDistanceFromPointToBedRequest(currentLatitude, currentLongitude, currentPostalCode,
-                        request, addressParser)
-                })
-                .OrderBy(item => item.Distance)
-                .ThenBy(item => item.Request.CreateDate)
-                .First();
+                    nextRequest = request;
+                    nextDistance = distance;
+                    nextCreateDate = createDate;
+                    nextBedRequestId = request.BedRequestId;
+                }
+            }
 
-            nextRequest.Request.Distance = nextRequest.Distance;
-            ordered.Add(nextRequest.Request);
-            remaining.Remove(nextRequest.Request);
+            if (nextRequest == null)
+            {
+                break;
+            }
 
-            currentLatitude = nextRequest.Request.Latitude.HasValue ? (double?)nextRequest.Request.Latitude.Value : null;
-            currentLongitude = nextRequest.Request.Longitude.HasValue ? (double?)nextRequest.Request.Longitude.Value : null;
-            currentPostalCode = nextRequest.Request.PostalCode;
+            nextRequest.Distance = nextDistance;
+            ordered.Add(nextRequest);
+            remaining.Remove(nextRequest);
+
+            currentLatitude = nextRequest.Latitude.HasValue ? (double?)nextRequest.Latitude.Value : null;
+            currentLongitude = nextRequest.Longitude.HasValue ? (double?)nextRequest.Longitude.Value : null;
+            currentPostalCode = nextRequest.PostalCode;
         }
 
         return ordered;
+    }
+
+    private static bool IsBetterRouteCandidate(double distance,
+        DateTime createDate,
+        int bedRequestId,
+        double bestDistance,
+        DateTime bestCreateDate,
+        int bestBedRequestId)
+    {
+        const double distanceTolerance = 0.000001d;
+
+        var isCloser = distance < bestDistance - distanceTolerance;
+        if (isCloser)
+        {
+            return true;
+        }
+
+        var isSameDistance = Math.Abs(distance - bestDistance) <= distanceTolerance;
+        if (!isSameDistance)
+        {
+            return false;
+        }
+
+        return createDate < bestCreateDate
+               || (createDate == bestCreateDate && bedRequestId < bestBedRequestId);
     }
 
     private double GetDistanceFromPointToBedRequest(double? startLatitude,
         double? startLongitude,
         string? startPostalCode,
         BedRequest request,
-        AddressParser addressParser)
+        Dictionary<string, double> postalCodeDistanceCache)
     {
         const double defaultDistance = 999;
 
@@ -548,14 +589,33 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return 0;
         }
 
+        var normalizedStartPostalCode = startPostalCode!;
+        var normalizedDestinationPostalCode = request.PostalCode!;
+        var cacheKey = BuildPostalCodeDistanceCacheKey(normalizedStartPostalCode, normalizedDestinationPostalCode);
+        if (postalCodeDistanceCache.TryGetValue(cacheKey, out var cachedDistance))
+        {
+            return cachedDistance;
+        }
+
         try
         {
-            return addressParser.GetDistanceInMilesBetweenTwoZipCodes(startPostalCode, request.PostalCode);
+            var distance = _addressParser.GetDistanceInMilesBetweenTwoZipCodes(normalizedStartPostalCode,
+                normalizedDestinationPostalCode);
+            postalCodeDistanceCache[cacheKey] = distance;
+            return distance;
         }
         catch
         {
+            postalCodeDistanceCache[cacheKey] = defaultDistance;
             return defaultDistance;
         }
+    }
+
+    private static string BuildPostalCodeDistanceCacheKey(string startPostalCode, string destinationPostalCode)
+    {
+        return string.Compare(startPostalCode, destinationPostalCode, StringComparison.OrdinalIgnoreCase) <= 0
+            ? $"{startPostalCode}|{destinationPostalCode}"
+            : $"{destinationPostalCode}|{startPostalCode}";
     }
 
     private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
