@@ -336,17 +336,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 targetBedRequest.PostalCode,
                 addressParser);
 
-            var remainingRequests = bedRequests
-                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId 
-                            && b.Status == BedRequestStatus.Scheduled)
-                .OrderBy(b => b.CreateDate)
-                .ToList();
-
-            remainingRequests.ForEach(b => b.Distance = 999);
-
             var result = new List<BedRequest> { targetBedRequest };
             result.AddRange(routeOrderedWaitingRequests);
-            result.AddRange(remainingRequests);
 
             return result;
         }
