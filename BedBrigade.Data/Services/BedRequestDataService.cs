@@ -337,7 +337,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 addressParser);
 
             var remainingRequests = bedRequests
-                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status != BedRequestStatus.Waiting)
+                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId 
+                            && b.Status == BedRequestStatus.Scheduled)
                 .OrderBy(b => b.CreateDate)
                 .ToList();
 
