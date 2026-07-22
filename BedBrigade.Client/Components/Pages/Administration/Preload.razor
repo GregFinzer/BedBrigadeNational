@@ -98,6 +98,9 @@ else
         var path = $"/{SeedConstants.SeedNationalName}/pages/{defaultHome}";
         string html = _loadImagesService.SetImagesForHtml(path, contentResult.Data.ContentHtml);
         BodyContent = html;
+
+        //The zip database takes 10MB of memory, preload it here so that the first request doesn't take a long time to load
+        var addressParser = LibraryFactory.AddressParser;
     }
 }
 

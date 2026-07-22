@@ -157,7 +157,7 @@ namespace BedBrigade.Data.Services
 
         public bool PopulateGeoLocationFromZipCode(BedRequest bedRequest)
         {
-            var addressParser = LibraryFactory.CreateAddressParser();
+            var addressParser = LibraryFactory.AddressParser;
 
             if (!addressParser.IsValidZipCode(bedRequest.PostalCode))
             {

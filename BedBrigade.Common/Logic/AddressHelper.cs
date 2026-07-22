@@ -5,7 +5,7 @@ namespace BedBrigade.Common.Logic
 {
     public static class AddressHelper
     {
-        private static StandardizationLogic _standardizationLogic = LibraryFactory.CreateStandardizationLogic();
+        private static StandardizationLogic _standardizationLogic = LibraryFactory.StandardizationLogic;
 
         public static List<UsState> GetStateList()
         {
