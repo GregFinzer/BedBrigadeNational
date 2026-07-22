@@ -22,8 +22,8 @@ public class ImportBedRequestsGC
     private const string ImportFilePath = @"C:\Users\gfinz\Downloads\Bed Requests - Bed Requests.csv";
     private const string ConnectionString =
         "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-    private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
-    private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
+    private readonly NameParserLogic _nameParserLogic = LibraryFactory.NameParser;
+    private readonly AddressParser _addressParser = LibraryFactory.AddressParser;
     private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
     private readonly Regex _teamRegex = new Regex(@"(team\s)(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private readonly Regex _zipRegex = new Regex(@"^\d{5}", RegexOptions.Compiled);

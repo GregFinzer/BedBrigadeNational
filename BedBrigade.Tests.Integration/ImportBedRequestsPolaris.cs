@@ -24,8 +24,8 @@ namespace BedBrigade.Tests.Integration
 
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-        private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
-        private readonly AddressParser _addressParser = LibraryFactory.CreateAddressParser();
+        private readonly NameParserLogic _nameParserLogic = LibraryFactory.NameParser;
+        private readonly AddressParser _addressParser = LibraryFactory.AddressParser;
 
         private Regex aptRegex =
             new Regex(@"(APT|apt)\s[#0-9A-Za-z]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);

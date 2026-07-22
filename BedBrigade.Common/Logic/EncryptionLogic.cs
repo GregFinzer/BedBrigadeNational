@@ -12,7 +12,7 @@ public static class EncryptionLogic
         {
             if (_encryption == null)
             {
-                _encryption = LibraryFactory.CreateEncryption();
+                _encryption = LibraryFactory.Encryption;
             }
 
             return _encryption;

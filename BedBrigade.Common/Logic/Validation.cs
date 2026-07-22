@@ -23,7 +23,7 @@ namespace BedBrigade.Common.Logic
 
         public static Result IsValidEmail(string? email)
         {
-            var emailValidation = LibraryFactory.CreateEmailValidation();
+            var emailValidation = LibraryFactory.EmailValidation;
             return emailValidation.ValidEmail(email, emailValidation.NoConnectOptions);
         }
 
@@ -34,7 +34,7 @@ namespace BedBrigade.Common.Logic
 
         public static bool IsValidZipCode(string? zipCode)
         {
-            var addressParser = LibraryFactory.CreateAddressParser();
+            var addressParser = LibraryFactory.AddressParser;
             return addressParser.IsValidZipCode(zipCode);
         }
 
@@ -43,7 +43,7 @@ namespace BedBrigade.Common.Logic
             if (!IsValidZipCode(zipCode))
                 return new List<string>();
 
-            var addressParser = LibraryFactory.CreateAddressParser();
+            var addressParser = LibraryFactory.AddressParser;
             var info = addressParser.GetInfoForZipCode(zipCode);
             List<string> cities = new List<string>();
             cities.Add(info.PrimaryCity);
@@ -56,7 +56,7 @@ namespace BedBrigade.Common.Logic
             if (!IsValidZipCode(zipCode))
                 return null;
 
-            var addressParser = LibraryFactory.CreateAddressParser();
+            var addressParser = LibraryFactory.AddressParser;
             var info = addressParser.GetInfoForZipCode(zipCode);
             return info.State;
         }
@@ -66,7 +66,7 @@ namespace BedBrigade.Common.Logic
             if (!IsValidZipCode(zipCode))
                 return null;
 
-            var addressParser = LibraryFactory.CreateAddressParser();
+            var addressParser = LibraryFactory.AddressParser;
             return addressParser.GetInfoForZipCode(zipCode).PrimaryCity;
         }
 
