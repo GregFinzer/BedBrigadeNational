@@ -13,7 +13,7 @@ public static class EncryptUtil
         get
         {
             if (_encryption == null)
-                _encryption = LibraryFactory.CreateEncryption();
+                _encryption = LibraryFactory.Encryption;
             
             return _encryption;
         }

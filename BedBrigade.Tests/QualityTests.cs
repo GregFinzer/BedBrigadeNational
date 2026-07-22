@@ -14,7 +14,7 @@ namespace BedBrigade.Tests
         [SetUp]
         public void Setup()
         {
-            _qualityLogic = LibraryFactory.CreateQualityLogic();
+            _qualityLogic = LibraryFactory.QualityLogic;
             _qualityLogic.Config.SetConfig("CSharpMaxNotImplementedException", -1);
             _qualityLogic.Config.SetConfig("MaxFileLength", 700);
             _qualityLogic.Config.SetConfig("MaxDuplicateStrings", -1);

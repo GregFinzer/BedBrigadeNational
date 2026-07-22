@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using BedBrigade.Client.Services;
 using BedBrigade.Common.Constants;
 using BedBrigade.Common.EnumModels;
@@ -5,6 +6,8 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
+using KellermanSoftware.AddressParser;
+using KellermanSoftware.USPSStandardization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -12,8 +15,6 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
-using KellermanSoftware.AddressParser;
-using KellermanSoftware.USPSStandardization;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages

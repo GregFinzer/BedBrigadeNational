@@ -259,7 +259,7 @@ public class LocationDataService : Repository<Location>, ILocationDataService
 
     public async Task<ServiceResponse<List<LocationDistance>>> GetBedBrigadeNearMe(string postalCode)
     {
-        AddressParser parser = LibraryFactory.CreateAddressParser();
+        AddressParser parser = LibraryFactory.AddressParser;
 
         if (!parser.IsValidZipCode(postalCode))
         {

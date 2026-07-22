@@ -76,7 +76,7 @@ namespace BedBrigade.Client.Components
         public List<BedRequestEnumItem>? BedRequestStatuses { get; private set; }
 
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
-        public bool IsGeneratingFile { get; set; } // Shows spinner overlay during delivery/team sheet generation
+        public bool ShowSpinner { get; set; } // Shows spinner overlay during delivery/team sheet generation
 
         protected override async Task OnInitializedAsync()
         {
@@ -346,36 +346,52 @@ namespace BedBrigade.Client.Components
 
         private async Task SortClosest()
         {
+            PerfLog.Log("SortClosest started");
+            ShowSpinner = true;
+            StateHasChanged();
             List<BedRequest> selectedBedRequests = new List<BedRequest>();
 
-            if (Grid != null)
+            try
             {
-                selectedBedRequests = await Grid.GetSelectedRecordsAsync();
 
-                if (!selectedBedRequests.Any())
+
+                if (Grid != null)
                 {
-                    DialogHeader = "Select Row";
-                    DialogContent = "Please select an address row you would like to sort closest.";
-                    IsDialogVisible = true;
-                    return;
+                    selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+                    PerfLog.Log("SortClosest GetSelectedRecordsAsync completed");
+                    if (!selectedBedRequests.Any())
+                    {
+                        DialogHeader = "Select Row";
+                        DialogContent = "Please select an address row you would like to sort closest.";
+                        IsDialogVisible = true;
+                        return;
+                    }
+                }
+
+                // Fix for CS8604: Ensure BedRequests is not null before passing to SortBedRequestClosestToAddress
+                if (BedRequests != null && BedRequestDataService != null && Grid != null)
+                {
+                    BedRequests =
+                        BedRequestDataService.SortBedRequestClosestToAddress(BedRequests,
+                            selectedBedRequests.First().BedRequestId);
+                    PerfLog.Log("SortClosest SortBedRequestClosestToAddress completed");
+
+                    // Clear any column sorts so the grid respects the pre-sorted data source order.
+                    // Do NOT re-sort by Distance � OrderByBestRoute assigns each record's Distance
+                    // as the leg distance from the previous stop (nearest-neighbor), so a global
+                    // Distance ASC sort would scramble the intended route sequence.
+                    await Grid.ClearSortingAsync();
+                    PerfLog.Log("SortClosest ClearSortingAsync completed");
+                    await Grid.GoToPageAsync(1);
+                    PerfLog.Log("SortClosest GoToPageAsync completed");
+                    await Grid.Refresh();
+                    PerfLog.Log("SortClosest Refresh completed");
                 }
             }
-
-            // Fix for CS8604: Ensure BedRequests is not null before passing to SortBedRequestClosestToAddress
-            if (BedRequests != null && BedRequestDataService != null && Grid != null)
+            finally
             {
-                BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedBedRequests.First().BedRequestId);
-                await Grid.Refresh();
-
-                // Clear existing sorts before applying new ones
-                await Grid.ClearSortingAsync();
-
-                // Sort first by Distance, then by CreateDate
-                await Grid.SortColumnsAsync(new List<SortColumn>
-                {
-                    new SortColumn { Field = "Distance", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending },
-                    new SortColumn { Field = "CreateDate", Direction = Syncfusion.Blazor.Grids.SortDirection.Ascending }
-                });
+                ShowSpinner = false;
+                StateHasChanged();
             }
         }
 
@@ -579,7 +595,7 @@ namespace BedBrigade.Client.Components
 
             try
             {
-                IsGeneratingFile = true;
+                ShowSpinner = true;
                 StateHasChanged();
 
                 if (!await ValidateScheduled())
@@ -628,7 +644,7 @@ namespace BedBrigade.Client.Components
             }
             finally
             {
-                IsGeneratingFile = false;
+                ShowSpinner = false;
             }
         }
 
@@ -636,7 +652,7 @@ namespace BedBrigade.Client.Components
         {
             try
             {
-                IsGeneratingFile = true;
+                ShowSpinner = true;
                 StateHasChanged();
                 if (!await ValidateScheduled())
                 {
@@ -667,7 +683,7 @@ namespace BedBrigade.Client.Components
             }
             finally
             {
-                IsGeneratingFile = false;
+                ShowSpinner = false;
             }   
         }
 

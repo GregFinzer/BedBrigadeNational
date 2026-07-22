@@ -48,7 +48,7 @@ namespace BedBrigade.Data.Services
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _emailValidation = LibraryFactory.CreateEmailValidation();
+            _emailValidation = LibraryFactory.EmailValidation;
         }
 
         public void StopService()

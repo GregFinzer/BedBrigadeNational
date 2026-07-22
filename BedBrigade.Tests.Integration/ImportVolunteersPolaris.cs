@@ -20,7 +20,7 @@ namespace BedBrigade.Tests.Integration
 
         private const string ConnectionString =
             "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
-        private readonly NameParserLogic _nameParserLogic = LibraryFactory.CreateNameParser();
+        private readonly NameParserLogic _nameParserLogic = LibraryFactory.NameParser;
         private readonly Regex _phoneRegex = new Regex(Validation.PhoneRegexPattern, RegexOptions.Compiled);
         private string[] groups = new[]
         {
