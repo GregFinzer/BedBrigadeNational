@@ -392,6 +392,7 @@ namespace BedBrigade.Client.Components
             {
                 ShowSpinner = false;
                 StateHasChanged();
+                PerfLog.Log("SortClosest StateHasChanged completed");
             }
         }
 
