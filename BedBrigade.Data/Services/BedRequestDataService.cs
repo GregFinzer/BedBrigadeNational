@@ -346,7 +346,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         try
         {
             var targetBedRequest = bedRequests.FirstOrDefault(b => b.BedRequestId == bedRequestId);
-            PerfLog.Log("SortClosest FirstOrDefault completed");
             if (targetBedRequest == null)
             {
                 return bedRequests;
@@ -357,18 +356,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             var waitingRequests = bedRequests
                 .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
                 .ToList();
-
-            PerfLog.Log("SortClosest WaitingRequests filtered");
             
             var routeOrderedWaitingRequests = OrderByBestRoute(
                 waitingRequests,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
                 targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null);
-
-            PerfLog.Log("SortClosest OrderByBestRoute completed");
+            
             var result = new List<BedRequest> { targetBedRequest };
             result.AddRange(routeOrderedWaitingRequests);
-            PerfLog.Log("SortClosest AddRange completed");
+
+            var scheduledRequests = bedRequests.Where(o => o.Status == BedRequestStatus.Scheduled
+                                                           && o.BedRequestId != targetBedRequest.BedRequestId);
+            
             return result;
         }
         catch (Exception ex)
