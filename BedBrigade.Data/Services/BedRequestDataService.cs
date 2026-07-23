@@ -367,7 +367,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
             var scheduledRequests = bedRequests.Where(o => o.Status == BedRequestStatus.Scheduled
                                                            && o.BedRequestId != targetBedRequest.BedRequestId);
-            
+            result.AddRange(scheduledRequests);
             return result;
         }
         catch (Exception ex)
