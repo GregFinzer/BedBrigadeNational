@@ -84,21 +84,28 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 var result = await _volunteerDataService.GetByIdAsync(VolunteerId.Value);
 
-                if (result.Success)
+                if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
-                    SelectedLanguages = Model!.OtherLanguagesSpoken.Replace(" ", string.Empty).Split(',');
+                    SelectedLanguages = string.IsNullOrWhiteSpace(Model.OtherLanguagesSpoken)
+                        ? []
+                        : Model.OtherLanguagesSpoken.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 }
                 else
                 {
-                    Log.Error($"AddEditVolunteer, Error loading volunteer with ID {VolunteerId}: {result.Message}");
-                    _toastService.Error(ErrorTitle, result.Message);
+                    string message = result.Success
+                        ? $"Volunteer with ID {VolunteerId} was not found."
+                        : result.Message;
+                    Log.Error($"AddEditVolunteer, Error loading volunteer with ID {VolunteerId}: {message}");
+                    _toastService.Error(ErrorTitle, message);
                 }
             }
             else
             {
-                Model = new Volunteer();
-                Model.LocationId = LocationId.Value;
+                Model = new Volunteer
+                {
+                    LocationId = LocationId ?? _svcAuth!.LocationId
+                };
             }
         }
 
