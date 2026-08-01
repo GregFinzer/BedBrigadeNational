@@ -86,7 +86,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             {
                 if (_svcAuth.UserHasRole(RoleNames.CanManageVolunteers))
                 {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
+                    // Every displayed volunteer column is read-only. Let our record double-click
+                    // handler navigate to the edit page instead of asking the grid to focus a
+                    // non-existent editable cell.
+                    Grid.EditSettings.AllowEditOnDblClick = false;
                     Grid.EditSettings.AllowDeleting = true;
                     Grid.EditSettings.AllowAdding = true;
                     Grid.EditSettings.AllowEditing = true;
@@ -211,6 +214,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             var volunteer = args.Data;
             await Grid.EndEditAsync();
             _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
+        }
+
+        protected void OnRecordDoubleClick(RecordDoubleClickEventArgs<Volunteer> args)
+        {
+            if (_svcAuth!.UserHasRole(RoleNames.CanManageVolunteers) && args.RowData != null)
+            {
+                _navigationManager!.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{args.RowData.VolunteerId}");
+            }
         }
 
         public async Task OnActionBegin(ActionEventArgs<Volunteer> args)
