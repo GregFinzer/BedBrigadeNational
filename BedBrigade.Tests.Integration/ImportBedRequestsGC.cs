@@ -19,7 +19,7 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
-    private const string ImportFilePath = @"C:\Users\gfinz\Downloads\Bed Requests - Bed Requests.csv";
+    private const string ImportFilePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed Requests - Bed Requests.csv";
     private const string ConnectionString =
         "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.NameParser;
@@ -52,6 +52,10 @@ public class ImportBedRequestsGC
             var item = items[i];
             try
             {
+                if (item["Status"] == "Transferred")
+                {
+                    continue; // Skip transferred requests
+                }
                 BedRequest bedRequest = new BedRequest();
                 FillBedRequest(bedRequest, item);
                 AddOrUpdateList(bedRequest, destItems);
