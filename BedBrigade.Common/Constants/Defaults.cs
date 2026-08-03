@@ -6,8 +6,6 @@
         public const int GroveCityLocationId = 2;
         public const int PolarisLocationId = 3;
         public const string ErrorImagePath = "media/national/NoImageFound.jpg";
-        public const string AuthToken = "AuthToken";
-        public const string MediaDirectory = "MediaDirectory";
         public const string NationalRoute = "/national";
         public const string DefaultPageTemplate = "ThreeRotatorPageTemplate";
         public const string DefaultUserNameAndEmail = "Anonymous";
