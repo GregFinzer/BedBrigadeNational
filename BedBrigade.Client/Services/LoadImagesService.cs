@@ -91,7 +91,12 @@ namespace BedBrigade.Client.Services
             return finalPath;
         }
 
-
+        /// <summary>
+        /// This is used when editing the content of a page to set to the first image found for the image rotator
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="html"></param>
+        /// <returns></returns>
         public string SetImgSourceForImageRotators(string path, string html)
         {
             //This will return example: leftImageRotator, middleImageRotator, rightImageRotator
@@ -133,26 +138,37 @@ namespace BedBrigade.Client.Services
             return false;
         }
 
-        public bool HandleSharedImageRotator(string imageId, string html)
+        private string? GetPathForSharedImageRotator(string imageId, string html)
         {
             string? imageSource = GetImageSrcById(html, imageId);
-            if (imageSource != null)
+            if (imageSource == null)
+                return null;
+            
+            int imageIdIndex = imageSource.LastIndexOf(imageId, StringComparison.OrdinalIgnoreCase);
+            if (imageIdIndex == -1)
             {
-                int imageIdIndex = imageSource.LastIndexOf(imageId);
-                if (imageIdIndex == -1)
-                {
-                    return false; 
-                }
+                return null; 
+            }
 
-                string path = imageSource.Substring(0, imageIdIndex);
-                path = path.TrimEnd('/').TrimStart('/');
-                if (path.StartsWith("media") || path.StartsWith("Media"))
-                {
-                    path = path.Substring("media".Length).TrimStart('/');
-                }
+            string path = imageSource.Substring(0, imageIdIndex);
+            path = path.TrimEnd('/').TrimStart('/');
+            if (path.StartsWith("media") || path.StartsWith("Media"))
+            {
+                path = path.Substring("media".Length).TrimStart('/');
+            }
 
+            return path;
+        }
+        
+        private bool HandleSharedImageRotator(string imageId, string html)
+        {
+            string? path = GetPathForSharedImageRotator(imageId, html);
+            
+            if (!string.IsNullOrWhiteSpace(path))
+            {
                 return HandleImagePath(path, html, imageId);
             }
+            
             return false;
         }
 
@@ -266,15 +282,39 @@ namespace BedBrigade.Client.Services
             {
                 if (node.Attributes[Id] != null)
                 {
-                    string attributeValue = node.Attributes[Id].Value;
-                    if (attributeValue.Contains(imageRotatorTag))
+                    SetImageNode(path, originalHtml, node, Id, Src);
+                }
+            }
+
+            return doc.DocumentNode.OuterHtml;
+        }
+
+        private void SetImageNode(string path, string originalHtml, HtmlNode node, string Id, string Src)
+        {
+            string attributeValue = node.Attributes[Id].Value;
+            if (attributeValue.Contains(imageRotatorTag))
+            {
+                string currentSrc = node.Attributes[Src].Value;
+
+                //Normal images in the path of the page
+                if (currentSrc.ToLower().Contains(path.ToLower()))
+                {
+                    node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
+                }
+                else
+                {
+                    //Shared images from another page
+                    string? sharedPath = GetPathForSharedImageRotator(attributeValue, originalHtml);
+                    if (!string.IsNullOrWhiteSpace(sharedPath))
+                    {
+                        node.Attributes[Src].Value = GetRotatedImage(sharedPath, attributeValue);
+                    }
+                    else
                     {
                         node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
                     }
                 }
             }
-
-            return doc.DocumentNode.OuterHtml;
         }
 
         /// <summary>
