@@ -282,34 +282,39 @@ namespace BedBrigade.Client.Services
             {
                 if (node.Attributes[Id] != null)
                 {
-                    string attributeValue = node.Attributes[Id].Value;
-                    if (attributeValue.Contains(imageRotatorTag))
-                    {
-                        string currentSrc = node.Attributes[Src].Value;
-
-                        //Normal images in the path of the page
-                        if (currentSrc.ToLower().Contains(path.ToLower()))
-                        {
-                            node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);    
-                        }
-                        else
-                        {
-                            //Shared images from another page
-                            string? sharedPath = GetPathForSharedImageRotator(attributeValue, originalHtml);
-                            if (!string.IsNullOrWhiteSpace(sharedPath))
-                            {
-                                node.Attributes[Src].Value = GetRotatedImage(sharedPath, attributeValue);
-                            }
-                            else
-                            {
-                                node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
-                            }
-                        }
-                    }
+                    SetImageNode(path, originalHtml, node, Id, Src);
                 }
             }
 
             return doc.DocumentNode.OuterHtml;
+        }
+
+        private void SetImageNode(string path, string originalHtml, HtmlNode node, string Id, string Src)
+        {
+            string attributeValue = node.Attributes[Id].Value;
+            if (attributeValue.Contains(imageRotatorTag))
+            {
+                string currentSrc = node.Attributes[Src].Value;
+
+                //Normal images in the path of the page
+                if (currentSrc.ToLower().Contains(path.ToLower()))
+                {
+                    node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
+                }
+                else
+                {
+                    //Shared images from another page
+                    string? sharedPath = GetPathForSharedImageRotator(attributeValue, originalHtml);
+                    if (!string.IsNullOrWhiteSpace(sharedPath))
+                    {
+                        node.Attributes[Src].Value = GetRotatedImage(sharedPath, attributeValue);
+                    }
+                    else
+                    {
+                        node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
+                    }
+                }
+            }
         }
 
         /// <summary>
