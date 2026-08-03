@@ -300,6 +300,10 @@ namespace BedBrigade.Client.Services
                             {
                                 node.Attributes[Src].Value = GetRotatedImage(sharedPath, attributeValue);
                             }
+                            else
+                            {
+                                node.Attributes[Src].Value = GetRotatedImage(path, attributeValue);
+                            }
                         }
                     }
                 }
