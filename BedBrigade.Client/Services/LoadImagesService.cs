@@ -94,18 +94,23 @@ namespace BedBrigade.Client.Services
 
         public string SetImgSourceForImageRotators(string path, string html)
         {
+            //This will return example: leftImageRotator, middleImageRotator, rightImageRotator
             List<string> imgIds = GetImgIdsWithRotator(html);
+
             foreach (var imgId in imgIds)
             {
-                List<string> images = GetImagesForArea(path, imgId);
-
-                if (images.Count > 0)
+                //The image rotator is in the same path as the page.
+                //Example: media/grove-city/pages/Donations/leftImageRotator/Bedding.jpg
+                if (HandleImagePath(path, html, imgId))
                 {
-                    var image = images.First().Replace("wwwroot/", "");
-                    html = ReplaceImageSrc(html, imgId, image);
+                    continue;
                 }
-
-                else
+                //The image rotator is on another page.
+                //Example: media/grove-city/pages/someOtherPage/leftImageRotator/Bedding.jpg
+                if (HandleSharedImageRotator(imgId, html))
+                {
+                    continue;
+                }
                 { // image source file not found - get "No Image Found" -  VS 9/4/2024                {                 
 
                     html = ReplaceImageSrc(html, imgId, Defaults.ErrorImagePath); // Image Not Found URL
@@ -113,6 +118,42 @@ namespace BedBrigade.Client.Services
             }
 
             return html;
+        }
+
+        private bool HandleImagePath(string path, string html, string imgId)
+        {
+            List<string> images = GetImagesForArea(path, imgId);
+
+            if (images.Count > 0)
+            {
+                var image = images.First().Replace("wwwroot/", "");
+                html = ReplaceImageSrc(html, imgId, image);
+                return true;
+            }
+            return false;
+        }
+
+        public bool HandleSharedImageRotator(string imageId, string html)
+        {
+            string? imageSource = GetImageSrcById(html, imageId);
+            if (imageSource != null)
+            {
+                int imageIdIndex = imageSource.LastIndexOf(imageId);
+                if (imageIdIndex == -1)
+                {
+                    return false; 
+                }
+
+                string path = imageSource.Substring(0, imageIdIndex);
+                path = path.TrimEnd('/').TrimStart('/');
+                if (path.StartsWith("media") || path.StartsWith("Media"))
+                {
+                    path = path.Substring("media".Length).TrimStart('/');
+                }
+
+                return HandleImagePath(path, html, imageId);
+            }
+            return false;
         }
 
         public void EnsureDirectoriesExist(string path, string html)
@@ -126,6 +167,20 @@ namespace BedBrigade.Client.Services
             {
                 MediaPathUtil.GetMediaDirectory(_hostingEnv.ContentRootPath, normalizedPath, imgId);
             }
+        }
+
+        public string? GetImageSrcById(string html, string id)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var imgNode = doc.DocumentNode.SelectSingleNode($"//img[@id='{id}']");
+            if (imgNode != null)
+            {
+                return imgNode.GetAttributeValue("src", null);
+            }
+
+            return null;
         }
 
         public string ReplaceImageSrc(string html, string id, string newSrc)
