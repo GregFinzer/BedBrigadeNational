@@ -58,13 +58,13 @@ public class EmailBounceService : IEmailBounceService
     public async Task ProcessInvalidEmail(string email)
     {
         List<string> bouncedEmails = new List<string>() { email };
-        int cancelledBeRequests = await _bedRequestDataService.CancelWaitingForBouncedEmail(bouncedEmails);
+        int cancelledBeRequests = await _bedRequestDataService.MarkInvalidEmailForWaitingForBedRequest(bouncedEmails);
 
         if (cancelledBeRequests > 0)
         {
             _logger.LogInformation($"{cancelledBeRequests} Bed Requests cancelled due to invalid email.");
         }
-        int cancelledContactUs = await _contactUsDataService.CancelContactRequestedForBouncedEmail(bouncedEmails);
+        int cancelledContactUs = await _contactUsDataService.MarkInvalidEmailForCancelContactRequested(bouncedEmails);
 
         if (cancelledContactUs > 0)
         {
@@ -91,13 +91,13 @@ public class EmailBounceService : IEmailBounceService
             }
 
             _logger.LogInformation($"{bouncedEmails.Count} Bounced emails: {String.Join(',', bouncedEmails)}");
-            int cancelledBeRequests = await _bedRequestDataService.CancelWaitingForBouncedEmail(bouncedEmails);
+            int cancelledBeRequests = await _bedRequestDataService.MarkInvalidEmailForWaitingForBedRequest(bouncedEmails);
 
             if (cancelledBeRequests > 0)
             {
                 _logger.LogInformation($"{cancelledBeRequests} Bed Requests cancelled due to bounced email.");
             }
-            int cancelledContactUs = await _contactUsDataService.CancelContactRequestedForBouncedEmail(bouncedEmails);
+            int cancelledContactUs = await _contactUsDataService.MarkInvalidEmailForCancelContactRequested(bouncedEmails);
 
             if (cancelledContactUs > 0)
             {

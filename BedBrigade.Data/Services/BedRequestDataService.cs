@@ -393,7 +393,7 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         }
     }
 
-    public async Task<int> CancelWaitingForBouncedEmail(List<string> emailList)
+    public async Task<int> MarkInvalidEmailForWaitingForBedRequest(List<string> emailList)
     {
         string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
         using (var ctx = _contextFactory.CreateDbContext())
@@ -402,14 +402,15 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
             int updated = await ctx.Set<BedRequest>()
                 .Where(o => lowerEmailList.Contains(o.Email.ToLower())
-                            && o.Status == BedRequestStatus.Waiting)
+                            && o.Status == BedRequestStatus.Waiting
+                            && o.Notes != null
+                            && !o.Notes.Contains("Invalid Email"))
                 .ExecuteUpdateAsync(updates => updates
                     .SetProperty(o => o.UpdateUser, userName)
                     .SetProperty(o => o.UpdateDate, DateTime.UtcNow)
                     .SetProperty(o => o.MachineName, Environment.MachineName)
-                    .SetProperty(o => o.Status, o => BedRequestStatus.Cancelled)
                     .SetProperty(o => o.Notes,
-                        o => (o.Notes ?? "") + " | Cancelled due to bounced email"));
+                        o => (o.Notes ?? "") + " | Invalid Email"));
 
             if (updated > 0)
             {

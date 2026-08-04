@@ -59,7 +59,7 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
         return await _commonService.GetAllForLocationList(this, locationIds);
     }
 
-    public async Task<int> CancelContactRequestedForBouncedEmail(List<string> emailList)
+    public async Task<int> MarkInvalidEmailForCancelContactRequested(List<string> emailList)
     {
         string userName = GetUserName() ?? Defaults.DefaultUserNameAndEmail;
         using (var ctx = _contextFactory.CreateDbContext())
@@ -68,14 +68,15 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
 
             int updated = await ctx.Set<ContactUs>()
                 .Where(o => lowerEmailList.Contains(o.Email.ToLower())
-                            && o.Status == ContactUsStatus.ContactRequested)
+                            && o.Status == ContactUsStatus.ContactRequested
+                            && o.Message != null
+                            && !o.Message.Contains("Invalid Email"))
                 .ExecuteUpdateAsync(updates => updates
                     .SetProperty(o => o.UpdateUser, userName)
                     .SetProperty(o => o.UpdateDate, DateTime.UtcNow)
                     .SetProperty(o => o.MachineName, Environment.MachineName)
-                    .SetProperty(o => o.Status, o => ContactUsStatus.Cancelled)
                     .SetProperty(o => o.Message,
-                        o => (o.Message ?? "") + " | Cancelled due to bounced email"));
+                        o => (o.Message ?? "") + " | Invalid Email"));
 
             if (updated > 0)
             {
