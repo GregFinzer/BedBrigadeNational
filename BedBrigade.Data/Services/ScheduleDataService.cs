@@ -360,7 +360,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
     }
 
-    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDateAndTime(BedRequest bedRequest)
     {
         if (!bedRequest.DeliveryDate.HasValue)
             return  new ServiceResponse<Schedule>("BedRequest DeliveryDate is null");
@@ -375,7 +375,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         schedule.EventName = "Delivery";
         schedule.EventType = EventType.Delivery;
         schedule.EventStatus = EventStatus.Scheduled;
-        schedule.EventDateScheduled = bedRequest.DeliveryDate.Value.Date;
+        schedule.EventDateScheduled = bedRequest.DeliveryDate.Value;
         schedule.Address = locationResponse.Data.BuildAddress;
         schedule.City = locationResponse.Data.BuildCity;
         schedule.State = locationResponse.Data.BuildState;
@@ -396,9 +396,6 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             schedule.OrganizerPhone = GetUserPhone().FormatPhoneNumber();
         }
 
-        int defaultHour = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-            ConfigNames.DefaultDeliveryTime, schedule.LocationId);
-        schedule.EventDateScheduled = schedule.EventDateScheduled.AddHours(defaultHour);
         int defaultDuration = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
             ConfigNames.DefaultDeliveryDurationHours, schedule.LocationId);
         schedule.EventDurationHours = defaultDuration;

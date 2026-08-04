@@ -457,11 +457,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (!scheduleResponse.Success || scheduleResponse.Data == null)
             {
+                var timeString = model.DeliveryDate.Value.Hour > 0 || model.DeliveryDate.Value.Minute > 0
+                    ? model.DeliveryDate.Value.ToString("h:mmtt")
+                    : "no specific time";
+
                 if (await ConfirmAddScheduleAsync("Schedule Not Found",
-                        $"No schedule was found for the delivery date {model.DeliveryDate.Value.ToShortDateString()} of this Bed Request. Would you like to add a schedule for this delivery date?"))
+                        $"No schedule was found for the delivery date {model.DeliveryDate.Value.ToShortDateString()} and time of {timeString} of this Bed Request. Would you like to add a schedule for this delivery date and time?"))
                 {
-                    scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDate(model);
-                    
+                    scheduleResponse = await _svcSchedule.AddMissingScheduleForBedRequestDeliveryDateAndTime(model);
+
                     if (scheduleResponse.Success && scheduleResponse.Data != null)
                     {
                         model.ScheduleId = scheduleResponse.Data.ScheduleId;
@@ -614,7 +618,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             var matchingSchedule = FutureDeliverySchedules
                 .FirstOrDefault(schedule => schedule.EventType == EventType.Delivery &&
-                                            schedule.EventDateScheduled.Date == Model.DeliveryDate.Value.Date);
+                                            schedule.EventDateScheduled.Date == Model.DeliveryDate.Value.Date &&
+                                            (Model.DeliveryDate.Value.Hour == 0 && Model.DeliveryDate.Value.Minute == 0 ||
+                                             schedule.EventDateScheduled.Hour == Model.DeliveryDate.Value.Hour &&
+                                             schedule.EventDateScheduled.Minute == Model.DeliveryDate.Value.Minute));
 
             Model.ScheduleId = matchingSchedule?.ScheduleId;
         }
