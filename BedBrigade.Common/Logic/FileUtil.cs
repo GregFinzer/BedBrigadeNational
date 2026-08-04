@@ -372,6 +372,10 @@ namespace BedBrigade.Common.Logic
         
         public static string? ResolveCaseInsensitivePath(string path)
         {
+            //Only Linux is case-sensitive, so we can skip the rest of the logic for Windows and MacOS
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                return path;
+
             if (_caseInsensitiveCache.TryGetValue(path, out string? cached))
             {
                 if (Directory.Exists(cached) || File.Exists(cached))
