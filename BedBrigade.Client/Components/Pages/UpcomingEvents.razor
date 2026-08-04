@@ -25,7 +25,14 @@
                         {
                             <div class="event-card mb-3 p-3 border rounded">
                                 <h4 class="bb-fore-primary">
-                                    <a class="bb-fore-primary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a> @_lc.Keys["ClickToSignup"]
+                                    @if (!evt.PrivateEvent)
+                                    {
+                                        <a class="bb-fore-primary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a> @_lc.Keys["ClickToSignup"]
+                                    }
+                                    else
+                                    {
+                                        @_translateLogic.GetTranslation(evt.EventName)
+                                    }
                                 </h4>
                                 <div class="event-details">
                                     <p class="mb-1">
@@ -102,7 +109,16 @@
                         @foreach (var evt in BuildEvents)
                         {
                             <div class="event-card mb-3 p-3 border rounded">
-                                <h4 class="bb-fore-secondary"><a class="bb-fore-secondary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a>  @_lc.Keys["ClickToSignup"]</h4>
+                                <h4 class="bb-fore-secondary">
+                                    @if (!evt.PrivateEvent)
+                                    {
+                                        <a class="bb-fore-secondary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a>  @_lc.Keys["ClickToSignup"]
+                                    }
+                                    else
+                                    {
+                                        @_translateLogic.GetTranslation(evt.EventName)
+                                    }
+                                </h4>
                                 <div class="event-details">
                                     <p class="mb-1">
                                         <i class="far fa-calendar-alt"></i>

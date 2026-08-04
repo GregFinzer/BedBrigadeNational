@@ -19,5 +19,6 @@ namespace BedBrigade.Common.Models
         public string? OrganizerEmail { get; set; }
         public string? OrganizerPhone { get; set; }
         public string? Volunteers { get; set; }
+        public bool PrivateEvent { get; set; } = false;
     }
 }

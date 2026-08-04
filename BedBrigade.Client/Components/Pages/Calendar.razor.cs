@@ -90,7 +90,8 @@ namespace BedBrigade.Client.Components.Pages
                     OrganizerName = s.OrganizerName,
                     OrganizerPhone = s.OrganizerPhone,
                     OrganizerEmail = s.OrganizerEmail,
-                    Volunteers = FormatVolunteerString(s.VolunteersRegistered, s.VolunteersMax)
+                    Volunteers = FormatVolunteerString(s.VolunteersRegistered, s.VolunteersMax),
+                    PrivateEvent = s.PrivateEvent
                 })
                 .ToList();
 

@@ -66,6 +66,8 @@ namespace BedBrigade.Common.Models
         public int Teams { get; set; } = 0;
         public int Beds { get; set; } = 0;
 
+        public bool PrivateEvent { get; set; } = false;
+
         [JsonIgnore]
         [NotMapped]
         public string? EventSelect { get; set; }
