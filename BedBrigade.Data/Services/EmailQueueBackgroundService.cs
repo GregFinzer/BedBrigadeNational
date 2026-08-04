@@ -403,7 +403,12 @@ namespace BedBrigade.Data.Services
             email.LockDate = null;
             email.SentDate = DateTime.UtcNow;
             await _emailQueueDataService.UpdateAsync(email);
-            await _emailBounceService.ProcessInvalidEmail(email.ToAddress);
+
+            if (!string.IsNullOrWhiteSpace(email.ToAddress))
+            {
+                await _emailBounceService.ProcessInvalidEmail(email.ToAddress);
+            }
+
             return false;
         }
 
