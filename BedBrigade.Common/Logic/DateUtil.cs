@@ -104,7 +104,43 @@ namespace BedBrigade.Common.Logic
                 lastDayOfMonth = lastDayOfMonth.AddDays(-1);
             }
             return lastDayOfMonth;
-        } 
+        }
+
+        /// <summary>
+        /// Returns the date from last month matching the day of the week and the week. For example, the 2nd Saturday of last month
+        /// </summary>
+        /// <param name="currentDate"></param>
+        /// <returns></returns>
+        public static DateTime GetNthDayOfWeekLastMonth(DateTime currentDate)
+        {
+            DayOfWeek targetDayOfWeek = currentDate.DayOfWeek;
+
+            // Determine which occurrence of the weekday currentDate represents.
+            // Days 1–7 = first, 8–14 = second, etc.
+            int occurrence = ((currentDate.Day - 1) / 7) + 1;
+
+            DateTime firstDayOfPreviousMonth = new(
+                currentDate.AddMonths(-1).Year,
+                currentDate.AddMonths(-1).Month,
+                1);
+
+            // Find the first matching weekday in the previous month.
+            int daysUntilTarget =
+                ((int)targetDayOfWeek - (int)firstDayOfPreviousMonth.DayOfWeek + 7) % 7;
+
+            DateTime resultDate = firstDayOfPreviousMonth
+                .AddDays(daysUntilTarget)
+                .AddDays((occurrence - 1) * 7);
+
+            // If the requested occurrence does not exist, use the previous occurrence.
+            if (resultDate.Month != firstDayOfPreviousMonth.Month)
+            {
+                resultDate = resultDate.AddDays(-7);
+            }
+
+            // Preserve the original time.
+            return resultDate.Date.Add(currentDate.TimeOfDay);
+        }
 
     } // class
 } // namespace
