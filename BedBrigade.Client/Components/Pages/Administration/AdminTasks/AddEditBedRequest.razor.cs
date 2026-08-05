@@ -375,19 +375,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (updateResult.Success && updateResult.Data != null)
             {
-                Model = updateResult.Data;
-                InitializeValidationContext();
-                _originalStatus = Model.Status;
-                _lastSelectedStatus = Model.Status;
-
-                await _emailQueueDataService.DeleteQueuedByBedRequestId(Model.BedRequestId);
-                await _smsQueueDataService.DeleteQueuedSmsByBedRequestId(Model.BedRequestId);
+                await _emailQueueDataService.DeleteQueuedByBedRequestId(updateResult.Data.BedRequestId);
+                await _smsQueueDataService.DeleteQueuedSmsByBedRequestId(updateResult.Data.BedRequestId);
                 
-                if (Model.Status == BedRequestStatus.Scheduled)
+                if (updateResult.Data.Status == BedRequestStatus.Scheduled)
                 {
-                    if (!Model.DeliveryDate.HasValue)
+                    if (!updateResult.Data.DeliveryDate.HasValue)
                     {
-                        Log.Error($"BedRequest {Model.BedRequestId} is scheduled but DeliveryDate is null.");
+                        Log.Error($"BedRequest {updateResult.Data.BedRequestId} is scheduled but DeliveryDate is null.");
                         _toastService?.Error("Delivery Date Required", "A scheduled BedRequest must have a delivery date before delivery reminders can be queued.");
                         return;
                     }
@@ -398,15 +393,26 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         await SendDeliveryReminderEmail(Model, scheduleResult.Data);
                         await SendDeliveryReminderSms(Model, scheduleResult.Data);
                     }
+                    else
+                    {
+                        return;
+                    }
                 }
-                
+
+                Model = updateResult.Data;
+                InitializeValidationContext();
+                _originalStatus = Model.Status;
+                _lastSelectedStatus = Model.Status;
+
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
             else
             {
                 Log.Error($"Unable to update BedRequest {bedRequest.BedRequestId} : {updateResult.Message}");
                 _toastService?.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
+                return;
             }
+
         }
 
         private async Task SendDeliveryReminderSms(Common.Models.BedRequest model, Common.Models.Schedule scheduleResultData)
@@ -469,7 +475,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (scheduleResponse.Success && scheduleResponse.Data != null)
                     {
                         model.ScheduleId = scheduleResponse.Data.ScheduleId;
-                        await UpdateBedRequest(model);
+                        await _svcBedRequest.UpdateAsync(model);
+
+                        // Redirect to schedule edit page with flag indicating this came from a bed request
+                        if (_nav != null)
+                        {
+                            _nav.NavigateTo($"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true",true);
+                        }
+
+                        //This is intentional when adding
+                        scheduleResponse.Success = false;
+                        return scheduleResponse;
                     }
                 }
             }

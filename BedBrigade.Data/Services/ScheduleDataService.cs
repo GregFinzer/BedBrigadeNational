@@ -151,7 +151,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
     private void FillSingleEventSelect(Schedule schedule)
     {
         string? eventName = _translateLogic.GetTranslation(schedule.EventName);
-        schedule.EventSelect = $"{eventName}: {schedule.EventDateScheduled.ToShortDateString()}, {schedule.EventDateScheduled.ToShortTimeString()}";
+        schedule.EventSelect = $"{eventName}: {schedule.EventDateScheduled:ddd, M/d/yyyy, h:mm tt}";
     }
 
     public async Task<ServiceResponse<List<Schedule>>> GetSchedulesByLocationId(int locationId)

@@ -40,10 +40,17 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private List<UsState>? StateList = AddressHelper.GetStateList();
         private User? _currentUser = new User();
 
+        private bool _isFromBedRequest = false;
+        private bool _showVerificationDialog = false;
+
         protected override async Task OnInitializedAsync()
         {
             try
             {
+                // Check if coming from bed request
+                var uri = _nav.ToAbsoluteUri(_nav.Uri);
+                _isFromBedRequest = uri.Query.Contains("fromBedRequest=true");
+
                 // Permissions
                 CanSetLocation = _svcUser.IsUserNationalAdmin();
 
@@ -54,6 +61,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 // Enum lists
                 EventStatuses = EnumHelper.GetEventStatusItems();
                 EventTypes = EnumHelper.GetEventTypeItems();
+
+                // Show verification dialog if coming from bed request
+                if (_isFromBedRequest && ScheduleId.HasValue)
+                {
+                    _showVerificationDialog = true;
+                }
             }
             catch (Exception ex)
             {
@@ -190,7 +203,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (update.Success)
                     {
                         _toast.Success("Success", "Schedule updated successfully");
-                        _nav.NavigateTo("/administration/manage/schedules");
+                        var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                        _nav.NavigateTo(redirectUrl);
                         return;
                     }
                     ErrorMessage = update.Message;
@@ -203,7 +217,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (create.Success)
                 {
                     _toast.Success("Success", "Schedule created successfully");
-                    _nav.NavigateTo("/administration/manage/schedules");
+                    var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                    _nav.NavigateTo(redirectUrl);
                 }
                 else
                 {
@@ -221,7 +236,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected void HandleCancel()
         {
-            _nav.NavigateTo("/administration/manage/schedules");
+            var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+            _nav.NavigateTo(redirectUrl);
+        }
+
+        private void CloseVerificationDialog()
+        {
+            _showVerificationDialog = false;
         }
 
         private string cssClass { get; set; } = "e-outline";
