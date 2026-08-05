@@ -475,7 +475,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (scheduleResponse.Success && scheduleResponse.Data != null)
                     {
                         model.ScheduleId = scheduleResponse.Data.ScheduleId;
-                        await _svcBedRequest.UpdateAsync(model);
+                        var updateResponse = await _svcBedRequest.UpdateAsync(model);
+
+                        if (updateResponse.Success && updateResponse.Data != null)
+                        {
+                            await SendDeliveryReminderEmail(updateResponse.Data, scheduleResponse.Data);
+                            await SendDeliveryReminderSms(updateResponse.Data, scheduleResponse.Data);
+                        }
 
                         // Redirect to schedule edit page with flag indicating this came from a bed request
                         if (_nav != null)
@@ -483,7 +489,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                             _nav.NavigateTo($"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true",true);
                         }
 
-                        //This is intentional when adding
+                        //This is intentional when adding to break out of the caller
                         scheduleResponse.Success = false;
                         return scheduleResponse;
                     }
