@@ -45,7 +45,7 @@ namespace BedBrigade.Client.Components.Pages
                 ? "/forgot-password"
                 : $"/forgot-password/{EncryptionLogic.EncodeUrl(loginModel.Email)}";
 
-
+        private bool _isLoading = true;
         protected override void OnInitialized()
         {
             _lc.InitLocalizedComponent(this);
@@ -82,8 +82,16 @@ namespace BedBrigade.Client.Components.Pages
                         {
                             NavigationManager.NavigateTo(returnUrl);
                             returnUrl = string.Empty;
+                            return;
                         }
                     }
+                }
+
+                //Show a blank page if we came here due to a force load
+                if (_isLoading)
+                {
+                    _isLoading = false;
+                    StateHasChanged();
                 }
             }
             catch (Exception ex)
@@ -91,6 +99,7 @@ namespace BedBrigade.Client.Components.Pages
                 Log.Logger.Error(ex, $"Login.OnAfterRenderAsync");
                 errorMessage = "There was an error loading the page, try again later.";
                 DisplayError = "block;";
+                _isLoading = false;
             }
         }
 
