@@ -486,12 +486,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         // Redirect to schedule edit page with flag indicating this came from a bed request
                         if (_nav != null)
                         {
-                            _nav.NavigateTo($"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true",false);
+                            // Use a small delay to ensure the navigation is processed properly
+                            await Task.Delay(100);
+                            _nav.NavigateTo($"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true", true);
+                            return new ServiceResponse<Common.Models.Schedule>("Navigating to schedule page");
                         }
-
-                        //This is intentional when adding to break out of the caller
-                        scheduleResponse.Success = false;
-                        return scheduleResponse;
                     }
                 }
             }
