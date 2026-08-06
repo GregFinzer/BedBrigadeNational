@@ -151,7 +151,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
     private void FillSingleEventSelect(Schedule schedule)
     {
         string? eventName = _translateLogic.GetTranslation(schedule.EventName);
-        schedule.EventSelect = $"{eventName}: {schedule.EventDateScheduled.ToShortDateString()}, {schedule.EventDateScheduled.ToShortTimeString()}";
+        schedule.EventSelect = $"{eventName}: {schedule.EventDateScheduled:ddd, M/d/yyyy, h:mm tt}";
     }
 
     public async Task<ServiceResponse<List<Schedule>>> GetSchedulesByLocationId(int locationId)
@@ -212,6 +212,40 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         {
             return new ServiceResponse<Schedule>(
                 $"Error GetLastScheduledByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Schedule>>> GetSchedulesForPreviousMonths(int locationId, int months)
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetSchedulesForPreviousMonths({locationId}, {months})");
+        List<Schedule>? cachedContent = _cachingService.Get<List<Schedule>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Schedule>>($"Found GetSchedulesForPreviousMonths in cache", true, cachedContent);
+        }
+
+        DateTime past = DateTime.Now.AddMonths(-months);
+        DateTime startDate =  new DateTime(past.Year, past.Month, 1);
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Schedule>();
+                var result = await dbSet
+                    .Where(o => o.LocationId == locationId
+                    && o.EventDateScheduled >= startDate)
+                    .ToListAsync();
+
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<Schedule>>($"GetSchedulesForPreviousMonths", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<Schedule>>(
+                $"Error GetSchedulesForPreviousMonths for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
     }
 
@@ -360,7 +394,87 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
     }
 
-    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    public async Task<bool> FillScheduleByUserAndDate(Schedule schedule,
+        int locationId, 
+        DateTime? lastDateTime, 
+        string? userName, 
+        EventType? eventType)
+    {
+        const int twoMonths = 2;
+        var lastMonthsSchedules = await GetSchedulesForPreviousMonths(locationId, twoMonths);
+
+        if (!lastMonthsSchedules.Success || lastMonthsSchedules.Data == null)
+        {
+            return false;
+        }
+
+        Schedule? matchingSchedule= GetMatchingSchedule(lastMonthsSchedules.Data, eventType, lastDateTime, userName);
+
+        if (matchingSchedule != null)
+        {
+            var locationResponse = await _locationDataService.GetByIdAsync(locationId);
+            Location? location = locationResponse.Data;
+
+            schedule.EventName = string.IsNullOrWhiteSpace(matchingSchedule.EventName) ? EnumHelper.GetEnumDescription(matchingSchedule.EventType) : matchingSchedule.EventName;
+            schedule.EventType = matchingSchedule.EventType;
+            schedule.GroupName = matchingSchedule.GroupName;
+            schedule.VolunteersMax = matchingSchedule.VolunteersMax;
+            schedule.EventDurationHours = matchingSchedule.EventDurationHours;
+            schedule.Address = string.IsNullOrWhiteSpace(matchingSchedule.Address) ? location?.BuildAddress : matchingSchedule.Address;
+            schedule.City = string.IsNullOrWhiteSpace(matchingSchedule.City) ? location?.BuildCity : matchingSchedule.City;
+            schedule.State = string.IsNullOrWhiteSpace(matchingSchedule.State) ? location?.BuildState : matchingSchedule.State;
+            schedule.PostalCode = string.IsNullOrWhiteSpace(matchingSchedule.PostalCode) ? location?.BuildPostalCode : matchingSchedule.PostalCode;
+            schedule.OrganizerName = string.IsNullOrWhiteSpace(matchingSchedule.OrganizerName) ? StringUtil.InsertSpaces(GetUserName()) : matchingSchedule.OrganizerName;
+            schedule.OrganizerEmail = string.IsNullOrWhiteSpace(matchingSchedule.OrganizerEmail) ? GetUserEmail() : matchingSchedule.OrganizerEmail;
+            schedule.OrganizerPhone = string.IsNullOrWhiteSpace(matchingSchedule.OrganizerPhone) ? GetUserPhone() : matchingSchedule.OrganizerPhone;
+            schedule.PrivateEvent = matchingSchedule.PrivateEvent;
+            schedule.EventNote = matchingSchedule.EventNote;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static Schedule? GetMatchingSchedule(List<Schedule> lastMonthsSchedules, 
+        EventType? eventType, 
+        DateTime? lastDateTime, 
+        string? userName)
+    {
+        List<Schedule> matchingSchedules;
+
+        if (!String.IsNullOrWhiteSpace(userName))
+        {
+            matchingSchedules = lastMonthsSchedules.Where(s => s.CreateUser == userName).ToList();
+        }
+        else
+        {
+            matchingSchedules = lastMonthsSchedules.ToList();
+        }
+
+        if (eventType.HasValue)
+        {
+            matchingSchedules = matchingSchedules.Where(s => s.EventType == eventType.Value).ToList();
+        }
+
+        Schedule? matchingSchedule;
+        if (lastDateTime.HasValue)
+        {
+            matchingSchedule = matchingSchedules.FirstOrDefault(s => s.EventDateScheduled == lastDateTime.Value);
+
+            if (matchingSchedule == null)
+            {
+                matchingSchedule = matchingSchedules.FirstOrDefault(s => s.EventDateScheduled.Date == lastDateTime.Value.Date);
+            }
+        }
+        else
+        {
+            matchingSchedule = matchingSchedules.FirstOrDefault();
+        }
+
+        return matchingSchedule;
+    }
+
+    public async Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDateAndTime(BedRequest bedRequest)
     {
         if (!bedRequest.DeliveryDate.HasValue)
             return  new ServiceResponse<Schedule>("BedRequest DeliveryDate is null");
@@ -372,54 +486,56 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         
         Schedule schedule = new  Schedule();
         schedule.LocationId = bedRequest.LocationId;
-        schedule.EventName = "Delivery";
         schedule.EventType = EventType.Delivery;
         schedule.EventStatus = EventStatus.Scheduled;
-        schedule.EventDateScheduled = bedRequest.DeliveryDate.Value.Date;
-        schedule.Address = locationResponse.Data.BuildAddress;
-        schedule.City = locationResponse.Data.BuildCity;
-        schedule.State = locationResponse.Data.BuildState;
-        schedule.PostalCode = locationResponse.Data.BuildPostalCode;
-
-        var lastScheduleResponse = await GetLastScheduledByLocationId(bedRequest.LocationId);
-
-        if (lastScheduleResponse.Success && lastScheduleResponse.Data != null)
-        {
-            schedule.OrganizerName = lastScheduleResponse.Data.OrganizerName;
-            schedule.OrganizerEmail = lastScheduleResponse.Data.OrganizerEmail;
-            schedule.OrganizerPhone = lastScheduleResponse.Data.OrganizerPhone.FormatPhoneNumber();
-        }
-        else //This will only happen if there is no previous schedule
-        {
-            schedule.OrganizerName = StringUtil.InsertSpaces(GetUserName());
-            schedule.OrganizerEmail = GetUserEmail();
-            schedule.OrganizerPhone = GetUserPhone().FormatPhoneNumber();
-        }
-
-        int defaultHour = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-            ConfigNames.DefaultDeliveryTime, schedule.LocationId);
-        schedule.EventDateScheduled = schedule.EventDateScheduled.AddHours(defaultHour);
-        int defaultDuration = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-            ConfigNames.DefaultDeliveryDurationHours, schedule.LocationId);
-        schedule.EventDurationHours = defaultDuration;
-        int defaultMaxVolunteers = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-            ConfigNames.DefaultDeliveryMaxVolunteers, schedule.LocationId);
-        schedule.VolunteersMax = defaultMaxVolunteers;
-        string defaultEventNote = await _configurationDataService.GetConfigValueAsync(ConfigSection.Schedule,
-            ConfigNames.DefaultDeliveryEventNote, schedule.LocationId);
-        schedule.EventNote = defaultEventNote;
+        schedule.EventDateScheduled = bedRequest.DeliveryDate.Value;
         schedule.VolunteersRegistered = 0;
         schedule.DeliveryVehiclesRegistered = 0;
         schedule.Teams = 0;
         schedule.Beds = 0;
+
+        DateTime lastWeek = bedRequest.DeliveryDate.Value.AddDays(-7);
+        DateTime lastMonth = DateUtil.GetNthDayOfWeekLastMonth(bedRequest.DeliveryDate.Value);
+
+        //Prefer to fill the schedule with the most recent schedule for the same user and date, then last month, then no user and last month, then no user and last week, then no user and no date.
+        bool filled =
+            await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, lastWeek, GetUserName(),
+                EventType.Delivery)
+            || await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, lastMonth, GetUserName(),
+                EventType.Delivery)
+            || await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, null, GetUserName(), EventType.Delivery)
+            || await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, lastMonth, null, EventType.Delivery)
+            || await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, lastWeek, null, EventType.Delivery)
+            || await FillScheduleByUserAndDate(schedule, bedRequest.LocationId, null, null, EventType.Delivery);
+
+        //Nothing could be found to fill the schedule, so use default values for a delivery event.
+        if (!filled)
+        {
+            schedule.EventName = "Delivery";
+            schedule.Address = locationResponse.Data.BuildAddress;
+            schedule.City = locationResponse.Data.BuildCity;
+            schedule.State = locationResponse.Data.BuildState;
+            schedule.PostalCode = locationResponse.Data.BuildPostalCode;
+            schedule.OrganizerName = StringUtil.InsertSpaces(GetUserName());
+            schedule.OrganizerEmail = GetUserEmail();
+            schedule.OrganizerPhone = GetUserPhone().FormatPhoneNumber();
+            int defaultDuration = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryDurationHours, schedule.LocationId);
+            schedule.EventDurationHours = defaultDuration;
+            int defaultMaxVolunteers = await _configurationDataService.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryMaxVolunteers, schedule.LocationId);
+            schedule.VolunteersMax = defaultMaxVolunteers;
+            string defaultEventNote = await _configurationDataService.GetConfigValueAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryEventNote, schedule.LocationId);
+            schedule.EventNote = defaultEventNote;
+        }
+
         var createResponse = await CreateAsync(schedule);
         if (!createResponse.Success || createResponse.Data == null)
             return new ServiceResponse<Schedule>(createResponse.Message);
 
         return new ServiceResponse<Schedule>("Success", true, createResponse.Data);
     }
-    
-
 }
 
 

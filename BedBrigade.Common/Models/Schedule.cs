@@ -55,6 +55,13 @@ namespace BedBrigade.Common.Models
         [MaxLength(14)]
         public String? OrganizerPhone { get; set; } = string.Empty;
 
+        [JsonIgnore]
+        [NotMapped]
+        public String? FormattedPhone
+        {
+            get { return OrganizerPhone.FormatPhoneNumber(); }
+        }
+
         [MaxLength(255)]
         public String? OrganizerEmail { get; set; } = string.Empty;
 
@@ -65,6 +72,8 @@ namespace BedBrigade.Common.Models
         public int DeliveryVehiclesRegistered { get; set; } = 0;
         public int Teams { get; set; } = 0;
         public int Beds { get; set; } = 0;
+
+        public bool PrivateEvent { get; set; } = false;
 
         [JsonIgnore]
         [NotMapped]

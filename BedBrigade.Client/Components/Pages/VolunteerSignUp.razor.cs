@@ -251,7 +251,7 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (response.Success && response.Data != null)
                 {
-                    LocationEvents = response.Data;
+                    LocationEvents = response.Data.Where(e => !e.PrivateEvent).ToList();
                 }
                 else
                 {
