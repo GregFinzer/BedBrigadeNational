@@ -7,6 +7,7 @@ using BedBrigade.Data.Migrations;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -121,11 +122,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             Model = new Common.Models.Schedule();
             Model.LocationId = LocationId ?? _svcAuth.LocationId;
                 
-            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationId(_svcAuth.LocationId);
+            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationIdAndUser(_svcAuth.LocationId);
 
             if (scheduleResult.Success && scheduleResult.Data != null)
             {
-                Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.Date.AddDays(7);
+                if (scheduleResult.Data.EventDateScheduled.Date < DateTime.Now.Date)
+                {
+                    Model.EventDateScheduled = DateUtil.NextSaturday();
+                }
+                else
+                {
+                    Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.Date.AddDays(7);
+                }
             }
             else
             {
@@ -134,60 +142,98 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (DateUtil.IsFirstSaturdayOfTheMonth(Model.EventDateScheduled))
             {
-                await SetBuildValues();
+                await SetBuildValues(scheduleResult.Data);
             }
             else
             {
-                await SetDeliveryValues();
+                await SetDeliveryValues(scheduleResult.Data);
             }
 
             ScheduleStartDate = Model.EventDateScheduled.Date;
             ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
-
-            Location loc = Locations.First(l => l.LocationId == Model.LocationId);
-            Model.Address = loc.BuildAddress;
-            Model.City = loc.BuildCity;
-            Model.State = loc.BuildState;
-            Model.PostalCode = loc.BuildPostalCode;
-            Model.OrganizerName = _currentUser.FullName;
-            Model.OrganizerEmail = _currentUser.Email;
-            Model.OrganizerPhone = _currentUser.Phone.FormatPhoneNumber();
         }
 
-        private async Task SetDeliveryValues()
+        private async Task SetDeliveryValues(Common.Models.Schedule? previousSchedule)
         {
-            Model.EventName = "Delivery";
+            Model.GroupName = previousSchedule?.GroupName ?? string.Empty;
             Model.EventType = EventType.Delivery;
-            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultDeliveryTime, Model.LocationId);
-            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
-            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
-            Model.EventDurationHours = defaultDuration;
+            Model.EventName = string.IsNullOrWhiteSpace(Model.GroupName) ? "Delivery" : Model.GroupName + " Delivery";
+
             int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryMaxVolunteers, Model.LocationId);
-            Model.VolunteersMax = defaultMaxVolunteers;
+            Model.VolunteersMax = previousSchedule == null ? defaultMaxVolunteers : previousSchedule.VolunteersMax;
+
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryTime, Model.LocationId);
+            Model.EventDateScheduled = previousSchedule == null 
+                ? Model.EventDateScheduled.AddHours(defaultHour) 
+                : Model.EventDateScheduled.AddHours(previousSchedule.EventDateScheduled.Hour);
+
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
+            Model.EventDurationHours = previousSchedule == null ? defaultDuration : previousSchedule.EventDurationHours;
+
+            Model.EventStatus = EventStatus.Scheduled;
+
+            FillAddressAndOrganizer(previousSchedule);
+
             string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryEventNote, Model.LocationId);
-            Model.EventNote = defaultEventNote;
+            Model.EventNote = previousSchedule != null && previousSchedule.EventType == EventType.Delivery ? previousSchedule.EventNote : defaultEventNote;
         }
 
-        private async Task SetBuildValues()
+        private async Task SetBuildValues(Common.Models.Schedule? previousSchedule)
         {
-            Model.EventName = "Build";
             Model.EventType = EventType.Build;
-            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultBuildTime, Model.LocationId);
-            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
-            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultBuildDurationHours, Model.LocationId);
-            Model.EventDurationHours = defaultDuration;
+            Model.GroupName = previousSchedule?.GroupName ?? string.Empty;
+            Model.EventName = string.IsNullOrWhiteSpace(Model.GroupName) ? "Build" : Model.GroupName + " Build";
+
             int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildMaxVolunteers, Model.LocationId);
             Model.VolunteersMax = defaultMaxVolunteers;
+
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildTime, Model.LocationId);
+            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
+
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildDurationHours, Model.LocationId);
+            Model.EventDurationHours = defaultDuration;
+
+            Model.EventStatus = EventStatus.Scheduled;
+
+            FillAddressAndOrganizer(previousSchedule);
+
             string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildEventNote, Model.LocationId);
             Model.EventNote =defaultEventNote;
+        }
+
+        private void FillAddressAndOrganizer(Common.Models.Schedule? previousSchedule)
+        {
+            Location loc = Locations.First(l => l.LocationId == Model.LocationId);
+
+            Model.Address = string.IsNullOrWhiteSpace(previousSchedule?.Address) 
+                ? loc.BuildAddress : previousSchedule!.Address;
+
+            Model.City = string.IsNullOrWhiteSpace(previousSchedule?.City) 
+                ? loc.BuildCity : previousSchedule!.City;
+
+            Model.State = string.IsNullOrWhiteSpace(previousSchedule?.State) 
+                ? loc.BuildState : previousSchedule!.State;
+
+            Model.PostalCode = string.IsNullOrWhiteSpace(previousSchedule?.PostalCode)
+                ? loc.BuildPostalCode : previousSchedule!.PostalCode;
+
+            Model.OrganizerName = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerName) 
+                ? Common.Logic.StringUtil.InsertSpaces(_svcAuth.UserName) 
+                : previousSchedule!.OrganizerName;
+
+            Model.OrganizerEmail = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerEmail)
+                ? _svcAuth.Email
+                : previousSchedule!.OrganizerEmail;
+
+            Model.OrganizerPhone = StringUtil.ExtractDigits(string.IsNullOrWhiteSpace(previousSchedule?.OrganizerPhone) ? _svcAuth.Phone : previousSchedule!.OrganizerPhone);
         }
 
 

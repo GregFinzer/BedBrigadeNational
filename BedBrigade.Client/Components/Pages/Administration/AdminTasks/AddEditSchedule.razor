@@ -45,7 +45,15 @@
                     <div class="card-header" style="font-weight: bold">Scheduling</div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="ScheduleDateOnly" class="formlabel required" style="font-weight: bold"><b>Event Date</b></label>
+                            @if (ScheduleStartDate != DateTime.MinValue)
+                            {
+                                string dayOfWeek = ScheduleStartDate.ToString("dddd");
+                                <label for="ScheduleDateOnly" class="formlabel required" style="font-weight: bold"><b>Event Date (@dayOfWeek)</b></label>
+                            }
+                            else
+                            {
+                                <label for="ScheduleDateOnly" class="formlabel required" style="font-weight: bold"><b>Event Date</b></label>    
+                            }
                             <SfDatePicker ID="ScheduleDateOnly" TValue="DateTime" @bind-Value="@ScheduleStartDate" Placeholder="Choose a date" ShowClearButton="true"></SfDatePicker>
                         </div>
                         <div class="form-group">
