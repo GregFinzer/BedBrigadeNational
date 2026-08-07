@@ -253,56 +253,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
                 if (ScheduleId.HasValue)
                 {
-                    var update = await _svcSchedule.UpdateAsync(Model);
-                    if (update.Success)
-                    {
-                        bool remindersRequeued = true;
-                        if (_originalEventDateScheduled.HasValue &&
-                            _originalEventDateScheduled.Value != Model.EventDateScheduled)
-                        {
-                            try
-                            {
-                                remindersRequeued = await RequeueReminders();
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
-                                    Model.ScheduleId);
-                                remindersRequeued = false;
-                            }
-                        }
-
-                        if (remindersRequeued)
-                        {
-                            _toast.Success("Success", "Schedule updated successfully");
-                        }
-                        else
-                        {
-                            _toast.Warning("Schedule Updated",
-                                "The schedule was updated, but one or more reminders could not be requeued.");
-                        }
-
-                        var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
-                        _nav.NavigateTo(redirectUrl);
-                        return;
-                    }
-                    ErrorMessage = update.Message;
-                    _toast.Error("Error", update.Message);
-                    return;
-                }
-
-                // Create
-                var create = await _svcSchedule.CreateAsync(Model);
-                if (create.Success)
-                {
-                    _toast.Success("Success", "Schedule created successfully");
-                    var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
-                    _nav.NavigateTo(redirectUrl);
+                    await HandleUpdate();
                 }
                 else
                 {
-                    ErrorMessage = create.Message;
-                    _toast.Error("Error", create.Message);
+                    await HandleCreate();
                 }
             }
             catch (Exception ex)
@@ -311,6 +266,61 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 _toast.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
             }
 
+        }
+
+        private async Task HandleCreate()
+        {
+            var create = await _svcSchedule.CreateAsync(Model);
+            if (create.Success)
+            {
+                _toast.Success("Success", "Schedule created successfully");
+                var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                _nav.NavigateTo(redirectUrl);
+            }
+            else
+            {
+                ErrorMessage = create.Message;
+                _toast.Error("Error", create.Message);
+            }
+        }
+
+        private async Task HandleUpdate()
+        {
+            var update = await _svcSchedule.UpdateAsync(Model);
+            if (update.Success)
+            {
+                bool remindersRequeued = true;
+                if (_originalEventDateScheduled.HasValue &&
+                    _originalEventDateScheduled.Value != Model.EventDateScheduled)
+                {
+                    try
+                    {
+                        remindersRequeued = await RequeueReminders();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
+                            Model.ScheduleId);
+                        remindersRequeued = false;
+                    }
+                }
+
+                if (remindersRequeued)
+                {
+                    _toast.Success("Success", "Schedule updated successfully");
+                }
+                else
+                {
+                    _toast.Warning("Schedule Updated",
+                        "The schedule was updated, but one or more reminders could not be requeued.");
+                }
+
+                var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                _nav.NavigateTo(redirectUrl);
+                return;
+            }
+            ErrorMessage = update.Message;
+            _toast.Error("Error", update.Message);
         }
 
         private async Task<bool> RequeueReminders()

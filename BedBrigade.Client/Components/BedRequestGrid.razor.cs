@@ -460,27 +460,7 @@ namespace BedBrigade.Client.Components
             }
 
         }
-
-        private void Add()
-        {
-            if(_lc == null || AuthService == null || Locations == null)
-            {
-                Log.Error("One or more required services or data are not available for Add Bed Request operation.");
-                return;
-            }
-
-            HeaderTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
-            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
-            BedRequest.LocationId = AuthService.LocationId;
-            BedRequest.PrimaryLanguage = "English";
-
-            var location = Locations.FirstOrDefault(o => o.LocationId == AuthService.LocationId);
-
-            if (location != null)
-            {
-                BedRequest.Group = location.Group;
-            }
-        }
+        
 
         private async Task NavigateToAdd()
         {
@@ -522,18 +502,6 @@ namespace BedBrigade.Client.Components
             await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
             Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
-        }
-
-        private async Task Save(ActionEventArgs<BedRequest> args)
-        {
-            // Placeholder - old grid save removed. Never called.
-            await Task.CompletedTask;
-        }
-
-        protected async Task Cancel()
-        {
-            // Placeholder - old grid cancel removed.
-            await Task.CompletedTask;
         }
 
         protected void DataBound()
@@ -812,31 +780,6 @@ namespace BedBrigade.Client.Components
             IsDialogVisible = false;
         }
 
-        public void OnLanguageChange(ChangeEventArgs<string, string> args)
-        {
-            SpeakEnglishVisibility = "hidden";
-            if (args.Value != null)
-            {
-                if (args.Value.ToString() != "English")
-                {
-                    SpeakEnglishVisibility = "visible";
-                }
-            }
-        }
-             
 
-        public void OnLocationChange(ChangeEventArgs<int, Location> args)
-        {
-            if (args.Value > 0 && BedRequest != null && Locations != null)
-            {
-                var location = Locations.FirstOrDefault(o => o.LocationId == args.Value);
-
-                if (location != null)
-                {
-                    BedRequest.Group = location.Group;
-                    StateHasChanged();
-                }
-            }
-        }
     }
 }
