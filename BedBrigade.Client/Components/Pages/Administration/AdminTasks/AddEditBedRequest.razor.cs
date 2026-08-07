@@ -61,6 +61,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private BedRequestStatus? _originalStatus;
         private BedRequestStatus? _lastSelectedStatus;
 
+        // Default target URL to navigate back to after saving or canceling
+        // This is overridden in GetOrCreateScheduleForBedRequestDeliveryDate if a new schedule is created
+        private string _targetUrl = "/administration/manage/bedrequests";
+
         protected bool OnlyRead { get; set; } = false;
         public string SpeakEnglishVisibility = "hidden";
         protected Dictionary<string, object> DescriptionHtmlAttribute { get; set; } = new Dictionary<string, object>()
@@ -253,7 +257,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 if (_nav != null)
                 {
-                    _nav.NavigateTo("/administration/manage/bedrequests");
+                    _nav.NavigateTo(_targetUrl);
                 }
                 return;
             }
@@ -272,7 +276,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             // After save navigate back to main grid page
             if (_nav != null)
             {
-                _nav.NavigateTo("/administration/manage/bedrequests");
+                _nav.NavigateTo(_targetUrl);
             }
         }
 
@@ -393,16 +397,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         await SendDeliveryReminderEmail(updateResult.Data, scheduleResult.Data);
                         await SendDeliveryReminderSms(updateResult.Data, scheduleResult.Data);
                     }
-                    else
-                    {
-                        return;
-                    }
                 }
-
-                Model = updateResult.Data;
-                InitializeValidationContext();
-                _originalStatus = Model.Status;
-                _lastSelectedStatus = Model.Status;
+                UpdateModel(updateResult.Data);
 
                 _toastService?.Success("Update Successful", "The BedRequest was updated successfully");
             }
@@ -410,9 +406,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 Log.Error($"Unable to update BedRequest {bedRequest.BedRequestId} : {updateResult.Message}");
                 _toastService?.Error("Update Unsuccessful", "The BedRequest was not updated successfully");
-                return;
             }
+        }
 
+        private void UpdateModel(Common.Models.BedRequest bedRequest)
+        {
+            Model = bedRequest;
+            InitializeValidationContext();
+            _originalStatus = Model.Status;
+            _lastSelectedStatus = Model.Status;
         }
 
         private async Task SendDeliveryReminderSms(Common.Models.BedRequest model, Common.Models.Schedule scheduleResultData)
@@ -479,15 +481,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
                         if (updateResponse.Success && updateResponse.Data != null)
                         {
-                            await SendDeliveryReminderEmail(updateResponse.Data, scheduleResponse.Data);
-                            await SendDeliveryReminderSms(updateResponse.Data, scheduleResponse.Data);
-                        }
-
-                        // Redirect to schedule edit page with flag indicating this came from a bed request
-                        if (_nav != null)
-                        {
-                            _nav.NavigateTo($"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true", true);
-                            return new ServiceResponse<Common.Models.Schedule>("Navigating to schedule page");
+                            _targetUrl = $"/administration/admintasks/addeditschedule/{model.LocationId}/{scheduleResponse.Data.ScheduleId}?fromBedRequest=true";
+                            UpdateModel(updateResponse.Data);
                         }
                     }
                 }
@@ -572,7 +567,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (_nav != null)
             {
-                _nav.NavigateTo("/administration/manage/bedrequests");
+                _nav.NavigateTo(_targetUrl);
             }
         }
 
