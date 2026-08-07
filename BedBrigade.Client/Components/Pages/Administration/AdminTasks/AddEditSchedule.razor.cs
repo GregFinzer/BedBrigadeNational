@@ -23,6 +23,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private IUserDataService _svcUser { get; set; }
         [Inject] private IConfigurationDataService _svcConfig { get; set; }
+        [Inject] private IBedRequestDataService _svcBedRequest { get; set; }
+        [Inject] private ISignUpDataService _svcSignUp { get; set; }
+        [Inject] private IEmailQueueDataService _svcEmailQueue { get; set; }
+        [Inject] private ISmsQueueDataService _svcSmsQueue { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
 
         public string ErrorMessage { get; set; } = string.Empty;
         public Common.Models.Schedule Model { get; set; } = new();
@@ -43,6 +49,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private bool _isFromBedRequest = false;
         private bool _showVerificationDialog = false;
+        private DateTime? _originalEventDateScheduled;
 
         protected override async Task OnInitializedAsync()
         {
@@ -102,6 +109,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
+                    _originalEventDateScheduled = Model.EventDateScheduled;
                     // Split date/time for editors
                     ScheduleStartDate = Model.EventDateScheduled.Date;
                     ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
@@ -248,7 +256,32 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     var update = await _svcSchedule.UpdateAsync(Model);
                     if (update.Success)
                     {
-                        _toast.Success("Success", "Schedule updated successfully");
+                        bool remindersRequeued = true;
+                        if (_originalEventDateScheduled.HasValue &&
+                            _originalEventDateScheduled.Value != Model.EventDateScheduled)
+                        {
+                            try
+                            {
+                                remindersRequeued = await RequeueReminders();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
+                                    Model.ScheduleId);
+                                remindersRequeued = false;
+                            }
+                        }
+
+                        if (remindersRequeued)
+                        {
+                            _toast.Success("Success", "Schedule updated successfully");
+                        }
+                        else
+                        {
+                            _toast.Warning("Schedule Updated",
+                                "The schedule was updated, but one or more reminders could not be requeued.");
+                        }
+
                         var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
                         _nav.NavigateTo(redirectUrl);
                         return;
@@ -278,6 +311,86 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 _toast.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
             }
 
+        }
+
+        private async Task<bool> RequeueReminders()
+        {
+            bool success = true;
+
+            if (Model.EventType == EventType.Delivery)
+            {
+                var bedRequestsResult = await _svcBedRequest.GetAllForScheduleId(Model.ScheduleId);
+                if (!bedRequestsResult.Success || bedRequestsResult.Data == null)
+                {
+                    Log.Error("Unable to get bed requests for schedule {ScheduleId}: {Message}",
+                        Model.ScheduleId, bedRequestsResult.Message);
+                    success = false;
+                }
+                else
+                {
+                    foreach (var bedRequest in bedRequestsResult.Data)
+                    {
+                        success &= await RequeueDeliveryReminders(bedRequest);
+                    }
+                }
+            }
+
+            var signUpsResult = await _svcSignUp.GetAllForScheduleIdAsync(Model.ScheduleId);
+            if (!signUpsResult.Success || signUpsResult.Data == null)
+            {
+                Log.Error("Unable to get volunteer signups for schedule {ScheduleId}: {Message}",
+                    Model.ScheduleId, signUpsResult.Message);
+                return false;
+            }
+
+            foreach (var signUp in signUpsResult.Data)
+            {
+                success &= await RequeueSignUpReminders(signUp);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> RequeueDeliveryReminders(Common.Models.BedRequest bedRequest)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedByBedRequestId(bedRequest.BedRequestId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedSmsByBedRequestId(bedRequest.BedRequestId);
+            var emailResult = await _svcEmailBuilder.QueueDeliveryEmailReminder(bedRequest, Model);
+            var smsResult = await _sendSmsLogic.QueueDeliverySmsReminder(bedRequest, Model);
+
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued delivery emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued delivery SMS messages"),
+                (emailResult.Success, emailResult.Message, "queue the delivery email reminder"),
+                (smsResult.Success, smsResult.Message, "queue the delivery SMS reminder"));
+        }
+
+        private async Task<bool> RequeueSignUpReminders(SignUp signUp)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            var emailResult = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(signUp);
+            var smsResult = await _sendSmsLogic.QueueSignUpSmsReminder(signUp);
+
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued signup emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued signup SMS messages"),
+                (emailResult.Success, emailResult.Message, "queue the signup email reminder"),
+                (smsResult.Success, smsResult.Message, "queue the signup SMS reminder"));
+        }
+
+        private bool LogReminderFailures(params (bool Success, string Message, string Operation)[] results)
+        {
+            bool success = true;
+
+            foreach (var result in results.Where(result => !result.Success))
+            {
+                Log.Error("Failed to {Operation} for schedule {ScheduleId}: {Message}",
+                    result.Operation, Model.ScheduleId, result.Message);
+                success = false;
+            }
+
+            return success;
         }
 
         protected void HandleCancel()

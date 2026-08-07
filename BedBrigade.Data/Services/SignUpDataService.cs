@@ -137,6 +137,18 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
+    public async Task<ServiceResponse<List<SignUp>>> GetAllForScheduleIdAsync(int scheduleId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<SignUp>();
+            var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
+                .ToListAsync();
+
+            return new ServiceResponse<List<SignUp>>("Found for ScheduleId", true, result);
+        }
+    }
+    
     public async Task<ServiceResponse<List<SignUp>>> GetSignUpsForDashboard(int locationId)
     {
         // Calculate target date to include the next two Saturdays
