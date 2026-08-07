@@ -246,7 +246,7 @@ namespace BedBrigade.Client.Components.Pages
             newRequest.LocationId = SearchLocation.ddlValue;
             DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
 
-            if (nextEligibleDate.HasValue)
+            if (nextEligibleDate.HasValue && nextEligibleDate.Value > DateTime.Today)
             {
                 await ShowValidationMessage(_lc.Keys["RecentlyGivenBed"] + " " + nextEligibleDate.Value.ToShortDateString());
                 return false;
