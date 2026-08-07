@@ -14,6 +14,7 @@ using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 using System.Diagnostics;
+using System.Text;
 
 
 namespace BedBrigade.Client.Components
@@ -36,6 +37,8 @@ namespace BedBrigade.Client.Components
         [Inject] private ToastService ToastService { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;
         [Inject] private IGeoLocationQueueDataService GeoLocationQueueDataService { get; set; } = default!;
+        [Inject] private IScheduleDataService ScheduleDataService { get; set; } = default!;
+        [Inject] private IMailMergeLogic MailMergeLogic { get; set; } = default!;
         [Parameter] public string? Id { get; set; }
 
         //private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -590,7 +593,7 @@ namespace BedBrigade.Client.Components
         }
 
 
-        private async void DownloadDeliverySheet()
+        private async Task DownloadDeliverySheet()
         {
             List<BedRequest> selectedBedRequests = new List<BedRequest>();
 
@@ -606,9 +609,17 @@ namespace BedBrigade.Client.Components
 
 
                 selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                int selectedLocation = selectedBedRequests.First().LocationId;
-                string? group = selectedBedRequests.First().Group;
+                BedRequest firstBedRequest = selectedBedRequests.First();
+                int selectedLocation = firstBedRequest.LocationId;
+                string? group = firstBedRequest.Group;
+                Schedule? schedule = null;
 
+                if (firstBedRequest.ScheduleId.HasValue)
+                {
+                    var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
+                    schedule = scheduleResponse.Data;
+                }
+                
                 var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
                 string? deliveryChecklist = string.Empty;
 
@@ -619,6 +630,11 @@ namespace BedBrigade.Client.Components
                 if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
                 {
                     deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                    if (schedule != null)
+                    {
+                        StringBuilder sb = new StringBuilder(deliveryChecklist);
+                        deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
+                    }
                 }
 
                 var scheduledBedRequestResult =
@@ -660,14 +676,29 @@ namespace BedBrigade.Client.Components
                     return;
                 }
                 var selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                int selectedLocation = selectedBedRequests.First().LocationId;
-                string? group = selectedBedRequests.First().Group;
+                var firstBedRequest = selectedBedRequests.First();
+                int selectedLocation = firstBedRequest.LocationId;
+                string? group = firstBedRequest.Group;
+                Schedule? schedule = null;
+                
+                if (firstBedRequest.ScheduleId.HasValue)
+                {
+                    var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
+                    schedule = scheduleResponse.Data;
+                }
+                
                 var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
                 string? deliveryChecklist = string.Empty;
                 var deliveryChecklistResult = await ContentDataService.GetSingleByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
                 if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
                 {
                     deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                    
+                    if (schedule != null)
+                    {
+                        StringBuilder sb = new StringBuilder(deliveryChecklist);
+                        deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
+                    }                    
                 }
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
                 var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
