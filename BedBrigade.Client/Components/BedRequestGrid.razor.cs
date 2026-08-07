@@ -563,8 +563,6 @@ namespace BedBrigade.Client.Components
 
         private async Task DownloadDeliverySheet()
         {
-            List<BedRequest> selectedBedRequests = new List<BedRequest>();
-
             try
             {
                 ShowSpinner = true;
@@ -575,40 +573,7 @@ namespace BedBrigade.Client.Components
                     return;
                 }
 
-
-                selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                BedRequest firstBedRequest = selectedBedRequests.First();
-                int selectedLocation = firstBedRequest.LocationId;
-                string? group = firstBedRequest.Group;
-                Schedule? schedule = null;
-
-                if (firstBedRequest.ScheduleId.HasValue)
-                {
-                    var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
-                    schedule = scheduleResponse.Data;
-                }
-                
-                var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
-                string? deliveryChecklist = string.Empty;
-
-                var deliveryChecklistResult =
-                    await ContentDataService.GetSingleByLocationAndContentType(selectedLocation,
-                        ContentType.DeliveryCheckList);
-
-                if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
-                {
-                    deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
-                    if (schedule != null)
-                    {
-                        StringBuilder sb = new StringBuilder(deliveryChecklist);
-                        deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
-                    }
-                }
-
-                var scheduledBedRequestResult =
-                    await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
-                List<BedRequest> scheduledBedRequests =
-                    scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                var (location, deliveryChecklist, scheduledBedRequests) = await BuildDataForDeliverySheet();
 
                 string fileName = DeliverySheetService.CreateDeliverySheetFileName(location, scheduledBedRequests);
                 Stream stream =
@@ -631,6 +596,45 @@ namespace BedBrigade.Client.Components
             {
                 ShowSpinner = false;
             }
+        }
+
+        private async Task<(Location? location, string? deliveryChecklist, List<BedRequest> scheduledBedRequests)> BuildDataForDeliverySheet()
+        {
+            List<BedRequest> selectedBedRequests;
+            selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+            BedRequest firstBedRequest = selectedBedRequests.First();
+            int selectedLocation = firstBedRequest.LocationId;
+            string? group = firstBedRequest.Group;
+            Schedule? schedule = null;
+
+            if (firstBedRequest.ScheduleId.HasValue)
+            {
+                var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
+                schedule = scheduleResponse.Data;
+            }
+                
+            var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+            string? deliveryChecklist = string.Empty;
+
+            var deliveryChecklistResult =
+                await ContentDataService.GetSingleByLocationAndContentType(selectedLocation,
+                    ContentType.DeliveryCheckList);
+
+            if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
+            {
+                deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                if (schedule != null)
+                {
+                    StringBuilder sb = new StringBuilder(deliveryChecklist);
+                    deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
+                }
+            }
+
+            var scheduledBedRequestResult =
+                await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
+            List<BedRequest> scheduledBedRequests =
+                scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+            return (location, deliveryChecklist, scheduledBedRequests);
         }
 
         private async void DownloadTeamSheet()
