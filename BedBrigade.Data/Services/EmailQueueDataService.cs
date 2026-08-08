@@ -377,6 +377,11 @@ namespace BedBrigade.Data.Services
 
         public async Task<ServiceResponse<string>> QueueEmail(EmailQueue email)
         {
+            if (string.IsNullOrWhiteSpace(email.ToAddress))
+            {
+                return new ServiceResponse<string>("Blank email, skipping", true);
+            }
+
             var duplicate = await GetDuplicateEmails(email);
 
             if (duplicate != null)
