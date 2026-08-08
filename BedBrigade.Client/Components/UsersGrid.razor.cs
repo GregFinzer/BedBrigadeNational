@@ -57,6 +57,7 @@ namespace BedBrigade.Client.Components
         public required SfMaskedTextBox phoneTextBox;
         public string ManageUsersMessage { get; set; } = "Manage Users";
         private string _userLocationName = string.Empty;
+        protected string? RecordText { get; set; } = "Loading Users ...";
         protected override async Task OnInitializedAsync()
         {
             try
@@ -543,6 +544,15 @@ namespace BedBrigade.Client.Components
         }
         protected void DataBound()
         {
+            if (BBUsers.Count == 0)
+            {
+                RecordText = "No User records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
+            
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

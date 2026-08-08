@@ -382,7 +382,14 @@ namespace BedBrigade.Client.Components
 
         protected void DataBound()
         {
-            if (Contacts.Count == 0) RecordText = "No ContactUs records found";
+            if (Contacts?.Count == 0)
+            {
+                RecordText = "No ContactUs records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

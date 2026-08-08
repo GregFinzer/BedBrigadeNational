@@ -70,7 +70,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 lstEventStatuses = EnumHelper.GetEventStatusItems();
                 lstEventTypes = EnumHelper.GetEventTypeItems();
                 DefaultSortColumns = new List<GridSortColumn> { new GridSortColumn { Field = EventDate, Direction = SortDirection.Ascending } };
-                
             }
             catch (Exception ex)
             {
@@ -294,7 +293,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected void DataBound()
         {
-            if (lstSchedules.Count == 0) RecordText = "No Schedule records found";
+            if (lstSchedules?.Count == 0)
+            {
+                RecordText = "No Schedule records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
+            
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

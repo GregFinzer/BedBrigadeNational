@@ -372,7 +372,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected void DataBound()
         {
-            if (Pages.Count == 0) RecordText = "No Page records found";
+            if (Pages?.Count == 0)
+            {
+                RecordText = "No Page records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;
