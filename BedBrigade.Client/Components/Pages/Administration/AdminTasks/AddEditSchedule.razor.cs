@@ -128,9 +128,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private async Task BuildModelForAdd()
         {
             Model = new Common.Models.Schedule();
-            Model.LocationId = LocationId ?? _svcAuth.LocationId;
+            Model.LocationId = LocationId.Value;
                 
-            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationIdAndUser(_svcAuth.LocationId);
+            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationIdAndUser(Model.LocationId, _currentUser?.UserName ?? string.Empty);
 
             if (scheduleResult.Success && scheduleResult.Data != null)
             {
@@ -234,14 +234,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 ? loc.BuildPostalCode : previousSchedule!.PostalCode;
 
             Model.OrganizerName = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerName) 
-                ? Common.Logic.StringUtil.InsertSpaces(_svcAuth.UserName) 
+                ? _currentUser?.FullName 
                 : previousSchedule!.OrganizerName;
 
             Model.OrganizerEmail = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerEmail)
-                ? _svcAuth.Email
+                ? _currentUser?.Email
                 : previousSchedule!.OrganizerEmail;
 
-            Model.OrganizerPhone = StringUtil.ExtractDigits(string.IsNullOrWhiteSpace(previousSchedule?.OrganizerPhone) ? _svcAuth.Phone : previousSchedule!.OrganizerPhone);
+            Model.OrganizerPhone = StringUtil.ExtractDigits(string.IsNullOrWhiteSpace(previousSchedule?.OrganizerPhone) ? _currentUser?.Phone : previousSchedule!.OrganizerPhone);
         }
 
 
