@@ -184,9 +184,8 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         }
     }
 
-    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationIdAndUser(int locationId)
+    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationIdAndUser(int locationId, string userName)
     {
-        string userName = GetUserName();
         string cacheKey =
             _cachingService.BuildCacheKey(GetEntityName(), $"GetLastScheduledByLocationIdAndUser({locationId}, {userName})");
         Schedule? cachedContent = _cachingService.Get<Schedule>(cacheKey);
