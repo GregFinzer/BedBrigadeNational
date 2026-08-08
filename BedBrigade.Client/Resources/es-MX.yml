@@ -1,6 +1,5 @@
 5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
 Active: Activo
-Add: Agregar
 Address: Dirección
 GenderAge: Género / Edad
 AmountColon: 'Importe:'
@@ -10,7 +9,6 @@ Back: Atrás
 BedBrigadeLocationEvents: Eventos de ubicación de Bed Brigade
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles no está establecido o no es un número entero
 BedBrigadeWeb: Web de la Brigada de Camas
-BedRequest: Solicitud de cama
 BedRequestDetails: Detalles de la solicitud de cama
 BedRequestFormNotCompleted: ¡El formulario de solicitud de cama no está completo!
 BedRequestFormCreated: Gracias por crear tu solicitud de cama. Revisa tu correo electrónico para ver si hay una confirmación. Si no recibes un correo en 5 minutos, revisa tu carpeta de correo no deseado.

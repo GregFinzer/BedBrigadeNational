@@ -180,6 +180,18 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         return result;
     }
 
+    public async Task<ServiceResponse<List<BedRequest>>> GetAllForScheduleId(int scheduleId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
+                    .ToListAsync();
+
+            return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+        }
+    }
+    
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId)
     {
         var result = await _commonService.GetAllForLocationAsync(this, locationId);

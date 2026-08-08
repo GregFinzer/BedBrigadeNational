@@ -11,5 +11,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<SignUp>>> GetSignUpsForDashboard(int locationId);
         Task<ServiceResponse<List<SignUpDisplayItem>>> GetSignUpsForSignUpGrid(int locationId, string filter);
         Task<ServiceResponse<List<Volunteer>>> GetVolunteersNotSignedUpForAnEvent(int locationId, int scheduleId);
+        Task<ServiceResponse<List<SignUp>>> GetAllForScheduleIdAsync(int scheduleId);
     }
 }
