@@ -611,6 +611,7 @@ namespace BedBrigade.Client.Components
             BedRequest firstBedRequest = selectedBedRequests.First();
             int selectedLocation = firstBedRequest.LocationId;
             string? group = firstBedRequest.Group;
+            DateTime? deliveryDateTime = firstBedRequest.DeliveryDate;
             Schedule? schedule = null;
 
             if (firstBedRequest.ScheduleId.HasValue)
@@ -639,7 +640,7 @@ namespace BedBrigade.Client.Components
             var scheduledBedRequestResult =
                 await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
             List<BedRequest> scheduledBedRequests =
-                scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
             return (location, deliveryChecklist, scheduledBedRequests);
         }
 
@@ -657,6 +658,8 @@ namespace BedBrigade.Client.Components
                 var firstBedRequest = selectedBedRequests.First();
                 int selectedLocation = firstBedRequest.LocationId;
                 string? group = firstBedRequest.Group;
+                DateTime? deliveryDateTime = firstBedRequest.DeliveryDate;
+                
                 Schedule? schedule = null;
                 
                 if (firstBedRequest.ScheduleId.HasValue)
@@ -679,7 +682,7 @@ namespace BedBrigade.Client.Components
                     }                    
                 }
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
-                var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
                 // We will include all teams present in scheduledBedRequests (group already filtered) - if need all groups remove Where above
                 string fileName = TeamSheetService.CreateTeamSheetFileName(location, scheduledBedRequests);
                 Stream stream = TeamSheetService.CreateTeamSheet(location, scheduledBedRequests, deliveryChecklist);
@@ -781,7 +784,7 @@ namespace BedBrigade.Client.Components
                 IsDialogVisible = true;
                 return false;
             }
-
+            
             return true;
         }
 
