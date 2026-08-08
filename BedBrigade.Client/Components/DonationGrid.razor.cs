@@ -71,7 +71,6 @@ namespace BedBrigade.Client.Components
                 await LoadDonations();
                 await LoadLocations();
                 await LoadDonationCampaigns();
-
             }
             catch (Exception ex)
             {
@@ -167,7 +166,6 @@ namespace BedBrigade.Client.Components
                     StateHasChanged();
                 }
             }
-
             await base.OnAfterRenderAsync(firstRender);
         }
 

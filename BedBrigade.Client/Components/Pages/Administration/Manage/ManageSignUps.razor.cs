@@ -52,7 +52,7 @@ public partial class ManageSignUps : ComponentBase
 
     // variables
 
-    protected string? RecordText { get; set; } = "Loading Schedules ...";
+    protected string? RecordText { get; set; } = "Loading Sign-Ups ...";
 
     // Grid references
 
@@ -106,7 +106,6 @@ public partial class ManageSignUps : ComponentBase
         }
 
     } 
-
 
     /// <summary>
     /// On loading of the Grid get the user grid persisted data
@@ -597,6 +596,17 @@ public partial class ManageSignUps : ComponentBase
         }
     }
 
+    protected void DataBound()
+    {
+        if (SignUpDisplayItems?.Count == 0)
+        {
+            RecordText = "No Sign-Up records found";
+        }
+        else
+        {
+            RecordText = "No Records found with current filters. Click the Reset button.";
+        }
+    }
 
     public class GridFilterOption
     {

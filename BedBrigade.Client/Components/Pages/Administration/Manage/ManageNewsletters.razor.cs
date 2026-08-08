@@ -265,7 +265,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected void DataBound()
         {
-            if (NewsletterRecords.ToList().Count == 0) RecordText = "No newsletters found";
+            if (NewsletterRecords?.Count == 0)
+            {
+                RecordText = "No Newsletter records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)
             {
                 NoPaging = true;

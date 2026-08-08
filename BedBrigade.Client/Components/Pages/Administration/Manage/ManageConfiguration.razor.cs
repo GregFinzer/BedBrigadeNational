@@ -71,7 +71,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 }
 
                 await LoadData();
-
             }
             catch (Exception ex)
             {
@@ -121,7 +120,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 Grid.EditSettings.AllowEditing = true;
                 StateHasChanged();
             }
-
             return base.OnAfterRenderAsync(firstRender);
         }
 
@@ -293,11 +291,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected void DataBound()
         {
-            if (ConfigRecs?.Any() != true)
+            if (ConfigRecs?.Count() == 0)
             {
-                RecordText = "No configurations found";
+                RecordText = "No Configuration Records found";
             }
-
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
+            
             if (Grid == null)
             {
                 return;

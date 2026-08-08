@@ -364,7 +364,14 @@ namespace BedBrigade.Client.Components
 
         protected void DataBound()
         {
-            if (Locations.Count == 0) RecordText = "No Location records found";
+            if (Locations?.Count == 0)
+            {
+                RecordText = "No Location records found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
             {
                 NoPaging = true;

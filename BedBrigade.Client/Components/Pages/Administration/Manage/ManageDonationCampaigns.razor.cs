@@ -279,7 +279,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         protected void DataBound()
         {
-            if (DonationCampaignRecords.ToList().Count == 0) RecordText = "No Donation Campaigns found";
+            if (DonationCampaignRecords?.Count == 0)
+            {
+                RecordText = "No Donation Campaigns found";
+            }
+            else
+            {
+                RecordText = "No Records found with current filters. Click the Reset button.";
+            }
+
             if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)
             {
                 NoPaging = true;

@@ -100,7 +100,6 @@ public partial class ManageMetroAreas : ComponentBase
                 StateHasChanged();
             }
         }
-
         return base.OnAfterRenderAsync(firstRender);
     }
 
@@ -275,7 +274,14 @@ public partial class ManageMetroAreas : ComponentBase
 
     protected void DataBound()
     {
-        if (MetroAreas.Count == 0) RecordText = "No Metro Area records found";
+        if (MetroAreas?.Count == 0)
+        {
+            RecordText = "No Metro Area records found";
+        }
+        else
+        {
+            RecordText = "No Records found with current filters. Click the Reset button.";
+        }
         if (Grid.TotalItemCount <= Grid.PageSettings.PageSize) //compare total grid data count with pagesize value 
         {
             NoPaging = true;
