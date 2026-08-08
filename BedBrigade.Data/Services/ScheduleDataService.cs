@@ -204,6 +204,12 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
                     .Where(o => o.LocationId == locationId && o.CreateUser == userName)
                     .OrderByDescending(o => o.EventDateScheduled).FirstOrDefaultAsync();
 
+                if (result == null)
+                {
+                    return new ServiceResponse<Schedule?>(
+                        $"No schedule found for location {locationId} and user {userName}", true, null);
+                }
+
                 _cachingService.Set(cacheKey, result);
                 return new ServiceResponse<Schedule>($"GetLastScheduledByLocationIdAndUser", true, result);
             }
