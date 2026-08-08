@@ -68,10 +68,19 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         return result;
     }
 
-    public async Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway)
+    public async Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway, bool includeToday)
     {
         // Retrieve available schedules for the specified location.
-        var availableSchedulesResponse = await GetAvailableSchedulesByLocationId(locationId);
+        ServiceResponse<List<Schedule>> availableSchedulesResponse;
+        if (includeToday)
+        {
+            availableSchedulesResponse = await GetFutureSchedulesByLocationId(locationId);
+        }
+        else
+        {
+            availableSchedulesResponse = await GetAvailableSchedulesByLocationId(locationId);
+        }
+        
         if (!availableSchedulesResponse.Success || availableSchedulesResponse.Data == null)
         {
             return availableSchedulesResponse;
@@ -136,10 +145,10 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         catch (DbException ex)
         {
             return new ServiceResponse<List<Schedule>>(
-                $"Error GetFutureSchedulesByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+                $"Error GetAvailableSchedulesByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
     }
-
+        
     private void FillEventSelects(List<Schedule> schedules)
     {
         foreach (var schedule in schedules.ToList())

@@ -34,7 +34,7 @@ namespace BedBrigade.Client.Services
 
             foreach (var tag in tags)
             {
-                var scheduleResult = await _scheduleDataService.GetScheduleForMonthsAndLocation(locationId, tag.months);
+                var scheduleResult = await _scheduleDataService.GetScheduleForMonthsAndLocation(locationId, tag.months, false);
 
                 if (!scheduleResult.Success || scheduleResult.Data == null)
                     return htmlText;
