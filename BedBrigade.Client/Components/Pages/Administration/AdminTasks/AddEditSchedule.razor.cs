@@ -7,6 +7,7 @@ using BedBrigade.Data.Migrations;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Serilog;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -22,6 +23,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IAuthService _svcAuth { get; set; }
         [Inject] private IUserDataService _svcUser { get; set; }
         [Inject] private IConfigurationDataService _svcConfig { get; set; }
+        [Inject] private IBedRequestDataService _svcBedRequest { get; set; }
+        [Inject] private ISignUpDataService _svcSignUp { get; set; }
+        [Inject] private IEmailQueueDataService _svcEmailQueue { get; set; }
+        [Inject] private ISmsQueueDataService _svcSmsQueue { get; set; }
+        [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
+        [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
 
         public string ErrorMessage { get; set; } = string.Empty;
         public Common.Models.Schedule Model { get; set; } = new();
@@ -42,6 +49,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private bool _isFromBedRequest = false;
         private bool _showVerificationDialog = false;
+        private DateTime? _originalEventDateScheduled;
 
         protected override async Task OnInitializedAsync()
         {
@@ -101,6 +109,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
+                    _originalEventDateScheduled = Model.EventDateScheduled;
                     // Split date/time for editors
                     ScheduleStartDate = Model.EventDateScheduled.Date;
                     ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
@@ -121,11 +130,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             Model = new Common.Models.Schedule();
             Model.LocationId = LocationId ?? _svcAuth.LocationId;
                 
-            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationId(_svcAuth.LocationId);
+            var scheduleResult = await _svcSchedule.GetLastScheduledByLocationIdAndUser(_svcAuth.LocationId);
 
             if (scheduleResult.Success && scheduleResult.Data != null)
             {
-                Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.Date.AddDays(7);
+                if (scheduleResult.Data.EventDateScheduled.Date < DateTime.Now.Date)
+                {
+                    Model.EventDateScheduled = DateUtil.NextSaturday();
+                }
+                else
+                {
+                    Model.EventDateScheduled = scheduleResult.Data.EventDateScheduled.Date.AddDays(7);
+                }
             }
             else
             {
@@ -134,60 +150,98 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (DateUtil.IsFirstSaturdayOfTheMonth(Model.EventDateScheduled))
             {
-                await SetBuildValues();
+                await SetBuildValues(scheduleResult.Data);
             }
             else
             {
-                await SetDeliveryValues();
+                await SetDeliveryValues(scheduleResult.Data);
             }
 
             ScheduleStartDate = Model.EventDateScheduled.Date;
             ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
-
-            Location loc = Locations.First(l => l.LocationId == Model.LocationId);
-            Model.Address = loc.BuildAddress;
-            Model.City = loc.BuildCity;
-            Model.State = loc.BuildState;
-            Model.PostalCode = loc.BuildPostalCode;
-            Model.OrganizerName = _currentUser.FullName;
-            Model.OrganizerEmail = _currentUser.Email;
-            Model.OrganizerPhone = _currentUser.Phone.FormatPhoneNumber();
         }
 
-        private async Task SetDeliveryValues()
+        private async Task SetDeliveryValues(Common.Models.Schedule? previousSchedule)
         {
-            Model.EventName = "Delivery";
+            Model.GroupName = previousSchedule?.GroupName ?? string.Empty;
             Model.EventType = EventType.Delivery;
-            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultDeliveryTime, Model.LocationId);
-            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
-            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
-            Model.EventDurationHours = defaultDuration;
+            Model.EventName = string.IsNullOrWhiteSpace(Model.GroupName) ? "Delivery" : Model.GroupName + " Delivery";
+
             int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryMaxVolunteers, Model.LocationId);
-            Model.VolunteersMax = defaultMaxVolunteers;
+            Model.VolunteersMax = previousSchedule == null ? defaultMaxVolunteers : previousSchedule.VolunteersMax;
+
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryTime, Model.LocationId);
+            Model.EventDateScheduled = previousSchedule == null 
+                ? Model.EventDateScheduled.AddHours(defaultHour) 
+                : Model.EventDateScheduled.AddHours(previousSchedule.EventDateScheduled.Hour);
+
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
+            Model.EventDurationHours = previousSchedule == null ? defaultDuration : previousSchedule.EventDurationHours;
+
+            Model.EventStatus = EventStatus.Scheduled;
+
+            FillAddressAndOrganizer(previousSchedule);
+
             string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryEventNote, Model.LocationId);
-            Model.EventNote = defaultEventNote;
+            Model.EventNote = previousSchedule != null && previousSchedule.EventType == EventType.Delivery ? previousSchedule.EventNote : defaultEventNote;
         }
 
-        private async Task SetBuildValues()
+        private async Task SetBuildValues(Common.Models.Schedule? previousSchedule)
         {
-            Model.EventName = "Build";
             Model.EventType = EventType.Build;
-            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultBuildTime, Model.LocationId);
-            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
-            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
-                ConfigNames.DefaultBuildDurationHours, Model.LocationId);
-            Model.EventDurationHours = defaultDuration;
+            Model.GroupName = previousSchedule?.GroupName ?? string.Empty;
+            Model.EventName = string.IsNullOrWhiteSpace(Model.GroupName) ? "Build" : Model.GroupName + " Build";
+
             int defaultMaxVolunteers = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildMaxVolunteers, Model.LocationId);
             Model.VolunteersMax = defaultMaxVolunteers;
+
+            int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildTime, Model.LocationId);
+            Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
+
+            int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                ConfigNames.DefaultBuildDurationHours, Model.LocationId);
+            Model.EventDurationHours = defaultDuration;
+
+            Model.EventStatus = EventStatus.Scheduled;
+
+            FillAddressAndOrganizer(previousSchedule);
+
             string defaultEventNote = await _svcConfig.GetConfigValueAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildEventNote, Model.LocationId);
             Model.EventNote =defaultEventNote;
+        }
+
+        private void FillAddressAndOrganizer(Common.Models.Schedule? previousSchedule)
+        {
+            Location loc = Locations.First(l => l.LocationId == Model.LocationId);
+
+            Model.Address = string.IsNullOrWhiteSpace(previousSchedule?.Address) 
+                ? loc.BuildAddress : previousSchedule!.Address;
+
+            Model.City = string.IsNullOrWhiteSpace(previousSchedule?.City) 
+                ? loc.BuildCity : previousSchedule!.City;
+
+            Model.State = string.IsNullOrWhiteSpace(previousSchedule?.State) 
+                ? loc.BuildState : previousSchedule!.State;
+
+            Model.PostalCode = string.IsNullOrWhiteSpace(previousSchedule?.PostalCode)
+                ? loc.BuildPostalCode : previousSchedule!.PostalCode;
+
+            Model.OrganizerName = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerName) 
+                ? Common.Logic.StringUtil.InsertSpaces(_svcAuth.UserName) 
+                : previousSchedule!.OrganizerName;
+
+            Model.OrganizerEmail = string.IsNullOrWhiteSpace(previousSchedule?.OrganizerEmail)
+                ? _svcAuth.Email
+                : previousSchedule!.OrganizerEmail;
+
+            Model.OrganizerPhone = StringUtil.ExtractDigits(string.IsNullOrWhiteSpace(previousSchedule?.OrganizerPhone) ? _svcAuth.Phone : previousSchedule!.OrganizerPhone);
         }
 
 
@@ -199,31 +253,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
                 if (ScheduleId.HasValue)
                 {
-                    var update = await _svcSchedule.UpdateAsync(Model);
-                    if (update.Success)
-                    {
-                        _toast.Success("Success", "Schedule updated successfully");
-                        var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
-                        _nav.NavigateTo(redirectUrl);
-                        return;
-                    }
-                    ErrorMessage = update.Message;
-                    _toast.Error("Error", update.Message);
-                    return;
-                }
-
-                // Create
-                var create = await _svcSchedule.CreateAsync(Model);
-                if (create.Success)
-                {
-                    _toast.Success("Success", "Schedule created successfully");
-                    var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
-                    _nav.NavigateTo(redirectUrl);
+                    await HandleUpdate();
                 }
                 else
                 {
-                    ErrorMessage = create.Message;
-                    _toast.Error("Error", create.Message);
+                    await HandleCreate();
                 }
             }
             catch (Exception ex)
@@ -232,6 +266,141 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 _toast.Error("Save Schedule", $"An error occurred while saving the schedule: {ex.Message}");
             }
 
+        }
+
+        private async Task HandleCreate()
+        {
+            var create = await _svcSchedule.CreateAsync(Model);
+            if (create.Success)
+            {
+                _toast.Success("Success", "Schedule created successfully");
+                var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                _nav.NavigateTo(redirectUrl);
+            }
+            else
+            {
+                ErrorMessage = create.Message;
+                _toast.Error("Error", create.Message);
+            }
+        }
+
+        private async Task HandleUpdate()
+        {
+            var update = await _svcSchedule.UpdateAsync(Model);
+            if (update.Success)
+            {
+                bool remindersRequeued = true;
+                if (_originalEventDateScheduled.HasValue &&
+                    _originalEventDateScheduled.Value != Model.EventDateScheduled)
+                {
+                    try
+                    {
+                        remindersRequeued = await RequeueReminders();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
+                            Model.ScheduleId);
+                        remindersRequeued = false;
+                    }
+                }
+
+                if (remindersRequeued)
+                {
+                    _toast.Success("Success", "Schedule updated successfully");
+                }
+                else
+                {
+                    _toast.Warning("Schedule Updated",
+                        "The schedule was updated, but one or more reminders could not be requeued.");
+                }
+
+                var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
+                _nav.NavigateTo(redirectUrl);
+                return;
+            }
+            ErrorMessage = update.Message;
+            _toast.Error("Error", update.Message);
+        }
+
+        private async Task<bool> RequeueReminders()
+        {
+            bool success = true;
+
+            if (Model.EventType == EventType.Delivery)
+            {
+                var bedRequestsResult = await _svcBedRequest.GetAllForScheduleId(Model.ScheduleId);
+                if (!bedRequestsResult.Success || bedRequestsResult.Data == null)
+                {
+                    Log.Error("Unable to get bed requests for schedule {ScheduleId}: {Message}",
+                        Model.ScheduleId, bedRequestsResult.Message);
+                    success = false;
+                }
+                else
+                {
+                    foreach (var bedRequest in bedRequestsResult.Data)
+                    {
+                        success &= await RequeueDeliveryReminders(bedRequest);
+                    }
+                }
+            }
+
+            var signUpsResult = await _svcSignUp.GetAllForScheduleIdAsync(Model.ScheduleId);
+            if (!signUpsResult.Success || signUpsResult.Data == null)
+            {
+                Log.Error("Unable to get volunteer signups for schedule {ScheduleId}: {Message}",
+                    Model.ScheduleId, signUpsResult.Message);
+                return false;
+            }
+
+            foreach (var signUp in signUpsResult.Data)
+            {
+                success &= await RequeueSignUpReminders(signUp);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> RequeueDeliveryReminders(Common.Models.BedRequest bedRequest)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedByBedRequestId(bedRequest.BedRequestId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedSmsByBedRequestId(bedRequest.BedRequestId);
+            var emailResult = await _svcEmailBuilder.QueueDeliveryEmailReminder(bedRequest, Model);
+            var smsResult = await _sendSmsLogic.QueueDeliverySmsReminder(bedRequest, Model);
+
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued delivery emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued delivery SMS messages"),
+                (emailResult.Success, emailResult.Message, "queue the delivery email reminder"),
+                (smsResult.Success, smsResult.Message, "queue the delivery SMS reminder"));
+        }
+
+        private async Task<bool> RequeueSignUpReminders(SignUp signUp)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            var emailResult = await _svcEmailBuilder.QueueSignUpEmailReminderAsync(signUp);
+            var smsResult = await _sendSmsLogic.QueueSignUpSmsReminder(signUp);
+
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued signup emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued signup SMS messages"),
+                (emailResult.Success, emailResult.Message, "queue the signup email reminder"),
+                (smsResult.Success, smsResult.Message, "queue the signup SMS reminder"));
+        }
+
+        private bool LogReminderFailures(params (bool Success, string Message, string Operation)[] results)
+        {
+            bool success = true;
+
+            foreach (var result in results.Where(result => !result.Success))
+            {
+                Log.Error("Failed to {Operation} for schedule {ScheduleId}: {Message}",
+                    result.Operation, Model.ScheduleId, result.Message);
+                success = false;
+            }
+
+            return success;
         }
 
         protected void HandleCancel()

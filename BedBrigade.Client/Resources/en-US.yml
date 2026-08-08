@@ -1,6 +1,5 @@
 5CharactersContainingOnly: (5 characters containing only digits 0-9)
 Active: Active
-Add: Add
 Address: Address
 AmountColon: 'Amount:'
 AreYouAbleToTranslate: Are you able to translate?
@@ -9,7 +8,6 @@ Back: Back
 BedBrigadeLocationEvents: Bed Brigade Location Events
 BedBrigadeNearMeMaxMiles: BedBrigadeNearMeMaxMiles is not set or is not an integer
 BedBrigadeWeb: Bed Brigade Web
-BedRequest: Bed Request
 BedRequestDetails: Bed Request Details
 BedRequestFormNotCompleted: The Bed Request Form is not completed!
 BedRequestFormCreated: Thank you for creating your Bed Request. Check your email for a confirmation. If you do not receive an email in 5 minutes, please check your spam folder.

@@ -184,15 +184,16 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         }
     }
 
-    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationId(int locationId)
+    public async Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationIdAndUser(int locationId)
     {
+        string userName = GetUserName();
         string cacheKey =
-            _cachingService.BuildCacheKey(GetEntityName(), $"GetLastScheduledByLocationId({locationId})");
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetLastScheduledByLocationIdAndUser({locationId}, {userName})");
         Schedule? cachedContent = _cachingService.Get<Schedule>(cacheKey);
 
         if (cachedContent != null)
         {
-            return new ServiceResponse<Schedule>($"Found GetLastScheduledByLocationId in cache", true, cachedContent);
+            return new ServiceResponse<Schedule>($"Found GetLastScheduledByLocationIdAndUser in cache", true, cachedContent);
         }
 
         try
@@ -201,17 +202,17 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             {
                 var dbSet = ctx.Set<Schedule>();
                 var result = await dbSet
-                    .Where(o => o.LocationId == locationId)
+                    .Where(o => o.LocationId == locationId && o.CreateUser == userName)
                     .OrderByDescending(o => o.EventDateScheduled).FirstOrDefaultAsync();
 
                 _cachingService.Set(cacheKey, result);
-                return new ServiceResponse<Schedule>($"GetLastScheduledByLocationId", true, result);
+                return new ServiceResponse<Schedule>($"GetLastScheduledByLocationIdAndUser", true, result);
             }
         }
         catch (DbException ex)
         {
             return new ServiceResponse<Schedule>(
-                $"Error GetLastScheduledByLocationId for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+                $"Error GetLastScheduledByLocationIdAndUser for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
         }
     }
 

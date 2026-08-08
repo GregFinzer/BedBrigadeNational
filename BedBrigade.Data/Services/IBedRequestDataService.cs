@@ -27,5 +27,6 @@ namespace BedBrigade.Data.Services
         Task<int> MarkInvalidEmailForWaitingForBedRequest(List<string> emailList);
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
         Task<ServiceResponse<List<BedRequest>>> GetBedRequestsByUserAndStatus(List<BedRequestStatus> statuses);
+        Task<ServiceResponse<List<BedRequest>>> GetAllForScheduleId(int scheduleId);
     }
 }

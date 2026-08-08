@@ -14,6 +14,7 @@ using System.Security.Claims;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 using System.Diagnostics;
+using System.Text;
 
 
 namespace BedBrigade.Client.Components
@@ -36,6 +37,8 @@ namespace BedBrigade.Client.Components
         [Inject] private ToastService ToastService { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;
         [Inject] private IGeoLocationQueueDataService GeoLocationQueueDataService { get; set; } = default!;
+        [Inject] private IScheduleDataService ScheduleDataService { get; set; } = default!;
+        [Inject] private IMailMergeLogic MailMergeLogic { get; set; } = default!;
         [Parameter] public string? Id { get; set; }
 
         //private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -457,27 +460,7 @@ namespace BedBrigade.Client.Components
             }
 
         }
-
-        private void Add()
-        {
-            if(_lc == null || AuthService == null || Locations == null)
-            {
-                Log.Error("One or more required services or data are not available for Add Bed Request operation.");
-                return;
-            }
-
-            HeaderTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
-            ButtonTitle = @_lc.Keys["Add"] + " " + @_lc.Keys["BedRequest"];
-            BedRequest.LocationId = AuthService.LocationId;
-            BedRequest.PrimaryLanguage = "English";
-
-            var location = Locations.FirstOrDefault(o => o.LocationId == AuthService.LocationId);
-
-            if (location != null)
-            {
-                BedRequest.Group = location.Group;
-            }
-        }
+        
 
         private async Task NavigateToAdd()
         {
@@ -519,18 +502,6 @@ namespace BedBrigade.Client.Components
             await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
             Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
-        }
-
-        private async Task Save(ActionEventArgs<BedRequest> args)
-        {
-            // Placeholder - old grid save removed. Never called.
-            await Task.CompletedTask;
-        }
-
-        protected async Task Cancel()
-        {
-            // Placeholder - old grid cancel removed.
-            await Task.CompletedTask;
         }
 
         protected void DataBound()
@@ -590,10 +561,8 @@ namespace BedBrigade.Client.Components
         }
 
 
-        private async void DownloadDeliverySheet()
+        private async Task DownloadDeliverySheet()
         {
-            List<BedRequest> selectedBedRequests = new List<BedRequest>();
-
             try
             {
                 ShowSpinner = true;
@@ -604,27 +573,7 @@ namespace BedBrigade.Client.Components
                     return;
                 }
 
-
-                selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                int selectedLocation = selectedBedRequests.First().LocationId;
-                string? group = selectedBedRequests.First().Group;
-
-                var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
-                string? deliveryChecklist = string.Empty;
-
-                var deliveryChecklistResult =
-                    await ContentDataService.GetSingleByLocationAndContentType(selectedLocation,
-                        ContentType.DeliveryCheckList);
-
-                if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
-                {
-                    deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
-                }
-
-                var scheduledBedRequestResult =
-                    await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
-                List<BedRequest> scheduledBedRequests =
-                    scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                var (location, deliveryChecklist, scheduledBedRequests) = await BuildDataForDeliverySheet();
 
                 string fileName = DeliverySheetService.CreateDeliverySheetFileName(location, scheduledBedRequests);
                 Stream stream =
@@ -649,6 +598,45 @@ namespace BedBrigade.Client.Components
             }
         }
 
+        private async Task<(Location? location, string? deliveryChecklist, List<BedRequest> scheduledBedRequests)> BuildDataForDeliverySheet()
+        {
+            List<BedRequest> selectedBedRequests;
+            selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+            BedRequest firstBedRequest = selectedBedRequests.First();
+            int selectedLocation = firstBedRequest.LocationId;
+            string? group = firstBedRequest.Group;
+            Schedule? schedule = null;
+
+            if (firstBedRequest.ScheduleId.HasValue)
+            {
+                var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
+                schedule = scheduleResponse.Data;
+            }
+                
+            var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
+            string? deliveryChecklist = string.Empty;
+
+            var deliveryChecklistResult =
+                await ContentDataService.GetSingleByLocationAndContentType(selectedLocation,
+                    ContentType.DeliveryCheckList);
+
+            if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
+            {
+                deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                if (schedule != null)
+                {
+                    StringBuilder sb = new StringBuilder(deliveryChecklist);
+                    deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
+                }
+            }
+
+            var scheduledBedRequestResult =
+                await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
+            List<BedRequest> scheduledBedRequests =
+                scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+            return (location, deliveryChecklist, scheduledBedRequests);
+        }
+
         private async void DownloadTeamSheet()
         {
             try
@@ -660,14 +648,29 @@ namespace BedBrigade.Client.Components
                     return;
                 }
                 var selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                int selectedLocation = selectedBedRequests.First().LocationId;
-                string? group = selectedBedRequests.First().Group;
+                var firstBedRequest = selectedBedRequests.First();
+                int selectedLocation = firstBedRequest.LocationId;
+                string? group = firstBedRequest.Group;
+                Schedule? schedule = null;
+                
+                if (firstBedRequest.ScheduleId.HasValue)
+                {
+                    var scheduleResponse = await ScheduleDataService.GetByIdAsync(firstBedRequest.ScheduleId);
+                    schedule = scheduleResponse.Data;
+                }
+                
                 var location = Locations.FirstOrDefault(l => l.LocationId == selectedLocation);
                 string? deliveryChecklist = string.Empty;
                 var deliveryChecklistResult = await ContentDataService.GetSingleByLocationAndContentType(selectedLocation, ContentType.DeliveryCheckList);
                 if (deliveryChecklistResult.Success && deliveryChecklistResult.Data != null)
                 {
                     deliveryChecklist = deliveryChecklistResult.Data.ContentHtml;
+                    
+                    if (schedule != null)
+                    {
+                        StringBuilder sb = new StringBuilder(deliveryChecklist);
+                        deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
+                    }                    
                 }
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
                 var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
@@ -781,31 +784,6 @@ namespace BedBrigade.Client.Components
             IsDialogVisible = false;
         }
 
-        public void OnLanguageChange(ChangeEventArgs<string, string> args)
-        {
-            SpeakEnglishVisibility = "hidden";
-            if (args.Value != null)
-            {
-                if (args.Value.ToString() != "English")
-                {
-                    SpeakEnglishVisibility = "visible";
-                }
-            }
-        }
-             
 
-        public void OnLocationChange(ChangeEventArgs<int, Location> args)
-        {
-            if (args.Value > 0 && BedRequest != null && Locations != null)
-            {
-                var location = Locations.FirstOrDefault(o => o.LocationId == args.Value);
-
-                if (location != null)
-                {
-                    BedRequest.Group = location.Group;
-                    StateHasChanged();
-                }
-            }
-        }
     }
 }
