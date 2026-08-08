@@ -563,6 +563,11 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     //This is currently only used by QueueDeliverySmsReminder and QueueSignUpSmsReminder
     public async Task<ServiceResponse<string>> QueueSms(SmsQueue smsQueue)
     {
+        if (string.IsNullOrWhiteSpace(StringUtil.ExtractDigits(smsQueue.ToPhoneNumber)))
+        {
+            return new ServiceResponse<string>("Blank phone number, skipping", true);
+        }
+
         var duplicate = await GetDuplicateSms(smsQueue);
 
         if (duplicate != null)
