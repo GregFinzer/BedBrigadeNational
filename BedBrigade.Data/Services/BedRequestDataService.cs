@@ -38,8 +38,31 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         _scheduleDataService = scheduleDataService;
     }
 
+    private void SetContacted(BedRequest entity)
+    {
+        if (entity.Contacted)
+            return;
+
+        string[] words =
+        {
+            "lm",
+            "txt",
+            "msg",
+            "message",
+            "called",
+            "spoke",
+            "phoned"
+        };
+
+        entity.Contacted = entity.Status != BedRequestStatus.Waiting
+                           || words.Any(o => (entity.Notes ?? string.Empty).ToLower().Contains(o))
+                           || (entity.Reference ?? string.Empty).ToLower().Contains("phone");
+    }
+    
     public override async Task<ServiceResponse<BedRequest>> CreateAsync(BedRequest entity)
     {
+        SetContacted(entity);
+        
         //Always set the longitude and latitude if the postal code is valid
         var parser = LibraryFactory.AddressParser;
 
@@ -83,6 +106,8 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public override async Task<ServiceResponse<BedRequest>> UpdateAsync(BedRequest entity)
     {
+        SetContacted(entity);
+        
         var allLocationsResponse = await _locationDataService.GetAllAsync();
         if (!allLocationsResponse.Success || allLocationsResponse.Data == null)
         {
