@@ -39,7 +39,6 @@ namespace BedBrigade.Client.Components
         private string strAlertType = "alert alert-danger";
         private bool PostalCodeSuccess = false;
         private string SearchDisplay = "";
-        private bool SubmitDisabled = true;
         private bool IsSearching = false;
 
         protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
@@ -94,7 +93,6 @@ namespace BedBrigade.Client.Components
         public async Task SetZipBoxFocus()
         {
             await maskObj.FocusAsync();
-            SubmitDisabled = true;
         }
 
         async Task CallLocationChanged()
@@ -221,12 +219,7 @@ namespace BedBrigade.Client.Components
             } // Locations Found
 
         } // Search Result
-
-        private void ZipCodeInputChange()
-        {
-            SubmitDisabled = PostalCode.Length != 5 || !PostalCode.All(c => Char.IsNumber(c));
-            StateHasChanged();
-        }        
+        
         
         public async Task HandleMaskFocus()
         {

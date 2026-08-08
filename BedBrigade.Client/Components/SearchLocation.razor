@@ -21,14 +21,13 @@
                                  @bind-Value="@PostalCode"
                                  Created="OnCreateInput"
                                  Placeholder="@_lc.Keys["ZipCode"]"
-                                 @onkeyup="@ZipCodeInputChange"
                                  @onkeydown="@HandleKeyDown"
                                  Focus="HandleMaskFocus"
                                  Width="200px">
                 </SfMaskedTextBox>
             </p>
             <div class="widget-body">
-                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())" disabled="@SubmitDisabled">@_lc.Keys["SearchBedBrigadeLocations"]</button>
+                <button id="search" type="button" class="btn btn-primary btn-desktop" @onclick="(() => HandleSearchClick())">@_lc.Keys["SearchBedBrigadeLocations"]</button>
                 <button id="search" type="button" class="btn btn-primary btn-mobile" @onclick="(() => HandleSearchClick())">@_lc.Keys["Search"]</button>
             </div>
         </div>
