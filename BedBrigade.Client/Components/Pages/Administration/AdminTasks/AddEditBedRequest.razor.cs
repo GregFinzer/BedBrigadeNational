@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.EnumModels;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.EnumModels;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -35,7 +36,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
         [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
-
+        private bool _isLoading = true;
         public DateTime? DeliveryDate { get; set; }
         public DateTime? DeliveryTime { get; set; }
         [Parameter] public string? Id { get; set; }
@@ -96,6 +97,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     {
                         Model.Phone = phoneTextBox.Value;
                     }
+
                     if (zipTextBox != null)
                     {
                         Model.PostalCode = zipTextBox.Value;
@@ -106,6 +108,10 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 Log.Error(ex, $"AddEditBedRequest.OnInitializedAsync");
                 _toastService?.Error(IsError, "An error occurred while initializing the Bed Request editor.");
+            }
+            finally
+            {
+                _isLoading = false;
             }
         }
 
@@ -234,14 +240,52 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private void DeliveryDateChanged(ChangedEventArgs<DateTime?> args)
+        private async Task DeliveryDateChanged(ChangedEventArgs<DateTime?> args)
         {
-            
+            if (_isLoading)
+                return;
+
+            DateTime? changedDate = args.Value;
+
+            if (changedDate.HasValue)
+            {
+                if (Model.DeliveryDate.HasValue)
+                {
+                    Model.DeliveryDate = changedDate;
+                }
+                else
+                {
+                    int defaultHour = await _svcConfiguration.GetConfigValueAsIntAsync(ConfigSection.Schedule,
+                        ConfigNames.DefaultDeliveryTime, Model.LocationId);
+
+                    changedDate= changedDate.Value.Date.AddHours(defaultHour);
+                    Model.DeliveryDate = changedDate.Value;
+                    DeliveryTime = Model.DeliveryDate;
+                }
+            }
+            else
+            {
+                Model.DeliveryDate = null;
+                DeliveryTime = null;
+            }
         }
 
         private void DeliveryTimeChanged(Syncfusion.Blazor.Calendars.ChangeEventArgs<DateTime?> args)
         {
+            if (_isLoading)
+                return;
 
+            DateTime? changedTime = args.Value;
+
+            if (changedTime.HasValue && DeliveryDate.HasValue)
+            {
+                Model.DeliveryDate = DeliveryDate.Value.Date.AddHours(changedTime.Value.Hour)
+                    .AddMinutes(changedTime.Value.Minute);
+            }
+            else if (!changedTime.HasValue && DeliveryDate.HasValue)
+            {
+                Model.DeliveryDate = Model.DeliveryDate.Value.Date;
+            }
         }
 
         // Fix CS8602: Add null checks before dereferencing _nav
@@ -559,7 +603,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (bedRequest.Status == BedRequestStatus.Scheduled && !bedRequest.DeliveryDate.HasValue)
             {
-                const string validationMessage = "A scheduled BedRequest must have a delivery date before it can be saved.";
+                const string validationMessage = "A scheduled Bed Request must have a delivery date before it can be saved.";
+                _validationMessageStore.Add(fieldIdentifier, validationMessage);
+            }
+            else if (bedRequest.Status == BedRequestStatus.Scheduled
+                     && bedRequest.DeliveryDate.HasValue
+                     && bedRequest.DeliveryDate.Value.Hour == 0)
+            {
+                const string validationMessage = "A scheduled Bed Request must have a delivery time before it can be saved.";
                 _validationMessageStore.Add(fieldIdentifier, validationMessage);
             }
         }
