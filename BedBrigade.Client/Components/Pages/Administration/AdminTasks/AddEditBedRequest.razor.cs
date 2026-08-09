@@ -36,6 +36,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
         [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
 
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime? DeliveryTime { get; set; }
         [Parameter] public string? Id { get; set; }
 
         protected BedBrigade.Common.Models.BedRequest? Model { get; set; }
@@ -150,6 +152,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         _toastService?.Error(IsError, result.Message);
                         Model = new BedBrigade.Common.Models.BedRequest { LocationId = LocationId };
                     }
+
+                    if (Model.DeliveryDate.HasValue)
+                    {
+                        DeliveryDate = Model.DeliveryDate.Value.Date;
+                        DeliveryTime = new DateTime(Model.DeliveryDate.Value.TimeOfDay.Ticks);
+                    }
                 }
                 else
                 {
@@ -226,6 +234,16 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
+        private void DeliveryDateChanged(ChangedEventArgs<DateTime?> args)
+        {
+            
+        }
+
+        private void DeliveryTimeChanged(Syncfusion.Blazor.Calendars.ChangeEventArgs<DateTime?> args)
+        {
+
+        }
+
         // Fix CS8602: Add null checks before dereferencing _nav
 
         private async Task HandleValidSubmit()
@@ -233,6 +251,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             if (Model == null)
                 return;
                 
+            if (DeliveryDate.HasValue && DeliveryDate != DateTime.MinValue)
+            {
+                Model.DeliveryDate = DeliveryDate.Value.Date + DeliveryDate.Value.TimeOfDay;
+            }
+
             // Normalize phone
             if (!string.IsNullOrEmpty(Model.Phone))
             {
