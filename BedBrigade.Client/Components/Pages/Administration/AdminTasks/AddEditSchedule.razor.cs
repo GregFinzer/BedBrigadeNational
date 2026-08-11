@@ -49,7 +49,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private bool _isFromBedRequest = false;
         private bool _showVerificationDialog = false;
-        private DateTime? _originalEventDateScheduled;
+        private DateTime? _originalEventDateTimeScheduled;
 
         protected override async Task OnInitializedAsync()
         {
@@ -109,7 +109,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
-                    _originalEventDateScheduled = Model.EventDateScheduled;
+                    _originalEventDateTimeScheduled = Model.EventDateScheduled;
                     // Split date/time for editors
                     ScheduleStartDate = Model.EventDateScheduled.Date;
                     ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
@@ -157,8 +157,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 await SetDeliveryValues(scheduleResult.Data);
             }
 
+            //The ScheduleStartTime is set in SetDeliveryValues and SetBuildValues
             ScheduleStartDate = Model.EventDateScheduled.Date;
-            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
         }
 
         private async Task SetDeliveryValues(Common.Models.Schedule? previousSchedule)
@@ -173,9 +173,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryTime, Model.LocationId);
-            Model.EventDateScheduled = previousSchedule == null 
-                ? Model.EventDateScheduled.AddHours(defaultHour) 
-                : Model.EventDateScheduled.AddHours(previousSchedule.EventDateScheduled.Hour);
+            Model.EventDateScheduled = previousSchedule == null
+                ? Model.EventDateScheduled.AddHours(defaultHour)
+                : Model.EventDateScheduled.AddHours(previousSchedule.EventDateScheduled.Hour)
+                    .AddMinutes(previousSchedule.EventDateScheduled.Minute);
+            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
 
             int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultDeliveryDurationHours, Model.LocationId);
@@ -200,9 +202,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 ConfigNames.DefaultBuildMaxVolunteers, Model.LocationId);
             Model.VolunteersMax = defaultMaxVolunteers;
 
+            //We always use the default build time from the config instead of the previous schedule from last week
             int defaultHour = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildTime, Model.LocationId);
             Model.EventDateScheduled = Model.EventDateScheduled.AddHours(defaultHour);
+            ScheduleStartTime = new DateTime(Model.EventDateScheduled.TimeOfDay.Ticks);
 
             int defaultDuration = await _svcConfig.GetConfigValueAsIntAsync(ConfigSection.Schedule,
                 ConfigNames.DefaultBuildDurationHours, Model.LocationId);
@@ -290,8 +294,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             if (update.Success)
             {
                 bool remindersRequeued = true;
-                if (_originalEventDateScheduled.HasValue &&
-                    _originalEventDateScheduled.Value != Model.EventDateScheduled)
+                if (_originalEventDateTimeScheduled.HasValue &&
+                    _originalEventDateTimeScheduled.Value != Model.EventDateScheduled)
                 {
                     try
                     {
@@ -340,6 +344,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 {
                     foreach (var bedRequest in bedRequestsResult.Data)
                     {
+                        success &= await UpdateDeliveryDateForBedRequest(bedRequest);
                         success &= await RequeueDeliveryReminders(bedRequest);
                     }
                 }
@@ -359,6 +364,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
 
             return success;
+        }
+
+        private async Task<bool> UpdateDeliveryDateForBedRequest(Common.Models.BedRequest bedRequest)
+        {
+            bedRequest.DeliveryDate = Model.EventDateScheduled;
+            var updateResponse = await _svcBedRequest.UpdateAsync(bedRequest);
+            return updateResponse.Success;
         }
 
         private async Task<bool> RequeueDeliveryReminders(Common.Models.BedRequest bedRequest)
