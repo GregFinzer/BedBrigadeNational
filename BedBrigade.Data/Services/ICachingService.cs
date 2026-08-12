@@ -12,9 +12,10 @@
         string BuildCacheKey(string entityName, int location, string key, string culture);
         void ClearAll();
         void ClearByEntityName(string entityName);
-        void Set<T>(string cacheKey, T value);
+        void Set<T>(string cacheKey, T? value);
         T? Get<T>(string cacheKey);
         void ClearScheduleRelated();
         void ForceClearAll();
+        void Remove<T>(string cacheKey);
     }
 }

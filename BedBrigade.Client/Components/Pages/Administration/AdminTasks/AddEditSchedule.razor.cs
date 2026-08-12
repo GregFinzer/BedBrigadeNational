@@ -417,6 +417,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected void HandleCancel()
         {
+            _svcSchedule.ClearCacheById(Model.ScheduleId);
             var redirectUrl = _isFromBedRequest ? "/administration/manage/bedrequests" : "/administration/manage/schedules";
             _nav.NavigateTo(redirectUrl);
         }

@@ -203,7 +203,7 @@ else
                                 </SfDropDownList>
                             </div>
                             <div class="form-group">
-                                @if (DeliveryDate != DateTime.MinValue)
+                                @if (DeliveryDate != null && DeliveryDate != DateTime.MinValue)
                                 {
                                     string dayOfWeek = DeliveryDate.Value.ToString("dddd");
                                     <label for="DeliveryDateOnly" class="formlabel required" style="font-weight: bold"><b>Delivery Date (@dayOfWeek)</b></label>

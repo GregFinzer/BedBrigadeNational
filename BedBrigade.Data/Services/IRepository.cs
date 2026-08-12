@@ -23,5 +23,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<TEntity>> CreateAsync(TEntity entity);
         Task<ServiceResponse<TEntity>> UpdateAsync(TEntity entity);
         Task<ServiceResponse<bool>> DeleteAsync(object id);
+        void ClearCacheById(object id);
     }
 }
