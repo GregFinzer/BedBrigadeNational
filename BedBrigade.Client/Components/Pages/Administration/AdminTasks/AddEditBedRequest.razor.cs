@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Serilog;
-using Stripe;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
@@ -704,7 +703,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        public void OnStatusChange(ChangeEventArgs<BedRequestStatus, BedRequestEnumItem> args)
+        public async Task OnStatusChange(ChangeEventArgs<BedRequestStatus, BedRequestEnumItem> args)
         {
             if (Model == null)
             {
@@ -713,7 +712,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             var previousStatus = _lastSelectedStatus ?? Model.Status;
             Model.Status = args.Value;
-
+            
             if (ShouldClearScheduleAndDeliveryDate(previousStatus, args.Value))
             {
                 Model.ScheduleId = null;
@@ -723,18 +722,39 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
             else if (args.Value == BedRequestStatus.Scheduled)
             {
-                SyncScheduleIdFromDeliveryDate();
+                await SyncScheduleFields();
             }
 
             _lastSelectedStatus = args.Value;
         }
 
+        public void OnDeliveryDateChange(ChangedEventArgs<DateTime?> args)
+        {
+            if (Model == null)
+            {
+                return;
+            }
+
+            Model.DeliveryDate = args.Value;
+            SyncScheduleIdFromDeliveryDate();
+        }
 
         private void SyncScheduleIdFromDeliveryDate()
         {
             if (Model == null || Model.Status != BedRequestStatus.Scheduled)
             {
                 return;
+            }
+
+            if (Model.LocationId != _svcAuth.LocationId)
+            {
+                Model.LocationId = _svcAuth.LocationId;
+                LocationId = _svcAuth.LocationId;
+                Model.ScheduleId = null;
+
+                var location = Locations.First(o => o.LocationId == Model.LocationId);
+                Model.Group = location.Group;
+                await LoadDeliverySchedules(Model.LocationId);
             }
 
             if (!Model.DeliveryDate.HasValue)
@@ -804,6 +824,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 StateHasChanged();
             }
         }
+
 
         public void OnScheduleChange(ChangeEventArgs<int?, BedBrigade.Common.Models.Schedule> args)
         {
