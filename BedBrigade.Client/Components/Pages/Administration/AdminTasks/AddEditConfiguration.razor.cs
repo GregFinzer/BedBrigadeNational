@@ -197,6 +197,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected void HandleCancel()
         {
+            SvcConfiguration.ClearCacheById(Model.ConfigurationId);
             NavigationManager.NavigateTo(ManageConfigurationPageUrl);
         }
     }

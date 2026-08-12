@@ -77,9 +77,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         };
 
         protected bool IsNew => !BedRequestId.HasValue || BedRequestId == 0;
-        private BedBrigade.Common.Models.BedRequest? _original = null;
-        private int _originalLocationId;
-        private int? _originalScheduleId;
 
         protected override async Task OnInitializedAsync()
         {
@@ -87,7 +84,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 _lc?.InitLocalizedComponent(this);
                 BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
-                _originalLocationId = LocationId;
                 await LoadConfiguration(LocationId);
                 await LoadLocations();
                 await LoadModel();
@@ -170,8 +166,6 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (result.Success && result.Data != null)
                     {
                         Model = result.Data;
-                        _original = ObjectUtil.Clone(result.Data);
-                        _originalScheduleId = result.Data.ScheduleId;
                     }
                     else
                     {
@@ -705,16 +699,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (_nav != null)
             {
-                if (_original != null)
-                {
-                    _isLoading = true;
-                    ObjectUtil.CopyProperties(_original, Model);
-                    Model.Location = Locations.FirstOrDefault(o => o.LocationId == _original.LocationId) ?? 
-                                     Locations.First(o => o.LocationId == _originalLocationId);
-                    Model.LocationId = _originalLocationId;
-                    Model.ScheduleId = _originalScheduleId;
-                }
-
+                _svcBedRequest.ClearCacheById(Model?.BedRequestId ?? 0);
                 _nav.NavigateTo(_targetUrl);
             }
         }

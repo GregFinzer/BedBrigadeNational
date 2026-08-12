@@ -176,6 +176,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         private void HandleCancel()
         {
+            _volunteerDataService.ClearCacheById(Model?.VolunteerId ?? 0);
             _navigationManager.NavigateTo("/administration/manage/volunteers");
         }
 
