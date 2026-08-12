@@ -77,6 +77,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         };
 
         protected bool IsNew => !BedRequestId.HasValue || BedRequestId == 0;
+        private BedBrigade.Common.Models.BedRequest? _original = null;
+        private int _originalLocationId;
+        private int? _originalScheduleId;
 
         protected override async Task OnInitializedAsync()
         {
@@ -84,6 +87,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 _lc?.InitLocalizedComponent(this);
                 BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
+                _originalLocationId = LocationId;
                 await LoadConfiguration(LocationId);
                 await LoadLocations();
                 await LoadModel();
@@ -166,6 +170,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (result.Success && result.Data != null)
                     {
                         Model = result.Data;
+                        _original = ObjectUtil.Clone(result.Data);
+                        _originalScheduleId = result.Data.ScheduleId;
                     }
                     else
                     {
@@ -264,7 +270,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
-        private void DeliveryDateChanged(ChangedEventArgs<DateTime?> args)
+        private async Task DeliveryDateChanged(ChangedEventArgs<DateTime?> args)
         {
             if (_isLoading)
                 return;
@@ -273,6 +279,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             if (changedDate.HasValue)
             {
+                ClearErrors();
+
                 Model.DeliveryDate = changedDate;
 
                 Common.Models.Schedule? matchingFutureSchedule =
@@ -303,9 +311,11 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.DeliveryDate = null;
                 DeliveryTime = null;
             }
+
+            await SyncScheduleFields();
         }
 
-        private void DeliveryTimeChanged(Syncfusion.Blazor.Calendars.ChangeEventArgs<DateTime?> args)
+        private async Task DeliveryTimeChanged(Syncfusion.Blazor.Calendars.ChangeEventArgs<DateTime?> args)
         {
             if (_isLoading)
                 return;
@@ -324,6 +334,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.DeliveryDate = Model.DeliveryDate.Value.Date;
             }
 
+            await SyncScheduleFields();
             _isLoading = false;
         }
 
@@ -363,6 +374,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 return;
             }
 
+            await SyncScheduleFields();
             ApplyStatusTransitionRules(Model);
 
             if (Model.BedRequestId != 0)
@@ -661,6 +673,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
+        private void ClearErrors()
+        {
+            _validationMessageStore?.Clear();
+            _editContext?.NotifyValidationStateChanged();
+        }
+
         public void Dispose()
         {
             if (_editContext == null)
@@ -687,6 +705,16 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (_nav != null)
             {
+                if (_original != null)
+                {
+                    _isLoading = true;
+                    ObjectUtil.CopyProperties(_original, Model);
+                    Model.Location = Locations.FirstOrDefault(o => o.LocationId == _original.LocationId) ?? 
+                                     Locations.First(o => o.LocationId == _originalLocationId);
+                    Model.LocationId = _originalLocationId;
+                    Model.ScheduleId = _originalScheduleId;
+                }
+
                 _nav.NavigateTo(_targetUrl);
             }
         }
@@ -728,18 +756,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             _lastSelectedStatus = args.Value;
         }
 
-        public void OnDeliveryDateChange(ChangedEventArgs<DateTime?> args)
-        {
-            if (Model == null)
-            {
-                return;
-            }
-
-            Model.DeliveryDate = args.Value;
-            SyncScheduleIdFromDeliveryDate();
-        }
-
-        private void SyncScheduleIdFromDeliveryDate()
+        private async Task SyncScheduleFields()
         {
             if (Model == null || Model.Status != BedRequestStatus.Scheduled)
             {
@@ -765,10 +782,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             var matchingSchedule = FutureDeliverySchedules
                 .FirstOrDefault(schedule => schedule.EventType == EventType.Delivery &&
-                                            schedule.EventDateScheduled.Date == Model.DeliveryDate.Value.Date &&
-                                            (Model.DeliveryDate.Value.Hour == 0 && Model.DeliveryDate.Value.Minute == 0 ||
-                                             schedule.EventDateScheduled.Hour == Model.DeliveryDate.Value.Hour &&
-                                             schedule.EventDateScheduled.Minute == Model.DeliveryDate.Value.Minute));
+                                            schedule.EventDateScheduled.Date == Model.DeliveryDate.Value.Date
+                                            && ((Model.DeliveryDate.Value.Hour == 0 &&
+                                                 Model.DeliveryDate.Value.Minute == 0)
+                                                || (schedule.EventDateScheduled.Hour == Model.DeliveryDate.Value.Hour
+                                                    && schedule.EventDateScheduled.Minute ==
+                                                    Model.DeliveryDate.Value.Minute)));
 
             Model.ScheduleId = matchingSchedule?.ScheduleId;
         }
@@ -809,6 +828,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         public async Task OnLocationChange(ChangeEventArgs<int, Location> args)
         {
+            if (_isLoading)
+                return;
+
             if (args.Value > 0 && Model != null && Locations != null)
             {
                 var location = Locations.FirstOrDefault(o => o.LocationId == args.Value);
@@ -828,6 +850,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         public void OnScheduleChange(ChangeEventArgs<int?, BedBrigade.Common.Models.Schedule> args)
         {
+            if (_isLoading)
+                return;
+
             if (Model == null)
             {
                 return;
@@ -848,6 +873,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.DeliveryDate = selectedSchedule.EventDateScheduled;
                 DeliveryDate = Model.DeliveryDate.Value.Date;
                 DeliveryTime = new DateTime(Model.DeliveryDate.Value.TimeOfDay.Ticks);
+                ClearErrors();
             }
         }
     }
