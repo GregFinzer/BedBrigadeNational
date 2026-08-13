@@ -152,6 +152,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         {
             if (_nav != null)
             {                
+                _svcDonation.ClearCacheById(Model.DonationId);
                 _nav.NavigateTo(ReturnURL);
             }                                
 

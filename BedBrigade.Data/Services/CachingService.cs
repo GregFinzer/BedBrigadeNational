@@ -69,9 +69,19 @@ namespace BedBrigade.Data.Services
             _cache.ClearAll();
         }
 
+        public void Remove<T>(string cacheKey)
+        {
+            if (!IsCachingEnabled || string.IsNullOrWhiteSpace(cacheKey) )
+            {
+                return;
+            }
+
+            _cache.Remove<T>(cacheKey);
+        }
+        
         public void ClearByEntityName(string entityName)
         {
-            if (!IsCachingEnabled)
+            if (!IsCachingEnabled || string.IsNullOrWhiteSpace(entityName))
             {
                 return;
             }
@@ -82,9 +92,11 @@ namespace BedBrigade.Data.Services
             _cache.ClearByRegex(regex);
         }
 
-        public void Set<T>(string cacheKey, T value)
+        public void Set<T>(string cacheKey, T? value)
         {
-            if (!IsCachingEnabled)
+            if (!IsCachingEnabled 
+                || string.IsNullOrWhiteSpace(cacheKey)
+                || value == null)
             {
                 return;
             }
@@ -97,7 +109,8 @@ namespace BedBrigade.Data.Services
             //Used to test the spinner
             //System.Threading.Thread.Sleep(1000);
 
-            if (!IsCachingEnabled)
+            if (!IsCachingEnabled 
+                || string.IsNullOrWhiteSpace(cacheKey))
             {
                 return default(T);
             }

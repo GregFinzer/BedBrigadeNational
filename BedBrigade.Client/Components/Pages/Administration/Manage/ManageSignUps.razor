@@ -44,7 +44,7 @@
                     ClipMode="ClipMode.EllipsisWithTooltip">
 
                 <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25, 50, 100 })" PageSize="15" />
-                <GridEvents Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick="ToolbarClickHandler" TValue="SignUpDisplayItem" RowSelected="GetSelectedRecords"></GridEvents>
+                <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick="ToolbarClickHandler" TValue="SignUpDisplayItem" RowSelected="GetSelectedRecords"></GridEvents>
                 <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
 
                 <GridTemplates>

@@ -203,13 +203,31 @@ else
                                 </SfDropDownList>
                             </div>
                             <div class="form-group">
-                                <label for="txtdeliverydatetime" class="formlabel">Delivery Date/Time</label>
-                                <SfDateTimePicker ID="txtdeliverydatetime" @bind-Value=@Model.DeliveryDate Enabled="true" Placeholder="Delivery Date/Time" FloatLabelType="FloatLabelType.Never">
-                                    <DateTimePickerEvents TValue="DateTime?" ValueChange="OnDeliveryDateChange"></DateTimePickerEvents>
-                                </SfDateTimePicker>
+                                @if (DeliveryDate != null && DeliveryDate != DateTime.MinValue)
+                                {
+                                    string dayOfWeek = DeliveryDate.Value.ToString("dddd");
+                                    <label for="DeliveryDateOnly" class="formlabel required" style="font-weight: bold"><b>Delivery Date (@dayOfWeek)</b></label>
+                                }
+                                else
+                                {
+                                    <label for="DeliveryDateOnly" class="formlabel required" style="font-weight: bold"><b>Delivery Date</b></label>
+                                }
+                                <SfDatePicker ID="DeliveryDateOnly" TValue="DateTime?" @bind-Value="@DeliveryDate" Placeholder="Choose a date" ShowClearButton="true">
+                                    <DatePickerEvents TValue="DateTime?"
+                                                      ValueChange="DeliveryDateChanged">
+                                    </DatePickerEvents>
+                                </SfDatePicker>
                                 <div style="font-size: smaller">
                                     <ValidationMessage For="@(() => Model.DeliveryDate)"></ValidationMessage>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="DeliveryTimeOnly" class="formlabel required" style="font-weight: bold"><b>Delivery Time</b></label>
+                                <SfTimePicker ID="DeliveryTimeOnly" TValue="DateTime?" Format="hh:mm tt" Step="30" @bind-Value="@DeliveryTime" Placeholder="Choose a time" ShowClearButton="true">
+                                    <TimePickerEvents TValue="DateTime?"
+                                                      ValueChange="DeliveryTimeChanged">
+                                    </TimePickerEvents>
+                                </SfTimePicker>
                             </div>
                             <div class="form-group">
                                 <label for="txtteam" class="formlabel">Team</label>

@@ -51,14 +51,19 @@ else
                             Width="100%">
                         <GridPageSettings PageSizes="@(new int[] { 5, 10, 15, 20, 25 })" PageSize="15"/>
                         <GridEvents DataBound=@DataBound 
-                                  OnToolbarClick=@OnToolBarClick 
-                                  OnActionBegin=@OnActionBegin 
-                                  RowSelected=@OnRowSelected 
-                                  RowDeselected=@OnRowDeselected 
-                                  OnLoad=@OnLoad 
-                                  Destroyed="@OnDestroyed" 
-                                  OnActionComplete="@OnActionComplete"
-                                  TValue="User"/>
+                                    OnToolbarClick=@OnToolBarClick 
+                                    OnActionBegin=@OnActionBegin 
+                                    RowSelected=@OnRowSelected 
+                                    RowDeselected=@OnRowDeselected 
+                                    OnLoad=@OnLoad 
+                                    Destroyed="@OnDestroyed" 
+                                    OnActionComplete="@OnActionComplete"
+                                    TValue="User"/>
+                        <GridTemplates>
+                            <EmptyRecordTemplate>
+                                <span>@RecordText</span>
+                            </EmptyRecordTemplate>
+                        </GridTemplates>                        
                         <GridSelectionSettings Mode="SelectionMode.Row" CellSelectionMode="CellSelectionMode.Flow" Type="SelectionType.Single"/>
                         <GridEditSettings Dialog=@DialogParams ShowDeleteConfirmDialog="false" AllowAdding="true" AllowEditOnDblClick="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog">
                             <Validator>

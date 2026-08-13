@@ -95,6 +95,15 @@ namespace BedBrigade.Data.Services
 
         }
 
+        public virtual void ClearCacheById(object id)
+        {
+            if (id == null || id.ToString() == "0")
+                return;
+            
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), id.ToString());
+            _cachingService.Remove<TEntity>(cacheKey);;
+        }
+        
         public virtual async Task<ServiceResponse<TEntity>> GetByIdAsync(object? id)
         {
             if (id == null)

@@ -27,7 +27,7 @@ jobs:
 
     - name: Perform Shutdown
       run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site4.ktempurl.com/api/Shutdown/PerformShutdown?password=${{ secrets.API_PASSWORD }})
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://www.thebedbrigade.org/api/Shutdown/PerformShutdown?password=${{ secrets.API_PASSWORD }})
         if [ $response -ne 200 ]; then
             echo "Shutdown failed with status code: $response, but ignoring the error."
         fi
@@ -85,7 +85,7 @@ jobs:
 
     - name: Perform Database Setup
       run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" http://gregfinzer2-001-site4.ktempurl.com/api/DatabaseSetup/PerformSetup?password=${{ secrets.API_PASSWORD }})
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://www.thebedbrigade.org/api/DatabaseSetup/PerformSetup?password=${{ secrets.API_PASSWORD }})
         if [ $response -ne 200 ]; then
           echo "Database setup failed with status code: $response"
           exit 1

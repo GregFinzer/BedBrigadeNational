@@ -67,7 +67,7 @@ namespace BedBrigade.Client.Components
 
         //protected bool OnlyRead { get; set; } = false;
 
-        protected string? RecordText { get; set; } = "Loading BedRequests ...";
+        protected string? RecordText { get; set; } = "Loading Bed Requests ...";
         public bool NoPaging { get; private set; }
         public string SpeakEnglishVisibility = "hidden";
         public bool IsDialogVisible { get; set; }
@@ -239,7 +239,7 @@ namespace BedBrigade.Client.Components
                     StateHasChanged();
                 }
             }
-
+            
             return base.OnAfterRenderAsync(firstRender);
         }
 
@@ -508,9 +508,15 @@ namespace BedBrigade.Client.Components
         {
             if (Grid != null && BedRequests != null)
             {
-
-
-                if (BedRequests.Count == 0) RecordText = "No BedRequest records found";
+                if (BedRequests.Count == 0)
+                {
+                    RecordText = "No Bed Request records found";
+                }
+                else
+                {
+                    RecordText = "No Records found with current filters. Click the Reset button.";
+                }
+                
                 if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 
                 {
                     NoPaging = true;
@@ -605,6 +611,7 @@ namespace BedBrigade.Client.Components
             BedRequest firstBedRequest = selectedBedRequests.First();
             int selectedLocation = firstBedRequest.LocationId;
             string? group = firstBedRequest.Group;
+            DateTime? deliveryDateTime = firstBedRequest.DeliveryDate;
             Schedule? schedule = null;
 
             if (firstBedRequest.ScheduleId.HasValue)
@@ -633,7 +640,7 @@ namespace BedBrigade.Client.Components
             var scheduledBedRequestResult =
                 await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
             List<BedRequest> scheduledBedRequests =
-                scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
             return (location, deliveryChecklist, scheduledBedRequests);
         }
 
@@ -651,6 +658,8 @@ namespace BedBrigade.Client.Components
                 var firstBedRequest = selectedBedRequests.First();
                 int selectedLocation = firstBedRequest.LocationId;
                 string? group = firstBedRequest.Group;
+                DateTime? deliveryDateTime = firstBedRequest.DeliveryDate;
+                
                 Schedule? schedule = null;
                 
                 if (firstBedRequest.ScheduleId.HasValue)
@@ -673,7 +682,7 @@ namespace BedBrigade.Client.Components
                     }                    
                 }
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
-                var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group).ToList();
+                var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
                 // We will include all teams present in scheduledBedRequests (group already filtered) - if need all groups remove Where above
                 string fileName = TeamSheetService.CreateTeamSheetFileName(location, scheduledBedRequests);
                 Stream stream = TeamSheetService.CreateTeamSheet(location, scheduledBedRequests, deliveryChecklist);
@@ -775,7 +784,7 @@ namespace BedBrigade.Client.Components
                 IsDialogVisible = true;
                 return false;
             }
-
+            
             return true;
         }
 
