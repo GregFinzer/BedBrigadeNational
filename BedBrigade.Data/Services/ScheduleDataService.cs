@@ -388,7 +388,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         }
     }
 
-    public async Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDate(BedRequest bedRequest)
+    public async Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDateTime(BedRequest bedRequest)
     {
         if (!bedRequest.DeliveryDate.HasValue)
             return new ServiceResponse<Schedule>("bedRequest.DeliveryDate is null");
@@ -399,14 +399,14 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
             return new ServiceResponse<Schedule>(scheduleResponse.Message);
 
         var schedule = scheduleResponse.Data
-            .FirstOrDefault(o => o.EventDateScheduled.Date == bedRequest.DeliveryDate.Value.Date
+            .FirstOrDefault(o => o.EventDateScheduled == bedRequest.DeliveryDate.Value
             && o.EventType == EventType.Delivery);
 
         if (schedule != null)
             return new ServiceResponse<Schedule>("Found schedule", true, schedule);
 
         return new ServiceResponse<Schedule>(
-            $"Schedule not found with delivery date of {bedRequest.DeliveryDate.Value.ToShortDateString()}. Please add a Schedule for that date.");
+            $"Schedule not found with delivery date/time of {bedRequest.DeliveryDate.ToString()}. Please add a Schedule for that date.");
     }
 
     public async Task<bool> FillScheduleByUserAndDate(Schedule schedule,

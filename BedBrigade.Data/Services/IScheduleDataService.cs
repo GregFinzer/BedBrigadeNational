@@ -12,7 +12,7 @@ namespace BedBrigade.Data.Services
         Task UpdateBedRequestSummaryInformation(int locationId, List<BedRequest> scheduledBedRequests);
         Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationIdAndUser(int locationId, string userName);
         Task UpdateScheduleVolunteers(int scheduleId);
-        Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDate(BedRequest bedRequest);
+        Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDateTime(BedRequest bedRequest);
         Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDateAndTime(BedRequest bedRequest);
 
     }
