@@ -404,14 +404,14 @@ namespace BedBrigade.Data.Services
             return new ServiceResponse<string>(QueueStatus.Queued.ToString(), true);
         }
 
-        public async Task<ServiceResponse<string>> QueueBulkEmail(List<string> emailList, string subject, string body, int locationId)
+        public async Task<ServiceResponse<string>> QueueBulkEmail(BulkEmailParms bulkEmailParms)
         {
-            if (emailList.Count == 0)
+            if (bulkEmailParms.EmailList.Count == 0)
                 return new ServiceResponse<string>("No emails to send", false);
 
             try
             {
-                var uniqueEmailList = emailList
+                var uniqueEmailList = bulkEmailParms.EmailList
                     .Where(email => !string.IsNullOrWhiteSpace(email))
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
@@ -424,13 +424,15 @@ namespace BedBrigade.Data.Services
                 var emailQueueList = uniqueEmailList.Select(email => new EmailQueue
                 {
                     ToAddress = email,
-                    Subject = subject,
-                    Body = body,
+                    Subject = bulkEmailParms.Subject,
+                    Body = bulkEmailParms.Body,
                     Status = QueueStatus.Queued.ToString(),
                     QueueDate = DateTime.UtcNow,
                     FailureMessage = string.Empty,
                     Priority = Defaults.BulkLowPriority,
-                    LocationId = locationId
+                    LocationId = bulkEmailParms.LocationId,
+                    BedRequestId = bulkEmailParms.BedRequestId,
+                    ContactUsId = bulkEmailParms.ContactUsId
                 }).ToList();
 
                 string userName = GetUserName();

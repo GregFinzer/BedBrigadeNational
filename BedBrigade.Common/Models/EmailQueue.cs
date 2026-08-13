@@ -74,6 +74,10 @@ namespace BedBrigade.Common.Models
         public Int32? SignUpId { get; set; }
         public SignUp? SignUp { get; set; }
 
+        [ForeignKey("ContactUsId")]
+        public Int32? ContactUsId { get; set; }
+        public SignUp? ContactUs { get; set; }
+
         [Required, DefaultValue(Defaults.GroveCityLocationId)]
         public Int32 LocationId { get; set; } = Defaults.GroveCityLocationId;
     }
