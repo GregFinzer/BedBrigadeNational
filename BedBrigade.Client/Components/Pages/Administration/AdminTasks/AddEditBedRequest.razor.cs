@@ -580,7 +580,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
 
             ServiceResponse<Common.Models.Schedule> scheduleResponse =
-                await _svcSchedule.GetScheduleForBedRequestDeliveryDate(model);
+                await _svcSchedule.GetScheduleForBedRequestDeliveryDateTime(model);
 
             if (!scheduleResponse.Success || scheduleResponse.Data == null)
             {
