@@ -5,8 +5,9 @@ using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
-using Serilog;
+
 using Syncfusion.Blazor.DropDowns;
+using Log = Serilog.Log;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Admin
 {
@@ -128,7 +129,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Admin
                     NewsletterId = Model.CurrentNewsletterId
                 };
                 var emails = await _svcEmailQueueDataService.GetEmailsToSend(parms);
-                var result = await _svcEmailQueueDataService.QueueBulkEmail(emails.Data, Model.Subject, Model.Body, Model.CurrentLocationId);
+                BulkEmailParms bulkParms = new BulkEmailParms();
+                bulkParms.EmailList = emails.Data;
+                bulkParms.Subject = Model.Subject;
+                bulkParms.Body = Model.Body;
+                bulkParms.LocationId = Model.CurrentLocationId;
+
+                var result = await _svcEmailQueueDataService.QueueBulkEmail(bulkParms);
                 if (result.Success)
                 {
                     Log.Information($"{_svcAuth.UserName} queued some Bulk Emails");
