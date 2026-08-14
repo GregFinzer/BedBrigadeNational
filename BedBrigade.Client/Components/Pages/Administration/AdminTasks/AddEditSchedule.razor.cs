@@ -293,23 +293,36 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             var update = await _svcSchedule.UpdateAsync(Model);
             if (update.Success)
             {
-                bool remindersRequeued = true;
-                if (_originalEventDateTimeScheduled.HasValue &&
-                    _originalEventDateTimeScheduled.Value != Model.EventDateScheduled)
+                bool redoReminders = true;
+                if (Model.EventStatus == EventStatus.Scheduled
+                    && _originalEventDateTimeScheduled.HasValue 
+                    && _originalEventDateTimeScheduled.Value != Model.EventDateScheduled)
                 {
                     try
                     {
-                        remindersRequeued = await RequeueReminders();
+                        redoReminders = await RequeueRemindersForSchedule();
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
                             Model.ScheduleId);
-                        remindersRequeued = false;
+                        redoReminders = false;
                     }
                 }
-
-                if (remindersRequeued)
+                else if (Model.EventStatus == EventStatus.Canceled)
+                {
+                    try
+                    {
+                        redoReminders = await DeleteRemindersForSchedule();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Unable to requeue reminders for schedule {ScheduleId}",
+                            Model.ScheduleId);
+                        redoReminders = false;
+                    }
+                }
+                if (redoReminders)
                 {
                     _toast.Success("Success", "Schedule updated successfully");
                 }
@@ -327,7 +340,45 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             _toast.Error("Error", update.Message);
         }
 
-        private async Task<bool> RequeueReminders()
+        private async Task<bool> DeleteRemindersForSchedule()
+        {
+            bool success = true;
+
+            if (Model.EventType == EventType.Delivery)
+            {
+                var bedRequestsResult = await _svcBedRequest.GetAllForScheduleId(Model.ScheduleId);
+                if (!bedRequestsResult.Success || bedRequestsResult.Data == null)
+                {
+                    Log.Error("Unable to get bed requests for schedule {ScheduleId}: {Message}",
+                        Model.ScheduleId, bedRequestsResult.Message);
+                    success = false;
+                }
+                else
+                {
+                    foreach (var bedRequest in bedRequestsResult.Data)
+                    {
+                        success &= await ClearDeliveryReminders(bedRequest);
+                    }
+                }
+            }
+
+            var signUpsResult = await _svcSignUp.GetAllForScheduleIdAsync(Model.ScheduleId);
+            if (!signUpsResult.Success || signUpsResult.Data == null)
+            {
+                Log.Error("Unable to get volunteer signups for schedule {ScheduleId}: {Message}",
+                    Model.ScheduleId, signUpsResult.Message);
+                return false;
+            }
+
+            foreach (var signUp in signUpsResult.Data)
+            {
+                success &= await ClearSignUpReminders(signUp);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> RequeueRemindersForSchedule()
         {
             bool success = true;
 
@@ -387,6 +438,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 (smsResult.Success, smsResult.Message, "queue the delivery SMS reminder"));
         }
 
+        private async Task<bool> ClearDeliveryReminders(Common.Models.BedRequest bedRequest)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedByBedRequestId(bedRequest.BedRequestId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedSmsByBedRequestId(bedRequest.BedRequestId);
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued delivery emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued delivery SMS messages"));
+        }
+
         private async Task<bool> RequeueSignUpReminders(SignUp signUp)
         {
             var deleteEmailResult = await _svcEmailQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
@@ -399,6 +459,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued signup SMS messages"),
                 (emailResult.Success, emailResult.Message, "queue the signup email reminder"),
                 (smsResult.Success, smsResult.Message, "queue the signup SMS reminder"));
+        }
+
+        private async Task<bool> ClearSignUpReminders(SignUp signUp)
+        {
+            var deleteEmailResult = await _svcEmailQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            var deleteSmsResult = await _svcSmsQueue.DeleteQueuedBySignUpId(signUp.SignUpId);
+            return LogReminderFailures(
+                (deleteEmailResult.Success, deleteEmailResult.Message, "delete queued signup emails"),
+                (deleteSmsResult.Success, deleteSmsResult.Message, "delete queued signup SMS messages"));
         }
 
         private bool LogReminderFailures(params (bool Success, string Message, string Operation)[] results)
