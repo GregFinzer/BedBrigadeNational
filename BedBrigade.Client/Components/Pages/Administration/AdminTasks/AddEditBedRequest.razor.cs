@@ -244,7 +244,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
 
             FutureDeliverySchedules = scheduleResponse.Data
-                .Where(schedule => schedule.EventType == EventType.Delivery)
+                .Where(schedule => schedule.EventType == EventType.Delivery
+                                   && schedule.EventStatus == EventStatus.Scheduled)
                 .OrderBy(schedule => schedule.EventDateScheduled)
                 .ToList();
 
