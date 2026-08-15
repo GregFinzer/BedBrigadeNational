@@ -959,6 +959,82 @@ a.back-btn:hover {
   }
 }
 @media (max-width: 767px) {
+  /* Keep all Grove City content inside the mobile viewport without clipping it. */
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: clip;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  .body-content,
+  .body-content .Container,
+  .Container,
+  section.flow,
+  section.flow > .widget {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .body-content p,
+  .body-content h1,
+  .body-content h2,
+  .body-content h3,
+  .body-content li,
+  .body-content a {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  /* The desktop image strip is intentionally 107% wide. Reset it on phones. */
+  .main-img-rotate .Container,
+  .request-img-rotate .Container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .main-img-rotate .Container section.flow .slider-angle,
+  .request-img-rotate .Container section.flow .slider-angle {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-left: 0;
+    transform: none;
+  }
+  .main-img-rotate .Container section.flow .slider-angle .carousel-inner,
+  .request-img-rotate .Container section.flow .slider-angle .carousel-inner {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  .main-img-rotate .slider-angle .carousel-inner .flow img,
+  .request-img-rotate .slider-angle .carousel-inner .flow img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .main-img-rotate .widget.widget-h-t-m-l-block .widget-body,
+  .request-img-rotate .widget.widget-h-t-m-l-block .widget-body {
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 12px;
+  }
+  .main-img-rotate .widget.widget-h-t-m-l-block .widget-body h2,
+  .request-img-rotate .widget.widget-h-t-m-l-block .widget-body h2 {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: clamp(38px, 12vw, 54px);
+    line-height: 1.08;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
   .request-form-section .Container {
     padding: 0;
   }
