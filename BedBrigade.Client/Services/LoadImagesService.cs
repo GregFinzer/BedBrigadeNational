@@ -105,37 +105,40 @@ namespace BedBrigade.Client.Services
             foreach (var imgId in imgIds)
             {
                 //The image rotator is in the same path as the page.
-                //Example: media/grove-city/pages/Donations/leftImageRotator/Bedding.jpg
-                if (HandleImagePath(path, html, imgId))
+                //Example: media/grove-city/pages/Donate/leftImageRotator/Bedding.jpg
+                string? replaced = HandleImagePath(path, html, imgId);
+                if (replaced != null)
                 {
+                    html = replaced;
                     continue;
                 }
+
                 //The image rotator is on another page.
                 //Example: media/grove-city/pages/someOtherPage/leftImageRotator/Bedding.jpg
-                if (HandleSharedImageRotator(imgId, html))
+                replaced = HandleSharedImageRotator(imgId, html);
+                if (replaced != null)
                 {
+                    html = replaced;
                     continue;
                 }
-                { // image source file not found - get "No Image Found" -  VS 9/4/2024                {                 
 
-                    html = ReplaceImageSrc(html, imgId, Defaults.ErrorImagePath); // Image Not Found URL
-                }
+                // image source file not found - get "No Image Found" -  VS 9/4/2024                                
+                html = ReplaceImageSrc(html, imgId, Defaults.ErrorImagePath); // Image Not Found URL
             }
 
             return html;
         }
 
-        private bool HandleImagePath(string path, string html, string imgId)
+        private string? HandleImagePath(string path, string html, string imgId)
         {
             List<string> images = GetImagesForArea(path, imgId);
 
             if (images.Count > 0)
             {
                 var image = images.First().Replace("wwwroot/", "");
-                html = ReplaceImageSrc(html, imgId, image);
-                return true;
+                return ReplaceImageSrc(html, imgId, image);
             }
-            return false;
+            return null;
         }
 
         private string? GetPathForSharedImageRotator(string imageId, string html)
@@ -160,7 +163,7 @@ namespace BedBrigade.Client.Services
             return path;
         }
         
-        private bool HandleSharedImageRotator(string imageId, string html)
+        private string? HandleSharedImageRotator(string imageId, string html)
         {
             string? path = GetPathForSharedImageRotator(imageId, html);
             
@@ -169,7 +172,7 @@ namespace BedBrigade.Client.Services
                 return HandleImagePath(path, html, imageId);
             }
             
-            return false;
+            return null;
         }
 
         public void EnsureDirectoriesExist(string path, string html)
