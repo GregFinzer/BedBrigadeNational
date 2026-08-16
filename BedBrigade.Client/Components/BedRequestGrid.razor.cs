@@ -7,14 +7,15 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Serilog;
+using Syncfusion.Blazor.Data;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
+using System.Diagnostics;
 using System.Security.Claims;
+using System.Text;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
-using System.Diagnostics;
-using System.Text;
 
 
 namespace BedBrigade.Client.Components
@@ -262,10 +263,10 @@ namespace BedBrigade.Client.Components
             if (Grid != null)
             {
                 await Grid.FilterByColumnAsync(
-                nameof(BedRequest.StatusString), // Column field name
-                "equal",                        // Filter operator
-                "Waiting"                     // Filter value
-            );
+                    nameof(BedRequest.StatusString),
+                    "equal",
+                    "Waiting"
+                );
             }
         }
 

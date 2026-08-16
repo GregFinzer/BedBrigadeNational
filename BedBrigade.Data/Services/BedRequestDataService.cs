@@ -425,11 +425,15 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
                 .Where(b => b.BedRequestId != targetBedRequest.BedRequestId 
                     && (b.Status == BedRequestStatus.Waiting || b.Status == BedRequestStatus.Scheduled))
                 .ToList();
-            
-            return OrderByBestRoute(
+
+            List<BedRequest> result = new List<BedRequest>();
+            List<BedRequest> ordered = OrderByBestRoute(
                 waitingOrScheduled,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
                 targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null);
+            result.Add(targetBedRequest);
+            result.AddRange(ordered);
+            return result;
         }
         catch (Exception ex)
         {
