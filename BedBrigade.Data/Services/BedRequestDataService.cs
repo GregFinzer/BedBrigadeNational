@@ -420,22 +420,19 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
 
             targetBedRequest.Distance = -1;
-            
-            var waitingRequests = bedRequests
-                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
+
+            List<BedRequest> waitingOrScheduled = bedRequests
+                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId 
+                    && (b.Status == BedRequestStatus.Waiting || b.Status == BedRequestStatus.Scheduled))
                 .ToList();
-            
-            var routeOrderedWaitingRequests = OrderByBestRoute(
-                waitingRequests,
+
+            List<BedRequest> result = new List<BedRequest>();
+            List<BedRequest> ordered = OrderByBestRoute(
+                waitingOrScheduled,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
                 targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null);
-            
-            var result = new List<BedRequest> { targetBedRequest };
-            result.AddRange(routeOrderedWaitingRequests);
-
-            var scheduledRequests = bedRequests.Where(o => o.Status == BedRequestStatus.Scheduled
-                                                           && o.BedRequestId != targetBedRequest.BedRequestId);
-            result.AddRange(scheduledRequests);
+            result.Add(targetBedRequest);
+            result.AddRange(ordered);
             return result;
         }
         catch (Exception ex)

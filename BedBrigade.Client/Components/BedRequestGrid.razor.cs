@@ -7,14 +7,16 @@ using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Serilog;
+using Syncfusion.Blazor.Data;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
+using System.Diagnostics;
 using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
-using System.Diagnostics;
-using System.Text;
 
 
 namespace BedBrigade.Client.Components
@@ -60,6 +62,8 @@ namespace BedBrigade.Client.Components
         protected List<string>? lstPrimaryLanguage;
         protected List<string>? lstSpeakEnglish;
 
+        // Remember last SortClosest selection and the page the user was on when they invoked SortClosest
+        private int? _lastSortClosestSelectedId;
         protected BedRequest BedRequest { get; set; } = new BedRequest();
         protected string? _state { get; set; }
         protected string? HeaderTitle { get; set; }
@@ -80,6 +84,7 @@ namespace BedBrigade.Client.Components
 
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
         public bool ShowSpinner { get; set; } // Shows spinner overlay during delivery/team sheet generation
+        public bool ShouldCheckSortClosest { get; set; } = true;
 
         protected override async Task OnInitializedAsync()
         {
@@ -240,6 +245,29 @@ namespace BedBrigade.Client.Components
                 }
             }
             
+            if (ShouldCheckSortClosest)
+            {
+                ShouldCheckSortClosest = false;
+
+                // If a query parameter requests sorting by a specific BedRequestId, schedule it after render
+                try
+                {
+                    var uri = new Uri(Nav.Uri);
+                    var query = QueryHelpers.ParseQuery(uri.Query);
+                    if (query.TryGetValue("sortClosestFor", out var sortParam))
+                    {
+                        if (int.TryParse(sortParam.FirstOrDefault() ?? string.Empty, out var sortId) && sortId > 0)
+                        {
+                            _ = InvokeAsync(async () => await SortClosestForBedRequestId(sortId));
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore parse/navigation errors
+                }
+            }
+
             return base.OnAfterRenderAsync(firstRender);
         }
 
@@ -262,10 +290,10 @@ namespace BedBrigade.Client.Components
             if (Grid != null)
             {
                 await Grid.FilterByColumnAsync(
-                nameof(BedRequest.StatusString), // Column field name
-                "equal",                        // Filter operator
-                "Waiting"                     // Filter value
-            );
+                    nameof(BedRequest.StatusString),
+                    "equal",
+                    "Waiting"
+                );
             }
         }
 
@@ -349,19 +377,15 @@ namespace BedBrigade.Client.Components
 
         private async Task SortClosest()
         {
-            PerfLog.Log("SortClosest started");
             ShowSpinner = true;
             StateHasChanged();
             List<BedRequest> selectedBedRequests = new List<BedRequest>();
 
             try
             {
-
-
                 if (Grid != null)
                 {
                     selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                    PerfLog.Log("SortClosest GetSelectedRecordsAsync completed");
                     if (!selectedBedRequests.Any())
                     {
                         DialogHeader = "Select Row";
@@ -374,28 +398,71 @@ namespace BedBrigade.Client.Components
                 // Fix for CS8604: Ensure BedRequests is not null before passing to SortBedRequestClosestToAddress
                 if (BedRequests != null && BedRequestDataService != null && Grid != null)
                 {
-                    BedRequests =
-                        BedRequestDataService.SortBedRequestClosestToAddress(BedRequests,
-                            selectedBedRequests.First().BedRequestId);
-                    PerfLog.Log("SortClosest SortBedRequestClosestToAddress completed");
+                    // Remember which BedRequest id was used and the page user was on BEFORE we change pages
+                    var selectedId = (await Grid.GetSelectedRecordsAsync()).First().BedRequestId;
+                    _lastSortClosestSelectedId = selectedId;
+
+                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedId);
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
-                    // Do NOT re-sort by Distance � OrderByBestRoute assigns each record's Distance
+                    // Do NOT re-sort by Distance, OrderByBestRoute assigns each record's Distance
                     // as the leg distance from the previous stop (nearest-neighbor), so a global
                     // Distance ASC sort would scramble the intended route sequence.
                     await Grid.ClearSortingAsync();
-                    PerfLog.Log("SortClosest ClearSortingAsync completed");
                     await Grid.GoToPageAsync(1);
-                    PerfLog.Log("SortClosest GoToPageAsync completed");
                     await Grid.Refresh();
-                    PerfLog.Log("SortClosest Refresh completed");
                 }
             }
             finally
             {
                 ShowSpinner = false;
                 StateHasChanged();
-                PerfLog.Log("SortClosest StateHasChanged completed");
+            }
+        }
+
+        private async Task SortClosestForBedRequestId(int bedRequestId)
+        {
+            if (bedRequestId <= 0)
+                return;
+
+            ShowSpinner = true;
+            StateHasChanged();
+
+            try
+            {
+                if (BedRequests != null && BedRequestDataService != null && Grid != null)
+                {
+                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
+
+                    await Grid.ClearSortingAsync();
+
+                    //// Determine which page to go to: prefer sortClosestPage query param when present
+                    //int targetPage = 1;
+                    //try
+                    //{
+                    //    var uri = new Uri(Nav.Uri);
+                    //    var query = QueryHelpers.ParseQuery(uri.Query);
+                    //    if (query.TryGetValue("sortClosestPage", out var pageParam))
+                    //    {
+                    //        if (int.TryParse(pageParam.FirstOrDefault() ?? string.Empty, out var parsedPage) && parsedPage > 0)
+                    //        {
+                    //            targetPage = parsedPage;
+                    //        }
+                    //    }
+                    //}
+                    //catch
+                    //{
+                    //    // ignore parse errors and default to page 1
+                    //}
+
+                    //await Grid.GoToPageAsync(targetPage);
+                    await Grid.Refresh();
+                }
+            }
+            finally
+            {
+                ShowSpinner = false;
+                StateHasChanged();
             }
         }
 
@@ -501,7 +568,16 @@ namespace BedBrigade.Client.Components
 
             await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
-            Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
+
+            if (_lastSortClosestSelectedId.HasValue)
+            {
+                int page = Grid.PageSettings.CurrentPage;
+                Nav.NavigateTo($"{EditPagePath}{loc}/{id}?sortClosestFor={_lastSortClosestSelectedId}&sortClosestPage={page}");
+            }
+            else
+            {
+                Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
+            }
         }
 
         protected void DataBound()
