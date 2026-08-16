@@ -11,6 +11,7 @@ using Serilog;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -104,6 +105,28 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     {
                         Model.PostalCode = zipTextBox.Value;
                     }
+                }
+
+                // If the caller passed a sortClosestFor query param, preserve it on the return URL so the grid can re-sort
+                try
+                {
+                    if (_nav != null)
+                    {
+                        var uri = new Uri(_nav.Uri);
+                        var query = QueryHelpers.ParseQuery(uri.Query);
+                        if (query.TryGetValue("sortClosestFor", out var sortParam))
+                        {
+                            var selectedIdStr = sortParam.FirstOrDefault();
+                            if (!string.IsNullOrEmpty(selectedIdStr) && int.TryParse(selectedIdStr, out var selectedId) && selectedId > 0)
+                            {
+                                _targetUrl = AppendQueryParam(_targetUrl, "sortClosestFor", selectedId.ToString());
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore parse/navigation errors
                 }
             }
             catch (Exception ex)
@@ -683,6 +706,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             _editContext.OnValidationRequested -= HandleValidationRequested;
             _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+
+        private string AppendQueryParam(string url, string key, string value)
+        {
+            if (string.IsNullOrEmpty(url))
+                return url;
+
+            return url.Contains("?") ? $"{url}&{key}={value}" : $"{url}?{key}={value}";
         }
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)

@@ -14,6 +14,7 @@ using Syncfusion.Blazor.Inputs;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
 using Action = Syncfusion.Blazor.Grids.Action;
 using ContentType = BedBrigade.Common.Enums.ContentType;
 
@@ -110,6 +111,24 @@ namespace BedBrigade.Client.Components
                 }
 
                 BedRequestStatuses = EnumHelper.GetBedRequestStatusItems();
+
+                // If a query parameter requests sorting by a specific BedRequestId, schedule it after render
+                try
+                {
+                    var uri = new Uri(Nav.Uri);
+                    var query = QueryHelpers.ParseQuery(uri.Query);
+                    if (query.TryGetValue("sortClosestFor", out var sortParam))
+                    {
+                        if (int.TryParse(sortParam.FirstOrDefault() ?? string.Empty, out var sortId) && sortId > 0)
+                        {
+                            _ = InvokeAsync(async () => await SortClosestForBedRequestId(sortId));
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore parse/navigation errors
+                }
             }
             catch (Exception ex)
             {
@@ -350,7 +369,6 @@ namespace BedBrigade.Client.Components
 
         private async Task SortClosest()
         {
-            PerfLog.Log("SortClosest started");
             ShowSpinner = true;
             StateHasChanged();
             List<BedRequest> selectedBedRequests = new List<BedRequest>();
@@ -362,7 +380,6 @@ namespace BedBrigade.Client.Components
                 if (Grid != null)
                 {
                     selectedBedRequests = await Grid.GetSelectedRecordsAsync();
-                    PerfLog.Log("SortClosest GetSelectedRecordsAsync completed");
                     if (!selectedBedRequests.Any())
                     {
                         DialogHeader = "Select Row";
@@ -378,25 +395,58 @@ namespace BedBrigade.Client.Components
                     BedRequests =
                         BedRequestDataService.SortBedRequestClosestToAddress(BedRequests,
                             selectedBedRequests.First().BedRequestId);
-                    PerfLog.Log("SortClosest SortBedRequestClosestToAddress completed");
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
                     // Do NOT re-sort by Distance � OrderByBestRoute assigns each record's Distance
                     // as the leg distance from the previous stop (nearest-neighbor), so a global
                     // Distance ASC sort would scramble the intended route sequence.
                     await Grid.ClearSortingAsync();
-                    PerfLog.Log("SortClosest ClearSortingAsync completed");
                     await Grid.GoToPageAsync(1);
-                    PerfLog.Log("SortClosest GoToPageAsync completed");
                     await Grid.Refresh();
-                    PerfLog.Log("SortClosest Refresh completed");
                 }
             }
             finally
             {
                 ShowSpinner = false;
                 StateHasChanged();
-                PerfLog.Log("SortClosest StateHasChanged completed");
+            }
+        }
+
+        private async Task SortClosestForBedRequestId(int bedRequestId)
+        {
+            if (bedRequestId <= 0)
+                return;
+
+            ShowSpinner = true;
+            StateHasChanged();
+
+            try
+            {
+                if (BedRequests != null && BedRequestDataService != null && Grid != null)
+                {
+                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
+
+                    await Grid.ClearSortingAsync();
+                    await Grid.GoToPageAsync(1);
+                    await Grid.Refresh();
+
+                    // Remove query string from URL so the action only runs once
+                    try
+                    {
+                        var current = Nav.Uri;
+                        var baseUri = current.Split('?')[0];
+                        Nav.NavigateTo(baseUri, replace: true);
+                    }
+                    catch
+                    {
+                        // ignore navigation errors
+                    }
+                }
+            }
+            finally
+            {
+                ShowSpinner = false;
+                StateHasChanged();
             }
         }
 
@@ -502,7 +552,7 @@ namespace BedBrigade.Client.Components
 
             await SaveGridPersistenceForNavigationAsync();
             int loc = AuthService.LocationId;
-            Nav.NavigateTo($"{EditPagePath}{loc}/{id}");
+            Nav.NavigateTo($"{EditPagePath}{loc}/{id}?sortClosestFor={id}");
         }
 
         protected void DataBound()
