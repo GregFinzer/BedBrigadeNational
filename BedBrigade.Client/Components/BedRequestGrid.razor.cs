@@ -405,7 +405,7 @@ namespace BedBrigade.Client.Components
                     BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedId);
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
-                    // Do NOT re-sort by Distance  96 OrderByBestRoute assigns each record's Distance
+                    // Do NOT re-sort by Distance, OrderByBestRoute assigns each record's Distance
                     // as the leg distance from the previous stop (nearest-neighbor), so a global
                     // Distance ASC sort would scramble the intended route sequence.
                     await Grid.ClearSortingAsync();
