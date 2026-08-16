@@ -107,27 +107,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     }
                 }
 
-                // If the caller passed a sortClosestFor query param, preserve it on the return URL so the grid can re-sort
-                try
-                {
-                    if (_nav != null)
-                    {
-                        var uri = new Uri(_nav.Uri);
-                        var query = QueryHelpers.ParseQuery(uri.Query);
-                        if (query.TryGetValue("sortClosestFor", out var sortParam))
-                        {
-                            var selectedIdStr = sortParam.FirstOrDefault();
-                            if (!string.IsNullOrEmpty(selectedIdStr) && int.TryParse(selectedIdStr, out var selectedId) && selectedId > 0)
-                            {
-                                _targetUrl = AppendQueryParam(_targetUrl, "sortClosestFor", selectedId.ToString());
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // ignore parse/navigation errors
-                }
+                ProcessSortClosestQueryParameters();
             }
             catch (Exception ex)
             {
@@ -137,6 +117,40 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             finally
             {
                 _isLoading = false;
+            }
+        }
+
+        private void ProcessSortClosestQueryParameters()
+        {
+            // If the caller passed sortClosest query params, preserve them on the return URL so the grid can re-sort and go back to the same page
+            try
+            {
+                if (_nav != null)
+                {
+                    var uri = new Uri(_nav.Uri);
+                    var query = QueryHelpers.ParseQuery(uri.Query);
+                    if (query.TryGetValue("sortClosestFor", out var sortParam))
+                    {
+                        var selectedIdStr = sortParam.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(selectedIdStr) && int.TryParse(selectedIdStr, out var selectedId) && selectedId > 0)
+                        {
+                            _targetUrl = AppendQueryParam(_targetUrl, "sortClosestFor", selectedId.ToString());
+                        }
+                    }
+
+                    if (query.TryGetValue("sortClosestPage", out var pageParam))
+                    {
+                        var pageStr = pageParam.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(pageStr) && int.TryParse(pageStr, out var page) && page > 0)
+                        {
+                            _targetUrl = AppendQueryParam(_targetUrl, "sortClosestPage", page.ToString());
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore parse/navigation errors
             }
         }
 
