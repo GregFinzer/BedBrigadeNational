@@ -200,9 +200,40 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
+        int bedRequestId = Convert.ToInt32(id);
+        await DeleteAssociatedSms(bedRequestId);
+        await DeleteAssociatedEmail(bedRequestId);
         var result = await base.DeleteAsync(id);
         _cachingService.ClearScheduleRelated();
         return result;
+    }
+
+    private async Task DeleteAssociatedEmail(int bedRequestId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<EmailQueue>();
+            var result = await dbSet.Where(o => o.BedRequestId == bedRequestId)
+                .ToListAsync();
+
+            dbSet.RemoveRange(result);
+            await ctx.SaveChangesAsync();
+            _cachingService.ClearByEntityName(nameof(EmailQueue));
+        }
+    }
+
+    private async Task DeleteAssociatedSms(int bedRequestId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<SmsQueue>();
+            var result = await dbSet.Where(o => o.BedRequestId == bedRequestId)
+                .ToListAsync();
+
+            dbSet.RemoveRange(result);
+            await ctx.SaveChangesAsync();
+            _cachingService.ClearByEntityName(nameof(SmsQueue));
+        }
     }
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForScheduleId(int scheduleId)
@@ -389,22 +420,19 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             }
 
             targetBedRequest.Distance = -1;
-            
-            var waitingRequests = bedRequests
-                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId && b.Status == BedRequestStatus.Waiting)
+
+            List<BedRequest> waitingOrScheduled = bedRequests
+                .Where(b => b.BedRequestId != targetBedRequest.BedRequestId 
+                    && (b.Status == BedRequestStatus.Waiting || b.Status == BedRequestStatus.Scheduled))
                 .ToList();
-            
-            var routeOrderedWaitingRequests = OrderByBestRoute(
-                waitingRequests,
+
+            List<BedRequest> result = new List<BedRequest>();
+            List<BedRequest> ordered = OrderByBestRoute(
+                waitingOrScheduled,
                 targetBedRequest.Latitude.HasValue ? (double?)targetBedRequest.Latitude.Value : null,
                 targetBedRequest.Longitude.HasValue ? (double?)targetBedRequest.Longitude.Value : null);
-            
-            var result = new List<BedRequest> { targetBedRequest };
-            result.AddRange(routeOrderedWaitingRequests);
-
-            var scheduledRequests = bedRequests.Where(o => o.Status == BedRequestStatus.Scheduled
-                                                           && o.BedRequestId != targetBedRequest.BedRequestId);
-            result.AddRange(scheduledRequests);
+            result.Add(targetBedRequest);
+            result.AddRange(ordered);
             return result;
         }
         catch (Exception ex)

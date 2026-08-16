@@ -24,6 +24,28 @@ public class ContactUsDataService : Repository<ContactUs>, IContactUsDataService
         _locationDataService = locationDataService;
     }
 
+    public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
+    {
+        int contactUsId = Convert.ToInt32(id);
+        await DeleteAssociatedEmail(contactUsId);
+        var result = await base.DeleteAsync(id);
+        return result;
+    }
+
+    private async Task DeleteAssociatedEmail(int contactUsId)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<EmailQueue>();
+            var result = await dbSet.Where(o => o.ContactUsId == contactUsId)
+                .ToListAsync();
+
+            dbSet.RemoveRange(result);
+            await ctx.SaveChangesAsync();
+            _cachingService.ClearByEntityName(nameof(EmailQueue));
+        }
+    }
+
     public async Task<ServiceResponse<List<ContactUs>>> GetAllForLocationAsync(int locationId)
     {
         return await _commonService.GetAllForLocationAsync(this, locationId);

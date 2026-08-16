@@ -28,7 +28,8 @@ namespace BedBrigade.Tests
             //These files are long but all the methods are related
             _qualityLogic.Config.FilesToExclude.Add("SmsQueueDataService.cs");
             _qualityLogic.Config.FilesToExclude.Add("AddEditBedRequest.razor.cs");
-
+            _qualityLogic.Config.FilesToExclude.Add("BedRequestGrid.razor.cs");
+            
             _solutionPath = TestHelper.GetSolutionPath();
         }
 

@@ -59,7 +59,7 @@ public partial class BulkSms : ComponentBase
 
     private async Task LoadSchedules()
     {
-        var scheduleResponse = await _svcScheduleDataService.GetAvailableSchedulesByLocationId(_svcAuth.LocationId);
+        var scheduleResponse = await _svcScheduleDataService.GetFutureSchedulesByLocationId(_svcAuth.LocationId);
 
         if (!scheduleResponse.Success || scheduleResponse.Data == null)
         {

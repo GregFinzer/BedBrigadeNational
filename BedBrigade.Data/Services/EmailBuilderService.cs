@@ -215,7 +215,8 @@ namespace BedBrigade.Data.Services
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority,
                 LocationId = entity.LocationId,
-                TargetDate = DateTime.UtcNow
+                TargetDate = DateTime.UtcNow,
+                ContactUsId = entity.ContactUsId
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -234,7 +235,13 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
+                BulkEmailParms parms = new BulkEmailParms();
+                parms.EmailList = userEmails.Data;
+                parms.Subject = subject;
+                parms.Body = bodyResult.Data;
+                parms.LocationId = entity.LocationId;
+                parms.ContactUsId = entity.ContactUsId;
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(parms);
 
                 if (!bulkEmailResponse.Success)
                 {
@@ -345,7 +352,8 @@ namespace BedBrigade.Data.Services
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority,
                 LocationId = entity.LocationId,
-                TargetDate = DateTime.UtcNow
+                TargetDate = DateTime.UtcNow,
+                BedRequestId = entity.BedRequestId
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
 
@@ -364,7 +372,13 @@ namespace BedBrigade.Data.Services
 
             if (userEmails.Data.Count > 0)
             {
-                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(userEmails.Data, subject, bodyResult.Data, entity.LocationId);
+                BulkEmailParms parms = new BulkEmailParms();
+                parms.EmailList = userEmails.Data;
+                parms.Subject = subject;
+                parms.Body = bodyResult.Data;
+                parms.LocationId = entity.LocationId;
+                parms.BedRequestId = entity.BedRequestId;
+                var bulkEmailResponse = await _emailQueueDataService.QueueBulkEmail(parms);
 
                 if (!bulkEmailResponse.Success)
                 {

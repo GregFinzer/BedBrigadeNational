@@ -11,6 +11,7 @@ using Serilog;
 using Syncfusion.Blazor.Calendars;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 {
@@ -105,6 +106,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                         Model.PostalCode = zipTextBox.Value;
                     }
                 }
+
+                ProcessSortClosestQueryParameters();
             }
             catch (Exception ex)
             {
@@ -114,6 +117,40 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             finally
             {
                 _isLoading = false;
+            }
+        }
+
+        private void ProcessSortClosestQueryParameters()
+        {
+            // If the caller passed sortClosest query params, preserve them on the return URL so the grid can re-sort and go back to the same page
+            try
+            {
+                if (_nav != null)
+                {
+                    var uri = new Uri(_nav.Uri);
+                    var query = QueryHelpers.ParseQuery(uri.Query);
+                    if (query.TryGetValue("sortClosestFor", out var sortParam))
+                    {
+                        var selectedIdStr = sortParam.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(selectedIdStr) && int.TryParse(selectedIdStr, out var selectedId) && selectedId > 0)
+                        {
+                            _targetUrl = AppendQueryParam(_targetUrl, "sortClosestFor", selectedId.ToString());
+                        }
+                    }
+
+                    if (query.TryGetValue("sortClosestPage", out var pageParam))
+                    {
+                        var pageStr = pageParam.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(pageStr) && int.TryParse(pageStr, out var page) && page > 0)
+                        {
+                            _targetUrl = AppendQueryParam(_targetUrl, "sortClosestPage", page.ToString());
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore parse/navigation errors
             }
         }
 
@@ -244,7 +281,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
 
             FutureDeliverySchedules = scheduleResponse.Data
-                .Where(schedule => schedule.EventType == EventType.Delivery)
+                .Where(schedule => schedule.EventType == EventType.Delivery
+                                   && schedule.EventStatus == EventStatus.Scheduled)
                 .OrderBy(schedule => schedule.EventDateScheduled)
                 .ToList();
 
@@ -682,6 +720,14 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             _editContext.OnValidationRequested -= HandleValidationRequested;
             _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+
+        private string AppendQueryParam(string url, string key, string value)
+        {
+            if (string.IsNullOrEmpty(url))
+                return url;
+
+            return url.Contains("?") ? $"{url}&{key}={value}" : $"{url}?{key}={value}";
         }
 
         private async Task SendDeliveryReminderEmail(Common.Models.BedRequest model, Common.Models.Schedule schedule)

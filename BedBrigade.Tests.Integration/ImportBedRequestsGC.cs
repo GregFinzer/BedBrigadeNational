@@ -19,7 +19,7 @@ namespace BedBrigade.Tests.Integration;
 [TestFixture]
 public class ImportBedRequestsGC
 {
-    private const string ImportFilePath = @"D:\DocumentsAllUsers\Greg\Downloads\Bed Requests - Bed Requests.csv";
+    private const string ImportFilePath = @"C:\Users\gfinz\Documents\BedBrigade\_NationalWebsite\ProductionScripts\Google Sheet Final Export Bed Requests.csv";
     private const string ConnectionString =
         "server=localhost\\sqlexpress;database=bedbrigade;trusted_connection=SSPI;Encrypt=False";
     private readonly NameParserLogic _nameParserLogic = LibraryFactory.NameParser;
