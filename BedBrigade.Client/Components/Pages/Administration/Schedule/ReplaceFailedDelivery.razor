@@ -1,0 +1,64 @@
+﻿@page "/administration/schedule/replacefaileddelivery"
+@layout Layout.AdminLayout
+
+<CheckAuth Roles=@RoleNames.CanManageBedRequests></CheckAuth>
+
+<h3 class="mt-3">Replace Failed Delivery</h3>
+
+@if (WorkflowStep == PickSchedule)
+{
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Choose the Delivery Event</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="ScheduleDropdown" class="formlabel">Delivery Event</label>
+                            <SfDropDownList ID="ScheduleDropdown" TItem="BedBrigade.Common.Models.Schedule" TValue="int?" DataSource="FutureDeliverySchedules" @bind-Value="ScheduleId" Enabled="true" Placeholder="Select Delivery Event" FloatLabelType="FloatLabelType.Never">
+                                <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect" />
+                                <DropDownListEvents TValue="int?" TItem="BedBrigade.Common.Models.Schedule" ValueChange="OnScheduleChange"></DropDownListEvents>
+                            </SfDropDownList>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-1">
+        <div class="col-md-12 text-left">
+            <button class="btn btn-primary" type="button" disabled="@_chooseEventButtonDisabled"  @onclick="ChooseEventNext">Next ></button>
+        </div>
+    </div>    
+}
+else if (WorkflowStep == PickFailedDelivery)
+{
+    <div class="content-wrapper mt-3 failed-delivery-grid">
+        <SfGrid TValue="BedBrigade.Common.Models.BedRequest"
+                DataSource="@BedRequests"
+                AllowPaging="false"
+                AllowGrouping="true"
+                Toolbar="@(new List<string>() { "Search" })">
+            <GridGroupSettings Columns="@(new string[] { nameof(BedBrigade.Common.Models.BedRequest.Team) })"
+                               ShowDropArea="false"
+                               ShowGroupedColumn="true">
+            </GridGroupSettings>
+
+            <GridColumns>
+                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.FullName)" HeaderText="Name"></GridColumn>
+                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.NumberOfBeds)" HeaderText="Number Of Beds" Width="150" TextAlign="TextAlign.Right"></GridColumn>
+                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.Team)" HeaderText="Team" Width="120"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
+
+
+<style>
+    .failed-delivery-grid .e-groupcaption,
+    .failed-delivery-grid .e-recordplusexpand,
+    .failed-delivery-grid .e-recordpluscollapse {
+        background-color: #e9ecef !important;
+    }
+</style>
