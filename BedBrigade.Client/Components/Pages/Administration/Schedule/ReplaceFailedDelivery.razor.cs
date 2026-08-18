@@ -21,12 +21,21 @@ public partial class ReplaceFailedDelivery : ComponentBase
     
     public List<Common.Models.Schedule> FutureDeliverySchedules { get; set; } = new List<Common.Models.Schedule>();
     public List<Common.Models.BedRequest> BedRequests { get; set; } = new List<Common.Models.BedRequest>();
-    
+    private string SearchText { get; set; } = string.Empty;
+
     [Inject] private NavigationManager _nav { get; set; } = default!;
 
     [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
 
     [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _baseUrl = _nav.Uri;
+        DetermineWorkflowStep();
+        await LoadScheduleData();
+        await LoadBedRequests();
+    }
 
     protected override async Task OnParametersSetAsync()
     {

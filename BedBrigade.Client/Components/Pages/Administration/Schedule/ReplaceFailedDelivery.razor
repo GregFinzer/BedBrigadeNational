@@ -41,41 +41,66 @@ else if (WorkflowStep == PickFailedDelivery)
             <div class="col-md-12 text-left">
                 <a href="/administration/schedule/replacefaileddelivery" class="btn btn-primary">Back</a>
             </div>
-        </div> 
+        </div>
     }
     else
     {
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Team</th>
-                <th scope="col">Number of Beds</th>
-            </tr>
-            </thead>
-            <tbody>
-            @{
-                string lastTeam = BedRequests.FirstOrDefault()?.Team ?? string.Empty;
-                string contextualClass = "table-default";
-            }
-            @for (int i = 0; i < BedRequests.Count; i++)
-            {
-                //We just keep adding on to the _baseUrl
-                string url = $"{_baseUrl}&failedBedRequestId={BedRequests[i].BedRequestId}";
+        <div class="mb-3">
+            <input type="search"
+                   class="form-control"
+                   placeholder="Search bed requests..."
+                   @bind="SearchText"
+                   @bind:event="oninput"/>
+        </div>
 
-                @if (BedRequests[i].Team != lastTeam)
-                {
-                    lastTeam = BedRequests[i].Team;
-                    contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
-                }
+        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchText)
+            ? BedRequests
+            : BedRequests.Where(x =>
+                    (x.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.Team?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    x.NumberOfBeds.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-                <tr class="@contextualClass">
-                    <td><a href="@url">@BedRequests[i].FullName</a></td>
-                    <td>@BedRequests[i].Team</td>
-                    <td>@BedRequests[i].NumberOfBeds</td>
+        if (!filteredBedRequests.Any())
+        {
+            <p>No bed requests match your search.</p>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Team</th>
+                    <th scope="col">Number of Beds</th>
                 </tr>
-            }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @{
+                    string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
+                    string contextualClass = "table-default";
+                }
+                @for (int i = 0; i < filteredBedRequests.Count; i++)
+                {
+                    //We just keep adding on to the _baseUrl
+                    string url = $"{_baseUrl}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+
+                    @if (filteredBedRequests[i].Team != lastTeam)
+                    {
+                        lastTeam = filteredBedRequests[i].Team;
+                        contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
+                    }
+
+                    <tr class="@contextualClass">
+                        <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
+                        <td>@filteredBedRequests[i].Team</td>
+                        <td>@filteredBedRequests[i].NumberOfBeds</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
     }
 }
+
+
