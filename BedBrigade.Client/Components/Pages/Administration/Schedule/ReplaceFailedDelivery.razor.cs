@@ -28,14 +28,14 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         _baseUrl = _nav.Uri;
         DetermineWorkflowStep();
         await LoadScheduleData();
         await LoadBedRequests();
     }
-
+    
     private async Task LoadBedRequests()
     {
         if (ScheduleId.HasValue)
@@ -72,7 +72,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private void ChooseEventNext()
     {
-        string url = _nav.ToBaseRelativePath(_nav.Uri) + $"&scheduleId={ScheduleId}";
+        string url = _nav.ToBaseRelativePath(_nav.Uri) + $"?scheduleId={ScheduleId}";
         _nav.NavigateTo(url);  
     }
 

@@ -34,31 +34,48 @@
 }
 else if (WorkflowStep == PickFailedDelivery)
 {
-    <div class="content-wrapper mt-3 failed-delivery-grid">
-        <SfGrid TValue="BedBrigade.Common.Models.BedRequest"
-                DataSource="@BedRequests"
-                AllowPaging="false"
-                AllowGrouping="true"
-                Toolbar="@(new List<string>() { "Search" })">
-            <GridGroupSettings Columns="@(new string[] { nameof(BedBrigade.Common.Models.BedRequest.Team) })"
-                               ShowDropArea="false"
-                               ShowGroupedColumn="true">
-            </GridGroupSettings>
-
-            <GridColumns>
-                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.FullName)" HeaderText="Name"></GridColumn>
-                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.NumberOfBeds)" HeaderText="Number Of Beds" Width="150" TextAlign="TextAlign.Right"></GridColumn>
-                <GridColumn Field="@nameof(BedBrigade.Common.Models.BedRequest.Team)" HeaderText="Team" Width="120"></GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
-}
-
-
-<style>
-    .failed-delivery-grid .e-groupcaption,
-    .failed-delivery-grid .e-recordplusexpand,
-    .failed-delivery-grid .e-recordpluscollapse {
-        background-color: #e9ecef !important;
+    if (!BedRequests.Any())
+    {
+        <p>There are no Bed Requests scheduled for the selected event.</p>
+        <div class="row mt-1">
+            <div class="col-md-12 text-left">
+                <a href="/administration/schedule/replacefaileddelivery" class="btn btn-primary">Back</a>
+            </div>
+        </div> 
     }
-</style>
+    else
+    {
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Team</th>
+                <th scope="col">Number of Beds</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+                string lastTeam = BedRequests.FirstOrDefault()?.Team ?? string.Empty;
+                string contextualClass = "table-default";
+            }
+            @for (int i = 0; i < BedRequests.Count; i++)
+            {
+                //We just keep adding on to the _baseUrl
+                string url = $"{_baseUrl}&failedBedRequestId={BedRequests[i].BedRequestId}";
+
+                @if (BedRequests[i].Team != lastTeam)
+                {
+                    lastTeam = BedRequests[i].Team;
+                    contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
+                }
+
+                <tr class="@contextualClass">
+                    <td><a href="@url">@BedRequests[i].FullName</a></td>
+                    <td>@BedRequests[i].Team</td>
+                    <td>@BedRequests[i].NumberOfBeds</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}

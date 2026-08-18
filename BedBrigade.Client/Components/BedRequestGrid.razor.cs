@@ -289,11 +289,29 @@ namespace BedBrigade.Client.Components
         {
             if (Grid != null)
             {
-                await Grid.FilterByColumnAsync(
-                    nameof(BedRequest.StatusString),
-                    "equal",
-                    "Waiting"
-                );
+                var columns = await Grid.GetColumnsAsync();
+                string statusUid = columns.Where(o => o.Field == nameof(BedRequest.StatusString)).First().Uid;
+                Grid.FilterSettings.Columns = new List<GridFilterColumn>();
+           
+                Grid.FilterSettings.Columns.Add(new GridFilterColumn
+                {
+                    Field = nameof(BedRequest.StatusString),
+                    Operator = Syncfusion.Blazor.Operator.Equal,
+                    Predicate = "or",
+                    Value = BedRequestStatus.Waiting.ToString(),
+                    Uid = statusUid
+                });
+
+                Grid.FilterSettings.Columns.Add(new GridFilterColumn
+                {
+                    Field = nameof(BedRequest.StatusString),
+                    Operator = Syncfusion.Blazor.Operator.Equal,
+                    Predicate = "or",
+                    Value = BedRequestStatus.Scheduled.ToString(),
+                    Uid = statusUid
+                });
+                
+                await Grid.Refresh();
             }
         }
 
