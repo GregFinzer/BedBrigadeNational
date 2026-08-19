@@ -131,7 +131,7 @@ public partial class SmsSummary : ComponentBase, IDisposable
     {
         if (string.IsNullOrWhiteSpace(name)) return "#";
         var parts = name.Split(' ');
-        return parts.Length > 1 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : $"{parts[0][0]}".ToUpper();
+        return parts.Length > 1 ? $"{parts[0]}{parts[1]}".ToUpper() : $"{parts[0]}".ToUpper();
     }
 
 
