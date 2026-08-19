@@ -130,7 +130,8 @@ public partial class SmsSummary : ComponentBase, IDisposable
     private string GetInitials(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return "#";
-        var parts = name.Split(' ');
+        var parts = name.Trim().Split(' ',  StringSplitOptions.RemoveEmptyEntries);
+
         return parts.Length > 1 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : $"{parts[0][0]}".ToUpper();
     }
 
