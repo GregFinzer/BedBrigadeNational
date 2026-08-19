@@ -18,7 +18,14 @@ else
 {
     <div class="container p-5">
         <p>@_lc.Keys["IdleLogoutMessage"]</p>
-        <a class="btn btn-primary" href="/login">@_lc.Keys["LogIn"]</a>
+        @if (!string.IsNullOrWhiteSpace(ReturnUrl))
+        {
+            <a class="btn btn-primary" href="/login?returnUrl=@ReturnUrl">@_lc.Keys["LogIn"]</a>    
+        }
+        else
+        {
+            <a class="btn btn-primary" href="/login">@_lc.Keys["LogIn"]</a>
+        }
     </div>
 }
 

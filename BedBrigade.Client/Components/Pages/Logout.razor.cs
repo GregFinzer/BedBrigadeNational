@@ -15,7 +15,8 @@ public partial class Logout : ComponentBase
     [Inject] private ILocationState _locationState { get; set; }
     public string ErrorMessage { get; set; } = string.Empty;
     [Parameter] public string? reason { get; set; }
-    
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl {  get; set; }
 
     protected override async Task OnInitializedAsync()
     {
