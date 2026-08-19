@@ -13,14 +13,18 @@ public partial class ReplaceFailedDelivery : ComponentBase
     
     [SupplyParameterFromQuery]
     public int? FailedBedRequestId { get; set; }
+    
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
+    private const int PickConfirm = 2;
     private bool _chooseEventButtonDisabled = true;
-    private string _baseUrl = string.Empty;
+    private const string BaseUrl = "/administration/schedule/replacefaileddelivery";
     
     public List<Common.Models.Schedule> FutureDeliverySchedules { get; set; } = new List<Common.Models.Schedule>();
     public List<Common.Models.BedRequest> BedRequests { get; set; } = new List<Common.Models.BedRequest>();
+    public Common.Models.BedRequest FailedBedRequest { get; set; } = new Common.Models.BedRequest();
+    
     private string SearchText { get; set; } = string.Empty;
 
     [Inject] private NavigationManager _nav { get; set; } = default!;
@@ -28,23 +32,28 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
 
     [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _baseUrl = _nav.Uri;
-        DetermineWorkflowStep();
-        await LoadScheduleData();
-        await LoadBedRequests();
-    }
-
+    
     protected override async Task OnParametersSetAsync()
     {
-        _baseUrl = _nav.Uri;
         DetermineWorkflowStep();
         await LoadScheduleData();
         await LoadBedRequests();
+        await LoadFailedBedRequest();
     }
-    
+
+    private async Task LoadFailedBedRequest()
+    {
+        if (FailedBedRequestId.HasValue)
+        {
+            var bedReqeuestResponse = await _bedRequestDataService.GetByIdAsync(FailedBedRequestId.Value);
+
+            if (bedReqeuestResponse.Success && bedReqeuestResponse.Data != null)
+            {
+                FailedBedRequest = bedReqeuestResponse.Data;
+            }
+        }
+    }
+
     private async Task LoadBedRequests()
     {
         if (ScheduleId.HasValue)
@@ -74,7 +83,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private void DetermineWorkflowStep()
     {
-        if (ScheduleId.HasValue)
+        if (FailedBedRequestId.HasValue)
+            WorkflowStep = PickConfirm;
+        else if (ScheduleId.HasValue)
             WorkflowStep = PickFailedDelivery;
     }
 

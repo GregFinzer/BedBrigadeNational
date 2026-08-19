@@ -39,7 +39,7 @@ else if (WorkflowStep == PickFailedDelivery)
         <p>There are no Bed Requests scheduled for the selected event.</p>
         <div class="row mt-1">
             <div class="col-md-12 text-left">
-                <a href="/administration/schedule/replacefaileddelivery" class="btn btn-primary">Back</a>
+                <a href="@BaseUrl" class="btn btn-primary">Back</a>
             </div>
         </div>
     }
@@ -83,8 +83,7 @@ else if (WorkflowStep == PickFailedDelivery)
                 }
                 @for (int i = 0; i < filteredBedRequests.Count; i++)
                 {
-                    //We just keep adding on to the _baseUrl
-                    string url = $"{_baseUrl}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
 
                     @if (filteredBedRequests[i].Team != lastTeam)
                     {
@@ -102,6 +101,60 @@ else if (WorkflowStep == PickFailedDelivery)
             </table>
         }
     }
+}
+else if (WorkflowStep == PickConfirm)
+{
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Confirm The Failed Bed Request</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <a href="tel:@StringUtil.ExtractDigits(FailedBedRequest.Phone)">
+                                    @FailedBedRequest.FormattedPhone
+                                </a>
+                            </div>
+                        </div>    
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Number of Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.NumberOfBeds
+                            </div>
+                        </div>       
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.GenderAge
+                            </div>
+                        </div>                          
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @* <div class="row mt-1"> *@
+    @*     <div class="col-md-12 text-left"> *@
+    @*         <button class="btn btn-primary" type="button" disabled="@_chooseEventButtonDisabled"  @onclick="ChooseEventNext">Next ></button> *@
+    @*     </div> *@
+    @* </div>   *@
 }
 
 
