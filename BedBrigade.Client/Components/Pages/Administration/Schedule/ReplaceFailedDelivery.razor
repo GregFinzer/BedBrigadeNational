@@ -9,7 +9,7 @@
 {
     <div class="content-wrapper mt-3">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="card">
                     <div class="card-header">Choose the Delivery Event</div>
                     <div class="card-body">
@@ -27,7 +27,7 @@
     </div>
     
     <div class="row mt-1">
-        <div class="col-md-12 text-left">
+        <div class="col-md-4 col-sm-6 col-xs-12 text-left">
             <button class="btn btn-primary" type="button" disabled="@_chooseEventButtonDisabled"  @onclick="ChooseEventNext">Next ></button>
         </div>
     </div>    
@@ -37,11 +37,6 @@ else if (WorkflowStep == PickFailedDelivery)
     if (!BedRequests.Any())
     {
         <p>There are no Bed Requests scheduled for the selected event.</p>
-        <div class="row mt-1">
-            <div class="col-md-12 text-left">
-                <a href="@BaseUrl" class="btn btn-primary">Back</a>
-            </div>
-        </div>
     }
     else
     {
@@ -101,12 +96,21 @@ else if (WorkflowStep == PickFailedDelivery)
             </table>
         }
     }
+    <div class="row mt-1">
+        <div class="col-md-12 text-left">
+            <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+        </div>
+    </div>
 }
 else if (WorkflowStep == PickConfirm)
 {
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId=0";
+    string waitingUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status=Waiting";
+    string canceledUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status=Cancelled";
+
     <div class="content-wrapper mt-3">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="card">
                     <div class="card-header">Confirm The Failed Bed Request</div>
                     <div class="card-body">
@@ -127,7 +131,7 @@ else if (WorkflowStep == PickConfirm)
                                     @FailedBedRequest.FormattedPhone
                                 </a>
                             </div>
-                        </div>    
+                        </div>
                         <div class="row mb-2">
                             <div class="col-sm-3 fw-bold">
                                 Number of Beds:
@@ -135,7 +139,7 @@ else if (WorkflowStep == PickConfirm)
                             <div class="col-sm-9">
                                 @FailedBedRequest.NumberOfBeds
                             </div>
-                        </div>       
+                        </div>
                         <div class="row mb-2">
                             <div class="col-sm-3 fw-bold">
                                 Gender/Age:
@@ -143,18 +147,24 @@ else if (WorkflowStep == PickConfirm)
                             <div class="col-sm-9">
                                 @FailedBedRequest.GenderAge
                             </div>
-                        </div>                          
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Team:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.Team
+                            </div>
+                        </div>                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    @* <div class="row mt-1"> *@
-    @*     <div class="col-md-12 text-left"> *@
-    @*         <button class="btn btn-primary" type="button" disabled="@_chooseEventButtonDisabled"  @onclick="ChooseEventNext">Next ></button> *@
-    @*     </div> *@
-    @* </div>   *@
+
+    <p class="mt-2"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></p>
+    <p><a class="btn btn-success" href="@waitingUrl">Set to Waiting and Replace</a></p>
+    <p><a class="btn btn-danger" href="@canceledUrl">Set to Canceled and Replace</a></p>
 }
 
 

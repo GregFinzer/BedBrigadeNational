@@ -14,6 +14,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [SupplyParameterFromQuery]
     public int? FailedBedRequestId { get; set; }
     
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+    
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
@@ -83,9 +86,11 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private void DetermineWorkflowStep()
     {
-        if (FailedBedRequestId.HasValue)
+        WorkflowStep = PickSchedule;
+        
+        if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0)
             WorkflowStep = PickConfirm;
-        else if (ScheduleId.HasValue)
+        else if (ScheduleId.HasValue  && ScheduleId.Value > 0)
             WorkflowStep = PickFailedDelivery;
     }
 
