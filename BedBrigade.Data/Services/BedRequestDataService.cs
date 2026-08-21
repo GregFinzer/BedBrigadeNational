@@ -247,6 +247,48 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
         }
     }
+
+    public async Task<ServiceResponse<List<BedRequest>>> GetReplacementBedRequests(BedRequest failedBedRequest)
+    {
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var dbSet = ctx.Set<BedRequest>();
+            var result = await dbSet.Where(o => o.LocationId == failedBedRequest.LocationId
+                                                && o.BedRequestId != failedBedRequest.BedRequestId
+                                                && o.Status == BedRequestStatus.Waiting
+                                                && o.NumberOfBeds <= failedBedRequest.NumberOfBeds
+                                                && (o.Notes == null || !o.Notes.Contains(Defaults.FailedDeliveryText)))
+                .ToListAsync();
+
+            result = SortByNumberOfBedsAndDistance(failedBedRequest, result);
+            return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+        }
+    }
+
+    private List<BedRequest> SortByNumberOfBedsAndDistance(BedRequest failedBedRequest, List<BedRequest> bedRequests)
+    {
+        if (failedBedRequest.Latitude == null && failedBedRequest.Longitude == null)
+        {
+            return bedRequests.OrderByDescending(o => o.NumberOfBeds)
+                .ThenBy(o => o.CreateDate).ToList();
+        }
+
+        //Fill distance
+        foreach (var bedRequest in bedRequests)
+        {
+            if (failedBedRequest.Latitude == null && failedBedRequest.Longitude == null)
+                bedRequest.Distance = Defaults.DefaultDistance;
+                
+            bedRequest.Distance = CalculateDistance((double)failedBedRequest.Latitude.Value, 
+                (double)failedBedRequest.Longitude.Value,
+                (double)bedRequest.Latitude, 
+                (double)bedRequest.Longitude);
+        }
+
+        return bedRequests
+            .OrderByDescending(o => o.NumberOfBeds)
+            .OrderBy(o => o.Distance).ToList();
+    }
     
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForLocationAsync(int locationId)
     {
@@ -610,15 +652,13 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
         double? startLongitude,
         BedRequest request)
     {
-        const double defaultDistance = 999;
-
         if (startLatitude.HasValue && startLongitude.HasValue && request.Latitude.HasValue && request.Longitude.HasValue)
         {
             return CalculateDistance(startLatitude.Value, startLongitude.Value, (double)request.Latitude.Value,
                 (double)request.Longitude.Value);
         }
 
-        return defaultDistance;
+        return Defaults.DefaultDistance;
     }
 
     private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)

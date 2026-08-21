@@ -34,7 +34,7 @@
 }
 else if (WorkflowStep == PickFailedDelivery)
 {
-    if (!BedRequests.Any())
+    if (!BedRequestsForEvent.Any())
     {
         <p>There are no Bed Requests scheduled for the selected event.</p>
     }
@@ -50,8 +50,8 @@ else if (WorkflowStep == PickFailedDelivery)
         </div>
 
         var filteredBedRequests = string.IsNullOrWhiteSpace(SearchText)
-            ? BedRequests
-            : BedRequests.Where(x =>
+            ? BedRequestsForEvent
+            : BedRequestsForEvent.Where(x =>
                     (x.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                     (x.Team?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                     x.NumberOfBeds.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase))
@@ -102,7 +102,7 @@ else if (WorkflowStep == PickFailedDelivery)
         </div>
     </div>
 }
-else if (WorkflowStep == PickConfirm)
+else if (WorkflowStep == PickStatus)
 {
     string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId=0";
     string waitingUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status=Waiting";
@@ -166,5 +166,76 @@ else if (WorkflowStep == PickConfirm)
     <p><a class="btn btn-success" href="@waitingUrl">Set to Waiting and Replace</a></p>
     <p><a class="btn btn-danger" href="@canceledUrl">Set to Canceled and Replace</a></p>
 }
+else if (WorkflowStep == PickReplacement)
+{
+    if (!WaitingBedRequests.Any())
+    {
+        string message = $"There are no waiting Bed Requests that have less than or equal to {FailedBedRequest.NumberOfBeds} beds."; 
+        <p>@message</p>
+    }
+    else
+    {
+        <p>Select the Bed Requester Name to Replace</p>
+        <div class="mb-3">
+            <input type="search"
+                   class="form-control"
+                   placeholder="Search bed requests..."
+                   @bind="SearchTextReplace"
+                   @bind:event="oninput"/>
+        </div>
 
+        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchTextReplace)
+            ? BedRequestsForEvent
+            : BedRequestsForEvent.Where(x =>
+                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (x.Team?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+        if (!filteredBedRequests.Any())
+        {
+            <p>No bed requests match your search.</p>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Beds</th>
+                    <th scope="col">Distance</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
+                    string contextualClass = "table-default";
+                }
+                @for (int i = 0; i < filteredBedRequests.Count; i++)
+                {
+                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+
+                    @if (filteredBedRequests[i].Team != lastTeam)
+                    {
+                        lastTeam = filteredBedRequests[i].Team;
+                        contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
+                    }
+
+                    <tr class="@contextualClass">
+                        <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
+                        <td>@filteredBedRequests[i].Team</td>
+                        <td>@filteredBedRequests[i].NumberOfBeds</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    }
+    <div class="row mt-1">
+        <div class="col-md-12 text-left">
+            <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+        </div>
+    </div>
+}
 

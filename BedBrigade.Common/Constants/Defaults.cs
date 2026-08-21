@@ -20,7 +20,10 @@
         public const string CountryCode = "US";
         public const string DefaultTimeZoneId = "Eastern Standard Time";
         public const string DefaultDonationCampaignName = "General";
-
+        public const string FailedDeliveryText = "Failed delivery";
+        public const string ContactedToAttemptReplacementText = "Contacted to attempt replacement";
+        public const int DefaultDistance = 999;
+        
         public const string DefaultBedType = "Single Bed";
         //The reason why I have chosen 12 is because each row is four bootstrap columns 
         public const int MaxTopBlogItems = 12;

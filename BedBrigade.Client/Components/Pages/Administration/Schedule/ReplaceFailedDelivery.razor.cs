@@ -20,15 +20,18 @@ public partial class ReplaceFailedDelivery : ComponentBase
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
-    private const int PickConfirm = 2;
+    private const int PickStatus = 2;
+    private const int PickReplacement = 3;
     private bool _chooseEventButtonDisabled = true;
     private const string BaseUrl = "/administration/schedule/replacefaileddelivery";
     
     public List<Common.Models.Schedule> FutureDeliverySchedules { get; set; } = new List<Common.Models.Schedule>();
-    public List<Common.Models.BedRequest> BedRequests { get; set; } = new List<Common.Models.BedRequest>();
+    public List<Common.Models.BedRequest> BedRequestsForEvent { get; set; } = new List<Common.Models.BedRequest>();
     public Common.Models.BedRequest FailedBedRequest { get; set; } = new Common.Models.BedRequest();
+    public List<Common.Models.BedRequest> WaitingBedRequests { get; set; } = new List<Common.Models.BedRequest>();
     
     private string SearchText { get; set; } = string.Empty;
+    private string SearchTextReplace { get; set; } = string.Empty;
 
     [Inject] private NavigationManager _nav { get; set; } = default!;
 
@@ -40,8 +43,14 @@ public partial class ReplaceFailedDelivery : ComponentBase
     {
         DetermineWorkflowStep();
         await LoadScheduleData();
-        await LoadBedRequests();
+        await LoadBedRequestsForEvent();
         await LoadFailedBedRequest();
+        await LoadReplacementBedRequests();
+    }
+
+    private async Task LoadReplacementBedRequests()
+    {
+        throw new NotImplementedException();
     }
 
     private async Task LoadFailedBedRequest()
@@ -57,7 +66,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
         }
     }
 
-    private async Task LoadBedRequests()
+    private async Task LoadBedRequestsForEvent()
     {
         if (ScheduleId.HasValue)
         {
@@ -65,7 +74,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
             if (bedRequestResponse.Success && bedRequestResponse.Data != null)
             {
-                BedRequests = bedRequestResponse.Data
+                BedRequestsForEvent = bedRequestResponse.Data
                     .OrderBy(o => o.Team)
                     .ToList();
             }
@@ -87,9 +96,11 @@ public partial class ReplaceFailedDelivery : ComponentBase
     private void DetermineWorkflowStep()
     {
         WorkflowStep = PickSchedule;
-        
+
+        if (!string.IsNullOrWhiteSpace(Status))
+            WorkflowStep = PickReplacement;
         if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0)
-            WorkflowStep = PickConfirm;
+            WorkflowStep = PickStatus;
         else if (ScheduleId.HasValue  && ScheduleId.Value > 0)
             WorkflowStep = PickFailedDelivery;
     }

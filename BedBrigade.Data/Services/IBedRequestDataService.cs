@@ -28,5 +28,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<DateTime?>> NextDateEligibleForBedRequest(NewBedRequest bedRequest);
         Task<ServiceResponse<List<BedRequest>>> GetBedRequestsByUserAndStatus(List<BedRequestStatus> statuses);
         Task<ServiceResponse<List<BedRequest>>> GetAllForScheduleId(int scheduleId);
+        Task<ServiceResponse<List<BedRequest>>> GetReplacementBedRequests(BedRequest bedRequest);
     }
 }
