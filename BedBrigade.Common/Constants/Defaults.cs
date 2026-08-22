@@ -21,7 +21,7 @@
         public const string DefaultTimeZoneId = "Eastern Standard Time";
         public const string DefaultDonationCampaignName = "General";
         public const string FailedDeliveryText = "Failed delivery";
-        public const string ContactedToAttemptReplacementText = "Contacted to attempt replacement";
+        public const string SameDayScheduleText = "Same day schedule";
         public const int DefaultDistance = 999;
         
         public const string DefaultBedType = "Single Bed";

@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Constants;
+﻿using System.Data.Common;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
 using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
@@ -200,12 +201,19 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public override async Task<ServiceResponse<bool>> DeleteAsync(object id)
     {
-        int bedRequestId = Convert.ToInt32(id);
-        await DeleteAssociatedSms(bedRequestId);
-        await DeleteAssociatedEmail(bedRequestId);
-        var result = await base.DeleteAsync(id);
-        _cachingService.ClearScheduleRelated();
-        return result;
+        try
+        {
+            int bedRequestId = Convert.ToInt32(id);
+            await DeleteAssociatedSms(bedRequestId);
+            await DeleteAssociatedEmail(bedRequestId);
+            var result = await base.DeleteAsync(id);
+            _cachingService.ClearScheduleRelated();
+            return result;
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<bool>($"Could not DeleteAsync {GetEntityName()}  with id {id}: {ex.Message} ({ex.ErrorCode})", false);
+        }
     }
 
     private async Task DeleteAssociatedEmail(int bedRequestId)
@@ -238,30 +246,44 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<List<BedRequest>>> GetAllForScheduleId(int scheduleId)
     {
-        using (var ctx = _contextFactory.CreateDbContext())
+        try
         {
-            var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<BedRequest>();
+                var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
                     .ToListAsync();
 
-            return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+                return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<BedRequest>>($"Could not GetAllForScheduleId {GetEntityName()}  with scheduleId {scheduleId}: {ex.Message} ({ex.ErrorCode})", false);
         }
     }
 
     public async Task<ServiceResponse<List<BedRequest>>> GetReplacementBedRequests(BedRequest failedBedRequest)
     {
-        using (var ctx = _contextFactory.CreateDbContext())
+        try
         {
-            var dbSet = ctx.Set<BedRequest>();
-            var result = await dbSet.Where(o => o.LocationId == failedBedRequest.LocationId
-                                                && o.BedRequestId != failedBedRequest.BedRequestId
-                                                && o.Status == BedRequestStatus.Waiting
-                                                && o.NumberOfBeds <= failedBedRequest.NumberOfBeds
-                                                && (o.Notes == null || !o.Notes.Contains(Defaults.FailedDeliveryText)))
-                .ToListAsync();
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<BedRequest>();
+                var result = await dbSet.Where(o => o.LocationId == failedBedRequest.LocationId
+                                                    && o.BedRequestId != failedBedRequest.BedRequestId
+                                                    && o.Status == BedRequestStatus.Waiting
+                                                    && o.NumberOfBeds <= failedBedRequest.NumberOfBeds
+                                                    && (o.Notes == null || !o.Notes.Contains(Defaults.FailedDeliveryText)))
+                    .ToListAsync();
 
-            result = SortByNumberOfBedsAndDistance(failedBedRequest, result);
-            return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+                result = SortByNumberOfBedsAndDistance(failedBedRequest, result);
+                return new ServiceResponse<List<BedRequest>>("Found for ScheduleId", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<BedRequest>>($"Could not GetReplacementBedRequests {GetEntityName()}  with failedBedRequest {failedBedRequest.BedRequestId}: {ex.Message} ({ex.ErrorCode})", false);
         }
     }
 
@@ -328,14 +350,21 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
 
     public async Task<ServiceResponse<int>> SumBedsForNotReceived(int locationId)
     {
-        using (var ctx = _contextFactory.CreateDbContext())
+        try
         {
-            var dbSet = ctx.Set<BedRequest>();
-            var sum = await dbSet.Where(o => o.LocationId == locationId
-                                             && o.Status == BedRequestStatus.Waiting)
-                .SumAsync(b => b.NumberOfBeds);
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<BedRequest>();
+                var sum = await dbSet.Where(o => o.LocationId == locationId
+                                                 && o.Status == BedRequestStatus.Waiting)
+                    .SumAsync(b => b.NumberOfBeds);
 
-            return new ServiceResponse<int>($"Found sum of {sum} beds", true, sum);
+                return new ServiceResponse<int>($"Found sum of {sum} beds", true, sum);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<int>($"Could not SumBedsForNotReceived {GetEntityName()} with locationId {locationId}: {ex.Message} ({ex.ErrorCode})", false);
         }
     }
 

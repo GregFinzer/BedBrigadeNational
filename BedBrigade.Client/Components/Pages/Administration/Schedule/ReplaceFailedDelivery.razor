@@ -168,7 +168,7 @@ else if (WorkflowStep == PickStatus)
 }
 else if (WorkflowStep == PickReplacement)
 {
-    if (!WaitingBedRequests.Any())
+    if (!ReplacementBedRequests.Any())
     {
         string message = $"There are no waiting Bed Requests that have less than or equal to {FailedBedRequest.NumberOfBeds} beds."; 
         <p>@message</p>

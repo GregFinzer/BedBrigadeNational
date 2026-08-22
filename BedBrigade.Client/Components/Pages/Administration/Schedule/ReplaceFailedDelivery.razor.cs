@@ -28,7 +28,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
     public List<Common.Models.Schedule> FutureDeliverySchedules { get; set; } = new List<Common.Models.Schedule>();
     public List<Common.Models.BedRequest> BedRequestsForEvent { get; set; } = new List<Common.Models.BedRequest>();
     public Common.Models.BedRequest FailedBedRequest { get; set; } = new Common.Models.BedRequest();
-    public List<Common.Models.BedRequest> WaitingBedRequests { get; set; } = new List<Common.Models.BedRequest>();
+    public List<Common.Models.BedRequest> ReplacementBedRequests { get; set; } = new List<Common.Models.BedRequest>();
     
     private string SearchText { get; set; } = string.Empty;
     private string SearchTextReplace { get; set; } = string.Empty;
@@ -50,7 +50,18 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private async Task LoadReplacementBedRequests()
     {
-        throw new NotImplementedException();
+        if (FailedBedRequestId.HasValue 
+            && FailedBedRequestId.Value > 0 
+            && FailedBedRequest != null 
+            && FailedBedRequest.BedRequestId > 0)
+        {
+            var bedRequestResponse = await _bedRequestDataService.GetReplacementBedRequests(FailedBedRequest);
+            
+            if (bedRequestResponse.Success && bedRequestResponse.Data != null)
+            {
+                ReplacementBedRequests = bedRequestResponse.Data;
+            }
+        }
     }
 
     private async Task LoadFailedBedRequest()
