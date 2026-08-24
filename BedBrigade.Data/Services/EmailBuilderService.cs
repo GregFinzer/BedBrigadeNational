@@ -19,7 +19,7 @@ namespace BedBrigade.Data.Services
         private readonly IScheduleDataService _scheduleDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
         private readonly ITimezoneDataService _timezoneDataService;
-
+        private readonly IBedRequestEmailDataService _bedRequestEmailDataService;
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
             IEmailQueueDataService emailQueueDataService,
@@ -29,7 +29,8 @@ namespace BedBrigade.Data.Services
             IVolunteerDataService volunteerDataService,
             IScheduleDataService scheduleDataService,
             IMailMergeLogic mailMergeLogic,
-            ITimezoneDataService timezoneDataService)
+            ITimezoneDataService timezoneDataService,
+            IBedRequestEmailDataService bedRequestEmailDataService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -41,6 +42,7 @@ namespace BedBrigade.Data.Services
             _scheduleDataService = scheduleDataService;
             _mailMergeLogic = mailMergeLogic;
             _timezoneDataService = timezoneDataService;
+            _bedRequestEmailDataService = bedRequestEmailDataService;
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)
@@ -403,7 +405,7 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>("Location not found", false);
             }
 
-            var countResult = await _bedRequestDataService.SumBedsForNotReceived(entity.LocationId);
+            var countResult = await _bedRequestEmailDataService.SumBedsForNotReceived(entity.LocationId);
 
             if (!countResult.Success || countResult.Data == null)
             {

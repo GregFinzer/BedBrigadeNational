@@ -38,7 +38,8 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
 
     [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
-    
+
+    [Inject] private IBedRequestFailedDeliveryDataService BedRequestFailedDeliveryDataService { get; set; } = default!;
     protected override async Task OnParametersSetAsync()
     {
         DetermineWorkflowStep();
@@ -55,7 +56,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
             && FailedBedRequest != null 
             && FailedBedRequest.BedRequestId > 0)
         {
-            var bedRequestResponse = await _bedRequestDataService.GetReplacementBedRequests(FailedBedRequest);
+            var bedRequestResponse = await BedRequestFailedDeliveryDataService.GetReplacementBedRequests(FailedBedRequest);
             
             if (bedRequestResponse.Success && bedRequestResponse.Data != null)
             {

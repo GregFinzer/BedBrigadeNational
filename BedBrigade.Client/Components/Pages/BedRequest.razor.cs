@@ -25,6 +25,8 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
+        [Inject] private IBedRequestPhoneDataService BedRequestPhoneDataService { get; set; } = default!;
+        [Inject] private IBedRequestEmailDataService BedRequestEmailDataService { get; set; } = default!;
         [Inject] private NavigationManager? _nav { get; set; }
 
         [Inject] private ILanguageContainerService _lc { get; set; }
@@ -460,7 +462,7 @@ namespace BedBrigade.Client.Components.Pages
                 Common.Models.BedRequest? bedRequest = await BuildBedRequest();
                 Common.Models.BedRequest? existingBedRequest = null;
 
-                var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
+                var existingByPhone = await BedRequestPhoneDataService.GetWaitingByPhone(bedRequest.Phone);
 
                 if (existingByPhone.Success && existingByPhone.Data != null)
                 {
@@ -468,7 +470,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
                 else
                 {
-                    var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
+                    var existingByEmail = await BedRequestEmailDataService.GetWaitingByEmail(bedRequest.Email);
                     if (existingByEmail.Success && existingByEmail.Data != null)
                     {
                         existingBedRequest = existingByEmail.Data;

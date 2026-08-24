@@ -21,6 +21,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Parameter] public int? BedRequestId { get; set; }
 
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
+        [Inject] private IBedRequestEmailDataService BedRequestEmailDataService { get; set; } = default!;
+        [Inject] private IBedRequestPhoneDataService BedRequestPhoneDataService { get; set; } = default!;
+        
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
@@ -434,32 +437,22 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             BedBrigade.Common.Models.BedRequest existingBedRequest = null;
 
-            // FIX CS8602: Add null check for _svcBedRequest before dereferencing
-            if (_svcBedRequest != null)
+            var existingByPhone = await BedRequestPhoneDataService.GetWaitingByPhone(bedRequest.Phone);
+
+            if (existingByPhone.Success && existingByPhone.Data != null)
             {
-                var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
+                existingBedRequest = existingByPhone.Data;
+            }
+            else if (!String.IsNullOrEmpty(bedRequest.Email))
+            {
+                var existingByEmail = await BedRequestEmailDataService.GetWaitingByEmail(bedRequest.Email);
 
-                if (existingByPhone.Success && existingByPhone.Data != null)
+                if (existingByEmail.Success && existingByEmail.Data != null)
                 {
-                    existingBedRequest = existingByPhone.Data;
-                }
-                else if (!String.IsNullOrEmpty(bedRequest.Email))
-                {
-                    var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
-
-                    if (existingByEmail.Success && existingByEmail.Data != null)
-                    {
-                        existingBedRequest = existingByEmail.Data;
-                    }
+                    existingBedRequest = existingByEmail.Data;
                 }
             }
-            else
-            {
-                Log.Error("CombineDuplicate, _svcBedRequest is null.");
-                _toastService?.Error(IsError, BRService);
-                return false;
-            }
-
+            
             if (existingBedRequest == null)
             {
                 return false;

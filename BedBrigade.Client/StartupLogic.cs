@@ -352,6 +352,10 @@ namespace BedBrigade.Client
             builder.Services.AddScoped<IDashboardDataService, DashboardDataService>();
             builder.Services.AddScoped<IDeliveryPlanService, DeliveryPlanService>();
             builder.Services.AddScoped<ITeamSheetService, TeamSheetService>();
+            builder.Services.AddScoped<IBedRequestEmailDataService, BedRequestEmailDataService>();
+            builder.Services.AddScoped<IBedRequestPhoneDataService, BedRequestPhoneDataService>();
+            builder.Services.AddScoped<IBedRequestEstimatedWaitDataService, BedRequestEstimatedWaitDataService>();
+            builder.Services.AddScoped<IBedRequestFailedDeliveryDataService, BedRequestFailedDeliveryDataService>();
         }
 
         public static WebApplication CreateAndConfigureApplication(WebApplicationBuilder builder)

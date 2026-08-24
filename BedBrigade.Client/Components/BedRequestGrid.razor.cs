@@ -420,7 +420,7 @@ namespace BedBrigade.Client.Components
                     var selectedId = (await Grid.GetSelectedRecordsAsync()).First().BedRequestId;
                     _lastSortClosestSelectedId = selectedId;
 
-                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedId);
+                    BedRequests = DriveRoutingLogic.SortBedRequestClosestToAddress(BedRequests, selectedId);
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
                     // Do NOT re-sort by Distance, OrderByBestRoute assigns each record's Distance
@@ -450,7 +450,7 @@ namespace BedBrigade.Client.Components
             {
                 if (BedRequests != null && BedRequestDataService != null && Grid != null)
                 {
-                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
+                    BedRequests = DriveRoutingLogic.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
 
                     await Grid.ClearSortingAsync();
 
