@@ -17,11 +17,15 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [SupplyParameterFromQuery]
     public string? Status { get; set; }
     
+    [SupplyParameterFromQuery]
+    public int? CallRequestId { get; set; }
+    
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
     private const int PickStatus = 2;
     private const int PickReplacement = 3;
+    private const int CallReplacement = 4;
     private bool _chooseEventButtonDisabled = true;
     private const string BaseUrl = "/administration/schedule/replacefaileddelivery";
     
@@ -29,6 +33,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
     public List<Common.Models.BedRequest> BedRequestsForEvent { get; set; } = new List<Common.Models.BedRequest>();
     public Common.Models.BedRequest FailedBedRequest { get; set; } = new Common.Models.BedRequest();
     public List<Common.Models.BedRequest> ReplacementBedRequests { get; set; } = new List<Common.Models.BedRequest>();
+    public Common.Models.BedRequest CallBedRequest { get; set; } = new Common.Models.BedRequest();
     
     private string SearchText { get; set; } = string.Empty;
     private string SearchTextReplace { get; set; } = string.Empty;
@@ -47,6 +52,20 @@ public partial class ReplaceFailedDelivery : ComponentBase
         await LoadBedRequestsForEvent();
         await LoadFailedBedRequest();
         await LoadReplacementBedRequests();
+        await LoadCallBedRequest();
+    }
+
+    private async Task LoadCallBedRequest()
+    {
+        if (CallRequestId.HasValue && CallRequestId.Value > 0)
+        {
+            var bedRequestResponse = await _bedRequestDataService.GetByIdAsync(CallRequestId.Value);
+
+            if (bedRequestResponse.Success && bedRequestResponse.Data != null)
+            {
+                CallBedRequest = bedRequestResponse.Data;
+            }
+        }
     }
 
     private async Task LoadReplacementBedRequests()
@@ -108,10 +127,12 @@ public partial class ReplaceFailedDelivery : ComponentBase
     private void DetermineWorkflowStep()
     {
         WorkflowStep = PickSchedule;
-
-        if (!string.IsNullOrWhiteSpace(Status))
+    
+        if (CallRequestId.HasValue && CallRequestId.Value > 0)
+            WorkflowStep = CallReplacement;
+        else if (!string.IsNullOrWhiteSpace(Status))
             WorkflowStep = PickReplacement;
-        if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0)
+        else if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0)
             WorkflowStep = PickStatus;
         else if (ScheduleId.HasValue  && ScheduleId.Value > 0)
             WorkflowStep = PickFailedDelivery;
@@ -134,5 +155,15 @@ public partial class ReplaceFailedDelivery : ComponentBase
         }
         
         StateHasChanged();
+    }
+
+    private Task HandleCalledClick()
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task HandleConfirmedClick()
+    {
+        throw new NotImplementedException();
     }
 }

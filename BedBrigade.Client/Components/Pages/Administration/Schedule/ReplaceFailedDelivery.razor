@@ -175,7 +175,7 @@ else if (WorkflowStep == PickReplacement)
     }
     else
     {
-        <p>Select the Bed Requester Name to Replace</p>
+        <p>Select the Bed Requester Name to Call</p>
         <div class="mb-3">
             <input type="search"
                    class="form-control"
@@ -185,11 +185,12 @@ else if (WorkflowStep == PickReplacement)
         </div>
 
         var filteredBedRequests = string.IsNullOrWhiteSpace(SearchTextReplace)
-            ? BedRequestsForEvent
-            : BedRequestsForEvent.Where(x =>
-                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (x.Team?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
+            ? ReplacementBedRequests
+            : ReplacementBedRequests.Where(x =>
+                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) 
+                    || x.Phone == SearchTextReplace
+                    || x.FormattedPhone == SearchTextReplace
+                    || x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
         if (!filteredBedRequests.Any())
@@ -205,27 +206,25 @@ else if (WorkflowStep == PickReplacement)
                     <th scope="col">Phone</th>
                     <th scope="col">Beds</th>
                     <th scope="col">Distance</th>
+                    <th scope="col">Called?</th>
                 </tr>
                 </thead>
                 <tbody>
-                @{
-                    string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
-                    string contextualClass = "table-default";
-                }
                 @for (int i = 0; i < filteredBedRequests.Count; i++)
                 {
-                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
 
-                    @if (filteredBedRequests[i].Team != lastTeam)
-                    {
-                        lastTeam = filteredBedRequests[i].Team;
-                        contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
-                    }
 
-                    <tr class="@contextualClass">
+                    <tr class="table-default">
                         <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
                         <td>@filteredBedRequests[i].Team</td>
                         <td>@filteredBedRequests[i].NumberOfBeds</td>
+                        <td>
+                            @if (filteredBedRequests[i].Notes != null && filteredBedRequests[i].Notes.Contains(Defaults.SameDayScheduleText))
+                            {
+                                <span>Yes</span>
+                            }
+                        </td>
                     </tr>
                 }
                 </tbody>
@@ -234,8 +233,77 @@ else if (WorkflowStep == PickReplacement)
     }
     <div class="row mt-1">
         <div class="col-md-12 text-left">
-            <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+            <a href="@BaseUrl?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
         </div>
     </div>
 }
+else if (WorkflowStep == CallReplacement)
+{
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}";
 
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Call the Replacement</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <a href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
+                                    @CallBedRequest.FormattedPhone
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Number of Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Street:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.Street
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Postal Code:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.PostalCode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="mt-2"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></p>
+    <p class="mt-2"><button class="btn btn-secondary" @onclick="HandleCalledClick">Called but Could not Replace</button></p>
+    <p class="mt-2"><button class="btn btn-success" @onclick="HandleConfirmedClick">Confirmed Replacement</button></p>
+}
