@@ -1,4 +1,5 @@
-﻿using BedBrigade.Common.Enums;
+﻿using BedBrigade.Common.Constants;
+using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
@@ -157,9 +158,16 @@ public partial class ReplaceFailedDelivery : ComponentBase
         StateHasChanged();
     }
 
-    private Task HandleCalledClick()
+    private async Task HandleCalledClick()
     {
-        throw new NotImplementedException();
+        if (CallBedRequest != null && CallBedRequest.BedRequestId > 0 
+                                   && (CallBedRequest.Notes == null || !CallBedRequest.Notes.Contains(Defaults.SameDayScheduleText))
+        {
+            string todayString = DateTime.Now.ToString("M/d/yy");
+            CallBedRequest.Notes = CallBedRequest.Notes + $" LM {Defaults.SameDayScheduleText} {todayString}";
+            await _bedRequestDataService.UpdateAsync(CallBedRequest);
+            @@@HERE
+        }
     }
 
     private Task HandleConfirmedClick()

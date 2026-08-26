@@ -34,71 +34,78 @@
 }
 else if (WorkflowStep == PickFailedDelivery)
 {
-    if (!BedRequestsForEvent.Any())
-    {
-        <p>There are no Bed Requests scheduled for the selected event.</p>
-    }
-    else
-    {
-        <p>Select the Bed Requester Name to Replace</p>
-        <div class="mb-3">
-            <input type="search"
-                   class="form-control"
-                   placeholder="Search bed requests..."
-                   @bind="SearchText"
-                   @bind:event="oninput"/>
-        </div>
-
-        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchText)
-            ? BedRequestsForEvent
-            : BedRequestsForEvent.Where(x =>
-                    (x.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (x.Team?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    x.NumberOfBeds.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-        if (!filteredBedRequests.Any())
-        {
-            <p>No bed requests match your search.</p>
-        }
-        else
-        {
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Team</th>
-                    <th scope="col">Beds</th>
-                </tr>
-                </thead>
-                <tbody>
-                @{
-                    string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
-                    string contextualClass = "table-default";
-                }
-                @for (int i = 0; i < filteredBedRequests.Count; i++)
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                @if (!BedRequestsForEvent.Any())
                 {
-                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
-
-                    @if (filteredBedRequests[i].Team != lastTeam)
-                    {
-                        lastTeam = filteredBedRequests[i].Team;
-                        contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
-                    }
-
-                    <tr class="@contextualClass">
-                        <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
-                        <td>@filteredBedRequests[i].Team</td>
-                        <td>@filteredBedRequests[i].NumberOfBeds</td>
-                    </tr>
+                <p>There are no Bed Requests scheduled for the selected event.</p>
                 }
-                </tbody>
-            </table>
-        }
-    }
-    <div class="row mt-1">
-        <div class="col-md-12 text-left">
-            <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+                else
+                {
+                    <p>Select the Bed Requester Name to Replace</p>
+                    <div class="mb-3">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search bed requests..."
+                               @bind="SearchText"
+                               @bind:event="oninput"/>
+                    </div>
+
+                    var filteredBedRequests = string.IsNullOrWhiteSpace(SearchText)
+                        ? BedRequestsForEvent
+                        : BedRequestsForEvent.Where(x =>
+                                (x.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                (x.Team?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                x.NumberOfBeds.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+
+                    if (!filteredBedRequests.Any())
+                    {
+                        <p>No bed requests match your search.</p>
+                    }
+                    else
+                    {
+
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th class="text-center" scope="col">Team</th>
+                                <th class="text-center" scope="col">Beds</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+                                string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
+                                string contextualClass = "table-default";
+                            }
+                            @for (int i = 0; i < filteredBedRequests.Count; i++)
+                            {
+                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+
+                                @if (filteredBedRequests[i].Team != lastTeam)
+                                {
+                                    lastTeam = filteredBedRequests[i].Team;
+                                    contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
+                                }
+
+                                <tr class="@contextualClass">
+                                    <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
+                                    <td class="text-center">@filteredBedRequests[i].Team</td>
+                                    <td class="text-center">@filteredBedRequests[i].NumberOfBeds</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                }
+                <div class="row mt-1">
+                    <div class="col-md-12 text-left">
+                        <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -175,6 +182,8 @@ else if (WorkflowStep == PickStatus)
 }
 else if (WorkflowStep == PickReplacement)
 {
+
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}";
     if (!ReplacementBedRequests.Any())
     {
         string message = $"There are no waiting Bed Requests that have less than or equal to {FailedBedRequest.NumberOfBeds} beds."; 
@@ -182,65 +191,78 @@ else if (WorkflowStep == PickReplacement)
     }
     else
     {
-        <p>Select the Bed Requester Name to Call</p>
-        <div class="mb-3">
-            <input type="search"
-                   class="form-control"
-                   placeholder="Search bed requests..."
-                   @bind="SearchTextReplace"
-                   @bind:event="oninput"/>
-        </div>
+        <div class="content-wrapper mt-3">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <p>Select the Bed Requester Name to Call</p>
+                    <div class="mb-3">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search bed requests..."
+                               @bind="SearchTextReplace"
+                               @bind:event="oninput"/>
+                    </div>
 
-        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchTextReplace)
-            ? ReplacementBedRequests
-            : ReplacementBedRequests.Where(x =>
-                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false) 
-                    || x.Phone == SearchTextReplace
-                    || x.FormattedPhone == SearchTextReplace
-                    || x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-        if (!filteredBedRequests.Any())
-        {
-            <p>No bed requests match your search.</p>
-        }
-        else
-        {
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Phone</th>
-                    <th scope="col">Beds</th>
-                    <th scope="col">Distance</th>
-                    <th scope="col">Called?</th>
-                </tr>
-                </thead>
-                <tbody>
-                @for (int i = 0; i < filteredBedRequests.Count; i++)
-                {
-                    string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
-
-
-                    <tr class="table-default">
-                        <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
-                        <td>@filteredBedRequests[i].Team</td>
-                        <td>@filteredBedRequests[i].NumberOfBeds</td>
-                        <td>
-                            @if (filteredBedRequests[i].Notes != null && filteredBedRequests[i].Notes.Contains(Defaults.SameDayScheduleText))
+                    @{
+                        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchTextReplace)
+                            ? ReplacementBedRequests
+                            : ReplacementBedRequests.Where(x =>
+                                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false)
+                                    || x.Phone == SearchTextReplace
+                                    || x.FormattedPhone == SearchTextReplace
+                                    || x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
+                                .ToList();
+                    }
+                    
+                    @if (!filteredBedRequests.Any())
+                    {
+                    <p>No bed requests match your search.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th class="text-center" scope="col">Beds</th>
+                                <th class="text-center" scope="col">Miles</th>
+                                <th class="text-center" scope="col">Called?</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @for (int i = 0; i < filteredBedRequests.Count; i++)
                             {
-                                <span>Yes</span>
+                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
+
+                                <tr class="table-default">
+                                    <td>
+                                        <a href="@url">@filteredBedRequests[i].FullName</a>
+                                    </td>
+                                    <td class="text-center">
+                                        @filteredBedRequests[i].NumberOfBeds
+                                    </td>
+                                    <td class="text-center">
+                                        @filteredBedRequests[i].Distance.ToString("N2")
+                                    </td>
+                                    <td class="text-center">
+                                        @if (filteredBedRequests[i].Notes != null &&
+                                             filteredBedRequests[i].Notes.Contains(Defaults.SameDayScheduleText))
+                                        {
+                                            <span>Yes</span>
+                                        }
+                                    </td>
+                                </tr>
                             }
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
     }
     <div class="row mt-1">
         <div class="col-md-12 text-left">
-            <a href="@BaseUrl?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+            <a href="@backUrl" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
         </div>
     </div>
 }
