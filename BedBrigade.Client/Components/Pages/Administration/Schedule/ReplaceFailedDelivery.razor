@@ -127,9 +127,16 @@ else if (WorkflowStep == PickStatus)
                                 Phone:
                             </div>
                             <div class="col-sm-9">
-                                <a href="tel:@StringUtil.ExtractDigits(FailedBedRequest.Phone)">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(FailedBedRequest.Phone)">
                                     @FailedBedRequest.FormattedPhone
                                 </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @FailedBedRequest.FormattedPhone
+                                </span>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -260,9 +267,16 @@ else if (WorkflowStep == CallReplacement)
                                 Phone:
                             </div>
                             <div class="col-sm-9">
-                                <a href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
                                     @CallBedRequest.FormattedPhone
                                 </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @CallBedRequest.FormattedPhone
+                                </span>
                             </div>
                         </div>
                         <div class="row mb-2">
