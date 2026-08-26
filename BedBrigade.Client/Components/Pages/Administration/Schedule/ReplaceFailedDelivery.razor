@@ -232,7 +232,7 @@ else if (WorkflowStep == PickReplacement)
                             <tbody>
                             @for (int i = 0; i < filteredBedRequests.Count; i++)
                             {
-                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
+                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
 
                                 <tr class="table-default">
                                     <td>
@@ -322,7 +322,7 @@ else if (WorkflowStep == CallReplacement)
                                 Street:
                             </div>
                             <div class="col-sm-9">
-                                @CallBedRequest.Street
+                                <SfTextBox ID="street" @bind-Value="@CallBedRequest.Street"></SfTextBox>
                             </div>
                         </div>
                         <div class="row mb-2">
@@ -330,7 +330,12 @@ else if (WorkflowStep == CallReplacement)
                                 Postal Code:
                             </div>
                             <div class="col-sm-9">
-                                @CallBedRequest.PostalCode
+                                <input type="text"
+                                       class="form-control"
+                                       @bind="CallBedRequest.PostalCode"
+                                       maxlength="5"
+                                       pattern="[0-9]{5}"
+                                       inputmode="numeric" />
                             </div>
                         </div>
                     </div>
@@ -339,7 +344,7 @@ else if (WorkflowStep == CallReplacement)
         </div>
     </div>
 
-    <p class="mt-2"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></p>
-    <p class="mt-2"><button class="btn btn-secondary" @onclick="HandleCalledClick">Called but Could not Replace</button></p>
-    <p class="mt-2"><button class="btn btn-success" @onclick="HandleConfirmedClick">Confirmed Replacement</button></p>
+    <div class="mt-1"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></div>
+    <div class="mt-1"><button class="btn btn-secondary" @onclick="HandleCalledClick">Called but Could not Replace</button></div>
+    <div class="mt-1"><button class="btn btn-success" @onclick="HandleConfirmedClick">Confirmed Replacement</button></div>
 }

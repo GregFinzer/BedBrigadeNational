@@ -160,13 +160,18 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private async Task HandleCalledClick()
     {
-        if (CallBedRequest != null && CallBedRequest.BedRequestId > 0 
-                                   && (CallBedRequest.Notes == null || !CallBedRequest.Notes.Contains(Defaults.SameDayScheduleText))
+        if (CallBedRequest != null && CallBedRequest.BedRequestId > 0)
         {
-            string todayString = DateTime.Now.ToString("M/d/yy");
-            CallBedRequest.Notes = CallBedRequest.Notes + $" LM {Defaults.SameDayScheduleText} {todayString}";
+            if (CallBedRequest.Notes == null || !CallBedRequest.Notes.Contains(Defaults.SameDayScheduleText))
+            {
+                string todayString = DateTime.Now.ToString("M/d/yy");
+                CallBedRequest.Notes =
+                    (CallBedRequest.Notes + $" LM {Defaults.SameDayScheduleText} {todayString}").Trim();
+            }
+
             await _bedRequestDataService.UpdateAsync(CallBedRequest);
-            @@@HERE
+            string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}";
+            _nav.NavigateTo(url);
         }
     }
 
