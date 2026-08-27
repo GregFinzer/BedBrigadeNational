@@ -21,7 +21,8 @@ public class SendSmsLogic : ISendSmsLogic
     private readonly ITimezoneDataService _timezoneDataService;
     private IMailMergeLogic _mailMergeLogic;
     private ISignUpDataService _signUpDataService;
-
+    private readonly SmsQueueBackgroundService _smsQueueBackgroundService;
+    
     public SendSmsLogic(IContentDataService contentDataService, 
         IConfigurationDataService configurationDataService, 
         IVolunteerDataService volunteerDataService,
@@ -30,7 +31,8 @@ public class SendSmsLogic : ISendSmsLogic
         IMailMergeLogic mailMergeLogic, 
         ISignUpDataService signUpDataService, 
         ILocationDataService locationDataService,
-        ITimezoneDataService timezoneDataService)
+        ITimezoneDataService timezoneDataService,
+        SmsQueueBackgroundService smsQueueBackgroundService)
     {
         _contentDataService = contentDataService;
         _configurationDataService = configurationDataService;
@@ -41,7 +43,82 @@ public class SendSmsLogic : ISendSmsLogic
         _signUpDataService = signUpDataService;
         _locationDataService = locationDataService;
         _timezoneDataService = timezoneDataService;
+        _smsQueueBackgroundService = smsQueueBackgroundService;
     }
+
+    /// <summary>
+    /// Send a replacement SMS to the user when a failed delivery occurs
+    /// </summary>
+    /// <param name="failedBedRequest"></param>
+    /// <param name="replacementBedRequest"></param>
+    /// <returns></returns>
+    public async Task<ServiceResponse<bool>> SendReplaceFailedDeliverySms(BedRequest failedBedRequest,
+        BedRequest replacementBedRequest)
+    {
+        string? userPhone = _configurationDataService.GetUserPhone();
+            
+        if (string.IsNullOrEmpty(userPhone))
+        {
+            return new ServiceResponse<bool>("User phone not found", false);
+        }
+            
+        var templateResult = await _contentDataService.GetSingleByLocationAndContentType(replacementBedRequest.LocationId, ContentType.ReplaceFailedDeliverySmsForm);
+
+        if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+        {
+            return new ServiceResponse<bool>("ReplaceFailedDeliverySmsForm not found", false);
+        }
+        
+        string fromPhone;
+        try
+        {
+            fromPhone = await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone,
+                replacementBedRequest.LocationId);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<bool>(ex.Message);
+        }
+
+        SmsQueue smsQueue = BuildReplaceFailedDeliveryQueueRecord(fromPhone, userPhone, failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
+
+        var queueResult = await _smsQueueDataService.QueueSms(smsQueue);
+        if (queueResult.Success)
+        {
+            _smsQueueBackgroundService.SendNow();
+            return new ServiceResponse<bool>("SMS Message queued", true);
+        }
+
+        return new ServiceResponse<bool>("Failed to create SMS Queue: " + queueResult.Message);
+    }
+
+    private SmsQueue BuildReplaceFailedDeliveryQueueRecord(string fromPhone, string userPhone, BedRequest failedBedRequest, BedRequest replacementBedRequest, string template)
+    {
+        StringBuilder sb = new StringBuilder(template, template.Length * 2);
+        sb = sb.Replace("%%FailedDeliveryRecipientName%%", $"{failedBedRequest.FullName}");
+        sb = _mailMergeLogic.ReplaceBedRequestFields(replacementBedRequest, sb);
+
+        SmsQueue smsQueue = new SmsQueue()
+        {
+            SignUpId = null,
+            BedRequestId = replacementBedRequest.BedRequestId,
+            FromPhoneNumber = fromPhone.FormatPhoneNumber(),
+            ToPhoneNumber = userPhone.FormatPhoneNumber(),
+            Body = sb.ToString(),
+            Priority = Defaults.BulkHighPriority,
+            Status = QueueStatus.Queued.ToString(),
+            QueueDate = DateTime.UtcNow,
+            FailureMessage = string.Empty,
+            TargetDate = DateTime.UtcNow,
+            IsRead = true,
+            IsReply = false,
+            LocationId = replacementBedRequest.LocationId,
+            ContactType = ContactTypes.User,
+            ContactName = StringUtil.InsertSpaces(_configurationDataService.GetUserName())
+        };
+        return smsQueue;
+    }
+
 
     /// <summary>
     /// Create a delivery SMS Reminder that is sent at 12pm the day before

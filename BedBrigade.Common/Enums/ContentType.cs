@@ -32,5 +32,10 @@ public enum ContentType
     [Description("Delivery Email Reminder Form")]
     DeliveryEmailReminderForm = 17,
     [Description("SignUp Email Reminder Form")]
-    SignUpEmailReminderForm = 18
+    SignUpEmailReminderForm = 18,
+    [Description("Replace Failed Delivery Email Form")]
+    ReplaceFailedDeliveryEmailForm = 19,
+    [Description("Replace Failed Delivery SMS Form")]
+    ReplaceFailedDeliverySmsForm= 20,
+    
 }

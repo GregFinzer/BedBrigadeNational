@@ -20,6 +20,8 @@ namespace BedBrigade.Data.Services
         private readonly IMailMergeLogic _mailMergeLogic;
         private readonly ITimezoneDataService _timezoneDataService;
         private readonly IBedRequestEmailDataService _bedRequestEmailDataService;
+        private readonly EmailQueueBackgroundService _emailQueueBackgroundService;
+        
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
             IEmailQueueDataService emailQueueDataService,
@@ -30,7 +32,8 @@ namespace BedBrigade.Data.Services
             IScheduleDataService scheduleDataService,
             IMailMergeLogic mailMergeLogic,
             ITimezoneDataService timezoneDataService,
-            IBedRequestEmailDataService bedRequestEmailDataService)
+            IBedRequestEmailDataService bedRequestEmailDataService,
+            EmailQueueBackgroundService emailQueueBackgroundService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -43,6 +46,62 @@ namespace BedBrigade.Data.Services
             _mailMergeLogic = mailMergeLogic;
             _timezoneDataService = timezoneDataService;
             _bedRequestEmailDataService = bedRequestEmailDataService;
+            _emailQueueBackgroundService = emailQueueBackgroundService;
+        }
+
+        /// <summary>
+        /// Send an email to the user that a replacement bed request has been scheduled for a failed delivery
+        /// </summary>
+        /// <param name="failedBedRequest"></param>
+        /// <param name="replacementBedRequest"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> SendReplaceFailedDeliveryEmail(BedRequest failedBedRequest, BedRequest replacementBedRequest)
+        {
+            string? userEmail = _bedRequestDataService.GetUserEmail();
+            
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return new ServiceResponse<bool>("User email not found", false);
+            }
+            
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(replacementBedRequest.LocationId, ContentType.ReplaceFailedDeliveryEmailForm);
+
+            if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+            {
+                return new ServiceResponse<bool>("ReplaceFailedDeliveryEmailForm not found", false);
+            }
+            
+            string body = BuildReplaceFailedDeliveryBody(failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
+            string subject = $"Replacement Bed Delivery for {replacementBedRequest.FullName}";
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = userEmail,
+                Subject = subject,
+                Body = body,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = replacementBedRequest.LocationId,
+                TargetDate = DateTime.UtcNow,
+                BedRequestId = replacementBedRequest.BedRequestId
+            };
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+            else
+            {
+                _emailQueueBackgroundService.SendNow();
+                return new ServiceResponse<bool>("Successfully queued Replace Failed Delivery Email", true);
+            }
+        }
+
+        private string BuildReplaceFailedDeliveryBody(BedRequest failedBedRequest, BedRequest replacementBedRequest, string template)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length*2);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(replacementBedRequest, sb);
+            sb = sb.Replace("%%FailedDeliveryRecipientName%%", $"{failedBedRequest.FullName}");
+            return sb.ToString();
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)

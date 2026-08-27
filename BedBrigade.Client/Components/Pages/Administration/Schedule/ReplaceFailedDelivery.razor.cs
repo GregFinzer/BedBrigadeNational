@@ -46,6 +46,10 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
 
     [Inject] private IBedRequestFailedDeliveryDataService BedRequestFailedDeliveryDataService { get; set; } = default!;
+    
+    [Inject] private ISendSmsLogic _sendSmsLogic { get; set; } = default!;
+    [Inject] private IEmailBuilderService _emailBuilderService { get; set; } = default!;    
+    
     protected override async Task OnParametersSetAsync()
     {
         DetermineWorkflowStep();
@@ -175,8 +179,49 @@ public partial class ReplaceFailedDelivery : ComponentBase
         }
     }
 
-    private Task HandleConfirmedClick()
+    private async Task HandleConfirmedClick()
     {
-        throw new NotImplementedException();
+        if (CallBedRequest == null 
+            || CallBedRequest.BedRequestId == 0
+            || FailedBedRequest == null
+            || FailedBedRequest.BedRequestId == 0)
+            return;
+        
+        CallBedRequest.Team = FailedBedRequest.Team;
+        CallBedRequest.Notes = (FailedBedRequest.Notes + $" {Defaults.SameDayScheduleText} {DateTime.Now:M/d/yy} for TEAM {FailedBedRequest.Team}").Trim();
+        CallBedRequest.ScheduleId = FailedBedRequest.ScheduleId;
+        CallBedRequest.DeliveryDate = FailedBedRequest.DeliveryDate;
+        CallBedRequest.Status = BedRequestStatus.Scheduled;
+        
+        FailedBedRequest.Status = Enum.Parse<BedRequestStatus>(Status);
+        FailedBedRequest.Notes = (FailedBedRequest.Notes + $" {Defaults.FailedDeliveryText} {DateTime.Now:M/d/yy}").Trim();
+        FailedBedRequest.DeliveryDate = null;
+        FailedBedRequest.Team = string.Empty;
+        FailedBedRequest.ScheduleId = null;
+        FailedBedRequest.DeliveryDate = null;
+        
+        var callBedRequestTask = _bedRequestDataService.UpdateAsync(CallBedRequest);
+        var failedBedRequestTask = _bedRequestDataService.UpdateAsync(FailedBedRequest);
+
+        await Task.WhenAll(
+            callBedRequestTask,
+            failedBedRequestTask);
+
+        var callBedRequestResponse = await callBedRequestTask;
+        var failedBedRequestResponse = await failedBedRequestTask;
+
+        if (!callBedRequestResponse.Success ||
+            !failedBedRequestResponse.Success)
+        {
+            // Handle database failure
+            return;
+        }
+
+        // Database updates succeeded, so send notifications.
+        await Task.WhenAll(
+            _sendSmsLogic.SendReplaceFailedDeliverySms(
+                FailedBedRequest, CallBedRequest),
+            _emailBuilderService.SendReplaceFailedDeliveryEmail(
+                FailedBedRequest, CallBedRequest));
     }
 }
