@@ -3,12 +3,25 @@ using BedBrigade.Common.Enums;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
+using Serilog;
 using Syncfusion.Blazor.DropDowns;
 
 namespace BedBrigade.Client.Components.Pages.Administration.Schedule;
 
 public partial class ReplaceFailedDelivery : ComponentBase
 {
+    [Inject] private NavigationManager _nav { get; set; } = default!;
+
+    [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
+
+    [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
+
+    [Inject] private IBedRequestFailedDeliveryDataService BedRequestFailedDeliveryDataService { get; set; } = default!;
+    
+    [Inject] private ISendSmsLogic _sendSmsLogic { get; set; } = default!;
+    [Inject] private IEmailBuilderService _emailBuilderService { get; set; } = default!;    
+    [Inject] private ToastService ToastService { get; set; } = default!;
+    
     [SupplyParameterFromQuery]
     public int? ScheduleId {  get; set; }
     
@@ -38,17 +51,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
     
     private string SearchText { get; set; } = string.Empty;
     private string SearchTextReplace { get; set; } = string.Empty;
-
-    [Inject] private NavigationManager _nav { get; set; } = default!;
-
-    [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
-
-    [Inject] private IBedRequestDataService _bedRequestDataService { get; set; } = default!;
-
-    [Inject] private IBedRequestFailedDeliveryDataService BedRequestFailedDeliveryDataService { get; set; } = default!;
-    
-    [Inject] private ISendSmsLogic _sendSmsLogic { get; set; } = default!;
-    [Inject] private IEmailBuilderService _emailBuilderService { get; set; } = default!;    
+    private bool _isBusy = false;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -186,42 +189,93 @@ public partial class ReplaceFailedDelivery : ComponentBase
             || FailedBedRequest == null
             || FailedBedRequest.BedRequestId == 0)
             return;
-        
-        CallBedRequest.Team = FailedBedRequest.Team;
-        CallBedRequest.Notes = (FailedBedRequest.Notes + $" {Defaults.SameDayScheduleText} {DateTime.Now:M/d/yy} for TEAM {FailedBedRequest.Team}").Trim();
-        CallBedRequest.ScheduleId = FailedBedRequest.ScheduleId;
-        CallBedRequest.DeliveryDate = FailedBedRequest.DeliveryDate;
-        CallBedRequest.Status = BedRequestStatus.Scheduled;
-        
+
+        if (_isBusy)
+            return;
+
+        try
+        {
+            _isBusy = true;
+            if (!(await SaveCallBedRequest()))
+                return;
+
+            if (!(await SaveFailedBedRequest()))
+                return;
+            
+            // Database updates succeeded, so send notifications.
+            await Task.WhenAll(
+                _sendSmsLogic.SendReplaceFailedDeliverySms(
+                    FailedBedRequest, CallBedRequest),
+                _emailBuilderService.SendReplaceFailedDeliveryEmail(
+                    FailedBedRequest, CallBedRequest));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex,"Error saving Confirm Bed Request Replacement");
+            ToastService.Error("Error","Error saving Confirm Bed Request Replacement");
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private async Task<bool> SaveFailedBedRequest()
+    {
         FailedBedRequest.Status = Enum.Parse<BedRequestStatus>(Status);
-        FailedBedRequest.Notes = (FailedBedRequest.Notes + $" {Defaults.FailedDeliveryText} {DateTime.Now:M/d/yy}").Trim();
+        string noteText = $" {Defaults.FailedDeliveryText} {DateTime.Now:M/d/yy}";
+        if (FailedBedRequest.Notes == null || !FailedBedRequest.Notes.Contains(noteText))
+            FailedBedRequest.Notes = (FailedBedRequest.Notes + noteText).Trim();
+        
         FailedBedRequest.DeliveryDate = null;
         FailedBedRequest.Team = string.Empty;
         FailedBedRequest.ScheduleId = null;
         FailedBedRequest.DeliveryDate = null;
         
-        var callBedRequestTask = _bedRequestDataService.UpdateAsync(CallBedRequest);
-        var failedBedRequestTask = _bedRequestDataService.UpdateAsync(FailedBedRequest);
+        var response = await _bedRequestDataService.UpdateAsync(FailedBedRequest);
 
-        await Task.WhenAll(
-            callBedRequestTask,
-            failedBedRequestTask);
-
-        var callBedRequestResponse = await callBedRequestTask;
-        var failedBedRequestResponse = await failedBedRequestTask;
-
-        if (!callBedRequestResponse.Success ||
-            !failedBedRequestResponse.Success)
+        if (!response.Success)
         {
-            // Handle database failure
-            return;
+            Log.Error("Error saving FailedBedRequest: " + response.Message);
+            ToastService.Error("Error saving FailedBedRequest",response.Message);
+            return false;
         }
 
-        // Database updates succeeded, so send notifications.
-        await Task.WhenAll(
-            _sendSmsLogic.SendReplaceFailedDeliverySms(
-                FailedBedRequest, CallBedRequest),
-            _emailBuilderService.SendReplaceFailedDeliveryEmail(
-                FailedBedRequest, CallBedRequest));
+        return true;
+    }
+
+    private async Task<bool> SaveCallBedRequest()
+    {
+        if (!String.IsNullOrWhiteSpace(FailedBedRequest.Team))
+        {
+            CallBedRequest.Team = FailedBedRequest.Team;
+        }
+
+        string noteText = $" {Defaults.SameDayScheduleText} {DateTime.Now:M/d/yy} for TEAM {FailedBedRequest.Team}";
+        
+        if (CallBedRequest.Notes == null || !CallBedRequest.Notes.Contains(noteText))
+            CallBedRequest.Notes = (FailedBedRequest.Notes + noteText).Trim();
+
+        if (FailedBedRequest.ScheduleId != null)
+        {
+            CallBedRequest.ScheduleId = FailedBedRequest.ScheduleId;
+        }
+
+        if (FailedBedRequest.DeliveryDate != null)
+        {
+            CallBedRequest.DeliveryDate = FailedBedRequest.DeliveryDate;
+        }
+
+        CallBedRequest.Status = BedRequestStatus.Scheduled;
+        var callResponse = await _bedRequestDataService.UpdateAsync(CallBedRequest);
+
+        if (!callResponse.Success)
+        {
+            Log.Error("Error saving CallBedRequest: " + callResponse.Message);
+            ToastService.Error("Error saving CallBedRequest",callResponse.Message);
+            return false;
+        }
+
+        return true;
     }
 }

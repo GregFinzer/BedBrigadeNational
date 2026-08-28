@@ -1,4 +1,5 @@
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Common.Models;
 using BedBrigade.Data;
 using BedBrigade.Data.Services;
@@ -29,7 +30,7 @@ public class BedRequestDataServiceSortingTests
             BuildBedRequest(4, 100, BedRequestStatus.Waiting, "Alpha", 1.0m, 0, new DateTime(2025, 1, 4)),
         ];
 
-        List<BedRequest> sorted = service.SortBedRequestClosestToAddress(bedRequests, 1);
+        List<BedRequest> sorted = DriveRoutingLogic.SortBedRequestClosestToAddress(bedRequests, 1);
 
         Assert.That(sorted.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 1, 2, 3, 4 }));
     }
