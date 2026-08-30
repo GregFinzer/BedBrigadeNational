@@ -86,9 +86,15 @@ public class BedRequestFailedDeliveryDataService : Repository<BedRequest>, IBedR
         //Fill distance
         foreach (var bedRequest in bedRequests)
         {
-            if (failedBedRequest.Latitude == null && failedBedRequest.Longitude == null)
+            if (failedBedRequest.Latitude == null
+                || failedBedRequest.Longitude == null
+                || bedRequest.Latitude == null
+                || bedRequest.Longitude == null)
+            {
                 bedRequest.Distance = Defaults.DefaultDistance;
-                
+                continue;
+            }
+
             bedRequest.Distance = DriveRoutingLogic.CalculateDistanceInMiles((double)failedBedRequest.Latitude.Value, 
                 (double)failedBedRequest.Longitude.Value,
                 (double)bedRequest.Latitude, 

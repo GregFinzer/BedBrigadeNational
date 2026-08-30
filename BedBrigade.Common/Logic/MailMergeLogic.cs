@@ -243,6 +243,7 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%BedRequest.Names%%", entity.Names);
         sb = sb.Replace("%%BedRequest.PrimaryLanguage%%", entity.PrimaryLanguage);
         sb = sb.Replace("%%BedRequest.Notes%%", entity.Notes);
+        sb = sb.Replace("%%BedRequest.Team%%", entity.Team);
         return sb;
     }
 

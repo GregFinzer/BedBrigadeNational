@@ -1,8 +1,11 @@
-﻿using BedBrigade.Common.Constants;
+﻿using System.Text;
+using BedBrigade.Common.Constants;
 using BedBrigade.Common.Enums;
+using BedBrigade.Common.Logic;
 using BedBrigade.Data.Services;
 using Microsoft.AspNetCore.Components;
 using BedBrigade.Common.Models;
+using Microsoft.JSInterop;
 using Serilog;
 using Syncfusion.Blazor.DropDowns;
 
@@ -10,6 +13,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.Schedule;
 
 public partial class ReplaceFailedDelivery : ComponentBase
 {
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+    
     [Inject] private NavigationManager _nav { get; set; } = default!;
 
     [Inject] private IScheduleDataService _scheduleDataService { get; set; } = default!;
@@ -21,6 +26,8 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [Inject] private ISendSmsLogic _sendSmsLogic { get; set; } = default!;
     [Inject] private IEmailBuilderService _emailBuilderService { get; set; } = default!;    
     [Inject] private ToastService ToastService { get; set; } = default!;
+    [Inject] private IContentDataService _contentDataService { get; set; } = default!;
+    [Inject] private IMailMergeLogic _mailMergeLogic { get; set; } = default!;
     
     [SupplyParameterFromQuery]
     public int? ScheduleId {  get; set; }
@@ -34,12 +41,16 @@ public partial class ReplaceFailedDelivery : ComponentBase
     [SupplyParameterFromQuery]
     public int? CallRequestId { get; set; }
     
+    [SupplyParameterFromQuery]
+    public bool? Replaced { get; set; }
+    
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
     private const int PickStatus = 2;
     private const int PickReplacement = 3;
     private const int CallReplacement = 4;
+    private const int ReplacedStep = 5;
     private bool _chooseEventButtonDisabled = true;
     private const string BaseUrl = "/administration/schedule/replacefaileddelivery";
     
@@ -52,15 +63,26 @@ public partial class ReplaceFailedDelivery : ComponentBase
     private string SearchText { get; set; } = string.Empty;
     private string SearchTextReplace { get; set; } = string.Empty;
     private bool _isBusy = false;
+    public string? WarningMessage { get; set; }
+    public string? ErrorMessage { get; set; }
+    private bool CopiedToClipboard { get; set; } = false;
     
     protected override async Task OnParametersSetAsync()
     {
-        DetermineWorkflowStep();
-        await LoadScheduleData();
-        await LoadBedRequestsForEvent();
-        await LoadFailedBedRequest();
-        await LoadReplacementBedRequests();
-        await LoadCallBedRequest();
+        try
+        {
+            DetermineWorkflowStep();
+            await LoadScheduleData();
+            await LoadBedRequestsForEvent();
+            await LoadFailedBedRequest();
+            await LoadReplacementBedRequests();
+            await LoadCallBedRequest();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error in ReplaceFailedDelivery.OnParametersSetAsync");
+            ErrorMessage = "An error has occured: " + ex.Message;
+        }
     }
 
     private async Task LoadCallBedRequest()
@@ -71,7 +93,19 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
             if (bedRequestResponse.Success && bedRequestResponse.Data != null)
             {
-                CallBedRequest = bedRequestResponse.Data;
+                if (WorkflowStep != ReplacedStep && bedRequestResponse.Data.Status == BedRequestStatus.Scheduled)
+                {
+                    WarningMessage = "This bed request has already been scheduled";
+                }
+                else
+                {
+                    CallBedRequest = bedRequestResponse.Data;
+                }
+            }
+            else
+            {
+                Log.Error(bedRequestResponse.Message);
+                ErrorMessage = "An error has occured: " + bedRequestResponse.Message;
             }
         }
     }
@@ -89,18 +123,36 @@ public partial class ReplaceFailedDelivery : ComponentBase
             {
                 ReplacementBedRequests = bedRequestResponse.Data;
             }
+            else
+            {
+                Log.Error(bedRequestResponse.Message);
+                ErrorMessage = "An error has occured: " + bedRequestResponse.Message;
+            }
         }
     }
 
     private async Task LoadFailedBedRequest()
     {
-        if (FailedBedRequestId.HasValue)
+        if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0)
         {
-            var bedReqeuestResponse = await _bedRequestDataService.GetByIdAsync(FailedBedRequestId.Value);
+            var bedRequestResponse = await _bedRequestDataService.GetByIdAsync(FailedBedRequestId.Value);
 
-            if (bedReqeuestResponse.Success && bedReqeuestResponse.Data != null)
+            if (bedRequestResponse.Success && bedRequestResponse.Data != null)
             {
-                FailedBedRequest = bedReqeuestResponse.Data;
+                if (WorkflowStep != ReplacedStep && bedRequestResponse.Data.Status != BedRequestStatus.Scheduled)
+                {
+                    WarningMessage =
+                        $"The Bed Request for {bedRequestResponse.Data.FullName} has already been replaced.";
+                }
+                else
+                {
+                    FailedBedRequest = bedRequestResponse.Data;    
+                }
+            }
+            else
+            {
+                Log.Error(bedRequestResponse.Message);
+                ErrorMessage = "An error has occured: " + bedRequestResponse.Message;
             }
         }
     }
@@ -117,6 +169,11 @@ public partial class ReplaceFailedDelivery : ComponentBase
                     .OrderBy(o => o.Team)
                     .ToList();
             }
+            else
+            {
+                Log.Error(bedRequestResponse.Message);
+                ErrorMessage = "An error has occured: " + bedRequestResponse.Message;
+            }	            
         }
     }
 
@@ -130,13 +187,20 @@ public partial class ReplaceFailedDelivery : ComponentBase
             FutureDeliverySchedules = scheduleResponse.Data
                 .Where(o => o.EventType == EventType.Delivery).ToList();
         }
+        else
+        {
+            Log.Error(scheduleResponse.Message);
+            ErrorMessage = "An error has occured: " + scheduleResponse.Message;
+        }	        
     }
 
     private void DetermineWorkflowStep()
     {
         WorkflowStep = PickSchedule;
-    
-        if (CallRequestId.HasValue && CallRequestId.Value > 0)
+
+        if (Replaced.HasValue && Replaced.Value)
+            WorkflowStep = ReplacedStep;
+        else if (CallRequestId.HasValue && CallRequestId.Value > 0)
             WorkflowStep = CallReplacement;
         else if (!string.IsNullOrWhiteSpace(Status))
             WorkflowStep = PickReplacement;
@@ -208,6 +272,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
                     FailedBedRequest, CallBedRequest),
                 _emailBuilderService.SendReplaceFailedDeliveryEmail(
                     FailedBedRequest, CallBedRequest));
+            
+            string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}&callRequestId={CallRequestId}&replaced=true";	
+            _nav.NavigateTo(url);
         }
         catch (Exception ex)
         {
@@ -237,7 +304,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
         if (!response.Success)
         {
             Log.Error("Error saving FailedBedRequest: " + response.Message);
-            ToastService.Error("Error saving FailedBedRequest",response.Message);
+            ErrorMessage = "Error saving FailedBedRequest: " + response.Message;
             return false;
         }
 
@@ -272,10 +339,32 @@ public partial class ReplaceFailedDelivery : ComponentBase
         if (!callResponse.Success)
         {
             Log.Error("Error saving CallBedRequest: " + callResponse.Message);
-            ToastService.Error("Error saving CallBedRequest",callResponse.Message);
+            ErrorMessage = "Error saving CallBedRequest: " + callResponse.Message;
             return false;
         }
 
         return true;
+    }
+
+    private async Task CopyToClipboard()
+    {
+        var templateResult = await _contentDataService.GetSingleByLocationAndContentType(CallBedRequest.LocationId, ContentType.ReplaceFailedDeliverySmsForm);
+
+        if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+        {
+            ErrorMessage = "Error getting template: " + templateResult.Message;
+            return;
+        }
+        
+        string template = templateResult.Data.ContentHtml;
+        StringBuilder sb = new StringBuilder(template, template.Length * 2);
+        sb = sb.Replace("%%FailedDeliveryRecipientName%%", $"{FailedBedRequest.FullName}");
+        sb = _mailMergeLogic.ReplaceBedRequestFields(CallBedRequest, sb);
+        
+        await JsRuntime.InvokeVoidAsync(
+            "navigator.clipboard.writeText",
+            sb.ToString());
+
+        CopiedToClipboard = true;
     }
 }

@@ -5,7 +5,23 @@
 
 <h3 class="mt-3">Replace Failed Delivery</h3>
 
-@if (WorkflowStep == PickSchedule)
+@if (!String.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <div class="row">
+        <div class="alert alert-danger col-md-4 col-sm-6 col-xs-12" role="alert">
+            @ErrorMessage
+        </div>
+    </div>
+}
+else if (!String.IsNullOrEmpty(WarningMessage))
+{
+    <div class="row">
+        <div class="alert alert-warning col-md-4 col-sm-6 col-xs-12" role="alert">
+            @WarningMessage
+        </div>
+    </div>
+}
+else if (WorkflowStep == PickSchedule)
 {
     <div class="content-wrapper mt-3">
         <div class="row">
@@ -148,7 +164,7 @@ else if (WorkflowStep == PickStatus)
                         </div>
                         <div class="row mb-2">
                             <div class="col-sm-3 fw-bold">
-                                Number of Beds:
+                                Beds:
                             </div>
                             <div class="col-sm-9">
                                 @FailedBedRequest.NumberOfBeds
@@ -303,7 +319,7 @@ else if (WorkflowStep == CallReplacement)
                         </div>
                         <div class="row mb-2">
                             <div class="col-sm-3 fw-bold">
-                                Number of Beds:
+                                Beds:
                             </div>
                             <div class="col-sm-9">
                                 @CallBedRequest.NumberOfBeds
@@ -347,4 +363,89 @@ else if (WorkflowStep == CallReplacement)
     <div class="mt-1"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></div>
     <div class="mt-1"><button class="btn btn-secondary" @onclick="HandleCalledClick">Called but Could not Replace</button></div>
     <div class="mt-1"><button class="btn btn-success" @onclick="HandleConfirmedClick">Confirmed Replacement</button></div>
+}
+else if (WorkflowStep == ReplacedStep)
+{
+    string googleMapsLink = GoogleMaps.CreateGoogleMapsLinkForBedRequest(CallBedRequest);
+    
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="alert alert-success col-md-4 col-sm-6 col-xs-12" role="alert">
+                Replacement Confirmed
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Replacement</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
+                                    @CallBedRequest.FormattedPhone
+                                </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @CallBedRequest.FormattedPhone
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Street:
+                            </div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-map-marker-alt"></i> <a href="@googleMapsLink">@CallBedRequest.Street</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Postal Code:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.PostalCode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button"
+            class="btn btn-success"
+            @onclick="CopyToClipboard">
+        <i class="fas @(CopiedToClipboard ? "fa-check" : "fa-copy") me-1"></i>
+        @(CopiedToClipboard ? "Copied!" : "Copy to Clipboard")
+    </button>
 }
