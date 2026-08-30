@@ -24,6 +24,8 @@
         public const string SameDayScheduleText = "Same day schedule";
         public const int DefaultDistance = 999;
         public const double AverageDaysInAMonth = 30.44; //This includes leap year
+        public const double AverageWeeksPerMonth = 4.345; 
+        public static DateTime SqlServerMinDate = new DateTime(1753, 1, 1);
         
         public const string DefaultBedType = "Single Bed";
         //The reason why I have chosen 12 is because each row is four bootstrap columns 
