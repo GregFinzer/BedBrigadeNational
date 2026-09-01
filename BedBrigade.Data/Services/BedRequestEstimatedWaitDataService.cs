@@ -24,11 +24,11 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
         return new ServiceResponse<string>("Estimated wait", true, estimatedWaitResult.EstimatedWait);
     }
 
-    public async Task<EstimatedWaitResult> GetEstimatedWaitResult(int locationId, DateTime minimumBedRequestDate)
+    public async Task<EstimatedWaitResult> GetEstimatedWaitResult(int locationId, DateTime maximumBedRequestDate)
     {
-        minimumBedRequestDate = minimumBedRequestDate.Date;
+        maximumBedRequestDate = maximumBedRequestDate.Date;
         string cacheKey = _cachingService.BuildCacheKey(nameof(BedRequest),
-            $"GetEstimatedWaitResult({locationId},{minimumBedRequestDate.ToShortDateString()})");
+            $"GetEstimatedWaitResult({locationId},{maximumBedRequestDate.ToShortDateString()})");
         
         var cached = _cachingService.Get<EstimatedWaitResult>(cacheKey);
         if (cached != null)
@@ -40,7 +40,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<BedRequest>();
-            await FillNumberOfWaitingBedRequests(dbSet, minimumBedRequestDate, estimatedWaitResult);
+            await FillNumberOfWaitingBedRequests(dbSet, maximumBedRequestDate, estimatedWaitResult);
             await FillFirstDeliveryDate(dbSet, estimatedWaitResult);
 
             //No deliveries so just return
@@ -89,7 +89,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
         }
     }
     
-    private static async Task FillNumberOfDeliveredBedRequests(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
+    private async Task FillNumberOfDeliveredBedRequests(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
     {
         estimatedWaitResult.NumberOfDeliveredBedRequests = await dbSet.Where(o => o.LocationId == estimatedWaitResult.LocationId
                 && (o.Status == BedRequestStatus.Delivered
@@ -99,7 +99,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
             .SumAsync(o => o.NumberOfBeds);
     }
 
-    private static async Task FillLastDeliveryDate(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
+    private async Task FillLastDeliveryDate(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
     {
         estimatedWaitResult.LastDeliveryDate = await dbSet.Where(o => o.LocationId == estimatedWaitResult.LocationId
                                                                       && (o.Status == BedRequestStatus.Delivered
@@ -109,7 +109,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
             .FirstOrDefaultAsync();
     }
 
-    private static async Task FillFirstDeliveryDate(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
+    private async Task FillFirstDeliveryDate(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
     {
         //For averaging purposes we only look back a maximum of 24 months
         const int MaxMonths = 24;
@@ -125,15 +125,26 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
     }
 
     private static async Task FillNumberOfWaitingBedRequests(DbSet<BedRequest> dbSet, 
-        DateTime minimumBedRequestDate,
+        DateTime maximumBedRequestDate,
         EstimatedWaitResult estimatedWaitResult)
     {
-        estimatedWaitResult.NumberOfWaitingBedRequests =  await dbSet
-            .Where(o => o.LocationId == estimatedWaitResult.LocationId
-                        && o.Status == BedRequestStatus.Waiting
-                        && o.CreateDate.HasValue
-                        && o.CreateDate.Value.Date <= minimumBedRequestDate)
-            .SumAsync(o => o.NumberOfBeds);
+        if (maximumBedRequestDate <= Defaults.SqlServerMinDate)
+        {
+            estimatedWaitResult.NumberOfWaitingBedRequests =  await dbSet
+                .Where(o => o.LocationId == estimatedWaitResult.LocationId
+                            && o.Status == BedRequestStatus.Waiting )
+                .SumAsync(o => o.NumberOfBeds);
+        }
+        else
+        {
+            estimatedWaitResult.NumberOfWaitingBedRequests =  await dbSet
+                .Where(o => o.LocationId == estimatedWaitResult.LocationId
+                            && o.Status == BedRequestStatus.Waiting
+                            && o.CreateDate.HasValue
+                            && o.CreateDate.Value.Date <= maximumBedRequestDate)
+                .SumAsync(o => o.NumberOfBeds);
+        }
+
     }
 
     private void FillAverageDeliveriesPerDay(EstimatedWaitResult estimatedWaitResult)

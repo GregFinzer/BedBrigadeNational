@@ -113,24 +113,4 @@ public class BedRequestEmailDataService : Repository<BedRequest>, IBedRequestEma
             return new ServiceResponse<BedRequest>($"Found waiting BedRequest for email {email}", true, bedRequest);
         }
     }
-    
-    public async Task<ServiceResponse<int>> SumBedsForNotReceived(int locationId)
-    {
-        try
-        {
-            using (var ctx = _contextFactory.CreateDbContext())
-            {
-                var dbSet = ctx.Set<BedRequest>();
-                var sum = await dbSet.Where(o => o.LocationId == locationId
-                                                 && o.Status == BedRequestStatus.Waiting)
-                    .SumAsync(b => b.NumberOfBeds);
-
-                return new ServiceResponse<int>($"Found sum of {sum} beds", true, sum);
-            }
-        }
-        catch (DbException ex)
-        {
-            return new ServiceResponse<int>($"Could not SumBedsForNotReceived {GetEntityName()} with locationId {locationId}: {ex.Message} ({ex.ErrorCode})", false);
-        }
-    }
 }

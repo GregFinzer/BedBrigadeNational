@@ -19,6 +19,10 @@ namespace BedBrigade.Client.Components.Pages.Administration
         [Inject] protected IDashboardDataService DashboardService { get; set; } = default!;
         [Inject] protected IDeliveryPlanService DeliveryPlanService { get; set; } = default!;
         [Inject] protected IJSRuntime JS { get; set; } = default!;
+        
+        [Inject]
+        protected IBedRequestEstimatedWaitDataService BedRequestEstimatedWaitDataService { get; set; } = default!;
+        
         protected List<BedRequestDashboardRow>? BedRequestsDashboard { get; set; } = default!;
         protected List<Common.Models.Schedule>? Schedules { get; set; }
         protected int ContactsNeedingResponses { get; set; }
@@ -114,7 +118,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             // Load chart data
             await LoadBedRequestHistory(LocationId);
             await LoadDeliveryHistory(LocationId);
-            EstimatedWaitingTime = (await DashboardService.GetEstimatedWaitTime(LocationId))?.Data ?? "Unknown";
+            EstimatedWaitingTime = (await BedRequestEstimatedWaitDataService.GetEstimatedWaitTime(LocationId))?.Data ?? "Unknown";
 
             // National deliveries
             var ndResponse = await DashboardService.GetNationalDeliveries();

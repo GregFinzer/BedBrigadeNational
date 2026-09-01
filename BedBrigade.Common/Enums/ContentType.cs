@@ -37,5 +37,7 @@ public enum ContentType
     ReplaceFailedDeliveryEmailForm = 19,
     [Description("Replace Failed Delivery SMS Form")]
     ReplaceFailedDeliverySmsForm= 20,
+    [Description("Bed Request Estimated Wait")]
+    BedRequestEstimatedWait = 21
     
 }

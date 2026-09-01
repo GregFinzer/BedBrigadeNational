@@ -5,6 +5,7 @@ namespace BedBrigade.Data.Services
 {
     public interface IBedRequestEstimatedWaitDataService : IRepository<BedRequest>
     {
-        Task FillEstimatedWait(BedRequest bedRequest);
+        Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId);
+        Task<EstimatedWaitResult> GetEstimatedWaitResult(int locationId, DateTime maximumBedRequestDate);
     }
 }

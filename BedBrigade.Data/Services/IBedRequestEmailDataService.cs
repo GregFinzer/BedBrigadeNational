@@ -11,6 +11,5 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<string>>> EmailsForReceivedABed(int locationId);
         Task<ServiceResponse<List<string>>> EmailsForSchedule(int locationId);
         Task<ServiceResponse<BedRequest>> GetWaitingByEmail(string email);
-        Task<ServiceResponse<int>> SumBedsForNotReceived(int locationId);
     }
 }

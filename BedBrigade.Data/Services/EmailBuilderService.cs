@@ -21,6 +21,7 @@ namespace BedBrigade.Data.Services
         private readonly ITimezoneDataService _timezoneDataService;
         private readonly IBedRequestEmailDataService _bedRequestEmailDataService;
         private readonly EmailQueueBackgroundService _emailQueueBackgroundService;
+        private readonly IBedRequestEstimatedWaitDataService _bedRequestEstimatedWaitDataService;
         
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
@@ -33,7 +34,8 @@ namespace BedBrigade.Data.Services
             IMailMergeLogic mailMergeLogic,
             ITimezoneDataService timezoneDataService,
             IBedRequestEmailDataService bedRequestEmailDataService,
-            EmailQueueBackgroundService emailQueueBackgroundService)
+            EmailQueueBackgroundService emailQueueBackgroundService,
+            IBedRequestEstimatedWaitDataService bedRequestEstimatedWaitDataService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -47,6 +49,7 @@ namespace BedBrigade.Data.Services
             _timezoneDataService = timezoneDataService;
             _bedRequestEmailDataService = bedRequestEmailDataService;
             _emailQueueBackgroundService = emailQueueBackgroundService;
+            _bedRequestEstimatedWaitDataService = bedRequestEstimatedWaitDataService;
         }
 
         /// <summary>
@@ -464,17 +467,13 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>("Location not found", false);
             }
 
-            var countResult = await _bedRequestEmailDataService.SumBedsForNotReceived(entity.LocationId);
-
-            if (!countResult.Success || countResult.Data == null)
-            {
-                return new ServiceResponse<string>(countResult.Message, false);
-            }
-
+            var waitResult = await _bedRequestEstimatedWaitDataService.GetEstimatedWaitResult(entity.LocationId, Defaults.SqlServerMinDate);
+            
             StringBuilder sb = new StringBuilder(template, template.Length*2);
             sb = _mailMergeLogic.ReplaceBedRequestFields(entity, sb);
             sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
-            sb = sb.Replace("%%BedRequest.NumberOfBedsWaitingSum%%", (countResult.Data - 1).ToString());
+            sb = sb.Replace("%%BedRequest.NumberOfBedsWaitingSum%%", (waitResult.NumberOfWaitingBedRequests - 1).ToString());
+            sb = sb.Replace("%%BedRequest.EstimatedWait%%", waitResult.EstimatedWait);
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 
