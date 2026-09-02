@@ -15,6 +15,7 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -37,7 +38,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
-
+        [Inject] private IBedRequestEstimatedWaitDataService BedRequestEstimatedWaitDataService { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -84,6 +85,9 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox zipTextBox;
         protected bool _isBusy = false;
         private bool _shouldForceLocation;
+        public int NumberOfWaitingBedRequests { get; set; } = 0;
+        public string Timeframe { get; set; } = string.Empty;
+        
         #endregion
         #region Initialization
 
@@ -97,8 +101,8 @@ namespace BedBrigade.Client.Components.Pages
                 _validationMessageStore = new ValidationMessageStore(EC);
                 await SetLocationState();
                 UpdateRouteDisplayState();
-
                 await LoadConfiguration();
+                await LoadEstimatedWait();
                 _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
             catch (Exception ex)
@@ -108,6 +112,16 @@ namespace BedBrigade.Client.Components.Pages
                 AlertType = AlertDanger;
                 ResultDisplay = "";
             }
+        }
+
+        private async Task LoadEstimatedWait()
+        {
+            var estimatedWaitResult = await BedRequestEstimatedWaitDataService.GetEstimatedWaitResult(SearchLocation.ddlValue,
+                    Defaults.SqlServerMinDate);
+            NumberOfWaitingBedRequests = estimatedWaitResult.NumberOfWaitingBedRequests;
+            string waitAmount = StringUtil.ExtractDigits(estimatedWaitResult.EstimatedWait);
+            string 
+
         }
 
         private async Task SetLocationState()

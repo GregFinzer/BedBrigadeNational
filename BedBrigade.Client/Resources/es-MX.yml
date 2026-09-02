@@ -96,7 +96,7 @@ DynamicYes: Sí
 Email: Correo electrónico
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
-EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado de {timeframe}.
+EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado de {timeframe}. Solo ofrecemos estructuras de cama Twin XL, colchones Twin XL y ropa de cama Twin XL.
 Events: Eventos
 EventDateTime: Fecha y hora del evento
 EventGroup: Grupo de eventos
