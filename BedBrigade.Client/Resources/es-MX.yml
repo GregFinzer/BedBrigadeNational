@@ -96,6 +96,7 @@ DynamicYes: Sí
 Email: Correo electrónico
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
+EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado de {timeframe}.
 Events: Eventos
 EventDateTime: Fecha y hora del evento
 EventGroup: Grupo de eventos

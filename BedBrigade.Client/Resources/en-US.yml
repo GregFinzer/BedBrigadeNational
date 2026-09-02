@@ -95,6 +95,7 @@ DynamicYes: Yes
 Email: Email
 EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
+EstimatedWait: There are currently {numberOfWaitingBedRequests} waiting bed requests with an estimated wait of {timeframe}.
 Events: Events
 EventDateTime: Event Date & Time
 EventGroup: Event Group

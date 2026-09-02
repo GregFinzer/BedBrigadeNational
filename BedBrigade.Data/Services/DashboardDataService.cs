@@ -167,36 +167,7 @@ public class DashboardDataService : IDashboardDataService
         }
     }
 
-    public async Task<ServiceResponse<string>> GetEstimatedWaitTime(int locationId)
-    {
-        string cacheKey = GetWaitTimeCacheKey(locationId);
-        var cached = _cachingService.Get<string>(cacheKey);
-        if (!string.IsNullOrWhiteSpace(cached))
-            return new ServiceResponse<string>("Found cached estimated wait time", true, cached);
 
-        var (success, bedsWaiting) = await TryGetBedsWaitingAsync(locationId);
-        if (!success)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
-
-        if (bedsWaiting <= 0)
-        {
-            _cachingService.Set(cacheKey, "0 weeks");
-            return new ServiceResponse<string>("No beds waiting", true, "0 weeks");
-        }
-
-        var deliveries = await GetDeliveriesHistoryAsync(locationId);
-        if (deliveries == null)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", false, null);
-
-        double avgDelPerMonth = CalculateAverageDeliveredPerMonth(deliveries);
-        if (avgDelPerMonth <= 0)
-            return new ServiceResponse<string>("Insufficient data to estimate wait time", true, "0 weeks");
-
-        double estimatedMonths = bedsWaiting / avgDelPerMonth;
-        string resultText = FormatEstimatedWaitText(estimatedMonths);
-        _cachingService.Set(cacheKey, resultText);
-        return new ServiceResponse<string>("Estimated wait time calculated", true, resultText);
-    }
 
     public async Task<ServiceResponse<List<NationalDelivery>>> GetNationalDeliveries()
     {
@@ -295,78 +266,11 @@ public class DashboardDataService : IDashboardDataService
     }
 
 
-
-    private string GetWaitTimeCacheKey(int locationId)
-        => _cachingService.BuildCacheKey(BedRequestEntityName, $"GetEstimatedWaitTime({locationId})");
-
-    private async Task<(bool Success, int BedsWaiting)> TryGetBedsWaitingAsync(int locationId)
-    {
-        var dashboard = await GetWaitingDashboard(locationId);
-        if (!dashboard.Success || dashboard.Data == null)
-            return (false, 0);
-
-        int bedsWaiting = dashboard.Data.FirstOrDefault(r => r.LocationId == locationId)?.Beds ?? 0;
-        return (true, bedsWaiting);
-    }
-
-    private async Task<List<BedRequestHistoryRow>?> GetDeliveriesHistoryAsync(int locationId)
-    {
-        var deliveriesResponse = await GetBedDeliveryHistory(locationId);
-        if (!deliveriesResponse.Success || deliveriesResponse.Data == null)
-            return null;
-        return deliveriesResponse.Data;
-    }
-
-    private static double CalculateAverageDeliveredPerMonth(List<BedRequestHistoryRow> data)
-    {
-        var currentYear = DateTime.UtcNow.Year;
-        var currentMonth = DateTime.UtcNow.Month;
-        int prevYear = currentYear - 1;
-
-        int[] delPrevYear = new int[12];
-        int[] delCurrentYtd = new int[currentMonth];
-
-        foreach (var row in data.Where(r => r.Year == prevYear))
-        {
-            if (row.Month >= 1 && row.Month <= 12) delPrevYear[row.Month - 1] = row.Beds;
-        }
-
-        foreach (var row in data.Where(r => r.Year == currentYear))
-        {
-            if (row.Month >= 1 && row.Month <= currentMonth) delCurrentYtd[row.Month - 1] = row.Beds;
-        }
-
-        return AverageExcludingZeros(delPrevYear.Concat(delCurrentYtd));
-    }
-
-    private static string FormatEstimatedWaitText(double estimatedMonths)
-    {
-        if (estimatedMonths < 1.0)
-        {
-            double weeks = estimatedMonths * 4.345;
-            int weeksRoundedUp = (int)Math.Ceiling(weeks);
-            weeksRoundedUp = Math.Max(weeksRoundedUp, 1);
-            return weeksRoundedUp == 1 ? "1 week" : $"{weeksRoundedUp} weeks";
-        }
-        else
-        {
-            int monthsRoundedUp = (int)Math.Ceiling(estimatedMonths);
-            return monthsRoundedUp == 1 ? "1 month" : $"{monthsRoundedUp} months";
-        }
-    }
-
-    private static double AverageExcludingZeros(IEnumerable<int> values)
-    {
-        var nonZero = values.Where(v => v > 0).ToList();
-        if (nonZero.Count == 0) return 0.0;
-        return nonZero.Average();
-    }
-
     private static IQueryable<BedRequest> BuildDeliveryHistoryQuery(IQueryable<BedRequest> source, int locationId,
         DateTime now)
     {
         int currentYear = now.Year;
-        var years = new int[] { currentYear - 2, currentYear - 1, currentYear };
+        int[] years = new int[] { currentYear - 2, currentYear - 1, currentYear };
 
         var query = source.Where(o => o.LocationId == locationId
                                       && o.DeliveryDate.HasValue

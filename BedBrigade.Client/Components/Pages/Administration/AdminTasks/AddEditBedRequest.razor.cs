@@ -40,6 +40,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
         [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
+        [Inject] private IBedRequestEstimatedWaitDataService _bedRequestEstimatedWaitDataService { get; set; } = null!;
+        
         private bool _isLoading = true;
         public DateTime? DeliveryDate { get; set; }
         public DateTime? DeliveryTime { get; set; }
@@ -82,6 +84,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected bool IsNew => !BedRequestId.HasValue || BedRequestId == 0;
 
+        public string EstimatedWait { get; set; } = string.Empty;
+        
         protected override async Task OnInitializedAsync()
         {
             try
@@ -91,6 +95,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 await LoadConfiguration(LocationId);
                 await LoadLocations();
                 await LoadModel();
+                await LoadEstimatedWait();
                 InitializeValidationContext();
                 await LoadDeliverySchedules(Model?.LocationId ?? LocationId);
                 await LoadPreviousSchedule(Model?.LocationId ?? LocationId);
@@ -246,6 +251,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
+        private async Task LoadEstimatedWait()
+        {
+            if (Model == null)
+                return;
+
+            var waitResponse = await _bedRequestEstimatedWaitDataService.GetEstimatedWaitResult(Model.LocationId,
+                Model.CreateDate ?? Defaults.SqlServerMinDate);
+
+            EstimatedWait =
+                $"{waitResponse.NumberOfWaitingBedRequests} beds ahead. Estimated wait: {waitResponse.EstimatedWait}.";
+        }
+        
         private void InitializeValidationContext()
         {
             if (_editContext != null)
