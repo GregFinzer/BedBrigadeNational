@@ -85,9 +85,12 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox zipTextBox;
         protected bool _isBusy = false;
         private bool _shouldForceLocation;
+        public int LocationId { get; set; } = 0;
         public int NumberOfWaitingBedRequests { get; set; } = 0;
+
         public string Timeframe { get; set; } = string.Empty;
-        
+
+        public string EstimatedWait { get; set; } = string.Empty;
         #endregion
         #region Initialization
 
@@ -102,7 +105,6 @@ namespace BedBrigade.Client.Components.Pages
                 await SetLocationState();
                 UpdateRouteDisplayState();
                 await LoadConfiguration();
-                await LoadEstimatedWait();
                 _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
             catch (Exception ex)
@@ -116,12 +118,13 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task LoadEstimatedWait()
         {
-            var estimatedWaitResult = await BedRequestEstimatedWaitDataService.GetEstimatedWaitResult(SearchLocation.ddlValue,
+            if (LocationId == 0)
+                return;
+            
+            var estimatedWaitResult = await BedRequestEstimatedWaitDataService.GetEstimatedWaitResult(LocationId,
                     Defaults.SqlServerMinDate);
             NumberOfWaitingBedRequests = estimatedWaitResult.NumberOfWaitingBedRequests;
-            string waitAmount = StringUtil.ExtractDigits(estimatedWaitResult.EstimatedWait);
-            string 
-
+            EstimatedWait = estimatedWaitResult.EstimatedWait;
         }
 
         private async Task SetLocationState()
@@ -133,7 +136,7 @@ namespace BedBrigade.Client.Components.Pages
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
                     _locationState.Location = LocationRoute;
-
+                    LocationId =  locationResponse.Data.LocationId;
                     if (!string.IsNullOrEmpty(locationResponse.Data.ExternalRequestABed) &&
                         Validation.IsValidUrl(locationResponse.Data.ExternalRequestABed))
                     {
@@ -146,9 +149,37 @@ namespace BedBrigade.Client.Components.Pages
         private async Task OnLanguageChanged(CultureInfo arg)
         {
             await TranslateSpeakEnglish();
+            SetTimeframe();
             StateHasChanged();
         }
 
+        private void SetTimeframe()
+        {
+            EstimatedWait = (EstimatedWait ?? string.Empty).ToLower();
+            if (string.IsNullOrWhiteSpace(EstimatedWait) || EstimatedWait == "unknown")
+            {
+                Timeframe = _lc["Unknown"].ToLower();
+                return;
+            }
+
+            string amount = StringUtil.ExtractDigits(EstimatedWait);
+                
+            if (EstimatedWait.Contains("months"))
+                Timeframe = $"{amount} {_lc["Months"].ToLower()}";
+            else if (EstimatedWait.Contains("month"))
+                Timeframe = $"{amount} {_lc["Month"].ToLower()}";
+            else if (EstimatedWait.Contains("weeks"))
+                Timeframe = $"{amount} {_lc["Weeks"].ToLower()}";
+            else if (EstimatedWait.Contains("week"))
+                Timeframe = $"{amount} {_lc["Week"].ToLower()}";
+            else if (EstimatedWait.Contains("days"))
+                Timeframe = $"{amount} {_lc["Days"].ToLower()}";
+            else if (EstimatedWait.Contains("day"))
+                Timeframe = $"{amount} {_lc["Day"].ToLower()}";
+            else
+                Timeframe = EstimatedWait.ToLower();
+        }
+        
         public void Dispose()
         {
             _svcLanguage.LanguageChanged -= OnLanguageChanged;
@@ -184,6 +215,8 @@ namespace BedBrigade.Client.Components.Pages
         {
             await SetLocationState();
             UpdateRouteDisplayState();
+            await LoadEstimatedWait();
+            SetTimeframe();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -259,7 +292,15 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task<bool> DeepValidation()
         {
-            newRequest.LocationId = SearchLocation.ddlValue;
+            if (SearchLocation != null && SearchLocation.ddlValue > 0)
+            {
+                newRequest.LocationId = SearchLocation.ddlValue;
+            }
+            else
+            {
+                newRequest.LocationId = LocationId;
+            }
+
             DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
 
             if (nextEligibleDate.HasValue && nextEligibleDate.Value > DateTime.Today)
@@ -417,7 +458,15 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (isValid)
                 {
-                    newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
+                    if (SearchLocation != null && SearchLocation.ddlValue > 0)
+                    {
+                        newRequest.LocationId = SearchLocation.ddlValue;
+                    }
+                    else
+                    {
+                        newRequest.LocationId = LocationId;
+                    }
+
                     newRequest.NumberOfBeds = NumericValue;
                     newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
                     newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
