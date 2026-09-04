@@ -213,8 +213,8 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
     private void ChooseEventNext()
     {
-        string url = _nav.ToBaseRelativePath(_nav.Uri) + $"?scheduleId={ScheduleId}";
-        _nav.NavigateTo(url);  
+        string url = $"{BaseUrl}?scheduleId={ScheduleId}";
+        _nav.NavigateTo(url);
     }
 
     private void OnScheduleChange(ChangeEventArgs<int?, Common.Models.Schedule> obj)
