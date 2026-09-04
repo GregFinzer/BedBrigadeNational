@@ -36,6 +36,8 @@ ContactUsFormSubmitted: Gracias por ponerse en contacto con nosotros. Nos pondre
 Continue: Continuar
 Currency: Moneda
 DateColon: 'Fecha:'
+Day: Dia
+Days: Dias
 DeliveryAddress: Dirección de entrega
 DeliveryVehicle: Vehículo de reparto
 DeliveryVehicleFullSizeVan: Tengo una camioneta de tamaño completo que está vacía sin asientos.
@@ -96,6 +98,7 @@ DynamicYes: Sí
 Email: Correo electrónico
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
+EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado de {timeframe}. Solo ofrecemos estructuras de cama Twin XL, colchones Twin XL y ropa de cama Twin XL.
 Events: Eventos
 EventDateTime: Fecha y hora del evento
 EventGroup: Grupo de eventos
@@ -171,6 +174,8 @@ MaxLengthVolunteerArea100: El área del voluntario tiene una longitud máxima de
 MaxLengthVehicleDescription100: La descripción del vehículo tiene una longitud máxima de 100 caracteres
 Message: Mensaje
 MilesAway: millas
+Month: Mes
+Months: Meses
 MonthlyDonationOf: 'Donación mensual de'
 Name: Nombre
 Names: Nombres
@@ -307,6 +312,7 @@ TurnYourPhone: Gira tu teléfono hacia un lado para una mejor vista
 UnableToChangePassword: No se puede cambiar la contraseña. Inténtalo de nuevo.
 UnableToSendEmail: No se pudo enviar el correo electrónico. Inténtalo de nuevo.
 Unauthorized: Desautorizado
+Unknown: Desconocido
 Unregister: Desregistrarse
 Unsubscribe: Darse de baja
 UnsubscribeFromNewsletter: Darse de baja del boletín
@@ -330,6 +336,8 @@ VolunteerSignUpNew: Bienvenido a Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: Agradecemos que se una al Equipo de Voluntarios de la Brigada de Camas.
 VolunteersRegisteredColon: 'Voluntarios registrados:'
 VolunteersRegisteredneeded: Voluntarios registrados/necesarios
+Week: Semana
+Weeks: Semanas
 WeLookForwardToSeeingYou: Te esperamos.
 WeReceivedYourRegistration: 'Recibimos su registro como participante para el evento programado:'
 WhatChurch: ¿A qué iglesia asistes?

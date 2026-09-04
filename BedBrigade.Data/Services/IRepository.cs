@@ -7,6 +7,8 @@ namespace BedBrigade.Data.Services
         //Get stuff out of the identity
         string? GetUserEmail();
 
+        string? GetUserPhone();
+
         string GetUserName();
 
         string GetEntityName();

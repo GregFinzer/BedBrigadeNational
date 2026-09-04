@@ -11,5 +11,13 @@ namespace BedBrigade.Common.Logic
             string googleMapsLink = $"https://www.google.com/maps/search/?api=1&query={urlEncodedAddress}";
             return googleMapsLink;
         }
+
+        public static string CreateGoogleMapsLinkForBedRequest(BedRequest bedRequest)
+        {
+            var address = bedRequest.Street + ", " + bedRequest.City + ", " + bedRequest.State + ", " + bedRequest.PostalCode;
+            string urlEncodedAddress = System.Net.WebUtility.UrlEncode(address);
+            string googleMapsLink = $"https://www.google.com/maps/search/?api=1&query={urlEncodedAddress}";
+            return googleMapsLink;
+        }
     }
 }

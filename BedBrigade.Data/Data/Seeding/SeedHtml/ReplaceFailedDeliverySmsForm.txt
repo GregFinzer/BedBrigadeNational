@@ -1,0 +1,14 @@
+﻿This is a replacement delivery for %%FailedDeliveryRecipientName%%.  See the replacement below.
+
+First Name:  %%BedRequest.FirstName%%
+Last Name:  %%BedRequest.LastName%%
+Email:  %%BedRequest.Email%%
+Phone:  %%BedRequest.Phone%%
+Street:  %%BedRequest.Street%%
+City:  %%BedRequest.City%%
+Zip:  %%BedRequest.PostalCode%%
+Number of Beds:  %%BedRequest.NumberOfBeds%%
+Ages:  %%BedRequest.GenderAge%%
+Names:  %%BedRequest.Names%%
+Primary Language:  %%BedRequest.PrimaryLanguage%%
+Team:  %%BedRequest.Team%%

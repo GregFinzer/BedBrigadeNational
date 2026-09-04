@@ -1,0 +1,446 @@
+﻿@page "/administration/schedule/replacefaileddelivery"
+@layout Layout.AdminLayout
+
+<CheckAuth Roles=@RoleNames.CanManageBedRequests></CheckAuth>
+
+<h3 class="mt-3">Replace Failed Delivery</h3>
+
+@if (!String.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <div class="row">
+        <div class="alert alert-danger col-md-4 col-sm-6 col-xs-12" role="alert">
+            @ErrorMessage
+        </div>
+    </div>
+}
+else if (!String.IsNullOrEmpty(WarningMessage))
+{
+    <div class="row">
+        <div class="alert alert-warning col-md-4 col-sm-6 col-xs-12" role="alert">
+            @WarningMessage
+        </div>
+    </div>
+}
+else if (WorkflowStep == PickSchedule)
+{
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Choose the Delivery Event</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="ScheduleDropdown" class="formlabel">Delivery Event</label>
+                            <SfDropDownList ID="ScheduleDropdown" TItem="BedBrigade.Common.Models.Schedule" TValue="int?" DataSource="FutureDeliverySchedules" @bind-Value="ScheduleId" Enabled="true" Placeholder="Select Delivery Event" FloatLabelType="FloatLabelType.Never">
+                                <DropDownListFieldSettings Value="ScheduleId" Text="EventSelect" />
+                                <DropDownListEvents TValue="int?" TItem="BedBrigade.Common.Models.Schedule" ValueChange="OnScheduleChange"></DropDownListEvents>
+                            </SfDropDownList>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-1">
+        <div class="col-md-4 col-sm-6 col-xs-12 text-left">
+            <button class="btn btn-primary" type="button" disabled="@_chooseEventButtonDisabled"  @onclick="ChooseEventNext">Next ></button>
+        </div>
+    </div>    
+}
+else if (WorkflowStep == PickFailedDelivery)
+{
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                @if (!BedRequestsForEvent.Any())
+                {
+                <p>There are no Bed Requests scheduled for the selected event.</p>
+                }
+                else
+                {
+                    <p>Select the Bed Requester Name to Replace</p>
+                    <div class="mb-3">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search bed requests..."
+                               @bind="SearchText"
+                               @bind:event="oninput"/>
+                    </div>
+
+                    var filteredBedRequests = string.IsNullOrWhiteSpace(SearchText)
+                        ? BedRequestsForEvent
+                        : BedRequestsForEvent.Where(x =>
+                                (x.FullName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                (x.Team?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                                x.NumberOfBeds.ToString().Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+
+                    if (!filteredBedRequests.Any())
+                    {
+                        <p>No bed requests match your search.</p>
+                    }
+                    else
+                    {
+
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th class="text-center" scope="col">Team</th>
+                                <th class="text-center" scope="col">Beds</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @{
+                                string lastTeam = filteredBedRequests.FirstOrDefault()?.Team ?? string.Empty;
+                                string contextualClass = "table-default";
+                            }
+                            @for (int i = 0; i < filteredBedRequests.Count; i++)
+                            {
+                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={filteredBedRequests[i].BedRequestId}";
+
+                                @if (filteredBedRequests[i].Team != lastTeam)
+                                {
+                                    lastTeam = filteredBedRequests[i].Team;
+                                    contextualClass = contextualClass == "table-default" ? "table-active" : "table-default";
+                                }
+
+                                <tr class="@contextualClass">
+                                    <td><a href="@url">@filteredBedRequests[i].FullName</a></td>
+                                    <td class="text-center">@filteredBedRequests[i].Team</td>
+                                    <td class="text-center">@filteredBedRequests[i].NumberOfBeds</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                }
+                <div class="row mt-1">
+                    <div class="col-md-12 text-left">
+                        <a href="@BaseUrl?scheduleId=0" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (WorkflowStep == PickStatus)
+{
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId=0";
+    string waitingUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status=Waiting";
+    string canceledUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status=Cancelled";
+
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Confirm The Failed Bed Request</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(FailedBedRequest.Phone)">
+                                    @FailedBedRequest.FormattedPhone
+                                </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @FailedBedRequest.FormattedPhone
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Team:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.Team
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="mt-2"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></p>
+    <p><a class="btn btn-success" href="@waitingUrl">Set to Waiting and Replace</a></p>
+    <p><a class="btn btn-danger" href="@canceledUrl">Set to Canceled and Replace</a></p>
+}
+else if (WorkflowStep == PickReplacement)
+{
+
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}";
+    if (!ReplacementBedRequests.Any())
+    {
+        string message = $"There are no waiting Bed Requests that have less than or equal to {FailedBedRequest.NumberOfBeds} beds."; 
+        <p>@message</p>
+    }
+    else
+    {
+        <div class="content-wrapper mt-3">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <p>Select the Bed Requester Name to Call</p>
+                    <div class="mb-3">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search bed requests..."
+                               @bind="SearchTextReplace"
+                               @bind:event="oninput"/>
+                    </div>
+
+                    @{
+                        var filteredBedRequests = string.IsNullOrWhiteSpace(SearchTextReplace)
+                            ? ReplacementBedRequests
+                            : ReplacementBedRequests.Where(x =>
+                                    (x.FullName?.Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase) ?? false)
+                                    || x.Phone == SearchTextReplace
+                                    || x.FormattedPhone == SearchTextReplace
+                                    || x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
+                                .ToList();
+                    }
+                    
+                    @if (!filteredBedRequests.Any())
+                    {
+                    <p>No bed requests match your search.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th class="text-center" scope="col">Beds</th>
+                                <th class="text-center" scope="col">Miles</th>
+                                <th class="text-center" scope="col">Called?</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @for (int i = 0; i < filteredBedRequests.Count; i++)
+                            {
+                                string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}&callRequestId={filteredBedRequests[i].BedRequestId}";
+
+                                <tr class="table-default">
+                                    <td>
+                                        <a href="@url">@filteredBedRequests[i].FullName</a>
+                                    </td>
+                                    <td class="text-center">
+                                        @filteredBedRequests[i].NumberOfBeds
+                                    </td>
+                                    <td class="text-center">
+                                        @filteredBedRequests[i].Distance.ToString("N2")
+                                    </td>
+                                    <td class="text-center">
+                                        @if (filteredBedRequests[i].Notes != null &&
+                                             filteredBedRequests[i].Notes.Contains(Defaults.SameDayScheduleText))
+                                        {
+                                            <span>Yes</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <div class="row mt-1">
+        <div class="col-md-12 text-left">
+            <a href="@backUrl" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+        </div>
+    </div>
+}
+else if (WorkflowStep == CallReplacement)
+{
+    string backUrl = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}";
+
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Call the Replacement</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
+                                    @CallBedRequest.FormattedPhone
+                                </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @CallBedRequest.FormattedPhone
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Street:
+                            </div>
+                            <div class="col-sm-9">
+                                <SfTextBox ID="street" @bind-Value="@CallBedRequest.Street"></SfTextBox>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Postal Code:
+                            </div>
+                            <div class="col-sm-9">
+                                <SfMaskedTextBox @key="CallBedRequest.BedRequestId" ID="zip" Mask="00000" @bind-Value="@CallBedRequest.PostalCode"></SfMaskedTextBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-1"><a class="btn btn-primary" href="@backUrl"><i class="fas fa-arrow-left me-2"></i>Go Back</a></div>
+    <div class="mt-1"><button class="btn btn-secondary" @onclick="HandleCalledClick">Called but Could not Replace</button></div>
+    <div class="mt-1"><button class="btn btn-success" @onclick="HandleConfirmedClick">Confirmed Replacement</button></div>
+}
+else if (WorkflowStep == ReplacedStep)
+{
+    string googleMapsLink = GoogleMaps.CreateGoogleMapsLinkForBedRequest(CallBedRequest);
+    
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="alert alert-success col-md-4 col-sm-6 col-xs-12" role="alert">
+                Replacement Confirmed
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Replacement</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(CallBedRequest.Phone)">
+                                    @CallBedRequest.FormattedPhone
+                                </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @CallBedRequest.FormattedPhone
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Street:
+                            </div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-map-marker-alt"></i> <a href="@googleMapsLink">@CallBedRequest.Street</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Postal Code:
+                            </div>
+                            <div class="col-sm-9">
+                                @CallBedRequest.PostalCode
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button"
+            class="btn btn-success"
+            @onclick="CopyToClipboard">
+        <i class="fas @(CopiedToClipboard ? "fa-check" : "fa-copy") me-1"></i>
+        @(CopiedToClipboard ? "Copied!" : "Copy to Clipboard")
+    </button>
+}

@@ -85,6 +85,7 @@ namespace BedBrigade.Client.Components
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
         public bool ShowSpinner { get; set; } // Shows spinner overlay during delivery/team sheet generation
         public bool ShouldCheckSortClosest { get; set; } = true;
+        private bool _gridEditSettingsApplied;
 
         protected override async Task OnInitializedAsync()
         {
@@ -233,16 +234,15 @@ namespace BedBrigade.Client.Components
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
+            if (!firstRender && !_gridEditSettingsApplied && Grid != null
+                && AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
-                {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
-                    Grid.EditSettings.AllowDeleting = true;
-                    Grid.EditSettings.AllowAdding = true;
-                    Grid.EditSettings.AllowEditing = true;
-                    StateHasChanged();
-                }
+                Grid.EditSettings.AllowEditOnDblClick = true;
+                Grid.EditSettings.AllowDeleting = true;
+                Grid.EditSettings.AllowAdding = true;
+                Grid.EditSettings.AllowEditing = true;
+                _gridEditSettingsApplied = true;
+                StateHasChanged();
             }
             
             if (ShouldCheckSortClosest)
@@ -289,11 +289,29 @@ namespace BedBrigade.Client.Components
         {
             if (Grid != null)
             {
-                await Grid.FilterByColumnAsync(
-                    nameof(BedRequest.StatusString),
-                    "equal",
-                    "Waiting"
-                );
+                var columns = await Grid.GetColumnsAsync();
+                string statusUid = columns.Where(o => o.Field == nameof(BedRequest.StatusString)).First().Uid;
+                Grid.FilterSettings.Columns = new List<GridFilterColumn>();
+           
+                Grid.FilterSettings.Columns.Add(new GridFilterColumn
+                {
+                    Field = nameof(BedRequest.StatusString),
+                    Operator = Syncfusion.Blazor.Operator.Equal,
+                    Predicate = "or",
+                    Value = BedRequestStatus.Waiting.ToString(),
+                    Uid = statusUid
+                });
+
+                Grid.FilterSettings.Columns.Add(new GridFilterColumn
+                {
+                    Field = nameof(BedRequest.StatusString),
+                    Operator = Syncfusion.Blazor.Operator.Equal,
+                    Predicate = "or",
+                    Value = BedRequestStatus.Scheduled.ToString(),
+                    Uid = statusUid
+                });
+                
+                await Grid.Refresh();
             }
         }
 
@@ -402,7 +420,7 @@ namespace BedBrigade.Client.Components
                     var selectedId = (await Grid.GetSelectedRecordsAsync()).First().BedRequestId;
                     _lastSortClosestSelectedId = selectedId;
 
-                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, selectedId);
+                    BedRequests = DriveRoutingLogic.SortBedRequestClosestToAddress(BedRequests, selectedId);
 
                     // Clear any column sorts so the grid respects the pre-sorted data source order.
                     // Do NOT re-sort by Distance, OrderByBestRoute assigns each record's Distance
@@ -432,7 +450,7 @@ namespace BedBrigade.Client.Components
             {
                 if (BedRequests != null && BedRequestDataService != null && Grid != null)
                 {
-                    BedRequests = BedRequestDataService.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
+                    BedRequests = DriveRoutingLogic.SortBedRequestClosestToAddress(BedRequests, bedRequestId);
 
                     await Grid.ClearSortingAsync();
 

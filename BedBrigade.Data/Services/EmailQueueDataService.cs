@@ -26,7 +26,7 @@ namespace BedBrigade.Data.Services
         private readonly IMailMergeLogic _mailMergeLogic;
         private readonly ICommonService _commonService;
         private readonly ITimezoneDataService _timezoneDataService;
-
+        private readonly IBedRequestEmailDataService _bedRequestEmailDataService;
         
         public EmailQueueDataService(IDbContextFactory<DataContext> contextFactory, 
             ICachingService cachingService,
@@ -42,7 +42,8 @@ namespace BedBrigade.Data.Services
             INewsletterDataService newsletterDataService,
             IMailMergeLogic mailMergeLogic, 
             ICommonService commonService, 
-            ITimezoneDataService timezoneDataService
+            ITimezoneDataService timezoneDataService,
+            IBedRequestEmailDataService  bedRequestEmailDataService
             ) : base(contextFactory, cachingService, authService)
         {
             _contextFactory = contextFactory;
@@ -59,6 +60,7 @@ namespace BedBrigade.Data.Services
             _mailMergeLogic = mailMergeLogic;
             _commonService = commonService;
             _timezoneDataService = timezoneDataService;
+            _bedRequestEmailDataService = bedRequestEmailDataService;
         }
 
         public async Task<List<EmailQueue>> GetLockedEmails()
@@ -527,7 +529,7 @@ namespace BedBrigade.Data.Services
                 case EmailRecipientOption.VolunteersForLocation:
                     return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsForLocation:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestEmailDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.ContactUsForLocation:
                     return new ServiceResponse<List<string>>(message, true, (await _contactUsDataService.GetDistinctEmailByLocation(parms.LocationId)).Data);
                 case EmailRecipientOption.BedBrigadeLeadersNationwide:
@@ -539,11 +541,11 @@ namespace BedBrigade.Data.Services
                 case EmailRecipientOption.VolunteersForAnEvent:
                     return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerEmailsForASchedule(parms.ScheduleId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveNotRecievedABed:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForNotReceivedABed(parms.LocationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestEmailDataService.EmailsForNotReceivedABed(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsWhoHaveRecievedABed:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForReceivedABed(parms.LocationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestEmailDataService.EmailsForReceivedABed(parms.LocationId)).Data);
                 case EmailRecipientOption.BedRequestorsForAnEvent:
-                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.EmailsForSchedule(parms.LocationId)).Data);
+                    return new ServiceResponse<List<string>>(message, true, (await _bedRequestEmailDataService.EmailsForSchedule(parms.LocationId)).Data);
                 case EmailRecipientOption.Newsletter:
                     return new ServiceResponse<List<string>>(message, true, (await _subscriptionDataService.GetEmailsByNewsletterAsync(parms.NewsletterId)).Data);
                 default:
@@ -581,7 +583,7 @@ namespace BedBrigade.Data.Services
         private async Task<List<string>> GetEveryone()
         {
             var volunteers = await _volunteerDataService.GetDistinctEmail();
-            var bedRequestors = await _bedRequestDataService.GetDistinctEmail();
+            var bedRequestors = await _bedRequestEmailDataService.GetDistinctEmail();
             var contactUs = await _contactUsDataService.GetDistinctEmail();
             var users = await _userDataService.GetDistinctEmail();
 

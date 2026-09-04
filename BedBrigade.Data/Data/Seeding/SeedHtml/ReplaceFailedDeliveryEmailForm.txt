@@ -1,10 +1,4 @@
-﻿<p>%%BedRequest.FirstName%%,</p>
-
-<p>We have received your Bed Request for %%BedRequest.NumberOfBeds%% bed(s) with Gender/Age of %%BedRequest.GenderAge%%</p>
-
-<p>Your request has been assigned to this location:  %%Location.Name%%</p>
-
-<p>There are currently %%BedRequest.NumberOfBedsWaitingSum%% Bed Requests in line ahead of you with an estimated wait of %%BedRequest.EstimatedWait%%.</p>
+﻿<p>This is a replacement delivery for %%FailedDeliveryRecipientName%%.  See the replacement below.</p>
 
 <table width="600" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
        <tbody>
@@ -53,8 +47,8 @@
 			   <td width="350">%%BedRequest.PrimaryLanguage%%</td>
 		   </tr>		  
 		   <tr>
-		       <td width="250">Any Special Instructions</td>
-			   <td width="350">%%BedRequest.Notes%%</td>
+		       <td width="250">Team</td>
+			   <td width="350">%%BedRequest.Team%%</td>
 		   </tr>
 	   </tbody>
 </table>

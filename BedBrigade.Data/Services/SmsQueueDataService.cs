@@ -14,38 +14,38 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private readonly ICachingService _cachingService;
     private IUserDataService _userDataService;
     private IVolunteerDataService _volunteerDataService;
-    private IBedRequestDataService _bedRequestDataService;
     private IContactUsDataService _contactUsDataService;
     private IConfigurationDataService _configDataService;
     private ISmsState _smsState;
     private ILocationDataService _locationDataService;
     private IScheduleDataService _scheduleDataService;
     private readonly ITimezoneDataService _svcTimeZone;
-
+    private readonly IBedRequestPhoneDataService _bedRequestPhoneDataService;
+    
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService, 
         IUserDataService userDataService, 
         IVolunteerDataService volunteerDataService, 
-        IBedRequestDataService bedRequestDataService, 
         IContactUsDataService contactUsDataService, 
         IConfigurationDataService configDataService, 
         ISmsState smsState,
         ITimezoneDataService svcTimeZone, 
         ILocationDataService locationDataService, 
-        IScheduleDataService scheduleDataService) : base(contextFactory, cachingService, authService)
+        IScheduleDataService scheduleDataService,
+        IBedRequestPhoneDataService bedRequestPhoneDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
         _userDataService = userDataService;
         _volunteerDataService = volunteerDataService;
-        _bedRequestDataService = bedRequestDataService;
         _contactUsDataService = contactUsDataService;
         _configDataService = configDataService;
         _smsState = smsState;
         _svcTimeZone = svcTimeZone;
         _locationDataService = locationDataService;
         _scheduleDataService = scheduleDataService;
+        _bedRequestPhoneDataService = bedRequestPhoneDataService;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -365,7 +365,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<bool> FillContactByPhoneNumberFromBedRequest(SmsQueue smsQueue)
     {
-        var result = await _bedRequestDataService.GetByPhone(smsQueue.ToPhoneNumber);
+        var result = await _bedRequestPhoneDataService.GetByPhone(smsQueue.ToPhoneNumber);
         if (result.Success && result.Data != null)
         {
             smsQueue.ContactType = ContactTypes.BedRequestor;
@@ -470,7 +470,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             case SmsRecipientOption.VolunteersForLocation:
                 return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetDistinctPhoneByLocation(locationId)).Data);
             case SmsRecipientOption.BedRequestorsForLocation:
-                return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.GetDistinctPhoneByLocation(locationId)).Data);
+                return new ServiceResponse<List<string>>(message, true, (await _bedRequestPhoneDataService.GetDistinctPhoneByLocation(locationId)).Data);
             case SmsRecipientOption.ContactUsForLocation:
                 return new ServiceResponse<List<string>>(message, true, (await _contactUsDataService.GetDistinctPhoneByLocation(locationId)).Data);
             case SmsRecipientOption.BedBrigadeLeadersNationwide:
@@ -482,11 +482,11 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
             case SmsRecipientOption.VolunteersForAnEvent:
                 return new ServiceResponse<List<string>>(message, true, (await _volunteerDataService.GetVolunteerPhonesForASchedule(scheduleId)).Data);
             case SmsRecipientOption.BedRequestorsWhoHaveNotRecievedABed:
-                return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.PhonesForNotReceivedABed(locationId)).Data);
+                return new ServiceResponse<List<string>>(message, true, (await _bedRequestPhoneDataService.PhonesForNotReceivedABed(locationId)).Data);
             case SmsRecipientOption.BedRequestorsWhoHaveRecievedABed:
-                return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.PhonesForReceivedABed(locationId)).Data);
+                return new ServiceResponse<List<string>>(message, true, (await _bedRequestPhoneDataService.PhonesForReceivedABed(locationId)).Data);
             case SmsRecipientOption.BedRequestorsForAnEvent:
-                return new ServiceResponse<List<string>>(message, true, (await _bedRequestDataService.PhonesForSchedule(locationId)).Data);
+                return new ServiceResponse<List<string>>(message, true, (await _bedRequestPhoneDataService.PhonesForSchedule(locationId)).Data);
             default:
                 throw new ArgumentOutOfRangeException(nameof(option), option, $"Unsupported Option: {option}");
         }
@@ -501,7 +501,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private async Task<List<string>> GetEveryone()
     {
         var volunteers = await _volunteerDataService.GetDistinctPhone();
-        var bedRequestors = await _bedRequestDataService.GetDistinctPhone();
+        var bedRequestors = await _bedRequestPhoneDataService.GetDistinctPhone();
         var contactUs = await _contactUsDataService.GetDistinctPhone();
         var users = await _userDataService.GetDistinctPhone();
 

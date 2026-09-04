@@ -103,6 +103,8 @@ namespace BedBrigade.Client.Services
                     _auth.UserHasRole(RoleNames.CanViewPages)),
                 ("Newsletters", "administration/manage/newsletters", "fas fa-paper-plane",
                     _auth.UserHasRole(RoleNames.CanManageNewsletters)),
+                ("Replace Failed Delivery", "administration/schedule/replacefaileddelivery", "fas fa-truck-pickup",
+                    _auth.UserHasRole(RoleNames.CanManageBedRequests)),                
                 ("Stories", "administration/manage/pages/Stories", "fas fa-book-open",
                     _auth.UserHasRole(RoleNames.CanViewPages)),
                 ("Server Info", "administration/admin/serverinfo", "fas fa-server",

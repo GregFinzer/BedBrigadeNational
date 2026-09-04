@@ -19,7 +19,10 @@ namespace BedBrigade.Data.Services
         private readonly IScheduleDataService _scheduleDataService;
         private readonly IMailMergeLogic _mailMergeLogic;
         private readonly ITimezoneDataService _timezoneDataService;
-
+        private readonly IBedRequestEmailDataService _bedRequestEmailDataService;
+        private readonly EmailQueueBackgroundService _emailQueueBackgroundService;
+        private readonly IBedRequestEstimatedWaitDataService _bedRequestEstimatedWaitDataService;
+        
         public EmailBuilderService(ILocationDataService locationDataService,
             IContentDataService contentDataService,
             IEmailQueueDataService emailQueueDataService,
@@ -29,7 +32,10 @@ namespace BedBrigade.Data.Services
             IVolunteerDataService volunteerDataService,
             IScheduleDataService scheduleDataService,
             IMailMergeLogic mailMergeLogic,
-            ITimezoneDataService timezoneDataService)
+            ITimezoneDataService timezoneDataService,
+            IBedRequestEmailDataService bedRequestEmailDataService,
+            EmailQueueBackgroundService emailQueueBackgroundService,
+            IBedRequestEstimatedWaitDataService bedRequestEstimatedWaitDataService)
         {
             _locationDataService = locationDataService;
             _contentDataService = contentDataService;
@@ -41,6 +47,64 @@ namespace BedBrigade.Data.Services
             _scheduleDataService = scheduleDataService;
             _mailMergeLogic = mailMergeLogic;
             _timezoneDataService = timezoneDataService;
+            _bedRequestEmailDataService = bedRequestEmailDataService;
+            _emailQueueBackgroundService = emailQueueBackgroundService;
+            _bedRequestEstimatedWaitDataService = bedRequestEstimatedWaitDataService;
+        }
+
+        /// <summary>
+        /// Send an email to the user that a replacement bed request has been scheduled for a failed delivery
+        /// </summary>
+        /// <param name="failedBedRequest"></param>
+        /// <param name="replacementBedRequest"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponse<bool>> SendReplaceFailedDeliveryEmail(BedRequest failedBedRequest, BedRequest replacementBedRequest)
+        {
+            string? userEmail = _bedRequestDataService.GetUserEmail();
+            
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return new ServiceResponse<bool>("User email not found", false);
+            }
+            
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(replacementBedRequest.LocationId, ContentType.ReplaceFailedDeliveryEmailForm);
+
+            if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+            {
+                return new ServiceResponse<bool>("ReplaceFailedDeliveryEmailForm not found", false);
+            }
+            
+            string body = BuildReplaceFailedDeliveryBody(failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
+            string subject = $"Replacement Bed Delivery for {replacementBedRequest.FullName}";
+            EmailQueue emailQueue = new()
+            {
+                ToAddress = userEmail,
+                Subject = subject,
+                Body = body,
+                Priority = Defaults.BulkHighPriority,
+                LocationId = replacementBedRequest.LocationId,
+                TargetDate = DateTime.UtcNow,
+                BedRequestId = replacementBedRequest.BedRequestId
+            };
+            var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
+
+            if (!emailResult.Success)
+            {
+                return new ServiceResponse<bool>(emailResult.Message, false);
+            }
+            else
+            {
+                _emailQueueBackgroundService.SendNow();
+                return new ServiceResponse<bool>("Successfully queued Replace Failed Delivery Email", true);
+            }
+        }
+
+        private string BuildReplaceFailedDeliveryBody(BedRequest failedBedRequest, BedRequest replacementBedRequest, string template)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length*2);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(replacementBedRequest, sb);
+            sb = sb.Replace("%%FailedDeliveryRecipientName%%", $"{failedBedRequest.FullName}");
+            return sb.ToString();
         }
 
         public async Task<ServiceResponse<bool>> EmailTaxForms(List<Donation> donations)
@@ -403,17 +467,13 @@ namespace BedBrigade.Data.Services
                 return new ServiceResponse<string>("Location not found", false);
             }
 
-            var countResult = await _bedRequestDataService.SumBedsForNotReceived(entity.LocationId);
-
-            if (!countResult.Success || countResult.Data == null)
-            {
-                return new ServiceResponse<string>(countResult.Message, false);
-            }
-
+            var waitResult = await _bedRequestEstimatedWaitDataService.GetEstimatedWaitResult(entity.LocationId, Defaults.SqlServerMinDate);
+            
             StringBuilder sb = new StringBuilder(template, template.Length*2);
             sb = _mailMergeLogic.ReplaceBedRequestFields(entity, sb);
             sb = _mailMergeLogic.ReplaceLocationFields(locationResult.Data, sb);
-            sb = sb.Replace("%%BedRequest.NumberOfBedsWaitingSum%%", (countResult.Data - 1).ToString());
+            sb = sb.Replace("%%BedRequest.NumberOfBedsWaitingSum%%", (waitResult.NumberOfWaitingBedRequests - 1).ToString());
+            sb = sb.Replace("%%BedRequest.EstimatedWait%%", waitResult.EstimatedWait);
             return new ServiceResponse<string>("Built Body", true, sb.ToString());
         }
 
