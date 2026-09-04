@@ -602,13 +602,15 @@ namespace BedBrigade.Client.Components
         {
             if (Grid != null && BedRequests != null)
             {
-                if (BedRequests.Count == 0)
+                if (Grid.TotalItemCount == 0)
                 {
-                    RecordText = "No Bed Request records found";
+                    RecordText = BedRequests.Count == 0
+                        ? "No Bed Request records found"
+                        : "No Records found with current filters. Click the Reset button.";
                 }
                 else
                 {
-                    RecordText = "No Records found with current filters. Click the Reset button.";
+                    RecordText = string.Empty;
                 }
                 
                 if (Grid.TotalItemCount <= Grid.PageSettings.PageSize)  //compare total grid data count with pagesize value 

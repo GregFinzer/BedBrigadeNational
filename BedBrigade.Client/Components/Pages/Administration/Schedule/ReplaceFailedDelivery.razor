@@ -346,12 +346,7 @@ else if (WorkflowStep == CallReplacement)
                                 Postal Code:
                             </div>
                             <div class="col-sm-9">
-                                <input type="text"
-                                       class="form-control"
-                                       @bind="CallBedRequest.PostalCode"
-                                       maxlength="5"
-                                       pattern="[0-9]{5}"
-                                       inputmode="numeric" />
+                                <SfMaskedTextBox @key="CallBedRequest.BedRequestId" ID="zip" Mask="00000" @bind-Value="@CallBedRequest.PostalCode"></SfMaskedTextBox>
                             </div>
                         </div>
                     </div>
