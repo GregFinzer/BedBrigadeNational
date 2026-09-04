@@ -85,6 +85,7 @@ namespace BedBrigade.Client.Components
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
         public bool ShowSpinner { get; set; } // Shows spinner overlay during delivery/team sheet generation
         public bool ShouldCheckSortClosest { get; set; } = true;
+        private bool _gridEditSettingsApplied;
 
         protected override async Task OnInitializedAsync()
         {
@@ -233,16 +234,15 @@ namespace BedBrigade.Client.Components
 
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
+            if (!firstRender && !_gridEditSettingsApplied && Grid != null
+                && AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                if (AuthService != null && AuthService.UserHasRole(RoleNames.CanManageBedRequests))
-                {
-                    Grid.EditSettings.AllowEditOnDblClick = true;
-                    Grid.EditSettings.AllowDeleting = true;
-                    Grid.EditSettings.AllowAdding = true;
-                    Grid.EditSettings.AllowEditing = true;
-                    StateHasChanged();
-                }
+                Grid.EditSettings.AllowEditOnDblClick = true;
+                Grid.EditSettings.AllowDeleting = true;
+                Grid.EditSettings.AllowAdding = true;
+                Grid.EditSettings.AllowEditing = true;
+                _gridEditSettingsApplied = true;
+                StateHasChanged();
             }
             
             if (ShouldCheckSortClosest)
