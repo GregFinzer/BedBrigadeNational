@@ -292,14 +292,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task<bool> DeepValidation()
         {
-            if (SearchLocation != null && SearchLocation.ddlValue > 0)
-            {
-                newRequest.LocationId = SearchLocation.ddlValue;
-            }
-            else
-            {
-                newRequest.LocationId = LocationId;
-            }
+            SetLocationIdForBedRequest();
 
             DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
 
@@ -353,6 +346,18 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
+        }
+
+        private void SetLocationIdForBedRequest()
+        {
+            if (SearchLocation != null && SearchLocation.ddlValue > 0)
+            {
+                newRequest.LocationId = SearchLocation.ddlValue;
+            }
+            else
+            {
+                newRequest.LocationId = LocationId;
+            }
         }
 
         private void ClearValidationMessage()
@@ -458,14 +463,7 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (isValid)
                 {
-                    if (SearchLocation != null && SearchLocation.ddlValue > 0)
-                    {
-                        newRequest.LocationId = SearchLocation.ddlValue;
-                    }
-                    else
-                    {
-                        newRequest.LocationId = LocationId;
-                    }
+                    SetLocationIdForBedRequest();
 
                     newRequest.NumberOfBeds = NumericValue;
                     newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
