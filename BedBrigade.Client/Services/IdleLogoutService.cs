@@ -11,7 +11,7 @@ public sealed class IdleLogoutService : IAsyncDisposable
 
     public IdleLogoutService(IJSRuntime js) => _js = js;
 
-    public async Task StartAsync(TimeSpan timeout, string logoutUrl = "/logout")
+    public async Task StartAsync(TimeSpan timeout, string logoutUrl = "/logout/idle")
     {
         try
         {

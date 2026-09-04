@@ -272,24 +272,22 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 case Action.BeginEdit:
                     switch (args.Data.ContentType)
                     {
-                        case ContentType.DeliveryCheckList:
-                        case ContentType.EmailTaxForm:
-                        case ContentType.BedRequestConfirmationForm:
-                        case ContentType.SignUpEmailConfirmationForm:
-                        case ContentType.SignUpSmsReminderForm:
-                        case ContentType.NewsletterForm:
-                        case ContentType.ContactUsConfirmationForm:
-                        case ContentType.ForgotPasswordForm:
-                        case ContentType.DeliverySmsReminderForm:
-                        case ContentType.DeliveryEmailReminderForm:
-                        case ContentType.SignUpEmailReminderForm:
+                        //These are the content types that will be edited in the EditContent.razor page
+                        case ContentType.Header:
+                        case ContentType.Footer:
+                        case ContentType.Body:
+                        case ContentType.Home:
+                        case ContentType.Reserved:
+                        case ContentType.News:
+                        case ContentType.Stories:
+                            await BeginEdit(args);
+                            break;
+                        //These are the content types that will be edited in the text editor
+                        default:
                             CurrentValues = args.Data;
                             await SetLocationName();
                             TextDialogHeading = "Edit " + EnumHelper.GetEnumDescription(args.Data.ContentType);
                             OpenTextDialog();
-                            break;
-                        default:
-                            await BeginEdit(args);
                             break;
                     }
 

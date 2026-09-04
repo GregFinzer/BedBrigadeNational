@@ -11,5 +11,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> SendForgotPasswordEmail(string email, string baseUrl);
         Task<ServiceResponse<bool>> QueueDeliveryEmailReminder(BedRequest bedRequest, Schedule schedule);
         Task<ServiceResponse<bool>> QueueSignUpEmailReminderAsync(SignUp signUp);
+        Task<ServiceResponse<bool>> SendReplaceFailedDeliveryEmail(BedRequest failedBedRequest,
+            BedRequest replacementBedRequest);
     }
 }

@@ -15,6 +15,7 @@ using Serilog;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using System.Globalization;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 using ValidationLocalization = BedBrigade.SpeakIt.ValidationLocalization;
 
 namespace BedBrigade.Client.Components.Pages
@@ -25,6 +26,8 @@ namespace BedBrigade.Client.Components.Pages
 
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
+        [Inject] private IBedRequestPhoneDataService BedRequestPhoneDataService { get; set; } = default!;
+        [Inject] private IBedRequestEmailDataService BedRequestEmailDataService { get; set; } = default!;
         [Inject] private NavigationManager? _nav { get; set; }
 
         [Inject] private ILanguageContainerService _lc { get; set; }
@@ -35,7 +38,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILanguageService _svcLanguage { get; set; }
         [Inject] private ITranslationDataService _translateLogic { get; set; }
         [Inject] private ILocationState _locationState { get; set; }
-
+        [Inject] private IBedRequestEstimatedWaitDataService BedRequestEstimatedWaitDataService { get; set; }
 
         private Common.Models.NewBedRequest? newRequest;
         private List<UsState>? StateList = AddressHelper.GetStateList();
@@ -82,6 +85,12 @@ namespace BedBrigade.Client.Components.Pages
         public required SfMaskedTextBox zipTextBox;
         protected bool _isBusy = false;
         private bool _shouldForceLocation;
+        public int LocationId { get; set; } = 0;
+        public int NumberOfWaitingBedRequests { get; set; } = 0;
+
+        public string Timeframe { get; set; } = string.Empty;
+
+        public string EstimatedWait { get; set; } = string.Empty;
         #endregion
         #region Initialization
 
@@ -95,7 +104,6 @@ namespace BedBrigade.Client.Components.Pages
                 _validationMessageStore = new ValidationMessageStore(EC);
                 await SetLocationState();
                 UpdateRouteDisplayState();
-
                 await LoadConfiguration();
                 _svcLanguage.LanguageChanged += OnLanguageChanged;
             }
@@ -108,6 +116,17 @@ namespace BedBrigade.Client.Components.Pages
             }
         }
 
+        private async Task LoadEstimatedWait()
+        {
+            if (LocationId == 0)
+                return;
+            
+            var estimatedWaitResult = await BedRequestEstimatedWaitDataService.GetEstimatedWaitResult(LocationId,
+                    Defaults.SqlServerMinDate);
+            NumberOfWaitingBedRequests = estimatedWaitResult.NumberOfWaitingBedRequests;
+            EstimatedWait = estimatedWaitResult.EstimatedWait;
+        }
+
         private async Task SetLocationState()
         {
             if (!string.IsNullOrEmpty(LocationRoute))
@@ -117,7 +136,7 @@ namespace BedBrigade.Client.Components.Pages
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
                     _locationState.Location = LocationRoute;
-
+                    LocationId =  locationResponse.Data.LocationId;
                     if (!string.IsNullOrEmpty(locationResponse.Data.ExternalRequestABed) &&
                         Validation.IsValidUrl(locationResponse.Data.ExternalRequestABed))
                     {
@@ -130,9 +149,37 @@ namespace BedBrigade.Client.Components.Pages
         private async Task OnLanguageChanged(CultureInfo arg)
         {
             await TranslateSpeakEnglish();
+            SetTimeframe();
             StateHasChanged();
         }
 
+        private void SetTimeframe()
+        {
+            EstimatedWait = (EstimatedWait ?? string.Empty).ToLower();
+            if (string.IsNullOrWhiteSpace(EstimatedWait) || EstimatedWait == "unknown")
+            {
+                Timeframe = _lc["Unknown"].ToLower();
+                return;
+            }
+
+            string amount = StringUtil.ExtractDigits(EstimatedWait);
+                
+            if (EstimatedWait.Contains("months"))
+                Timeframe = $"{amount} {_lc["Months"].ToLower()}";
+            else if (EstimatedWait.Contains("month"))
+                Timeframe = $"{amount} {_lc["Month"].ToLower()}";
+            else if (EstimatedWait.Contains("weeks"))
+                Timeframe = $"{amount} {_lc["Weeks"].ToLower()}";
+            else if (EstimatedWait.Contains("week"))
+                Timeframe = $"{amount} {_lc["Week"].ToLower()}";
+            else if (EstimatedWait.Contains("days"))
+                Timeframe = $"{amount} {_lc["Days"].ToLower()}";
+            else if (EstimatedWait.Contains("day"))
+                Timeframe = $"{amount} {_lc["Day"].ToLower()}";
+            else
+                Timeframe = EstimatedWait.ToLower();
+        }
+        
         public void Dispose()
         {
             _svcLanguage.LanguageChanged -= OnLanguageChanged;
@@ -168,6 +215,8 @@ namespace BedBrigade.Client.Components.Pages
         {
             await SetLocationState();
             UpdateRouteDisplayState();
+            await LoadEstimatedWait();
+            SetTimeframe();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -243,7 +292,8 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task<bool> DeepValidation()
         {
-            newRequest.LocationId = SearchLocation.ddlValue;
+            SetLocationIdForBedRequest();
+
             DateTime? nextEligibleDate = (await _svcBedRequest.NextDateEligibleForBedRequest(newRequest)).Data;
 
             if (nextEligibleDate.HasValue && nextEligibleDate.Value > DateTime.Today)
@@ -296,6 +346,18 @@ namespace BedBrigade.Client.Components.Pages
             }
 
             return true;
+        }
+
+        private void SetLocationIdForBedRequest()
+        {
+            if (SearchLocation != null && SearchLocation.ddlValue > 0)
+            {
+                newRequest.LocationId = SearchLocation.ddlValue;
+            }
+            else
+            {
+                newRequest.LocationId = LocationId;
+            }
         }
 
         private void ClearValidationMessage()
@@ -401,7 +463,8 @@ namespace BedBrigade.Client.Components.Pages
 
                 if (isValid)
                 {
-                    newRequest.LocationId = SearchLocation.ddlValue; // get value from child component
+                    SetLocationIdForBedRequest();
+
                     newRequest.NumberOfBeds = NumericValue;
                     newRequest.Phone = newRequest.Phone.FormatPhoneNumber();
                     newRequest.Group = (await _svcLocation.GetByIdAsync(newRequest.LocationId)).Data.Group;
@@ -460,7 +523,7 @@ namespace BedBrigade.Client.Components.Pages
                 Common.Models.BedRequest? bedRequest = await BuildBedRequest();
                 Common.Models.BedRequest? existingBedRequest = null;
 
-                var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
+                var existingByPhone = await BedRequestPhoneDataService.GetWaitingByPhone(bedRequest.Phone);
 
                 if (existingByPhone.Success && existingByPhone.Data != null)
                 {
@@ -468,7 +531,7 @@ namespace BedBrigade.Client.Components.Pages
                 }
                 else
                 {
-                    var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
+                    var existingByEmail = await BedRequestEmailDataService.GetWaitingByEmail(bedRequest.Email);
                     if (existingByEmail.Success && existingByEmail.Data != null)
                     {
                         existingBedRequest = existingByEmail.Data;

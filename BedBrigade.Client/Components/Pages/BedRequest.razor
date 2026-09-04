@@ -10,6 +10,7 @@
 </div>
 
 <div class="container-fluid" style="display: @DisplayForm">
+    <p>@_lc.Keys["EstimatedWait",new {numberOfWaitingBedRequests = NumberOfWaitingBedRequests.ToString(), timeframe = Timeframe }]</p>
     <EditForm EditContext="@EC">
         <div class="row">
             <div class="col-md-3">
@@ -72,7 +73,7 @@
                         </div>
                         <div class="form-group">
                             <label for="state" class="formlabel required">@_lc.Keys["State"]</label>
-                            <SfDropDownList TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="newRequest.State">
+                            <SfDropDownList ID="state" TValue="string" TItem="UsState" PopupHeight="350px" PopupWidth="350px" Placeholder="@_lc.Keys["SelectAState"]" DataSource="@StateList" @bind-Value="newRequest.State">
                                 <DropDownListFieldSettings Value="StateCode" Text="StateName"></DropDownListFieldSettings>
                                 <DropDownListEvents TValue="string" TItem="UsState"></DropDownListEvents>
                                 <div style="font-size: smaller">
@@ -126,12 +127,12 @@
                 </div>
             </div>
 
-            
+
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-header">@_lc.Keys["LanguagePreference"]</div>
                     <div class="card-body">
-                         <div class="form-group">
+                        <div class="form-group">
                             <label for="PL" class="formlabel required">@_lc.Keys["PrimaryLanguageCaption"]</label>
                             <SfDropDownList ID="PL" TItem="string" TValue="string" DataSource=@lstPrimaryLanguage @bind-Value="@newRequest.PrimaryLanguage" Enabled="true" Placeholder="@_lc.Keys["PrimaryLanguagePlaceholder"]">
                                 <DropDownListEvents TValue="string" TItem="string" ValueChange="OnPrimaryLanguageChange"></DropDownListEvents>
@@ -140,7 +141,7 @@
                                 <ValidationMessage For="@(() => newRequest.PrimaryLanguage)"></ValidationMessage>
                             </div>
                         </div>
-                        <div class="form-group" style="display: @DisplaySpeakEnglish" >
+                        <div class="form-group" style="display: @DisplaySpeakEnglish">
                             <label for="SE" class="formlabel required">@_lc.Keys["SpeakEnglishCaption"]</label>
                             <SfDropDownList ID="SE" TValue="string" TItem="DisplayTextValue" DataSource=@lstSpeakEnglish @bind-Value=@newRequest.SpeakEnglish Enabled="true" Placeholder="@_lc.Keys["SpeakEnglishPlaceholder"]">
                                 <DropDownListFieldSettings Value="Value" Text="DisplayText"></DropDownListFieldSettings>
@@ -168,10 +169,10 @@
         </div>
         <div class="row">
             <div class="col-md-3" style="text-align: center">
-                <ReCAPTCHA OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                <ReCAPTCHA OnSuccess="OnSuccess" OnExpired="OnExpired"/>
             </div>
         </div>
-        <br />
+        <br/>
         <div class="row">
             <div class="col-md-3" style="text-align: center">
                 <button class="btn btn-primary" @onclick="(SaveRequest)" disabled="@_isBusy">

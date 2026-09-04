@@ -18,7 +18,8 @@
         {
             try
             {
-                string returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                string relativeUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                string returnUrl = Uri.EscapeDataString("/" + relativeUrl);
                 NavigationManager.NavigateTo($"/login?returnUrl={returnUrl}", true);
             }
             catch (Microsoft.AspNetCore.Components.NavigationException)

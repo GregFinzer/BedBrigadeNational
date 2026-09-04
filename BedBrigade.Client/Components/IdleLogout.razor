@@ -20,8 +20,9 @@
             {
                 _started = true;
 
-                string returnUrl = Nav.ToBaseRelativePath(Nav.Uri);
-                var logoutUrl = Nav.BaseUri.TrimEnd('/') + $"/logout/idle";
+                string relativeUrl = Nav.ToBaseRelativePath(Nav.Uri);
+                string returnUrl = Uri.EscapeDataString("/" + relativeUrl);
+                var logoutUrl = Nav.BaseUri.TrimEnd('/') + $"/logout/idle?returnUrl={returnUrl}";
 
                 var idleTimeoutMinutesString = Configuration.GetSection("AppSettings:IdleLogoutMinutes").Value;
                 int.TryParse(idleTimeoutMinutesString, out int idleTimeoutMinutes);

@@ -35,6 +35,8 @@ ContactUsFormSubmitted: Thank you for contacting us. We will get back to you as 
 Continue: Continue
 Currency: Currency
 DateColon: 'Date:'
+Day: Day
+Days: Days
 DeliveryAddress: Delivery Address
 DeliveryVehicle: Delivery Vehicle
 DeliveryVehicleFullSizeVan: I have a Full-Size Van that is empty without seats
@@ -95,6 +97,7 @@ DynamicYes: Yes
 Email: Email
 EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
+EstimatedWait: There are currently {numberOfWaitingBedRequests} waiting bed requests with an estimated wait of {timeframe}. We only carry Twin XL bed frames and Twin XL mattresses with Twin XL Bedding.
 Events: Events
 EventDateTime: Event Date & Time
 EventGroup: Event Group
@@ -172,6 +175,8 @@ MaxLengthVehicleDescription100: Vehicle Description has a maximum length of 100 
 Message: Message
 MilesAway: miles away
 MonthlyDonationOf: Monthly Donation of
+Month: Month
+Months: Months
 Name: Name
 Names: Names
 NationalPathColon: 'National Path:'
@@ -306,6 +311,7 @@ TurnYourPhone: Turn your phone sideways for a better view
 UnableToChangePassword: Unable to change password. Please try again.
 UnableToSendEmail: Unable to send email. Please try again.
 Unauthorized: Unauthorized
+Unknown: Unknown
 Unregister: Unregister
 Unsubscribe: Unsubscribe
 UnsubscribeFromNewsletter: Unsubscribe from Newsletter
@@ -329,6 +335,8 @@ VolunteerSignUpNew: Welcome to Bed Brigade {fullName}
 VolunteerSignUpNewSubtitle: We appreciate you joining the Bed Brigade Volunteer Team.
 VolunteersRegisteredColon: 'Volunteers Registered:'
 VolunteersRegisteredneeded: Volunteers registered/needed
+Week: Week
+Weeks: Weeks
 WeLookForwardToSeeingYou: We look forward to seeing you.
 WeReceivedYourRegistration: 'We received your registration as a participant to scheduled Event:'
 WhatChurch: What church do you attend?

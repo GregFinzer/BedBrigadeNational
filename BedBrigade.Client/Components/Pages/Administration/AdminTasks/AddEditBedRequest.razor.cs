@@ -21,6 +21,9 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Parameter] public int? BedRequestId { get; set; }
 
         [Inject] private IBedRequestDataService? _svcBedRequest { get; set; }
+        [Inject] private IBedRequestEmailDataService BedRequestEmailDataService { get; set; } = default!;
+        [Inject] private IBedRequestPhoneDataService BedRequestPhoneDataService { get; set; } = default!;
+        
         [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] private IAuthService? _svcAuth { get; set; }
         [Inject] private IUserDataService? _svcUser { get; set; }
@@ -37,6 +40,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
         [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
+        [Inject] private IBedRequestEstimatedWaitDataService _bedRequestEstimatedWaitDataService { get; set; } = null!;
+        
         private bool _isLoading = true;
         public DateTime? DeliveryDate { get; set; }
         public DateTime? DeliveryTime { get; set; }
@@ -79,6 +84,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
         protected bool IsNew => !BedRequestId.HasValue || BedRequestId == 0;
 
+        public string EstimatedWait { get; set; } = string.Empty;
+        
         protected override async Task OnInitializedAsync()
         {
             try
@@ -88,6 +95,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 await LoadConfiguration(LocationId);
                 await LoadLocations();
                 await LoadModel();
+                await LoadEstimatedWait();
                 InitializeValidationContext();
                 await LoadDeliverySchedules(Model?.LocationId ?? LocationId);
                 await LoadPreviousSchedule(Model?.LocationId ?? LocationId);
@@ -243,6 +251,18 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             }
         }
 
+        private async Task LoadEstimatedWait()
+        {
+            if (Model == null)
+                return;
+
+            var waitResponse = await _bedRequestEstimatedWaitDataService.GetEstimatedWaitResult(Model.LocationId,
+                Model.CreateDate ?? Defaults.SqlServerMinDate);
+
+            EstimatedWait =
+                $"{waitResponse.NumberOfWaitingBedRequests} beds ahead. Estimated wait: {waitResponse.EstimatedWait}.";
+        }
+        
         private void InitializeValidationContext()
         {
             if (_editContext != null)
@@ -434,32 +454,22 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
 
             BedBrigade.Common.Models.BedRequest existingBedRequest = null;
 
-            // FIX CS8602: Add null check for _svcBedRequest before dereferencing
-            if (_svcBedRequest != null)
+            var existingByPhone = await BedRequestPhoneDataService.GetWaitingByPhone(bedRequest.Phone);
+
+            if (existingByPhone.Success && existingByPhone.Data != null)
             {
-                var existingByPhone = await _svcBedRequest.GetWaitingByPhone(bedRequest.Phone);
+                existingBedRequest = existingByPhone.Data;
+            }
+            else if (!String.IsNullOrEmpty(bedRequest.Email))
+            {
+                var existingByEmail = await BedRequestEmailDataService.GetWaitingByEmail(bedRequest.Email);
 
-                if (existingByPhone.Success && existingByPhone.Data != null)
+                if (existingByEmail.Success && existingByEmail.Data != null)
                 {
-                    existingBedRequest = existingByPhone.Data;
-                }
-                else if (!String.IsNullOrEmpty(bedRequest.Email))
-                {
-                    var existingByEmail = await _svcBedRequest.GetWaitingByEmail(bedRequest.Email);
-
-                    if (existingByEmail.Success && existingByEmail.Data != null)
-                    {
-                        existingBedRequest = existingByEmail.Data;
-                    }
+                    existingBedRequest = existingByEmail.Data;
                 }
             }
-            else
-            {
-                Log.Error("CombineDuplicate, _svcBedRequest is null.");
-                _toastService?.Error(IsError, BRService);
-                return false;
-            }
-
+            
             if (existingBedRequest == null)
             {
                 return false;
