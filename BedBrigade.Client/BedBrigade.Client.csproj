@@ -43,16 +43,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
-    <PackageReference Include="Syncfusion.Blazor.Cards" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.Charts" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.CircularGauge" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.Layouts" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.ProgressBar" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.RichTextEditor" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.Schedule" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.Sparkline" Version="34.2.6" />
-    <PackageReference Include="Syncfusion.Blazor.TreeGrid" Version="34.2.6" />
+    <PackageReference Include="Syncfusion.Blazor" Version="33.2.15" />
     <PackageReference Include="System.ClientModel" Version="1.14.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.9" />
     <PackageReference Include="System.Formats.Asn1" Version="10.0.9" />
