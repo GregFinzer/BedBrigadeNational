@@ -378,6 +378,11 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveVolunteer()
         {
+            if (_isBusy)
+            {
+                return;
+            }
+
             _isBusy = true;
             try
             {
@@ -712,7 +717,7 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task UnregisterVolunteer()
         {
-            if (!await IsValid())
+            if (_isBusy || !await IsValid())
             {
                 return;
             }

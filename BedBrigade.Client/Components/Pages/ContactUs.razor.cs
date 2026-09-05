@@ -53,6 +53,7 @@ namespace BedBrigade.Client.Components.Pages
         private ValidationMessageStore _validationMessageStore;
         private bool _isBusy = false;
         private bool _shouldForceLocation;
+        private object _locker = new object();
         #endregion
 
         #region Initialization
@@ -215,6 +216,11 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
+            if (_isBusy)
+            {
+                return;
+            }
+
             _isBusy = true;
 
             try
