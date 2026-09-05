@@ -8,7 +8,7 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<List<Schedule>>> GetFutureSchedulesByLocationId(int locationId);
         Task<ServiceResponse<List<Schedule>>> GetPastSchedulesByLocationId(int locationId);
         Task<ServiceResponse<List<Schedule>>> GetAvailableSchedulesByLocationId(int locationId);
-        Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway, bool includeToday);
+        Task<ServiceResponse<List<Schedule>>> GetActiveScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway, bool includeToday);
         Task UpdateBedRequestSummaryInformation(int locationId, List<BedRequest> scheduledBedRequests);
         Task<ServiceResponse<Schedule?>> GetLastScheduledByLocationIdAndUser(int locationId, string userName);
         Task UpdateScheduleVolunteers(int scheduleId);

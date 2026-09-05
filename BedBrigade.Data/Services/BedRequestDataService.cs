@@ -90,11 +90,14 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             tasks.Add(QueueForGeoLocation(entity));
         }
 
-        var scheduled = await GetScheduledBedRequestsForLocation(entity.LocationId);
-        if (scheduled.Success && scheduled.Data != null)
+        if (entity.Status == BedRequestStatus.Scheduled)
         {
-            tasks.Add(_scheduleDataService.UpdateBedRequestSummaryInformation(
-                entity.LocationId, scheduled.Data));
+            var scheduled = await GetScheduledBedRequestsForLocation(entity.LocationId);
+            if (scheduled.Success && scheduled.Data != null)
+            {
+                tasks.Add(_scheduleDataService.UpdateBedRequestSummaryInformation(
+                    entity.LocationId, scheduled.Data));
+            }
         }
 
         // Run both in parallel for performance

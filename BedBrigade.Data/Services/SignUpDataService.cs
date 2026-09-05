@@ -176,7 +176,8 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                                 && s.Schedule != null
                                 && s.Schedule.EventDateScheduled >= today
                                 && s.Schedule.EventDateScheduled <= targetDateInclusive)
-                    .OrderByDescending(s => s.UpdateDate)
+                    .OrderBy(s => s.Schedule.EventDateScheduled)
+                    .ThenBy(s => s.UpdateDate)
                     .ToListAsync();
 
                 _cachingService.Set(cacheKey, result);

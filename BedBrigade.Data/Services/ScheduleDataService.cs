@@ -68,7 +68,7 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
         return result;
     }
 
-    public async Task<ServiceResponse<List<Schedule>>> GetScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway, bool includeToday)
+    public async Task<ServiceResponse<List<Schedule>>> GetActiveScheduleForMonthsAndLocation(int locationId, int numberOfMonthsAway, bool includeToday)
     {
         // Retrieve available schedules for the specified location.
         ServiceResponse<List<Schedule>> availableSchedulesResponse;
@@ -91,7 +91,8 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
 
         // Filter schedules to include only those whose EventDateScheduled is within the desired range.
         var filteredSchedules = availableSchedulesResponse.Data
-            .Where(schedule => schedule.EventDateScheduled <= upperBoundDate)
+            .Where(schedule => schedule.EventDateScheduled.Date <= upperBoundDate.Date
+                && schedule.EventStatus != EventStatus.Canceled)
             .ToList();
 
         return new ServiceResponse<List<Schedule>>(
@@ -336,19 +337,18 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
 
         foreach (var schedule in scheduleResult.Data)
         {
-            if (scheduledBedRequests.Any(o =>
-                    o.DeliveryDate.HasValue && o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date))
+            if (scheduledBedRequests.Any(o => o.ScheduleId.HasValue))
             {
                 schedule.Teams = scheduledBedRequests
-                    .Where(o => o.DeliveryDate.HasValue &&
-                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Where(o => o.ScheduleId.HasValue &&
+                                o.ScheduleId.Value == schedule.ScheduleId)
                     .Select(request => request.Team)
                     .Distinct()
                     .Count();
 
                 schedule.Beds = scheduledBedRequests
-                    .Where(o => o.DeliveryDate.HasValue &&
-                                o.DeliveryDate.Value.Date == schedule.EventDateScheduled.Date)
+                    .Where(o => o.ScheduleId.HasValue &&
+                                o.ScheduleId.Value == schedule.ScheduleId)
                     .Sum(request => request.NumberOfBeds);
 
                 await UpdateAsync(schedule);

@@ -38,5 +38,7 @@
         public const string GroupPolaris = "Polaris";
         public const string GroupPeace = "Peace";
         public const string GroupUalc = "UALC";
+
+        public const string DateWithTimeFormat = "M/d/yy hh:mm tt";
     }
 }
