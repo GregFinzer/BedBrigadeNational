@@ -43,7 +43,7 @@ namespace BedBrigade.Data.Services
             int currentRow = 1;
             for (int i = 0; i < grouped.Count; i++)
             {
-                var teamGroup = grouped[i].OrderBy(b => b.FullName).ToList();
+                var teamGroup = grouped[i].ToList();
                 // Team header row: left merged all cells but the last, then the date
                 currentRow = CreateTeamHeader(sheet, teamGroup, currentRow);
                 // Column headers

@@ -914,6 +914,12 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.DeliveryDate = selectedSchedule.EventDateScheduled;
                 DeliveryDate = Model.DeliveryDate.Value.Date;
                 DeliveryTime = new DateTime(Model.DeliveryDate.Value.TimeOfDay.Ticks);
+
+                if (Model.Status == BedRequestStatus.Waiting)
+                {
+                    Model.Status = BedRequestStatus.Scheduled;
+                }
+
                 ClearErrors();
             }
         }

@@ -37,6 +37,25 @@ public static class DriveRoutingLogic
 
         return ordered;
     }
+
+    public static List<BedRequest> OrderByBestRouteByTeam(List<BedRequest> bedRequests,
+        double startLatitude,
+        double startLongitude)
+    {
+        var sortedRequests = new List<BedRequest>();
+
+        var groupedByTeam = bedRequests
+            .GroupBy(request => request.Team)
+            .OrderBy(group => group.Key)
+            .ToList();
+
+        foreach (var teamGroup in groupedByTeam)
+        {
+            sortedRequests.AddRange(OrderByBestRoute(teamGroup.ToList(), startLatitude, startLongitude));
+        }
+
+        return sortedRequests;
+    }
     
     public static double CalculateDistanceInMiles(double lat1, double lon1, double lat2, double lon2)
     {

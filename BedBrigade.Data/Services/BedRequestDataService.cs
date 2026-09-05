@@ -331,7 +331,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             var result = await dbSet.Where(o => o.LocationId == locationId
                                                 && o.Status == BedRequestStatus.Scheduled).ToListAsync();
 
-            result = await SortScheduledBedRequests(locationId, result);
             _cachingService.Set(cacheKey, result);
             return new ServiceResponse<List<BedRequest>>($"Found {result.Count} {GetEntityName()} records", true,
                 result);
@@ -402,51 +401,6 @@ public class BedRequestDataService : Repository<BedRequest>, IBedRequestDataServ
             return new ServiceResponse<DateTime?>("Next eligible date.", true, nextEligibleDate);
         }
     }
-
-    public async Task<List<BedRequest>> SortScheduledBedRequests(int locationId, List<BedRequest> bedRequests)
-    {
-        try
-        {
-            var locationResult = await _locationDataService.GetByIdAsync(locationId);
-
-            if (!locationResult.Success || locationResult.Data == null ||
-                !Validation.IsValidZipCode(locationResult.Data.BuildPostalCode))
-            {
-                return bedRequests.OrderBy(o => o.Team).ThenBy(o => o.PostalCode).ToList();
-            }
-
-            var location = locationResult.Data;
-            var sortedRequests = new List<BedRequest>();
-
-            var groupedByTeam = bedRequests
-                .GroupBy(o => o.Team)
-                .OrderBy(o => o.Key)
-                .ToList();
-
-            foreach (var teamGroup in groupedByTeam)
-            {
-                var routeOrdered = DriveRoutingLogic.OrderByBestRoute(
-                    teamGroup.ToList(),
-                    location.Latitude.HasValue ? (double?)location.Latitude.Value : null,
-                    location.Longitude.HasValue ? (double?)location.Longitude.Value : null);
-
-                sortedRequests.AddRange(routeOrdered);
-            }
-
-            return sortedRequests;
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error sorting scheduled bed requests.");
-            return bedRequests;
-        }
-    }
-
-
-
-
-
-
 
 
 

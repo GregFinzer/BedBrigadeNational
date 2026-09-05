@@ -384,10 +384,10 @@ namespace BedBrigade.Client.Components
                     await CsvExportAsync();
                     break;
                 case "Delivery Sheet":
-                    DownloadDeliverySheet();
+                    await DownloadDeliverySheet();
                     break;
                 case "Team Sheet":
-                    DownloadTeamSheet();
+                    await DownloadTeamSheet();
                     break;
                 case "Sort Waiting Closest":
                     await SortClosest();
@@ -737,10 +737,11 @@ namespace BedBrigade.Client.Components
                 await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
             List<BedRequest> scheduledBedRequests =
                 scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
+            scheduledBedRequests = OrderDeliverySheetRequests(scheduledBedRequests, (double) location.Latitude , (double) location.Longitude);
             return (location, deliveryChecklist, scheduledBedRequests);
         }
 
-        private async void DownloadTeamSheet()
+        private async Task DownloadTeamSheet()
         {
             try
             {
@@ -777,9 +778,10 @@ namespace BedBrigade.Client.Components
                         deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
                     }                    
                 }
+
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
                 var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
-                // We will include all teams present in scheduledBedRequests (group already filtered) - if need all groups remove Where above
+                scheduledBedRequests = OrderDeliverySheetRequests(scheduledBedRequests, (double) location.Latitude , (double) location.Longitude);
                 string fileName = TeamSheetService.CreateTeamSheetFileName(location, scheduledBedRequests);
                 Stream stream = TeamSheetService.CreateTeamSheet(location, scheduledBedRequests, deliveryChecklist);
                 using var streamRef = new DotNetStreamReference(stream: stream);
@@ -794,6 +796,14 @@ namespace BedBrigade.Client.Components
             {
                 ShowSpinner = false;
             }   
+        }
+
+        private static List<BedRequest> OrderDeliverySheetRequests(List<BedRequest> bedRequests, double startLatitude, double startLongitude)
+        {
+            return DriveRoutingLogic.OrderByBestRouteByTeam(
+                bedRequests,
+                startLatitude,
+                startLongitude);
         }
 
         private async Task<bool> ValidateScheduled()
