@@ -258,6 +258,7 @@ namespace BedBrigade.Client.Components
                     {
                         if (int.TryParse(sortParam.FirstOrDefault() ?? string.Empty, out var sortId) && sortId > 0)
                         {
+                            _lastSortClosestSelectedId = sortId;
                             _ = InvokeAsync(async () => await SortClosestForBedRequestId(sortId));
                         }
                     }
@@ -365,6 +366,7 @@ namespace BedBrigade.Client.Components
             switch (args.Item.Text)
             {
                 case "Reset":
+                    _lastSortClosestSelectedId = null;
                     if (Grid != null)
                     {
                         await Grid.ResetPersistDataAsync();
