@@ -267,6 +267,7 @@ else
                 <div class="col-md-12 text-left">
                     <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
                     <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
+                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleLeftMessage">Left Message</button>
                 </div>
             </div>
         </EditForm>

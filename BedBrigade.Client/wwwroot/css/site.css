@@ -53,6 +53,24 @@ img {
         color: #000000 !important;
     }
 
+.btn-additional {
+    background-color: #8D4585 !important;
+    color: #fff !important;
+    border-color: #8D4585 !important;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: "Comfortaa";
+    border-radius: 100px;
+    padding: 9px 40px;
+    margin: 20px 0 0;
+    transition: 0.7s ease;
+}
+
+    .btn-additional:hover {
+        background-color: #7852A9 !important;
+        color: #000000 !important;
+    }
+
 .btn-success {
     background-color: green !important;
     font-size: 15px;

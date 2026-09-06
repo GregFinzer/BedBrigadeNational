@@ -923,5 +923,15 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 ClearErrors();
             }
         }
+
+        private void HandleLeftMessage()
+        {
+            string message = $"LM {DateTime.Now.ToString("M/d/yy")}";
+
+            if (Model != null && !(Model.Notes ?? string.Empty).Contains(message))
+            {
+                Model.Notes = string.IsNullOrEmpty(Model.Notes) ? message : $"{Model.Notes} {message}";
+            }
+        }
     }
 }
