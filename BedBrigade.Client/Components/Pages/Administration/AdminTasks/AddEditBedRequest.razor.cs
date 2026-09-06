@@ -65,6 +65,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         private const string BRService = "_svcBedRequest service is not available.";
 
         private bool _showConfirmAddScheduleDialog;
+        private bool _showDeliveryNoteValidationDialog;
         private string _confirmAddScheduleTitle = string.Empty;
         private string _confirmAddScheduleMessage = string.Empty;
         private TaskCompletionSource<bool>? _confirmAddScheduleTcs;
@@ -237,6 +238,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model = new BedBrigade.Common.Models.BedRequest();
                 Model.LocationId = LocationId;
                 Model.PrimaryLanguage = "English";
+                Model.BedType = "Single";
+                Model.Notes = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings, ConfigNames.BedRequestNote);
                 var location = Locations?.FirstOrDefault(o => o.LocationId == LocationId);
                 if (location != null)
                 {
@@ -932,6 +935,27 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
             {
                 Model.Notes = string.IsNullOrEmpty(Model.Notes) ? message : $"{Model.Notes} {message}";
             }
+        }
+
+        private void HandleDeliveryNote()
+        {
+            if (Model == null || !DeliveryDate.HasValue || !DeliveryTime.HasValue || string.IsNullOrWhiteSpace(Model.Team))
+            {
+                _showDeliveryNoteValidationDialog = true;
+                return;
+            }
+
+            string message = $"Delivery scheduled for {DeliveryDate.Value:M/d/yyyy} at {DeliveryTime.Value.AddHours(1):h:mm tt} TEAM {Model.Team}";
+
+            if (Model != null && !(Model.Notes ?? string.Empty).Contains(message))
+            {
+                Model.Notes = string.IsNullOrEmpty(Model.Notes) ? message : $"{Model.Notes} {message}";
+            }
+        }
+
+        private void HandleDeliveryNoteValidationClose()
+        {
+            _showDeliveryNoteValidationDialog = false;
         }
     }
 }

@@ -222,7 +222,7 @@ namespace BedBrigade.Client.Components
         {
             if (AuthService.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Delivery Sheet", "Team Sheet", "Sort Waiting Closest" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Delivery Sheet", "Team Sheet", "Sort Waiting Closest", "Left Message" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
             else
@@ -392,7 +392,70 @@ namespace BedBrigade.Client.Components
                 case "Sort Waiting Closest":
                     await SortClosest();
                     break;
+                case "Left Message":
+                    await AddLeftMessage();
+                    break;
             }
+        }
+
+        private async Task AddLeftMessage()
+        {
+            if (Grid == null)
+            {
+                ShowSelectRowDialog();
+                return;
+            }
+
+            var selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+            if (!selectedBedRequests.Any())
+            {
+                ShowSelectRowDialog();
+                return;
+            }
+
+            var selectedBedRequest = selectedBedRequests.First();
+            string message = $"LM {DateTime.Now:M/d/yy}";
+
+            if (!(selectedBedRequest.Notes ?? string.Empty).Contains(message))
+            {
+                selectedBedRequest.Notes = string.IsNullOrEmpty(selectedBedRequest.Notes)
+                    ? message
+                    : $"{selectedBedRequest.Notes} {message}";
+            }
+            else
+            {
+                ToastService.Warning("Left Message Not Added", $"The left message was already added for {selectedBedRequest.FullName}.");
+                return;
+            }
+
+            selectedBedRequest.Contacted = true;
+
+            try
+            {
+                var updateResult = await BedRequestDataService.UpdateAsync(selectedBedRequest);
+                if (updateResult.Success)
+                {
+                    await Grid.Refresh();
+                    ToastService.Success("Left Message Added", $"The left message was added successfully for {selectedBedRequest.FullName}.");
+                }
+                else
+                {
+                    Log.Error($"Unable to add left message to BedRequest {selectedBedRequest.BedRequestId}: {updateResult.Message}");
+                    ToastService.Error("Left Message Unsuccessful", $"The left message was not added successfully for {selectedBedRequest.FullName}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Unable to add left message to BedRequest {selectedBedRequest.BedRequestId}");
+                ToastService.Error("Left Message Unsuccessful", $"The left message was not added successfully for {selectedBedRequest.FullName}.");
+            }
+        }
+
+        private void ShowSelectRowDialog()
+        {
+            DialogHeader = "Select Row";
+            DialogContent = "Please select a row.";
+            IsDialogVisible = true;
         }
 
         private async Task SortClosest()
