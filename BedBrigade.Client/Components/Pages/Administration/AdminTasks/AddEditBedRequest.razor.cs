@@ -96,8 +96,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 await LoadConfiguration(LocationId);
                 await LoadLocations();
                 await LoadModel();
-                await LoadEstimatedWait();
                 InitializeValidationContext();
+                await LoadEstimatedWait();
                 await LoadDeliverySchedules(Model?.LocationId ?? LocationId);
                 await LoadPreviousSchedule(Model?.LocationId ?? LocationId);
 

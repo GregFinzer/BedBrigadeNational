@@ -8,7 +8,7 @@
 
 <CheckAuth Roles=@RoleNames.CanManageBedRequests></CheckAuth>
 
-@if (Model == null || Locations == null || lstPrimaryLanguage == null || lstSpeakEnglish == null)
+@if (Model == null || _editContext == null || Locations == null || lstPrimaryLanguage == null || lstSpeakEnglish == null)
 {
     <Spinner />
 }
