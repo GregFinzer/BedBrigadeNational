@@ -222,7 +222,7 @@ namespace BedBrigade.Client.Components
         {
             if (AuthService.UserHasRole(RoleNames.CanManageBedRequests))
             {
-                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Delivery Sheet", "Team Sheet", "Sort Waiting Closest" };
+                ToolBar = new List<string> { "Add", "Edit", "Delete", "Print", "Pdf Export", "Excel Export", "Csv Export", "Search", "Reset", "Delivery Sheet", "Team Sheet", "Sort Waiting Closest", "Left Message" };
                 ContextMenu = new List<string> { "Edit", "Delete", FirstPage, NextPage, PrevPage, LastPage, "AutoFit", "AutoFitAll", "SortAscending", "SortDescending" };
             }
             else
@@ -258,6 +258,7 @@ namespace BedBrigade.Client.Components
                     {
                         if (int.TryParse(sortParam.FirstOrDefault() ?? string.Empty, out var sortId) && sortId > 0)
                         {
+                            _lastSortClosestSelectedId = sortId;
                             _ = InvokeAsync(async () => await SortClosestForBedRequestId(sortId));
                         }
                     }
@@ -365,6 +366,7 @@ namespace BedBrigade.Client.Components
             switch (args.Item.Text)
             {
                 case "Reset":
+                    _lastSortClosestSelectedId = null;
                     if (Grid != null)
                     {
                         await Grid.ResetPersistDataAsync();
@@ -382,15 +384,78 @@ namespace BedBrigade.Client.Components
                     await CsvExportAsync();
                     break;
                 case "Delivery Sheet":
-                    DownloadDeliverySheet();
+                    await DownloadDeliverySheet();
                     break;
                 case "Team Sheet":
-                    DownloadTeamSheet();
+                    await DownloadTeamSheet();
                     break;
                 case "Sort Waiting Closest":
                     await SortClosest();
                     break;
+                case "Left Message":
+                    await AddLeftMessage();
+                    break;
             }
+        }
+
+        private async Task AddLeftMessage()
+        {
+            if (Grid == null)
+            {
+                ShowSelectRowDialog();
+                return;
+            }
+
+            var selectedBedRequests = await Grid.GetSelectedRecordsAsync();
+            if (!selectedBedRequests.Any())
+            {
+                ShowSelectRowDialog();
+                return;
+            }
+
+            var selectedBedRequest = selectedBedRequests.First();
+            string message = $"LM {DateTime.Now:M/d/yy}";
+
+            if (!(selectedBedRequest.Notes ?? string.Empty).Contains(message))
+            {
+                selectedBedRequest.Notes = string.IsNullOrEmpty(selectedBedRequest.Notes)
+                    ? message
+                    : $"{selectedBedRequest.Notes} {message}";
+            }
+            else
+            {
+                ToastService.Warning("Left Message Not Added", $"The left message was already added for {selectedBedRequest.FullName}.");
+                return;
+            }
+
+            selectedBedRequest.Contacted = true;
+
+            try
+            {
+                var updateResult = await BedRequestDataService.UpdateAsync(selectedBedRequest);
+                if (updateResult.Success)
+                {
+                    await Grid.Refresh();
+                    ToastService.Success("Left Message Added", $"The left message was added successfully for {selectedBedRequest.FullName}.");
+                }
+                else
+                {
+                    Log.Error($"Unable to add left message to BedRequest {selectedBedRequest.BedRequestId}: {updateResult.Message}");
+                    ToastService.Error("Left Message Unsuccessful", $"The left message was not added successfully for {selectedBedRequest.FullName}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Unable to add left message to BedRequest {selectedBedRequest.BedRequestId}");
+                ToastService.Error("Left Message Unsuccessful", $"The left message was not added successfully for {selectedBedRequest.FullName}.");
+            }
+        }
+
+        private void ShowSelectRowDialog()
+        {
+            DialogHeader = "Select Row";
+            DialogContent = "Please select a row.";
+            IsDialogVisible = true;
         }
 
         private async Task SortClosest()
@@ -735,10 +800,11 @@ namespace BedBrigade.Client.Components
                 await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
             List<BedRequest> scheduledBedRequests =
                 scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
+            scheduledBedRequests = OrderDeliverySheetRequests(scheduledBedRequests, (double) location.Latitude , (double) location.Longitude);
             return (location, deliveryChecklist, scheduledBedRequests);
         }
 
-        private async void DownloadTeamSheet()
+        private async Task DownloadTeamSheet()
         {
             try
             {
@@ -775,9 +841,10 @@ namespace BedBrigade.Client.Components
                         deliveryChecklist = MailMergeLogic.ReplaceScheduleFields(schedule, sb).ToString();
                     }                    
                 }
+
                 var scheduledBedRequestResult = await BedRequestDataService.GetScheduledBedRequestsForLocation(selectedLocation);
                 var scheduledBedRequests = scheduledBedRequestResult.Data.Where(o => o.Group == group && o.DeliveryDate == deliveryDateTime).ToList();
-                // We will include all teams present in scheduledBedRequests (group already filtered) - if need all groups remove Where above
+                scheduledBedRequests = OrderDeliverySheetRequests(scheduledBedRequests, (double) location.Latitude , (double) location.Longitude);
                 string fileName = TeamSheetService.CreateTeamSheetFileName(location, scheduledBedRequests);
                 Stream stream = TeamSheetService.CreateTeamSheet(location, scheduledBedRequests, deliveryChecklist);
                 using var streamRef = new DotNetStreamReference(stream: stream);
@@ -792,6 +859,14 @@ namespace BedBrigade.Client.Components
             {
                 ShowSpinner = false;
             }   
+        }
+
+        private static List<BedRequest> OrderDeliverySheetRequests(List<BedRequest> bedRequests, double startLatitude, double startLongitude)
+        {
+            return DriveRoutingLogic.OrderByBestRouteByTeam(
+                bedRequests,
+                startLatitude,
+                startLongitude);
         }
 
         private async Task<bool> ValidateScheduled()

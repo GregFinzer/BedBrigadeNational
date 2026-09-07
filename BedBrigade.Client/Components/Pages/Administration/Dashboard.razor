@@ -39,7 +39,7 @@
         <div class="col-md-8 col-xl-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule for @LocationName </a></h5>
+                    <h5 class="mb-0"><a href="/administration/manage/schedules">Schedule for @LocationName</a> (next two months)</h5>
                 </div>
                 <div class="card-body p-0">
                     @if (Schedules == null)
@@ -71,7 +71,7 @@
                                     <tr>
                                         <td>
                                             <a href=@($"/administration/admintasks/addeditschedule/{s.LocationId}/{s.ScheduleId}")>
-                                                @s.EventDateScheduled.ToString("g")
+                                                @s.EventDateScheduled.ToString(Defaults.DateWithTimeFormat)
                                             </a>
                                         </td>
                                         <td>@s.EventName</td>
@@ -190,7 +190,7 @@
                                     @foreach (var dp in DeliveryPlanList)
                                     {
                                         <tr>
-                                            <td>@dp.DeliveryDate.ToString("d")</td>
+                                            <td>@dp.DeliveryDate.ToString(Defaults.DateWithTimeFormat)</td>
                                             <td>@dp.Group</td>
                                             <td>@dp.Team</td>
                                             <td class="text-end">@dp.NumberOfBeds</td>
@@ -210,7 +210,7 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><a href="/administration/manage/sign-ups">Sign-Ups for @LocationName</a></h5>
+                    <h5 class="mb-0"><a href="/administration/manage/sign-ups">Sign-Ups for @LocationName</a> (next two weeks)</h5>
                 </div>
                 <div class="card-body p-0">
                     @if (SignUps == null)
@@ -245,11 +245,11 @@
                                             <td>
                                                 @if (su.Schedule != null)
                                                 {
-                                                    <a href=@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")>@su.Schedule.EventDateScheduled.ToString("g")</a>
+                                                    <a href=@($"/administration/admintasks/addeditschedule/{su.Schedule.LocationId}/{su.Schedule.ScheduleId}")>@su.Schedule.EventDateScheduled.ToString(Defaults.DateWithTimeFormat)</a>
                                                 }
                                                 else
                                                 {
-                                                    @su.Schedule?.EventDateScheduled.ToString("g")
+                                                    @su.Schedule?.EventDateScheduled.ToString(Defaults.DateWithTimeFormat)
                                                 }
                                             </td>
                                             <td>@su.Schedule?.ScheduleName</td>

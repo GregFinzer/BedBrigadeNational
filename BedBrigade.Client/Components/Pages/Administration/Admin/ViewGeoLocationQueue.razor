@@ -1,0 +1,117 @@
+@layout Layout.AdminLayout
+@page "/administration/admin/view-geolocation-queue"
+@using BedBrigade.Common.Models
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+<CheckAuth Roles=@RoleNames.NationalAdmin></CheckAuth>
+
+@if (Items is null)
+{
+    <Spinner/>
+}
+else
+{
+    <div class="container my-5">
+        <div class="row mb-3">
+            <div class="col-md-10">
+                <h3>GeoLocation Queue</h3>
+            </div>
+            <div class="col-md-2">
+                <UserInfo/>
+            </div>
+        </div>
+
+        <SfGrid TItem="GeoLocationQueue" @ref="Grid" DataSource="Items"
+                AllowPaging="true"
+                AllowSorting="true"
+                AllowFiltering="true"
+                AllowExcelExport="true"
+                AllowPdfExport="true"
+                Toolbar="Toolbar" Height="auto">
+            <GridSortSettings>
+                <GridSortColumns>
+                    <GridSortColumn Field=@nameof(GeoLocationQueue.QueueDate) Direction="SortDirection.Descending"/>
+                </GridSortColumns>
+            </GridSortSettings>
+            <GridFilterSettings Type="FilterType.CheckBox"></GridFilterSettings>
+            <GridPageSettings PageSize="25" PageSizes="true"/>
+            <GridEvents TValue="GeoLocationQueue" OnToolbarClick="OnToolbarClick" RowSelected="OnRowSelected" OnRecordDoubleClick="OnRecordDoubleClick" />
+
+            <GridColumns>
+                <GridColumn Field=@nameof(GeoLocationQueue.GeoLocationQueueId) HeaderText="Id" Width="90" TextAlign="TextAlign.Right" Visible="false"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.Status) HeaderText="Status" Width="130"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.Priority) HeaderText="Priority" Width="110" TextAlign="TextAlign.Right"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.Street) HeaderText="Street" Width="180"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.City) HeaderText="City" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.State) HeaderText="State" Width="110"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.PostalCode) HeaderText="Postal Code" Width="120"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.CountryCode) HeaderText="Country" Width="110"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.TableName) HeaderText="Table Name" Width="150"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.TableId) HeaderText="Table Id" Width="110" TextAlign="TextAlign.Right"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.Latitude) HeaderText="Latitude" Width="130"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.Longitude) HeaderText="Longitude" Width="130"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.QueueDate) HeaderText="Queued" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.LockDate) HeaderText="Locked" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.ProcessedDate) HeaderText="Processed" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field=@nameof(GeoLocationQueue.FailureMessage) HeaderText="Failure Message" Width="300"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
+
+<SfDialog Width="800px" MinHeight="90%" ShowCloseIcon="true" IsModal="true" @bind-Visible="ViewDialogVisible">
+    <DialogEvents OnOpen="OnDialogOpen"></DialogEvents>
+    <DialogTemplates>
+        <Header>GeoLocation Queue Detail</Header>
+        <Content>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-4 fw-bold">Status</div>
+                    <div class="col-8">@_selected?.Status</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Priority</div>
+                    <div class="col-8">@_selected?.Priority</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Address</div>
+                    <div class="col-8">@SelectedAddress</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Country Code</div>
+                    <div class="col-8">@_selected?.CountryCode</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Source</div>
+                    <div class="col-8">@_selected?.TableName (@_selected?.TableId)</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Latitude</div>
+                    <div class="col-8">@_selected?.Latitude</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Longitude</div>
+                    <div class="col-8">@_selected?.Longitude</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Queue Date</div>
+                    <div class="col-8">@(_selected?.QueueDate.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Lock Date</div>
+                    <div class="col-8">@(_selected?.LockDate?.ToString("g"))</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 fw-bold">Processed Date</div>
+                    <div class="col-8">@(_selected?.ProcessedDate?.ToString("g"))</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Failure Message</div>
+                    <div class="col-8 text-break">@_selected?.FailureMessage</div>
+                </div>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton Content="OK" IsPrimary="true" OnClick="CloseDialog" />
+    </DialogButtons>
+</SfDialog>

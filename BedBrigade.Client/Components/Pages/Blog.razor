@@ -34,7 +34,7 @@ else
                         }
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">
-                                <a href="@($"/{LocationRoute}/BlogItem/{BlogType}/{item.Name}/{Filter}")">
+                                <a href="@($"/{LocationRoute}/BlogItem/{BlogType}/{item.Name}{(string.IsNullOrEmpty(Filter) ? string.Empty : $"/{Filter}")}")">
                                     @item.TitleTranslated
                                 </a>
                             </h5>

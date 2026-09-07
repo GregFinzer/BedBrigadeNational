@@ -171,7 +171,8 @@ namespace BedBrigade.Data.Services
                                                     && !String.IsNullOrEmpty(o.Email) 
                                                     && (o.Role == RoleNames.LocationAdmin
                                                     || o.Role == RoleNames.LocationScheduler
-                                                    || o.Role == RoleNames.LocationCommunications))
+                                                    || o.Role == RoleNames.LocationCommunications
+                                                    || o.Role == RoleNames.NationalAdmin))
                     .Select(o => o.Email.ToLower()).Distinct()
                     .ToListAsync();
                 _cachingService.Set(cacheKey, result);

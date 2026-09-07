@@ -61,6 +61,29 @@ public class BedRequestDataServiceSortingTests
         Assert.That(result.Data?.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 11, 12, 13, 21, 22 }));
     }
 
+    [Test]
+    public void OrderByBestRouteByTeam_ShouldStartAtThistlewoodAndPreserveTeamRoutes()
+    {
+        //Grove City Bed Brigade
+        const double DeliverySheetStartLatitude = 39.882527;
+        const double DeliverySheetStartLongitude = -83.042266;
+
+        List<BedRequest> bedRequests =
+        [
+            BuildBedRequest(4, 100, BedRequestStatus.Scheduled, "B", 39.9m, -83.0m, new DateTime(2025, 1, 4)),
+            BuildBedRequest(2, 100, BedRequestStatus.Scheduled, "A", 39.9931859m, -82.9766695m, new DateTime(2025, 1, 2)),
+            BuildBedRequest(1, 100, BedRequestStatus.Scheduled, "A", 39.985602m, -82.968034m, new DateTime(2025, 1, 1)),
+            BuildBedRequest(3, 100, BedRequestStatus.Scheduled, "A", 40.006905m, -82.964436m, new DateTime(2025, 1, 3)),
+        ];
+
+        List<BedRequest> sorted = DriveRoutingLogic.OrderByBestRouteByTeam(
+            bedRequests,
+            DeliverySheetStartLatitude,
+            DeliverySheetStartLongitude);
+
+        Assert.That(sorted.Select(x => x.BedRequestId).ToList(), Is.EqualTo(new List<int> { 1, 2, 3, 4 }));
+    }
+
     private static async Task SeedScheduledBedRequestsAsync(IDbContextFactory<DataContext> contextFactory, int locationId)
     {
         using DataContext context = contextFactory.CreateDbContext();
