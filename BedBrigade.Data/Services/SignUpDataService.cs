@@ -165,6 +165,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         {
             var dbSet = ctx.Set<SignUp>();
             var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
+                .Include(signUp => signUp.Volunteer)
                 .ToListAsync();
 
             return new ServiceResponse<List<SignUp>>("Found for ScheduleId", true, result);

@@ -1,5 +1,6 @@
 ﻿@using BedBrigade.Common.Models
 @using BedBrigade.Common.Logic
+@using BedBrigade.Data.Services
 @using BedBrigade.SpeakIt;
 
  @{
@@ -184,6 +185,37 @@
             </div>    
     }
 
+        @if (RequestedView == "quick" && SignUps.Any())
+        {
+            <p class="bb-fore-primary fw-bold">
+                @_lc["SignUps"]
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">@_lc["Volunteer"]</th>
+                            <th scope="col">@_lc["Group"]</th>
+                            <th class="text-center" scope="col">@_lc["NumberOfVolunteers"]</th>
+                            <th scope="col">@_lc["VehicleType"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var signUp in SignUps)
+                        {
+                            <tr>
+                                <td>@signUp.Volunteer?.FullName</td>
+                                <td>@signUp.Volunteer?.Group</td>
+                                <td class="text-center">@signUp.NumberOfVolunteers</td>
+                                <td>@signUp.VehicleTypeString</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
 </div>
     }
 }
@@ -202,15 +234,25 @@
 
     [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ITranslateLogic _translateLogic { get; set; }
+    [Inject] private ISignUpDataService _svcSignUp { get; set; }
 
     public string? SplitDescription = String.Empty;
     public string SignUpUrl = String.Empty;
+    private List<SignUp> SignUps { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
         if (EventData != null)
         {
             SignUpUrl = $"/{LocationRoute}/volunteer/{EventData.Id}";
+
+            if (RequestedView == "quick")
+            {
+                var signUpsResponse = await _svcSignUp.GetAllForScheduleIdAsync(EventData.Id);
+                SignUps = signUpsResponse.Success && signUpsResponse.Data != null
+                    ? signUpsResponse.Data
+                    : [];
+            }
         }
 
         _lc.InitLocalizedComponent(this);
@@ -247,8 +289,13 @@
 
 
     .quick-wrap {
-        height: 300px;
-        width: 550px;
+        height: auto;
+        min-height: 300px;
+        max-height: 80vh;
+        width: 100%;
+        max-width: 550px;
+        overflow-y: auto;
+        overflow-x: hidden;
         font-family: Arial;
         font-size: 16px
     }
