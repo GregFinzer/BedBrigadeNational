@@ -280,7 +280,7 @@ public class SendSmsLogic : ISendSmsLogic
             Status = QueueStatus.Queued.ToString(),
             QueueDate = DateTime.UtcNow,
             FailureMessage = string.Empty,
-            TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2),
+            TargetDate = scheduleResult.Data.EventDateScheduled.AddHours(-2).ToUniversalTime(),
             IsRead = true,
             IsReply = false,
             LocationId = signUp.LocationId,
