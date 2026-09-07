@@ -25,6 +25,8 @@ namespace BedBrigade.Client.Components
             signUp.VolunteerPhone = selectedGridObject.VolunteerPhone;
             signUp.VolunteerEmail = selectedGridObject.VolunteerEmail;
             signUp.VehicleType = selectedGridObject.VehicleType;
+            signUp.SignUpNumberOfVolunteers = selectedGridObject.SignUpNumberOfVolunteers;
+            signUp.SignUpNote = selectedGridObject.SignUpNote;
             return (signUp);
 
         } 

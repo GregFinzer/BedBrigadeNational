@@ -166,11 +166,19 @@
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top; white-space: nowrap">Vehicle Type</td>
-                                            <th style="vertical-align: top">@(newSignUp.VehicleType.HasValue ? @EnumHelper.GetEnumDescription(newSignUp.VehicleType.Value) : string.Empty)</th>
+                                            <th style="vertical-align: top">
+                                                <SfDropDownList ID="vehicleType" TValue="VehicleType" TItem="VehicleTypeEnumItem" DataSource="@lstVehicleTypes" @bind-Value="SelectedVehicleType" Enabled="@IsSignUpEditable">
+                                                    <DropDownListFieldSettings Value="Value" Text="Name"></DropDownListFieldSettings>
+                                                </SfDropDownList>
+                                            </th>
                                         </tr>
                                         <tr>
                                             <td style="vertical-align: top; white-space: nowrap">Number of Volunteers</td>
-                                            <th style="vertical-align: top"><SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newSignUp.SignUpNumberOfVolunteers"></SfNumericTextBox></th>
+                                            <th style="vertical-align: top"><SfNumericTextBox ID="numberOfVolunteers" TValue="int" Min="1" Max="100" @bind-Value="newSignUp.SignUpNumberOfVolunteers" Enabled="@IsSignUpEditable"></SfNumericTextBox></th>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: top">Note</td>
+                                            <th style="vertical-align: top"><SfTextBox ID="signUpNote" @bind-Value="newSignUp.SignUpNote" Multiline="true" Enabled="@IsSignUpEditable"></SfTextBox></th>
                                         </tr>
                                     </table>
 
@@ -184,6 +192,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" style="display: @DisplayAddButton" class="btn btn-primary" @onclick="@(() => onConfirmAdd())">Ok</button>&nbsp;
+                    <button type="button" style="display: @DisplayEditButton" class="btn btn-primary" @onclick="@(() => onConfirmEdit())">Ok</button>&nbsp;
                     <button type="button" style="display: @DisplayDeleteButton" class="btn btn-primary" @onclick="@(() => onConfirmDelete())">Ok</button>&nbsp;
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => this.ShowEditDialog = false)">@CloseButtonCaption</button>
                 </div>

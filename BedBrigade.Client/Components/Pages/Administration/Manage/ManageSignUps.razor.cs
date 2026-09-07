@@ -65,6 +65,7 @@ public partial class ManageSignUps : ComponentBase
     private const string CaptionWarning = "warning";
     private const string CaptionAdd = "Add";
     private const string CaptionDelete = "Delete";
+    private const string CaptionEdit = "Edit";
     private const string RegisterColumn = "SignUpId";
     private const string Reset = "Reset";
     // Action & Dialog variables
@@ -72,10 +73,24 @@ public partial class ManageSignUps : ComponentBase
     public bool ShowEditDialog { get; set; } = false;
     private string ErrorMessage = String.Empty;
     private string DisplayAddButton = DisplayNone;
+    private string DisplayEditButton = DisplayNone;
     private string DisplayDeleteButton = DisplayNone;
     private string DisplayDataPanel = DisplayNone;
     private string DisplaySearchPanel = DisplayNone;
     private string GridDisplay = String.Empty;
+    private bool IsSignUpEditable => DisplayEditButton != DisplayNone || DisplayAddButton != DisplayNone;
+
+    private VehicleType SelectedVehicleType
+    {
+        get => newSignUp?.VehicleType ?? VehicleType.None;
+        set
+        {
+            if (newSignUp != null)
+            {
+                newSignUp.VehicleType = value;
+            }
+        }
+    }
 
     private MarkupString DialogMessage;
     private MarkupString AvailabilityMessage; // Volunteer Availability
@@ -158,7 +173,7 @@ public partial class ManageSignUps : ComponentBase
     {
         foreach (ItemModel tbItem in Toolbaritems)
         {
-            if (tbItem.Id.Contains("add") || tbItem.Id.Contains("del"))
+            if (tbItem.Id.Contains("add") || tbItem.Id.Contains("del") || tbItem.Id.Contains("edit"))
             {
                 tbItem.Disabled = true;
             }
@@ -187,6 +202,13 @@ public partial class ManageSignUps : ComponentBase
             PrefixIcon = "e-delete"
         });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
+        {
+            Text = CaptionEdit,
+            Id = "edit",
+            TooltipText = "Edit selected Volunteer Signup",
+            PrefixIcon = "e-edit"
+        });
+        Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         { Text = "PDF Export", Id = "pdf", TooltipText = "Export Grid Data to PDF" });
         Toolbaritems.Add(new Syncfusion.Blazor.Navigations.ItemModel()
         { Text = "Excel Export", Id = "excel", TooltipText = "Export Grid Data to Excel" });
@@ -197,14 +219,6 @@ public partial class ManageSignUps : ComponentBase
 
     } 
 
-
-    private bool IsLocationAdmin
-    {
-        get
-        {
-            return _svcAuth.UserHasRole(RoleNames.CanManageSchedule);
-        }
-    }
 
     private async Task LoadLocations()
     {
@@ -284,13 +298,18 @@ public partial class ManageSignUps : ComponentBase
                     bSelectionStatus = true;
                 }
             }
-            else // Delete
+            else if (args.Item.Text.ToString() == CaptionDelete)
             {
                 if (selectedGridObject.SignUpId > 0) // existing Link ID
                 {
                     bSelectionStatus = true;
                     displayVolunteerData = "";
                 }
+            }
+            else if (args.Item.Text.ToString() == CaptionEdit && selectedGridObject.SignUpId > 0)
+            {
+                bSelectionStatus = true;
+                displayVolunteerData = "";
             }
         } // Grid Row selected
 
@@ -310,6 +329,7 @@ public partial class ManageSignUps : ComponentBase
     {
         newSignUp = new SignUpDisplayItem();
         DisplayAddButton = DisplayNone;
+        DisplayEditButton = DisplayNone;
         DisplayDeleteButton = DisplayNone;
         DisplayDataPanel = DisplayNone;
         DisplaySearchPanel = DisplayNone;
@@ -331,6 +351,10 @@ public partial class ManageSignUps : ComponentBase
                 newSignUp = SignUpHelper.PrepareVolunteerDeleteDialog(selectedGridObject, ref strMessageText,
                     ref DialogTitle, ref DisplayDeleteButton, ref CloseButtonCaption);
                 break;
+
+            case CaptionEdit:
+                PrepareVolunteerEditDialog();
+                break;
         }
 
         if (strMessageText.Length > 0)
@@ -340,7 +364,57 @@ public partial class ManageSignUps : ComponentBase
 
         this.ShowEditDialog = true;
 
-    } 
+    }
+
+    private void PrepareVolunteerEditDialog()
+    {
+        DialogTitle = "Edit Volunteer Signup";
+        CloseButtonCaption = CaptionClose;
+        DisplayEditButton = "";
+        displayVolunteerData = "";
+        newSignUp = new SignUpDisplayItem
+        {
+            SignUpId = selectedGridObject.SignUpId,
+            VolunteerId = selectedGridObject.VolunteerId,
+            VolunteerFirstName = selectedGridObject.VolunteerFirstName,
+            VolunteerLastName = selectedGridObject.VolunteerLastName,
+            VolunteerPhone = selectedGridObject.VolunteerPhone,
+            VolunteerEmail = selectedGridObject.VolunteerEmail,
+            VehicleType = selectedGridObject.VehicleType ?? VehicleType.None,
+            SignUpNumberOfVolunteers = selectedGridObject.SignUpNumberOfVolunteers,
+            SignUpNote = selectedGridObject.SignUpNote
+        };
+    }
+
+    private async Task onConfirmEdit()
+    {
+        if (newSignUp == null || newSignUp.SignUpId <= 0)
+        {
+            HideDialogs();
+            return;
+        }
+
+        var existingResponse = await _svcSignUp.GetByIdAsync(newSignUp.SignUpId);
+        if (existingResponse.Success && existingResponse.Data != null)
+        {
+            var signUp = existingResponse.Data;
+            signUp.VehicleType = newSignUp.VehicleType ?? VehicleType.None;
+            signUp.NumberOfVolunteers = newSignUp.SignUpNumberOfVolunteers;
+            signUp.SignUpNote = newSignUp.SignUpNote;
+
+            var updateResult = await _svcSignUp.UpdateAsync(signUp);
+            if (updateResult.Success)
+            {
+                HideDialogs();
+                await RefreshGrid();
+                _toastService.Success("Volunteer Signup Updated", "The volunteer signup has been updated.");
+                return;
+            }
+        }
+
+        HideDialogs();
+        DialogMessage = BootstrapHelper.GetBootstrapMessage(ErrorTitle, "Unable to update the volunteer signup.", "");
+    }
 
     private void NoSelectedGridRow(string strAction, ref string strMessageText)
     {
@@ -404,15 +478,17 @@ public partial class ManageSignUps : ComponentBase
         AvailabilityMessage = (MarkupString)"&nbsp;";
         var strMessageText = ErrorTitle;
         var actionStatus = "Unable to Add Volunteer.";
-        if (selectedGridObject != null && newSignUp.VolunteerId > 0)
+        if (selectedGridObject != null && newSignUp != null && newSignUp.VolunteerId > 0)
         {
-            var newSignUp = new SignUp();
-            newSignUp.VolunteerId = this.newSignUp.VolunteerId;
-            newSignUp.ScheduleId = selectedGridObject.ScheduleId;
-            newSignUp.LocationId = selectedGridObject.ScheduleLocationId;
-            newSignUp.NumberOfVolunteers = this.newSignUp.SignUpNumberOfVolunteers;
-            newSignUp.VehicleType = this.newSignUp.VehicleType ?? VehicleType.None;
-            var addResult = await _svcSignUp.CreateAsync(newSignUp);
+            var signUpToAdd = new SignUp();
+            signUpToAdd.VolunteerId = newSignUp.VolunteerId;
+            signUpToAdd.ScheduleId = selectedGridObject.ScheduleId;
+            signUpToAdd.LocationId = selectedGridObject.ScheduleLocationId;
+            signUpToAdd.NumberOfVolunteers = newSignUp.SignUpNumberOfVolunteers;
+            signUpToAdd.VehicleType = newSignUp.VehicleType ?? VehicleType.None;
+            signUpToAdd.SignUpNote = newSignUp.SignUpNote;
+
+            var addResult = await _svcSignUp.CreateAsync(signUpToAdd);
             if (addResult.Success && addResult.Data != null)
             {
                 string customMessage = "This is to confirm that your sign-up was created.";
@@ -494,6 +570,7 @@ public partial class ManageSignUps : ComponentBase
         ShowEditDialog = false;
         CloseButtonCaption = CaptionClose;
         DisplayDeleteButton = DisplayNone;
+        DisplayEditButton = DisplayNone;
         DisplayDataPanel = DisplayNone;
         DisplaySearchPanel = DisplayNone;
         DisplayAddButton = DisplayNone;
@@ -523,6 +600,7 @@ public partial class ManageSignUps : ComponentBase
             newSignUp.VolunteerFirstName = args.ItemData.FirstName;
             newSignUp.VolunteerLastName = args.ItemData.LastName;
             newSignUp.VehicleType = args.ItemData.VehicleType;
+            newSignUp.SignUpNote = args.ItemData.Message;
             DisplayAddButton = ""; //  OK button
             var strMessageText = "New selected Volunteer will be added to selected Event. Are you sure?";
             DialogMessage = BootstrapHelper.GetBootstrapMessage("help", strMessageText, "", false);
@@ -549,6 +627,12 @@ public partial class ManageSignUps : ComponentBase
             if (delItem != null)
             {
                 delItem.Disabled = false;
+            }
+
+            var editItem = Toolbaritems.FirstOrDefault(tb => tb.Text == CaptionEdit);
+            if (editItem != null)
+            {
+                editItem.Disabled = false;
             }
         }
     } 
