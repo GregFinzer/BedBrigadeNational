@@ -38,8 +38,6 @@ else
 @code {
     [Inject] private ILanguageContainerService _lc { get; set; }
     [Inject] private ILocationDataService _svcLocation { get; set; }
-    [Inject] private IAuthService _authService { get; set; }
-    [Inject] private NavigationManager _navigationManager { get; set; }
     [Parameter] public string? myLocation { get; set; }
     [Parameter] public string? myPageName { get; set; }
     [Parameter] public string? mySubPageName { get; set; }
@@ -47,7 +45,7 @@ else
     public string HomeUrl = "/";
     private bool IsLocationActive = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _lc.InitLocalizedComponent(this);
         if (myLocation != null && myPageName != null && mySubPageName != null)
@@ -58,7 +56,7 @@ else
         else if (myLocation != null && myPageName != null)
         {
             HomeUrl = $"/{myLocation}";
-            CheckLocationStatus(myLocation);           
+            await CheckLocationStatusAsync(myLocation);
             Log.Logger.Warning($"404 for Page: /{myLocation}/{myPageName}");
 
         }
@@ -72,24 +70,7 @@ else
         }
     } // init
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !_authService.IsLoggedIn)
-        {
-            var restoredFromState = await _authService.GetStateFromTokenAsync();
-            if (restoredFromState && _authService.IsNationalAdmin)
-            {
-                var locationResponse = await _svcLocation.GetLocationByRouteAsync($"/{myLocation}");
-
-                if (locationResponse.Success && locationResponse.Data != null)
-                {
-                    _navigationManager.NavigateTo($"/{myLocation}/{myPageName}", false);
-                }
-            }
-        }
-    }
-
-    private async void CheckLocationStatus(string location)
+    private async Task CheckLocationStatusAsync(string location)
     {
         try
         {
