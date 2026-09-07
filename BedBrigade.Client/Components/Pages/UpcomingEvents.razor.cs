@@ -14,6 +14,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private NavigationManager _navigationManager { get; set; }
         [Inject] private ILocationDataService _svcLocation { get; set; }
         [Inject] private IScheduleDataService? _svcSchedule { get; set; }
+        [Inject] private ISignUpDataService _svcSignUp { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ToastService _toastService { get; set; }
         [Inject] private IJSRuntime _js { get; set; }
@@ -21,6 +22,7 @@ namespace BedBrigade.Client.Components.Pages
         [Inject] private ILocationState _locationState { get; set; }
         private List<Schedule>? DeliveryEvents { get; set; }
         private List<Schedule>? BuildEvents { get; set; }
+        private Dictionary<int, List<SignUp>> SignUpsBySchedule { get; set; } = [];
 
         [Parameter] public string LocationRoute { get; set; }
 
@@ -37,13 +39,25 @@ namespace BedBrigade.Client.Components.Pages
                 }
 
                 var allEventsResponse =
-                    await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
+                    await _svcSchedule.GetFutureSchedulesByLocationId(locationResponse.Data.LocationId);
 
                 if (!allEventsResponse.Success)
                 {
                     _toastService.Error("Error", allEventsResponse.Message);
                     return;
                 }
+
+                var signUpsResponse = await _svcSignUp.GetFutureSignUpsForLocation(locationResponse.Data.LocationId);
+
+                if (!signUpsResponse.Success)
+                {
+                    _toastService.Error("Error", signUpsResponse.Message);
+                    return;
+                }
+
+                SignUpsBySchedule = signUpsResponse.Data
+                    .GroupBy(signUp => signUp.ScheduleId)
+                    .ToDictionary(group => group.Key, group => group.ToList());
 
                 _locationState.Location = LocationRoute;
 

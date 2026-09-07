@@ -24,7 +24,7 @@ Cancel: Cancelar
 ChangePassword: Cambiar contraseña
 ChangePasswordExpired: Cambiar contraseña expirada, solicitar Olvidé mi contraseña nuevamente.
 City: Ciudad
-ClickToSignup: (Haga clic para registrarse)
+ClickToSignup: Haga clic para registrarse
 Close: Cerrar
 CompareConfirmPasswordToPassword: Las contraseñas no coinciden.
 ConfirmPassword: Confirmar contraseña
@@ -191,6 +191,7 @@ NotSent: No enviado
 NoUpcomingBuildsScheduled: No hay próximas compilaciones programadas.
 NoUpcomingDeliveriesScheduled: No hay próximas entregas programadas.
 NumberOfBeds: Número de camas
+NumberOfVolunteers: Número de voluntarios
 NumberOfVolunteersIncludingYourself: Número de Voluntarios (incluyéndote a ti mismo)
 OneTimeDonationOf: 'Donación única de'
 Organization: Organización
@@ -215,6 +216,7 @@ PostalCode: Código postal
 PostalCodeIsMilitary: El código postal es un apartado militar o postal y no se puede utilizar
 PrimaryLanguageCaption: Lengua materna
 PrimaryLanguagePlaceholder: Elegir idioma
+PrivateEvent: Evento privado
 Processing: Procesando
 RangeNumberOfVolunteers1To100: El número de voluntarios debe estar entre 1 y 100
 RecentlyGivenBed: Recientemente se le entregó una cama. Su próxima fecha elegible es
@@ -285,6 +287,7 @@ SendMessage: Enviar Mensaje
 SendTaxForms: Enviar formularios de impuestos
 ServiceZipCodes: Códigos postales de servicio
 ShowPassword: Mostrar contraseña
+SignUps: Registros
 SkipToBuilds: Ir a Compilaciones
 Sorry: Arrepentido
 SorryThePage: Lo sentimos, no se encontró la página asociada con este enlace.
@@ -323,6 +326,7 @@ UserName: Nombre de usuario
 ValidEmail: Introduzca una dirección de correo electrónico válida
 ValidPhoneNumber: Los números de teléfono deben tener 10 dígitos con un código de área y un prefijo válidos
 VehicleDescription: Por favor describe tu vehículo
+VehicleType: Tipo de vehículo
 ViewNewer: Ver más reciente
 ViewOlder: Ver más antiguo
 Volunteer: Voluntario

@@ -25,13 +25,19 @@
                         {
                             <div class="event-card mb-3 p-3 border rounded">
                                 <h4 class="bb-fore-primary">
-                                    @if (!evt.PrivateEvent)
+                                    @if (evt.PrivateEvent)
                                     {
-                                        <a class="bb-fore-primary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a> @_lc.Keys["ClickToSignup"]
+                                        @_translateLogic.GetTranslation(evt.EventName)
+                                        <span> (@_lc.Keys["PrivateEvent"])</span>
+                                    }
+                                    else if (evt.VolunteersRegistered < evt.VolunteersMax)
+                                    {
+                                        <a class="bb-fore-primary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a>
+                                        <span> (@_lc.Keys["ClickToSignup"])</span>
                                     }
                                     else
                                     {
-                                        @_translateLogic.GetTranslation(evt.EventName)
+                                        @_translateLogic.GetTranslation(evt.EventName)<span> (Fully Staffed)</span>
                                     }
                                 </h4>
                                 <div class="event-details">
@@ -84,6 +90,37 @@
                                     @if (!string.IsNullOrEmpty(evt.EventNote))
                                     {
                                         <p class="mt-2">@evt.EventNote</p>
+                                    }
+
+                                    @if (SignUpsBySchedule.TryGetValue(evt.ScheduleId, out var signUps) && signUps.Any())
+                                    {
+                                        <p class="bb-fore-primary fw-bold">
+                                            @_lc["SignUps"]
+                                        </p>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">@_lc["Volunteer"]</th>
+                                                        <th scope="col">@_lc["Group"]</th>
+                                                        <th class="text-center" scope="col">@_lc["NumberOfVolunteers"]</th>
+                                                        <th scope="col">@_lc["VehicleType"]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var signUp in signUps)
+                                                    {
+                                                        <tr>
+                                                            <td>@signUp.Volunteer?.FullName</td>
+                                                            <td>@signUp.Volunteer?.Group</td>
+                                                            <td class="text-center">@signUp.NumberOfVolunteers</td>
+                                                            <td>@signUp.VehicleTypeString</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     }
                                 </div>
                             </div>
@@ -110,13 +147,19 @@
                         {
                             <div class="event-card mb-3 p-3 border rounded">
                                 <h4 class="bb-fore-secondary">
-                                    @if (!evt.PrivateEvent)
+                                    @if (evt.PrivateEvent)
                                     {
-                                        <a class="bb-fore-secondary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a>  @_lc.Keys["ClickToSignup"]
+                                        @_translateLogic.GetTranslation(evt.EventName)
+                                        <span> (@_lc.Keys["PrivateEvent"])</span>
+                                    }
+                                    else if (evt.VolunteersRegistered < evt.VolunteersMax)
+                                    {
+                                        <a class="bb-fore-secondary" href="/@LocationRoute/volunteer/@evt.ScheduleId">@_translateLogic.GetTranslation(evt.EventName)</a>
+                                        <span> (@_lc.Keys["ClickToSignup"])</span>
                                     }
                                     else
                                     {
-                                        @_translateLogic.GetTranslation(evt.EventName)
+                                        @_translateLogic.GetTranslation(evt.EventName)<span> (Fully Staffed)</span>
                                     }
                                 </h4>
                                 <div class="event-details">
@@ -169,6 +212,36 @@
                                     @if (!string.IsNullOrEmpty(evt.EventNote))
                                     {
                                         <p class="mt-2">@evt.EventNote</p>
+                                    }
+                                    @if (SignUpsBySchedule.TryGetValue(evt.ScheduleId, out var signUps) && signUps.Any())
+                                    {
+                                        <p class="bb-fore-secondary fw-bold">
+                                            @_lc["SignUps"]
+                                        </p>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">@_lc["Volunteer"]</th>
+                                                        <th scope="col">@_lc["Group"]</th>
+                                                        <th class="text-center" scope="col">@_lc["NumberOfVolunteers"]</th>
+                                                        <th scope="col">@_lc["VehicleType"]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var signUp in signUps)
+                                                    {
+                                                        <tr>
+                                                            <td>@signUp.Volunteer?.FullName</td>
+                                                            <td>@signUp.Volunteer?.Group</td>
+                                                            <td class="text-center">@signUp.NumberOfVolunteers</td>
+                                                            <td>@signUp.VehicleTypeString</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     }
                                 </div>
                             </div>
