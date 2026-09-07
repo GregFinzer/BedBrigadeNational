@@ -265,10 +265,10 @@ else
 
             <div class="row mt-1">
                 <div class="col-md-12 text-left">
-                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
-                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
-                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleLeftMessage">Left Message</button>
-                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleDeliveryNote">Delivery Note</button>
+                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit"><i class="fas fa-save"></i> @((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
+                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel"><i class="fas fa-times-circle"></i> @_lc.Keys["Cancel"]</button>
+                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleLeftMessage"><i class="fas fa-phone"></i> Left Message</button>
+                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleDeliveryNote"><i class="fas fa-truck-pickup"></i> Delivery Note</button>
                 </div>
             </div>
         </EditForm>
