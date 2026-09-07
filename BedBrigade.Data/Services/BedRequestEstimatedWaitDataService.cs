@@ -92,8 +92,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
     private async Task FillNumberOfDeliveredBedRequests(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
     {
         estimatedWaitResult.NumberOfDeliveredBedRequests = await dbSet.Where(o => o.LocationId == estimatedWaitResult.LocationId
-                && (o.Status == BedRequestStatus.Delivered
-                    || o.Status == BedRequestStatus.Given)
+                && (o.Status == BedRequestStatus.Delivered)
                 && o.DeliveryDate.HasValue
                 && o.DeliveryDate.Value.Date >= estimatedWaitResult.FirstDeliveryDate)
             .SumAsync(o => o.NumberOfBeds);
@@ -102,8 +101,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
     private async Task FillLastDeliveryDate(DbSet<BedRequest> dbSet, EstimatedWaitResult estimatedWaitResult)
     {
         estimatedWaitResult.LastDeliveryDate = await dbSet.Where(o => o.LocationId == estimatedWaitResult.LocationId
-                                                                      && (o.Status == BedRequestStatus.Delivered
-                                                                          || o.Status == BedRequestStatus.Given))
+                                                                      && (o.Status == BedRequestStatus.Delivered))
             .OrderByDescending(o => o.DeliveryDate)
             .Select(o => o.DeliveryDate)
             .FirstOrDefaultAsync();
@@ -115,8 +113,7 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
         const int MaxMonths = 24;
         DateTime minimumDeliveryDate = DateTime.UtcNow.AddMonths(-MaxMonths);
         estimatedWaitResult.FirstDeliveryDate = await dbSet.Where(o => o.LocationId == estimatedWaitResult.LocationId
-                                                                       && (o.Status == BedRequestStatus.Delivered
-                                                                           || o.Status == BedRequestStatus.Given)
+                                                                       && (o.Status == BedRequestStatus.Delivered)
                                                                        && o.DeliveryDate.HasValue
                                                                        && o.DeliveryDate.Value.Date >= minimumDeliveryDate)
             .OrderBy(o => o.DeliveryDate)
