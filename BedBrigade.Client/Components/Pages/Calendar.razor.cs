@@ -5,6 +5,7 @@ using BedBrigade.Client.Services;
 using BedBrigade.Data.Services;
 using Syncfusion.Blazor.Schedule;
 using System.Text;
+using BedBrigade.Common.Enums;
 using Serilog;
 using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
@@ -46,11 +47,14 @@ namespace BedBrigade.Client.Components.Pages
                 if (locationResponse.Success && locationResponse.Data != null)
                 {
                     _locationState.Location = LocationRoute;
-                    scheduleResult = await _svcSchedule.GetAvailableSchedulesByLocationId(locationResponse.Data.LocationId);
+                    scheduleResult = await _svcSchedule.GetFutureSchedulesByLocationId(locationResponse.Data.LocationId);
 
                     if (scheduleResult.Success && scheduleResult.Data != null)
                     {
-                        lstSchedules = scheduleResult.Data;
+                        lstSchedules = scheduleResult.Data.Where(
+                            e => e.EventStatus == EventStatus.Scheduled
+                                 && e.EventDateScheduled < DateTime.Now.AddMonths(7)).ToList();
+
                         IsDisplayCalendar = true;
                         dataSource = GetCalendarAppointments(lstSchedules);
                     }
