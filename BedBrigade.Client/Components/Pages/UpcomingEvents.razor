@@ -37,7 +37,7 @@
                                     }
                                     else
                                     {
-                                        @_translateLogic.GetTranslation(evt.EventName)<span> (Fully Staffed)</span>
+                                        @_translateLogic.GetTranslation(evt.EventName)<span> (@_lc.Keys["FullyStaffed"])</span>
                                     }
                                 </h4>
                                 <div class="event-details">
@@ -112,8 +112,8 @@
                                                     @foreach (var signUp in signUps)
                                                     {
                                                         <tr>
-                                                            <td>@signUp.Volunteer?.FullName</td>
-                                                            <td>@signUp.Volunteer?.Group</td>
+                                                            <td>@signUp.Volunteer.FullName</td>
+                                                            <td>@signUp.Volunteer.Group</td>
                                                             <td class="text-center">@signUp.NumberOfVolunteers</td>
                                                             <td>@signUp.VehicleTypeString</td>
                                                         </tr>
@@ -159,7 +159,7 @@
                                     }
                                     else
                                     {
-                                        @_translateLogic.GetTranslation(evt.EventName)<span> (Fully Staffed)</span>
+                                        @_translateLogic.GetTranslation(evt.EventName)<span> (@_lc.Keys["FullyStaffed"])</span>
                                     }
                                 </h4>
                                 <div class="event-details">
@@ -233,8 +233,8 @@
                                                     @foreach (var signUp in signUps)
                                                     {
                                                         <tr>
-                                                            <td>@signUp.Volunteer?.FullName</td>
-                                                            <td>@signUp.Volunteer?.Group</td>
+                                                            <td>@signUp.Volunteer.FullName</td>
+                                                            <td>@signUp.Volunteer.Group</td>
                                                             <td class="text-center">@signUp.NumberOfVolunteers</td>
                                                             <td>@signUp.VehicleTypeString</td>
                                                         </tr>

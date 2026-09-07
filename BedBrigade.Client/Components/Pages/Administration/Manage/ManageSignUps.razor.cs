@@ -260,7 +260,6 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {
-        bool bSelectionStatus = false;
         displayVolunteerData = DisplayNone;
         var strMessageText = String.Empty;
 
@@ -289,29 +288,7 @@ public partial class ManageSignUps : ComponentBase
             return;
         }
 
-        if (selectedGridObject != null)
-        {
-            if (args.Item.Text.ToString() == CaptionAdd)
-            {
-                if (selectedGridObject.ScheduleId > 0) // Existing Schedule/Event ID
-                {
-                    bSelectionStatus = true;
-                }
-            }
-            else if (args.Item.Text.ToString() == CaptionDelete)
-            {
-                if (selectedGridObject.SignUpId > 0) // existing Link ID
-                {
-                    bSelectionStatus = true;
-                    displayVolunteerData = "";
-                }
-            }
-            else if (args.Item.Text.ToString() == CaptionEdit && selectedGridObject.SignUpId > 0)
-            {
-                bSelectionStatus = true;
-                displayVolunteerData = "";
-            }
-        } // Grid Row selected
+        bool bSelectionStatus = DetermineGridRowSelected(args);
 
         if (bSelectionStatus)
         {
@@ -323,7 +300,38 @@ public partial class ManageSignUps : ComponentBase
 
         this.ShowEditDialog = true;
 
-    } 
+    }
+
+    private bool DetermineGridRowSelected(ClickEventArgs args)
+    {
+        bool selectionStatus = false;
+
+        if (selectedGridObject != null)
+        {
+            if (args.Item.Text.ToString() == CaptionAdd)
+            {
+                if (selectedGridObject.ScheduleId > 0) // Existing Schedule/Event ID
+                {
+                    selectionStatus = true;
+                }
+            }
+            else if (args.Item.Text.ToString() == CaptionDelete)
+            {
+                if (selectedGridObject.SignUpId > 0) // existing Link ID
+                {
+                    selectionStatus = true;
+                    displayVolunteerData = "";
+                }
+            }
+            else if (args.Item.Text.ToString() == CaptionEdit && selectedGridObject.SignUpId > 0)
+            {
+                selectionStatus = true;
+                displayVolunteerData = "";
+            }
+        } // Grid Row selected
+
+        return selectionStatus;
+    }
 
     private async Task ToolbarActions(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {

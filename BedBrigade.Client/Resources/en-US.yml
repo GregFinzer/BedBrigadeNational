@@ -118,6 +118,7 @@ FirstName: First Name
 ForgotPassword: Forgot Password
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
+FullyStaffed: Fully Staffed
 GenderAge: Gender / Age
 Gross: Gross
 Group: Group
