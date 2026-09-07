@@ -65,16 +65,14 @@ namespace BedBrigade.Client.Components.Pages
                 DeliveryEvents = allEventsResponse.Data
                     .Where(e => e.EventType == EventType.Delivery &&
                                 e.EventStatus == EventStatus.Scheduled
-                                && e.EventDateScheduled < DateTime.Now.AddMonths(7)
-                                && !e.PrivateEvent)
+                                && e.EventDateScheduled < DateTime.Now.AddMonths(7))
                     .OrderBy(e => e.EventDateScheduled)
                     .ToList();
 
                 BuildEvents = allEventsResponse.Data
                     .Where(e => e.EventType == EventType.Build &&
                                 e.EventStatus == EventStatus.Scheduled
-                                && e.EventDateScheduled < DateTime.Now.AddMonths(7)
-                                && !e.PrivateEvent)
+                                && e.EventDateScheduled < DateTime.Now.AddMonths(7))
                     .OrderBy(e => e.EventDateScheduled)
                     .ToList();
             }
