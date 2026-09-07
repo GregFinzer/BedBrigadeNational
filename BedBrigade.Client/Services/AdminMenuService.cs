@@ -122,6 +122,8 @@ namespace BedBrigade.Client.Services
                     _auth.UserHasRole(RoleNames.NationalAdmin)),
                 ("View Email Queue", "administration/admin/viewemailqueue", "fas fa-envelope",
                     _auth.UserHasRole(RoleNames.CanSendBulkEmail)),
+                ("View GeoLocation Queue", "administration/admin/view-geolocation-queue", "fas fa-globe",
+                    _auth.UserHasRole(RoleNames.NationalAdmin)),
                 ("View SMS Queue", "administration/admin/viewsmsqueue", "fas fa-sms",
                     _auth.UserHasRole(RoleNames.NationalAdmin)),
                 ("View Translation Queue", "administration/admin/viewtranslationqueue", "fas fa-language",

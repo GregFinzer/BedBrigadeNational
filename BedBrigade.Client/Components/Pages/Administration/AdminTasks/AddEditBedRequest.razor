@@ -8,7 +8,7 @@
 
 <CheckAuth Roles=@RoleNames.CanManageBedRequests></CheckAuth>
 
-@if (Model == null || Locations == null || lstPrimaryLanguage == null || lstSpeakEnglish == null)
+@if (Model == null || _editContext == null || Locations == null || lstPrimaryLanguage == null || lstSpeakEnglish == null)
 {
     <Spinner />
 }
@@ -265,8 +265,10 @@ else
 
             <div class="row mt-1">
                 <div class="col-md-12 text-left">
-                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit">@((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
-                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel">@_lc.Keys["Cancel"]</button>
+                    <button class="btn btn-primary me-2 px-2 text-nowrap min-width-button" type="submit"><i class="fas fa-save"></i> @((IsNew ? _lc.Keys["Add"] : _lc.Keys["Update"]))</button>
+                    <button class="btn btn-secondary px-2 text-nowrap min-width-button" type="button" @onclick="HandleCancel"><i class="fas fa-times-circle"></i> @_lc.Keys["Cancel"]</button>
+                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleLeftMessage"><i class="fas fa-phone"></i> Left Message</button>
+                    <button class="btn btn-additional px-2 text-nowrap min-width-button" type="button" @onclick="HandleDeliveryNote"><i class="fas fa-truck-pickup"></i> Delivery Note</button>
                 </div>
             </div>
         </EditForm>
@@ -285,6 +287,21 @@ else
         <FooterTemplate>
             <button id="confirmAddScheduleYes" type="button" class="btn btn-primary me-2" @onclick="() => HandleConfirmAddScheduleSelection(true)">Yes</button>
             <button id="confirmAddScheduleNo" type="button" class="btn btn-secondary" @onclick="() => HandleConfirmAddScheduleSelection(false)">No</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<SfDialog ID="deliveryNoteValidationDialog" Width="400px" IsModal="true" ShowCloseIcon="true" Visible="@_showDeliveryNoteValidationDialog"
+          OnClose="HandleDeliveryNoteValidationClose">
+    <DialogTemplates>
+        <Header>
+            <h3>Delivery Note</h3>
+        </Header>
+        <Content>
+            <p>Please enter the delivery date, delivery time and team.</p>
+        </Content>
+        <FooterTemplate>
+            <button id="deliveryNoteValidationOk" type="button" class="btn btn-primary" @onclick="HandleDeliveryNoteValidationClose">Ok</button>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>

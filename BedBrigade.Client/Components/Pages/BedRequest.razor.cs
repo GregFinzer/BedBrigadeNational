@@ -455,6 +455,11 @@ namespace BedBrigade.Client.Components.Pages
 
         private async Task SaveRequest()
         {
+            if (_isBusy)
+            {
+                return;
+            }
+
             _isBusy = true;
 
             try

@@ -363,8 +363,6 @@ namespace BedBrigade.Client
             Log.Logger.Information("Create and configure application");
             var app = builder.Build();
 
-            app.UsePathBase("/National");
-
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -375,6 +373,16 @@ namespace BedBrigade.Client
 
             app.UseDefaultFiles();
             app.UseHttpsRedirection();
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.Value is { Length: > 1 } requestPath && requestPath.EndsWith('/'))
+                {
+                    context.Request.Path = requestPath.TrimEnd('/');
+                }
+
+                await next();
+            });
 
             //Possible fix for AT&T Mobile Data            
             app.UseResponseCompression();

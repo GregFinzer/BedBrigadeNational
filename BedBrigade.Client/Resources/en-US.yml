@@ -23,7 +23,7 @@ Cancel: Cancel
 ChangePassword: Change Password
 ChangePasswordExpired: Change password expired, request Forgot Password again.
 City: City
-ClickToSignup: (Click to Signup)
+ClickToSignup: Click to Signup
 Close: Close
 CompareConfirmPasswordToPassword: The passwords do not match.
 ConfirmPassword: Confirm Password
@@ -118,6 +118,7 @@ FirstName: First Name
 ForgotPassword: Forgot Password
 FoundLocationsWithin: Found {count} locations within {maxMiles} miles of {postalCode}
 FromStartTimeToEndTime: from {startTime} to {endTime}
+FullyStaffed: Fully Staffed
 GenderAge: Gender / Age
 Gross: Gross
 Group: Group
@@ -191,6 +192,7 @@ NotSent: Not Sent
 NoUpcomingBuildsScheduled: No upcoming builds scheduled.
 NoUpcomingDeliveriesScheduled: No upcoming deliveries scheduled.
 NumberOfBeds: Number of Beds
+NumberOfVolunteers: Number of Volunteers
 NumberOfVolunteersIncludingYourself: Number of Volunteers (including yourself)
 OneTimeDonationOf: One Time Donation of
 Organization: Organization
@@ -213,6 +215,7 @@ PostalCode: Postal Code
 PostalCodeIsMilitary: Postal code is a military or PO Box and cannot be used
 PrimaryLanguageCaption: Primary Language
 PrimaryLanguagePlaceholder: Choose language
+PrivateEvent: Private Event
 Processing: Processing
 RangeNumberOfVolunteers1To100: Number Of Volunteers must be between 1 and 100
 RecentlyGivenBed: You were recently given a bed.  Your next eligible date to request a bed is
@@ -284,6 +287,7 @@ SendMessage: Send Message
 SendTaxForms: Send Tax Forms
 ServiceZipCodes: Service Zip Codes
 ShowPassword: Show Password
+SignUps: Sign Ups
 SkipToBuilds: Skip to Builds
 Sorry: Sorry
 SorryThePage: Sorry - the page associated with this link was not found.
@@ -322,6 +326,7 @@ UserName: User Name
 ValidEmail: Please enter a valid email address
 ValidPhoneNumber: Phone numbers must be 10 digits with a valid area code and prefix
 VehicleDescription: Please describe your vehicle
+VehicleType: Vehicle Type
 ViewNewer: View Newer
 ViewOlder: View Older
 Volunteer: Volunteer

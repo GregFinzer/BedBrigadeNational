@@ -96,7 +96,7 @@ namespace BedBrigade.Client.Components.Pages.Administration
             LocationName = (await LocationDataService.GetByIdAsync(LocationId))?.Data?.Name ?? "Unknown Location";
 
             // Existing schedules
-            var scheduleResponse = await ScheduleService.GetScheduleForMonthsAndLocation(LocationId, 2, true);
+            var scheduleResponse = await ScheduleService.GetActiveScheduleForMonthsAndLocation(LocationId, 2, true);
             Schedules = scheduleResponse.Success ? scheduleResponse.Data : new List<Common.Models.Schedule>();
 
             // New bed requests

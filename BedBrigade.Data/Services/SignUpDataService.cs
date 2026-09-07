@@ -137,12 +137,35 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         return await _commonService.GetAllForLocationAsync(this, locationId);
     }
 
+    public async Task<ServiceResponse<List<SignUp>>> GetFutureSignUpsForLocation(int locationId)
+    {
+        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetFutureSignUpsForLocation({locationId})");
+        List<SignUp>? cachedContent = _cachingService.Get<List<SignUp>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<SignUp>>($"Found {cachedContent.Count} sign-ups for location {locationId} in cache", true, cachedContent);
+        }
+
+        using var ctx = _contextFactory.CreateDbContext();
+        List<SignUp> result = await ctx.SignUps
+            .Include(signUp => signUp.Volunteer)
+            .Include(signUp => signUp.Schedule)
+            .Where(signUp => signUp.LocationId == locationId
+            && signUp.Schedule.EventDateScheduled.Date >= DateTime.UtcNow.Date)
+            .ToListAsync();
+
+        _cachingService.Set(cacheKey, result);
+        return new ServiceResponse<List<SignUp>>($"Found {result.Count} sign-ups for location {locationId}", true, result);
+    }
+
     public async Task<ServiceResponse<List<SignUp>>> GetAllForScheduleIdAsync(int scheduleId)
     {
         using (var ctx = _contextFactory.CreateDbContext())
         {
             var dbSet = ctx.Set<SignUp>();
             var result = await dbSet.Where(o => o.ScheduleId == scheduleId)
+                .Include(signUp => signUp.Volunteer)
                 .ToListAsync();
 
             return new ServiceResponse<List<SignUp>>("Found for ScheduleId", true, result);
@@ -176,7 +199,8 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
                                 && s.Schedule != null
                                 && s.Schedule.EventDateScheduled >= today
                                 && s.Schedule.EventDateScheduled <= targetDateInclusive)
-                    .OrderByDescending(s => s.UpdateDate)
+                    .OrderBy(s => s.Schedule.EventDateScheduled)
+                    .ThenBy(s => s.UpdateDate)
                     .ToListAsync();
 
                 _cachingService.Set(cacheKey, result);

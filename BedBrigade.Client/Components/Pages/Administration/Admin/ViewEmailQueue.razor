@@ -43,6 +43,7 @@ else
                 <GridColumn Field="ToAddress" HeaderText="To" Width="220"></GridColumn>
                 <GridColumn Field="Subject" HeaderText="Subject" Width="260"></GridColumn>
                 <GridColumn Field="QueueDateLocal" HeaderText="Queued" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
+                <GridColumn Field="TargetDateLocal" HeaderText="Target" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
                 <GridColumn Field="SentDateLocal" HeaderText="Sent" Type="ColumnType.DateTime" Format="g" Width="170"></GridColumn>
                 <GridColumn Field="CreateUser" HeaderText="Created By" Width="180"></GridColumn>
                 <GridColumn Field="FailureMessage" HeaderText="Failure Message" Width="300"></GridColumn>
@@ -65,6 +66,10 @@ else
                     <div class="col-8">@(_selected?.QueueDateLocal.ToString("g"))</div>
                 </div>
                 <div class="row">
+                    <div class="col-4 fw-bold">Target Date</div>
+                    <div class="col-8">@(_selected?.TargetDateLocal?.ToString("g"))</div>
+                </div>
+                <div class="row">
                     <div class="col-4 fw-bold">Sent Date</div>
                     <div class="col-8">@(_selected?.SentDateLocal?.ToString("g"))</div>
                 </div>
@@ -79,6 +84,10 @@ else
                 <div class="row mb-2">
                     <div class="col-4 fw-bold">Subject</div>
                     <div class="col-8 text-break">@_selected?.Subject</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Failure Message</div>
+                    <div class="col-8 text-break">@_selected?.FailureMessage</div>
                 </div>
             </div>
             <hr />

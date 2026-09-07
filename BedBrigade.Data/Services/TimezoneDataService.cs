@@ -118,6 +118,7 @@ public class TimezoneDataService : ITimezoneDataService
             item.UpdateDateLocal = ConvertUtcToTimeZone(item.UpdateDate, timeZoneId);
             item.SentDateLocal = ConvertUtcToTimeZone(item.SentDate, timeZoneId);
             item.QueueDateLocal = ConvertUtcToTimeZone(item.QueueDate, timeZoneId) ?? item.QueueDate;
+            item.TargetDateLocal = ConvertUtcToTimeZone(item.TargetDate, timeZoneId) ?? item.TargetDate;
         }
     }
 
