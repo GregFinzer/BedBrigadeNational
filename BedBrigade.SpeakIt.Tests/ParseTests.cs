@@ -1,4 +1,5 @@
 using System.Text;
+using BedBrigade.Common.Models;
 
 namespace BedBrigade.SpeakIt.Tests
 {
@@ -19,6 +20,35 @@ namespace BedBrigade.SpeakIt.Tests
             //Assert
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(expected, result[0].LocalizableString);
+        }
+
+        [Test]
+        public void DoNotTranslateSpanIsExcludedFromTranslation()
+        {
+            string html = "<h3>Donations by Check</h3><p>Make out to:  <span class=\"DoNotTranslate\">Bed Brigade Columbus</span></p>";
+            var translateLogic = new TranslateLogic(null);
+            var translations = new Dictionary<string, List<Translation>>();
+            translations.Add(
+                translateLogic.ComputeSHA512Hash("Donations by Check"),
+                CreateTranslations("Donations by Check", "Donaciones por cheque", 1));
+            translations.Add(
+                translateLogic.ComputeSHA512Hash("Make out to:"),
+                CreateTranslations("Make out to:", "Hacer el cheque a:", 2));
+
+            var result = translateLogic.ParseAndTranslateText(html, "es-US", translations);
+
+            Assert.That(result, Does.Contain("<h3>Donaciones por cheque</h3>"));
+            Assert.That(result, Does.Contain("Hacer el cheque a:"));
+            Assert.That(result, Does.Contain("<span class=\"DoNotTranslate\">Bed Brigade Columbus</span>"));
+        }
+
+        private static List<Translation> CreateTranslations(string sourceContent, string targetContent, int sourceId)
+        {
+            return new List<Translation>
+            {
+                new Translation { TranslationId = sourceId, Culture = "en-US", Content = sourceContent },
+                new Translation { ParentId = sourceId, Culture = "es-US", Content = targetContent }
+            };
         }
 
         [Test]
