@@ -34,6 +34,9 @@ namespace BedBrigade.SpeakIt
         private static Regex _codeTag = new Regex(@"@code[\s\S]+", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _brTag = new Regex(@"(<br>)|(<br\s*\/>)", RegexOptions.Compiled | RegexOptions.Multiline);
         private static Regex _htmlComment = new Regex(@"<!--[\s\S]*?-->", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static Regex _doNotTranslateSpan = new Regex(
+            @"<span\b(?=[^>]*\bclass\s*=\s*(?:""[^""]*\bDoNotTranslate\b[^""]*""|'[^']*\bDoNotTranslate\b[^']*'))[^>]*>[\s\S]*?</span\s*>",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
         //Not wrapped inside an HTML Tag
         private static Regex _notWrapped =
@@ -268,6 +271,7 @@ namespace BedBrigade.SpeakIt
 
         private string PreProcess(string input)
         {
+            input = RemoveByTag(input, _doNotTranslateSpan);
             input = RemoveByTag(input, _scriptTag);
             input = RemoveByTag(input, _styleTag);
             input = RemoveByTag(input, _imgTag);
