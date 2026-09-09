@@ -76,6 +76,8 @@ namespace BedBrigade.Data.Services
                         _isProcessing = true;
                         using (var scope = _serviceProvider.CreateScope())
                         {
+                            var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+                            authService.SetBackgroundServiceUser(nameof(EmailQueueBackgroundService));
                             _emailQueueDataService = scope.ServiceProvider.GetRequiredService<IEmailQueueDataService>();
                             _configurationDataService = scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();
                             _emailBounceService = scope.ServiceProvider.GetRequiredService<IEmailBounceService>();

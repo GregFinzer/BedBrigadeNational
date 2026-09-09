@@ -221,6 +221,19 @@ namespace BedBrigade.Data.Services
             await _sessionService.SetItemAsStringAsync(AuthTokenName, jwt);
         }
 
+        public void SetBackgroundServiceUser(string serviceName)
+        {
+            if (string.IsNullOrWhiteSpace(serviceName))
+            {
+                throw new ArgumentException("A background service name is required.", nameof(serviceName));
+            }
+
+            ClaimsIdentity identity = new(
+                [new Claim(ClaimTypes.NameIdentifier, serviceName)],
+                "BackgroundService");
+            _currentUser = new ClaimsPrincipal(identity);
+        }
+
         public async Task NotifyAuthChangedAsync()
         {
             if (AuthChanged != null)

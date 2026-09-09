@@ -74,6 +74,8 @@ public class SmsQueueBackgroundService : BackgroundService
                     _isProcessing = true;
                     using (var scope = _serviceProvider.CreateScope())
                     {
+                        var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+                        authService.SetBackgroundServiceUser(nameof(SmsQueueBackgroundService));
                         _smsQueueDataService = scope.ServiceProvider.GetRequiredService<ISmsQueueDataService>();
                         _configurationDataService =
                             scope.ServiceProvider.GetRequiredService<IConfigurationDataService>();

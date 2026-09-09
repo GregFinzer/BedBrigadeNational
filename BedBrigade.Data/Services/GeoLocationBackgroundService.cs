@@ -38,6 +38,8 @@ namespace BedBrigade.Data.Services
                         _isProcessing = true;
                         using (var scope = _serviceProvider.CreateScope())
                         {
+                            var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+                            authService.SetBackgroundServiceUser(nameof(GeoLocationBackgroundService));
                             var processorDataService = scope.ServiceProvider.GetRequiredService<IGeoLocationProcessorDataService>();
                             await processorDataService.ProcessQueue(cancellationToken);
                         }
