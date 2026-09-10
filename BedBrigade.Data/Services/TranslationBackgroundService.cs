@@ -38,6 +38,8 @@ namespace BedBrigade.Data.Services
                         _isProcessing = true;
                         using (var scope = _serviceProvider.CreateScope())
                         {
+                            var authService = scope.ServiceProvider.GetRequiredService<IAuthService>();
+                            authService.SetBackgroundServiceUser(nameof(TranslationBackgroundService));
                             var translationService = scope.ServiceProvider.GetRequiredService<ITranslationProcessorDataService>();
                             await translationService.ProcessQueue(cancellationToken);
                         }

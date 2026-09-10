@@ -80,7 +80,8 @@ namespace BedBrigade.Client.Components.Pages
                     _locationState.Location = LocationRoute;
 
                     if (!string.IsNullOrEmpty(locationResponse.Data.ExternalContactUs) &&
-                        Validation.IsValidUrl(locationResponse.Data.ExternalContactUs))
+                        (Validation.IsValidUrl(locationResponse.Data.ExternalContactUs)
+                         || locationResponse.Data.ExternalContactUs.StartsWith("mailto")))
                     {
                         _nav.NavigateTo(locationResponse.Data.ExternalContactUs, true);
                     }
