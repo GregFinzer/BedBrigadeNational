@@ -115,7 +115,8 @@ namespace BedBrigade.Client.Components.Pages
                     _locationState.Location = LocationRoute;
 
                     if (!string.IsNullOrEmpty(locationResponse.Data.ExternalVolunteer) &&
-                        Validation.IsValidUrl(locationResponse.Data.ExternalVolunteer))
+                        (Validation.IsValidUrl(locationResponse.Data.ExternalVolunteer) 
+                        || locationResponse.Data.ExternalVolunteer.StartsWith("mailto")))
                     {
                         _nav.NavigateTo(locationResponse.Data.ExternalVolunteer, true);
                     }

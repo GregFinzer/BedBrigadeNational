@@ -138,7 +138,8 @@ namespace BedBrigade.Client.Components.Pages
                     _locationState.Location = LocationRoute;
                     LocationId =  locationResponse.Data.LocationId;
                     if (!string.IsNullOrEmpty(locationResponse.Data.ExternalRequestABed) &&
-                        Validation.IsValidUrl(locationResponse.Data.ExternalRequestABed))
+                        (Validation.IsValidUrl(locationResponse.Data.ExternalRequestABed)
+                         || locationResponse.Data.ExternalRequestABed.StartsWith("mailto")))
                     {
                         _nav.NavigateTo(locationResponse.Data.ExternalRequestABed, true);
                     }
