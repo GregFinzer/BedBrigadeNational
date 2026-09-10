@@ -24,6 +24,8 @@ namespace BedBrigade.Client.Components
         public EventCallback<string> LocationChanged { get; set; }        [Inject] private ILocationDataService? _svcLocation { get; set; }
         [Inject] public required ILanguageContainerService _lc { get; set; }
         [Inject] public required IJSRuntime JS { get; set; }
+        [Inject] public ILocationDataService LocationDataService { get; set; } = default!;
+
         private List<LocationDistance> Locations { get; set; } = new List<LocationDistance>();
 
         public required SfMaskedTextBox maskObj;
@@ -40,15 +42,21 @@ namespace BedBrigade.Client.Components
         private bool PostalCodeSuccess = false;
         private string SearchDisplay = "";
         private bool IsSearching = false;
-
+        private List<Location> _locations = new List<Location>();
         protected Dictionary<string, object> DropDownHtmlAttribute = new Dictionary<string, object>()
         {
            { "font-weight", "bold" },
         };
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             _lc.InitLocalizedComponent(this);
+            var locationResult = await LocationDataService.GetActiveLocations();
+            
+            if (locationResult.Success && locationResult.Data != null)
+            {
+                _locations = locationResult.Data;
+            }
         }
 
         public async Task ChangeLocation(ChangeEventArgs<int, LocationDistance> args)
@@ -233,11 +241,48 @@ namespace BedBrigade.Client.Components
                 return ResultPath.StartsWith('/') ? ResultPath : $"/{ResultPath}";
             }
 
+            string? externalRoute = GetExternalRoute(route);
+
+            if (!string.IsNullOrEmpty(externalRoute))
+            {
+                return externalRoute;
+            }
+
             string normalizedRoute = route.TrimEnd('/');
             string normalizedResultPath = ResultPath.StartsWith('/') ? ResultPath : $"/{ResultPath}";
             return $"{normalizedRoute}{normalizedResultPath}";
         }
-        
+
+        private string? GetExternalRoute(string route)
+        {
+            string? externalRoute = null;
+
+            Location? location = _locations.FirstOrDefault(o => o.Route == route);
+
+            if (location == null)
+                return externalRoute;
+
+            switch (ResultPath.Trim('/').ToLower())
+            {
+                case "home":
+                    externalRoute = location.ExternalHome;
+                    break;
+                case "contact-us":
+                    externalRoute = location.ExternalContactUs;
+                    break;
+                case "donations":
+                    externalRoute = location.ExternalDonate;
+                    break;
+                case "request-bed":
+                    externalRoute = location.ExternalRequestABed;
+                    break;
+                case "volunteer":
+                    externalRoute = location.ExternalVolunteer;
+                    break;
+            }
+
+            return externalRoute;
+        }
     }
 
 

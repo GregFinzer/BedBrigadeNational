@@ -70,7 +70,8 @@ public partial class Donations : ComponentBase, IDisposable
         if (locationResponse.Success && locationResponse.Data != null)
         {
             if (!string.IsNullOrEmpty(locationResponse.Data.ExternalDonate) &&
-                Validation.IsValidUrl(locationResponse.Data.ExternalDonate))
+                (Validation.IsValidUrl(locationResponse.Data.ExternalDonate)
+                 || locationResponse.Data.ExternalDonate.StartsWith("mailto")))
             {
                 _nav.NavigateTo(locationResponse.Data.ExternalDonate, true);
                 return;
