@@ -64,6 +64,9 @@ else
                                         <SfTextBox ID="name" @bind-Value=@location.Name Enabled="true" Placeholder="@_lc.Keys["Name"]" FloatLabelType="FloatLabelType.Auto"/>
                                     </div>
                                     <div class="col-md-3">
+                                        <SfTextBox ID="mobileName" @bind-Value=@location.MobileName Enabled="true" Placeholder="Mobile Name" FloatLabelType="FloatLabelType.Auto"/>
+                                    </div>
+                                    <div class="col-md-3">
                                         <SfTextBox ID="group" @bind-Value=@location.Group Enabled="true" Placeholder="@_lc.Keys["Group"]" FloatLabelType="FloatLabelType.Auto" />
                                     </div>
                                     <div class="col-md-3">
@@ -176,6 +179,7 @@ else
                     <GridColumns>
                         <GridColumn Field=@nameof(Location.LocationId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="false"/>
                         <GridColumn Field=@nameof(Location.Name) ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
+                         <GridColumn Field=@nameof(Location.MobileName) ShowColumnMenu="false" HeaderText="Mobile Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>
                         <GridColumn Field=@nameof(Location.Group) ShowColumnMenu="false" HeaderText="Group" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Location.ExternalContent) HeaderText="External Content" Width="150" DisplayAsCheckBox="true" Type="ColumnType.Boolean" AllowEditing="false" AllowFiltering="true" CustomAttributes="@(new Dictionary<string, object> { { "class", "center-boolean" } })"/>
                         <GridColumn Field=@nameof(Location.Route) ShowColumnMenu="false" HeaderText="Route" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" AutoFit="true"/>

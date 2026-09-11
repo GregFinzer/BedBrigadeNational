@@ -40,6 +40,7 @@ public static class Seed
                 new Location
                 {
                     Name = SeedConstants.SeedNationalName,
+                    MobileName = "National",
                     Route = "/national",
                     MailingCity = "Columbus",
                     MailingState = "Ohio",
@@ -49,6 +50,7 @@ public static class Seed
                 new Location
                 {
                     Name = "Grove City Bed Brigade",
+                    MobileName = "Grove City, Ohio",
                     Route = "/grove-city",
                     MailingAddress = "1788 Killdeer Rd",
                     MailingCity = "Grove City",
@@ -67,6 +69,7 @@ public static class Seed
                 new Location
                 {
                     Name = "Polaris Bed Brigade",
+                    MobileName = "Polaris, Ohio",
                     Route = "/polaris",
                     MailingAddress = "171 E. Fifth Ave",
                     MailingCity = "Columbus",
@@ -85,6 +88,7 @@ public static class Seed
                 new Location
                 {
                     Name = "Greensburg United Methodist Church Bed Brigade",
+                    MobileName = "Greensburg, Ohio",
                     Route = "/greensburgumc",
                     MailingAddress = "2161 Greensburg Road",
                     MailingCity = "North Canton",
@@ -109,6 +113,7 @@ public static class Seed
                 new Location
                 {
                     Name = "Bed Brigade Vineyard Church Circleville",
+                    MobileName = "Circleville, Ohio",
                     Route = "/circleville",
                     MailingAddress = "911 S Pickaway St",
                     MailingCity = "Circleville",
@@ -132,6 +137,7 @@ public static class Seed
                 new Location
                 {
                     Name = "Hardbarger Impact Ministries",
+                    MobileName = "Lancaster, Ohio",
                     Route = "/hardbarger",
                     MailingAddress = "2950 Thrush Avenue SW",
                     MailingCity = "Lancaster",
@@ -642,6 +648,31 @@ public static class Seed
             else
             {
                 Log.Logger.Information("No existing Locations found, adding all.");
+            }
+
+            var mobileNames = new Dictionary<int, string>
+            {
+                [Defaults.NationalLocationId] = "National",
+                [Defaults.GroveCityLocationId] = "Grove City, Ohio",
+                [Defaults.PolarisLocationId] = "Polaris, Ohio",
+                [Defaults.GreensburgLocationId] = "Greensburg, Ohio",
+                [Defaults.CirclevilleLocationId] = "Circleville, Ohio",
+                [Defaults.LancasterLocationId] = "Lancaster, Ohio"
+            };
+
+            var locationsToUpdate = existingLocations
+                .Where(location => mobileNames.ContainsKey(location.LocationId)
+                                   && string.IsNullOrWhiteSpace(location.MobileName))
+                .ToList();
+
+            foreach (var location in locationsToUpdate)
+            {
+                location.MobileName = mobileNames[location.LocationId];
+            }
+
+            if (locationsToUpdate.Any())
+            {
+                await context.SaveChangesAsync();
             }
 
             var locationsToAdd = new List<Location>();
