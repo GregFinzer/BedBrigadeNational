@@ -498,6 +498,9 @@ namespace BedBrigade.Data.Data.Seeding
 
             result.AddRange(LocationSpecificConfigurations(Defaults.GroveCityLocationId));
             result.AddRange(LocationSpecificConfigurations(Defaults.PolarisLocationId));
+            result.AddRange(LocationSpecificConfigurations(Defaults.GreensburgLocationId));
+            result.AddRange(LocationSpecificConfigurations(Defaults.CirclevilleLocationId));
+            result.AddRange(LocationSpecificConfigurations(Defaults.LancasterLocationId));
             return result;
         }
 

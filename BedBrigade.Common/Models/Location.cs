@@ -17,6 +17,10 @@ public class Location : BaseEntity
     [Required] [MaxLength(128)] 
     public String Name { get; set; } = string.Empty;
 
+    [Required]
+    [MaxLength(50)]
+    public String MobileName { get; set; } = string.Empty;
+
     [Required] [MaxLength(256)] 
     public String Route { get; set; } = string.Empty;
 
