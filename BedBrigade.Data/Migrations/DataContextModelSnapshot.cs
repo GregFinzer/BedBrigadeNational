@@ -937,11 +937,6 @@ namespace BedBrigade.Server.Migrations
                     b.Property<int?>("MetroAreaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("MobileName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
