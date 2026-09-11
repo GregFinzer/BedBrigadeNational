@@ -158,7 +158,6 @@ public static class Seed
     }
 
 
-    private static List<Configuration> _configurations = SeedConfigLogic.AllConfigurationForSeeding();
 
     private static readonly List<User> _developmentUsers = new()
     {
@@ -598,8 +597,11 @@ public static class Seed
             }
 
             var configurationsToAdd = new List<Configuration>();
+            int[] locationIds = await context.Locations.Where(o => o.LocationId != Defaults.NationalLocationId)
+                .Select(o => o.LocationId).ToArrayAsync();
+            List<Configuration> configurations = SeedConfigLogic.AllConfigurationForSeeding(locationIds);
 
-            foreach (var newConfig in _configurations)
+            foreach (var newConfig in configurations)
             {
                 if (!existingConfigurations.Any(c => c.ConfigurationKey == newConfig.ConfigurationKey && c.LocationId == newConfig.LocationId))
                 {

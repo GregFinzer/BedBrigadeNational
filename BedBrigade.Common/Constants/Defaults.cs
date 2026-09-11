@@ -5,6 +5,10 @@
         public const int NationalLocationId = 1;
         public const int GroveCityLocationId = 2;
         public const int PolarisLocationId = 3;
+        public const int GreensburgLocationId = 4;
+        public const int CirclevilleLocationId = 5;
+        public const int LancasterLocationId = 6;
+
         public const string ErrorImagePath = "media/national/NoImageFound.jpg";
         public const string NationalRoute = "/national";
         public const string DefaultPageTemplate = "ThreeRotatorPageTemplate";

@@ -20,7 +20,8 @@ public class AuthDataServiceLockoutTests
     [Test]
     public void AllConfigurationForSeeding_ShouldIncludeNationalLoginLockoutSettings()
     {
-        List<Configuration> seededConfigurations = SeedConfigLogic.AllConfigurationForSeeding();
+        int[] locationIds = { Defaults.GroveCityLocationId, Defaults.PolarisLocationId, Defaults.GreensburgLocationId, Defaults.CirclevilleLocationId, Defaults.LancasterLocationId };
+        List<Configuration> seededConfigurations = SeedConfigLogic.AllConfigurationForSeeding(locationIds);
 
         Configuration? maxLoginAttempts = seededConfigurations.FirstOrDefault(c =>
             c.LocationId == Defaults.NationalLocationId
