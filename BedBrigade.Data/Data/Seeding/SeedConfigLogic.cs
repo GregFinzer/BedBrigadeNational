@@ -6,7 +6,7 @@ namespace BedBrigade.Data.Data.Seeding
 {
     public static class SeedConfigLogic
     {
-        public static List<Configuration> AllConfigurationForSeeding()
+        public static List<Configuration> AllConfigurationForSeeding(int[] locationIds)
         {
             List<Configuration> result = new List<Configuration>()
             {
@@ -496,11 +496,11 @@ namespace BedBrigade.Data.Data.Seeding
                 },
             };
 
-            result.AddRange(LocationSpecificConfigurations(Defaults.GroveCityLocationId));
-            result.AddRange(LocationSpecificConfigurations(Defaults.PolarisLocationId));
-            result.AddRange(LocationSpecificConfigurations(Defaults.GreensburgLocationId));
-            result.AddRange(LocationSpecificConfigurations(Defaults.CirclevilleLocationId));
-            result.AddRange(LocationSpecificConfigurations(Defaults.LancasterLocationId));
+            foreach (var locationId in locationIds)
+            {
+                result.AddRange(LocationSpecificConfigurations(locationId));
+            }
+
             return result;
         }
 
