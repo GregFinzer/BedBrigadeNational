@@ -551,6 +551,70 @@ public class ScheduleDataService : Repository<Schedule>, IScheduleDataService
 
         return new ServiceResponse<Schedule>("Success", true, createResponse.Data);
     }
+
+    public async Task<ServiceResponse<List<Schedule>>> GetAllFutureSchedules()
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetAllFutureSchedules()");
+        List<Schedule>? cachedContent = _cachingService.Get<List<Schedule>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            FillEventSelects(cachedContent);
+            return new ServiceResponse<List<Schedule>>($"Found {cachedContent.Count()} GetAllFutureSchedules in cache",
+                true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Schedule>();
+                var result = await dbSet
+                    .Where(o => o.EventDateScheduled.Date >= DateTime.UtcNow.Date)
+                    .OrderBy(o => o.EventDateScheduled).ToListAsync();
+                FillEventSelects(result);
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<Schedule>>($"Found {result.Count()} {GetEntityName()}", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<Schedule>>(
+                $"Error GetAllFutureSchedules for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
+
+    public async Task<ServiceResponse<List<Schedule>>> GetAllPastSchedules()
+    {
+        string cacheKey =
+            _cachingService.BuildCacheKey(GetEntityName(), $"GetAllPastSchedules()");
+        List<Schedule>? cachedContent = _cachingService.Get<List<Schedule>>(cacheKey);
+
+        if (cachedContent != null)
+        {
+            return new ServiceResponse<List<Schedule>>($"Found {cachedContent.Count()} GetAllPastSchedules in cache",
+                true, cachedContent);
+        }
+
+        try
+        {
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<Schedule>();
+                var result = await dbSet
+                    .Where(o => o.EventDateScheduled.Date < DateTime.UtcNow.Date)
+                    .OrderBy(o => o.EventDateScheduled).ToListAsync();
+                _cachingService.Set(cacheKey, result);
+                return new ServiceResponse<List<Schedule>>($"Found {result.Count()} {GetEntityName()}", true, result);
+            }
+        }
+        catch (DbException ex)
+        {
+            return new ServiceResponse<List<Schedule>>(
+                $"Error GetAllPastSchedules for {GetEntityName()}: {ex.Message} ({ex.ErrorCode})", false, null);
+        }
+    }
 }
 
 

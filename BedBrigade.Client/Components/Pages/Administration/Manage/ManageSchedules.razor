@@ -14,10 +14,16 @@
 @using BedBrigade.Common.Logic;
 
 <div class="row mt-3">
-    <div class="col-md-6 ps-3">
+    <div class="col-md-4 ps-3">
         <h3>@ManageScheduleMessage</h3>
     </div>
-    <div class="col-md-4 ps-3 ps-md-0">
+    <div class="col-md-2 ps-3 ps-md-0">
+        @if (_svcAuth.IsNationalAdmin)
+        {
+            <SfCheckBox TChecked="bool" ID="view-all-locations" Label="View All Locations" @bind-Checked="ViewAllLocations" ValueChange="@ViewAllLocationsChanged"></SfCheckBox>
+        }
+    </div>
+    <div class="col-md-4 ps-3 ps-md-0">ll
         @_lc.Keys["ShowSchedules"]
         <SfDropDownList CssClass="periodselector" TValue="string" TItem="GridFilterOption" Placeholder="@_lc.Keys["SelectAGridFilter"]" DataSource="@GridFilterOptions" @bind-Value="@CurrentFilterOption" Width="200px">
             <DropDownListEvents TItem="GridFilterOption" TValue="string" ValueChange="OnFilterChange"></DropDownListEvents>
@@ -25,7 +31,7 @@
         </SfDropDownList>
     </div>
     <div class="col-md-2 ps-3 ps-md-0">
-        <UserInfo />
+        <UserInfo/>
     </div>
 </div>
 <div class="col-lg-12 control-sec">
@@ -57,6 +63,7 @@
                     <GridEvents DataBound=@DataBound Destroyed=@OnDestroyed OnLoad=@OnLoad OnToolbarClick=@OnToolBarClick OnActionBegin=@OnActionBegin RowSelected="@RowSelectHandler" TValue="Schedule" />
                     <GridColumns>
                         <GridColumn Field=@nameof(Schedule.ScheduleId) Visible="false" IsPrimaryKey="true" AllowFiltering="false" AllowEditing="false" AllowAdding="false"></GridColumn>
+                        <GridForeignColumn Field=@nameof(Schedule.LocationId) ForeignDataSource=@lstLocations ForeignKeyField="LocationId" ForeignKeyValue="Name" Visible=@ViewAllLocations HeaderText="Location" AllowEditing="false" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventName) HeaderText="Event Name" AutoFit="true" AllowFiltering="true" AllowAdding="false" AllowEditing="false"></GridColumn>
                         <GridForeignColumn Field=@nameof(Schedule.EventType) ForeignDataSource=@lstEventTypes ForeignKeyField="Value" ForeignKeyValue="Name" ShowColumnMenu="true" HeaderText="Type" Type="ColumnType.String" AllowEditing="false" AllowGrouping="true" AllowFiltering="true" AutoFit="true" />
                         <GridColumn Field=@nameof(Schedule.EventDateScheduled) HeaderText="Date/Time" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.DateTime" TextAlign="TextAlign.Right" DefaultValue="@DateTime.Today" AllowEditing="true" EditType="EditType.DateTimePickerEdit" Width="150px" AllowFiltering="true">

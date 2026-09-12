@@ -9,8 +9,14 @@
 else
 {
     <div class="row">
-        <div class="col-md-10 mt-3">
+        <div class="col-md-8 mt-3">
             <h3>@ManageBedRequestsMessage</h3>
+        </div>
+        <div class="col-md-2 mt-3">
+            @if (AuthService.IsNationalAdmin)
+            {
+                <SfCheckBox TChecked="bool" ID="view-all-locations" Label="View All Locations" @bind-Checked="ViewAllLocations" ValueChange="@ViewAllLocationsChanged"></SfCheckBox>
+            }
         </div>
         <div class="col-md-2 mt-3">
             <UserInfo />
@@ -60,7 +66,7 @@ else
                     </GridSortSettings>
                     <GridColumns>
                         <GridColumn Field=@nameof(BedRequest.BedRequestId) IsPrimaryKey="true" Visible="false" ShowInColumnChooser="true" />
-                        <GridForeignColumn Field=@nameof(BedRequest.LocationId) Width="172" Visible="false" ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" />
+                        <GridForeignColumn Field=@nameof(BedRequest.LocationId) Width="172" Visible=@ViewAllLocations ShowColumnMenu="false" HeaderText="Location" ForeignDataSource=@Locations ForeignKeyField="LocationId" ForeignKeyValue="Name" AllowFiltering="true" AllowGrouping="true" />
                         <GridColumn Field=@nameof(BedRequest.FullName) Width="172" ShowColumnMenu="false" HeaderText="Name" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.FormattedPhone) Width="118" ShowColumnMenu="false" HeaderText="Phone" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />
                         <GridColumn Field=@nameof(BedRequest.Street) Width="175" ShowColumnMenu="false" HeaderText="Address" Type="ColumnType.String" AllowEditing="false" AllowFiltering="true" />

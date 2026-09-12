@@ -107,6 +107,7 @@ public partial class ManageSignUps : ComponentBase
     public string strHtml = string.Empty;
 
     public string ManageSignUpsMessage { get; set; }
+    protected bool ViewAllLocations { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -240,23 +241,58 @@ public partial class ManageSignUps : ComponentBase
 
     private async Task LoadSignUpData(string filter)
     {
-        var response = await _svcSignUp.GetSignUpsForSignUpGrid(_svcAuth.LocationId, filter);
-
-        if (response.Success && response.Data != null)
+        List<SignUpDisplayItem> signUps = new List<SignUpDisplayItem>();
+        bool success = true;
+        string errorMessage = string.Empty;
+        if (_svcAuth.IsNationalAdmin && ViewAllLocations && Locations != null)
         {
-            SignUpDisplayItems = response.Data;
+            foreach (Location location in Locations.Where(location => location.LocationId != Defaults.NationalLocationId))
+            {
+                var locationResponse = await _svcSignUp.GetSignUpsForSignUpGrid(location.LocationId, filter);
+                if (locationResponse.Success && locationResponse.Data != null)
+                {
+                    signUps.AddRange(locationResponse.Data);
+                }
+                else
+                {
+                    success = false;
+                    errorMessage = locationResponse.Message;
+                }
+            }
+        }
+        else
+        {
+            var response = await _svcSignUp.GetSignUpsForSignUpGrid(userLocationId, filter);
+            success = response.Success;
+            errorMessage = response.Message;
+            if (response.Success && response.Data != null)
+            {
+                signUps = response.Data;
+            }
+        }
+
+        if (success)
+        {
+            SignUpDisplayItems = signUps;
             RecordText = $"{SignUpDisplayItems.Count} Sign-Up Records Loaded";
             GridDisplay = String.Empty;
         }
         else
         {
-            Log.Error($"SignUpGrid, Error loading SignUp data: {response.Message}");
-            _toastService.Error(ErrorTitle, response.Message);
-            ErrorMessage = "Unable to load Sign-Up Data. " + response.Message;
+            Log.Error($"SignUpGrid, Error loading SignUp data: {errorMessage}");
+            _toastService.Error(ErrorTitle, errorMessage);
+            ErrorMessage = "Unable to load Sign-Up Data. " + errorMessage;
             SignUpDisplayItems = new List<SignUpDisplayItem>();
             GridDisplay = DisplayNone;
         }
     } 
+
+    private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+    {
+        ViewAllLocations = args.Checked;
+        await LoadSignUpData(CurrentFilter);
+        await Grid.Refresh();
+    }
 
     private async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
     {
@@ -456,7 +492,7 @@ public partial class ManageSignUps : ComponentBase
         // create a list to select Volunteer: Volunteers of current Location and not linked to selected event
         // Location Volunteers
 
-        var response = await _svcSignUp.GetVolunteersNotSignedUpForAnEvent(_svcAuth.LocationId, selectedGridObject.ScheduleId);
+        var response = await _svcSignUp.GetVolunteersNotSignedUpForAnEvent(selectedGridObject.ScheduleLocationId, selectedGridObject.ScheduleId);
 
         if (response.Success && response.Data != null)
         {
