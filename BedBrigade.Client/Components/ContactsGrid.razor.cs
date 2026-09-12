@@ -158,14 +158,7 @@ namespace BedBrigade.Client.Components
 
         private async Task LoadContactsForAllLocations()
         {
-            if (Locations == null)
-            {
-                Contacts = new List<ContactUs>();
-                return;
-            }
-
-            List<int> locationIds = Locations.Select(location => location.LocationId).ToList();
-            var result = await _svcContactUs.GetAllForLocationList(locationIds);
+            var result = await _svcContactUs.GetAllAsync();
             if (result.Success && result.Data != null)
             {
                 Contacts = result.Data.ToList();
