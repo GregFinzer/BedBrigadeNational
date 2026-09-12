@@ -14,6 +14,7 @@ namespace BedBrigade.Data.Services
         Task UpdateScheduleVolunteers(int scheduleId);
         Task<ServiceResponse<Schedule>> GetScheduleForBedRequestDeliveryDateTime(BedRequest bedRequest);
         Task<ServiceResponse<Schedule>> AddMissingScheduleForBedRequestDeliveryDateAndTime(BedRequest bedRequest);
-
+        Task<ServiceResponse<List<Schedule>>> GetAllFutureSchedules();
+        Task<ServiceResponse<List<Schedule>>> GetAllPastSchedules();
     }
 }

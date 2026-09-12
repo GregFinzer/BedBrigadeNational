@@ -42,6 +42,7 @@ namespace BedBrigade.Client.Components
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
         protected bool OnlyRead { get; set; } = false;
+        protected bool ViewAllLocations { get; set; }
 
         protected string? RecordText { get; set; } = "Loading Contacts ...";
         public bool NoPaging { get; private set; }
@@ -93,38 +94,22 @@ namespace BedBrigade.Client.Components
         private async Task LoadContacts()
         {
             var locationId = _svcUser.GetUserLocationId();
+            bool isNationalAdmin = _svcAuth.IsNationalAdmin;
+
+            if (isNationalAdmin && ViewAllLocations)
+            {
+                await LoadContactsForAllLocations();
+                ManageContactsMessage = "Manage Contacts for All Locations";
+                return;
+            }
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
             if (userLocationResult.Success && userLocationResult.Data != null)
             {
                 //If this is a metro user, get all contacts for the metro area
-                if (userLocationResult.Data.IsMetroLocation())
+                if (!isNationalAdmin && userLocationResult.Data.IsMetroLocation())
                 {
-                    var metroAreaResult = await _svcMetroArea.GetByIdAsync(userLocationResult.Data.MetroAreaId.Value);
-
-                    if (metroAreaResult.Success && metroAreaResult.Data != null)
-                    {
-                        if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
-                        {
-                            ManageContactsMessage = $"Manage Contacts for the {metroAreaResult.Data.Name} Metro Area";
-                        }
-                        else
-                        {
-                            ManageContactsMessage = $"View Contacts for the {metroAreaResult.Data.Name} Metro Area";
-                        }
-                    }
-
-                    var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
-
-                    if (metroLocations.Success && metroLocations.Data != null)
-                    {
-                        var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
-                        var metroAreaBedRequestResult = await _svcContactUs.GetAllForLocationList(metroAreaLocationIds);
-                        if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
-                        {
-                            Contacts = metroAreaBedRequestResult.Data.ToList();
-                        }
-                    }
+                    await LoadContactsForMetro(userLocationResult);
 
                     return;
                 }
@@ -145,6 +130,57 @@ namespace BedBrigade.Client.Components
                     }
                 }
             }
+        }
+
+        private async Task LoadContactsForMetro(ServiceResponse<Location> userLocationResult)
+        {
+            var metroAreaResult = await _svcMetroArea.GetByIdAsync(userLocationResult.Data.MetroAreaId.Value);
+
+            if (metroAreaResult.Success && metroAreaResult.Data != null)
+            {
+                if (_svcAuth.UserHasRole(RoleNames.CanManageContacts))
+                {
+                    ManageContactsMessage = $"Manage Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                }
+                else
+                {
+                    ManageContactsMessage = $"View Contacts for the {metroAreaResult.Data.Name} Metro Area";
+                }
+            }
+
+            var metroLocations = await _svcLocation.GetLocationsByMetroAreaId(userLocationResult.Data.MetroAreaId.Value);
+
+            if (metroLocations.Success && metroLocations.Data != null)
+            {
+                var metroAreaLocationIds = metroLocations.Data.Select(l => l.LocationId).ToList();
+                var metroAreaBedRequestResult = await _svcContactUs.GetAllForLocationList(metroAreaLocationIds);
+                if (metroAreaBedRequestResult.Success && metroAreaBedRequestResult.Data != null)
+                {
+                    Contacts = metroAreaBedRequestResult.Data.ToList();
+                }
+            }
+        }
+
+        private async Task LoadContactsForAllLocations()
+        {
+            var result = await _svcContactUs.GetAllAsync();
+            if (result.Success && result.Data != null)
+            {
+                Contacts = result.Data.ToList();
+            }
+            else
+            {
+                Contacts = new List<ContactUs>();
+                Log.Error($"Unable to load contacts for all locations: {result.Message}");
+                _toastService.Error("Error loading contacts", result.Message);
+            }
+        }
+
+        private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+        {
+            ViewAllLocations = args.Checked;
+            await LoadContacts();
+            await Grid.Refresh();
         }
 
         private void SetupToolbar()

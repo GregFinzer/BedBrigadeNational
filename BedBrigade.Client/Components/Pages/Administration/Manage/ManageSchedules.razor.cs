@@ -37,6 +37,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public DateTime ScheduleStartDate { get; set; }
         public DateTime ScheduleStartTime { get; set; }
         public bool enabledLocationSelector { get; set; } = true;
+        protected bool ViewAllLocations { get; set; }
 
         private const string EventDate = "EventDateScheduled";
         private const string FutureFilter = "future";
@@ -144,6 +145,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
 
         private async Task LoadScheduleData(string filter)
         {
+            if (_svcAuth.IsNationalAdmin && ViewAllLocations)
+            {
+                await LoadSchedulesForAllLocations(filter);
+                ManageScheduleMessage = "Manage Schedules for All Locations";
+                return;
+            }
+
             ServiceResponse<List<Common.Models.Schedule>> result;
 
             switch (filter)
@@ -169,6 +177,60 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
                 Log.Error("Error loading future schedules: {ErrorMessage}", result.Message);
                 _toastService.Error("Error", $"An error occurred while loading future schedules: {result.Message}");
             }
+        }
+
+        private async Task LoadSchedulesForAllLocations(string filter)
+        {
+            switch (filter)
+            {
+                case FutureFilter:
+                    var result = await _svcSchedule.GetAllFutureSchedules();
+
+                    if (result.Success && result.Data != null)
+                    {
+                        lstSchedules = result.Data;
+                    }
+                    else
+                    {
+                        lstSchedules = new List<Common.Models.Schedule>();
+                        Log.Error("Error loading future schedules for all locations: {ErrorMessage}", result.Message);
+                        _toastService.Error("Error", $"An error occurred while loading future schedules for all locations: {result.Message}");
+                    }
+                    break;
+                case "past":
+                    var pastResult = await _svcSchedule.GetAllPastSchedules();
+                    if (pastResult.Success && pastResult.Data != null)
+                    {
+                        lstSchedules = pastResult.Data;
+                    }
+                    else
+                    {
+                        lstSchedules = new List<Common.Models.Schedule>();
+                        Log.Error("Error loading past schedules for all locations: {ErrorMessage}", pastResult.Message);
+                        _toastService.Error("Error", $"An error occurred while loading past schedules for all locations: {pastResult.Message}");
+                    }
+                    break;
+                default:
+                    var allResult = await _svcSchedule.GetAllAsync();
+                    if (allResult.Success && allResult.Data != null)
+                    {
+                        lstSchedules = allResult.Data;
+                    }
+                    else
+                    {
+                        lstSchedules = new List<Common.Models.Schedule>();
+                        Log.Error("Error loading all schedules for all locations: {ErrorMessage}", allResult.Message);
+                        _toastService.Error("Error", $"An error occurred while loading all schedules for all locations: {allResult.Message}");
+                    }
+                    break;
+            }
+        }
+
+        private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+        {
+            ViewAllLocations = args.Checked;
+            await LoadScheduleData(CurrentFilterOption);
+            await Grid.Refresh();
         }
 
 
