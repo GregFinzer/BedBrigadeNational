@@ -21,7 +21,7 @@ else
         <div class="col-md-2 ps-3 ps-md-0">
             @if (_svcAuth.IsNationalAdmin)
             {
-                <SfCheckBox TChecked="bool" ID="view-all-locations" Label="View All Locations" @bind-Checked="ViewAllLocations" ValueChange="@ViewAllLocationsChanged"></SfCheckBox>
+                <SfCheckBox TChecked="bool" ID="view-all-locations" Label="@_lc.Keys["ViewAllLocations"]" @bind-Checked="ViewAllLocations" ValueChange="@ViewAllLocationsChanged"></SfCheckBox>
             }
         </div>
         <div class="col-md-2 ps-3 ps-md-0">
