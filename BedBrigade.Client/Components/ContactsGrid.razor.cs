@@ -42,6 +42,7 @@ namespace BedBrigade.Client.Components
         protected string? HeaderTitle { get; set; }
         protected string? ButtonTitle { get; private set; }
         protected bool OnlyRead { get; set; } = false;
+        protected bool ViewAllLocations { get; set; }
 
         protected string? RecordText { get; set; } = "Loading Contacts ...";
         public bool NoPaging { get; private set; }
@@ -93,12 +94,20 @@ namespace BedBrigade.Client.Components
         private async Task LoadContacts()
         {
             var locationId = _svcUser.GetUserLocationId();
+            bool isNationalAdmin = _svcAuth.IsNationalAdmin;
+
+            if (isNationalAdmin && ViewAllLocations)
+            {
+                await LoadContactsForAllLocations();
+                ManageContactsMessage = "Manage Contacts for All Locations";
+                return;
+            }
 
             var userLocationResult = await _svcLocation.GetByIdAsync(locationId);
             if (userLocationResult.Success && userLocationResult.Data != null)
             {
                 //If this is a metro user, get all contacts for the metro area
-                if (userLocationResult.Data.IsMetroLocation())
+                if (!isNationalAdmin && userLocationResult.Data.IsMetroLocation())
                 {
                     var metroAreaResult = await _svcMetroArea.GetByIdAsync(userLocationResult.Data.MetroAreaId.Value);
 
@@ -145,6 +154,35 @@ namespace BedBrigade.Client.Components
                     }
                 }
             }
+        }
+
+        private async Task LoadContactsForAllLocations()
+        {
+            if (Locations == null)
+            {
+                Contacts = new List<ContactUs>();
+                return;
+            }
+
+            List<int> locationIds = Locations.Select(location => location.LocationId).ToList();
+            var result = await _svcContactUs.GetAllForLocationList(locationIds);
+            if (result.Success && result.Data != null)
+            {
+                Contacts = result.Data.ToList();
+            }
+            else
+            {
+                Contacts = new List<ContactUs>();
+                Log.Error($"Unable to load contacts for all locations: {result.Message}");
+                _toastService.Error("Error loading contacts", result.Message);
+            }
+        }
+
+        private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+        {
+            ViewAllLocations = args.Checked;
+            await LoadContacts();
+            await Grid.Refresh();
         }
 
         private void SetupToolbar()
