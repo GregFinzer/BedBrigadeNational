@@ -13,5 +13,6 @@ namespace BedBrigade.Data.Services
         Task<ServiceResponse<bool>> QueueSignUpEmailReminderAsync(SignUp signUp);
         Task<ServiceResponse<bool>> SendReplaceFailedDeliveryEmail(BedRequest failedBedRequest,
             BedRequest replacementBedRequest);
+        Task<ServiceResponse<bool>> SendFailedDeliveryEmail(BedRequest failedBedRequest);
     }
 }

@@ -180,6 +180,37 @@ namespace BedBrigade.Data.Services
             }
         }
 
+        public async Task<User?> GetByUserName(string? userName)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return null;
+            }
+
+            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetByUserName({userName})");
+            User? cachedContent = _cachingService.Get<User>(cacheKey);
+
+            if (cachedContent != null)
+            {
+                return cachedContent;
+            }
+
+            using (var ctx = _contextFactory.CreateDbContext())
+            {
+                var dbSet = ctx.Set<User>();
+                var result = await dbSet.Where(o => o.UserName == userName)
+                    .FirstOrDefaultAsync();
+
+                if (result != null)
+                {
+                    _cachingService.Set(cacheKey, result);
+                }
+
+                _cachingService.Set(cacheKey, result);
+                return result;
+            }
+        }
+
         public async Task<ServiceResponse<List<string>>> GetEmailsByLocationAndConfigName(int locationId, string key)
         {
             var userResponse = await GetAllForLocationAsync(locationId);

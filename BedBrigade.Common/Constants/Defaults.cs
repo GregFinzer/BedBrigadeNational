@@ -44,5 +44,6 @@
         public const string GroupUalc = "UALC";
 
         public const string DateWithTimeFormat = "M/d/yy hh:mm tt";
+        public const string DateWithDayOfWeek = "dddd, M/d/yy hh:mm tt";
     }
 }

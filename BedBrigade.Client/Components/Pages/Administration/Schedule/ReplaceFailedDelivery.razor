@@ -209,6 +209,14 @@ else if (WorkflowStep == PickReplacement)
     {
         <div class="content-wrapper mt-3">
             <div class="row">
+                <div class="col-sm-6 col-xs-10">
+                    Select the Bed Requester Name to Call
+                </div>
+                <div class="col-sm-6 col-xs-2">
+                    <button class="btn btn-danger" @onclick="HandleCannotReplace">Cannot Replace Failed Delivery</button>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <p>Select the Bed Requester Name to Call</p>
                     <div class="mb-3">
@@ -229,10 +237,10 @@ else if (WorkflowStep == PickReplacement)
                                     || x.NumberOfBeds.ToString().Contains(SearchTextReplace, StringComparison.OrdinalIgnoreCase))
                                 .ToList();
                     }
-                    
+
                     @if (!filteredBedRequests.Any())
                     {
-                    <p>No bed requests match your search.</p>
+                        <p>No bed requests match your search.</p>
                     }
                     else
                     {
@@ -443,4 +451,90 @@ else if (WorkflowStep == ReplacedStep)
         <i class="fas @(CopiedToClipboard ? "fa-check" : "fa-copy") me-1"></i>
         @(CopiedToClipboard ? "Copied!" : "Copy to Clipboard")
     </button>
+}
+else if (WorkflowStep == CannotReplaceStep)
+{
+    string googleMapsLink = GoogleMaps.CreateGoogleMapsLinkForBedRequest(FailedBedRequest);
+
+    <div class="content-wrapper mt-3">
+        <div class="row">
+            <div class="alert alert-success col-md-4 col-sm-6 col-xs-12" role="alert">
+                Cannot Replace Failed Delivery
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="card">
+                    <div class="card-header">Failed Delivery</div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Name:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.FullName
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Phone:
+                            </div>
+                            <div class="col-sm-9">
+                                <!-- XS: Clickable telephone link -->
+                                <a class="d-sm-none"
+                                   href="tel:@StringUtil.ExtractDigits(FailedBedRequest.Phone)">
+                                    @FailedBedRequest.FormattedPhone
+                                </a>
+
+                                <!-- SM and larger: Plain text -->
+                                <span class="d-none d-sm-inline">
+                                    @FailedBedRequest.FormattedPhone
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Beds:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.NumberOfBeds
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Gender/Age:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.GenderAge
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Street:
+                            </div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-map-marker-alt"></i> <a href="@googleMapsLink">@FailedBedRequest.Street</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Postal Code:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.PostalCode
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-3 fw-bold">
+                                Status:
+                            </div>
+                            <div class="col-sm-9">
+                                @FailedBedRequest.Status.ToString()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }

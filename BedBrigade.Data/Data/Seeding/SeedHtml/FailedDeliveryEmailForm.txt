@@ -1,4 +1,4 @@
-﻿<p>This is a replacement delivery for %%FailedDeliveryRecipientName%% for team %%BedRequest.Team%%.  See the replacement below.</p>
+<p>%%BedRequest.FullName%% has been noted as a failed delivery and has been put into %%BedRequest.Status%% status. This delivery could not be replaced.</p>
 
 <table width="600" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
        <tbody>
@@ -47,10 +47,10 @@
 			   <td width="350">%%BedRequest.PrimaryLanguage%%</td>
 		   </tr>
 		   <tr>
-			   <td width="250">Delivery Date</td>
+		       <td width="250">Delivery Date</td>
 			   <td width="350">%%BedRequest.DeliveryDate%%</td>
 		   </tr>
-		   <tr>
+			<tr>
 		       <td width="250">Group</td>
 			   <td width="350">%%BedRequest.Group%%</td>
 		   </tr>
