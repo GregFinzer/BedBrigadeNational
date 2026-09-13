@@ -53,16 +53,16 @@ namespace BedBrigade.Data.Services
         }
 
         /// <summary>
-        /// Send an email to the user that a replacement bed request has been scheduled for a failed delivery
+        /// Send an email to the user, schedulers, and admins that a replacement bed request has been scheduled for a failed delivery
         /// </summary>
         /// <param name="failedBedRequest"></param>
         /// <param name="replacementBedRequest"></param>
         /// <returns></returns>
         public async Task<ServiceResponse<bool>> SendReplaceFailedDeliveryEmail(BedRequest failedBedRequest, BedRequest replacementBedRequest)
         {
-            string? userEmail = _bedRequestDataService.GetUserEmail();
+            string? currentUserEmail = _bedRequestDataService.GetUserEmail();
             
-            if (string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(currentUserEmail))
             {
                 return new ServiceResponse<bool>("User email not found", false);
             }
@@ -75,28 +75,69 @@ namespace BedBrigade.Data.Services
             }
             
             string body = BuildReplaceFailedDeliveryBody(failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
-            string subject = $"Replacement Bed Delivery for {replacementBedRequest.FullName}";
+            string subject = $"Replacement Bed Delivery for {replacementBedRequest.FullName} for Team {replacementBedRequest.Team}";
+            await SendEmailForBedRequestUser(replacementBedRequest, currentUserEmail, subject, body);
+
+            User? scheduleUser = await _userDataService.GetByUserName(failedBedRequest.UpdateUser);
+
+            if (scheduleUser != null && !String.IsNullOrWhiteSpace(scheduleUser.Email) && scheduleUser.Email != currentUserEmail)
+            {
+                await SendEmailForBedRequestUser(replacementBedRequest, scheduleUser.Email, subject, body);
+            }
+
+            return new ServiceResponse<bool>("Successfully queued Replace Failed Delivery Email", true);
+        }
+
+        public async Task<ServiceResponse<bool>> SendFailedDeliveryEmail(BedRequest failedBedRequest)
+        {
+            string? currentUserEmail = _bedRequestDataService.GetUserEmail();
+
+            if (string.IsNullOrEmpty(currentUserEmail))
+            {
+                return new ServiceResponse<bool>("User email not found", false);
+            }
+
+            var templateResult = await _contentDataService.GetSingleByLocationAndContentType(failedBedRequest.LocationId, ContentType.FailedDeliveryEmailForm);
+
+            if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+            {
+                return new ServiceResponse<bool>("FailedDeliveryEmailForm not found", false);
+            }
+
+            string body = BuildFailedDeliveryBody(failedBedRequest, templateResult.Data.ContentHtml);
+            string subject = $"Failed Bed Delivery for {failedBedRequest.FullName} for Team {failedBedRequest.Team}";
+            await SendEmailForBedRequestUser(failedBedRequest, currentUserEmail, subject, body);
+
+            User? scheduleUser = await _userDataService.GetByUserName(failedBedRequest.UpdateUser);
+
+            if (scheduleUser != null && !String.IsNullOrWhiteSpace(scheduleUser.Email) && scheduleUser.Email != currentUserEmail)
+            {
+                await SendEmailForBedRequestUser(failedBedRequest, scheduleUser.Email, subject, body);
+            }
+            return new ServiceResponse<bool>("Successfully queued Failed Delivery Email", true);
+        }
+
+        private string BuildFailedDeliveryBody(BedRequest failedBedRequest, string template)
+        {
+            StringBuilder sb = new StringBuilder(template, template.Length * 2);
+            sb = _mailMergeLogic.ReplaceBedRequestFields(failedBedRequest, sb);
+            return sb.ToString();
+        }
+
+        private async Task SendEmailForBedRequestUser(BedRequest bedRequest,
+            string userEmail, string subject, string body)
+        {
             EmailQueue emailQueue = new()
             {
                 ToAddress = userEmail,
                 Subject = subject,
                 Body = body,
                 Priority = Defaults.BulkHighPriority,
-                LocationId = replacementBedRequest.LocationId,
+                LocationId = bedRequest.LocationId,
                 TargetDate = DateTime.UtcNow,
-                BedRequestId = replacementBedRequest.BedRequestId
+                BedRequestId = bedRequest.BedRequestId
             };
             var emailResult = await _emailQueueDataService.QueueEmail(emailQueue);
-
-            if (!emailResult.Success)
-            {
-                return new ServiceResponse<bool>(emailResult.Message, false);
-            }
-            else
-            {
-                _emailQueueBackgroundService.SendNow();
-                return new ServiceResponse<bool>("Successfully queued Replace Failed Delivery Email", true);
-            }
         }
 
         private string BuildReplaceFailedDeliveryBody(BedRequest failedBedRequest, BedRequest replacementBedRequest, string template)
@@ -517,7 +558,7 @@ namespace BedBrigade.Data.Services
             {
                 BedRequestId = bedRequest.BedRequestId,
                 ToAddress = bedRequest.Email,
-                Subject = "Your bed(s) will be delivered tomorrow",
+                Subject = $"Your bed(s) will be delivered tomorrow {bedRequest.DeliveryDate.Value.ToString(Defaults.DateWithDayOfWeek)}",
                 Body = body,
                 Priority = Defaults.BulkHighPriority,
                 LocationId = bedRequest.LocationId,
@@ -586,7 +627,7 @@ namespace BedBrigade.Data.Services
             EmailQueue emailQueue = new()
             {
                 ToAddress = volunteerResult.Data.Email,
-                Subject = $"Reminder: Volunteer Event Tomorrow for {volunteerResult.Data.FirstName} {volunteerResult.Data.LastName}",
+                Subject = $"Reminder: Volunteer Event Tomorrow {scheduleResult.Data.EventDateScheduled.ToString(Defaults.DateWithDayOfWeek)} for {volunteerResult.Data.FirstName} {volunteerResult.Data.LastName}",
                 Body = bodyResult.Data,
                 Priority = Defaults.BulkHighPriority,
                 LocationId = signUp.LocationId,

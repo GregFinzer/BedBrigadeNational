@@ -1,4 +1,4 @@
-﻿This is a replacement delivery for %%FailedDeliveryRecipientName%% for team %%BedRequest.Team%%.  See the replacement below.
+%%BedRequest.FullName%% has been noted as a failed delivery and has been put into %%BedRequest.Status%% status. This delivery could not be replaced.
 
 First Name:  %%BedRequest.FirstName%%
 Last Name:  %%BedRequest.LastName%%

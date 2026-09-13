@@ -125,14 +125,6 @@ public class BedRequest : BaseEntity, ILocationId, IEmail, IPhone
     [JsonIgnore]
     [NotMapped]
     public string ContactedYes => Contacted == true ? "Yes" : "No";
-
-    [JsonIgnore]
-    [NotMapped]
-    public int NumberOfBedsAhead { get; set; }
-    
-    [JsonIgnore]
-    [NotMapped]
-    public string EstimatedWait { get; set; }
     
     public void UpdateDuplicateFields(BedRequest? bedRequest, string newNote)
     {

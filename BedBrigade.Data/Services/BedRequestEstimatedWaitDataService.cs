@@ -163,12 +163,5 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
                 ((double)estimatedWaitResult.NumberOfDeliveredBedRequests) / timeSpan.TotalDays;
         }
     }
-    
-    public async Task FillEstimatedWait(BedRequest bedRequest)
-    {
-        EstimatedWaitResult estimatedWaitResult = await GetEstimatedWaitResult(bedRequest.LocationId, bedRequest.DeliveryDate.Value);
-        bedRequest.EstimatedWait = estimatedWaitResult.EstimatedWait;
-    }
-    
 
 }

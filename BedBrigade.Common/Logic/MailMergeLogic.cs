@@ -3,6 +3,7 @@ using BedBrigade.Common.Exceptions;
 using BedBrigade.Common.Models;
 using System.Text;
 using System.Web;
+using BedBrigade.Common.Constants;
 
 namespace BedBrigade.Common.Logic;
 
@@ -189,7 +190,7 @@ public class MailMergeLogic : IMailMergeLogic
         }
 
         sb = sb.Replace("%%Schedule.EventNote%%", entity.EventNote);
-        sb = sb.Replace("%%Schedule.EventDateScheduled%%", entity.EventDateScheduled.ToString("MM/dd/yyyy h:mm tt"));
+        sb = sb.Replace("%%Schedule.EventDateScheduled%%", entity.EventDateScheduled.ToString("dddd, MM/dd/yyyy h:mm tt"));
         sb = sb.Replace("%%Schedule.EventDurationHours%%", entity.EventDurationHours + " hours");
         sb = sb.Replace("%%Schedule.Address%%", entity.Address);
         sb = sb.Replace("%%Schedule.City%%", entity.City);
@@ -198,7 +199,7 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%Schedule.OrganizerName%%", entity.OrganizerName);
         sb = sb.Replace("%%Schedule.OrganizerEmail%%", entity.OrganizerEmail);
         sb = sb.Replace("%%Schedule.OrganizerPhone%%", entity.OrganizerPhone.FormatPhoneNumber());
-        sb = sb.Replace("%%Schedule.EventDateOnly%%", entity.EventDateScheduled.ToString("MM/dd/yyyy"));
+        sb = sb.Replace("%%Schedule.EventDateOnly%%", entity.EventDateScheduled.ToString("dddd, MM/dd/yyyy"));
         sb = sb.Replace("%%Schedule.StartTime%%", entity.EventDateScheduled.ToString("h:mm tt"));
         sb = sb.Replace("%%Schedule.EndTime%%", entity.EventDateScheduled.AddHours(entity.EventDurationHours).ToString("h:mm tt"));
         return sb;
@@ -243,7 +244,18 @@ public class MailMergeLogic : IMailMergeLogic
         sb = sb.Replace("%%BedRequest.Names%%", entity.Names);
         sb = sb.Replace("%%BedRequest.PrimaryLanguage%%", entity.PrimaryLanguage);
         sb = sb.Replace("%%BedRequest.Notes%%", entity.Notes);
+        sb = sb.Replace("%%BedRequest.Group%%", entity.Group);
         sb = sb.Replace("%%BedRequest.Team%%", entity.Team);
+        sb = sb.Replace("%%BedRequest.FullName%%", entity.FullName);
+        sb = sb.Replace("%%BedRequest.Status%%", entity.Status.ToString());
+        if (entity.DeliveryDate.HasValue)
+        {
+            sb = sb.Replace("%%BedRequest.DeliveryDate%%", entity.DeliveryDate.Value.ToString(Defaults.DateWithTimeFormat));
+        }
+        else
+        {
+            sb = sb.Replace("%%BedRequest.DeliveryDate%%", string.Empty);
+        }
         return sb;
     }
 

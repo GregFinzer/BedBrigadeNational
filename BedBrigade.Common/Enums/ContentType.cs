@@ -36,5 +36,9 @@ public enum ContentType
     [Description("Replace Failed Delivery Email Form")]
     ReplaceFailedDeliveryEmailForm = 19,
     [Description("Replace Failed Delivery SMS Form")]
-    ReplaceFailedDeliverySmsForm= 20
+    ReplaceFailedDeliverySmsForm= 20,
+    [Description("Failed Delivery Email Form")]
+    FailedDeliveryEmailForm=21,
+    [Description("Failed Delivery SMS Form")]
+    FailedDeliverySmsForm = 22,
 }
