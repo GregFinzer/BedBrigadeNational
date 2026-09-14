@@ -239,7 +239,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 Model.LocationId = LocationId;
                 Model.PrimaryLanguage = "English";
                 Model.BedType = "Single";
-                Model.Notes = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings, ConfigNames.BedRequestNote);
+                Model.Notes = await _svcConfiguration.GetConfigValueAsync(ConfigSection.CustomStrings, ConfigNames.BedRequestNote, LocationId);
+                Model.Reference = "Phone";
                 var location = Locations?.FirstOrDefault(o => o.LocationId == LocationId);
                 if (location != null)
                 {
