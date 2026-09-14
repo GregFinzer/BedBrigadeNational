@@ -46,6 +46,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         public bool NoPaging { get; private set; }
         private bool ShouldDisplayEmailMessage = false;
         public string ManageVolunteersMessage { get; set; }
+        protected bool ViewAllLocations { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -128,10 +129,21 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             try // get Volunteer List ===========================================================================================
             {
-                var dataVolunteer = await _svcVolunteer.GetAllForLocationAsync(_svcAuth.LocationId); // get Schedules
                 Volunteers = new List<Volunteer>();
 
-                if (dataVolunteer.Success && dataVolunteer != null)
+                if (_svcAuth.IsNationalAdmin && ViewAllLocations)
+                {
+                    var allLocationVolunteers = await _svcVolunteer.GetAllAsync();
+                    if (allLocationVolunteers.Success && allLocationVolunteers.Data != null)
+                    {
+                        Volunteers.AddRange(allLocationVolunteers.Data);
+                    }
+                    return;
+                }
+
+                var dataVolunteer = await _svcVolunteer.GetAllForLocationAsync(userLocationId); // get Volunteers
+
+                if (dataVolunteer.Success && dataVolunteer.Data != null)
                 {
 
                     if (dataVolunteer.Data.Count > 0)
@@ -152,6 +164,13 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
             }
 
         } // OnInit
+
+        private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+        {
+            ViewAllLocations = args.Checked;
+            await LoadVolunteerData();
+            await Grid.Refresh();
+        }
 
 
         /// <summary>
@@ -213,7 +232,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.Manage
         {
             var volunteer = args.Data;
             await Grid.EndEditAsync();
-            _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{userLocationId}/{volunteer.VolunteerId}");
+            _navigationManager.NavigateTo($"/administration/admintasks/addeditvolunteer/{volunteer.LocationId}/{volunteer.VolunteerId}");
         }
 
         protected void OnRecordDoubleClick(RecordDoubleClickEventArgs<Volunteer> args)

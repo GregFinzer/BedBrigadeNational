@@ -43,7 +43,10 @@ public partial class ReplaceFailedDelivery : ComponentBase
     
     [SupplyParameterFromQuery]
     public bool? Replaced { get; set; }
-    
+
+    [SupplyParameterFromQuery]
+    public bool? CannotReplace { get; set; }
+
     private int WorkflowStep { get; set; }
     private const int PickSchedule = 0;
     private const int PickFailedDelivery = 1;
@@ -51,6 +54,7 @@ public partial class ReplaceFailedDelivery : ComponentBase
     private const int PickReplacement = 3;
     private const int CallReplacement = 4;
     private const int ReplacedStep = 5;
+    private const int CannotReplaceStep = 6;
     private bool _chooseEventButtonDisabled = true;
     private const string BaseUrl = "/administration/schedule/replacefaileddelivery";
     
@@ -139,7 +143,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
 
             if (bedRequestResponse.Success && bedRequestResponse.Data != null)
             {
-                if (WorkflowStep != ReplacedStep && bedRequestResponse.Data.Status != BedRequestStatus.Scheduled)
+                if (WorkflowStep != ReplacedStep 
+                    && WorkflowStep != CannotReplaceStep
+                    && bedRequestResponse.Data.Status != BedRequestStatus.Scheduled)
                 {
                     WarningMessage =
                         $"The Bed Request for {bedRequestResponse.Data.FullName} has already been replaced.";
@@ -198,7 +204,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
     {
         WorkflowStep = PickSchedule;
 
-        if (Replaced.HasValue && Replaced.Value)
+        if (FailedBedRequestId.HasValue && FailedBedRequestId.Value > 0 && CannotReplace.HasValue && CannotReplace.Value)
+            WorkflowStep = CannotReplaceStep;
+        else if (Replaced.HasValue && Replaced.Value)
             WorkflowStep = ReplacedStep;
         else if (CallRequestId.HasValue && CallRequestId.Value > 0)
             WorkflowStep = CallReplacement;
@@ -334,6 +342,9 @@ public partial class ReplaceFailedDelivery : ComponentBase
         }
 
         CallBedRequest.Status = BedRequestStatus.Scheduled;
+        CallBedRequest.Group = FailedBedRequest.Group;
+        CallBedRequest.Team = FailedBedRequest.Team;
+        CallBedRequest.Contacted = true;
         var callResponse = await _bedRequestDataService.UpdateAsync(CallBedRequest);
 
         if (!callResponse.Success)
@@ -366,5 +377,40 @@ public partial class ReplaceFailedDelivery : ComponentBase
             sb.ToString());
 
         CopiedToClipboard = true;
+    }
+
+    private async Task HandleCannotReplace()
+    {
+        if (FailedBedRequest == null
+            || FailedBedRequest.BedRequestId == 0)
+            return;
+
+        if (_isBusy)
+            return;
+
+        try
+        {
+            _isBusy = true;
+
+            if (!(await SaveFailedBedRequest()))
+                return;
+
+            // Database updates succeeded, so send notifications.
+            await Task.WhenAll(
+                _sendSmsLogic.SendFailedDeliverySms(FailedBedRequest),
+                _emailBuilderService.SendFailedDeliveryEmail(FailedBedRequest));
+
+            string url = $"{BaseUrl}?scheduleId={ScheduleId}&failedBedRequestId={FailedBedRequestId}&status={Status}&cannotReplace=true";
+            _nav.NavigateTo(url);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error saving Confirm Bed Request Replacement");
+            ToastService.Error("Error", "Error saving Confirm Bed Request Replacement");
+        }
+        finally
+        {
+            _isBusy = false;
+        }
     }
 }

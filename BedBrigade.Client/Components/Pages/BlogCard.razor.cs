@@ -32,6 +32,8 @@ namespace BedBrigade.Client.Components.Pages
         public string? Filter { get; set; }
 
         private Content? ContentItem;
+        private string _displayTitle = string.Empty;
+        private string _displayContentHtml = string.Empty;
         public string? ErrorMessage { get; set; }
         public int? LocationId { get; set; }
         public string LocationName { get; set; }
@@ -103,6 +105,8 @@ namespace BedBrigade.Client.Components.Pages
             if (response.Success && response.Data is not null)
             {
                 ContentItem = response.Data;
+                _displayTitle = response.Data.Title;
+                _displayContentHtml = response.Data.ContentHtml ?? string.Empty;
             }
             else
             {
@@ -122,8 +126,8 @@ namespace BedBrigade.Client.Components.Pages
 
             if (contentResult.Success && contentResult.Data != null)
             {
-                ContentItem.ContentHtml = contentResult.Data.ContentHtml;
-                ContentItem.Title = await _translateLogic.GetTranslation(contentResult.Data.Title, _svcLanguage.CurrentCulture.Name);
+                _displayContentHtml = contentResult.Data.ContentHtml ?? string.Empty;
+                _displayTitle = await _translateLogic.GetTranslation(contentResult.Data.Title, _svcLanguage.CurrentCulture.Name);
             }
             else
             {

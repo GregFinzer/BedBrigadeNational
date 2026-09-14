@@ -85,6 +85,7 @@ namespace BedBrigade.Client.Components
         public string EditPagePath = "/administration/admintasks/addeditbedrequest/";
         public bool ShowSpinner { get; set; } // Shows spinner overlay during delivery/team sheet generation
         public bool ShouldCheckSortClosest { get; set; } = true;
+        protected bool ViewAllLocations { get; set; }
         private bool _gridEditSettingsApplied;
 
         protected override async Task OnInitializedAsync()
@@ -107,7 +108,7 @@ namespace BedBrigade.Client.Components
                 await LoadLocations();
                 await LoadUser();
 
-                var bedRequestResult = await BedRequestDataService.GetBedRequestsForUser();
+                var bedRequestResult = await LoadBedRequestsForScope();
                 if (bedRequestResult.Success && bedRequestResult.Data != null)
                 {
                     BedRequests = bedRequestResult.Data.ToList();
@@ -124,6 +125,33 @@ namespace BedBrigade.Client.Components
                     ToastService.Error("Error", "An error occurred while initializing the Bed Request Grid.");
                 }
             }
+        }
+
+        private async Task<ServiceResponse<List<BedRequest>>> LoadBedRequestsForScope()
+        {
+            if (AuthService.IsNationalAdmin && ViewAllLocations)
+            {
+                return await BedRequestDataService.GetAllAsync();
+            }
+
+            if (AuthService.IsNationalAdmin)
+            {
+                return await BedRequestDataService.GetAllForLocationAsync(UserDataService.GetUserLocationId());
+            }
+
+            return await BedRequestDataService.GetBedRequestsForUser();
+        }
+
+        private async Task ViewAllLocationsChanged(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+        {
+            ViewAllLocations = args.Checked;
+            var result = await LoadBedRequestsForScope();
+            if (result.Success && result.Data != null)
+            {
+                BedRequests = result.Data.ToList();
+                SetManageBedRequestsMessage();
+            }
+            await Grid.Refresh();
         }
 
 

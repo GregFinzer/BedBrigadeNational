@@ -17,5 +17,6 @@ namespace BedBrigade.Data.Services
         Task<List<string>> GetMissedMessageEmailsForLocation(int locationId);
         Task<ServiceResponse<List<string>>> GetEmailsByLocationAndConfigName(int locationId, string key);
         Task<ServiceResponse<User>> GetByEmail(string email);
+        Task<User?> GetByUserName(string? userName);
     }
 }

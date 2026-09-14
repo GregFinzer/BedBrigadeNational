@@ -22,7 +22,8 @@ public class SendSmsLogic : ISendSmsLogic
     private IMailMergeLogic _mailMergeLogic;
     private ISignUpDataService _signUpDataService;
     private readonly SmsQueueBackgroundService _smsQueueBackgroundService;
-    
+    private readonly IUserDataService _userDataService;
+
     public SendSmsLogic(IContentDataService contentDataService, 
         IConfigurationDataService configurationDataService, 
         IVolunteerDataService volunteerDataService,
@@ -32,7 +33,8 @@ public class SendSmsLogic : ISendSmsLogic
         ISignUpDataService signUpDataService, 
         ILocationDataService locationDataService,
         ITimezoneDataService timezoneDataService,
-        SmsQueueBackgroundService smsQueueBackgroundService)
+        SmsQueueBackgroundService smsQueueBackgroundService,
+        IUserDataService userDataService)
     {
         _contentDataService = contentDataService;
         _configurationDataService = configurationDataService;
@@ -44,6 +46,7 @@ public class SendSmsLogic : ISendSmsLogic
         _locationDataService = locationDataService;
         _timezoneDataService = timezoneDataService;
         _smsQueueBackgroundService = smsQueueBackgroundService;
+        _userDataService = userDataService;
     }
 
     /// <summary>
@@ -55,9 +58,9 @@ public class SendSmsLogic : ISendSmsLogic
     public async Task<ServiceResponse<bool>> SendReplaceFailedDeliverySms(BedRequest failedBedRequest,
         BedRequest replacementBedRequest)
     {
-        string? userPhone = _configurationDataService.GetUserPhone();
+        string? currentUserPhone = _configurationDataService.GetUserPhone();
             
-        if (string.IsNullOrEmpty(userPhone))
+        if (string.IsNullOrEmpty(currentUserPhone))
         {
             return new ServiceResponse<bool>("User phone not found", false);
         }
@@ -80,13 +83,21 @@ public class SendSmsLogic : ISendSmsLogic
             return new ServiceResponse<bool>(ex.Message);
         }
 
-        SmsQueue smsQueue = BuildReplaceFailedDeliveryQueueRecord(fromPhone, userPhone, failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
+        SmsQueue smsQueue = BuildReplaceFailedDeliveryQueueRecord(fromPhone, currentUserPhone, failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml);
 
         var queueResult = await _smsQueueDataService.QueueSms(smsQueue);
         if (queueResult.Success)
         {
             _smsQueueBackgroundService.SendNow();
-            return new ServiceResponse<bool>("SMS Message queued", true);
+        }
+
+        User? scheduleUser = await _userDataService.GetByUserName(failedBedRequest.UpdateUser);
+
+        if (scheduleUser != null && !String.IsNullOrWhiteSpace(scheduleUser.Phone) &&
+            scheduleUser.Phone.FormatPhoneNumber() != currentUserPhone.FormatPhoneNumber())
+        {
+            smsQueue = BuildReplaceFailedDeliveryQueueRecord(fromPhone, scheduleUser.Phone, failedBedRequest, replacementBedRequest, templateResult.Data.ContentHtml); await _smsQueueDataService.QueueSms(smsQueue);
+            await _smsQueueDataService.QueueSms(smsQueue);
         }
 
         return new ServiceResponse<bool>("Failed to create SMS Queue: " + queueResult.Message);
@@ -446,6 +457,89 @@ public class SendSmsLogic : ISendSmsLogic
         return new ServiceResponse<bool>("SMS Message Failed: " + message.FailureMessage);
     }
 
+    public async Task<ServiceResponse<bool>> SendFailedDeliverySms(BedRequest failedBedRequest)
+    {
+        string? currentUserPhone = _configurationDataService.GetUserPhone();
+
+        if (string.IsNullOrEmpty(currentUserPhone))
+        {
+            return new ServiceResponse<bool>("User phone not found", false);
+        }
+
+        var templateResult = await _contentDataService.GetSingleByLocationAndContentType(failedBedRequest.LocationId, ContentType.FailedDeliverySmsForm);
+
+        if (!templateResult.Success || templateResult.Data == null || templateResult.Data.ContentHtml == null)
+        {
+            return new ServiceResponse<bool>("FailedDeliverySmsForm not found", false);
+        }
+
+        string templateHtml = templateResult.Data.ContentHtml;
+        string fromPhone;
+        try
+        {
+            fromPhone = await _configurationDataService.GetConfigValueAsync(ConfigSection.Sms, ConfigNames.SmsPhone,
+                failedBedRequest.LocationId);
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<bool>(ex.Message);
+        }
+
+        await SendUserFailedDeliverySms(failedBedRequest, fromPhone, currentUserPhone, templateHtml);
+
+        User? scheduleUser = await _userDataService.GetByUserName(failedBedRequest.UpdateUser);
+        if (scheduleUser != null && !String.IsNullOrWhiteSpace(scheduleUser.Phone) &&
+            scheduleUser.Phone.FormatPhoneNumber() != currentUserPhone.FormatPhoneNumber())
+        {
+            await SendUserFailedDeliverySms(failedBedRequest, fromPhone, scheduleUser.Phone, templateHtml);
+        }
+
+        return new ServiceResponse<bool>("SMS Message queued", true);
+    }
+
+
+
+    private async Task SendUserFailedDeliverySms(BedRequest failedBedRequest, string fromPhone, string userPhone,
+        string templateHtml)
+    {
+        SmsQueue smsQueue = BuildFailedDeliveryQueueRecord(fromPhone, userPhone, failedBedRequest, templateHtml);
+
+        var queueResult = await _smsQueueDataService.QueueSms(smsQueue);
+        if (queueResult.Success)
+        {
+            _smsQueueBackgroundService.SendNow();
+        }
+        else
+        {
+            Log.Error("Failed to create SMS Queue for current user: {0}", queueResult.Message);
+        }
+    }
+
+    private SmsQueue BuildFailedDeliveryQueueRecord(string fromPhone, string userPhone, BedRequest failedBedRequest, string template)
+    {
+        StringBuilder sb = new StringBuilder(template, template.Length * 2);
+        sb = _mailMergeLogic.ReplaceBedRequestFields(failedBedRequest, sb);
+
+        SmsQueue smsQueue = new SmsQueue()
+        {
+            SignUpId = null,
+            BedRequestId = failedBedRequest.BedRequestId,
+            FromPhoneNumber = fromPhone.FormatPhoneNumber(),
+            ToPhoneNumber = userPhone.FormatPhoneNumber(),
+            Body = sb.ToString(),
+            Priority = Defaults.BulkHighPriority,
+            Status = QueueStatus.Queued.ToString(),
+            QueueDate = DateTime.UtcNow,
+            FailureMessage = string.Empty,
+            TargetDate = DateTime.UtcNow,
+            IsRead = true,
+            IsReply = false,
+            LocationId = failedBedRequest.LocationId,
+            ContactType = ContactTypes.User,
+            ContactName = StringUtil.InsertSpaces(_configurationDataService.GetUserName())
+        };
+        return smsQueue;
+    }
 
 }
 

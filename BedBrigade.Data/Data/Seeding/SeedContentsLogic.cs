@@ -48,6 +48,8 @@ public static class SeedContentsLogic
             await SeedForm(context, locations, ContentType.SignUpEmailReminderForm);
             await SeedForm(context, locations, ContentType.ReplaceFailedDeliveryEmailForm);
             await SeedForm(context, locations, ContentType.ReplaceFailedDeliverySmsForm);
+            await SeedForm(context, locations, ContentType.FailedDeliveryEmailForm);
+            await SeedForm(context, locations, ContentType.FailedDeliverySmsForm);
         }
     }
 

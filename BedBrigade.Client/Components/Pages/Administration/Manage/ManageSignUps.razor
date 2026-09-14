@@ -5,8 +5,14 @@
 @using BedBrigade.Common.Models
 
 <div class="row mt-3">
-    <div class="col-md-6 ps-3">
+    <div class="col-md-4 ps-3">
         <h3>@ManageSignUpsMessage</h3>
+    </div>
+    <div class="col-md-2 ps-3 ps-md-0">
+        @if (_svcAuth.IsNationalAdmin)
+        {
+            <SfCheckBox TChecked="bool" ID="view-all-locations" Label="View All Locations" @bind-Checked="ViewAllLocations" ValueChange="@ViewAllLocationsChanged"></SfCheckBox>
+        }
     </div>
     <div class="col-md-4 ps-3 ps-md-0">
         <label for="VolunteerSelector" style="display: inline-block;">Scheduled</label>
@@ -67,6 +73,7 @@
                     <GridColumn Field=@nameof(SignUpDisplayItem.SignUpId) Visible="false" HeaderText="Reg ID" TextAlign="TextAlign.Right" AutoFit="false" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
                     <GridColumn Field=@nameof(SignUpDisplayItem.ScheduleLocationId) Visible="false" HeaderText="Loc ID" TextAlign="TextAlign.Right" AutoFit="false" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
                     <GridColumn Field=@nameof(SignUpDisplayItem.ScheduleId) Visible="false" HeaderText="Event ID" TextAlign="TextAlign.Right" AutoFit="false" AllowFiltering="true" AllowEditing="false" AllowAdding="false"></GridColumn>
+                    <GridColumn Field=@nameof(SignUpDisplayItem.ScheduleLocationName) Visible=@ViewAllLocations HeaderText="Location" Type="ColumnType.String" Width="150px" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
                     <GridColumn Field=@nameof(SignUpDisplayItem.ScheduleEventName) HeaderText="Event Name" Type="ColumnType.String" Width="150px" AllowEditing="false" AllowFiltering="true" AutoFit="false" AllowSorting="true" />
                     <GridColumn Field=@nameof(SignUpDisplayItem.ScheduleEventDate) HeaderText="Event Date" Format="MM/dd/yyyy hh:mm tt" Type="ColumnType.Date" Width="150px" AllowEditing="false" AllowFiltering="true" AutoFit="false" />
 
