@@ -26,9 +26,9 @@ else
     <div class="content-wrapper mt-3">
         <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
-            
+
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-sm-6 col-md-4 col-lg-2">
                     <div class="card">
                         <div class="card-header">@_lc.Keys["ContactInformation"]</div>
                         <div class="card-body">
@@ -93,7 +93,7 @@ else
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-sm-6 col-md-4 col-lg-3">
 
                     <div class="card">
                         <div class="card-header">@_lc.Keys["DeliveryAddress"]</div>
@@ -147,7 +147,7 @@ else
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-sm-6 col-md-4 col-lg-2">
                     <div class="card">
                         <div class="card-header">@_lc.Keys["BedRequestDetails"]</div>
                         <div class="card-body">
@@ -173,11 +173,11 @@ else
                                 </div>
                             </div>
                         </div>
-
                     </div>
+                    
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="card">
                         <div class="card-header">Scheduling</div>
                         <div class="card-body">
@@ -245,7 +245,9 @@ else
                         </div>
                     </div>
                 </div>
-
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <UpdateInformation BaseEntity="Model" />
+                </div>
             </div>
 
             <div class="row mt-3">

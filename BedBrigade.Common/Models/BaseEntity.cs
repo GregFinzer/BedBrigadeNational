@@ -43,5 +43,10 @@ namespace BedBrigade.Common.Models
             UpdateDate = DateTime.UtcNow;
             MachineName = Environment.MachineName;
         }
+
+        public bool IsNew()
+        {
+            return string.IsNullOrWhiteSpace(CreateUser);
+        }
     }
 }

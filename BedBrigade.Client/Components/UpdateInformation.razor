@@ -1,0 +1,46 @@
+@if (BaseEntity?.IsNew() == false)
+{
+    <div class="card">
+        <div class="card-header">
+            Update Information
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Created</strong><br />
+                                @if (BaseEntity.CreateDateLocal.HasValue)
+                                {
+                                    @BaseEntity.CreateDateLocal.Value.ToString("M/d/yy hh:mmtt")
+                                }
+                                </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Created By</strong><br />
+                                @StringUtil.InsertSpaces(BaseEntity.CreateUser)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Updated</strong><br />
+                                @if (BaseEntity.UpdateDateLocal.HasValue)
+                                {
+                                    @BaseEntity.UpdateDateLocal.Value.ToString("M/d/yy hh:mmtt")
+                                }
+                                </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Updated By</strong><br />
+                                @StringUtil.InsertSpaces(BaseEntity.UpdateUser)
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </dl>
+        </div>
+    </div>
+}
