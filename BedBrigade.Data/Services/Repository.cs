@@ -123,7 +123,7 @@ namespace BedBrigade.Data.Services
                 {
                     var dbSet = ctx.Set<TEntity>();
                     var result = await dbSet.FindAsync(id);
-
+                    
                     if (result != null)
                     {
                         _cachingService.Set(cacheKey, result);
