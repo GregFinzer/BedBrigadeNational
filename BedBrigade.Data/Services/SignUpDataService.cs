@@ -163,30 +163,7 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         return new ServiceResponse<List<SignUp>>($"Found {result.Count} sign-ups for location {locationId}", true, result);
     }
 
-    public async Task<ServiceResponse<List<SignUp>>> GetFutureSignUpsByPhone(string phone)
-    {
-        string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), $"GetFutureSignUpsByPhone({phone})");
-        List<SignUp>? cachedContent = _cachingService.Get<List<SignUp>>(cacheKey);
 
-        if (cachedContent != null)
-        {
-            return new ServiceResponse<List<SignUp>>($"Found {cachedContent.Count} future sign-ups for phone {phone} in cache", true, cachedContent);
-        }
-
-        string phoneNumbersOnly = StringUtil.ExtractDigits(phone);
-        string formattedPhone = phoneNumbersOnly.FormatPhoneNumber();
-
-        using var ctx = _contextFactory.CreateDbContext();
-        List<SignUp> result = await ctx.SignUps
-            .Include(signUp => signUp.Volunteer)
-            .Include(signUp => signUp.Schedule)
-            .Where(signUp => (signUp.Volunteer.Phone == phoneNumbersOnly || signUp.Volunteer.Phone == formattedPhone)
-                             && signUp.Schedule.EventDateScheduled.Date >= DateTime.UtcNow.Date)
-            .ToListAsync();
-
-        _cachingService.Set(cacheKey, result);
-        return new ServiceResponse<List<SignUp>>($"Found {result.Count} future sign-ups for phone {phone}", true, result);
-    }
 
     public async Task<ServiceResponse<List<SignUp>>> GetAllForScheduleIdAsync(int scheduleId)
     {

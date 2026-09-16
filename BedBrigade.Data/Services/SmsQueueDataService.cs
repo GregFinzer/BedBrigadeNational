@@ -21,7 +21,6 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IScheduleDataService _scheduleDataService;
     private readonly ITimezoneDataService _svcTimeZone;
     private readonly IBedRequestPhoneDataService _bedRequestPhoneDataService;
-    private readonly ISignUpDataService _signUpDataService;
 
 
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
@@ -35,8 +34,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         ITimezoneDataService svcTimeZone, 
         ILocationDataService locationDataService, 
         IScheduleDataService scheduleDataService,
-        IBedRequestPhoneDataService bedRequestPhoneDataService,
-        ISignUpDataService signUpDataService) : base(contextFactory, cachingService, authService)
+        IBedRequestPhoneDataService bedRequestPhoneDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -49,7 +47,6 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _locationDataService = locationDataService;
         _scheduleDataService = scheduleDataService;
         _bedRequestPhoneDataService = bedRequestPhoneDataService;
-        _signUpDataService = signUpDataService;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -459,14 +456,26 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
 
     private async Task<bool> FillSignUpIdByPhone(SmsQueue smsQueue)
     {
-        var result = await _signUpDataService.GetFutureSignUpsByPhone(smsQueue.ToPhoneNumber);
-        if (result.Success && result.Data != null)
-        {
-            smsQueue.SignUpId = result.Data.First().SignUpId;
-            smsQueue.VolunteerId = result.Data.First().VolunteerId;
-            return true;
-        }
+        string phoneNumbersOnly = StringUtil.ExtractDigits(smsQueue.ToPhoneNumber);
+        string formattedPhone = phoneNumbersOnly.FormatPhoneNumber();
 
+        using (var ctx = _contextFactory.CreateDbContext())
+        {
+            var signUp = await ctx.SignUps
+                .Include(signUp => signUp.Volunteer)
+                .Include(signUp => signUp.Schedule)
+                .Where(signUp =>
+                    (signUp.Volunteer.Phone == phoneNumbersOnly || signUp.Volunteer.Phone == formattedPhone)
+                    && signUp.Schedule.EventDateScheduled.Date >= DateTime.UtcNow.Date)
+                .FirstOrDefaultAsync();
+
+            if (signUp != null)
+            {
+                smsQueue.SignUpId = signUp.SignUpId;
+                smsQueue.VolunteerId = signUp.VolunteerId;
+                return true;
+            }
+        }
         return false;
     }
 
