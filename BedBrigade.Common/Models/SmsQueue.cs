@@ -75,9 +75,12 @@ namespace BedBrigade.Common.Models
         [Required, StringLength(50)]
         public string ContactName { get; set; } = string.Empty;
 
+        [ForeignKey("VolunteerId")]
+        public Int32? VolunteerId { get; set; }
+        public Volunteer? Volunteer { get; set; }
 
-
-
-
+        [ForeignKey("ContactUsId")]
+        public Int32? ContactUsId { get; set; }
+        public ContactUs? ContactUs { get; set; }
     }
 }

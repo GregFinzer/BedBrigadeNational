@@ -21,7 +21,9 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     private IScheduleDataService _scheduleDataService;
     private readonly ITimezoneDataService _svcTimeZone;
     private readonly IBedRequestPhoneDataService _bedRequestPhoneDataService;
-    
+    private readonly ISignUpDataService _signUpDataService;
+
+
     public SmsQueueDataService(IDbContextFactory<DataContext> contextFactory, 
         ICachingService cachingService,
         IAuthService authService, 
@@ -33,7 +35,8 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         ITimezoneDataService svcTimeZone, 
         ILocationDataService locationDataService, 
         IScheduleDataService scheduleDataService,
-        IBedRequestPhoneDataService bedRequestPhoneDataService) : base(contextFactory, cachingService, authService)
+        IBedRequestPhoneDataService bedRequestPhoneDataService,
+        ISignUpDataService signUpDataService) : base(contextFactory, cachingService, authService)
     {
         _contextFactory = contextFactory;
         _cachingService = cachingService;
@@ -46,6 +49,7 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
         _locationDataService = locationDataService;
         _scheduleDataService = scheduleDataService;
         _bedRequestPhoneDataService = bedRequestPhoneDataService;
+        _signUpDataService = signUpDataService;
     }
 
     public async Task<List<SmsQueue>> GetLockedMessages()
@@ -404,6 +408,69 @@ public class SmsQueueDataService : Repository<SmsQueue>, ISmsQueueDataService
     }
 
     private async Task<string> FillLocationByFromPhoneNumber(SmsQueue smsQueue)
+    {
+        //Try to find by the Bed Requestor
+        var bedRequestorResult = await _bedRequestPhoneDataService.GetByPhone(smsQueue.ToPhoneNumber);
+
+        if (bedRequestorResult.Success && bedRequestorResult.Data != null)
+        {
+            smsQueue.LocationId = bedRequestorResult.Data.LocationId;
+            smsQueue.BedRequestId = bedRequestorResult.Data.BedRequestId;
+            return string.Empty;
+        }
+
+        //Try to find it by the SignUp
+        if (await FillSignUpIdByPhone(smsQueue))
+        {
+            return string.Empty;
+        }
+
+        //Try to find by the Volunteer
+        var volunteerResult = await _volunteerDataService.GetByPhone(smsQueue.ToPhoneNumber);
+
+        if (volunteerResult.Success && volunteerResult.Data != null)
+        {
+            smsQueue.LocationId = volunteerResult.Data.LocationId;
+            smsQueue.VolunteerId = volunteerResult.Data.VolunteerId;
+            return string.Empty;
+        }
+
+        //Try to find by Contact Us
+        var contactUsResult = await _contactUsDataService.GetByPhone(smsQueue.ToPhoneNumber);
+
+        if (contactUsResult.Success && contactUsResult.Data != null)
+        {
+            smsQueue.LocationId = contactUsResult.Data.LocationId;
+            smsQueue.ContactUsId = contactUsResult.Data.ContactUsId;
+            return string.Empty;
+        }
+
+        //Try to find by the User
+        var userResult = await _userDataService.GetByPhone(smsQueue.ToPhoneNumber);
+
+        if (userResult.Success && userResult.Data != null)
+        {
+            smsQueue.LocationId = userResult.Data.LocationId;
+            return string.Empty;
+        }
+
+        return await FillLocationPhoneNumberByConfig(smsQueue);
+    }
+
+    private async Task<bool> FillSignUpIdByPhone(SmsQueue smsQueue)
+    {
+        var result = await _signUpDataService.GetFutureSignUpsByPhone(smsQueue.ToPhoneNumber);
+        if (result.Success && result.Data != null)
+        {
+            smsQueue.SignUpId = result.Data.First().SignUpId;
+            smsQueue.VolunteerId = result.Data.First().VolunteerId;
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<string> FillLocationPhoneNumberByConfig(SmsQueue smsQueue)
     {
         var result = await _configDataService.GetAllAsync(ConfigSection.Sms);
         if (!result.Success || result.Data == null || !result.Data.Any())
