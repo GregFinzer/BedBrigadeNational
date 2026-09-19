@@ -51,6 +51,9 @@
   
   
     <ItemGroup>
+      <Folder Include="Data\Seeding\SeedImages\national\pages\History\leftImageRotator\" />
+      <Folder Include="Data\Seeding\SeedImages\national\pages\History\middleImageRotator\" />
+      <Folder Include="Data\Seeding\SeedImages\national\pages\History\rightImageRotator\" />
       <Folder Include="Data\Seeding\SeedTranslations\" />
     </ItemGroup>
 
