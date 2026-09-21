@@ -5,7 +5,7 @@
 
 <CheckAuth Roles=@RoleNames.CanManageSchedule></CheckAuth>
 
-<div class="container my-4">
+<div class="content-wrapper mt-3">
 
     <h3>@HeaderText</h3>
             
@@ -13,7 +13,7 @@
         <DataAnnotationsValidator/>
 
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-sm-6 col-md-4 col-lg-3">
                 <div class="card">
                     <div class="card-header" style="font-weight: bold">Event Details</div>
                     <div class="card-body">
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-sm-6 col-md-4 col-lg-2">
                 <div class="card">
                     <div class="card-header" style="font-weight: bold">Scheduling</div>
                     <div class="card-body">
@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-sm-6 col-md-4 col-lg-3">
                 <div class="card">
                     <div class="card-header" style="font-weight: bold">Location</div>
                     <div class="card-body">
@@ -100,7 +100,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-sm-6 col-md-4 col-lg-2">
                 <div class="card">
                     <div class="card-header" style="font-weight: bold">Organizer</div>
                     <div class="card-body">
@@ -122,6 +122,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <UpdateInformation BaseEntity="Model"></UpdateInformation>
             </div>
         </div>
         

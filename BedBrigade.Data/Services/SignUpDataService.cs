@@ -1,8 +1,12 @@
 ﻿using BedBrigade.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Stripe.Terminal;
 using System.Data.Common;
+using AKSoftware.Localization.MultiLanguages;
+using BedBrigade.Common.Logic;
 using Twilio.TwiML.Voice;
+using StringUtil = BedBrigade.Common.Logic.StringUtil;
 
 namespace BedBrigade.Data.Services;
 
@@ -158,6 +162,8 @@ public class SignUpDataService : Repository<SignUp>, ISignUpDataService
         _cachingService.Set(cacheKey, result);
         return new ServiceResponse<List<SignUp>>($"Found {result.Count} sign-ups for location {locationId}", true, result);
     }
+
+
 
     public async Task<ServiceResponse<List<SignUp>>> GetAllForScheduleIdAsync(int scheduleId)
     {

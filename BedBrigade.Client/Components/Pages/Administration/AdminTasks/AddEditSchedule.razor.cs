@@ -29,6 +29,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private ISmsQueueDataService _svcSmsQueue { get; set; }
         [Inject] private IEmailBuilderService _svcEmailBuilder { get; set; }
         [Inject] private ISendSmsLogic _sendSmsLogic { get; set; }
+        [Inject] private ITimezoneDataService _timezoneDataService { get; set; }
 
         public string ErrorMessage { get; set; } = string.Empty;
         public Common.Models.Schedule Model { get; set; } = new();
@@ -109,6 +110,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
+                    _timezoneDataService.FillLocalDates(Model);
                     _originalEventDateTimeScheduled = Model.EventDateScheduled;
                     // Split date/time for editors
                     ScheduleStartDate = Model.EventDateScheduled.Date;

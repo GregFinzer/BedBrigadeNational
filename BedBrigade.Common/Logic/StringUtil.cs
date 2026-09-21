@@ -254,7 +254,7 @@ namespace BedBrigade.Common.Logic
         /// </example> 
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string InsertSpaces(string input)
+        public static string InsertSpaces(string? input)
         {
             const string space = " ";
             bool isSpace = false;

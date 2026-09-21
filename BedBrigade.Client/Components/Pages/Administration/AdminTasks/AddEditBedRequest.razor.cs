@@ -41,7 +41,8 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IEmailQueueDataService _emailQueueDataService { get; set; } = null!;
         [Inject] private ISmsQueueDataService _smsQueueDataService { get; set; } = null!;
         [Inject] private IBedRequestEstimatedWaitDataService _bedRequestEstimatedWaitDataService { get; set; } = null!;
-        
+        [Inject] private ITimezoneDataService _timezoneDataService { get; set; } = null!;
+
         private bool _isLoading = true;
         public DateTime? DeliveryDate { get; set; }
         public DateTime? DeliveryTime { get; set; }
@@ -212,6 +213,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                     if (result.Success && result.Data != null)
                     {
                         Model = result.Data;
+                        _timezoneDataService.FillLocalDates(Model);
                     }
                     else
                     {

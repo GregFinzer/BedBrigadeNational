@@ -24,6 +24,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
         [Inject] private IJSRuntime JS { get; set; }
         [Inject] private ILanguageContainerService _lc { get; set; }
         [Inject] private ISpokenLanguageDataService _svcSpokenLanguage { get; set; }
+        [Inject] private ITimezoneDataService _svcTimezone { get; set; }
         public string ErrorMessage { get; set; }
         public Volunteer? Model { get; set; }
         private const string ErrorTitle = "Error";
@@ -87,6 +88,7 @@ namespace BedBrigade.Client.Components.Pages.Administration.AdminTasks
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
+                    _svcTimezone.FillLocalDates(Model);
                     SelectedLanguages = string.IsNullOrWhiteSpace(Model.OtherLanguagesSpoken)
                         ? []
                         : Model.OtherLanguagesSpoken.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
