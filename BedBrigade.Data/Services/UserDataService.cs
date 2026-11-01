@@ -154,32 +154,6 @@ namespace BedBrigade.Data.Services
             return await _commonService.GetDistinctPhoneByLocation(this, locationId);
         }
 
-        public async Task<List<string>> GetMissedMessageEmailsForLocation(int locationId)
-        {
-            string cacheKey = _cachingService.BuildCacheKey(GetEntityName(), locationId, "GetMissedMessageEmailsForLocation()");
-            List<string>? cachedContent = _cachingService.Get<List<string>>(cacheKey);
-
-            if (cachedContent != null)
-            {
-                return cachedContent;
-            }
-
-            using (var ctx = _contextFactory.CreateDbContext())
-            {
-                var dbSet = ctx.Set<User>();
-                var result = await dbSet.Where(o => o.LocationId == locationId 
-                                                    && !String.IsNullOrEmpty(o.Email) 
-                                                    && (o.Role == RoleNames.LocationAdmin
-                                                    || o.Role == RoleNames.LocationScheduler
-                                                    || o.Role == RoleNames.LocationCommunications
-                                                    || o.Role == RoleNames.NationalAdmin))
-                    .Select(o => o.Email.ToLower()).Distinct()
-                    .ToListAsync();
-                _cachingService.Set(cacheKey, result);
-                return result;
-            }
-        }
-
         public async Task<User?> GetByUserName(string? userName)
         {
             if (string.IsNullOrWhiteSpace(userName))

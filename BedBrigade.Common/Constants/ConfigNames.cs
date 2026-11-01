@@ -56,6 +56,7 @@
         public const string EmailPassword = "EmailPassword";
         public const string ContactUsEmails = "ContactUsEmails";
         public const string BedRequestEmails = "BedRequestEmails";
+        public const string MissedTextMessageEmails = "MissedTextMessageEmails";
         public const string EmailImapPort = "EmailImapPort";
         public const string EmailImapUseSsl = "EmailImapUseSsl";
 

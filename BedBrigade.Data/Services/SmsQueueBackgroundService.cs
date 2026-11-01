@@ -170,7 +170,17 @@ public class SmsQueueBackgroundService : BackgroundService
 
     private async Task SendMissedMessageEmails(SmsQueue smsQueue, string subject)
     {
-        List<string> emails = await _userDataService.GetMissedMessageEmailsForLocation(smsQueue.LocationId);
+        ServiceResponse<List<string>> emailResponse = await _userDataService.GetEmailsByLocationAndConfigName(
+            smsQueue.LocationId, ConfigNames.MissedTextMessageEmails);
+
+        if (!emailResponse.Success || emailResponse.Data == null)
+        {
+            _logger.LogError("Could not find missed text message email recipients for location {LocationId}: {Message}",
+                smsQueue.LocationId, emailResponse.Message);
+            return;
+        }
+
+        List<string> emails = emailResponse.Data;
 
         foreach (var email in emails)
         {
