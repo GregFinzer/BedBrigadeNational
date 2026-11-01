@@ -575,6 +575,13 @@ namespace BedBrigade.Data.Data.Seeding
                 },
                 new()
                 {
+                    ConfigurationKey = ConfigNames.MissedTextMessageEmails,
+                    ConfigurationValue = "Location Admin,National Admin",
+                    Section = ConfigSection.Email,
+                    LocationId = locationId
+                },
+                new()
+                {
                     ConfigurationKey = ConfigNames.MonthsBetweenRequests,
                     ConfigurationValue = "12",
                     Section = ConfigSection.System,
