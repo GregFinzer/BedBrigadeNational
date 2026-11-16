@@ -222,7 +222,16 @@ img {
 }
 
 .paypal-container-wrapper {
+    flex: 0 0 100%;
     padding: 10px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .paypal-container-wrapper {
+        flex-basis: 50%;
+        width: 50%;
+    }
 }
 
 [id^="paypal-container-"] div,
