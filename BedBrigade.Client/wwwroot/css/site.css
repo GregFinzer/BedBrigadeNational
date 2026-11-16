@@ -214,6 +214,23 @@ img {
     }
 }
 
+[id^="paypal-container-"] {
+    display: block;
+    flex: 0 0 100%;
+    min-width: 0;
+    width: 100%;
+}
+
+.paypal-container-wrapper {
+    padding: 10px;
+}
+
+[id^="paypal-container-"] div,
+[id^="paypal-container-"] iframe {
+    width: 100% !important;
+    max-width: none !important;
+}
+
 .nat-home-main {
     position: absolute;
     z-index: 999;
