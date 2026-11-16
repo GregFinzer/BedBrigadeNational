@@ -31,6 +31,7 @@ public static class SeedContentsLogic
             await SeedNationalHistoryPage(context);
             await SeedNationalLocations(context);
             await SeedNationalDonations(context);
+            await SeedColliers(context);
             await SeedAssemblyInstructions(context, locations);
             await SeedThreeRotatorPageTemplate(context);
             await SeedGroveCity(context);
@@ -57,7 +58,38 @@ public static class SeedContentsLogic
 
 
 
+    private static async Task SeedColliers(DataContext context)
+    {
+        Log.Logger.Information("SeedColliers Started");
 
+        var name = "Colliers";
+        if (!await context.Content.AnyAsync(c => c.Name == name && c.LocationId == Defaults.NationalLocationId))
+        {
+            var seedHtml = WebHelper.GetSeedingFile("Colliers.html");
+            seedHtml = _translateLogic.CleanUpSpacesAndLineFeedsFromHtml(seedHtml);
+
+            var content = new Content
+            {
+                LocationId = Defaults.NationalLocationId,
+                ContentType = ContentType.Body,
+                Name = name,
+                ContentHtml = seedHtml,
+                Title = "Colliers"
+            };
+
+            SeedRoutines.SetMaintFields(content);
+            context.Content.Add(content);
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Debug($"Error in content {ex.Message}");
+            }
+        }
+    }
 
     private static async Task SeedNationalDonations(DataContext context)
     {
