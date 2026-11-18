@@ -163,22 +163,16 @@ namespace BedBrigade.Client.Components.Pages
                 return;
             }
 
-            string amount = StringUtil.ExtractDigits(EstimatedWait);
-                
-            if (EstimatedWait.Contains("months"))
-                Timeframe = $"{amount} {_lc["Months"].ToLower()}";
-            else if (EstimatedWait.Contains("month"))
-                Timeframe = $"{amount} {_lc["Month"].ToLower()}";
-            else if (EstimatedWait.Contains("weeks"))
-                Timeframe = $"{amount} {_lc["Weeks"].ToLower()}";
-            else if (EstimatedWait.Contains("week"))
-                Timeframe = $"{amount} {_lc["Week"].ToLower()}";
-            else if (EstimatedWait.Contains("days"))
-                Timeframe = $"{amount} {_lc["Days"].ToLower()}";
-            else if (EstimatedWait.Contains("day"))
-                Timeframe = $"{amount} {_lc["Day"].ToLower()}";
-            else
-                Timeframe = EstimatedWait.ToLower();
+            Timeframe = EstimatedWait
+                .Replace("between", _lc["Between"].ToLower())
+                .Replace("and", _lc["And"].ToLower())
+                .Replace("to", _lc["To"].ToLower())
+                .Replace("months", _lc["Months"].ToLower())
+                .Replace("month", _lc["Month"].ToLower())
+                .Replace("weeks", _lc["Weeks"].ToLower())
+                .Replace("week", _lc["Week"].ToLower())
+                .Replace("days", _lc["Days"].ToLower())
+                .Replace("day", _lc["Day"].ToLower());
         }
         
         public void Dispose()

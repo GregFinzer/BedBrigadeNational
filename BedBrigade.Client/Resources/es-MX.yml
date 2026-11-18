@@ -1,6 +1,8 @@
 5CharactersContainingOnly: (5 caracteres que contienen solo los dígitos del 0 al 9)
 Active: Activo
 Address: Dirección
+And: y
+Between: entre
 GenderAge: Género / Edad
 AmountColon: 'Importe:'
 AreYouAbleToTranslate: ¿Puedes traducir Bed Brigade a otro idioma?
@@ -98,7 +100,7 @@ DynamicYes: Sí
 Email: Correo electrónico
 EmailSent: Correo electrónico enviado
 EnterYourZipCode: Ingresa tu código postal
-EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado de {timeframe}. Solo ofrecemos estructuras de cama Twin XL, colchones Twin XL y ropa de cama Twin XL.
+EstimatedWait: Actualmente hay {numberOfWaitingBedRequests} solicitudes de camas en espera, con un tiempo de espera estimado {timeframe}. Solo ofrecemos estructuras de cama Twin XL, colchones Twin XL y ropa de cama Twin XL.
 Events: Eventos
 EventDateTime: Fecha y hora del evento
 EventGroup: Grupo de eventos
@@ -309,6 +311,7 @@ ThankYou: ¡Gracias!
 ThankYouForMakingADifferenceInTheLifeOfAChild: ¡Gracias por hacer una diferencia en la vida de un niño! 
 ThankYouForYourDonation: ¡Gracias por su donación!
 TheBedBrigade: La Brigada de la Cama
+To: a
 TransactionFees: Tarifas de transacción
 TransactionId: ID de transacción
 TransactionIdColon: 'ID de transacción:'

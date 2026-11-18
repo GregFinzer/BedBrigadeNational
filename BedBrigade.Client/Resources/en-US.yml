@@ -1,6 +1,8 @@
 5CharactersContainingOnly: (5 characters containing only digits 0-9)
 Active: Active
 Address: Address
+And: and
+Between: between
 AmountColon: 'Amount:'
 AreYouAbleToTranslate: Are you able to translate?
 AtBedBrigadeLocation: at Bed Brigade location {locationName}
@@ -97,7 +99,7 @@ DynamicYes: Yes
 Email: Email
 EmailSent: Email Sent
 EnterYourZipCode: Enter your Zip code
-EstimatedWait: There are currently {numberOfWaitingBedRequests} waiting bed requests with an estimated wait of {timeframe}. We only carry Twin XL bed frames and Twin XL mattresses with Twin XL Bedding.
+EstimatedWait: There are currently {numberOfWaitingBedRequests} waiting bed requests with an estimated wait {timeframe}. We only carry Twin XL bed frames and Twin XL mattresses with Twin XL Bedding.
 Events: Events
 EventDateTime: Event Date & Time
 EventGroup: Event Group
@@ -308,6 +310,7 @@ ThankYou: Thank you!
 ThankYouForMakingADifferenceInTheLifeOfAChild: Thank you for making a difference in the life of a child.
 ThankYouForYourDonation: Thank You For Your Donation!
 TheBedBrigade: The Bed Brigade
+To: to
 TransactionFees: Transaction Fees
 TransactionId: Transaction ID
 TransactionIdColon: 'Transaction ID:'
