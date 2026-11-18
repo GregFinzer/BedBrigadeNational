@@ -74,18 +74,23 @@ public class BedRequestEstimatedWaitDataService : Repository<BedRequest>, IBedRe
         {
             double estimatedMonths = estimatedWaitInDays / Defaults.AverageDaysInAMonth;
             int monthsRoundedUp = (int)Math.Ceiling(estimatedMonths);
-            estimatedWaitResult.EstimatedWait = monthsRoundedUp <= 1 ? "1 month" : $"{monthsRoundedUp} months";
+            estimatedWaitResult.EstimatedWait = monthsRoundedUp <= 1
+                ? "between 1 week to 1 month"
+                : $"between 1 to {monthsRoundedUp} months";
         }
         else if (estimatedWaitInDays > 7)
         {
             double estimatedWeeks = estimatedWaitInDays / ((double) 7);
             int weeksRoundedUp = (int)Math.Ceiling(estimatedWeeks);
-            estimatedWaitResult.EstimatedWait = weeksRoundedUp  <= 1 ? "1 week" : $"{weeksRoundedUp} weeks";
+            estimatedWaitResult.EstimatedWait = weeksRoundedUp  <= 1 ? "1 week" 
+                :  $"between 1 week to {weeksRoundedUp} weeks";
         }
         else
         {
             int daysRoundedUp = (int)Math.Ceiling(estimatedWaitInDays);
-            estimatedWaitResult.EstimatedWait = daysRoundedUp  <= 1 ? "1 day" : $"{daysRoundedUp} days";
+            estimatedWaitResult.EstimatedWait = daysRoundedUp <= 1
+                ? "1 day"
+                : $"between 1 day to {daysRoundedUp} days";
         }
     }
     
