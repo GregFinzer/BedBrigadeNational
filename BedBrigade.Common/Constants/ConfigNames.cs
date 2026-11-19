@@ -20,6 +20,7 @@
 
         //Translation
         public const string TranslationApiKey = "TranslationApiKey";
+        public const string TranslationModel = "TranslationModel";
         public const string TranslationMaxRequestsPerMinute = "TranslationMaxRequestsPerMinute";
         public const string TranslationMaxRequestsPerDay = "TranslationMaxRequestsPerDay";
         public const string TranslationMaxPerChunk = "TranslationMaxPerChunk";
