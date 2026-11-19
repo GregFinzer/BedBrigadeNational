@@ -357,6 +357,8 @@ namespace BedBrigade.Data.Services
                 // Get the API key from your configuration service
                 var apiKey = await _configurationDataService.GetConfigValueAsync(
                     ConfigSection.System, ConfigNames.TranslationApiKey);
+                var model = await _configurationDataService.GetConfigValueAsync(
+                    ConfigSection.System, ConfigNames.TranslationModel);
 
                 if (string.IsNullOrWhiteSpace(apiKey))
                 {
@@ -364,10 +366,15 @@ namespace BedBrigade.Data.Services
                     return null;
                 }
 
+                if (string.IsNullOrWhiteSpace(model))
+                {
+                    Log.Error("TranslateTextAsync TranslationModel is null or empty");
+                    return null;
+                }
+
                 var client = new OpenAIClient(apiKey);
 
-                // Use GPT-5 mini for translation
-                var chat = client.GetChatClient("gpt-5-mini");
+                var chat = client.GetChatClient(model);
 
                 string prompt =
                     $"Translate the following text from English into {targetLanguage}. Only give the best translation with no other options.:\n\n{textToTranslate}";

@@ -312,6 +312,13 @@ namespace BedBrigade.Data.Data.Seeding
                 },
                 new()
                 {
+                    ConfigurationKey = ConfigNames.TranslationModel,
+                    ConfigurationValue = "gpt-6.1-terra",
+                    Section = ConfigSection.System,
+                    LocationId = Defaults.NationalLocationId
+                },
+                new()
+                {
                     ConfigurationKey = ConfigNames.TranslationMaxRequestsPerMinute,
                     ConfigurationValue = "3",
                     Section = ConfigSection.System,
